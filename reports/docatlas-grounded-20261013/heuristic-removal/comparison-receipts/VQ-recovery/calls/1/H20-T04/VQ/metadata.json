@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-T04",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-typer",
+  "public_request": {
+    "question": "What documented conflict-resolution rule applies when --accept and --reject are both passed in the same Typer invocation?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-typer/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "ecb0aa0cb91aab38da174b68ac457938a40618f6a0cb2e063aa02fd8005901cc",
+  "utf8_bytes": 2752,
+  "tokens": 874,
+  "seconds": 0.5402517190013896,
+  "cpu_seconds": 0.5380615669999997,
+  "peak_rss_kib": 205488,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

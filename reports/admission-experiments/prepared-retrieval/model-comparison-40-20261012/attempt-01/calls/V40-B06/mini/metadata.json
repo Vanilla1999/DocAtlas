@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-B06",
+  "mode": "mini",
+  "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+  "public_request": {
+    "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/black.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:12:52.388693+00:00",
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_before": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.9971057729999302,
+  "process_cpu_seconds": 3.8428520430000006,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 902636,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_after": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "wire_sha256": "8da2fec52e79ee742e52a2680f81047fb10bc5cc142a899c47a9a9544c57f575",
+  "wire_utf8_bytes": 2629,
+  "utf8_quarter_proxy": 658,
+  "codec_o200k_base": 798,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

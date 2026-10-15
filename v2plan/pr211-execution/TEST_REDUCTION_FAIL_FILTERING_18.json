@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "decision": "FAIL-based unit deletion authorized by owner",
+  "proof_run": "38033112465",
+  "proof_sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+  "module": "tests/test_filtering.py",
+  "removed": 18,
+  "added": 0,
+  "old_nodeids": [
+    "tests/test_filtering.py::TestNormalizeUrl::test_strips_trailing_slash",
+    "tests/test_filtering.py::TestNormalizeUrl::test_strips_tracking_params",
+    "tests/test_filtering.py::TestInferDocsetRoot::test_docs_subdomain_collapses_to_host",
+    "tests/test_filtering.py::TestInferDocsetRoot::test_docs_path_collapses_to_docs_root",
+    "tests/test_filtering.py::TestInferDocsetRoot::test_llms_full_strips_suffix",
+    "tests/test_filtering.py::TestInferScopePath::test_deep_path_with_root_hint_widens",
+    "tests/test_filtering.py::TestInferScopePath::test_deeper_path_with_root_hint",
+    "tests/test_filtering.py::TestInferScopePath::test_reference_root_hint",
+    "tests/test_filtering.py::TestInferScopePath::test_no_root_hint_strips_leaf",
+    "tests/test_filtering.py::TestInferScopePath::test_api_root_hint",
+    "tests/test_filtering.py::TestIsDocsUrl::test_blocklist_blog",
+    "tests/test_filtering.py::TestIsDocsUrl::test_blocklist_pricing",
+    "tests/test_filtering.py::TestIsDocsUrl::test_blocklist_print_pages",
+    "tests/test_filtering.py::TestIsDocsUrl::test_deep_base_url_widens_scope",
+    "tests/test_filtering.py::TestIsDocsUrl::test_search_blocked",
+    "tests/test_filtering.py::TestIsDocsUrl::test_default_ingest_excludes_locale_mirrors",
+    "tests/test_filtering.py::TestIsDocsUrl::test_default_ingest_excludes_locale_mirrors_below_docs_root",
+    "tests/test_filtering.py::TestContentDeduplicator::test_url_dedup_trailing_slash"
+  ],
+  "boundary": "All18 have saved CI failures. PASS methods and production unchanged. No runtime executed. Shared complete ledger update pending."
+}

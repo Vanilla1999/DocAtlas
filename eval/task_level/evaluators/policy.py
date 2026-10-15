@@ -112,9 +112,10 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
                     violations.append("required_docatlas_objective_mismatch")
                 if arguments.get("retrieval_succeeded") is not True:
                     violations.append("required_docatlas_retrieval_unsuccessful")
-                if arguments.get("delivery_strategy") != "bounded_direct":
-                    violations.append("required_docatlas_delivery_strategy_mismatch")
-                if arguments.get("action_packet_status") not in {"ok", "truncated"}:
+                if arguments.get("context_format") != "patch_context":
+                    violations.append("required_docatlas_context_format_mismatch")
+                if (arguments.get("action_packet_result") != "data"
+                    or arguments.get("action_packet_completeness") != "complete"):
                     violations.append("required_docatlas_action_packet_invalid")
 
     audit = PolicyAudit(

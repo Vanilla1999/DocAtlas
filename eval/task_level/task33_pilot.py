@@ -203,7 +203,8 @@ def evaluate_task33c_pilot_completeness(results: list[dict[str, Any]]) -> dict[s
                 errors.append(f"{condition}:invalid_retrieval_call_count")
             if metrics.get("delivery_attempts") != 1:
                 errors.append(f"{condition}:invalid_delivery_attempt_count")
-            if metrics.get("action_packet_status") == "insufficient_evidence":
+            if (metrics.get("action_packet_result") != "data"
+                or metrics.get("action_packet_completeness") != "complete"):
                 errors.append(f"{condition}:insufficient_evidence")
             coverage = metrics.get("action_packet_project_doc_coverage")
             if not isinstance(coverage, (int, float)) or isinstance(coverage, bool) or coverage <= 0:

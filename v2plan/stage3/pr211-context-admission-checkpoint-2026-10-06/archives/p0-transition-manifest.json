@@ -1,0 +1,2523 @@
+{
+  "schema": "p0-transition-manifest-v1",
+  "python": "3.12.3",
+  "executable": "/tmp/opencode/docatlas-stage3-integration-active/.venv/bin/python",
+  "distribution": {
+    "version": "1.3.2",
+    "location": "/tmp/opencode/docatlas-stage3-integration-active/.venv/lib/python3.12/site-packages",
+    "direct_url": "{\"url\":\"file:///tmp/opencode/docatlas-stage3-integration-active\",\"dir_info\":{\"editable\":true}}",
+    "record_available": true
+  },
+  "external_product_imports": [
+    {
+      "path": "docmancer/docs/application/_patch_review_service_shared.py",
+      "line": 12,
+      "statement": "from eval.task_level.artifact_hygiene import apply_patch_hygiene, is_runtime_artifact, parse_status_paths"
+    }
+  ],
+  "frame_symbols": [
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 14,
+      "symbol": "InventoryKind",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 18,
+      "symbol": "QuestionClause",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 35,
+      "symbol": "InventoryFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 43,
+      "symbol": "RequirementsFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 48,
+      "symbol": "ActionFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 54,
+      "symbol": "_STRONG_QUESTION_START",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 59,
+      "symbol": "_QUESTION_START",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 64,
+      "symbol": "_ACTION_START",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 71,
+      "symbol": "_REQUEST_WRAPPER_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 88,
+      "symbol": "_CLAUSE_BOUNDARY_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 101,
+      "symbol": "clean_phrase",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 106,
+      "symbol": "strip_request_wrapper",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 112,
+      "symbol": "_trim_clause",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 122,
+      "symbol": "split_question_clause_spans",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 145,
+      "symbol": "split_question_clauses",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 155,
+      "symbol": "_inventory_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 164,
+      "symbol": "_INDEXING_CONTEXT",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 169,
+      "symbol": "_MARKER_CONTEXT",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 174,
+      "symbol": "_STRONG_REQUEST_HEAD_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 182,
+      "symbol": "_DISCOURSE_SWITCH_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 188,
+      "symbol": "_COORDINATED_DESTRUCTIVE_REQUEST_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 195,
+      "symbol": "semantic_tail_is_safe",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 218,
+      "symbol": "match_inventory_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 279,
+      "symbol": "match_requirements_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 301,
+      "symbol": "_EN_SYNC_SURFACE_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 311,
+      "symbol": "_RU_SYNC_SURFACE_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 321,
+      "symbol": "match_action_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 343,
+      "symbol": "ambiguous_frame_reason",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "line": 387,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 76,
+      "symbol": "_release_docs_line_limit",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 98,
+      "symbol": "_storage_coordination_contract",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 123,
+      "symbol": "_remove_library_during_refresh",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 148,
+      "symbol": "_source_type_inventory",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 167,
+      "symbol": "_release_checklist_compound",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 183,
+      "symbol": "_token_bounding_compound",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 199,
+      "symbol": "_public_tools_with_usage",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 229,
+      "symbol": "_env_var_purpose_usage",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 254,
+      "symbol": "_CLEAR_INDEX_CONDITION_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 268,
+      "symbol": "_conditional_clear_index",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 291,
+      "symbol": "_CONFIG_TARGET_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 297,
+      "symbol": "_configuration_workflow",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 324,
+      "symbol": "_contamination_definition",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 342,
+      "symbol": "_v4_protocol_run",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 364,
+      "symbol": "_named_run_or_verify",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 390,
+      "symbol": "_CHOICE_TAIL_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 399,
+      "symbol": "_SPLIT_TAIL_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 410,
+      "symbol": "_named_behavior",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 451,
+      "symbol": "_SMOKE_CONTEXT_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 460,
+      "symbol": "_two_cell_smoke",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 482,
+      "symbol": "_test_markers_and_offline_suite",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 505,
+      "symbol": "_semantic_comparison",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 519,
+      "symbol": "_semantic_location",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 533,
+      "symbol": "_semantic_condition",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 547,
+      "symbol": "_semantic_premise",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 562,
+      "symbol": "_SPECIFIC_RULES: tuple[Rule, ...]",
+      "kind": "AnnAssign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 594,
+      "symbol": "_GENERIC_RULES: tuple[Rule, ...]",
+      "kind": "AnnAssign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 602,
+      "symbol": "_reusable_frame_plan",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 695,
+      "symbol": "_UNSAFE_GENERIC_SUBJECTS",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 701,
+      "symbol": "_normal_subject",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 705,
+      "symbol": "_guard_plan_subjects",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 727,
+      "symbol": "_compile_specific_question",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 740,
+      "symbol": "_compile_generic_question",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 749,
+      "symbol": "_compile_atomic_question",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 766,
+      "symbol": "_unresolved_compound",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 776,
+      "symbol": "_combine_clause_plans",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 864,
+      "symbol": "_prefix_plan_is_owned",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 884,
+      "symbol": "_recognized_prefix_residue_plan",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 913,
+      "symbol": "_compile_question_plan_core",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 964,
+      "symbol": "compile_question_plan",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "line": 979,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "line": 14,
+      "symbol": "_docs_mcp_server_command",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "line": 42,
+      "symbol": "_command_sync",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "line": 70,
+      "symbol": "_OFFLINE_SUITE_CONTEXT_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "line": 76,
+      "symbol": "_offline_suite_run",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "line": 104,
+      "symbol": "_two_cell_cardinality",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "line": 125,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 16,
+      "symbol": "_safe_coverage_gap",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 28,
+      "symbol": "_finalize_full_span_coverage",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 65,
+      "symbol": "PlanKind",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 72,
+      "symbol": "PlannedFacet",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 101,
+      "symbol": "QuestionPlan",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 120,
+      "symbol": "Rule",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 123,
+      "symbol": "_clean",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 128,
+      "symbol": "_technical",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 141,
+      "symbol": "_normalized_clause",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 151,
+      "symbol": "_span_pattern",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 158,
+      "symbol": "_bind_plan_to_clause",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 185,
+      "symbol": "_bind_whole_plan",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 200,
+      "symbol": "_unsafe_free_text",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "line": 212,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 19,
+      "symbol": "PlannedProof",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 30,
+      "symbol": "_norm",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 34,
+      "symbol": "_has",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 38,
+      "symbol": "_AUTHORITATIVE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 44,
+      "symbol": "_source_identity",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 50,
+      "symbol": "_bounded_subject_aliases",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 58,
+      "symbol": "_planned_subject_score",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 84,
+      "symbol": "_semantic_terms",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 107,
+      "symbol": "_scope_actors",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 115,
+      "symbol": "_proposition_clauses",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 140,
+      "symbol": "_REQUIREMENT_RELATION_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 146,
+      "symbol": "_REQUIREMENT_CONTENT_WORD_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 147,
+      "symbol": "_REQUIREMENT_STOP_WORDS",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 152,
+      "symbol": "_GOVERNANCE_STOP_WORDS",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 156,
+      "symbol": "_GOVERNANCE_PREDICATE_RE",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 166,
+      "symbol": "_governance_tokens",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 184,
+      "symbol": "_governance_subject_match",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 192,
+      "symbol": "_requirement_item_count",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 212,
+      "symbol": "_subject_bound_requirement_tail",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 239,
+      "symbol": "_structured_requirement_proof",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 274,
+      "symbol": "relation_proof",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 617,
+      "symbol": "usage_proof",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 642,
+      "symbol": "workflow_proof",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 729,
+      "symbol": "behavior_proof",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "line": 775,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 15,
+      "symbol": "_PUBLIC_TOOLS",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 17,
+      "symbol": "_GENERIC_COMPONENT_SUBJECTS",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 25,
+      "symbol": "_component_subject",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 30,
+      "symbol": "semantic_components",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 107,
+      "symbol": "_governance_facet_plan",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 146,
+      "symbol": "governance_facets",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 189,
+      "symbol": "public_tool_usage",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 208,
+      "symbol": "public_tools_with_purposes",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 229,
+      "symbol": "python_version_support",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 247,
+      "symbol": "mcp_request_handling",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 263,
+      "symbol": "provider_request_timeout",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "line": 280,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 14,
+      "symbol": "RetrievalNeed",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 25,
+      "symbol": "_need_relation",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 46,
+      "symbol": "_RELATION_NOUNS",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 52,
+      "symbol": "_need_subject",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 92,
+      "symbol": "_locate_need_span",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 99,
+      "symbol": "_masked_quotations",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 104,
+      "symbol": "_sentence_ranges",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 110,
+      "symbol": "retrieval_needs",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 116,
+      "symbol": "_cached_retrieval_needs",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "line": 212,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 15,
+      "symbol": "ComparisonFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 22,
+      "symbol": "LocationFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 27,
+      "symbol": "ConditionFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 34,
+      "symbol": "PremiseFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 42,
+      "symbol": "DecisionFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 49,
+      "symbol": "ArgumentValueFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 56,
+      "symbol": "ContractScopeFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 63,
+      "symbol": "PurposeBehaviorFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 69,
+      "symbol": "BeforeBehaviorFrame",
+      "kind": "ClassDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 74,
+      "symbol": "_entity",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 79,
+      "symbol": "match_comparison_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 110,
+      "symbol": "match_location_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 130,
+      "symbol": "match_condition_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 194,
+      "symbol": "match_premise_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 236,
+      "symbol": "match_decision_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 244,
+      "symbol": "match_argument_value_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 255,
+      "symbol": "match_contract_scope_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 277,
+      "symbol": "match_purpose_behavior_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 288,
+      "symbol": "match_before_behavior_frame",
+      "kind": "FunctionDef",
+      "review": "OPEN unless covered by symbol audit"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "line": 296,
+      "symbol": "__all__",
+      "kind": "Assign",
+      "review": "OPEN unless covered by symbol audit"
+    }
+  ],
+  "assertions": [
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_docs_mcp_sequence_keeps_generic_workflow_and_normal_flow_probes",
+      "line": 16,
+      "assertion": "assert workflow",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_docs_mcp_sequence_keeps_generic_workflow_and_normal_flow_probes",
+      "line": 17,
+      "assertion": "assert any((all((name in row.text for name in ('get_docs_context', 'prepare_docs', 'docs_status'))) for row in workflow))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_docs_mcp_sequence_keeps_generic_workflow_and_normal_flow_probes",
+      "line": 21,
+      "assertion": "assert any(('normal flow' in row.text.casefold() for row in workflow))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_docs_mcp_sequence_keeps_generic_workflow_and_normal_flow_probes",
+      "line": 22,
+      "assertion": "assert all(('packs' not in row.text.casefold() for row in workflow))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_generic_docs_mcp_workflow_question_still_has_a_surface_level_probe",
+      "line": 31,
+      "assertion": "assert workflow",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_generic_docs_mcp_workflow_question_still_has_a_surface_level_probe",
+      "line": 32,
+      "assertion": "assert any(('docs mcp server workflow' in row.text.casefold() and 'get_docs_context' in row.text and ('prepare_docs' in row.text) and ('docs_status' in row.text) for row in workflow))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 57,
+      "assertion": "assert any(('allowed lifecycle action' in row.text.casefold() for row in prepare))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 58,
+      "assertion": "assert any(('network approval confirmation' in row.text.casefold() for row in prepare))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 59,
+      "assertion": "assert not any(('must not' in row.text.casefold() for row in prepare))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 65,
+      "assertion": "assert any(('must not' in row.text.casefold() for row in status_policy))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 67,
+      "assertion": "assert not any((row.intent_id == 'docs_mcp_tool_policy' for row in _aliases('Where is prepare_docs implemented in this repository?')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 49,
+      "assertion": "assert policy",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 50,
+      "assertion": "assert any((tool in row.text and 'default use' in row.text.casefold() for row in policy))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "line": 51,
+      "assertion": "assert 'overview' in policy[0].preferred_catalog_roles",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_overview_splits_identity_from_purpose_without_answer_hardcoding",
+      "line": 81,
+      "assertion": "assert any(('documentation context runtime' in row.text.casefold() for row in overview))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_overview_splits_identity_from_purpose_without_answer_hardcoding",
+      "line": 82,
+      "assertion": "assert any(('product purpose problem' in row.text.casefold() for row in overview))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 89,
+      "assertion": "assert locations",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 90,
+      "assertion": "assert len(locations) == 1",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 91,
+      "assertion": "assert 'mcp docs server area responsibility' in locations[0].text.casefold()",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 92,
+      "assertion": "assert all(('docmancer/mcp/docs_server.py' not in row.text for row in locations))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 93,
+      "assertion": "assert 'project_architecture' in locations[0].preferred_catalog_roles",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 94,
+      "assertion": "assert not any((row.intent_id == 'implementation_location' for row in _aliases('What are the public tools exposed by the Docs MCP server?')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 99,
+      "assertion": "assert any((row.intent_id == 'project_docs_config_location' for row in config))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "line": 100,
+      "assertion": "assert not any((row.intent_id == 'implementation_location' for row in config))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_boundaries_use_relation_not_the_known_inventory",
+      "line": 109,
+      "assertion": "assert boundaries",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_boundaries_use_relation_not_the_known_inventory",
+      "line": 110,
+      "assertion": "assert boundaries[0].text.casefold() == 'docatlas product boundaries'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_boundaries_use_relation_not_the_known_inventory",
+      "line": 111,
+      "assertion": "assert any(('does not replace' in row.text.casefold() for row in boundaries))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_boundaries_use_relation_not_the_known_inventory",
+      "line": 113,
+      "assertion": "assert all((answer not in row.text.casefold() for row in boundaries for answer in forbidden_answers))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_fail_closed_definition_targets_context_contract_not_incident_diagnostics",
+      "line": 123,
+      "assertion": "assert any((row.intent_id == 'fail_closed_workflow' for row in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_fail_closed_definition_targets_context_contract_not_incident_diagnostics",
+      "line": 124,
+      "assertion": "assert any(('insufficient_evidence' in row.text.casefold() for row in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_fail_closed_definition_targets_context_contract_not_incident_diagnostics",
+      "line": 125,
+      "assertion": "assert any(('safe retrieval-only context' in row.text.casefold() for row in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_fail_closed_definition_targets_context_contract_not_incident_diagnostics",
+      "line": 126,
+      "assertion": "assert not any((row.intent_id == 'troubleshooting' for row in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_claims_targets_claim_status_not_the_document_title",
+      "line": 135,
+      "assertion": "assert claims",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_claims_targets_claim_status_not_the_document_title",
+      "line": 136,
+      "assertion": "assert any(('product claims evidence status demonstrated' in row.text.casefold() for row in claims))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_claims_targets_claim_status_not_the_document_title",
+      "line": 137,
+      "assertion": "assert all(('product brief' not in row.text.casefold() for row in claims))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_claims_targets_claim_status_not_the_document_title",
+      "line": 138,
+      "assertion": "assert not any((row.intent_id == 'product_claims' for row in _aliases('Which product brief file should I edit?')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "line": 150,
+      "assertion": "assert sync",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "line": 151,
+      "assertion": "assert all(('overview' in row.preferred_catalog_roles for row in sync))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "line": 152,
+      "assertion": "assert not any((row.intent_id == 'troubleshooting' for row in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "line": 157,
+      "assertion": "assert 'sync_project_docs' not in state_probe.text",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "line": 158,
+      "assertion": "assert 'project docs' in state_probe.text.casefold()",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "line": 164,
+      "assertion": "assert all((state not in generic.text.casefold() for state in ('new', 'changed', 'stale', 'deleted')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_original_direct_question_families_keep_a_fresh_paraphrase",
+      "line": 188,
+      "assertion": "assert intent_id in {row.intent_id for row in _aliases(question)}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_direct_question_family_neighbors_do_not_collapse_to_the_wrong_relation",
+      "line": 208,
+      "assertion": "assert forbidden_intent not in {row.intent_id for row in _aliases(question)}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_insufficient_evidence_agent_workflow_gets_neutral_cross_language_lookup",
+      "line": 219,
+      "assertion": "assert workflow",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_insufficient_evidence_agent_workflow_gets_neutral_cross_language_lookup",
+      "line": 220,
+      "assertion": "assert any(('insufficient_evidence' in row.text.casefold() for row in workflow))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_insufficient_evidence_agent_workflow_gets_neutral_cross_language_lookup",
+      "line": 221,
+      "assertion": "assert all((forbidden not in row.text.casefold() for row in workflow for forbidden in ('rephrase_question', 'hard_stop', 'local source', 'tests')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_unknown_tool_insufficient_evidence_does_not_inherit_docs_mcp_workflow",
+      "line": 232,
+      "assertion": "assert not any((row.intent_id == 'fail_closed_workflow' for row in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_dependency_version_questions_get_neutral_binding_lookup_without_answer_injection",
+      "line": 243,
+      "assertion": "assert rows",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_dependency_version_questions_get_neutral_binding_lookup_without_answer_injection",
+      "line": 244,
+      "assertion": "assert all((row.force_context_only for row in rows))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_dependency_version_questions_get_neutral_binding_lookup_without_answer_injection",
+      "line": 245,
+      "assertion": "assert all((forbidden not in row.text.casefold() for row in rows for forbidden in ('14.8.1', '15.0.0', 'go_router', 'serve old', 'reject old')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_evidence_claim_question_does_not_require_explicit_product_name",
+      "line": 258,
+      "assertion": "assert rows",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_product_evidence_claim_question_does_not_require_explicit_product_name",
+      "line": 259,
+      "assertion": "assert all(('product brief' not in row.text.casefold() for row in rows))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_document_instruction_questions_get_neutral_trust_lookup",
+      "line": 269,
+      "assertion": "assert rows",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_document_instruction_questions_get_neutral_trust_lookup",
+      "line": 270,
+      "assertion": "assert all((row.force_context_only for row in rows))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_document_instruction_questions_get_neutral_trust_lookup",
+      "line": 271,
+      "assertion": "assert all((forbidden not in row.text.casefold() for row in rows for forbidden in ('never execute', 'permission denied', 'must not run', 'do not execute')))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_unrelated_runtime_version_and_generic_shell_question_do_not_gain_new_aliases",
+      "line": 281,
+      "assertion": "assert 'dependency_version_binding' not in python",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_unrelated_runtime_version_and_generic_shell_question_do_not_gain_new_aliases",
+      "line": 282,
+      "assertion": "assert 'instruction_trust' not in shell",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_preparation_job_failure_reuses_subject_aware_troubleshooting_slot",
+      "line": 291,
+      "assertion": "assert len(rows) == 1",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_preparation_job_failure_reuses_subject_aware_troubleshooting_slot",
+      "line": 292,
+      "assertion": "assert rows[0].text == 'documentation preparation job status terminal failed docs_status'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_version_binding_mechanism_lookup_keeps_safety_and_resolution_in_one_slot",
+      "line": 303,
+      "assertion": "assert len(rows) == 1",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_direct_question_retrieval_intents.py::test_version_binding_mechanism_lookup_keeps_safety_and_resolution_in_one_slot",
+      "line": 304,
+      "assertion": "assert rows[0].text == 'dependency version binding lockfile exact latest documentation'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases",
+      "line": 49,
+      "assertion": "assert intent_id in {alias.intent_id for alias in aliases}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases",
+      "line": 50,
+      "assertion": "assert all((alias.force_context_only for alias in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases",
+      "line": 51,
+      "assertion": "assert all((alias.text for alias in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_named_policy_or_contract_is_not_collapsed_to_broad_storage_alias",
+      "line": 63,
+      "assertion": "assert build_project_retrieval_aliases(question) == ()",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_named_policy_or_contract_is_not_collapsed_to_broad_storage_alias",
+      "line": 74,
+      "assertion": "assert forbidden_facet not in facets",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_state_home_variable_uses_narrow_retrieval_without_forcing_context",
+      "line": 83,
+      "assertion": "assert alias.force_context_only is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_state_home_variable_uses_narrow_retrieval_without_forcing_context",
+      "line": 84,
+      "assertion": "assert 'DOCATLAS_HOME' in alias.text",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_russian_docs_mcp_start_command_builds_a_command_obligation",
+      "line": 92,
+      "assertion": "assert any((obligation.kind == 'command' and obligation.relation == 'invocation' for obligation in contract.proof_obligations))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 101,
+      "assertion": "assert 'product_overview' not in {alias.intent_id for alias in aliases}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 105,
+      "assertion": "assert 'product_overview' not in {alias.intent_id for alias in aliases}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 110,
+      "assertion": "assert {alias.intent_id for alias in product_aliases} == {'product_overview'}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 116,
+      "assertion": "assert 'docs_mcp_workflow' in workflow_facets",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 117,
+      "assertion": "assert 'product_overview' not in workflow_facets",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 130,
+      "assertion": "assert 'troubleshooting' in {alias.intent_id for alias in incident_aliases}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "line": 123,
+      "assertion": "assert 'troubleshooting' not in {alias.intent_id for alias in build_project_retrieval_aliases(concept_question)}",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_generic_project_alias_does_not_require_docatlas_product_wording",
+      "line": 141,
+      "assertion": "assert 'DocAtlas' not in installation.text",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval",
+      "line": 152,
+      "assertion": "assert canonical",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval",
+      "line": 153,
+      "assertion": "assert original.coverage_required is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval",
+      "line": 154,
+      "assertion": "assert any((item.facet_id == 'intent-context:getting_started' for item in canonical))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval",
+      "line": 160,
+      "assertion": "assert anchors == ['docatlas.project-docs.yaml', 'docatlas.docs.yaml', 'get_docs_context']",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 200,
+      "assertion": "assert projection['status'] == 'ok'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 201,
+      "assertion": "assert projection['kind'] == 'docs_context'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 202,
+      "assertion": "assert projection['answer_supported'] is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 203,
+      "assertion": "assert projection['edit_ready'] is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 204,
+      "assertion": "assert projection['sources'][0]['path_or_url'] == 'README.md'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 205,
+      "assertion": "assert canonical.query_id not in projection['covered_query_ids']",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 206,
+      "assertion": "assert projection['missing_query_ids'] == ['query-original']",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "line": 207,
+      "assertion": "assert any((facet['status'] == 'retrieval_only' for facet in projection['facets']))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_generic_first_commands_are_not_docs_mcp_public_tool_inventory",
+      "line": 217,
+      "assertion": "assert not any((obligation.attribute == 'public_tools' for obligation in contract.proof_obligations))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_explicit_docs_mcp_command_inventory_remains_supported",
+      "line": 228,
+      "assertion": "assert any((obligation.attribute == 'public_tools' for obligation in contract.proof_obligations))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_explicit_docs_mcp_tool_inventory_remains_supported",
+      "line": 239,
+      "assertion": "assert any((obligation.attribute == 'public_tools' for obligation in contract.proof_obligations))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_generic_architecture_is_not_rewritten_as_mcp_server_architecture",
+      "line": 248,
+      "assertion": "assert not any((obligation.subject == 'MCP server' and obligation.relation == 'architecture' for obligation in contract.proof_obligations))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_generic_architecture_is_not_rewritten_as_mcp_server_architecture",
+      "line": 252,
+      "assertion": "assert can_authorize_docs_answer(contract) is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_russian_parser_failure_does_not_generate_mixed_language_rephrase",
+      "line": 264,
+      "assertion": "assert _suggested_questions('Как пользоваться DocAtlas?', _EmptyRequirements(), evidence_path=None) == []",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_broad_retrieval_intent_requires_context_only_delivery",
+      "line": 272,
+      "assertion": "assert project_retrieval_requires_context_only('Где хранится индекс и как он изолирован для каждого проекта?') is True",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_broad_retrieval_intent_requires_context_only_delivery",
+      "line": 275,
+      "assertion": "assert project_retrieval_requires_context_only('Какая команда запускает Docs MCP сервер?') is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 287,
+      "assertion": "assert project_retrieval_requires_context_only(narrow) is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 288,
+      "assertion": "assert project_retrieval_allows_certified_answer(narrow) is True",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 289,
+      "assertion": "assert project_retrieval_requires_context_only(mixed) is True",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 290,
+      "assertion": "assert project_retrieval_allows_certified_answer(mixed) is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 291,
+      "assertion": "assert project_retrieval_allows_certified_answer('How do I install and verify DocAtlas locally?') is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 294,
+      "assertion": "assert project_retrieval_allows_certified_answer('What is DocAtlas and what problem does it solve?') is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_certified_answer_preservation_requires_a_complete_question_contract",
+      "line": 297,
+      "assertion": "assert project_retrieval_allows_certified_answer('What test markers are available?') is True",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_project_retrieval_disposition_is_structural",
+      "line": 318,
+      "assertion": "assert project_retrieval_disposition(question) == expected",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_project_scope_aliases_accept_bounded_plural_forms",
+      "line": 333,
+      "assertion": "assert project_retrieval_disposition(question) == 'broad_context'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_project_scope_aliases_reject_prefix_collisions",
+      "line": 338,
+      "assertion": "assert build_project_retrieval_aliases(f'What is the model-visible {term}?') == ()",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 402,
+      "assertion": "assert sync.status == 'success'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 405,
+      "assertion": "assert first_stats['sources_count'] == 1",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 406,
+      "assertion": "assert first_stats['sections_count'] >= 1",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 407,
+      "assertion": "assert first_generation is not None",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 420,
+      "assertion": "assert second_agent.collection_stats() == first_stats",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 421,
+      "assertion": "assert second_agent.store.generation_info() == first_generation",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 432,
+      "assertion": "assert result['status'] == 'ok'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 433,
+      "assertion": "assert result['kind'] == 'docs_context'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 434,
+      "assertion": "assert result['edit_ready'] is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_context7_style_project_chat.py::test_current_docatlas_index_persists_across_service_restart_without_resync",
+      "line": 435,
+      "assertion": "assert result['sources'][0]['path_or_url'] == 'README.md'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_ambiguous_split_does_not_invent_indexing_subject",
+      "line": 21,
+      "assertion": "assert all((a.intent_id != 'index_chunking' for a in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_explicit_chunking_question_retains_existing_alias",
+      "line": 29,
+      "assertion": "assert any((a.intent_id == 'index_chunking' for a in build_project_retrieval_aliases(question)))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_query_plan_keeps_host_need_without_invented_chunking_lane",
+      "line": 43,
+      "assertion": "assert plan['original_question'] == question",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_query_plan_keeps_host_need_without_invented_chunking_lane",
+      "line": 44,
+      "assertion": "assert any((q['origin'] == 'host_lookup' and q['text'] == lookups[0] for q in plan['queries']))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_query_plan_keeps_host_need_without_invented_chunking_lane",
+      "line": 48,
+      "assertion": "assert not any(('indexing split documentation sections parent child chunks' in q['text'] for q in plan['queries']))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 126,
+      "assertion": "assert not any((q['origin'] == 'canonical_intent' and 'parent child chunks' in q['text'] for q in plan['queries']))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 131,
+      "assertion": "assert 'docs/retrieval-workflow.md' in paths",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 132,
+      "assertion": "assert 'docs/indexing.md' not in paths",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 133,
+      "assertion": "assert any(('Do not pre-split a single compound or comparison question' in source['snippet'] for source in payload['sources']))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 137,
+      "assertion": "assert payload['kind'] == 'docs_context'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 138,
+      "assertion": "assert payload['answer_supported'] is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 139,
+      "assertion": "assert payload['answer_available'] is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 140,
+      "assertion": "assert payload['edit_ready'] is False",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 141,
+      "assertion": "assert payload['estimated_tokens'] <= 800",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_comparison_search_does_not_route_through_indexing_distractor",
+      "line": 142,
+      "assertion": "assert len(payload['sources']) <= 3",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_explicit_chunking_query_still_returns_indexing_contract",
+      "line": 153,
+      "assertion": "assert any((source['path_or_url'] == 'docs/indexing.md' and 'token-bounded child chunks' in source['snippet'] for source in payload['sources']))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_explicit_chunking_query_still_returns_indexing_contract",
+      "line": 158,
+      "assertion": "assert payload['estimated_tokens'] <= 800",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_retrieval_alias_subject_binding.py::test_native_explicit_chunking_query_still_returns_indexing_contract",
+      "line": 159,
+      "assertion": "assert len(payload['sources']) <= 3",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_offline_behavior_does_not_invent_testing",
+      "line": 14,
+      "assertion": "assert any((a.intent_id == 'offline_usage' for a in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_offline_behavior_does_not_invent_testing",
+      "line": 15,
+      "assertion": "assert not any(('test suite' in a.text or a.text == 'DOCATLAS_OFFLINE' for a in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_offline_behavior_does_not_invent_testing",
+      "line": 17,
+      "assertion": "assert {'pytest', 'smoke', 'fixture', 'test suite'} <= set(offline.forbidden_evidence_terms)",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_explicit_offline_tests_keep_both_requested_subjects",
+      "line": 24,
+      "assertion": "assert any(('offline test suite' in a.text for a in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_explicit_offline_tests_keep_both_requested_subjects",
+      "line": 25,
+      "assertion": "assert any(('offline mode' in a.text for a in aliases))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_explicit_offline_tests_keep_both_requested_subjects",
+      "line": 26,
+      "assertion": "assert not all(('smoke' in a.forbidden_evidence_terms for a in aliases if a.intent_id == 'offline_usage'))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_explicit_offline_tests_keep_both_requested_subjects",
+      "line": 27,
+      "assertion": "assert len(aliases) <= 4",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_dependency_change_does_not_become_document_file_sync",
+      "line": 36,
+      "assertion": "assert not any((a.intent_id == 'project_docs_sync' for a in build_project_retrieval_aliases(question)))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_document_file_change_retains_sync_direction",
+      "line": 46,
+      "assertion": "assert any((a.intent_id == 'project_docs_sync' for a in build_project_retrieval_aliases(question)))",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 58,
+      "assertion": "assert before.original_question == after.original_question == question",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 59,
+      "assertion": "assert before.explicit_paths == after.explicit_paths == ('docs/source.md',)",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 62,
+      "assertion": "assert not q.preferred_catalog_roles",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 63,
+      "assertion": "assert not q.forbidden_catalog_roles",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 64,
+      "assertion": "assert not q.forbidden_evidence_terms",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 66,
+      "assertion": "assert q.relation == 'host_lookup'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 67,
+      "assertion": "assert q.public_parent_query_id is None",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_weak_alias_cannot_restrict_original_or_exact_or_audit_it",
+      "line": 68,
+      "assertion": "assert q.forbidden_catalog_roles == ('api_contract',)",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_alias_does_not_restrict_unscoped_original_or_exact",
+      "line": 75,
+      "assertion": "assert not q.preferred_catalog_roles",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_alias_does_not_restrict_unscoped_original_or_exact",
+      "line": 76,
+      "assertion": "assert not q.forbidden_catalog_roles",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_alias_does_not_restrict_unscoped_original_or_exact",
+      "line": 77,
+      "assertion": "assert not q.forbidden_evidence_terms",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_shared_topic_does_not_audit_different_conditional_questions",
+      "line": 86,
+      "assertion": "assert q.relation == 'host_lookup'",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_shared_topic_does_not_audit_different_conditional_questions",
+      "line": 87,
+      "assertion": "assert q.public_parent_query_id is None",
+      "migration": "NO CHANGE / approval pending"
+    },
+    {
+      "test": "tests/docs/test_query_planning_alias_regressions.py::test_host_topic_cannot_audit_away_an_extra_condition",
+      "line": 93,
+      "assertion": "assert not any((q.relation == 'audited_rewrite' for q in plan.queries))",
+      "migration": "NO CHANGE / approval pending"
+    }
+  ],
+  "corpus": [
+    {
+      "path": "eval/project_context_quality/BASELINE.md",
+      "sha256": "294bb27c577ea4f7fa2fa848ee7b99f7689b1d0b560d51e2d9243e89db57ae5d"
+    },
+    {
+      "path": "eval/project_context_quality/IMPLEMENTATION_REPORT.md",
+      "sha256": "940c5eab236e3f0e0fb49f0250f4ee3759de26c3daa9591f80866a2bb937c0d5"
+    },
+    {
+      "path": "eval/project_context_quality/README.md",
+      "sha256": "ab9b2a9532b158281020a687ce35c8c4ea71950034e0cf6af02bd9fdf30336c3"
+    },
+    {
+      "path": "eval/project_context_quality/V2_DESIGN.md",
+      "sha256": "f0df067e1971213a0471a56e105778927c7ca1aaf3dc0db078bfb31bc56086f1"
+    },
+    {
+      "path": "eval/project_context_quality/__pycache__/capture_public_context.cpython-312.pyc",
+      "sha256": "646ebecbdff7c559411ea58e3dd92b11d651a89844c1796fea477c16ea7eb346"
+    },
+    {
+      "path": "eval/project_context_quality/__pycache__/capture_public_context.cpython-313.pyc",
+      "sha256": "ab376d8d302a5f16c7300e4894048e0618fc2a5f205c0c701c136cd00d34eae4"
+    },
+    {
+      "path": "eval/project_context_quality/capture_public_context.py",
+      "sha256": "9c906d4184139daffbf4b1ce8ab68e627250154446b2b744297f990970b471cf"
+    },
+    {
+      "path": "eval/project_context_quality/cases.json",
+      "sha256": "b77ae44e8fb41bc53a6aa6cf584d886ee884ba337302285e4de9af2e4a5d829a",
+      "case_ids": [
+        "ru-install",
+        "ru-overview",
+        "ru-first-commands",
+        "ru-contributor",
+        "ru-mcp-flow",
+        "ru-sync",
+        "ru-config",
+        "ru-clean",
+        "ru-troubleshoot",
+        "ru-storage",
+        "ru-chunks",
+        "ru-selection",
+        "ru-tests",
+        "ru-offline",
+        "ru-server-command",
+        "negative-quantum"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/cases.legacy.json",
+      "sha256": "b77ae44e8fb41bc53a6aa6cf584d886ee884ba337302285e4de9af2e4a5d829a",
+      "case_ids": [
+        "ru-install",
+        "ru-overview",
+        "ru-first-commands",
+        "ru-contributor",
+        "ru-mcp-flow",
+        "ru-sync",
+        "ru-config",
+        "ru-clean",
+        "ru-troubleshoot",
+        "ru-storage",
+        "ru-chunks",
+        "ru-selection",
+        "ru-tests",
+        "ru-offline",
+        "ru-server-command",
+        "negative-quantum"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/generic_blind_lookup_pair30_manual_assessment.json",
+      "sha256": "ab5a8abc4b5d9eb0c164797e3a0950f992a5cfd55e3c5b58544c777510345d8f",
+      "case_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "G11",
+        "G12",
+        "G13",
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25",
+        "G26",
+        "G27",
+        "G28",
+        "G29",
+        "G30"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/generic_blind_lookup_pair30_questions.json",
+      "sha256": "5cb972b858723ca76680ff12bfa01ec727b2486666e543bdec9d10b976067577",
+      "case_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "G11",
+        "G12",
+        "G13",
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25",
+        "G26",
+        "G27",
+        "G28",
+        "G29",
+        "G30"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/lanes.lock.json",
+      "sha256": "9c8e7c9b06eacaa28876e89e0b163c80cbe4f1e09453cf620b15aec0e30ba671"
+    },
+    {
+      "path": "eval/project_context_quality/natural.json",
+      "sha256": "ea8e4d9e6b518cb41b39c12ef3bc57424bf4dae8a408a451da67a8871a09a5b4",
+      "case_ids": [
+        "natural-install-verify",
+        "natural-purpose-start",
+        "natural-first-session",
+        "natural-contributor",
+        "natural-architecture",
+        "natural-request-flow",
+        "natural-sync-renames",
+        "natural-catalog",
+        "natural-cleanup",
+        "natural-stale-health",
+        "natural-storage",
+        "natural-chunking",
+        "natural-evidence-selection",
+        "natural-offline",
+        "natural-docs-server",
+        "natural-negative-retention",
+        "natural-negative-telepathy"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/paraphrases.json",
+      "sha256": "9b575bff7c2906dc8c91e94f2ad3d5c80607893e0c15188c986b6e2f2588d658",
+      "case_ids": [
+        "paraphrase-local-trial",
+        "paraphrase-review-ready",
+        "paraphrase-cache-reset",
+        "paraphrase-search-trust",
+        "paraphrase-reconcile-files",
+        "paraphrase-negative-martian"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/protocol.lock.json",
+      "sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516"
+    },
+    {
+      "path": "eval/project_context_quality/results/adaptive_gap_recovery_20260918/README.md",
+      "sha256": "3f809482c00922fd60e5f84a48bcc87223628669ab945e28d1357e7ec4df446d"
+    },
+    {
+      "path": "eval/project_context_quality/v13_v15_fresh30_manual_assessment.json",
+      "sha256": "e46b0492287e03c031c3274b5c32eb7bc36a5d84a1ed7a60bc8e2f6a78c1abde",
+      "case_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/v13_v15_fresh30_questions.json",
+      "sha256": "a4d9e67b9617556e8bd00045fdfd039c74c13cec737ef5d6cf130f3b6c86516e",
+      "case_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/v13_v15_manual_assessment.json",
+      "sha256": "69fb7061459b5d08caf62a3ba630dabd8ff98faddfa0e16afac902d6210340d4",
+      "case_ids": [
+        "DR30-01",
+        "DR30-02",
+        "DR30-03",
+        "DR30-04",
+        "DR30-05",
+        "DR30-06",
+        "DR30-07",
+        "DR30-08",
+        "DR30-09",
+        "DR30-10",
+        "DR30-11",
+        "DR30-12",
+        "DR30-13",
+        "DR30-14",
+        "DR30-15",
+        "DR30-16",
+        "DR30-17",
+        "DR30-18",
+        "DR30-19",
+        "DR30-20",
+        "DR30-21",
+        "DR30-22",
+        "DR30-23",
+        "DR30-24",
+        "DR30-25",
+        "DR30-26",
+        "DR30-27",
+        "DR30-28",
+        "DR30-29",
+        "DR30-30"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality/v13_v15_questions.json",
+      "sha256": "7c829999e53e04861ae40a0cf08c0811fe232f1b2edbcd417e6f94d5c61b3128",
+      "case_ids": [
+        "DR30-01",
+        "DR30-02",
+        "DR30-03",
+        "DR30-04",
+        "DR30-05",
+        "DR30-06",
+        "DR30-07",
+        "DR30-08",
+        "DR30-09",
+        "DR30-10",
+        "DR30-11",
+        "DR30-12",
+        "DR30-13",
+        "DR30-14",
+        "DR30-15",
+        "DR30-16",
+        "DR30-17",
+        "DR30-18",
+        "DR30-19",
+        "DR30-20",
+        "DR30-21",
+        "DR30-22",
+        "DR30-23",
+        "DR30-24",
+        "DR30-25",
+        "DR30-26",
+        "DR30-27",
+        "DR30-28",
+        "DR30-29",
+        "DR30-30"
+      ]
+    },
+    {
+      "path": "eval/direct_docatlas_questions_15/README.md",
+      "sha256": "102cf6f0273b86e1c34c4f92e7fad7a8113c6a5ac460a0df4c0bec5b5da9180b"
+    },
+    {
+      "path": "eval/direct_docatlas_questions_15/audit_first_loss.py",
+      "sha256": "e9e837f51ecd96690a8aa83f38882b75f02d9c3ad3fc684d72ba75efe8e01165"
+    },
+    {
+      "path": "eval/direct_docatlas_questions_15/cases.json",
+      "sha256": "48ddd7030c886cfe3df2959df65e092298823b7c308f240a8644fd03a4571d7e",
+      "case_ids": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04",
+        "Q05",
+        "Q06",
+        "Q07",
+        "Q08",
+        "Q09",
+        "Q10",
+        "Q11",
+        "Q12",
+        "Q13",
+        "Q14",
+        "Q15"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality_v2/README.md",
+      "sha256": "5bd46c8cd6215801d4d05b1ec993749611ed73d5e7abb3b511efd30071d6cfdd"
+    },
+    {
+      "path": "eval/project_context_quality_v2/acceptance.lock.json",
+      "sha256": "1a5800c9d45fdbee6f550fea64c50165cc90a6ce4f852d9fabb55e8a4b610fea"
+    },
+    {
+      "path": "eval/project_context_quality_v2/cases.json",
+      "sha256": "80a663d5e560fb039f6f1a30b2b1d634da7684af8b8c7d0976c7b60813370963",
+      "case_ids": [
+        "v2-natural-install-verify",
+        "v2-natural-purpose-start",
+        "v2-natural-first-session",
+        "v2-natural-contributor",
+        "v2-natural-architecture",
+        "v2-natural-request-flow",
+        "v2-natural-sync-renames",
+        "v2-natural-catalog",
+        "v2-natural-cleanup",
+        "v2-natural-stale-health",
+        "v2-natural-storage",
+        "v2-natural-chunking",
+        "v2-natural-evidence-selection",
+        "v2-natural-offline",
+        "v2-natural-docs-server",
+        "v2-natural-negative-retention",
+        "v2-natural-negative-telepathy",
+        "v2-natural-negative-retention-policy",
+        "v2-natural-negative-encryption",
+        "v2-paraphrase-local-trial",
+        "v2-paraphrase-review-ready",
+        "v2-paraphrase-cache-reset",
+        "v2-paraphrase-search-trust",
+        "v2-paraphrase-reconcile-files",
+        "v2-paraphrase-negative-martian"
+      ]
+    },
+    {
+      "path": "eval/project_context_quality_v2/diagnostic.json",
+      "sha256": "6dd895c8e635bc959291a353569b5326b07dfa9042d50a7674574ce50cea7f5d"
+    },
+    {
+      "path": "eval/project_context_quality_v2/migration-crosswalk.json",
+      "sha256": "9b2b15f78ee9ba66c8f98dfb5d2f36418d568ac84351b8e49b61ec7f2be83e1a"
+    },
+    {
+      "path": "eval/project_context_quality_v2/protocol.lock.json",
+      "sha256": "a48010f3432327e996a37bcf92b2891b2ce324d3a81b87139c6b3db090d80477"
+    }
+  ],
+  "templates": [
+    {
+      "path": "docmancer/templates/agent_contract.md",
+      "sha256": "1b9911400dd599392481e670953c64fb957b8c26aab7a5828c1e67a5b88cfa20"
+    },
+    {
+      "path": "docmancer/templates/claude_code_skill.md",
+      "sha256": "d69b935f36957b6c0f27e6d1d6d67650dfefd53e906a10a0550a6a94b1047921"
+    },
+    {
+      "path": "docmancer/templates/claude_desktop_skill.md",
+      "sha256": "64e836c4ed8c3db00ddcf9aba61f131186d35aedbf96b0a743148e9dc055ccb8"
+    },
+    {
+      "path": "docmancer/templates/copilot_instructions.md",
+      "sha256": "1157dd9d88f725cb06e5ee7a2f647faf18a3ab03ebafd0ff986506acc578fe88"
+    },
+    {
+      "path": "docmancer/templates/cursor_agents_md.md",
+      "sha256": "58a44405094cc07e4f7050388fe1055a90aa07e667359fbc2a6f375bfd268830"
+    },
+    {
+      "path": "docmancer/templates/project_bootstrap.md",
+      "sha256": "b6b88a0459b281b0d0a485c4e040ca0b0385917fe7de0a43ff16c6492e67abfc"
+    },
+    {
+      "path": "docmancer/templates/skill.md",
+      "sha256": "64e836c4ed8c3db00ddcf9aba61f131186d35aedbf96b0a743148e9dc055ccb8"
+    }
+  ],
+  "limitations": "Manifest is not completed classification, holdout approval, or clean-wheel runtime verification."
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "state": "source_plan_frozen_before_validation_questions_and_results",
+  "frozen_candidate_ref": "e5e1bec980caa1b66758f655940d519f0ba2fa04",
+  "families": [
+    {
+      "id": "black",
+      "repo": "psf/black",
+      "commit": "acd6198877ced2d8126b9b3958bb17f4a65ef0d1",
+      "license": "MIT",
+      "paths": [
+        "docs/usage_and_configuration/the_basics.md",
+        "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "docs/faq.md"
+      ]
+    },
+    {
+      "id": "poetry",
+      "repo": "python-poetry/poetry",
+      "commit": "6de19222e44a948bc64f215ea3539b93ecf08719",
+      "license": "MIT",
+      "paths": [
+        "docs/configuration.md",
+        "docs/managing-environments.md",
+        "docs/dependency-specification.md"
+      ]
+    },
+    {
+      "id": "textual",
+      "repo": "Textualize/textual",
+      "commit": "06dbeef4bb70fb718236aa418ed658ef4667a126",
+      "license": "MIT",
+      "paths": [
+        "docs/guide/reactivity.md",
+        "docs/guide/workers.md",
+        "docs/widgets/input.md"
+      ]
+    },
+    {
+      "id": "vite",
+      "repo": "vitejs/vite",
+      "commit": "e9078f865cdff6bed77cd729214a7e2868f126b5",
+      "license": "MIT",
+      "paths": [
+        "docs/guide/env-and-mode.md",
+        "docs/config/server-options.md",
+        "docs/guide/assets.md"
+      ]
+    },
+    {
+      "id": "eslint",
+      "repo": "eslint/eslint",
+      "commit": "3c0b7c6e1fe2dec778b97a996018126f22d437ae",
+      "license": "MIT",
+      "paths": [
+        "docs/src/use/command-line-interface.md",
+        "docs/src/use/configure/configuration-files.md",
+        "docs/src/use/configure/ignore.md"
+      ]
+    }
+  ],
+  "exclusion_rule": "No family or selected source file appears in evidence_quality_v2 external80 or retrieval_recheck H20.",
+  "result_rule": "After validation results are opened, production candidate and these source bytes are immutable for this cycle."
+}

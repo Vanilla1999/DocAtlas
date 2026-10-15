@@ -54,7 +54,6 @@ def _score_code_graph_file_detail(
     question: str,
 ) -> tuple[float, list[str], list[dict[str, Any]]]:
     terms = _context_query_terms(question)
-    use_intent = _has_reference_intent(question)
     breakdown: list[dict[str, Any]] = []
     seen_breakdown: set[tuple[str, str]] = set()
     edges = _edges_for_file(graph, file_node.id)
@@ -96,8 +95,6 @@ def _score_code_graph_file_detail(
                 if _is_low_signal_symbol(edge.symbol):
                     points = min(points, 0.5)
                 add("reference_match", points, edge.symbol, edge.confidence)
-                if use_intent and points > 0.5:
-                    add("reference_intent_match", 7.0, edge.symbol, edge.confidence)
             elif edge.kind == "unresolved_reference" and edge.symbol and _contains_term(edge.symbol, term):
                 add("unresolved_reference_search_hint", _edge_relevance_weight(edge), edge.symbol, "unresolved")
             elif edge.kind in {"imports", "exports"} and (_contains_term(edge.to_path or "", term) or _contains_term(edge.symbol or "", term)):
@@ -450,7 +447,7 @@ def _file_matches_terms(graph: CodeGraph, file_node: CodeGraphNode, terms: set[s
 
 
 def _has_reference_intent(question: str) -> bool:
-    normalized = _normalize_match_text(question)
-    return any(marker in normalized for marker in ("использ", "usage", "used", "uses", "use", "reference", "references"))
+    # Prose cannot supply parser-reference intent or ranking credit.
+    return False
 
 __all__=['build_code_graph_context_items', 'score_code_graph_file', '_score_code_graph_file_detail', 'code_graph_diagnostics', 'code_graph_context_diagnostics', 'find_code_graph_paths', 'render_code_graph_path', '_path_query_terms', '_is_low_signal_symbol', '_edge_relevance_weight', '_code_graph_context_item', '_render_code_graph_content', '_fit_content_to_budget', '_estimate_tokens', '_display_edges_for_file', '_edges_for_file', '_linked_paths', '_is_connected_to_matched_file', '_file_matches_terms', '_has_reference_intent']

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_refresh_identity.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_refresh_identity.py": "4cc3916043911f9c36851523093f348e86c44b41fb919d4505719fe29a4dc503"
+  }
+}

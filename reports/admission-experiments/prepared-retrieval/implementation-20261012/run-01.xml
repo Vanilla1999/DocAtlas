@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.075" timestamp="2026-10-12T09:48:49.733739-07:00" hostname="ea7bdae9a53c"><testcase classname="tests.test_prepared_retrieval_integration" name="test_source_valid_candidates_deliver_multifacet_bound_read_only_packet" time="0.005"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/tmp/docatlas-evidence-vhrcgjnq'">tmp_path = PosixPath('/workspace/scratch/7ccc1a9e2e54/DocAtlas/pytest-of-root/pytest-0/test_source_valid_candidates_d0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2cad933cb0&gt;
+state_root = PosixPath('/workspace/scratch/7ccc1a9e2e54/DocAtlas/pytest-of-root/pytest-0/test_source_valid_candidates_d0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7f2cad719ee0&gt;
+
+    def test_source_valid_candidates_deliver_multifacet_bound_read_only_packet(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """1 prepare, 2 contexts, at most 2 bounded source reads."""
+        project = tmp_path / "project"
+        runtime.write_project(project, OPTICS_DOCUMENTS)
+&gt;       with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_prepared_retrieval_integration.py:328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+eval/evidence_quality_v2/runtime.py:83: in isolated_service
+    _FIXTURE_HOMES[state] = TemporaryDirectory(prefix='docatlas-evidence-', dir='/tmp')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tempfile.py:886: in __init__
+    self.name = mkdtemp(suffix, prefix, dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+suffix = '', prefix = 'docatlas-evidence-', dir = '/tmp'
+
+    def mkdtemp(suffix=None, prefix=None, dir=None):
+        """User-callable function to create and return a unique temporary
+        directory.  The return value is the pathname of the directory.
+    
+        Arguments are as for mkstemp, except that the 'text' argument is
+        not accepted.
+    
+        The directory is readable, writable, and searchable only by the
+        creating user.
+    
+        Caller is responsible for deleting the directory when done with it.
+        """
+    
+        prefix, suffix, dir, output_type = _sanitize_params(prefix, suffix, dir)
+    
+        names = _get_candidate_names()
+        if output_type is bytes:
+            names = map(_os.fsencode, names)
+    
+        for seq in range(TMP_MAX):
+            name = next(names)
+            file = _os.path.join(dir, prefix + name + suffix)
+            _sys.audit("tempfile.mkdtemp", file)
+            try:
+&gt;               _os.mkdir(file, 0o700)
+E               FileNotFoundError: [Errno 2] No such file or directory: '/tmp/docatlas-evidence-vhrcgjnq'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tempfile.py:384: FileNotFoundError</failure></testcase></testsuite></testsuites>

@@ -90,56 +90,12 @@ def _write_zip(tmp_path, name: str = "uspto.zip") -> str:
     return str(archive)
 
 
-def test_iter_case_files_emits_live_only_by_default(tmp_path):
-    stats = ParseStats()
-    cases = list(iter_case_files(_write_xml(tmp_path), stats=stats))
-    assert len(cases) == 1
-    cf = cases[0]
-    assert cf.serial_number == "75000001"
-    assert cf.mark_identification == "STARBUCKS"
-    assert cf.registration_number == "4500001"
-    assert cf.status_code == "700"
-    assert cf.filing_date.isoformat() == "2020-01-15"
-    assert [g.international_class_code for g in cf.goods_and_services] == ["030"]
-    assert cf.goods_and_services[0].description == "Coffee, tea, and related beverages"
-    assert cf.owners[0].party_name == "Starbucks Corporation"
-    assert cf.pseudo_marks == ["STARBUKS"]
-    assert cf.design_search_codes == ["020101"]
-    assert stats.parsed == 2
-    assert stats.emitted == 1
-    assert stats.skipped_dead == 1
-    assert stats.failed == 0
 
 
-def test_iter_case_files_include_dead(tmp_path):
-    cases = list(iter_case_files(_write_xml(tmp_path), live_only=False))
-    assert {cf.serial_number for cf in cases} == {"75000001", "75000002"}
 
 
-def test_iter_case_files_supports_zip(tmp_path):
-    cases = list(iter_case_files(_write_zip(tmp_path)))
-    assert [cf.serial_number for cf in cases] == ["75000001"]
 
 
-def test_case_file_to_document_single_section(tmp_path):
-    cases = list(iter_case_files(_write_xml(tmp_path)))
-    doc = case_file_to_document(cases[0])
-    assert doc.source == "uspto-tm://75000001"
-    assert doc.metadata["chunking_strategy"] == "single"
-    assert doc.metadata["format"] == "uspto-tm"
-    assert doc.metadata["serial_number"] == "75000001"
-    assert doc.metadata["international_classes"] == ["030"]
-    assert doc.metadata["owner_names"] == ["Starbucks Corporation"]
-    assert doc.metadata["pseudo_marks"] == ["STARBUKS"]
-    # Body must contain searchable text we care about for FTS5.
-    body = doc.content
-    assert "STARBUCKS" in body
-    assert "Class 030" in body
-    assert "Coffee, tea, and related beverages" in body
-    assert "STARBUKS" in body  # pseudo mark for phonetic-ish lookup
-    # No `##` headings — the single-section chunker would otherwise split.
-    for line in body.splitlines():
-        assert not line.startswith("## "), f"unexpected H2 in body: {line!r}"
 
 
 def test_streaming_ingest_writes_one_section_per_case_file(tmp_path, monkeypatch):

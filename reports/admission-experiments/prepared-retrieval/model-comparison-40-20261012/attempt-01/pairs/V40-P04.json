@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P04",
+  "question": "How do you undo an explicitly selected Poetry Python environment and return to default behavior?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "d9c856fc159189bb43e47ea2f3ea7bb685a700470d478e1e4022cb9d821fca7c",
+      "mini_sha256": "d9c856fc159189bb43e47ea2f3ea7bb685a700470d478e1e4022cb9d821fca7c"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "5a404aadd651d0a620f95431496524ac9c31835b734370220f2f52ded63ccd61",
+      "mini_sha256": "5a404aadd651d0a620f95431496524ac9c31835b734370220f2f52ded63ccd61"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "1867ad88952342d2a85f742c806a95e0386e7ceac4c5c262f75a9f95e82c869e",
+      "mini_sha256": "1867ad88952342d2a85f742c806a95e0386e7ceac4c5c262f75a9f95e82c869e"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

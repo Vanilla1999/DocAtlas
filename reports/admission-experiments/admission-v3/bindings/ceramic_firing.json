@@ -1,0 +1,11 @@
+{
+  "project": "/tmp/docatlas-v3-nzq3j3mg/project",
+  "generation": "gen-7f938858f88b4755be8372d89743cc20",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "document_hashes": {
+    "holdout/ceramic_firing/loading.md": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+    "holdout/ceramic_firing/cooling.md": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+    "holdout/ceramic_firing/incident.md": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59"
+  }
+}

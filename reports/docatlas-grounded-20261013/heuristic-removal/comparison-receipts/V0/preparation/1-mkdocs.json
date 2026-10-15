@@ -1,0 +1,1002 @@
+{
+  "root": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-mkdocs/project",
+  "inventory": {
+    "seconds": 0.25157305799984897,
+    "expected_paths": [
+      "docs/user-guide/configuration.md"
+    ],
+    "indexed_paths": [
+      "docs/user-guide/configuration.md"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-f044418bb04d1cc5c173756c780ca24b1052f8f7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "# Configuration\n\nGuide to all available configuration settings.\n\n---\n\n",
+        "line_start": 1,
+        "line_end": 6
+      },
+      {
+        "stable_chunk_id": "child-ced2228df1050460b4e38e155ce57b2c52d129f1",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Introduction\n\nProject settings are configured by default using a YAML configuration file in\nthe project directory named `mkdocs.yml`. You can specify another path for it\nby using the `-f`/`--config-file` option (see `mkdocs build --help`).\n\nAt a minimum, this configuration file must contain the `site_name`. All other settings are optional.\n\n",
+        "line_start": 7,
+        "line_end": 14
+      },
+      {
+        "stable_chunk_id": "child-c12f26c1ad8b8d1a0adaed4287ce0d912a02a202",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Project information\n\n",
+        "line_start": 15,
+        "line_end": 16
+      },
+      {
+        "stable_chunk_id": "child-8094a1e73116d0a2309e736e7b458f6aa84179c8",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### site_name\n\nThis is a **required setting**, and should be a string that is used as the main\ntitle for the project documentation. For example:\n\n```yaml\nsite_name: Marshmallow Generator\n```\n\nWhen rendering the theme this setting will be passed as the `site_name` context\nvariable.\n\n",
+        "line_start": 17,
+        "line_end": 28
+      },
+      {
+        "stable_chunk_id": "child-85b30032b1ca00af70915002f676a115f3a9c976",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### site_url\n\nSet the canonical URL of the site. This will add a `link` tag with the\n`canonical` URL to the `head` section of each HTML page. If the 'root' of the\nMkDocs site will be within a subdirectory of a domain, be sure to include that\nsubdirectory in the setting (`https://example.com/foo/`).\n\n",
+        "line_start": 29,
+        "line_end": 35
+      },
+      {
+        "stable_chunk_id": "child-0505c47c631ae84d5867f9eaf0f955b2dfd278f5",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "This setting is also used for `mkdocs serve`: the server will be mounted onto a\npath taken from the path component of the URL, e.g. `some/page.md` will be\nserved from `http://127.0.0.1:8000/foo/some/page/` to mimic the expected remote\nlayout.\n\n**default**: `null`\n\n",
+        "line_start": 36,
+        "line_end": 42
+      },
+      {
+        "stable_chunk_id": "child-0f06d04d5be1f3c6d637039fcbf4ca0908c84ad7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### repo_url\n\nWhen set, provides a link to your repository (GitHub, Bitbucket, GitLab, ...)\non each page.\n\n```yaml\nrepo_url: https://github.com/example/repository/\n```\n\n**default**: `null`\n\n",
+        "line_start": 43,
+        "line_end": 53
+      },
+      {
+        "stable_chunk_id": "child-064bbef460dc6da9c4b2246ad76d28eea6031b6f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### repo_name\n\nWhen set, provides the name for the link to your repository on each page.\n\n**default**: `'GitHub'`, `'Bitbucket'` or `'GitLab'` if the `repo_url` matches\nthose domains, otherwise the hostname from the `repo_url`.\n\n",
+        "line_start": 54,
+        "line_end": 60
+      },
+      {
+        "stable_chunk_id": "child-41584ace2142c24d8a810dbe6582b001b3ac8f43",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### edit_uri\n\nThe path from the base `repo_url` to the docs directory when directly viewing a\npage, accounting for specifics of the repository host (e.g. GitHub, Bitbucket,\netc), the branch, and the docs directory itself. MkDocs concatenates `repo_url`\nand `edit_uri`, and appends the input path of the page.\n\n",
+        "line_start": 61,
+        "line_end": 67
+      },
+      {
+        "stable_chunk_id": "child-9243e922b8e6971fc81eb45710186561f56dd1eb",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "When set, and if your theme supports it, provides a link directly to the page in\nyour source repository. This makes it easier to find and edit the source for the\npage. If `repo_url` is not set, this option is ignored. On some themes, setting\nthis option may cause an edit link to be used in place of a repository link.\nOther themes may show both links.\n\n",
+        "line_start": 68,
+        "line_end": 73
+      },
+      {
+        "stable_chunk_id": "child-9cb7737529e80e3397c8968df0790ff10731d371",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "The `edit_uri` supports query ('?') and fragment ('#') characters. For\nrepository hosts that use a query or a fragment to access the files, the\n`edit_uri` might be set as follows. (Note the `?` and `#` in the URI...)\n\n```yaml\n# Query string example\nedit_uri: '?query=root/path/docs/'\n```\n\n```yaml\n# Hash fragment example\nedit_uri: '#root/path/docs/'\n```\n\nFor other repository hosts, simply specify the relative path to the docs\ndirectory.\n\n",
+        "line_start": 74,
+        "line_end": 90
+      },
+      {
+        "stable_chunk_id": "child-5633c5758844f72e44bdb8fed26616fa2ebb9e0d",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\n# Query string example\nedit_uri: root/path/docs/\n```\n\nFor example, having this config:\n\n```yaml\nrepo_url: https://example.com/project/repo\nedit_uri: blob/main/docs/\n```\n\nmeans that a page named 'foo/bar.md' will have its edit link lead to:  \n<https://example.com/project/repo/blob/main/docs/foo/bar.md>\n\n`edit_uri` can actually be just an absolute URL, not necessarily relative to `repo_url`, so this can achieve the same result:\n\n",
+        "line_start": 91,
+        "line_end": 107
+      },
+      {
+        "stable_chunk_id": "child-b3780ca595f73ec83eab653fb11a81904f2e38f5",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nedit_uri: https://example.com/project/repo/blob/main/docs/\n```\n\nFor more flexibility, see [edit_uri_template](#edit_uri_template) below.\n\n",
+        "line_start": 108,
+        "line_end": 113
+      },
+      {
+        "stable_chunk_id": "child-3b048a2cbb79eff8f7779931a42ac31e24edda31",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> NOTE:\n> On a few known hosts (specifically GitHub, Bitbucket and GitLab), the\n> `edit_uri` is derived from the 'repo_url' and does not need to be set\n> manually. Simply defining a `repo_url` will automatically populate the\n> `edit_uri` configs setting.\n>\n> For example, for a GitHub- or GitLab-hosted repository, the `edit_uri`\n> would be automatically set as `edit/master/docs/` (Note the `edit` path\n> and `master` branch).\n>\n> For a Bitbucket-hosted repository, the equivalent `edit_uri` would be\n> automatically set as `src/default/docs/` (note the `src` path and `default`\n> branch).\n>\n> To use a different URI than the default (for example a different branch),\n> simply set the `edit_uri` to your desired string. If you do not want any\n> \"edit URL link\" displayed on your pages, then set `edit_uri` to an empty\n> string to disable the automatic setting.\n\n",
+        "line_start": 114,
+        "line_end": 132
+      },
+      {
+        "stable_chunk_id": "child-2de450e7e09320b4ea601c2da37e826cb017d511",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "WARNING:\nOn GitHub and GitLab, the default \"edit\" path (`edit/master/docs/`) opens\nthe page in the online editor. This functionality requires that the user\nhave and be logged in to a GitHub/GitLab account. Otherwise, the user will\nbe redirected to a login/signup page. Alternatively, use the \"blob\" path\n(`blob/master/docs/`) to open a read-only view, which supports anonymous\naccess.\n\n",
+        "line_start": 133,
+        "line_end": 140
+      },
+      {
+        "stable_chunk_id": "child-fe49ea719f664954a010491319404d0f9ef0853c",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**default**: `edit/master/docs/` for GitHub and GitLab repos or\n`src/default/docs/` for a Bitbucket repo, if `repo_url` matches those domains,\notherwise `null`\n\n",
+        "line_start": 141,
+        "line_end": 144
+      },
+      {
+        "stable_chunk_id": "child-c80e875d8d542a528ef9f31866e8e76117512b62",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### edit_uri_template\n\nThe more flexible variant of [edit_uri](#edit_uri). These two are equivalent:\n\n```yaml\nedit_uri: 'blob/main/docs/'\nedit_uri_template: 'blob/main/docs/{path}'\n```\n\n(they are also mutually exclusive -- don't specify both).\n\nStarting from here, you can change the positioning or formatting of the path, in case the default behavior of appending the path isn't enough.\n\n",
+        "line_start": 145,
+        "line_end": 157
+      },
+      {
+        "stable_chunk_id": "child-a5b3e288e56c1dfe1a9807a1917ff50cee60927d",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "The contents of `edit_uri_template` are normal [Python format strings](https://docs.python.org/3/library/string.html#formatstrings), with only these fields available:\n\n* `{path}`, e.g. `foo/bar.md`\n* `{path_noext}`, e.g. `foo/bar`\n\nAnd the conversion flag `!q` is available, to percent-encode the field:\n\n* `{path!q}`, e.g. `foo%2Fbar.md`\n\n",
+        "line_start": 158,
+        "line_end": 166
+      },
+      {
+        "stable_chunk_id": "child-6e6afb48f54a4f46e129785369fe8a1be5832db4",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": ">? NOTE: **Suggested useful configurations:**\n>\n> *   GitHub Wiki:  \n>     (e.g. `https://github.com/project/repo/wiki/foo/bar/_edit`)\n>\n>     ```yaml\n>     repo_url: 'https://github.com/project/repo/wiki'\n>     edit_uri_template: '{path_noext}/_edit'\n>     ```\n>\n> *   BitBucket editor:  \n>     (e.g. `https://bitbucket.org/project/repo/src/master/docs/foo/bar.md?mode=edit`)\n>\n>     ```yaml\n>     repo_url: 'https://bitbucket.org/project/repo/'\n>     edit_uri_template: 'src/master/docs/{path}?mode=edit'\n>     ```\n>\n> *   GitLab Static Site Editor:  \n>     (e.g. `https://gitlab.com/project/repo/-/sse/master/docs%2Ffoo%2bar.md`)\n>\n>     ```yaml\n>     repo_url: 'https://gitlab.com/project/repo'\n>     edit_uri_template: '-/sse/master/docs%2F{path!q}'\n>     ```\n>\n> *   GitLab Web IDE:  \n>     (e.g. `https://gitlab.com/-/ide/project/repo/edit/master/-/docs/foo/bar.md`)\n>\n>     ```yaml\n>     edit_uri_template: 'https://gitlab.com/-/ide/project/repo/edit/master/-/docs/{path}'\n>     ```\n\n",
+        "line_start": 167,
+        "line_end": 199
+      },
+      {
+        "stable_chunk_id": "child-ba21ae0dba6a10bc5a8097c89085510fc9de38b7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**default**: `null`\n\n",
+        "line_start": 200,
+        "line_end": 201
+      },
+      {
+        "stable_chunk_id": "child-dacd3c0bff174d43810eadb3ece179522a6d535f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### site_description\n\nSet the site description. This will add a meta tag to the generated HTML header.\n\n**default**: `null`\n\n",
+        "line_start": 202,
+        "line_end": 207
+      },
+      {
+        "stable_chunk_id": "child-f95da058b111b9df40ac27a28ae11a3f537859ce",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### site_author\n\nSet the name of the author. This will add a meta tag to the generated HTML\nheader.\n\n**default**: `null`\n\n",
+        "line_start": 208,
+        "line_end": 214
+      },
+      {
+        "stable_chunk_id": "child-44c7c3703a298525dc993f44796fe289bb337610",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### copyright\n\nSet the copyright information to be included in the documentation by the theme.\n\n**default**: `null`\n\n",
+        "line_start": 215,
+        "line_end": 220
+      },
+      {
+        "stable_chunk_id": "child-9c428121e448ee486823af2377e95b9f6b5af7bb",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### remote_branch\n\nSet the remote branch to commit to when using `gh-deploy` to deploy to GitHub\nPages. This option can be overridden by a command line option in `gh-deploy`.\n\n**default**: `gh-pages`\n\n",
+        "line_start": 221,
+        "line_end": 227
+      },
+      {
+        "stable_chunk_id": "child-07c350a4a6d82ebbc192c6c15d3eef847b13f04a",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### remote_name\n\nSet the remote name to push to when using `gh-deploy` to deploy to GitHub Pages.\nThis option can be overridden by a command line option in `gh-deploy`.\n\n**default**: `origin`\n\n",
+        "line_start": 228,
+        "line_end": 234
+      },
+      {
+        "stable_chunk_id": "child-6894f02b1dd6865d6e17329a7ccb0f19f8285b64",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Documentation layout\n\n",
+        "line_start": 235,
+        "line_end": 236
+      },
+      {
+        "stable_chunk_id": "child-82709c91cc2e9b71a2a3f623c2e1972cf7659e79",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### nav\n\nThis setting is used to determine the format and layout of the global navigation\nfor the site. A minimal navigation configuration could look like this:\n\n```yaml\nnav:\n  - 'index.md'\n  - 'about.md'\n```\n\nAll paths in the navigation configuration must be relative to the\n[`docs_dir`](#docs_dir) configuration option. See the section on [configuring\npages and navigation] for a more detailed breakdown, including how to create\nsub-sections.\n\n",
+        "line_start": 237,
+        "line_end": 252
+      },
+      {
+        "stable_chunk_id": "child-de1d71e6ff69bd76f012cd396752bee535a07e13",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Navigation items may also include links to external sites. While titles are\noptional for internal links, they are required for external links. An external\nlink may be a full URL or a relative URL. Any path which is not found in the\nfiles is assumed to be an external link. See the section about [Meta-Data] on\nhow MkDocs determines the page title of a document.\n\n",
+        "line_start": 253,
+        "line_end": 258
+      },
+      {
+        "stable_chunk_id": "child-ad07fc6e38380922e8843cf730ff71c0c5172b40",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nnav:\n  - Introduction: 'index.md'\n  - 'about.md'\n  - 'Issue Tracker': 'https://example.com/'\n```\n\nIn the above example, the first two items point to local files while the third\npoints to an external site.\n\nHowever, sometimes the MkDocs site is hosted in a subdirectory of a project's\nsite and you may want to link to other parts of the same site without including\nthe full domain. In that case, you may use an appropriate relative URL.\n\n",
+        "line_start": 259,
+        "line_end": 272
+      },
+      {
+        "stable_chunk_id": "child-3e9f836bae70cdb08fa906c8c412bdd6b1376a2b",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nsite_url: https://example.com/foo/\n\nnav:\n  - Home: '../'\n  - 'User Guide': 'user-guide.md'\n  - 'Bug Tracker': '/bugs/'\n```\n\n",
+        "line_start": 273,
+        "line_end": 281
+      },
+      {
+        "stable_chunk_id": "child-9bd9ec0024ed2f91a9d03a104599d269ef4ab59b",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "In the above example, two different styles of external links are used. First,\nnote that the `site_url` indicates that the MkDocs site is hosted in the `/foo/`\nsubdirectory of the domain. Therefore, the `Home` navigation item is a relative\nlink that steps up one level to the server root and effectively points to\n`https://example.com/`. The `Bug Tracker` item uses an absolute path from the\nserver root and effectively points to `https://example.com/bugs/`. Of course, the\n`User Guide` points to a local MkDocs page.\n\n",
+        "line_start": 282,
+        "line_end": 289
+      },
+      {
+        "stable_chunk_id": "child-7c044224cf97657486d3f6d814e76863b12b2e4a",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**default**: By default `nav` will contain an alphanumerically sorted, nested\nlist of all the Markdown files found within the `docs_dir` and its\nsub-directories. Index files will always be listed first within a sub-section.\n\n",
+        "line_start": 290,
+        "line_end": 293
+      },
+      {
+        "stable_chunk_id": "child-4ecca8982ec2d8363c3875416bfd83a35a9928b5",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### exclude_docs\n\nNEW: **New in version 1.5.**\n\n> DANGER: **Changed in version 1.6:**\n>\n> This config no longer applies the \"drafts\" functionality for `mkdocs serve`. If you have draft documents that you want available in \"serve\" and not \"build\", replace `exclude_docs` with the new [`draft_docs`](#draft_docs) config option.\n\nThis config defines patterns of files (under [`docs_dir`](#docs_dir)) to not be picked up into the built site.\n\nExample:\n\n",
+        "line_start": 294,
+        "line_end": 305
+      },
+      {
+        "stable_chunk_id": "child-21dc7850b45667dd638fd3c0ac1133ffc95dcf59",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nexclude_docs: |\n  # A file with this name anywhere.\n  api-config.json\n\n  # Top-level \"docs/requirements.txt\".\n  /requirements.txt\n\n  # Any file with this extension anywhere.\n  *.py\n\n  # But keep this particular file.\n  !/foo/example.py\n```\n\nThis follows the [.gitignore pattern format](https://git-scm.com/docs/gitignore#_pattern_format).\n\n",
+        "line_start": 306,
+        "line_end": 322
+      },
+      {
+        "stable_chunk_id": "child-f426bd3f4482497bbce98a8c6b5606b3998c8603",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "The following defaults are always implicitly prepended - to exclude dot-files (and directories) as well as the top-level `templates` directory:\n\n```yaml\nexclude_docs: |\n  .*\n  /templates/\n```\n\nSo, in order to really start this config fresh, you'd need to specify a negated version of these entries first.\n\nOtherwise you could for example opt only certain dot-files back into the site:\n\n",
+        "line_start": 323,
+        "line_end": 334
+      },
+      {
+        "stable_chunk_id": "child-a2614e365e846bc8b6d9161bc2e64ab464804d06",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nexclude_docs: |\n  # Don't exclude '.assets' although all other '.*' are excluded\n  !.assets\n```\n\n",
+        "line_start": 335,
+        "line_end": 340
+      },
+      {
+        "stable_chunk_id": "child-d207b8a919590a10908c24b87ce873897ea0a65f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### draft_docs\n\nNEW: **New in version 1.6.**\n\nThis config defines patterns of files (under [`docs_dir`](#docs_dir)) to be treated as a draft.  Draft files are available during `mkdocs serve` and include a \"DRAFT\" mark but will not be included in the build. To prevent this effect and make \"serve\" behave the same as \"build\", you can run `mkdocs serve --clean`.\n\nExample:\n\n",
+        "line_start": 341,
+        "line_end": 348
+      },
+      {
+        "stable_chunk_id": "child-d0dcc25167ad288c8e43dc5d7f44375c5454f34f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\ndraft_docs: |\n  # A \"drafts\" directory anywhere.\n  drafts/\n\n  # A Markdown file ending in _unpublished.md anywhere.\n  *_unpublished.md\n\n  # But keep this particular file.\n  !/foo_unpublished.md\n```\n\nThis follows the [.gitignore pattern format](https://git-scm.com/docs/gitignore#_pattern_format).\n\n",
+        "line_start": 349,
+        "line_end": 362
+      },
+      {
+        "stable_chunk_id": "child-8c5450c0a1ecbf5f0bb97a09b9c9f941e8223f9b",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### not_in_nav\n\nNEW: **New in version 1.5.**\n\n> NEW: **New in version 1.6:**\n>\n> If the [`nav`](#nav) config is not specified at all, pages specified in this config will now be excluded from the inferred navigation.\n\nIf you want to include some docs into the site but intentionally exclude them from the nav, normally MkDocs warns about this.\n\n",
+        "line_start": 363,
+        "line_end": 372
+      },
+      {
+        "stable_chunk_id": "child-29a4bba57c8b8746c2b19e2dcb79215abeb7d28d",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Adding such patterns of files (relative to [`docs_dir`](#docs_dir)) into the `not_in_nav` config will prevent such warnings.\n\nExample:\n\n```yaml\nnav:\n  - Foo: foo.md\n  - Bar: bar.md\n\nnot_in_nav: |\n  /private.md\n```\n\nAs the previous option, this follows the .gitignore pattern format.\n\nNOTE: Adding a given file to [`exclude_docs`](#exclude_docs) takes precedence over and implies `not_in_nav`.\n\n",
+        "line_start": 373,
+        "line_end": 389
+      },
+      {
+        "stable_chunk_id": "child-7d2227465d84825c0c52fe92cd776796ad9b52a2",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### validation\n\nNEW: **New in version 1.5.**\n\nConfigure the strictness of MkDocs' diagnostic messages when validating links to documents.\n\n",
+        "line_start": 390,
+        "line_end": 395
+      },
+      {
+        "stable_chunk_id": "child-149d64d72e98da81da3b70ecdcff78cc72d24d1d",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "This is a tree of configs, and for each one the value can be one of the three: `warn`, `info`, `ignore`. Which cause a logging message of the corresponding severity to be produced. The `warn` level is, of course, intended for use with `mkdocs build --strict` (where it becomes an error), which you can employ in continuous testing.\n\n",
+        "line_start": 396,
+        "line_end": 397
+      },
+      {
+        "stable_chunk_id": "child-4fa4e28303758b0ab9e14260d1a11f76d28dfcc7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "The config `validation.links.absolute_links` additionally has a special value `relative_to_docs`, for [validation of absolute links](#validation-of-absolute-links).\n\n",
+        "line_start": 398,
+        "line_end": 399
+      },
+      {
+        "stable_chunk_id": "child-a2a7d3ed709ca1b16aebe7670fab3dbd954ac67d",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": ">? EXAMPLE: **Defaults of this config as of MkDocs 1.6:**\n>\n> ```yaml\n> validation:\n>   nav:\n>     omitted_files: info\n>     not_found: warn\n>     absolute_links: info\n>   links:\n>     not_found: warn\n>     anchors: info\n>     absolute_links: info\n>     unrecognized_links: info\n> ```\n>\n> (Note: you shouldn't copy this whole example, because it only duplicates the defaults. Only individual items that differ should be set.)\n\n",
+        "line_start": 400,
+        "line_end": 416
+      },
+      {
+        "stable_chunk_id": "child-5e98c7499965ee709f359c005a7a978f4d3745af",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "The defaults of some of the behaviors already differ from MkDocs 1.4 and below - they were ignored before.\n\n",
+        "line_start": 417,
+        "line_end": 418
+      },
+      {
+        "stable_chunk_id": "child-ba3a53c882cd973b87ab3a57a83850f96eeafc7f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": ">? EXAMPLE: **Configure MkDocs 1.6 to behave like MkDocs 1.4 and below (reduce strictness):**\n>\n> ```yaml\n> validation:\n>   absolute_links: ignore\n>   unrecognized_links: ignore\n>   anchors: ignore\n> ```\n<!-- -->\n>! EXAMPLE: **Recommended settings for most sites (maximal strictness):**\n>\n> ```yaml\n> validation:\n>   omitted_files: warn\n>   absolute_links: warn  # Or 'relative_to_docs' - new in MkDocs 1.6\n>   unrecognized_links: warn\n>   anchors: warn  # New in MkDocs 1.6\n> ```\n\n",
+        "line_start": 419,
+        "line_end": 437
+      },
+      {
+        "stable_chunk_id": "child-9d0a1d195afcb5e7d432242c2cfbcc717d6710ef",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Note how in the above examples we omitted the 'nav' and 'links' keys. Here `absolute_links:` means setting both `nav: absolute_links:` and `links: absolute_links:`.\n\n",
+        "line_start": 438,
+        "line_end": 439
+      },
+      {
+        "stable_chunk_id": "child-6904f1e100bdcabc5ce1953b273408fa62c520a7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Full list of values and examples of log messages that they can hide or make more prominent:\n\n*   `validation.nav.omitted_files`\n    * > The following pages exist in the docs directory, but are not included in the \"nav\" configuration: ...\n*   `validation.nav.not_found`\n    * > A reference to 'foo/bar.md' is included in the 'nav' configuration, which is not found in the documentation files.\n    * > A reference to 'foo/bar.md' is included in the 'nav' configuration, but this file is excluded from the built site.\n*   `validation.nav.absolute_links`\n    * > An absolute path to '/foo/bar.html' is included in the 'nav' configuration, which presumably points to an external resource.\n",
+        "line_start": 440,
+        "line_end": 448
+      },
+      {
+        "stable_chunk_id": "child-47e746307c26ead766d2d8364739aebf47c7013e",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "<!-- -->\n",
+        "line_start": 449,
+        "line_end": 449
+      },
+      {
+        "stable_chunk_id": "child-8c751c3304d6a2c3abf66dca932cb95cfac98fad",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "*   `validation.links.not_found`\n    * > Doc file 'example.md' contains a link '../foo/bar.md', but the target is not found among documentation files.\n    * > Doc file 'example.md' contains a link to 'foo/bar.md' which is excluded from the built site.\n*   `validation.links.anchors`\n    * > Doc file 'example.md' contains a link '../foo/bar.md#some-heading', but the doc 'foo/bar.md' does not contain an anchor '#some-heading'.\n    * > Doc file 'example.md' contains a link '#some-heading', but there is no such anchor on this page.\n*   `validation.links.absolute_links`\n    * > Doc file 'example.md' contains an absolute link '/foo/bar.html', it was left as is. Did you mean 'foo/bar.md'?\n*   `validation.links.unrecognized_links`\n    * > Doc file 'example.md' contains an unrecognized relative link '../foo/bar/', it was left as is. Did you mean 'foo/bar.md'?\n    * > Doc file 'example.md' contains an unrecognized relative link 'mail\\@example.com', it was left as is. Did you mean 'mailto:mail\\@example.com'?\n\n",
+        "line_start": 450,
+        "line_end": 461
+      },
+      {
+        "stable_chunk_id": "child-c49d93c9f4b5a08611f7ee7293efaa2bbb5ab340",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "#### Validation of absolute links\n\nNEW: **New in version 1.6.**\n\n",
+        "line_start": 462,
+        "line_end": 465
+      },
+      {
+        "stable_chunk_id": "child-3273334fe19f9a2eaa6d66696067d594b9c519b9",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> Historically, within Markdown, MkDocs only recognized **relative** links that lead to another physical `*.md` document (or media file). This is a good convention to follow because then the source pages are also freely browsable without MkDocs, for example on GitHub. Whereas absolute links were left unmodified (making them often not work as expected) or, more recently, warned against. If you dislike having to always use relative links, now you can opt into absolute links and have them work correctly.\n\n",
+        "line_start": 466,
+        "line_end": 467
+      },
+      {
+        "stable_chunk_id": "child-c3f1ee03b801944236d083139c0abd92fcf0cad3",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "If you set the setting `validation.links.absolute_links` to the new value `relative_to_docs`, all Markdown links starting with `/` will be understood as being relative to the `docs_dir` root. The links will then be validated for correctness according to all the other rules that were already working for relative links in prior versions of MkDocs. For the HTML output, these links will still be turned relative so that the site still works reliably.\n\n",
+        "line_start": 468,
+        "line_end": 469
+      },
+      {
+        "stable_chunk_id": "child-5cd1cf9601e73d2377c7c3147fc6b630a7c842b3",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "So, now any document (e.g. \"dir1/foo.md\") can link to the document \"dir2/bar.md\" as `[link](/dir2/bar.md)`, in addition to the previously only correct way `[link](../dir2/bar.md)`.\n\nYou have to enable the setting, though. The default is still to just skip the link.\n\n",
+        "line_start": 470,
+        "line_end": 473
+      },
+      {
+        "stable_chunk_id": "child-79c498bad664e5d44b9ce5041d37feb17cf78836",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> EXAMPLE: **Settings to recognize absolute links and validate them:**\n>\n> ```yaml\n> validation:\n>   links:\n>     absolute_links: relative_to_docs\n>     anchors: warn\n>     unrecognized_links: warn\n> ```\n\n",
+        "line_start": 474,
+        "line_end": 483
+      },
+      {
+        "stable_chunk_id": "child-2313fa6207631c062562de8f93aa2632adca67f4",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Build directories\n\n",
+        "line_start": 484,
+        "line_end": 485
+      },
+      {
+        "stable_chunk_id": "child-f2b954126a9e0507032060fc3b6afe6d8260b962",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### theme\n\nSets the theme and theme specific configuration of your documentation site.\nMay be either a string or a set of key/value pairs.\n\nIf a string, it must be the string name of a known installed theme. For a list\nof available themes visit [Choosing Your Theme].\n\nAn example set of key/value pairs might look something like this:\n\n",
+        "line_start": 486,
+        "line_end": 495
+      },
+      {
+        "stable_chunk_id": "child-3973f9b82175d41439039d7c51528c47e96ba7ea",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\ntheme:\n  name: mkdocs\n  locale: en\n  custom_dir: my_theme_customizations/\n  static_templates:\n    - sitemap.html\n  include_sidebar: false\n```\n\nIf a set of key/value pairs, the following nested keys can be defined:\n\n",
+        "line_start": 496,
+        "line_end": 507
+      },
+      {
+        "stable_chunk_id": "child-1ae5a7e59a4949e333b75bac912f8723a1051bcd",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> BLOCK:\n>\n> #### name\n>\n> The string name of a known installed theme. For a list of available themes\n> visit [Choosing Your Theme].\n>\n> #### locale\n>\n> A code representing the language of your site. See [Localizing your theme]\n> for details.\n>\n> #### custom_dir\n>\n> A directory containing a custom theme. This can either be a relative\n> directory, in which case it is resolved relative to the directory containing\n> your configuration file or it can be an absolute directory path from the\n> root of your local file system.\n>\n> See [Customizing Your Theme][theme_dir] for details if you would like to tweak an\n> existing theme.\n>\n> See the [Theme Developer Guide] if you would like to build your own theme\n> from the ground up.\n>\n> #### static_templates\n>\n> A list of templates to render as static pages. The templates must be located\n> in either the theme's template directory or in the `custom_dir` defined in\n> the theme configuration.\n>\n> #### (theme specific keywords)\n>\n> Any additional keywords supported by the theme can also be defined. See the\n> documentation for the theme you are using for details.\n\n",
+        "line_start": 508,
+        "line_end": 543
+      },
+      {
+        "stable_chunk_id": "child-d1c33e495fc5bf8f5b2da0c769fb7a2d994732d9",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**default**: `'mkdocs'`\n\n",
+        "line_start": 544,
+        "line_end": 545
+      },
+      {
+        "stable_chunk_id": "child-c9ca9fc3de084d63d644945a0503b637e806428f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### docs_dir\n\nThe directory containing the documentation source markdown files. This can\neither be a relative directory, in which case it is resolved relative to the\ndirectory containing your configuration file, or it can be an absolute directory\npath from the root of your local file system.\n\n**default**: `'docs'`\n\n",
+        "line_start": 546,
+        "line_end": 554
+      },
+      {
+        "stable_chunk_id": "child-11f829ccda03a37e83e921eb6db543eac8de7831",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### site_dir\n\nThe directory where the output HTML and other files are created. This can either\nbe a relative directory, in which case it is resolved relative to the directory\ncontaining your configuration file, or it can be an absolute directory path from\nthe root of your local file system.\n\n**default**: `'site'`\n\n",
+        "line_start": 555,
+        "line_end": 563
+      },
+      {
+        "stable_chunk_id": "child-76880bc6a9a162e55a29269f33785862c7244125",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> NOTE:\n> If you are using source code control you will normally want to ensure that\n> your *build output* files are not committed into the repository, and only\n> keep the *source* files under version control. For example, if using `git`\n> you might add the following line to your `.gitignore` file:\n>\n> ```text\n> site/\n> ```\n>\n> If you're using another source code control tool, you'll want to check its\n> documentation on how to ignore specific directories.\n\n",
+        "line_start": 564,
+        "line_end": 576
+      },
+      {
+        "stable_chunk_id": "child-34b284889432e9edaa33be5c4c6fc8b30d046310",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### extra_css\n\nSet a list of CSS files (relative to `docs_dir`) to be included by the theme, typically as `<link>` tags.\n\nExample:\n\n```yaml\nextra_css:\n  - css/extra.css\n  - css/second_extra.css\n```\n\n**default**: `[]` (an empty list).\n\n",
+        "line_start": 577,
+        "line_end": 590
+      },
+      {
+        "stable_chunk_id": "child-ebd7df5a30ccb564670eefbaaabebc0dd02f9b1e",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### extra_javascript\n\nSet a list of JavaScript files in your `docs_dir` to be included by the theme, as `<script>` tags.\n\n> NEW: **Changed in version 1.5:**\n>\n> Older versions of MkDocs supported only a plain list of strings, but now several additional config keys are available: `type`, `async`, `defer`.\n\nSee the examples and what they produce:\n\n",
+        "line_start": 591,
+        "line_end": 600
+      },
+      {
+        "stable_chunk_id": "child-da32f5ebb81631f85bb7a1f0ae18b6b8b360fea2",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nextra_javascript:\n  - some_plain_javascript.js       # <script src=\"some_plain_javascript.js\"></script>\n        # New behavior in MkDocs 1.5:\n  - implicitly_as_module.mjs       # <script src=\"implicitly_as_module.mjs\" type=\"module\"></script>\n        # Config keys only supported since MkDocs 1.5:\n  - path: explicitly_as_module.mjs # <script src=\"explicitly_as_module.mjs\" type=\"module\"></script>\n    type: module\n  - path: deferred_plain.js        # <script src=\"deferred_plain.js\" defer></script>\n    defer: true\n  - path: scripts/async_module.mjs # <script src=\"scripts/async_module.mjs\" type=\"module\" async></script>\n    type: module\n    async: true\n```\n\n",
+        "line_start": 601,
+        "line_end": 615
+      },
+      {
+        "stable_chunk_id": "child-38f8531b68801210dd2b95cadde9965395793a25",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "So, each item can be either:\n\n* a plain string, or\n* a mapping that has the required `path` key and 3 optional keys `type` (string), `async` (boolean), `defer` (boolean).\n\nOnly the plain string variant detects the `.mjs` extension and adds `type=\"module\"`, otherwise `type: module` must be written out regardless of extension.\n\n**default**: `[]` (an empty list).\n\n",
+        "line_start": 616,
+        "line_end": 624
+      },
+      {
+        "stable_chunk_id": "child-b8f946201f02515bb504c2d84d5cf8d00256c0de",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "NOTE: `*.js` and `*.css` files, just like any other type of file, are always copied from `docs_dir` into the site's deployed copy, regardless if they're linked to the pages via the above configs or not.\n\n",
+        "line_start": 625,
+        "line_end": 626
+      },
+      {
+        "stable_chunk_id": "child-e0aec7a31a695d34645cdd2afcebe74125f7d05c",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### extra_templates\n\nSet a list of templates in your `docs_dir` to be built by MkDocs. To see more\nabout writing templates for MkDocs read the documentation about [custom themes]\nand specifically the section about the [available variables] to\ntemplates. See the example in [extra_css] for usage.\n\n**default**: `[]` (an empty list).\n\n",
+        "line_start": 627,
+        "line_end": 635
+      },
+      {
+        "stable_chunk_id": "child-a48588a5ecaaf8fc16c9afdddc63088c642160f4",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### extra\n\nA set of key-value pairs, where the values can be any valid YAML construct, that\nwill be passed to the template. This allows for great flexibility when creating\ncustom themes.\n\nFor example, if you are using a theme that supports displaying the project\nversion, you can pass it to the theme like this:\n\n```yaml\nextra:\n  version: 1.0\n```\n\n**default**: By default `extra` will be an empty key-value mapping.\n\n",
+        "line_start": 636,
+        "line_end": 651
+      },
+      {
+        "stable_chunk_id": "child-9f331c6bdebcad8da6e2eeada689abd04239e4a9",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Preview controls\n\n",
+        "line_start": 652,
+        "line_end": 653
+      },
+      {
+        "stable_chunk_id": "child-d5bad2219dd60727c9bc9db66ed1d0d710352533",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Live Reloading\n\n",
+        "line_start": 654,
+        "line_end": 655
+      },
+      {
+        "stable_chunk_id": "child-fcb78d9de1e5aeba6da3726af6196c5f18a8ccd9",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### watch\n\nDetermines additional directories to watch when running `mkdocs serve`.\nConfiguration is a YAML list.\n\n```yaml\nwatch:\n  - directory_a\n  - directory_b\n```\n\nAllows a custom default to be set without the need to pass it through the `-w`/`--watch`\noption every time the `mkdocs serve` command is called.\n\n",
+        "line_start": 656,
+        "line_end": 669
+      },
+      {
+        "stable_chunk_id": "child-19c3d9a08b33e8bac428dc65b5be5131e72b6de2",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> NOTE:\n> The paths provided via the configuration file are relative to the configuration file.\n>\n> The paths provided via the `-w`/`--watch` CLI parameters are not.\n\n",
+        "line_start": 670,
+        "line_end": 674
+      },
+      {
+        "stable_chunk_id": "child-816f10e90129d2a7f4f2b9ecdbad078cc8d9f2e7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### use_directory_urls\n\nThis setting controls the directory structure of the generated documentation, and thereby the URL format used for linking to pages.\n\nThe following tables demonstrate how the directory structure and URLs used on the site differ when\nsetting `use_directory_urls` to `true` or `false`.\n\n**`use_directory_urls: false`**\n\n",
+        "line_start": 675,
+        "line_end": 683
+      },
+      {
+        "stable_chunk_id": "child-c1f58fcce1bb2a3102f9a58d989c674d21f5ca59",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "This setting is needed when the documentation is hosted on systems that can't\naccess the file `X/index.html` when given the URL `X`. When set to `false`,\nno additional `X` directory is created, and the file is simply stored as `X.html`.\nLinks are created that point directly to the target *file* rather than a target\n*directory*.\n\n",
+        "line_start": 684,
+        "line_end": 689
+      },
+      {
+        "stable_chunk_id": "child-6c4aad2590855530ca091d96540fc4a248019016",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Source file      | Generated File     | URL Format\n---------------- | ------------------ | -------------------\nindex.md         | index.html         | /index.html\napi-guide.md     | api-guide.html     | /api-guide.html\nabout/license.md | about/license.html | /about/license.html\n\nFor example, this needs to be set to `false` when:\n\n* opening pages directly from the file system\n* publishing the documentation to a static S3 website.\n\n",
+        "line_start": 690,
+        "line_end": 700
+      },
+      {
+        "stable_chunk_id": "child-84b130ef127da93f71a3e2844345b788d615bd57",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**`use_directory_urls: true`**\n\nThe default style of `use_directory_urls: true` creates more user friendly URLs,\nand is usually what you'll want to use.\n\nSource file      | Generated File            | URL Format\n---------------- | ------------------------- | ---------------\nindex.md         | /index.html               | /\napi-guide.md     | /api-guide/index.html     | /api-guide/\nabout/license.md | /about/license/index.html | /about/license/\n\n",
+        "line_start": 701,
+        "line_end": 711
+      },
+      {
+        "stable_chunk_id": "child-4029692fd7440dbe6722796862b477aa00f02f46",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**default**: `true`\n\n",
+        "line_start": 712,
+        "line_end": 713
+      },
+      {
+        "stable_chunk_id": "child-219f6090670e34cb3ce660b39654ee6fcae65446",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### strict\n\nDetermines how warnings are handled. Set to `true` to halt processing when a\nwarning is raised. Set to `false` to print a warning and continue processing.\n\nThis is also available as a command line flag: `--strict`.\n\n**default**: `false`\n\n",
+        "line_start": 714,
+        "line_end": 722
+      },
+      {
+        "stable_chunk_id": "child-0c5f630849a86a0bb6ae901ba45ed3036e89da8e",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### dev_addr\n\nDetermines the address used when running `mkdocs serve`. Must be of the format\n`IP:PORT`.\n\nAllows a custom default to be set without the need to pass it through the\n`--dev-addr` option every time the `mkdocs serve` command is called.\n\n**default**: `'127.0.0.1:8000'`\n\nSee also: [site_url](#site_url).\n\n",
+        "line_start": 723,
+        "line_end": 734
+      },
+      {
+        "stable_chunk_id": "child-209fc9fc6bc3ad7ee3056b1b81e47e68bb3642be",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Formatting options\n\n",
+        "line_start": 735,
+        "line_end": 736
+      },
+      {
+        "stable_chunk_id": "child-1621436cc4cbdfca19fdede7435ae9aa23377705",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### markdown_extensions\n\nMkDocs uses the [Python Markdown][pymkd] library to translate Markdown files\ninto HTML. Python Markdown supports a variety of [extensions][pymdk-extensions]\nthat customize how pages are formatted. This setting lets you enable a list of\nextensions beyond the ones that MkDocs uses by default (`meta`, `toc`, `tables`,\nand `fenced_code`).\n\nFor example, to enable the [SmartyPants typography extension][smarty], use:\n\n",
+        "line_start": 737,
+        "line_end": 746
+      },
+      {
+        "stable_chunk_id": "child-94556c07bf4d7d8ebbda4579a43f4a83f869446e",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nmarkdown_extensions:\n  - smarty\n```\n\nSome extensions provide configuration options of their own. If you would like to\nset any configuration options, then you can nest a key/value mapping\n(`option_name: option value`) of any options that a given extension supports.\nSee the documentation for the extension you are using to determine what options\nthey support.\n\nFor example, to enable permalinks in the (included) `toc` extension, use:\n\n",
+        "line_start": 747,
+        "line_end": 759
+      },
+      {
+        "stable_chunk_id": "child-c0007ae4679693abd76d5cde8d1aad57d80275ae",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nmarkdown_extensions:\n  - toc:\n      permalink: true\n```\n\nNote that a colon (`:`) must follow the extension name (`toc`) and then on a new\nline the option name and value must be indented and separated by a colon. If you\nwould like to define multiple options for a single extension, each option must be\ndefined on a separate line:\n\n```yaml\nmarkdown_extensions:\n  - toc:\n      permalink: true\n      separator: \"_\"\n```\n\n",
+        "line_start": 760,
+        "line_end": 777
+      },
+      {
+        "stable_chunk_id": "child-09a5ae531c5528f69bd54a988ad26840a10a21e8",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Add an additional item to the list for each extension. If you have no\nconfiguration options to set for a specific extension, then simply omit options\nfor that extension:\n\n```yaml\nmarkdown_extensions:\n  - smarty\n  - toc:\n      permalink: true\n  - sane_lists\n```\n\n",
+        "line_start": 778,
+        "line_end": 789
+      },
+      {
+        "stable_chunk_id": "child-5d56dd1dc414186e535150a62e3cea1c70ccc5f0",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> NOTE: **Dynamic config values.**\n>\n> To dynamically configure the extensions, you can get the config values from [environment variables](#environment-variables) or [obtain paths](#paths-relative-to-the-current-file-or-site) of the currently rendered Markdown file or the overall MkDocs site.\n\n",
+        "line_start": 790,
+        "line_end": 793
+      },
+      {
+        "stable_chunk_id": "child-04f51d509d642fc3b6bc7b9dbb6fe39efc044b7f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "In the above examples, each extension is a list item (starts with a `-`). As an\nalternative, key/value pairs can be used instead. However, in that case an empty\nvalue must be provided for extensions for which no options are defined.\nTherefore, the last example above could also be defined as follows:\n\n```yaml\nmarkdown_extensions:\n  smarty: {}\n  toc:\n    permalink: true\n  sane_lists: {}\n```\n\n",
+        "line_start": 794,
+        "line_end": 806
+      },
+      {
+        "stable_chunk_id": "child-bc83af579387bc4954e16607803a00409895bf92",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "This alternative syntax is required if you intend to override some options via\n[inheritance].\n\n",
+        "line_start": 807,
+        "line_end": 809
+      },
+      {
+        "stable_chunk_id": "child-6cc223022700c2b68c82f6839824212ff7c40f61",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> NOTE: **More extensions.**\n>\n> The Python-Markdown documentation provides a [list of extensions][exts]\n> which are available out-of-the-box. For a list of configuration options\n> available for a given extension, see the documentation for that extension.\n>\n> You may also install and use various third party extensions ([Python-Markdown wiki], [MkDocs project catalog][catalog]). Consult\n> the documentation provided by those extensions for installation instructions\n> and available configuration options.\n\n",
+        "line_start": 810,
+        "line_end": 819
+      },
+      {
+        "stable_chunk_id": "child-82b0fe9283eb0b70d12745a12847408437212133",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "**default**: `[]` (an empty list).\n\n",
+        "line_start": 820,
+        "line_end": 821
+      },
+      {
+        "stable_chunk_id": "child-df1c95ed73f71b72c1cfa53c38e7a6f255706d20",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### hooks\n\nNEW: **New in version 1.4.**\n\nA list of paths to Python scripts (relative to `mkdocs.yml`) that are loaded and used as [plugin](#plugins) instances.\n\nFor example:\n\n```yaml\nhooks:\n  - my_hooks.py\n```\n\nThen the file `my_hooks.py` can contain any [plugin event handlers](../dev-guide/plugins.md#events) (without `self`), e.g.:\n\n```python\ndef on_page_markdown(markdown, **kwargs):\n    return markdown.replace('a', 'z')\n```\n\n",
+        "line_start": 822,
+        "line_end": 841
+      },
+      {
+        "stable_chunk_id": "child-e3717f4a7eed1b050a9cde60b79e0486a196d8d7",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": ">? EXAMPLE: **Advanced example:**\n>\n> This produces warnings based on the Markdown content (and warnings are fatal in [strict](#strict) mode):\n>\n> ```python\n> import logging, re\n> import mkdocs.plugins\n>\n> log = logging.getLogger('mkdocs')\n>\n> @mkdocs.plugins.event_priority(-50)\n> def on_page_markdown(markdown, page, **kwargs):\n>     path = page.file.src_uri\n>     for m in re.finditer(r'\\bhttp://[^) ]+', markdown):\n>         log.warning(f\"Documentation file '{path}' contains a non-HTTPS link: {m[0]}\")\n> ```\n\n",
+        "line_start": 842,
+        "line_end": 858
+      },
+      {
+        "stable_chunk_id": "child-c49198437ac5d1f52b55b466795626f8849db3b1",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "This does not enable any new abilities compared to [plugins][], it only simplifies one-off usages, as these don't need to be *installed* like plugins do.\n\nNote that for `mkdocs serve` the hook module will *not* be reloaded on each build.\n\nYou might have seen this feature in the [mkdocs-simple-hooks plugin](https://github.com/aklajnert/mkdocs-simple-hooks). If using standard method names, it can be directly replaced, e.g.:\n\n",
+        "line_start": 859,
+        "line_end": 864
+      },
+      {
+        "stable_chunk_id": "child-1d3bc4afe3e90aba632ff11fd7cf8f6f281ad752",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```diff\n-plugins:\n-  - mkdocs-simple-hooks:\n-      hooks:\n-        on_page_markdown: 'my_hooks:on_page_markdown'\n+hooks:\n+  - my_hooks.py\n```\n\n> NEW: **New in MkDocs 1.6.**\n>\n> If a hook file has a file `foo.py` adjacent to it, it can use the normal Python syntax `import foo` to access its functions.\n>\n> In older versions of MkDocs, a workaround was necessary to make this work - adding the path to `sys.path`.\n\n",
+        "line_start": 865,
+        "line_end": 879
+      },
+      {
+        "stable_chunk_id": "child-32e31f1efb546d001b59fee4642e68ebd1ba0143",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### plugins\n\nA list of plugins (with optional configuration settings) to use when building\nthe site. See the [Plugins] documentation for full details.\n\n**default**: `['search']` (the \"search\" plugin included with MkDocs).\n\nIf the `plugins` config setting is defined in the `mkdocs.yml` config file, then\nany defaults (such as `search`) are ignored and you need to explicitly re-enable\nthe defaults if you would like to continue using them:\n\n",
+        "line_start": 880,
+        "line_end": 890
+      },
+      {
+        "stable_chunk_id": "child-772e72edc01e78c5da6b418f4ef7b80c10196458",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nplugins:\n  - search\n  - your_other_plugin\n```\n\nTo define options for a given plugin, use a nested set of key/value pairs:\n\n```yaml\nplugins:\n  - search\n  - your_other_plugin:\n      option1: value\n      option2: other value\n```\n\nTo completely disable all plugins, including any defaults, set the `plugins`\nsetting to an empty list:\n\n```yaml\nplugins: []\n```\n\n",
+        "line_start": 891,
+        "line_end": 913
+      },
+      {
+        "stable_chunk_id": "child-52858b64f97fcf3d4c92322ff365a0a88a446561",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "#### `enabled` option\n\n> NEW: **New in MkDocs 1.6.**\n>\n> Each plugin has its own options keys. However MkDocs also ensures that each plugin has the `enabled` boolean option. This can be used to conditionally enable a particular plugin, as in the following example:\n>\n> ```yaml\n> plugins:\n>   - search\n>   - code-validator:\n>       enabled: !ENV [LINT, false]\n> ```\n>\n> See: [Environment variables](#environment-variables)\n\n",
+        "line_start": 914,
+        "line_end": 928
+      },
+      {
+        "stable_chunk_id": "child-1b712b421feecdbdef142fc851267bcdd1f5b4be",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "#### Alternate syntax\n\nIn the above examples, each plugin is a list item (starts with a `-`). As an\nalternative, key/value pairs can be used instead. However, in that case an empty\nvalue must be provided for plugins for which no options are defined. Therefore,\nthe last example above could also be defined as follows:\n\n```yaml\nplugins:\n  search: {}\n  your_other_plugin:\n    option1: value\n    option2: other value\n```\n\n",
+        "line_start": 929,
+        "line_end": 943
+      },
+      {
+        "stable_chunk_id": "child-64d4442fa13bd31b5bf3fa86e32a0c4076ba7d6b",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "This alternative syntax is required if you intend to override some options via\n[inheritance].\n\n",
+        "line_start": 944,
+        "line_end": 946
+      },
+      {
+        "stable_chunk_id": "child-8dd3642fd10dad22ef0a01b4b67a88437a205773",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "#### Search\n\nA search plugin is provided by default with MkDocs which uses [lunr.js] as a\nsearch engine. The following config options are available to alter the behavior\nof the search plugin:\n\n",
+        "line_start": 947,
+        "line_end": 952
+      },
+      {
+        "stable_chunk_id": "child-a934e6a56cb0aaafc9804862dd68d33d8f1f04b8",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "##### **separator**\n\nA regular expression which matches the characters used as word separators when\nbuilding the index. By default whitespace and the hyphen (`-`) are used. To add\nthe dot (`.`) as a word separator you might do this:\n\n```yaml\nplugins:\n  - search:\n      separator: '[\\s\\-\\.]+'\n```\n\n**default**: `'[\\s\\-]+'`\n\n",
+        "line_start": 953,
+        "line_end": 966
+      },
+      {
+        "stable_chunk_id": "child-c6827e8b1863510db46d9ff2a07f1bf6972adaa4",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "##### **min_search_length**\n\nAn integer value that defines the minimum length for a search query. By default\nsearches shorter than 3 chars in length are ignored as search result quality with\nshort search terms are poor. However, for some use cases (such as documentation\nabout Message Queues which might generate searches for 'MQ') it may be preferable\nto set a shorter limit.\n\n",
+        "line_start": 967,
+        "line_end": 974
+      },
+      {
+        "stable_chunk_id": "child-7b1cc0762ab96ec44df29df39a7ac85234058f7f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nplugins:\n  - search:\n      min_search_length: 2\n```\n\n**default**: 3\n\n",
+        "line_start": 975,
+        "line_end": 982
+      },
+      {
+        "stable_chunk_id": "child-c03034475105a2cd8eb5d29a93fe8cd6b1bbae62",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "##### **lang**\n\n",
+        "line_start": 983,
+        "line_end": 984
+      },
+      {
+        "stable_chunk_id": "child-eb88b3b9bbafa17a273e4346b33ea7c037570843",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "A list of languages to use when building the search index as identified by their\n[ISO 639-1] language codes. With [Lunr Languages], the following languages are\nsupported:\n\n* `ar`: Arabic\n* `da`: Danish\n* `nl`: Dutch\n* `en`: English\n* `fi`: Finnish\n* `fr`: French\n* `de`: German\n* `hu`: Hungarian\n* `it`: Italian\n* `ja`: Japanese\n* `no`: Norwegian\n* `pt`: Portuguese\n* `ro`: Romanian\n* `ru`: Russian\n* `es`: Spanish\n* `sv`: Swedish\n* `th`: Thai\n* `tr`: Turkish\n* `vi`: Vietnamese\n\n",
+        "line_start": 985,
+        "line_end": 1008
+      },
+      {
+        "stable_chunk_id": "child-3e01c1309127ce32110d8eb32a1c53340123730d",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "You may [contribute additional languages].\n\nWARNING:\nWhile search does support using multiple languages together, it is best not\nto add additional languages unless you really need them. Each additional\nlanguage adds significant bandwidth requirements and uses more browser\nresources. Generally, it is best to keep each instance of MkDocs to a single\nlanguage.\n\n",
+        "line_start": 1009,
+        "line_end": 1017
+      },
+      {
+        "stable_chunk_id": "child-a9a3f1d6845c65f9ecfac64de6b7a8dd24b7dec0",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "NOTE:\nLunr Languages does not currently include support for Chinese or other Asian\nlanguages. However, some users have reported decent results using Japanese.\n\n**default**: The value of `theme.locale` if set, otherwise `[en]`.\n\n",
+        "line_start": 1018,
+        "line_end": 1023
+      },
+      {
+        "stable_chunk_id": "child-279ee37f95648bee8923702406caaef25406b15a",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "##### **prebuild_index**\n\nOptionally generates a pre-built index of all pages, which provides some\nperformance improvements for larger sites. Before enabling, confirm that the\ntheme you are using explicitly supports using a prebuilt index (the builtin\nthemes do). Set to `true` to enable.\n\n",
+        "line_start": 1024,
+        "line_end": 1030
+      },
+      {
+        "stable_chunk_id": "child-449d4b7fe786edfbe6914745672782f0e7f4e636",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "WARNING:\nThis option requires that [Node.js] be installed and the command `node` be\non the system path. If the call to `node` fails for any reason, a warning\nis issued and the build continues uninterrupted. You may use the `--strict`\nflag when building to cause such a failure to raise an error instead.\n\n",
+        "line_start": 1031,
+        "line_end": 1036
+      },
+      {
+        "stable_chunk_id": "child-6733ba41ae95a781ef8391f97ae34fc07c21e123",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "NOTE:\nOn smaller sites, using a pre-built index is not recommended as it creates a\nsignificant increase is bandwidth requirements with little to no noticeable\nimprovement to your users. However, for larger sites (hundreds of pages),\nthe bandwidth increase is relatively small and your users will notice a\nsignificant improvement in search performance.\n\n**default**: `False`\n\n",
+        "line_start": 1037,
+        "line_end": 1045
+      },
+      {
+        "stable_chunk_id": "child-31af4b5600bffa587f9a221c9696646caf29f2d6",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "##### **indexing**\n\nConfigures what strategy the search indexer will use when building the index\nfor your pages. This property is particularly useful if your project is large\nin scale, and the index takes up an enormous amount of disk space.\n\n```yaml\nplugins:\n  - search:\n      indexing: 'full'\n```\n\n",
+        "line_start": 1046,
+        "line_end": 1057
+      },
+      {
+        "stable_chunk_id": "child-4957186e285fad5d0bf8006a628d32de222d3c2a",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "###### Options\n\nOption | Description\n------ | -----------\n`full` | Indexes the title, section headings, and full text of each page.\n`sections` | Indexes the title and section headings of each page.\n`titles` | Indexes only the title of each page.\n\n**default**: `full`\n\n",
+        "line_start": 1058,
+        "line_end": 1067
+      },
+      {
+        "stable_chunk_id": "child-1afd174c8c7cc962141012150c5f55b3bfb9d74f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Special YAML tags\n\n",
+        "line_start": 1068,
+        "line_end": 1069
+      },
+      {
+        "stable_chunk_id": "child-daee7f99264e8ec52b8f476f70475e13f782173f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### Environment variables\n\nIn most cases, the value of a configuration option is set directly in the\nconfiguration file. However, as an option, the value of a configuration option\nmay be set to the value of an environment variable using the `!ENV` tag. For\nexample, to set the value of the `site_name` option to the value of the\nvariable `SITE_NAME` the YAML file may contain the following:\n\n```yaml\nsite_name: !ENV SITE_NAME\n```\n\n",
+        "line_start": 1070,
+        "line_end": 1081
+      },
+      {
+        "stable_chunk_id": "child-ee57860b5d2427fb251bf06f4fc5dced11571023",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "If the environment variable is not defined, then the configuration setting\nwould be assigned a `null` (or `None` in Python) value. A default value can be\ndefined as the last value in a list. Like this:\n\n```yaml\nsite_name: !ENV [SITE_NAME, 'My default site name']\n```\n\n",
+        "line_start": 1082,
+        "line_end": 1089
+      },
+      {
+        "stable_chunk_id": "child-f62e94fe45ef4deea52880da630343110e58507a",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Multiple fallback variables can be used as well. Note that the last value is\nnot an environment variable, but must be a value to use as a default if none\nof the specified environment variables are defined.\n\n```yaml\nsite_name: !ENV [SITE_NAME, OTHER_NAME, 'My default site name']\n```\n\n",
+        "line_start": 1090,
+        "line_end": 1097
+      },
+      {
+        "stable_chunk_id": "child-c10762752ad0aacdec4e58dce6a49d09abd7c142",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Simple types defined within an environment variable such as string, bool,\ninteger, float, datestamp and null are parsed as if they were defined directly\nin the YAML file, which means that the value will be converted to the\nappropriate type. However, complex types such as lists and key/value pairs\ncannot be defined within a single environment variable.\n\n",
+        "line_start": 1098,
+        "line_end": 1103
+      },
+      {
+        "stable_chunk_id": "child-242d0b100e76522e7d43722fb8496ff83aa08da0",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "For more details, see the [pyyaml_env_tag](https://github.com/waylan/pyyaml-env-tag)\nproject.\n\n",
+        "line_start": 1104,
+        "line_end": 1106
+      },
+      {
+        "stable_chunk_id": "child-969444ac32b0b46c79a7ef5e9f54362db29e3678",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "### Paths relative to the current file or site\n\nNEW: **New in version 1.5.**\n\nSome Markdown extensions can benefit from knowing the path of the Markdown file that's currently being processed, or just the root path of the current site. For that, the special tag `!relative` can be used in most contexts within the config file, though the only known usecases are within [`markdown_extensions`](#markdown_extensions).\n\n",
+        "line_start": 1107,
+        "line_end": 1112
+      },
+      {
+        "stable_chunk_id": "child-71d0ea9de7fa68e88f7dcd6544fc744a30d297d6",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Examples of the possible values are:\n\n```yaml\n- !relative  # Relative to the directory of the current Markdown file\n- !relative $docs_dir  # Path of the docs_dir\n- !relative $config_dir  # Path of the directory that contains the main mkdocs.yml\n- !relative $config_dir/some/child/dir  # Some subdirectory of the root config directory\n```\n\n",
+        "line_start": 1113,
+        "line_end": 1121
+      },
+      {
+        "stable_chunk_id": "child-486d7669d3e0dde2922bda25a6f358f552fd6196",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "(Here, `$docs_dir` and `$config_dir` are currently the *only* special prefixes that are recognized.)\n\nExample:\n\n```yaml\nmarkdown_extensions:\n  - pymdownx.snippets:\n      base_path: !relative  # Relative to the current Markdown file\n```\n\nThis allows the [pymdownx.snippets] extension to include files relative to the current Markdown file, which without this tag it would have no way of knowing.\n\n",
+        "line_start": 1122,
+        "line_end": 1133
+      },
+      {
+        "stable_chunk_id": "child-54bd3d2c0c6d6c486ffe0fc22d1082c6939c126f",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "> NOTE: Even for the default case, any extension's base path is technically the *current working directory* although the assumption is that it's the *directory of mkdocs.yml*. So even if you don't want the paths to be relative, to improve the default behavior, always prefer to use this idiom:\n>\n> ```yaml\n> markdown_extensions:\n>   - pymdownx.snippets:\n>       base_path: !relative $config_dir  # Relative to the root directory with mkdocs.yml\n> ```\n\n",
+        "line_start": 1134,
+        "line_end": 1141
+      },
+      {
+        "stable_chunk_id": "child-c748258b1b0daf90c7199275365b6e31f0f7b417",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "## Configuration Inheritance\n\nGenerally, a single file would hold the entire configuration for a site.\nHowever, some organizations may maintain multiple sites which all share a common\nconfiguration across them. Rather than maintaining separate configurations for\neach, the common configuration options can be defined in a parent configuration\nfile which each site's primary configuration file inherits.\n\n",
+        "line_start": 1142,
+        "line_end": 1149
+      },
+      {
+        "stable_chunk_id": "child-cbf72fa2c0d6ed02a30e2e578f3ee9a96af2031a",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "To define the parent for a configuration file, set the `INHERIT` (all caps) key\nto the path of the parent file. The path must be relative to the location of the\nprimary file.\n\nFor configuration options to be merged with a parent configuration, those\noptions must be defined as key/value pairs. Specifically, the\n[markdown_extensions] and [plugins](#plugins) options must use the alternative syntax\nwhich does not use list items (lines which start with  `-`).\n\n",
+        "line_start": 1150,
+        "line_end": 1158
+      },
+      {
+        "stable_chunk_id": "child-7456a1cc43888114527ed2d98dc9dc990e9322ef",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "For example, suppose the common (parent) configuration is defined in `base.yml`:\n\n```yaml\ntheme:\n  name: mkdocs\n  locale: en\n  highlightjs: true\n\nmarkdown_extensions:\n  toc:\n    permalink: true\n  admonition: {}\n```\n\nThen, for the \"foo\" site, the primary configuration file would be defined at\n`foo/mkdocs.yml`:\n\n```yml\nINHERIT: ../base.yml\nsite_name: Foo Project\nsite_url: https://example.com/foo\n```\n\n",
+        "line_start": 1159,
+        "line_end": 1181
+      },
+      {
+        "stable_chunk_id": "child-c67c4487ae809dd2e8330d7d75997ff9a7b481de",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "When running `mkdocs build`, the file at `foo/mkdocs.yml` would be passed in as\nthe configuration file. MkDocs will then parse that file, retrieve and parse the\nparent file `base.yml` and deep merge the two. This would result in MkDocs\nreceiving the following merged configuration:\n\n",
+        "line_start": 1182,
+        "line_end": 1186
+      },
+      {
+        "stable_chunk_id": "child-eb1ea70eee8f833bb7bfa2d9039569b8255e62da",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nsite_name: Foo Project\nsite_url: https://example.com/foo\n\ntheme:\n  name: mkdocs\n  locale: en\n  highlightjs: true\n\nmarkdown_extensions:\n  toc:\n    permalink: true\n  admonition: {}\n```\n\n",
+        "line_start": 1187,
+        "line_end": 1201
+      },
+      {
+        "stable_chunk_id": "child-edd217dd2ba5bd7ded8fdfd7d4b318fa5391b6d2",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "Deep merging allows you to add and/or override various values in your primary\nconfiguration file. For example, suppose for one site you wanted to add support\nfor definition lists, use a different symbol for permalinks, and define a\ndifferent separator. In that site's primary configuration file you could do:\n\n",
+        "line_start": 1202,
+        "line_end": 1206
+      },
+      {
+        "stable_chunk_id": "child-3a9fe1f648ad9e64c59d4e07aa7bcdddbc1cbd36",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nINHERIT: ../base.yml\nsite_name: Bar Project\nsite_url: https://example.com/bar\n\nmarkdown_extensions:\n  def_list: {}\n  toc:\n    permalink: \n    separator: \"_\"\n```\n\nIn that case, the above configuration would be deep merged with `base.yml` and\nresult in the following configuration:\n\n",
+        "line_start": 1207,
+        "line_end": 1221
+      },
+      {
+        "stable_chunk_id": "child-da13397708ab7e007de05081656376c36672f074",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "```yaml\nsite_name: Bar Project\nsite_url: https://example.com/bar\n\ntheme:\n  name: mkdocs\n  locale: en\n  highlightjs: true\n\nmarkdown_extensions:\n  def_list: {}\n  toc:\n    permalink: \n    separator: \"_\"\n  admonition: {}\n```\n\nNotice that the `admonition` extension was retained from the parent\nconfiguration, the `def_list` extension was added, the value of\n`toc.permalink` was replaced, and the value of `toc.separator` was added.\n\n",
+        "line_start": 1222,
+        "line_end": 1242
+      },
+      {
+        "stable_chunk_id": "child-9759bc371bef7766ea725681fed986d0ef946550",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "You can replace or merge the value of any key. However, any non-key is always\nreplaced. Therefore, you cannot append items to a list. You must redefine the\nentire list.\n\n",
+        "line_start": 1243,
+        "line_end": 1246
+      },
+      {
+        "stable_chunk_id": "child-b273214a11191356c9e6d33f92ae145f6631f244",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "As the [nav] configuration is made up of nested lists, this means that you\ncannot merge navigation items. Of course, you can replace the entire `nav`\nconfiguration with a new one. However, it is generally expected that the entire\nnavigation would be defined in the primary configuration file for a project.\n\n",
+        "line_start": 1247,
+        "line_end": 1251
+      },
+      {
+        "stable_chunk_id": "child-cf6baa3b1aff09d31bfe86c287df03bc470551d0",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "WARNING:\nAs a reminder, all path based configuration options must be relative to the\nprimary configuration file and MkDocs does not alter the paths when merging.\nTherefore, defining paths in a parent file which is inherited by multiple\ndifferent sites may not work as expected. It is generally best to define\npath based options in the primary configuration file only.\n\n",
+        "line_start": 1252,
+        "line_end": 1258
+      },
+      {
+        "stable_chunk_id": "child-85f62006ff899bd78f63fb96febc1b0b74fd7fe3",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "The inheritance can also be used as a quick way to override keys on the command line - by using stdin as the config file. For example:\n\n```bash\necho '{INHERIT: mkdocs.yml, site_name: \"Renamed site\"}' | mkdocs build -f -\n```\n\n",
+        "line_start": 1259,
+        "line_end": 1264
+      },
+      {
+        "stable_chunk_id": "child-867323edd617f6aace1287d43c699d483b5d310b",
+        "source_path": "docs/user-guide/configuration.md",
+        "display_text": "[Theme Developer Guide]: ../dev-guide/themes.md\n[custom themes]: ../dev-guide/themes.md\n[available variables]: ../dev-guide/themes.md#template-variables\n[pymdk-extensions]: https://python-markdown.github.io/extensions/\n[pymkd]: https://python-markdown.github.io/\n[smarty]: https://python-markdown.github.io/extensions/smarty/\n[exts]: https://python-markdown.github.io/extensions/\n[Python-Markdown wiki]: https://github.com/Python-Markdown/markdown/wiki/Third-Party-Extensions\n[catalog]: https://github.com/mkdocs/catalog\n[configuring pages and navigation]: writing-your-docs.md#configure-pages-and-navigation\n[Meta-Data]: writing-your-docs.md#meta-data\n[theme_dir]: customizing-your-theme.md#using-the-theme-custom_dir\n[choosing your theme]: choosing-your-theme.md\n[Localizing your theme]: localizing-your-theme.md\n[extra_css]: #extra_css\n[Plugins]: ../dev-guide/plugins.md\n[lunr.js]: https://lunrjs.com/\n[ISO 639-1]: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes\n[Lunr Languages]: https://github.com/MihaiValentin/lunr-languages#lunr-languages-----\n[contribute additional languages]: https://github.com/MihaiValentin/lunr-languages/blob/master/CONTRIBUTING.md\n[Node.js]: https://nodejs.org/\n[markdown_extensions]: #markdown_extensions\n[nav]: #nav\n[inheritance]: #configuration-inheritance\n[pymdownx.snippets]: https://facelessuser.github.io/pymdown-extensions/extensions/snippets/\n",
+        "line_start": 1265,
+        "line_end": 1289
+      }
+    ],
+    "sqlite_version": "3.45.1",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "909ce7f71de03d0447dee29127931d1971e4c22a9d95391750c6b6893a21158f",
+    "storage_path": "/tmp/docatlas-removal-secure-xs_64g44/docatlas-evidence-aw1l_lmj/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-c5736f738da04c81bdecdc86490261de",
+    "catalog_sha256": "333bce60db3f8efc631c6883b546e14d744dec2afedd451f58e40fc167316f86",
+    "documents": [
+      {
+        "path": "docs/user-guide/configuration.md",
+        "content_sha256": "18ef4f7e72a22b07130a8daa42be00fec836b748419b83d3bd035266e0e6e4fb",
+        "catalog_entry_hash": "sha256:d345cf459a38544558254ecf22ccf7f98a764aeb98f10cbbc5ce6e772054700c"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-c5736f738da04c81bdecdc86490261de",
+      "members": 1,
+      "new_count": 1,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 55,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 55
+    }
+  },
+  "snapshot_sources": [
+    {
+      "path": "docs/user-guide/configuration.md",
+      "content_sha256": "18ef4f7e72a22b07130a8daa42be00fec836b748419b83d3bd035266e0e6e4fb",
+      "matches_pinned_source": true
+    }
+  ],
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "mkdocs"
+}

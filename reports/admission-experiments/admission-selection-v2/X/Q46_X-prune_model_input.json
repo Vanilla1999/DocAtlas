@@ -1,0 +1,83 @@
+{
+  "question": "Можно ли признать PASS, если оба режима логирования дали одинаковый неправильный ответ?",
+  "sources": [
+    {
+      "source_id": "excerpt-6d679b7f97c4144e",
+      "text": "## Предлагаемый публичный сценарий logging off/on\n\nСначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n\n1. **Независимый эталон.** До запуска зафиксировать исходный вопрос, corpus и его версии, обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения состояния. Получить эталон из исходных документов и требований, не из выдачи проверяемого кода. Проверяемый поток не должен переписывать эталон или критерии ради PASS.\n2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n",
+      "provenance": {
+        "path_or_url": "README.md",
+        "scope": "project",
+        "version_binding": "unversioned",
+        "line_start": 76,
+        "line_end": 86,
+        "project_identity": "local:fc65a8f501f5c5f0dc7df8772047291fc305bfcccffdcdd0f9f87998af8bb775",
+        "authority": "source_of_truth"
+      }
+    },
+    {
+      "source_id": "excerpt-073df080d475e28e",
+      "text": "*",
+      "provenance": {
+        "path_or_url": "README.md",
+        "scope": "project",
+        "version_binding": "unversioned",
+        "line_start": 76,
+        "line_end": 86,
+        "project_identity": "local:fc65a8f501f5c5f0dc7df8772047291fc305bfcccffdcdd0f9f87998af8bb775",
+        "authority": "source_of_truth"
+      }
+    },
+    {
+      "source_id": "excerpt-3be674da6b42ed4e",
+      "text": "В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый",
+      "provenance": {
+        "path_or_url": "README.md",
+        "scope": "project",
+        "version_binding": "unversioned",
+        "line_start": 76,
+        "line_end": 86,
+        "project_identity": "local:fc65a8f501f5c5f0dc7df8772047291fc305bfcccffdcdd0f9f87998af8bb775",
+        "authority": "source_of_truth"
+      }
+    },
+    {
+      "source_id": "excerpt-3982181389ad967a",
+      "text": "Одинаковые неправильные ответы не дают PASS.",
+      "provenance": {
+        "path_or_url": "README.md",
+        "scope": "project",
+        "version_binding": "unversioned",
+        "line_start": 76,
+        "line_end": 86,
+        "project_identity": "local:fc65a8f501f5c5f0dc7df8772047291fc305bfcccffdcdd0f9f87998af8bb775",
+        "authority": "source_of_truth"
+      }
+    },
+    {
+      "source_id": "excerpt-9c09c426b35f89c8",
+      "text": " Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n4. **Диагностический контракт.** При on трасса должна позволять связать этапы одного вопроса и локализовать причину сбоя; пропуски трассы должны быть явными. При off подробная трасса отключена. В MCP диагностический канал отделён от protocol stdout. Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.\n\nВнутренние mocks не использовать. Если для воспроизводимости подменяется внешний транспорт, явно указать эту границу: такой запуск не доказывает работоспособность живого провайдера.\n\n",
+      "provenance": {
+        "path_or_url": "README.md",
+        "scope": "project",
+        "version_binding": "unversioned",
+        "line_start": 76,
+        "line_end": 86,
+        "project_identity": "local:fc65a8f501f5c5f0dc7df8772047291fc305bfcccffdcdd0f9f87998af8bb775",
+        "authority": "source_of_truth"
+      }
+    },
+    {
+      "source_id": "excerpt-4b221a25871fe56a",
+      "text": "Для MCP-клиента можно задать `DOCATLAS_TRACE=1` в окружении серверного процесса.\nДиагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.\nОбычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`.\n\n",
+      "provenance": {
+        "path_or_url": "README.md",
+        "scope": "project",
+        "version_binding": "unversioned",
+        "line_start": 23,
+        "line_end": 26,
+        "project_identity": "local:fc65a8f501f5c5f0dc7df8772047291fc305bfcccffdcdd0f9f87998af8bb775",
+        "authority": "source_of_truth"
+      }
+    }
+  ]
+}

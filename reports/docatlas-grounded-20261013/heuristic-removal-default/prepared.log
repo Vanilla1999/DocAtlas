@@ -1,0 +1,86 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_prepared_retrieval_preserves_default_and_scope_boundaries ________
+
+tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-4/test_prepared_retrieval_preser0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa72f69d5e0>
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-4/test_prepared_retrieval_preser0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x7fa7365471a0>
+
+    def test_prepared_retrieval_preserves_default_and_scope_boundaries(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """1 prepare, 10 contexts, at most 1 bounded source read."""
+        project, foreign = tmp_path / "project", tmp_path / "foreign-project"
+        runtime.write_project(project, SCOPE_DOCUMENTS)
+        catalog_path = project / "docatlas.project-docs.yaml"
+        catalog = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+        for entry in catalog["documents"]:
+            if entry["path"] == "modules/imaging/guide.md":
+                entry.update(scope="module", module_path="modules/imaging")
+        catalog_path.write_text(yaml.safe_dump(catalog, sort_keys=False), encoding="utf-8")
+        (project / "docs/unlisted.md").write_text(
+            "# Unlisted\n\n`UNLISTED_PIN` opens the private calibration cabinet.\n", encoding="utf-8",
+        )
+        runtime.write_project(foreign, {"docs/camera.md": SCOPE_DOCUMENTS["docs/camera.md"]})
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.setenv(PARENTS_ENV, "1")
+            inventory = runtime.index_project(service, config, project)
+            _committed_documents(inventory, project, SCOPE_DOCUMENTS)
+            assert _prepared_manifest(inventory)
+            before, files_before = _database_state(inventory), _file_state(project)
+            foreign_before = _file_state(foreign)
+            env.delenv(PARENTS_ENV)
+            positive_off = _context(service, project, SHUTTER_QUESTION)
+            negative_off = _context(service, project, EXACT_NEGATIVE_QUESTION)
+            env.setenv(PARENTS_ENV, "1")
+            positive_on = _context(service, project, SHUTTER_QUESTION)
+            negative_on = _context(service, project, EXACT_NEGATIVE_QUESTION)
+            shutter_facts = {"docs/camera.md": ("`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.",)}
+            _assert_facts(positive_off, project, shutter_facts)
+            _assert_facts(positive_on, project, shutter_facts)
+            assert _semantic_packet(positive_off) == _semantic_packet(positive_on)
+            assert not negative_off.get("sources") and not negative_on.get("sources")
+            assert _semantic_packet(negative_off) == _semantic_packet(negative_on)
+            for payload in (positive_off, positive_on, negative_off, negative_on):
+                _assert_packet_sources(payload, project, SCOPE_DOCUMENTS, module_paths=("modules/imaging/guide.md",))
+    
+            env.setenv(ADMISSION_ENV, "source_valid_candidates_v1")
+            env.setenv(CAP_ENV, str(WIDE_CAP))
+            unassessed_negative = _context(service, project, EXACT_NEGATIVE_QUESTION)
+            _assert_packet_sources(unassessed_negative, project, SCOPE_DOCUMENTS, module_paths=("modules/imaging/guide.md",))
+            assert unassessed_negative.get("answer_supported") is False
+            assert unassessed_negative.get("answer_available") is False
+            assert unassessed_negative.get("edit_ready") is False
+            assert not unassessed_negative.get("covered_query_ids")
+            # This recorded FAIL is not converted into a relevance PASS by this test.
+            record_property("negative_empty_source_current_contract",
+                            "FAIL" if unassessed_negative.get("sources") else "PASS")
+            record_property("unassessed_negative_source_count", len(unassessed_negative.get("sources") or ()))
+            assert not unassessed_negative.get("sources"), unassessed_negative
+            all_scope = _context(service, project, MODULE_QUESTION, scope="all")
+            project_scope = _context(service, project, MODULE_QUESTION)
+            module_scope = _context(service, project, MODULE_QUESTION, scope="module", module_path="modules/imaging")
+            for payload in (all_scope, module_scope):
+                _assert_packet_sources(payload, project, SCOPE_DOCUMENTS, module_paths=("modules/imaging/guide.md",))
+>               _assert_facts(payload, project, {"modules/imaging/guide.md": (
+                    "`SENSOR_GAIN` controls sensor gain for flat-field calibration.",
+                )})
+
+tests/test_prepared_retrieval_integration.py:416: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['required_evidence_missing'], 'estimated_tokens': 155, ...}
+project = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-4/test_prepared_retrieval_preser0/project')
+facts = {'modules/imaging/guide.md': ('`SENSOR_GAIN` controls sensor gain for flat-field calibration.',)}
+
+    def _assert_facts(payload, project, facts):
+>       assert payload.get("context_available") is True, payload
+E       AssertionError: {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['required_evidence_missing'], 'estimated_tokens': 155, ...}
+E       assert False is True
+E        +  where False = <built-in method get of dict object at 0x7fa7365c86c0>('context_available')
+E        +    where <built-in method get of dict object at 0x7fa7365c86c0> = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['required_evidence_missing'], 'estimated_tokens': 155, ...}.get
+
+tests/test_prepared_retrieval_integration.py:271: AssertionError
+==================================== PASSES ====================================
+1 failed, 3 passed in 2.06s

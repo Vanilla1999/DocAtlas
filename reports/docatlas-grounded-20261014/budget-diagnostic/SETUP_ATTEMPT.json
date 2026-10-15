@@ -1,0 +1,18 @@
+{
+  "attempt": "initial local setup",
+  "code_sha": "a011c7298f0731455799de2b19b4b7bb304876e8",
+  "work": "/tmp/opencode/docatlas-budget-data-20261014",
+  "output": "/tmp/opencode/docatlas-budget-measurements-20261014",
+  "tmpdir": "/tmp/opencode",
+  "tmpdir_mode": "0775",
+  "status": "failed before prepare/context",
+  "error": "PermissionError: storage ancestors must not permit foreign namespace replacement",
+  "source": "docmancer/core/member_storage_policy.py:53-69",
+  "public_prepare_calls": 0,
+  "public_context_calls": 0,
+  "recovery": "Fresh work/output and private safe host TMPDIR; no storage-policy bypass or chmod of shared directory",
+  "successful_work": "/tmp/opencode/docatlas-budget-data-20261014-b",
+  "successful_output": "/tmp/opencode/docatlas-budget-measurements-20261014-b",
+  "successful_tmpdir": "/home/viadmin/.cache/docatlas-budget-private-20261014",
+  "successful_tmpdir_mode": "0700"
+}

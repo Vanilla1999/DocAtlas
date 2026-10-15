@@ -1,0 +1,51 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-2213224fb8326e22",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Writeback and reporting",
+      "snippet": "### Writeback and reporting\n\nBy default _Black_ reformats the files given and/or found in place. Sometimes you need\n_Black_ to just tell you what it _would_ do without actually rewriting the Python files.\n\nThere's two variations to this mode that are independently enabled by their respective\nflags:\n\n- `--check` (exit with code 1 if any file would be reformatted)\n- `--diff` (print a diff instead of reformatting files)\n\nBoth variations can be enabled at once.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "24c4014cab7544ecf224e121f0e576c76cbad2a36c9fd8f344e52cee8f3c2045",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 437,
+      "line_end": 449,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/841fc796c7c74b939a628e2d"
+    },
+    {
+      "evidence_id": "ev-ac1160735e5da210",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Command line options > `--check`",
+      "snippet": "#### `--check`\n\nDon't write the files back, just return the status. _Black_ will exit with:\n\n- code 0 if nothing would change;\n- code 1 if some files would be reformatted; or\n- code 123 if there was an internal error\n\nIf used in combination with `--quiet` then only the exit code will be returned, unless\nthere was an internal error.\n\n```console\n$ black test.py --check\nAll done! ✨ 🍰 ✨\n1 file would be left unchanged.\n$ echo $?\n0\n\n$ black test.py --check\nwould reformat test.py\nOh no! 💥 💔 💥\n1 file would be reformatted.\n$ echo $?\n1\n\n$ black test.py --check\nerror: cannot format test.py: INTERNAL ERROR: Black produced code that is not equivalent to the source.  Please report a bug on https://github.com/psf/black/issues.  This diff might be helpful: /tmp/blk_kjdr1oog.log\nOh no! 💥 💔 💥\n1 file would fail to reformat.\n$ echo $?\n123\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "95f4ec98ca7c46579d90812484a19e2b4db68664d941f57b75135ee9ebb7ea36",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 180,
+      "line_end": 212,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/bc2e24347d577d0f71f50d3e"
+    },
+    {
+      "evidence_id": "ev-51f3a6cfa253a294",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Output verbosity",
+      "snippet": "```console\n$ black src/\nerror: cannot parse: src/black_primer/cli.py:5:6\n    mport asyncio\n         ^\nParseError: bad input\nreformatted src/black_primer/lib.py\nreformatted src/blackd/__init__.py\nreformatted src/black/__init__.py\nOh no! 💥 💔 💥\n3 files reformatted, 2 files left unchanged, 1 file failed to reformat.\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "d41899ae4a8f347362a8f6da026c9a17b52f4aebf926cd0b0e6a103ebefc0812",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 456,
+      "line_end": 468,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2f0ba49527a344b6e8a115b8"
+    }
+  ],
+  "tokens": 1097,
+  "utf8_bytes": 3324,
+  "sha256": "ed74d017828dfd9d452b961bd96ac57417828759257d1bf7132f5f81af2c5d71",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

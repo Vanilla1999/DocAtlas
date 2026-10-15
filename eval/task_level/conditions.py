@@ -177,7 +177,7 @@ Before making the first code edit, call the DocAtlas MCP tool
 
 Use:
 - project_path="."
-- delivery_strategy="bounded_direct"
+- context_format="patch_context"
 - question="<original task objective>"
 
 Use the returned ActionPacket as the source of project constraints.

@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "contract": "explicit-project-retrieval-alias-boundary-v1",
+  "migration_status": "guard-added-original-tests-still-collected",
+  "base_commit": "ec85a4969f71e62e48c66d835bf5d31431f5fc2c",
+  "source": {
+    "original_path": "tests/docs/test_direct_question_retrieval_intents.py",
+    "archive_path": "eval/task_level/contract_history/direct_question_retrieval_intents.py.txt",
+    "git_blob_sha": "6d81ce383b273a73e0679aad48d6a10495b91c48",
+    "sha256": "23e0e84815cf887cdd1ab5bd4c4caa550580982e9b5fd52ae9a2beb4075c7791",
+    "encoding": "utf-8"
+  },
+  "frozen_roster_sha256": "0c244ebb644ffb18366fb3bbcaf8fb1a26c32e35758db056530af91f9d56da48",
+  "historical_baseline": {
+    "label": "2199002 core-3.13",
+    "test_functions": 19,
+    "collected_cases": 49,
+    "passed": 13,
+    "failed": 36,
+    "errors": 0,
+    "skipped": 0,
+    "note": "Historical counts, not a result for this new gate or the current HEAD."
+  },
+  "current_contract": {
+    "original_input": "The complete original question remains an exact executable query.",
+    "explicit_lookup": "A caller-authored lookup remains a separate host_lookup with no required or parent coverage.",
+    "compatibility_api": "build_project_retrieval_aliases does not turn free-form questions into queries, inferred roles, or injected expected answers.",
+    "guards": [
+      "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    ],
+    "expected_mutation": "project_retrieval_no_generated_aliases",
+    "expected_failure_guard": "critical_alias_no_generated_queries",
+    "scope_limit": "This is an alias/planner boundary check. It does not establish retrieval recall, source qualification, factual completeness, original-query evidence credit, or runtime authorization.",
+    "retrieval_quality": "Existing project ranking, source qualification, factual retrieval and authority gates remain independent and unchanged.",
+    "retirement_rule": "Keep the original test module collected until an ordinary PR CI baseline passes and the directed production mutant fails at the named assertion; retirement requires a later reviewed change.",
+    "literal_comparison": "The separately recorded 702 historical / 82 compact cases and 51 mutation comparisons are unchanged and are not claimed as coverage for this alias helper."
+  },
+  "roster": [
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_docs_mcp_sequence_keeps_generic_workflow_and_normal_flow_probes",
+      "definition_line": 10,
+      "source_lines": [
+        10,
+        22
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate an English workflow alias with tool names and normal-flow wording.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_generic_docs_mcp_workflow_question_still_has_a_surface_level_probe",
+      "definition_line": 25,
+      "source_lines": [
+        25,
+        38
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate a cross-language workflow alias for a Russian question.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_policy_for_location",
+      "definition_line": 41,
+      "source_lines": [
+        41,
+        70
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Infer a tool-policy relation and overview catalog role from a question.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_product_overview_splits_identity_from_purpose_without_answer_hardcoding",
+      "definition_line": 73,
+      "source_lines": [
+        73,
+        82
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Infer product identity and purpose queries from prose.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_implementation_location_is_a_relation_not_any_code_symbol_or_config_location",
+      "definition_line": 85,
+      "source_lines": [
+        85,
+        100
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Infer implementation/configuration relations and architecture catalog roles.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_product_boundaries_use_relation_not_the_known_inventory",
+      "definition_line": 103,
+      "source_lines": [
+        103,
+        117
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate product-boundary queries without injecting the known answers.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_fail_closed_definition_targets_context_contract_not_incident_diagnostics",
+      "definition_line": 120,
+      "source_lines": [
+        120,
+        126
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate fail-closed workflow queries and distinguish incident troubleshooting.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_product_claims_targets_claim_status_not_the_document_title",
+      "definition_line": 129,
+      "source_lines": [
+        129,
+        141
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate product-claim queries and distinguish an editing request.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_sync_alias_preserves_only_states_explicitly_asked_by_the_user",
+      "definition_line": 144,
+      "source_lines": [
+        144,
+        164
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate sync-state queries from requested states.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_original_direct_question_families_keep_a_fresh_paraphrase",
+      "definition_line": 187,
+      "source_lines": [
+        167,
+        188
+      ],
+      "collected_cases": 15,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Map 15 paraphrases to inferred semantic intent identifiers.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_direct_question_family_neighbors_do_not_collapse_to_the_wrong_relation",
+      "definition_line": 207,
+      "source_lines": [
+        191,
+        208
+      ],
+      "collected_cases": 11,
+      "observed_2199002_outcome": "pass",
+      "historical_expectation": "Forbid an inferred relation for each of 11 neighboring questions.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_insufficient_evidence_agent_workflow_gets_neutral_cross_language_lookup",
+      "definition_line": 211,
+      "source_lines": [
+        211,
+        225
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate cross-language recovery aliases without injecting a prescribed action.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_unknown_tool_insufficient_evidence_does_not_inherit_docs_mcp_workflow",
+      "definition_line": 228,
+      "source_lines": [
+        228,
+        232
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "pass",
+      "historical_expectation": "Forbid a Docs MCP workflow alias for an unknown tool.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_dependency_version_questions_get_neutral_binding_lookup_without_answer_injection",
+      "definition_line": 241,
+      "source_lines": [
+        235,
+        249
+      ],
+      "collected_cases": 4,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate dependency-binding aliases without injecting an answer or version.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_product_evidence_claim_question_does_not_require_explicit_product_name",
+      "definition_line": 252,
+      "source_lines": [
+        252,
+        259
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate product-evidence aliases without an explicit product name.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_document_instruction_questions_get_neutral_trust_lookup",
+      "definition_line": 267,
+      "source_lines": [
+        262,
+        275
+      ],
+      "collected_cases": 3,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate trust aliases without injecting shell-execution policy.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_unrelated_runtime_version_and_generic_shell_question_do_not_gain_new_aliases",
+      "definition_line": 278,
+      "source_lines": [
+        278,
+        282
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "pass",
+      "historical_expectation": "Forbid dependency/trust aliases for unrelated runtime and shell questions.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_preparation_job_failure_reuses_subject_aware_troubleshooting_slot",
+      "definition_line": 289,
+      "source_lines": [
+        285,
+        292
+      ],
+      "collected_cases": 2,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate a fixed troubleshooting lookup for English and Russian questions.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    },
+    {
+      "original_nodeid": "tests/docs/test_direct_question_retrieval_intents.py::test_version_binding_mechanism_lookup_keeps_safety_and_resolution_in_one_slot",
+      "definition_line": 295,
+      "source_lines": [
+        295,
+        304
+      ],
+      "collected_cases": 1,
+      "observed_2199002_outcome": "fail",
+      "historical_expectation": "Generate a fixed dependency-safety-and-resolution lookup.",
+      "current_property": "free_form_questions_create_no_alias_queries_or_roles",
+      "current_guard": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-c519792f3ac41c6b",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Configuration File Resolution",
+      "snippet": "In this case, ESLint does not search for configuration files and instead uses `some-other-file.js`.\n\n## TypeScript Configuration Files\n\nFor Deno and Bun, TypeScript configuration files are natively supported; for Node.js, you must install the optional dev dependency [`jiti`](https://github.com/unjs/jiti) in version 2.2.0 or later in your project (this dependency is not automatically installed by ESLint):\n\n{{ npm_tabs({\n    command: \"install\",\n    packages: [\"jiti\"],\n    args: [\"--save-dev\"]\n}) }}\n\nYou can then create a configuration file with a `.ts`, `.mts`, or `.cts` extension, and export an array of [configuration objects](#configuration-objects).\n\n::: important\nESLint does not perform type checking on your configuration file and does not apply any settings from `tsconfig.json`.\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "de4eb61ead88c48e9a8e19690980abb37cc6f93d93a8ff6d6a239f9340b60c72",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 793,
+      "line_end": 810,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/b6bedfdfcf917e0753b46859"
+    },
+    {
+      "evidence_id": "ev-cb6f14bd3e2ae779",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Miscellaneous > `--env-info`",
+      "snippet": "#### `--env-info`\n\nThis option outputs information about the execution environment, including the version of Node.js, npm, and local and global installations of ESLint.\n\n- **Argument Type**: No argument.\n\nThe ESLint team may ask for this information to help solve bugs. When you use this flag, the CLI does not perform linting.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "316e44524c04f7d76b46c9b2290a4acbaaf991d49ec027f524f8143144c3ad55",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 855,
+      "line_end": 862,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/3c5bb268f8e3a328bf0c83e0"
+    },
+    {
+      "evidence_id": "ev-6a74ee5684b2c564",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "TypeScript Configuration Files > Native TypeScript Support",
+      "snippet": "### Native TypeScript Support\n\nIf you're using **Node.js >= 22.13.0**, you can load TypeScript configuration files natively without requiring [`jiti`](https://github.com/unjs/jiti). This is possible thanks to the [**`--experimental-strip-types`**](https://nodejs.org/docs/latest-v22.x/api/cli.html#--experimental-strip-types) flag.\n\nSince this feature is still experimental, you must also enable the `unstable_native_nodejs_ts_config` flag.\n\n```bash\nnpx --node-options='--experimental-strip-types' eslint --flag unstable_native_nodejs_ts_config\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "74d1b75e75ac81e5472808baa199cf37bf51373dd1b68474fc05b0b7f8a4c237",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 811,
+      "line_end": 820,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/d54245d3f7f516281f82a517"
+    }
+  ],
+  "tokens": 1037,
+  "utf8_bytes": 3325,
+  "sha256": "25ad046f81a02ed6f7b79f3f8c0266c036f7ef2f530bc4db30dcdc96ada86a61",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

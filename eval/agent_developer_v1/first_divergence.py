@@ -366,6 +366,10 @@ def build_atlas(
         raise ValueError("task/oracle corpus is malformed")
     if not isinstance(results, list):
         raise ValueError("model report is malformed")
+    if report.get("public_tasks_sha256") != sha256_json(public_tasks):
+        raise ValueError("historical report public-task fingerprint differs from the supplied corpus")
+    if report.get("oracle_contract_sha256") != sha256_json(oracle):
+        raise ValueError("historical report oracle fingerprint differs from the supplied corpus")
 
     task_by_id = {str(row.get("id") or ""): row for row in tasks if isinstance(row, dict)}
     oracle_by_id = {

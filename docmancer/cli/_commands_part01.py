@@ -616,6 +616,20 @@ def _build_skill_content(template_name: str, config_path: str | Path | None) -> 
 
 
 def _install_skill_file(content: str, dest: Path) -> None:
+    if dest.exists():
+        existing = dest.read_text(encoding="utf-8")
+        legacy_end = existing.find(_AGENTS_MD_END)
+        legacy = existing.startswith(_AGENTS_MD_START) and legacy_end != -1
+        managed = existing[len(_AGENTS_MD_START):legacy_end].strip() if legacy else ""
+        legacy = legacy and bool(_split_front_matter(managed)[0]) and _is_proven_docatlas_text(managed)
+        if not legacy:
+            try:
+                block = _current_managed_block(existing)
+            except ValueError as exc:
+                raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
+            if _SKILL_FILE_OWNER in existing and _split_front_matter(existing)[0] and block is None:
+                raise click.ClickException(f"Could not update {display_path(dest)} because its DocAtlas markers are missing.")
+    _install_skill_references(content, dest.parent)
     front_matter, body = _split_front_matter(content)
     marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"
     if not dest.exists():
@@ -664,11 +678,81 @@ def _split_front_matter(content: str) -> tuple[str, str]:
     return content[:boundary], content[boundary:]
 
 
+def _install_skill_references(content: str, directory: Path) -> None:
+    """Ship optional guides beside rendered skills and instruction fallbacks."""
+    if "Agent workflow contract schema: `docatlas-agent-contract-v1`" not in content:
+        return
+    from importlib.resources import files
+    import stat
+
+    if (os.name != "posix" or not hasattr(os, "O_NOFOLLOW")
+            or not hasattr(os, "O_DIRECTORY")
+            or not {os.open, os.mkdir}.issubset(os.supports_dir_fd)):
+        raise click.ClickException("Safe reference installation requires POSIX no-follow descriptors.")
+    directory.mkdir(parents=True, exist_ok=True)
+    parent_fd = refs_fd = None
+    opened = []
+    try:
+        parent_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            os.mkdir("docatlas-references", dir_fd=parent_fd)
+        except FileExistsError:
+            pass
+        refs_fd = os.open("docatlas-references", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent_fd)
+        # Preflight every guide before writing any: a later hostile member must
+        # not leave earlier guides modified. Open descriptors pin accepted files.
+        for reference in files("docmancer.templates").joinpath("references").iterdir():
+            if not reference.name.endswith(".md"):
+                continue
+            name = reference.name
+            body = reference.read_text(encoding="utf-8").strip()
+            marker = f"{_AGENTS_MD_START}\n{body}\n{_AGENTS_MD_END}"
+            try:
+                fd = os.open(name, os.O_RDWR | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=refs_fd)
+            except FileNotFoundError:
+                opened.append((name, None, marker + "\n"))
+                continue
+            opened.append((name, fd, None))
+            info = os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+                raise ValueError(f"Reference {name} must be a regular, unlinked file")
+            with os.fdopen(os.dup(fd), "r", encoding="utf-8") as stream:
+                existing = stream.read()
+            current = _current_managed_block(existing)
+            if current is not None:
+                start, end = current
+                updated = existing[:start] + marker + existing[end + len(_AGENTS_MD_END):]
+            else:
+                separator = "\n\n" if existing and not existing.endswith("\n\n") else ""
+                updated = existing + separator + marker + "\n"
+            opened[-1] = (name, fd, updated)
+        for index, (name, fd, updated) in enumerate(opened):
+            if fd is None:
+                fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o666, dir_fd=refs_fd)
+                opened[index] = (name, fd, updated)
+            os.lseek(fd, 0, os.SEEK_SET)
+            with os.fdopen(os.dup(fd), "w", encoding="utf-8") as stream:
+                stream.write(updated)
+                stream.flush()
+                os.ftruncate(fd, stream.tell())
+    except (OSError, ValueError) as exc:
+        raise click.ClickException(f"Could not safely install DocAtlas references: {exc}.") from exc
+    finally:
+        for _, fd, _ in opened:
+            if fd is not None:
+                os.close(fd)
+        if refs_fd is not None:
+            os.close(refs_fd)
+        if parent_fd is not None:
+            os.close(parent_fd)
+
+
 def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
     marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"
     dest.parent.mkdir(parents=True, exist_ok=True)
 
     if not dest.exists():
+        _install_skill_references(content_body, dest.parent)
         dest.write_text(marker_block + "\n", encoding="utf-8")
         return
 
@@ -677,6 +761,7 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
         current = _current_managed_block(existing)
     except ValueError as exc:
         raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
+    _install_skill_references(content_body, dest.parent)
     if current is not None:
         start_idx, end_idx = current
         new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_AGENTS_MD_END):]

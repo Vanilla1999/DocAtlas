@@ -1,0 +1,104 @@
+{
+  "archive_bytes": 291472,
+  "archive_sha256": "edff3dafa53459f981ab79412d9f0451cffeab3c31792719b3e131d4ffeb300c",
+  "files": {
+    "V40-E01-A-dto.txt": {
+      "bytes": 36565,
+      "sha256": "c8bab7f7d3af4dea991f2e051c2b24ef600eed2e2cacde66a481d59ec799f5b8"
+    },
+    "V40-E01-A-mcp-result.json": {
+      "bytes": 39210,
+      "sha256": "05f20675df9dd5e8ce5f531b97e0c2566c0d1ddc86a67bfa1de7355ad08e75b2"
+    },
+    "V40-E01-A-oracle.json": {
+      "bytes": 30440,
+      "sha256": "ee560fabe6666394e49fe813b32e8ad60fb504e949b41cff99926581cfa53361"
+    },
+    "V40-E01-A-server.json": {
+      "bytes": 5126006,
+      "sha256": "3825a9e6ca64046618d80dbebc11cce170ee2cbf24f129129f0a4cfcc527748e"
+    },
+    "V40-E01-C-dto.txt": {
+      "bytes": 38773,
+      "sha256": "ae60cc821edcc1d3318f3605c4623414c10dc53770511e0e8e560ab4e5ed6c4f"
+    },
+    "V40-E01-C-mcp-result.json": {
+      "bytes": 41611,
+      "sha256": "066ad4a233238708c4b4e0697facff792910151b874a31cff55424bf4ab5fab0"
+    },
+    "V40-E01-C-oracle.json": {
+      "bytes": 33416,
+      "sha256": "538b64463467a19f8c70c462a2cb631e037a340e9de0aaa2c0a5e0ac76803d46"
+    },
+    "V40-E01-C-server.json": {
+      "bytes": 5164304,
+      "sha256": "307d556a15967af1464746259230ddb52b4f029f4ac70dfdc536cc98c7f4a447"
+    },
+    "V40-E01-boundaries/call-1.json": {
+      "bytes": 5110620,
+      "sha256": "8147f5505716970c592b5bfbdbbcbade239ade2e01cce784f76668d79a98ec5f"
+    },
+    "V40-E01-boundaries/call-2.json": {
+      "bytes": 5076893,
+      "sha256": "2afd7e032c941bcd325b47bb111db15f69431e8ae8bb1205808ed12a1965188e"
+    },
+    "V40-E01-preparation.json": {
+      "bytes": 159447,
+      "sha256": "83e397e651e1ef6b49c7ebac15495bf44bc48dd31f0c01ae240a5ee93a1a5a8c"
+    },
+    "V40-E01-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "V40-P03-A-dto.txt": {
+      "bytes": 36876,
+      "sha256": "0b0e1c9cc135d6ed608c09839a07eb75fb5f96d733a0797029150e82c832251d"
+    },
+    "V40-P03-A-mcp-result.json": {
+      "bytes": 39456,
+      "sha256": "80014e9703a1f3b9c023f10396f5f9aa0bdaea7da9af2a6fb123cead95082d9b"
+    },
+    "V40-P03-A-oracle.json": {
+      "bytes": 31241,
+      "sha256": "3fc8bdfd9a190daf7c3aeed19b6b90e05351f34d809e00fbd5e8614ed7ae2fa1"
+    },
+    "V40-P03-A-server.json": {
+      "bytes": 3418812,
+      "sha256": "c8e99df0d04dfd0e96d51943ec53805709e4268b313f9213911c195692c998c1"
+    },
+    "V40-P03-C-dto.txt": {
+      "bytes": 39455,
+      "sha256": "3969dba048f2b92dcf5fb3257ee144475f02f40b589e96d17104f173b2abb752"
+    },
+    "V40-P03-C-mcp-result.json": {
+      "bytes": 42309,
+      "sha256": "fe1b03035146293ee83bab72369bdaea07f547f42ee792fb096e8a107d491dad"
+    },
+    "V40-P03-C-oracle.json": {
+      "bytes": 34768,
+      "sha256": "fb1d7ab7ea11f03eef8b87052d07f147c50d91fe1a35532e7b44e15678e35f1f"
+    },
+    "V40-P03-C-server.json": {
+      "bytes": 3449961,
+      "sha256": "772301ee3fc51550ade87ed4add2695c97a89e09d4a7251f1e0f5599e7af335e"
+    },
+    "V40-P03-boundaries/call-1.json": {
+      "bytes": 3369170,
+      "sha256": "9651f5f18d0d07a8dd107c7fe767d100638cf8e39979276921f0ed4a0d42156f"
+    },
+    "V40-P03-boundaries/call-2.json": {
+      "bytes": 3395058,
+      "sha256": "02dba7142f72eaba8997736db8fac65e56f305d38d66d8447e4eabe01391822c"
+    },
+    "V40-P03-preparation.json": {
+      "bytes": 94529,
+      "sha256": "ec397f2f263cd4505f0c9cd1422bc3af166821a9cf6f8452285339763015eb1f"
+    },
+    "V40-P03-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "verified": true,
+  "included": "Full trials/traces, actual client TextContent bytes and MCP results, oracle and preparation receipts"
+}

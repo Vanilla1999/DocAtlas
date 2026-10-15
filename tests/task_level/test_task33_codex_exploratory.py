@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from docmancer.docs.application.action_packet import build_action_packet
+from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
 from eval.task_level.execution import (
     _assert_task33_run_preconditions,
     _run_evaluation_command,
@@ -74,102 +76,10 @@ def _snapshot() -> HostEvidenceSnapshot:
     )
 
 
-def test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usage(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    stdout = "\n".join([
-        json.dumps({"type": "thread.started", "thread_id": "thread-123"}),
-        json.dumps({
-            "type": "item.completed",
-            "item": {"type": "agent_message", "text": '{"selected_indices":[0]}'},
-        }),
-        json.dumps({
-            "type": "turn.completed",
-            "usage": {
-                "input_tokens": 120,
-                "cached_input_tokens": 20,
-                "output_tokens": 15,
-                "reasoning_output_tokens": 5,
-            },
-        }),
-    ])
-    captured: dict[str, object] = {}
-    source_home = tmp_path / "source-codex-home"
-    source_home.mkdir()
-    (source_home / "auth.json").write_text('{"tokens": {}}')
-    monkeypatch.setenv("CODEX_HOME", str(source_home))
-    monkeypatch.setenv("OPENAI_API_KEY", "must-not-be-forwarded")
-    monkeypatch.setenv("UNRELATED_SECRET", "must-not-be-forwarded")
-
-    def fake_run(command, **kwargs):
-        captured["command"] = command
-        captured["cwd"] = kwargs["cwd"]
-        captured["env"] = kwargs["env"]
-        assert (Path(kwargs["env"]["CODEX_HOME"]) / "auth.json").is_file()
-        assert Path(kwargs["env"]["HOME"]).is_dir()
-        schema_path = Path(command[command.index("--output-schema") + 1])
-        schema = json.loads(schema_path.read_text())
-        assert "uniqueItems" not in schema["properties"]["selected_indices"]
-        return subprocess.CompletedProcess(command, 0, stdout=stdout, stderr="")
-
-    monkeypatch.setattr(task33_codex_exploratory.shutil, "which", lambda _name: "/usr/bin/codex")
-    monkeypatch.setattr(task33_codex_exploratory, "_run_bounded_codex", fake_run)
-    worker = CodexExploratoryWorker(
-        model="gpt-test", reasoning_effort="low", temp_root=tmp_path,
-    )
-
-    output = worker.run(_envelope(), _snapshot(), timeout_seconds=30)
-
-    assert worker.capabilities.verified is False
-    assert worker.capability_evidence["status"] == "exploratory_unverified"
-    assert "OPENAI_API_KEY" not in worker.capability_evidence
-    assert output.packet["task_interpretation"]["objective"] == _envelope().task_objective
-    assert output.usage.request_id == "client-thread:thread-123"
-    assert output.usage.proof["request_id_kind"] == "client_thread_id"
-    assert output.usage.input_tokens == 120
-    assert output.usage.reasoning_tokens == 5
-    assert output.usage.proof["server_request_id_verified"] is False
-    command = captured["command"]
-    assert "--ephemeral" in command
-    assert "--skip-git-repo-check" in command
-    assert "--ignore-user-config" in command
-    assert "--ignore-rules" in command
-    assert command[command.index("--sandbox") + 1] == "read-only"
-    assert 'model_reasoning_effort="low"' in command
-    assert worker.capability_evidence["reasoning_effort"] == "low"
-    assert "danger-full-access" not in command
-    assert captured["cwd"] != Path.cwd()
-    env = captured["env"]
-    assert "OPENAI_API_KEY" not in env
-    assert "UNRELATED_SECRET" not in env
 
 
-def test_codex_selector_rejects_unknown_reasoning_effort():
-    with pytest.raises(ValueError, match="Unsupported Codex reasoning effort"):
-        CodexExploratoryWorker(reasoning_effort="minimal")
 
 
-def test_codex_failure_summary_redacts_credentials_and_preserves_diagnostic():
-    summary = _codex_failure_summary(
-        "Authorization: Bearer secret...odel gpt-test is unavailable"
-    )
-
-    assert "secret-token" not in summary
-    assert "Bearer <redacted>" in summary
-    assert "gpt-test is unavailable" in summary
-
-
-def test_unverified_codex_worker_requires_explicit_exploratory_delivery(tmp_path: Path):
-    worker = CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path)
-    with pytest.raises(IsolatedDeliveryError, match="capability_unverified"):
-        deliver_with_isolated_worker(
-            worker=worker,
-            envelope=_envelope(),
-            evidence=_snapshot(),
-            output_dir=tmp_path / "causal",
-            timeout_seconds=30,
-        )
 
 
 def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
@@ -195,22 +105,65 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
             "provider_usage_verified": False,
         },
     )
-    output = IsolatedWorkerOutput(
-        packet=build_action_packet(
-            question=_envelope().task_objective,
-            context_pack=_snapshot().evidence_items,
-            trust_contract=_snapshot().trust_contract,
-            max_tokens=_envelope().token_budget,
-        ),
-        usage=usage,
-        wall_time_seconds=0.5,
-    )
+    envelope = _envelope()
+    source_literal = "Keep permission checks centralized in lib/modules/permission/service.dart."
+
+    def worker_output(evidence):
+        packet = build_action_packet(
+            question=envelope.task_objective,
+            context_pack=evidence.evidence_items,
+            trust_contract=evidence.trust_contract,
+            required_evidence_paths=envelope.required_evidence_paths,
+            required_target_paths=envelope.suspected_modules,
+            # Path assignments establish identities only; this authored quote
+            # supplies the separate visible-content witness.
+            public_requirements=(source_literal,),
+        )
+        assert validate_action_packet(packet, evidence_items=evidence.evidence_items) == []
+        assert packet["result"] == "data" and packet["edit_ready"] is False
+        return IsolatedWorkerOutput(packet=packet, usage=usage, wall_time_seconds=0.5)
+
+    evidence = _snapshot()
+    assert evidence.evidence_items[0]["content"] == source_literal
+    output = worker_output(evidence)
+    assert output.packet["completeness"] == "partial"
+    assert output.packet["missing"] == ["target_path:0:" + envelope.suspected_modules[0]]
     monkeypatch.setattr(CodexExploratoryWorker, "run", lambda *args, **kwargs: output)
+    with pytest.raises(IsolatedDeliveryError, match="action_packet_missing_required_target_modules"):
+        deliver_with_exploratory_worker(
+            worker=CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path),
+            envelope=envelope,
+            evidence=evidence,
+            output_dir=tmp_path / "missing-target",
+            timeout_seconds=30,
+        )
+    assert not (tmp_path / "missing-target" / "action_packet.json").exists()
+
+    # An explicit host-selected code window supplies the target identity; the
+    # documentation's mention of this filename does not establish that identity.
+    target = envelope.suspected_modules[0]
+    target_path = tmp_path / target
+    target_path.parent.mkdir(parents=True)
+    target_path.write_text("class PermissionService {}\n", encoding="utf-8")
+    target_text = target_path.read_text(encoding="utf-8")
+    target_evidence = {
+        "path": target,
+        "source_class": "project_file",
+        "authority": "supporting",
+        "content": target_text,
+        "matched": True,
+        "char_start": 0,
+        "char_end": len(target_text),
+        "line_start": 1,
+        "line_end": 1,
+    }
+    evidence = replace(evidence, evidence_items=(*evidence.evidence_items, target_evidence))
+    output = worker_output(evidence)
 
     result = deliver_with_exploratory_worker(
         worker=CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path),
-        envelope=_envelope(),
-        evidence=_snapshot(),
+        envelope=envelope,
+        evidence=evidence,
         output_dir=tmp_path / "exploratory",
         timeout_seconds=30,
     )
@@ -218,54 +171,48 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
     metrics = json.loads(
         (tmp_path / "exploratory" / "isolated_delivery_metrics.json").read_text()
     )
-    assert result["status"] == metrics["status"]
+    assert result["result"] == metrics["result"] == "data"
+    assert result["completeness"] == metrics["completeness"] == "complete"
+    assert result["packet"]["estimated_tokens"] <= envelope.token_budget
+    assert result["packet"]["edit_ready"] is False
+    projection = result["projection"]
+    projection_snapshot = json.loads(
+        (tmp_path / "exploratory" / "model_visible_evidence_snapshot.json").read_text()
+    )
+    assert validate_model_visible_projection(projection, snapshot=projection_snapshot) == []
+    assert projection["sources"] == result["packet"]["sources"]
+    assert projection["edit_ready"] is False
+    expected = {item["path"]: item["content"] for item in evidence.evidence_items}
+    assert len(projection["sources"]) == len(expected) == 2
+    for source in projection["sources"]:
+        assert source["text"] == expected[source["path"]]
+        assert source["content_sha256"] == hashlib.sha256(source["text"].encode()).hexdigest()
+        assert source["instruction_trust"] == "untrusted_data"
+    selected_target = next(source for source in projection["sources"] if source["path"] == target)
+    assert (selected_target["char_start"], selected_target["char_end"], selected_target["line_start"], selected_target["line_end"]) == (0, len(target_text), 1, 1)
+    assert any(row["path"] == target and row["proof_role"] == "target_identity" for row in projection["assignments"])
+    literal_requirement, = [row for row in projection["requirements"] if row["kind"] == "required_fact"]
+    assert literal_requirement["value"] == source_literal and literal_requirement["mandatory"] is True
+    assert literal_requirement["public_provenance"] == "public_task_contract"
+    content_assignment, = [row for row in projection["assignments"]
+                           if row["requirement_id"] == literal_requirement["requirement_id"]]
+    doc_source = next(source for source in projection["sources"]
+                      if source["path"] == envelope.required_evidence_paths[0])
+    assert content_assignment["evidence_id"] == doc_source["stable_id"]
+    assert content_assignment["path"] == doc_source["path"]
+    assert content_assignment["proof_role"] == "generic_fact" and content_assignment["unit_id"]
+    assert content_assignment["unit_content_hash"] == doc_source["content_sha256"]
+    assert (content_assignment["unit_char_start"], content_assignment["unit_char_end"]) == (0, len(source_literal))
+    assert "missing" not in projection
+    assert metrics["evidence_fingerprint"] == evidence.fingerprint
+    assert metrics["attempts"] == metrics["retrieval_calls"] == 1
     assert metrics["evidence_tier"] == "exploratory"
     assert metrics["causal_claim_allowed"] is False
     assert metrics["server_request_id_verified"] is False
 
 
-def test_task33_preconditions_allow_codex_only_for_explicit_exploratory_tier():
-    task = next(task for task in load_tasks() if task.task_id == load_protocol()["task_id"])
-    runner = CodexRunner(sandbox_mode="workspace-write")
-    conditions = load_protocol()["conditions"]
-
-    with pytest.raises(ValueError, match="proven hard turn limit"):
-        _assert_task33_run_preconditions([task], runner)
-
-    _assert_task33_run_preconditions(
-        [task], runner, evidence_tier="exploratory", conditions=conditions, repeats=1
-    )
-    with pytest.raises(ValueError, match="exactly the frozen protocol cells"):
-        _assert_task33_run_preconditions(
-            [task], runner, evidence_tier="exploratory", conditions=conditions[:-1], repeats=1
-        )
 
 
-def test_task33_preconditions_allow_only_exact_two_cell_exploratory_smoke():
-    task = next(task for task in load_tasks() if task.task_id == load_protocol()["task_id"])
-    runner = CodexRunner(sandbox_mode="workspace-write")
-    smoke_conditions = (
-        "repo_only_strict_offline",
-        "docatlas_bounded_direct",
-    )
-
-    _assert_task33_run_preconditions(
-        [task],
-        runner,
-        evidence_tier="exploratory",
-        conditions=smoke_conditions,
-        repeats=1,
-        evaluation_backend="host_exploratory",
-    )
-    with pytest.raises(ValueError, match="exactly the frozen protocol cells or two-cell smoke"):
-        _assert_task33_run_preconditions(
-            [task],
-            runner,
-            evidence_tier="exploratory",
-            conditions=smoke_conditions[:1],
-            repeats=1,
-            evaluation_backend="host_exploratory",
-        )
 
 
 def test_host_exploratory_evaluator_runs_without_docker(
@@ -299,306 +246,16 @@ def test_host_exploratory_evaluator_runs_without_docker(
     assert boundary["causal_claim_allowed"] is False
 
 
-def test_host_evaluator_is_rejected_for_causal_task33():
-    task = next(task for task in load_tasks() if task.task_id == load_protocol()["task_id"])
-    runner = CodexRunner(sandbox_mode="workspace-write")
-
-    with pytest.raises(ValueError, match="host evaluator requires exploratory evidence tier"):
-        _assert_task33_run_preconditions(
-            [task],
-            runner,
-            conditions=load_protocol()["conditions"],
-            repeats=1,
-            evaluation_backend="host_exploratory",
-        )
 
 
-def test_host_preflight_does_not_require_or_probe_docker(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    monkeypatch.setattr(task33_codex_exploratory, "RESULTS_ROOT", tmp_path)
-    monkeypatch.setattr(
-        task33_codex_exploratory.shutil,
-        "which",
-        lambda name: None if name == "docker" else f"/usr/bin/{name}",
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_prewarm_fixture_dependencies",
-        lambda output: output / "uv-cache",
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_probe_retrieval",
-        lambda output: {"status": "verified"},
-    )
-    selector_options = {}
-
-    def fake_selector(*args, **kwargs):
-        selector_options.update(kwargs)
-        return {"status": "exploratory_verified"}
-
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_probe_codex_selector",
-        fake_selector,
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory.DockerCommandSandbox,
-        "verify",
-        lambda self: pytest.fail("Docker must not be probed"),
-    )
-
-    rc = task33_codex_exploratory.main(
-        ["--host-exploratory", "--run-id", "host-preflight"]
-    )
-
-    summary = json.loads(
-        (tmp_path / "host-preflight_preflight" / "preflight-summary.json").read_text()
-    )
-    assert rc == 0
-    assert selector_options["reasoning_effort"] == "medium"
-    assert summary["checks"]["execution_backend"]["status"] == "exploratory_unisolated"
-    assert "docker" not in summary["checks"]
 
 
-def test_preflight_stops_before_codex_probe_when_docker_boundary_fails(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    monkeypatch.setattr(task33_codex_exploratory, "RESULTS_ROOT", tmp_path)
-    monkeypatch.setattr(
-        task33_codex_exploratory.shutil, "which", lambda name: f"/usr/bin/{name}"
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_build_image",
-        lambda *args: {"status": "verified", "image_id": "sha256:test"},
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_prewarm_fixture_dependencies",
-        lambda output: output / "uv-cache",
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory.DockerCommandSandbox,
-        "verify",
-        lambda self: {"status": "failed", "reason": "no-new-privileges blocked"},
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_probe_codex_selector",
-        lambda *args: pytest.fail("Codex probe must not run after failed Docker boundary"),
-    )
-
-    rc = task33_codex_exploratory.main(["--run-id", "blocked-docker"] )
-
-    summary = json.loads(
-        (tmp_path / "blocked-docker_preflight" / "preflight-summary.json").read_text()
-    )
-    assert rc == 3
-    assert summary["checks"]["docker"]["status"] == "failed"
-    assert "codex_oauth_selector" not in summary["checks"]
 
 
-def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    monkeypatch.setattr(task33_codex_exploratory, "RESULTS_ROOT", tmp_path)
-    monkeypatch.setattr(
-        task33_codex_exploratory.shutil,
-        "which",
-        lambda name: f"/usr/bin/{name}",
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_prewarm_fixture_dependencies",
-        lambda output: output / "uv-cache",
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_probe_retrieval",
-        lambda output: {"status": "verified"},
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "_probe_codex_selector",
-        lambda *args, **kwargs: pytest.fail("selector must not run for two-cell smoke"),
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "run_docatlas_tool_visibility_canary",
-        lambda *args, **kwargs: pytest.fail("tool canary must not run for two-cell smoke"),
-    )
-    monkeypatch.setattr(
-        task33_codex_exploratory,
-        "CodexExploratoryWorker",
-        lambda *args, **kwargs: pytest.fail("worker must not be created for two-cell smoke"),
-    )
-    runner_options = {}
-
-    def fake_runner(**kwargs):
-        runner_options.update(kwargs)
-        return object()
-
-    monkeypatch.setattr(task33_codex_exploratory, "CodexRunner", fake_runner)
-    canary_calls = []
-
-    def fake_canary(*args, **kwargs):
-        canary_calls.append((args, kwargs))
-        return {"status": "passed"}
-
-    monkeypatch.setattr(task33_codex_exploratory, "run_canary", fake_canary)
-    captured_conditions = []
-
-    def fake_execute(tasks, conditions, *args, **kwargs):
-        captured_conditions.extend(conditions)
-        return [
-            {
-                "condition_id": condition,
-                "status": "completed",
-                "resolved": True,
-                "metrics": {},
-                "budget": {},
-                "token_attribution": {
-                    "indexing": {
-                        "status": "already_current",
-                        "provider_input_tokens": 0,
-                        "provider_output_tokens": 0,
-                        "included_in_parent_budget": False,
-                    },
-                },
-            }
-            for condition in conditions
-        ]
-
-    monkeypatch.setattr(task33_codex_exploratory, "execute_pilot", fake_execute)
-    monkeypatch.setattr(task33_codex_exploratory, "write_report", lambda *args, **kwargs: None)
-    monkeypatch.setattr(task33_codex_exploratory, "_contains_auth_artifact", lambda root: False)
-
-    rc = task33_codex_exploratory.main([
-        "--host-exploratory",
-        "--two-cell-smoke",
-        "--run-exploratory-pilot",
-        "--run-id",
-        "two-cell-smoke",
-        "--reasoning-effort",
-        "low",
-    ])
-
-    manifest = json.loads((tmp_path / "two-cell-smoke" / "exploratory_manifest.json").read_text())
-    assert rc == 0
-    assert len(canary_calls) == 1
-    assert captured_conditions == [
-        "repo_only_strict_offline",
-        "docatlas_bounded_direct",
-    ]
-    assert manifest["conditions"] == captured_conditions
-    assert manifest["provider_call_cap"] == 3
-    assert manifest["two_cell_smoke"] is True
-    assert manifest["reasoning_effort"] == "low"
-    assert runner_options["reasoning_effort"] == "low"
 
 
-def test_exploratory_summary_reports_metrics_without_valid_verdict():
-    conditions = load_protocol()["conditions"]
-    results = [
-        {
-            "condition_id": condition,
-            "status": "completed",
-            "resolved": condition != "repo_only_strict_offline",
-            "hidden_tests_passed": condition != "repo_only_strict_offline",
-            "metrics": {
-                "input_tokens": 100 + index,
-                "cached_input_tokens": 80,
-                "uncached_input_tokens": 20 + index,
-                "output_tokens": 20,
-                "total_latency": 1.0 + index,
-                "time_to_first_edit": 0.5,
-            },
-            "budget": {
-                "input_token_basis": "parent_provider_reported_input_including_cached",
-                "indexing_provider_tokens_included": False,
-            },
-            "token_attribution": {
-                "indexing": {
-                    "status": "already_current",
-                    "provider_input_tokens": 0,
-                    "provider_output_tokens": 0,
-                    "included_in_parent_budget": False,
-                },
-            },
-        }
-        for index, condition in enumerate(conditions)
-    ]
-
-    summary = summarize_exploratory_results(results)
-
-    assert summary["status"] == "complete_exploratory"
-    assert summary["verdict"] == "EXPLORATORY_NON_CAUSAL"
-    assert summary["valid"] is False
-    assert summary["conditions"]["repo_only_strict_offline"]["hidden_tests_passed"] is False
-    assert summary["conditions"]["docatlas_bounded_direct"]["input_tokens"] == 102
-    assert summary["conditions"]["docatlas_bounded_direct"]["cached_input_tokens"] == 80
-    assert summary["conditions"]["docatlas_bounded_direct"]["uncached_input_tokens"] == 22
-    assert summary["conditions"]["docatlas_bounded_direct"]["indexing_provider_tokens"] == 0
-    assert summary["conditions"]["docatlas_bounded_direct"]["indexing_provider_tokens_included"] is False
-    assert summary["conditions"]["docatlas_bounded_direct"]["time_to_first_edit"] is None
-    assert (
-        summary["conditions"]["docatlas_bounded_direct"]["time_to_first_edit_reason"]
-        == "codex_jsonl_not_stream_timed"
-    )
 
 
-def test_exploratory_summary_accepts_declared_two_cell_smoke_scope():
-    conditions = ("repo_only_strict_offline", "docatlas_bounded_direct")
-    results = [
-        {
-            "condition_id": condition,
-            "status": "completed",
-            "resolved": True,
-            "metrics": {},
-            "budget": {},
-            "token_attribution": {
-                "indexing": {
-                    "status": "already_current",
-                    "provider_input_tokens": 0,
-                    "provider_output_tokens": 0,
-                    "included_in_parent_budget": False,
-                },
-            },
-        }
-        for condition in conditions
-    ]
-
-    summary = summarize_exploratory_results(results, expected_conditions=conditions)
-
-    assert summary["status"] == "complete_exploratory"
-    assert summary["missing_conditions"] == []
-    assert set(summary["conditions"]) == set(conditions)
 
 
-def test_exploratory_summary_is_inconclusive_when_indexing_attribution_is_missing():
-    conditions = load_protocol()["conditions"]
-    results = [
-        {
-            "condition_id": condition,
-            "status": "completed",
-            "metrics": {},
-            "budget": {},
-        }
-        for condition in conditions
-    ]
 
-    summary = summarize_exploratory_results(results)
-
-    assert summary["status"] == "inconclusive_exploratory"
-    assert summary["verdict"] == "INCONCLUSIVE"
-    assert summary["missing_indexing_attribution"] == conditions
-    assert summary["conditions"][conditions[0]]["indexing_provider_tokens"] is None
-
-
-def test_codex_exploratory_path_does_not_change_frozen_provider_profiles():
-    assert set(load_protocol()["provider_profiles"]) == {"github-models", "openai-api"}

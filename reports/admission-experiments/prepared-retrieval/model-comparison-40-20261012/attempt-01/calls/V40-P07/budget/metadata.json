@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-P07",
+  "mode": "budget",
+  "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+  "public_request": {
+    "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/poetry.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:11.249756+00:00",
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_before": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5893619989983563,
+  "process_cpu_seconds": 0.587078457000004,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 940460,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_after": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "wire_sha256": "dbc24d6b0173e4d6773a2ea9dc34cf4735afaebda18a6d3c6bac617e3c4f9969",
+  "wire_utf8_bytes": 4901,
+  "utf8_quarter_proxy": 1226,
+  "codec_o200k_base": 1548,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

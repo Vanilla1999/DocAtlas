@@ -7,6 +7,8 @@ that exercise the vector path opt in explicitly.
 """
 from __future__ import annotations
 
+import gzip
+import hashlib
 import ipaddress
 import os
 import socket
@@ -27,6 +29,33 @@ os.environ.setdefault("DOCATLAS_AUTO_VECTORS", "0")
 # network fetch fails fast instead of hanging on restricted networks.
 # Tests that exercise the hosted path mock transports or delete this var.
 os.environ.setdefault("DOCATLAS_REGISTRY_API_URL", "http://127.0.0.1:1")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def isolated_tokenizer_cache(tmp_path_factory):
+    """Provide tiktoken's pinned vocabulary without DNS or a developer cache.
+
+    This is environment preparation for real integration scenarios, not a
+    replacement encoder or a product result. Child processes inherit the same
+    isolated cache; the original host setting is restored after the session.
+    """
+    cache = tmp_path_factory.mktemp("docatlas-tokenizer-cache")
+    vocabulary = Path(__file__).resolve().parents[1] / "docmancer/docs/data/o200k_base.tiktoken.gz"
+    data = gzip.decompress(vocabulary.read_bytes())
+    expected = "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d"
+    if hashlib.sha256(data).hexdigest() != expected:
+        raise RuntimeError("pinned integration tokenizer vocabulary hash mismatch")
+    url = "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken"
+    (cache / hashlib.sha1(url.encode()).hexdigest()).write_bytes(data)
+    previous = os.environ.get("TIKTOKEN_CACHE_DIR")
+    os.environ["TIKTOKEN_CACHE_DIR"] = str(cache)
+    try:
+        yield cache
+    finally:
+        if previous is None:
+            os.environ.pop("TIKTOKEN_CACHE_DIR", None)
+        else:
+            os.environ["TIKTOKEN_CACHE_DIR"] = previous
 
 
 def pytest_configure(config):

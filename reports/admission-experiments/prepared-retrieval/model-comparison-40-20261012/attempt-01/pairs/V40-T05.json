@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T05",
+  "question": "What does exclusive=True do when Textual starts a new worker?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "c59f9da01cce0ce92b5d4f8a85c924e4f76344d5b92cc2359c891140ac556529",
+      "mini_sha256": "c59f9da01cce0ce92b5d4f8a85c924e4f76344d5b92cc2359c891140ac556529"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "c4336cf8db6c027ec7e6063c925a1d1ce2d0e6a50a4f282f7b61d213286b7d70",
+      "mini_sha256": "c4336cf8db6c027ec7e6063c925a1d1ce2d0e6a50a4f282f7b61d213286b7d70"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "e6efcbc3b3e49feb210ac38b3608887a35f2852aaef13ad8631140222752ef04",
+      "mini_sha256": "e6efcbc3b3e49feb210ac38b3608887a35f2852aaef13ad8631140222752ef04"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

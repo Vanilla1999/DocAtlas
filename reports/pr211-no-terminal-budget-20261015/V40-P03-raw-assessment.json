@@ -1,0 +1,4220 @@
+{
+  "boundary": "saved public DTO vs frozen raw sources and committed content hashes; full snapshot metadata audit NOT MEASURED",
+  "oracle": {
+    "claims": [
+      {
+        "claim_id": "required",
+        "documented": true,
+        "covered": true,
+        "witness_sets": [
+          {
+            "set_index": 0,
+            "covered": true,
+            "parts": [
+              {
+                "witness_id": "V40-P03/required/set-0/part-0",
+                "path": "docs/configuration.md",
+                "line_start": 102,
+                "line_end": 114,
+                "covered": true,
+                "char_start": 2805,
+                "char_end": 3320,
+                "expected_characters": 515,
+                "covered_characters": 515,
+                "missing_char_ranges": [],
+                "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "required_claim_count": 1,
+    "documented_claim_count": 1,
+    "covered_documented_claim_count": 1,
+    "all_documented_claims_covered": true,
+    "missing_documented_claim_ids": [],
+    "unavailable_requested_claim_ids": [],
+    "missing_witness_ids": [],
+    "errors": []
+  },
+  "verified_sources": [
+    {
+      "source_index": 0,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-6e1700cd8f2a6292",
+      "line_start": 249,
+      "line_end": 250,
+      "projection_fingerprint": "4093e2fafca125deba8068d93b8f4d06c45be884a7b3b15e050c1b166e6aeb32",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7393,
+          7519
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7393,
+          7519
+        ]
+      ]
+    },
+    {
+      "source_index": 1,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-0a335c5a675d879b",
+      "line_start": 142,
+      "line_end": 149,
+      "projection_fingerprint": "dc447beaf05eb6b04dbc44bdea2603fccf4df898f735eee6905ce996d60737ac",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4236,
+          4436
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4236,
+          4436
+        ]
+      ]
+    },
+    {
+      "source_index": 2,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-b3d69b87d3e7729b",
+      "line_start": 164,
+      "line_end": 171,
+      "projection_fingerprint": "65c95bd4a3ef2bd88db9e22fabda0cc0a0d9f569c0cb5902cd7d907bc0b98e30",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5489,
+          5689
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5489,
+          5689
+        ]
+      ]
+    },
+    {
+      "source_index": 3,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-0f1f16ef00c5aa85",
+      "line_start": 455,
+      "line_end": 469,
+      "projection_fingerprint": "b209f9d39ab13a2ec57a0b8f14fa8478a34e5b5e4309d54ba1eb020fac134969",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13901,
+          14306
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13901,
+          14306
+        ]
+      ]
+    },
+    {
+      "source_index": 4,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-7516c7e3ba473ddc",
+      "line_start": 484,
+      "line_end": 493,
+      "projection_fingerprint": "eca10158e119f372bd7085adb19ad75685ba6208a066b7912c1ea3d27e9c8d0b",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14577,
+          15007
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14577,
+          15007
+        ]
+      ]
+    },
+    {
+      "source_index": 5,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-c1f748c2619b8dda",
+      "line_start": 371,
+      "line_end": 375,
+      "projection_fingerprint": "27bd6e169d7aeeb8063f0e046646802f65ee42c6c43694ce46644e72c711da72",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11132,
+          11373
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11132,
+          11373
+        ]
+      ]
+    },
+    {
+      "source_index": 6,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-50c4dc643298ffdb",
+      "line_start": 567,
+      "line_end": 579,
+      "projection_fingerprint": "cf5f16977c8f6acfaeb9cf08cda4a611fdde7939d9fc219a06fcb87642cc3d61",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17730,
+          18083
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17730,
+          18083
+        ]
+      ]
+    },
+    {
+      "source_index": 7,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-ba2df9cd7036f592",
+      "line_start": 251,
+      "line_end": 260,
+      "projection_fingerprint": "5d79b3e8b5fecb8e834bd526bc0f9781aeca0225c43dcf9b0971a28b2af3e7cd",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7519,
+          7970
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7519,
+          7970
+        ]
+      ]
+    },
+    {
+      "source_index": 8,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-c319ed9a625af245",
+      "line_start": 38,
+      "line_end": 46,
+      "projection_fingerprint": "4b5b3b19b2663d675c54e4966426fd71938dc0bee5d6599c9c11f91a3621a369",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1011,
+          1363
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1011,
+          1363
+        ]
+      ]
+    },
+    {
+      "source_index": 9,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-eeeebf7bdc4ff4e7",
+      "line_start": 102,
+      "line_end": 111,
+      "projection_fingerprint": "c644258651501101e3a9b8db8a150a5a34b5b09e23f9dc2ea90033cd9ec2703e",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2805,
+          3247
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2805,
+          3247
+        ]
+      ]
+    },
+    {
+      "source_index": 10,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-a4d2e98de7eb0e40",
+      "line_start": 522,
+      "line_end": 525,
+      "projection_fingerprint": "4e7b45a9eae80b881c1ac267ecab4dcfeba8fabb5320c3e385bb025934817c4d",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15662,
+          15974
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15662,
+          15974
+        ]
+      ]
+    },
+    {
+      "source_index": 11,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-bc2a97047def6989",
+      "line_start": 171,
+      "line_end": 178,
+      "projection_fingerprint": "91526f3a4ffd558c183bc5a1d68306c975f84f27973fe3474f7a6f93a02f1640",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4994,
+          5243
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4994,
+          5243
+        ]
+      ]
+    },
+    {
+      "source_index": 12,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-041ee4ad6307a4ed",
+      "line_start": 155,
+      "line_end": 162,
+      "projection_fingerprint": "78eb603878bde72aaf53571c1369343ed1cf5dbedeadfa46c43f37d9892672df",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4396,
+          4658
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4396,
+          4658
+        ]
+      ]
+    },
+    {
+      "source_index": 13,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-ec56bbf40bbb3a23",
+      "line_start": 553,
+      "line_end": 558,
+      "projection_fingerprint": "7587859f968f0255bb35b201f5475c7e56ccd2e8df069c3f5e1dd6f015ef96aa",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16996,
+          17342
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16996,
+          17342
+        ]
+      ]
+    },
+    {
+      "source_index": 14,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-6f1c02e5c58d4b78",
+      "line_start": 368,
+      "line_end": 380,
+      "projection_fingerprint": "88cc238d6baa11b314482a7d8566f527e9f9806b049e3e7613cb3cc2af18ecf9",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11283,
+          11564
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11283,
+          11564
+        ]
+      ]
+    },
+    {
+      "source_index": 15,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-cbee6f9066066dfd",
+      "line_start": 92,
+      "line_end": 101,
+      "projection_fingerprint": "139e52dafced374e36a9e66f3a9afd00b087f8ab59c6b686adb4fcd2e3001e96",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2587,
+          2805
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2587,
+          2805
+        ]
+      ]
+    },
+    {
+      "source_index": 16,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-10300ca34d15b15a",
+      "line_start": 613,
+      "line_end": 626,
+      "projection_fingerprint": "c5a1285ec5a753366989d6353c80247c03f81a04c7e223ef8efb618430088e14",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19180,
+          19602
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19180,
+          19602
+        ]
+      ]
+    },
+    {
+      "source_index": 17,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-e94585b017ababeb",
+      "line_start": 81,
+      "line_end": 91,
+      "projection_fingerprint": "476ca1d2b0e3a518bc14379ad3378e9506e4a7aca6f91bd393bbf94e02dc2aaa",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2265,
+          2587
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2265,
+          2587
+        ]
+      ]
+    },
+    {
+      "source_index": 18,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-cddcedb7fba8ce53",
+      "line_start": 70,
+      "line_end": 80,
+      "projection_fingerprint": "8dfb2b232142d4ede1cc432ae30b7c230fa7f7f14176441a7454aeaafc311a54",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1986,
+          2265
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1986,
+          2265
+        ]
+      ]
+    },
+    {
+      "source_index": 19,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-0960f0bc9151b2cc",
+      "line_start": 195,
+      "line_end": 209,
+      "projection_fingerprint": "bd3cde4c32b50723e96957ed3c424ddc6a97220ad782f3eb18be99afa9c07ad0",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5578,
+          6023
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5578,
+          6023
+        ]
+      ]
+    },
+    {
+      "source_index": 20,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-ba9faf4553cc638e",
+      "line_start": 398,
+      "line_end": 409,
+      "projection_fingerprint": "5ac46f6b218c4a379ed682137fb1b8cedcd449c7c20a4152ed92963bd29cf535",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12049,
+          12290
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12049,
+          12290
+        ]
+      ]
+    },
+    {
+      "source_index": 21,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-f5d10dfb4b46bb25",
+      "line_start": 627,
+      "line_end": 639,
+      "projection_fingerprint": "0fa62a78bd6b063be0959978d1612b4755a025718287ac235b81e664e7b2f6e2",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19602,
+          19950
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19602,
+          19950
+        ]
+      ]
+    },
+    {
+      "source_index": 22,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-76bd407c4589600b",
+      "line_start": 122,
+      "line_end": 131,
+      "projection_fingerprint": "545613df4249ab23596af3f194ea00e583072329c2c07fe95950b26ebac95904",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3446,
+          3785
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3446,
+          3785
+        ]
+      ]
+    },
+    {
+      "source_index": 23,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-7c82af69533b135d",
+      "line_start": 393,
+      "line_end": 397,
+      "projection_fingerprint": "c98c2d7f7205612fd295271fe8bd2260aa054368303aca41eed1a948538445d7",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11766,
+          12049
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11766,
+          12049
+        ]
+      ]
+    },
+    {
+      "source_index": 24,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-b9caf6d6db9619e3",
+      "line_start": 531,
+      "line_end": 539,
+      "projection_fingerprint": "96188cd3c2ecaf7e237161ef5835d2c11a0c46bed9692e89e9f1303b1d35072d",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16176,
+          16629
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16176,
+          16629
+        ]
+      ]
+    },
+    {
+      "source_index": 25,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-bbbbbed238a856ef",
+      "line_start": 420,
+      "line_end": 426,
+      "projection_fingerprint": "cf614aa231aeb312a3e9fb585fba5da99daaef4330192af9348c8dd83ce2388a",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12434,
+          12856
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12434,
+          12856
+        ]
+      ]
+    },
+    {
+      "source_index": 26,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-06aa3d05b623c65b",
+      "line_start": 767,
+      "line_end": 778,
+      "projection_fingerprint": "f586b7ddf68036869c7079d840e5fa7d501d71c2a6c98bbd8684e4f69635393d",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22473,
+          22802
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22473,
+          22802
+        ]
+      ]
+    },
+    {
+      "source_index": 27,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-fe78c2eec8fb258c",
+      "line_start": 559,
+      "line_end": 566,
+      "projection_fingerprint": "605e6e91a52f924d7aec8efe31919ea28d75e8287fabecf357314da1c08721a4",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17342,
+          17730
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17342,
+          17730
+        ]
+      ]
+    },
+    {
+      "source_index": 28,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-7f9ac5a2cfc8764f",
+      "line_start": 163,
+      "line_end": 170,
+      "projection_fingerprint": "b5de1278638d915d57b094d6c377c7f8115b130ecae220e33e03d4a908f15526",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4658,
+          4994
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4658,
+          4994
+        ]
+      ]
+    },
+    {
+      "source_index": 29,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-434c0e0e24a72c79",
+      "line_start": 449,
+      "line_end": 454,
+      "projection_fingerprint": "7d51169fb6116d0f78e320120fdcfa2b8c6973e9c0ce30dad366bac055658295",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13677,
+          13901
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13677,
+          13901
+        ]
+      ]
+    },
+    {
+      "source_index": 30,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-6b5ac38654a8e6bd",
+      "line_start": 441,
+      "line_end": 448,
+      "projection_fingerprint": "1c3f747c68b0dce0ab3ce67f0e20b3cbbc059da92231751df5fb6dda3b17e3cb",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13266,
+          13677
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13266,
+          13677
+        ]
+      ]
+    },
+    {
+      "source_index": 31,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-3257a69916261493",
+      "line_start": 512,
+      "line_end": 521,
+      "projection_fingerprint": "c785e164038b510d168423597967fdff9af190eb0104e194ff8dfd5c58d37e1a",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15475,
+          15662
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15475,
+          15662
+        ]
+      ]
+    },
+    {
+      "source_index": 32,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-9758aedd53f1473c",
+      "line_start": 320,
+      "line_end": 324,
+      "projection_fingerprint": "4c1e8860fb4d630498fcdf0f67dcb0d6e978ec9b07125cf95c661535ebbbb7d6",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9288,
+          9590
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9288,
+          9590
+        ]
+      ]
+    },
+    {
+      "source_index": 33,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-18fb806997d3a3c8",
+      "line_start": 37,
+      "line_end": 40,
+      "projection_fingerprint": "9f6e9e8fae7c42bb9559e17c392e9da7262d91b3069e9bde57c9aee0c1dd9249",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          734,
+          940
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          734,
+          940
+        ]
+      ]
+    },
+    {
+      "source_index": 34,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-8c51f6f9545aed97",
+      "line_start": 47,
+      "line_end": 60,
+      "projection_fingerprint": "6eed08d194250e6387b840c7989950d35801db8cdb9dc103f1dee8192cff3bf3",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1336,
+          1661
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1336,
+          1661
+        ]
+      ]
+    },
+    {
+      "source_index": 35,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-98c715e59065a672",
+      "line_start": 310,
+      "line_end": 319,
+      "projection_fingerprint": "b87d53b286b29d85e41c495d893b311570113a14c3d8a7915b3d7d07acb86014",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9123,
+          9288
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9123,
+          9288
+        ]
+      ]
+    },
+    {
+      "source_index": 36,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-d7b1a868adf9288a",
+      "line_start": 410,
+      "line_end": 419,
+      "projection_fingerprint": "00b7f84d305d0e669d1a53cf69cf58590612d3b2b4c4b647e28e4495d0052c8c",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12290,
+          12434
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12290,
+          12434
+        ]
+      ]
+    },
+    {
+      "source_index": 37,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-8c01f528e3732ac5",
+      "line_start": 354,
+      "line_end": 367,
+      "projection_fingerprint": "9de1e0335bdcc653c6dbbcfe3372cd7f7fc73715b6f32cea8d8311b78dce5a22",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10897,
+          11283
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10897,
+          11283
+        ]
+      ]
+    },
+    {
+      "source_index": 38,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-ec2d1580794a9e31",
+      "line_start": 261,
+      "line_end": 274,
+      "projection_fingerprint": "d90140d092af11f0e1863ae49b56c8dc299dda17e78a9966258d50269f42072a",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7970,
+          8253
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7970,
+          8253
+        ]
+      ]
+    },
+    {
+      "source_index": 39,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-38a9773d16a99b6b",
+      "line_start": 87,
+      "line_end": 92,
+      "projection_fingerprint": "cb509d5bcb59d031f855240fcc107ebd4fd7201f8d7a0a26a8bfd8ab80fd5495",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2476,
+          2838
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2476,
+          2838
+        ]
+      ]
+    },
+    {
+      "source_index": 40,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-596067e86e5a8b7e",
+      "line_start": 172,
+      "line_end": 177,
+      "projection_fingerprint": "aa0ecf608c86a4a453648c272782cbf0323ebf180eb5e0d7dd485d2041842989",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5689,
+          6024
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5689,
+          6024
+        ]
+      ]
+    },
+    {
+      "source_index": 41,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-d4fa5d21250e82a7",
+      "line_start": 430,
+      "line_end": 440,
+      "projection_fingerprint": "9675cfca1c13497627cee237b77fd364ff92574068c15b0ff4e3c890405932e4",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12915,
+          13367
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12915,
+          13367
+        ]
+      ]
+    },
+    {
+      "source_index": 42,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-39af485bba50a327",
+      "line_start": 602,
+      "line_end": 612,
+      "projection_fingerprint": "b71845831031cb828686e06babfdad3d7b17195eb115899ba788b2e199b745ad",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18904,
+          19180
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18904,
+          19180
+        ]
+      ]
+    },
+    {
+      "source_index": 43,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-ae67b21fdfde3c09",
+      "line_start": 298,
+      "line_end": 309,
+      "projection_fingerprint": "bdd8de00e1a7f7f2196654516afb95ff699622376f01133a95595133c290b52a",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8911,
+          9123
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8911,
+          9123
+        ]
+      ]
+    },
+    {
+      "source_index": 44,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-5db4cbd1183953a3",
+      "line_start": 653,
+      "line_end": 662,
+      "projection_fingerprint": "49b40b8410ae272035038b58f97697d5c5dce0f8d74a7366d53e4e74ecbf67d2",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20292,
+          20551
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20292,
+          20551
+        ]
+      ]
+    },
+    {
+      "source_index": 45,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-5dd9d8a448e828a1",
+      "line_start": 706,
+      "line_end": 716,
+      "projection_fingerprint": "fbdbadea42c482aaddb60a883027d23ac357787a943ac1777a84512e51cd07a4",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22041,
+          22331
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22041,
+          22331
+        ]
+      ]
+    },
+    {
+      "source_index": 46,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-12d031efcd7e7301",
+      "line_start": 347,
+      "line_end": 353,
+      "projection_fingerprint": "245c76c2ea1dec499dc6f2e4c151f8a9d7cc3e442acfcd66dbd7b5494011fc7d",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10557,
+          10897
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10557,
+          10897
+        ]
+      ]
+    },
+    {
+      "source_index": 47,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-25102354790c3443",
+      "line_start": 381,
+      "line_end": 392,
+      "projection_fingerprint": "941e575be7e8407e38ca2760dd058ba50c65615ac3bb55982c95c0dd31ce6562",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11564,
+          11766
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11564,
+          11766
+        ]
+      ]
+    },
+    {
+      "source_index": 48,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-14562a956501c7f0",
+      "line_start": 580,
+      "line_end": 592,
+      "projection_fingerprint": "f93caef0cfab07ea1e41f03d76466e99b0e6dbadf2e4697fc711520ad5bd8549",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18083,
+          18457
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18083,
+          18457
+        ]
+      ]
+    },
+    {
+      "source_index": 49,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-3d55d5ed164c5353",
+      "line_start": 673,
+      "line_end": 682,
+      "projection_fingerprint": "78e2333e333bded39b15d552b4b4337b7ba329823aaf7a8b725b48199c8f38ef",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20909,
+          21193
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20909,
+          21193
+        ]
+      ]
+    },
+    {
+      "source_index": 50,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-4bd128f501503e47",
+      "line_start": 540,
+      "line_end": 552,
+      "projection_fingerprint": "5d695dcc319569a104ace00b3dc7b5b474edd7068b29666fc5aab5891b40d085",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16629,
+          16996
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16629,
+          16996
+        ]
+      ]
+    },
+    {
+      "source_index": 51,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-48050e8ee1c808a6",
+      "line_start": 640,
+      "line_end": 652,
+      "projection_fingerprint": "0e9648136eb06b38bd3e6e4c5232d8fff709427d8a2350f1334a72b3bd389f90",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19950,
+          20292
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19950,
+          20292
+        ]
+      ]
+    },
+    {
+      "source_index": 52,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-3813d18bdee046ca",
+      "line_start": 474,
+      "line_end": 483,
+      "projection_fingerprint": "42a8ef814cbaba9bda7d46f168122812e99f58afc7ee062bf4fd89a67dfbcfbb",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14391,
+          14577
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14391,
+          14577
+        ]
+      ]
+    },
+    {
+      "source_index": 53,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-cb7e261bfba7ad3b",
+      "line_start": 683,
+      "line_end": 692,
+      "projection_fingerprint": "b49c32e002491e8ccd9a1ced57d0696e63ddaedad6022a1c381ef8f16bc05e02",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21193,
+          21563
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21193,
+          21563
+        ]
+      ]
+    },
+    {
+      "source_index": 54,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-9690c5615f69c64c",
+      "line_start": 181,
+      "line_end": 194,
+      "projection_fingerprint": "267e45ab3ba693e28a5d68f93bb73fc423800683b69c09ae29d58aa2250f87a6",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5266,
+          5578
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5266,
+          5578
+        ]
+      ]
+    },
+    {
+      "source_index": 55,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-8ac0053749a5ae20",
+      "line_start": 696,
+      "line_end": 705,
+      "projection_fingerprint": "b58696a302199ee4699a0aae9f031ff374cd3213949ed078c8c49b8b7eb6e8b7",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21677,
+          22041
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21677,
+          22041
+        ]
+      ]
+    },
+    {
+      "source_index": 56,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-2ae076da91779465",
+      "line_start": 231,
+      "line_end": 242,
+      "projection_fingerprint": "a75cfd502abb52ea6d305a35c77dd4e26b5b7ec69330f9cbb85e2e00625f2e09",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6665,
+          6952
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6665,
+          6952
+        ]
+      ]
+    },
+    {
+      "source_index": 57,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-1acb0e2ae80d313c",
+      "line_start": 280,
+      "line_end": 292,
+      "projection_fingerprint": "4992dd7e9de89b1e5244b5856152ea8ad34af98458038589168df3acbbefb34a",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8434,
+          8724
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8434,
+          8724
+        ]
+      ]
+    },
+    {
+      "source_index": 58,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-db46f89fcf751161",
+      "line_start": 325,
+      "line_end": 339,
+      "projection_fingerprint": "c3fc5d0d6140db9c02b763ae231247b2d8c1ef06364e2497c70551adbd3ca419",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9590,
+          9999
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9590,
+          9999
+        ]
+      ]
+    },
+    {
+      "source_index": 59,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-883eff2a51590ae8",
+      "line_start": 494,
+      "line_end": 509,
+      "projection_fingerprint": "e185dea7fc74e3e094dc15af3dbcba5da81986ec55dccf3c0ed1d57f7291dff1",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15007,
+          15390
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15007,
+          15390
+        ]
+      ]
+    },
+    {
+      "source_index": 60,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-ea7ff58f969020ab",
+      "line_start": 24,
+      "line_end": 37,
+      "projection_fingerprint": "8589dfe273359138a3a7baa10e09f7e968c8cbf7f039ac3cf45585a041d6c365",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          635,
+          1011
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          635,
+          1011
+        ]
+      ]
+    },
+    {
+      "source_index": 61,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-73d792613fee7c7f",
+      "line_start": 210,
+      "line_end": 223,
+      "projection_fingerprint": "1c4356a299f45ff0e3429a9111eb975b1ba862ebe0a97eabedea0337c03518d2",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6023,
+          6402
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6023,
+          6402
+        ]
+      ]
+    },
+    {
+      "source_index": 62,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-8958f3f9a45a53e8",
+      "line_start": 427,
+      "line_end": 440,
+      "projection_fingerprint": "50b5e41f4283c8e467bd6e70f6770bfa031e384bdc107626ab4a771def5b8026",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12856,
+          13266
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12856,
+          13266
+        ]
+      ]
+    },
+    {
+      "source_index": 63,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-139a9e349aed8576",
+      "line_start": 112,
+      "line_end": 124,
+      "projection_fingerprint": "30b315689c7ff05dd6447ed38e9961c768317eabf9a273bee68fb0f9a7b2bd82",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3420,
+          3645
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3420,
+          3645
+        ]
+      ]
+    },
+    {
+      "source_index": 64,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-54a52705062e08da",
+      "line_start": 100,
+      "line_end": 111,
+      "projection_fingerprint": "cb19b9322146df27f227f826fd150af0243ea4644a8f1a281dbd30e17e66029a",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3041,
+          3420
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3041,
+          3420
+        ]
+      ]
+    },
+    {
+      "source_index": 65,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-977913cc5dc7c983",
+      "line_start": 751,
+      "line_end": 758,
+      "projection_fingerprint": "219ca285baee4ae24661d016c4b91aed3cc75b29f123800e18cf0ab376f85c3a",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21847,
+          22183
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21847,
+          22183
+        ]
+      ]
+    },
+    {
+      "source_index": 66,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-1e2ee847d1bbdc05",
+      "line_start": 184,
+      "line_end": 195,
+      "projection_fingerprint": "90ea96596d09b26bb8731cbcfd47d7b0259810b70e4367731133638fc6637fae",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6200,
+          6553
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6200,
+          6553
+        ]
+      ]
+    },
+    {
+      "source_index": 67,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-c83eb048734de1eb",
+      "line_start": 74,
+      "line_end": 84,
+      "projection_fingerprint": "bc8ac0e47cf37bc0c2c83b10ddabcf3d677ca8d50759c5f23ecb971d8714c8ca",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2055,
+          2452
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2055,
+          2452
+        ]
+      ]
+    },
+    {
+      "source_index": 68,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-0192a203aa72504c",
+      "line_start": 441,
+      "line_end": 459,
+      "projection_fingerprint": "8f588f329fb5b26086722e1540e7ee735dcc5625a43248ea2ba2bcf806fcc53e",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13367,
+          13778
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13367,
+          13778
+        ]
+      ]
+    },
+    {
+      "source_index": 69,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-937b2d72e869d42d",
+      "line_start": 728,
+      "line_end": 732,
+      "projection_fingerprint": "6bf1be184799d250a1fdf3fae1ee76dc34593afd9bd7480e0619fe8d29490ab2",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20790,
+          21157
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20790,
+          21157
+        ]
+      ]
+    },
+    {
+      "source_index": 70,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-9c398ef183866a4c",
+      "line_start": 41,
+      "line_end": 46,
+      "projection_fingerprint": "2e5b9aa6f8d28076bde8253a5a19f3083aa93970a6fd5a36171a8b110fad807c",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          940,
+          1336
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          940,
+          1336
+        ]
+      ]
+    },
+    {
+      "source_index": 71,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-423d30bc830d4175",
+      "line_start": 152,
+      "line_end": 163,
+      "projection_fingerprint": "eef6106c15c0b17c04758d940ad873f3a430b48bc395ad951c519ae969658fa5",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5072,
+          5489
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5072,
+          5489
+        ]
+      ]
+    },
+    {
+      "source_index": 72,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-21a718f266d736a9",
+      "line_start": 526,
+      "line_end": 530,
+      "projection_fingerprint": "04719d6cb792ea8d897e5e8759c3e927b4d41eb5d75a2a9579175d502b3eac18",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15974,
+          16176
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15974,
+          16176
+        ]
+      ]
+    },
+    {
+      "source_index": 73,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-5555809d2c8bdd47",
+      "line_start": 112,
+      "line_end": 121,
+      "projection_fingerprint": "53729a5679d2417c06063137e7bfdb90154389bd1563ec1c4920924f9e14f8af",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3247,
+          3446
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3247,
+          3446
+        ]
+      ]
+    },
+    {
+      "source_index": 74,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-f419c0fae64f634b",
+      "line_start": 593,
+      "line_end": 601,
+      "projection_fingerprint": "a798dffe5d68aa32238fda3b23b2c9813ee8392d0d9519de05b88294f0b50559",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18457,
+          18904
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18457,
+          18904
+        ]
+      ]
+    },
+    {
+      "source_index": 75,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-1b7bef85d4cca22e",
+      "line_start": 132,
+      "line_end": 135,
+      "projection_fingerprint": "5ab5463f715a4f1b1e905ec90be478c02d575a54216d0b6fe110bb67efeefd20",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3785,
+          4041
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3785,
+          4041
+        ]
+      ]
+    },
+    {
+      "source_index": 76,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-e5d51bfaf485c0cb",
+      "line_start": 663,
+      "line_end": 672,
+      "projection_fingerprint": "d68bdd26e4073ada1cf42dd3b6776e79d72102d944bc699d086ac36347ee9cd8",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20551,
+          20909
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20551,
+          20909
+        ]
+      ]
+    },
+    {
+      "source_index": 77,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-24378165d3131596",
+      "line_start": 560,
+      "line_end": 567,
+      "projection_fingerprint": "8b6fe9461355cc46a1102e5d44c54f3892fbb23de41bffeabdbb0b8f0f5a1ab1",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16282,
+          16639
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16282,
+          16639
+        ]
+      ]
+    },
+    {
+      "source_index": 78,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-e4e4e916c93ff5a7",
+      "line_start": 117,
+      "line_end": 127,
+      "projection_fingerprint": "5340fd8ee5b7a58720de85972ebb107ada146fa684fc602c1300278c097bb7a2",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3416,
+          3653
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3416,
+          3653
+        ]
+      ]
+    },
+    {
+      "source_index": 79,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-daa0b1b2d6d4a3b5",
+      "line_start": 148,
+      "line_end": 154,
+      "projection_fingerprint": "a230c951aaac050be788f3bdb3368aa141176dd2efbfa9d63085858de32455e6",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4031,
+          4289
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4031,
+          4289
+        ]
+      ]
+    },
+    {
+      "source_index": 80,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-3c79d3d5056b6fc5",
+      "line_start": 79,
+      "line_end": 88,
+      "projection_fingerprint": "cc9e795383c3c61c72d93eb53d3f57117cfae2a3a1785d1a79c23ecb30629d19",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2381,
+          2836
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2381,
+          2836
+        ]
+      ]
+    },
+    {
+      "source_index": 81,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-10493ab6b243b0c3",
+      "line_start": 587,
+      "line_end": 599,
+      "projection_fingerprint": "156b376da157a9dd4aae6ff146a0dbbae47007c9216e36a8b86fe727cc28aef2",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17008,
+          17393
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17008,
+          17393
+        ]
+      ]
+    },
+    {
+      "source_index": 82,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-b4e7e6046db0a89c",
+      "line_start": 196,
+      "line_end": 209,
+      "projection_fingerprint": "8ff0abdacab34c8928c549645741d19dc673a4548c90ffea6f809f53592a6446",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5152,
+          5503
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5152,
+          5503
+        ]
+      ]
+    },
+    {
+      "source_index": 83,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-7dc9a53cc8e06dca",
+      "line_start": 128,
+      "line_end": 147,
+      "projection_fingerprint": "14753713fcb6a17d3f424a2486836d93bde4025ebd92ec05dc2b60f25a092f14",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3653,
+          4031
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3653,
+          4031
+        ]
+      ]
+    },
+    {
+      "source_index": 84,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-21058d2049f3d29b",
+      "line_start": 109,
+      "line_end": 116,
+      "projection_fingerprint": "3808ea9679f431bd6c2423968f01803f7629c511031c1be55077ad6f597c4cd5",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3280,
+          3416
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3280,
+          3416
+        ]
+      ]
+    },
+    {
+      "source_index": 85,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-c917efbfe0965743",
+      "line_start": 652,
+      "line_end": 656,
+      "projection_fingerprint": "86d84559e547f02d8a558dd7b68595a5de4699630a158133c6a0b78b61b1fe73",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18851,
+          19045
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18851,
+          19045
+        ]
+      ]
+    },
+    {
+      "source_index": 86,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-3a62809ed59390cc",
+      "line_start": 568,
+      "line_end": 586,
+      "projection_fingerprint": "df8e692b38d515b6b84ab95c5863fd5a50feb1edd9a85f28bff1b883d9612e37",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16639,
+          17008
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16639,
+          17008
+        ]
+      ]
+    },
+    {
+      "source_index": 87,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-7159719653214fc8",
+      "line_start": 600,
+      "line_end": 612,
+      "projection_fingerprint": "4b84b0cd110633827cef867d57bea3cd115441267ad7979f8f0d8b78de1530b2",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17393,
+          17694
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17393,
+          17694
+        ]
+      ]
+    },
+    {
+      "source_index": 88,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-8af2fb4279d064bc",
+      "line_start": 89,
+      "line_end": 108,
+      "projection_fingerprint": "67a4c401a9d23b76fe29ca59a2718932c2bd656a0685e1edbfbad53f1b5e3323",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2836,
+          3280
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2836,
+          3280
+        ]
+      ]
+    },
+    {
+      "source_index": 89,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-0baee1038f9ae0de",
+      "line_start": 12,
+      "line_end": 20,
+      "projection_fingerprint": "54ffbae8321b89559378aafd991d062e176298b8d6a6d56cd10a95e60f667c36",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          109,
+          547
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          109,
+          547
+        ]
+      ]
+    },
+    {
+      "source_index": 90,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-ac6a9360a787eb7c",
+      "line_start": 613,
+      "line_end": 618,
+      "projection_fingerprint": "54d8cfcf44f3fad604115b75fffa6b0a700d88db40c67122480c518536c5c80c",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17694,
+          18216
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17694,
+          18216
+        ]
+      ]
+    },
+    {
+      "source_index": 91,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-3c61e879507cbde1",
+      "line_start": 619,
+      "line_end": 651,
+      "projection_fingerprint": "212f4447423bb36f283cfbb9ce022dfcd6d5b79f3a089c57c3fb5e044b944837",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18216,
+          18851
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18216,
+          18851
+        ]
+      ]
+    },
+    {
+      "source_index": 92,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-de1e27f16f6b97f5",
+      "line_start": 657,
+      "line_end": 689,
+      "projection_fingerprint": "e0c31c6eaaaa3676e83b6adec41669e1f8c30e968f39ef2517a7f03a3774d353",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19045,
+          19691
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19045,
+          19691
+        ]
+      ]
+    },
+    {
+      "source_index": 93,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-8b72fc20cd9b37d2",
+      "line_start": 49,
+      "line_end": 59,
+      "projection_fingerprint": "3330f1870ed576b2bcc2953c745936df41fed8879d7da56992b36aae055e9bd4",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1601,
+          1996
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1601,
+          1996
+        ]
+      ]
+    },
+    {
+      "source_index": 94,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-7f4238bce144b517",
+      "line_start": 60,
+      "line_end": 78,
+      "projection_fingerprint": "ae3d032bba36ade651c9931304cdf0597ce2ced06855657538d3cdbe56bffd01",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1996,
+          2381
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1996,
+          2381
+        ]
+      ]
+    },
+    {
+      "source_index": 95,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-d8a27d69dc2a3cb8",
+      "line_start": 177,
+      "line_end": 195,
+      "projection_fingerprint": "b9c8d48452af97b71281c9880fadf30853a07f3c2550bd01154dc8640d255ab4",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4722,
+          5152
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4722,
+          5152
+        ]
+      ]
+    },
+    {
+      "source_index": 96,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-a5cf7abd2856ea54",
+      "line_start": 21,
+      "line_end": 28,
+      "projection_fingerprint": "65c5cda4671e1300fe9f1fe54ac7a26f0192a8ac6ed9d402825c9ff3bef18746",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          547,
+          1023
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          547,
+          1023
+        ]
+      ]
+    },
+    {
+      "source_index": 97,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-eaeb1af83de1c6d9",
+      "line_start": 29,
+      "line_end": 44,
+      "projection_fingerprint": "0b5b9e9c3fed4d664306641e5308c6d5e0904585392bee597c7a089360081059",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1023,
+          1490
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1023,
+          1490
+        ]
+      ]
+    },
+    {
+      "source_index": 98,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-942263c75b77f94a",
+      "line_start": 47,
+      "line_end": 57,
+      "projection_fingerprint": "5d54b042c8aaf6101ccefed544d18c9445ae56361efbfde03bfd15fdcc8f416f",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1363,
+          1575
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1363,
+          1575
+        ]
+      ]
+    },
+    {
+      "source_index": 99,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-49e4cc63e0dfb013",
+      "line_start": 179,
+      "line_end": 180,
+      "projection_fingerprint": "7de7b16dac7a582ac7037bd5fadc8a47819b33ba3d16c21367f936360fc6ff3c",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5243,
+          5266
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5243,
+          5266
+        ]
+      ]
+    },
+    {
+      "source_index": 100,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-24cba927234041a0",
+      "line_start": 21,
+      "line_end": 23,
+      "projection_fingerprint": "28976b68ffe93155f0863bbff36d566cdb6712cf4e311f35227e844e1067b766",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          524,
+          635
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          524,
+          635
+        ]
+      ]
+    },
+    {
+      "source_index": 101,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-316312708d228a6e",
+      "line_start": 693,
+      "line_end": 695,
+      "projection_fingerprint": "6a3fc8621346d3013a6b60265a7da4e163b87961f63091eba52a558933054f4f",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21563,
+          21677
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21563,
+          21677
+        ]
+      ]
+    },
+    {
+      "source_index": 102,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-1255a1a07da1f061",
+      "line_start": 1,
+      "line_end": 11,
+      "projection_fingerprint": "178da1a4af83281ea28dc0b38bb2d0bf0b9dae5e97ba243a504fcdc0320a8bf5",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          0,
+          101
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          0,
+          101
+        ]
+      ]
+    },
+    {
+      "source_index": 103,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-dff5d4eaa1f46e93",
+      "line_start": 224,
+      "line_end": 230,
+      "projection_fingerprint": "e88fb919eb1c763409fb23738c3ad96f474b0ff47296f49085f800563cb77f6d",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6402,
+          6665
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6402,
+          6665
+        ]
+      ]
+    },
+    {
+      "source_index": 104,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-5ede5a27543ab424",
+      "line_start": 293,
+      "line_end": 297,
+      "projection_fingerprint": "f942bee843526c8befb971298d083e5959a48ec7eeaaa3fb9f36bba80ca71eee",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8724,
+          8911
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8724,
+          8911
+        ]
+      ]
+    },
+    {
+      "source_index": 105,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-abe43465fb33d801",
+      "line_start": 151,
+      "line_end": 154,
+      "projection_fingerprint": "3a1f796fa6291ea7699b5729dccd954ea91bc9ab35cccf60f2dab6af479d93e1",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4324,
+          4396
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4324,
+          4396
+        ]
+      ]
+    },
+    {
+      "source_index": 106,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-09f9fe299ef38957",
+      "line_start": 243,
+      "line_end": 248,
+      "projection_fingerprint": "b05ff464109d286b35652f42968057f95fe4abb35295c87176ae2d38d243863b",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6952,
+          7393
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6952,
+          7393
+        ]
+      ]
+    },
+    {
+      "source_index": 107,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-9d076e9256190d18",
+      "line_start": 12,
+      "line_end": 20,
+      "projection_fingerprint": "6b65c113c8b6d7b877d669dbb784f634849a27269538e67ec6f71e3551d24594",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          101,
+          524
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          101,
+          524
+        ]
+      ]
+    },
+    {
+      "source_index": 108,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-b9bc39d7071368e0",
+      "line_start": 510,
+      "line_end": 511,
+      "projection_fingerprint": "ecfe41c7419ff58aa8aa4e05c9eca8c0d5b117cb8c92a4e731c64fb3221b7c54",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15390,
+          15475
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15390,
+          15475
+        ]
+      ]
+    },
+    {
+      "source_index": 109,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-1ed5aae827f334dc",
+      "line_start": 470,
+      "line_end": 473,
+      "projection_fingerprint": "aa5028f32d35a80047c76482dde0425de9684ad921c0b3b4ed983cbd00bf7bda",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14306,
+          14391
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14306,
+          14391
+        ]
+      ]
+    },
+    {
+      "source_index": 110,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-37c3261ada659662",
+      "line_start": 58,
+      "line_end": 69,
+      "projection_fingerprint": "27bfd5e9f90485f40400aaf6f771ea08800ffdde62f85b9adfc059a8c3c5457d",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1575,
+          1986
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1575,
+          1986
+        ]
+      ]
+    },
+    {
+      "source_index": 111,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-272e653fc2f3ffaf",
+      "line_start": 275,
+      "line_end": 279,
+      "projection_fingerprint": "e8c1782b691f6a2ebfe6f4585c49e63d125b3a6b360fb351549fb297db877aa4",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8253,
+          8434
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8253,
+          8434
+        ]
+      ]
+    },
+    {
+      "source_index": 112,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-0f659fe96d269947",
+      "line_start": 343,
+      "line_end": 346,
+      "projection_fingerprint": "123f87708dd670236eca592504ed8b6b465140efde80bd5c8f00476898003b99",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10229,
+          10557
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10229,
+          10557
+        ]
+      ]
+    },
+    {
+      "source_index": 113,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-73a84eefb4c03c1a",
+      "line_start": 136,
+      "line_end": 150,
+      "projection_fingerprint": "231123281b1dcd6a35169e85659a0ef45ff2008b043c684ad6837bf5d538416f",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4041,
+          4324
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4041,
+          4324
+        ]
+      ]
+    },
+    {
+      "source_index": 114,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-eae9dfb0c98da5fb",
+      "line_start": 340,
+      "line_end": 342,
+      "projection_fingerprint": "54acfd9253357a2a486da5e6f91d4df8341ad683cdfa5d354f5dd142aa75d13d",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9999,
+          10229
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9999,
+          10229
+        ]
+      ]
+    },
+    {
+      "source_index": 115,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-4a81e9d7221967f1",
+      "line_start": 17,
+      "line_end": 36,
+      "projection_fingerprint": "8687f7f6f2e3e5ffc7b68a1abe02fbc40a23a09809e2de0bde25eea59cb84cac",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          323,
+          734
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          323,
+          734
+        ]
+      ]
+    },
+    {
+      "source_index": 116,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-3aec1fee9ea3952f",
+      "line_start": 61,
+      "line_end": 73,
+      "projection_fingerprint": "252895447b399827d55a7ffcef5c18bb99a6ebd1beb1d0c8eed4cdc9368ed74a",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1661,
+          2055
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1661,
+          2055
+        ]
+      ]
+    },
+    {
+      "source_index": 117,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-0add490d97ae55e3",
+      "line_start": 196,
+      "line_end": 217,
+      "projection_fingerprint": "6282abba09371dd496e571ac5d13f31f370bd3cbe1f0806ce2b6ccecb9ad33d5",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6553,
+          6972
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6553,
+          6972
+        ]
+      ]
+    },
+    {
+      "source_index": 118,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-407bbd34de42aee5",
+      "line_start": 512,
+      "line_end": 527,
+      "projection_fingerprint": "902b9e1b9e18d8f5b23878b3990288082dd9485d541afd11baf58d44bcf979a9",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15062,
+          15336
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15062,
+          15336
+        ]
+      ]
+    },
+    {
+      "source_index": 119,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-9b57d48e949025ea",
+      "line_start": 269,
+      "line_end": 285,
+      "projection_fingerprint": "8d4324f1892b7ae1ee5f18fdd06d3ad7d54fdf29d0efda11d69c97070fa74e2b",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8077,
+          8526
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8077,
+          8526
+        ]
+      ]
+    },
+    {
+      "source_index": 120,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-41ecdcde7d9c1e91",
+      "line_start": 236,
+      "line_end": 243,
+      "projection_fingerprint": "5542372a656e8af5c55aa21763cf789d5602a9958579f8c43bb39f847f6ce83b",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7389,
+          7511
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7389,
+          7511
+        ]
+      ]
+    },
+    {
+      "source_index": 121,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-51850fc8a979078f",
+      "line_start": 699,
+      "line_end": 712,
+      "projection_fingerprint": "83e0e495c28fbb82ee269cb5ba23d9fb4ed67c2d45d684d794c10743d2248b19",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20039,
+          20465
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20039,
+          20465
+        ]
+      ]
+    },
+    {
+      "source_index": 122,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-7da54af318cc5034",
+      "line_start": 218,
+      "line_end": 235,
+      "projection_fingerprint": "91113b0452286353cd384259a058a5093d47f00bbec22547dafd490583ff4355",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6972,
+          7389
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6972,
+          7389
+        ]
+      ]
+    },
+    {
+      "source_index": 123,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-c289aba9cfc5f038",
+      "line_start": 474,
+      "line_end": 491,
+      "projection_fingerprint": "622c1f89741403a8ea22a89901db6d0756b769677a7342d9d9d303d94655c6a1",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14028,
+          14455
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14028,
+          14455
+        ]
+      ]
+    },
+    {
+      "source_index": 124,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-e8338b3cbc6e27b4",
+      "line_start": 349,
+      "line_end": 363,
+      "projection_fingerprint": "e1ffcb692f37a129a6def655344bb4cc3d3a0e7b290103d23a567c075a9492a2",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10575,
+          11004
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10575,
+          11004
+        ]
+      ]
+    },
+    {
+      "source_index": 125,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-cdce207841d53d07",
+      "line_start": 533,
+      "line_end": 539,
+      "projection_fingerprint": "556d2d8d1a8ed525e5cbafcf48391d92ef129a79ebb291403f6d721362dcc385",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15554,
+          15874
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15554,
+          15874
+        ]
+      ]
+    },
+    {
+      "source_index": 126,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-c6a0609058ab10a6",
+      "line_start": 323,
+      "line_end": 334,
+      "projection_fingerprint": "93912c20654a6562cf0df20df69624163f46a085b48a26fe888f7d05c3122b75",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9902,
+          10158
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9902,
+          10158
+        ]
+      ]
+    },
+    {
+      "source_index": 127,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-38f78d75558cf0cd",
+      "line_start": 460,
+      "line_end": 473,
+      "projection_fingerprint": "78f4279d339d101b5319a99a6ec409b33e68cff70a1617456d9d5848e85e48ff",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13778,
+          14028
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13778,
+          14028
+        ]
+      ]
+    },
+    {
+      "source_index": 128,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-8a12ef86644f992d",
+      "line_start": 540,
+      "line_end": 559,
+      "projection_fingerprint": "0e971f0cd6774047cd64930e416db2d775c1e3d339beae92a9a83bdea8cc80b7",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15874,
+          16282
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15874,
+          16282
+        ]
+      ]
+    },
+    {
+      "source_index": 129,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-6543c4121a507082",
+      "line_start": 364,
+      "line_end": 370,
+      "projection_fingerprint": "b95d57006dc00620b567db0069431a0f63a9ddae8103347fc22260f8ea207244",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11004,
+          11132
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11004,
+          11132
+        ]
+      ]
+    },
+    {
+      "source_index": 130,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-3881009a556575b1",
+      "line_start": 376,
+      "line_end": 384,
+      "projection_fingerprint": "02c69b0443cc64532948be036a421bf0b7a8c59bea70481ffcbeefe6775f1b9d",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11373,
+          11651
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11373,
+          11651
+        ]
+      ]
+    },
+    {
+      "source_index": 131,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-0460d824e0cca6fb",
+      "line_start": 252,
+      "line_end": 268,
+      "projection_fingerprint": "e5183a86182a38bca2186e69c1a48438fd6400603943e896abbd4313982b1be4",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7651,
+          8077
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7651,
+          8077
+        ]
+      ]
+    },
+    {
+      "source_index": 132,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-981e1159339ece8c",
+      "line_start": 415,
+      "line_end": 429,
+      "projection_fingerprint": "95f0d0c0bac24066f96d7e45f612a46dacf0b7d3e9341755c3747b0d389acffb",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12588,
+          12915
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12588,
+          12915
+        ]
+      ]
+    },
+    {
+      "source_index": 133,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-92e716b6896e747a",
+      "line_start": 335,
+      "line_end": 348,
+      "projection_fingerprint": "2aec9c9f1fb99c9f932d966c493ca5c18c6a64db0f96849046cb2b192cbeb424",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10158,
+          10575
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10158,
+          10575
+        ]
+      ]
+    },
+    {
+      "source_index": 134,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-4df235e9f539d7c8",
+      "line_start": 397,
+      "line_end": 414,
+      "projection_fingerprint": "1e01188ceb26187cf8cc48a3020a9a4424a3cc094923a08b99ac3b65b35c6eef",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12138,
+          12588
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12138,
+          12588
+        ]
+      ]
+    },
+    {
+      "source_index": 135,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-700256e0bfe5c647",
+      "line_start": 317,
+      "line_end": 322,
+      "projection_fingerprint": "bc403c7e75239ed08136e3fcbe2c370a153153e8ee503685ef67586b2da5bc81",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9505,
+          9902
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9505,
+          9902
+        ]
+      ]
+    },
+    {
+      "source_index": 136,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-e724c9b0289a8562",
+      "line_start": 150,
+      "line_end": 151,
+      "projection_fingerprint": "b09c46cdb42b0c221b3e2d062d3360e9e974f569accd5329989359e87a03245a",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4436,
+          5072
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4436,
+          5072
+        ]
+      ]
+    },
+    {
+      "source_index": 137,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-1b9471b2234e0980",
+      "line_start": 492,
+      "line_end": 503,
+      "projection_fingerprint": "a6e298567f7ef659882a47bb50206da7d8aaa26e847e94f83ba21af09cad7629",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14455,
+          14772
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14455,
+          14772
+        ]
+      ]
+    },
+    {
+      "source_index": 138,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-8301778425499908",
+      "line_start": 286,
+      "line_end": 301,
+      "projection_fingerprint": "4386ad38075bd0c6c8fc6869105745d8c2f0f391ae040b8993f50ede8a6824ef",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8526,
+          8979
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8526,
+          8979
+        ]
+      ]
+    },
+    {
+      "source_index": 139,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-6d3ca48381824e1b",
+      "line_start": 713,
+      "line_end": 727,
+      "projection_fingerprint": "e9ccb76f8893dd37a4a44309bb1a583a84921a0257067a0ffba4445bc802711b",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20465,
+          20790
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20465,
+          20790
+        ]
+      ]
+    },
+    {
+      "source_index": 140,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-db926358ef210b72",
+      "line_start": 759,
+      "line_end": 766,
+      "projection_fingerprint": "61a58fa9182496c650d74523f94bfd51b2f8e45daab6c4d6a498a5ec56783cd8",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22183,
+          22473
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22183,
+          22473
+        ]
+      ]
+    },
+    {
+      "source_index": 141,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-09e99a93d63f4865",
+      "line_start": 45,
+      "line_end": 48,
+      "projection_fingerprint": "ec3a870924e8dbc8f6b94fefbf45a1068f7e96b198a43e36abdba5364f04dc12",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1490,
+          1601
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1490,
+          1601
+        ]
+      ]
+    },
+    {
+      "source_index": 142,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-c05f01a97b0188ea",
+      "line_start": 302,
+      "line_end": 304,
+      "projection_fingerprint": "8d685e55a8db381aa8eaf55d193c9313742cd4bb6260ef1e0244905fc2cb67ab",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8979,
+          9089
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8979,
+          9089
+        ]
+      ]
+    },
+    {
+      "source_index": 143,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-3d00241c895feb8a",
+      "line_start": 173,
+      "line_end": 176,
+      "projection_fingerprint": "ed3d6ce71485c3de587cfbb3ff2ca4cebf79878a7e8a47af4f18dca54dde8d3c",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4681,
+          4722
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4681,
+          4722
+        ]
+      ]
+    },
+    {
+      "source_index": 144,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-82926e51c52b0137",
+      "line_start": 244,
+      "line_end": 251,
+      "projection_fingerprint": "8248a51ff01c6015b4061dbef679a0a887b70d949a2a5c934ad60fc4c4e34e62",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7511,
+          7651
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7511,
+          7651
+        ]
+      ]
+    },
+    {
+      "source_index": 145,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-a786567fb5261ab3",
+      "line_start": 305,
+      "line_end": 316,
+      "projection_fingerprint": "d11d8356b458fc038adc110731325a1751b74b2781299a5220d5cfced8f09441",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9089,
+          9505
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9089,
+          9505
+        ]
+      ]
+    },
+    {
+      "source_index": 146,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-f10f1b2ea9881229",
+      "line_start": 389,
+      "line_end": 396,
+      "projection_fingerprint": "7989f7b4108176a2421b3b7a8c5cb9f974eaf8736aad4ce3cc7d9e17ef310af7",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11905,
+          12138
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11905,
+          12138
+        ]
+      ]
+    },
+    {
+      "source_index": 147,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-5042e62104cfb86b",
+      "line_start": 789,
+      "line_end": 791,
+      "projection_fingerprint": "bf7c290a823eb5d68f6179b680be3e768ff2baa1eb420fb1aef5080957a6e07e",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23298,
+          23532
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23298,
+          23532
+        ]
+      ]
+    },
+    {
+      "source_index": 148,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-486d7709c06234b6",
+      "line_start": 779,
+      "line_end": 784,
+      "projection_fingerprint": "a0eeb9cb0fc2d66192d39202bfd033cbc094a4ec51cccafdfee1807bb01af242",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22802,
+          23087
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22802,
+          23087
+        ]
+      ]
+    },
+    {
+      "source_index": 149,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-f9af0fb8f2974b61",
+      "line_start": 129,
+      "line_end": 137,
+      "projection_fingerprint": "22987bf7c560cdee950dbf781847fcd0560a8cdef52eb2f4fce7c408ef2bbb13",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3762,
+          4095
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3762,
+          4095
+        ]
+      ]
+    },
+    {
+      "source_index": 150,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-c6fcca5972223585",
+      "line_start": 155,
+      "line_end": 172,
+      "projection_fingerprint": "b89cace451d5b20d2e2a396cf122bd97efdc8109d6f5286e016f664ead63f568",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4289,
+          4681
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4289,
+          4681
+        ]
+      ]
+    },
+    {
+      "source_index": 151,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-423e0623a80d1244",
+      "line_start": 85,
+      "line_end": 86,
+      "projection_fingerprint": "48df835b189e4fc4de30653b3b39daedfa96d251a6d5785d06b1cce87fc5be0a",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2452,
+          2476
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2452,
+          2476
+        ]
+      ]
+    },
+    {
+      "source_index": 152,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-e94e6a24d451d6be",
+      "line_start": 1,
+      "line_end": 11,
+      "projection_fingerprint": "d83b0548de7ca1c10c6cdc3af6274898bed59afc7a6acb0a0d21ca008649f918",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          0,
+          112
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          0,
+          112
+        ]
+      ]
+    },
+    {
+      "source_index": 153,
+      "path_or_url": "docs/managing-environments.md",
+      "relative_path": "docs/managing-environments.md",
+      "evidence_id": "ev-72cc72ea9fad0225",
+      "line_start": 1,
+      "line_end": 11,
+      "projection_fingerprint": "83938037f01626f69a3b18a4cab02ce127254aa2869d27bc4cc83e90727a3126",
+      "pinned_raw_file_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          0,
+          109
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          0,
+          109
+        ]
+      ]
+    },
+    {
+      "source_index": 154,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-64c396e7b16d09db",
+      "line_start": 125,
+      "line_end": 128,
+      "projection_fingerprint": "3111c75d42ab628d70105dbfab838de83d7bd70462449a47965c4c76cadc8fd3",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3645,
+          3762
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3645,
+          3762
+        ]
+      ]
+    },
+    {
+      "source_index": 155,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-25822aad0d8f6cf5",
+      "line_start": 528,
+      "line_end": 532,
+      "projection_fingerprint": "83e7628c6e3a3f51e0a7792cef8a67a4af318eb414064d5f3ab29ffeec944255",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15336,
+          15554
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15336,
+          15554
+        ]
+      ]
+    },
+    {
+      "source_index": 156,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-670687cd94f69778",
+      "line_start": 178,
+      "line_end": 183,
+      "projection_fingerprint": "e43b12f2dee66ba1be280c96d9ccd5fe6ae7e4c4021eafab3247eda09270a540",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6024,
+          6200
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6024,
+          6200
+        ]
+      ]
+    },
+    {
+      "source_index": 157,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-9578f00bc599d085",
+      "line_start": 12,
+      "line_end": 16,
+      "projection_fingerprint": "8cd57b2f795b0855187d559aed5054165196d8ca0d2a8b2dbf68afd69b61f7a2",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          112,
+          323
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          112,
+          323
+        ]
+      ]
+    },
+    {
+      "source_index": 158,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-8a315c9f11eb9eb0",
+      "line_start": 93,
+      "line_end": 99,
+      "projection_fingerprint": "737db30ad4e1edecd74c7881cd4f349a786b97f5ff5f62ef871084b5a4ab174b",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2838,
+          3041
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2838,
+          3041
+        ]
+      ]
+    },
+    {
+      "source_index": 159,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-f89d4cec5894d87d",
+      "line_start": 138,
+      "line_end": 141,
+      "projection_fingerprint": "b2dd5acec2108e66f0991a9404961bdccc4adf508db6ab88211c1a8fa4c56391",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4095,
+          4236
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4095,
+          4236
+        ]
+      ]
+    },
+    {
+      "source_index": 160,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-5055332e2fccbc1f",
+      "line_start": 504,
+      "line_end": 511,
+      "projection_fingerprint": "5de05e0451c88dba698128f49100a26b7627b9f41b8b08f88da9ed692246f555",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14772,
+          15062
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14772,
+          15062
+        ]
+      ]
+    },
+    {
+      "source_index": 161,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-62cf816c2183d6ab",
+      "line_start": 785,
+      "line_end": 788,
+      "projection_fingerprint": "ef98c1373735bf43179e4bf9cebbcb04b80fcebab152be2d8c6b3f4506a596ae",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23087,
+          23298
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23087,
+          23298
+        ]
+      ]
+    },
+    {
+      "source_index": 162,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-2e1872ad61cf1e8e",
+      "line_start": 733,
+      "line_end": 739,
+      "projection_fingerprint": "0c10337d1d0384a28244f620bcfb9dd03388ce700ff2a4a1319338feb65de0dd",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21157,
+          21313
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21157,
+          21313
+        ]
+      ]
+    },
+    {
+      "source_index": 163,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-3b4e86d6fd621024",
+      "line_start": 385,
+      "line_end": 388,
+      "projection_fingerprint": "52b875e743fb969d0309f80b671a165fdf97091297d2daaccde41f9d430dbccf",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11651,
+          11905
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11651,
+          11905
+        ]
+      ]
+    },
+    {
+      "source_index": 164,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-fb7815d05d52d3c4",
+      "line_start": 744,
+      "line_end": 750,
+      "projection_fingerprint": "10bd38bac168a6fed12872227114967c3bcee2bbf1a2e7f62483e328f6d68012",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21662,
+          21847
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21662,
+          21847
+        ]
+      ]
+    },
+    {
+      "source_index": 165,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-067817627d99bf98",
+      "line_start": 690,
+      "line_end": 698,
+      "projection_fingerprint": "6e97b135ab29963af83c775892a1e02d853d5ac992a99cb960a715ea0aaba747",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19691,
+          20039
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19691,
+          20039
+        ]
+      ]
+    },
+    {
+      "source_index": 166,
+      "path_or_url": "docs/dependency-specification.md",
+      "relative_path": "docs/dependency-specification.md",
+      "evidence_id": "ev-d8f807a598abea17",
+      "line_start": 740,
+      "line_end": 743,
+      "projection_fingerprint": "d02164e6804aa1974fb7074ffe35f852f8b2dc69c0c8e44ce2546ec4922df559",
+      "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21313,
+          21662
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21313,
+          21662
+        ]
+      ]
+    }
+  ],
+  "source_errors": []
+}

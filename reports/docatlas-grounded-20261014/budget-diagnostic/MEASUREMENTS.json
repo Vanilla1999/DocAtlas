@@ -1,0 +1,782 @@
+{
+  "cases": [
+    {
+      "case_id": "V40-P03",
+      "observer_output_exact_equal": true,
+      "off": {
+        "utf8_bytes": 35884,
+        "utf8_div4": 8971,
+        "codec_tokens": 11884,
+        "cost": 11884,
+        "wire_sha256": "5d8241bb6033e80c06dcb4e807f12f84b9201fb83d44401c5c6b716de1f3e0b8"
+      },
+      "on": {
+        "utf8_bytes": 35884,
+        "utf8_div4": 8971,
+        "codec_tokens": 11884,
+        "cost": 11884,
+        "wire_sha256": "5d8241bb6033e80c06dcb4e807f12f84b9201fb83d44401c5c6b716de1f3e0b8"
+      },
+      "read_only": true,
+      "diagnostic": {
+        "before_gold": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": true,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": true,
+                  "parts": [
+                    {
+                      "witness_id": "V40-P03/required/set-0/part-0",
+                      "path": "docs/configuration.md",
+                      "line_start": 102,
+                      "line_end": 114,
+                      "covered": true,
+                      "char_start": 2805,
+                      "char_end": 3320,
+                      "expected_characters": 515,
+                      "covered_characters": 515,
+                      "missing_char_ranges": [],
+                      "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                      "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 1,
+          "all_documented_claims_covered": true,
+          "missing_documented_claim_ids": [],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [],
+          "errors": []
+        },
+        "original_final_gold": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": false,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": false,
+                  "parts": [
+                    {
+                      "witness_id": "V40-P03/required/set-0/part-0",
+                      "path": "docs/configuration.md",
+                      "line_start": 102,
+                      "line_end": 114,
+                      "covered": false,
+                      "char_start": 2805,
+                      "char_end": 3320,
+                      "expected_characters": 515,
+                      "covered_characters": 442,
+                      "missing_char_ranges": [
+                        [
+                          3247,
+                          3320
+                        ]
+                      ],
+                      "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                      "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 0,
+          "all_documented_claims_covered": false,
+          "missing_documented_claim_ids": [
+            "required"
+          ],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [
+            "V40-P03/required/set-0/part-0"
+          ],
+          "errors": []
+        },
+        "projection_errors": [],
+        "source_errors": [],
+        "feasible_gold": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": true,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": true,
+                  "parts": [
+                    {
+                      "witness_id": "V40-P03/required/set-0/part-0",
+                      "path": "docs/configuration.md",
+                      "line_start": 102,
+                      "line_end": 114,
+                      "covered": true,
+                      "char_start": 2805,
+                      "char_end": 3320,
+                      "expected_characters": 515,
+                      "covered_characters": 515,
+                      "missing_char_ranges": [],
+                      "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                      "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 1,
+          "all_documented_claims_covered": true,
+          "missing_documented_claim_ids": [],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [],
+          "errors": []
+        },
+        "feasible": {
+          "utf8_bytes": 2431,
+          "utf8_div4": 608,
+          "codec_tokens": 743,
+          "cost": 743,
+          "wire_sha256": "dfdf3b1c564d68da65a2238b2a26f6732c980196e9ed28c7a515aa1434758b60"
+        },
+        "selected_whole_ids": [
+          "ev-4ee38ec394d37817",
+          "ev-de9f17e55b14ffb8"
+        ],
+        "real_recheck_pass": true,
+        "real_budget_checker_pass": true,
+        "public_budget": {
+          "full": {
+            "utf8_bytes": 35884,
+            "utf8_div4": 8971,
+            "codec_tokens": 11884,
+            "cost": 11884,
+            "wire_sha256": "5d8241bb6033e80c06dcb4e807f12f84b9201fb83d44401c5c6b716de1f3e0b8"
+          },
+          "envelope": {
+            "utf8_bytes": 743,
+            "utf8_div4": 186,
+            "codec_tokens": 194,
+            "cost": 194,
+            "wire_sha256": "341d68fb754e493cb728d697ea6100c8e02ee6c5c190d78a41082f7d3ab439c7"
+          },
+          "empty_snippets": {
+            "utf8_bytes": 22660,
+            "utf8_div4": 5665,
+            "codec_tokens": 8509,
+            "cost": 8509,
+            "wire_sha256": "24719b7b7fc6d24cc36bfb56295688dfb56bc525abfae7d3666c81ee204705f8"
+          },
+          "byte_parts": {
+            "envelope": 743,
+            "source_metadata": 21917,
+            "escaped_snippets": 13224
+          },
+          "ordered_codec_deltas": {
+            "envelope": 194,
+            "source_metadata": 8315,
+            "escaped_snippets": 3375
+          },
+          "raw_snippets": {
+            "utf8_bytes": 12805,
+            "standalone_codec_tokens": 2978
+          },
+          "top_level_fields": {
+            "status": {
+              "utf8_bytes": 23,
+              "utf8_div4": 6,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "ba3be31e98ab057a94766ade907fd1b741740657695e1971e12f17ffb24acb94"
+            },
+            "kind": {
+              "utf8_bytes": 24,
+              "utf8_div4": 6,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "8d3c3e6d1bd47f159b32dd7a312a0c1fe7f279e6658376fd7ddda28e9da8fc34"
+            },
+            "context_status": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "e36fad535efb342a0e27bdfe3d7e77ee04e1db5e4f47e8db53f4bf74d150be78"
+            },
+            "context_available": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 6,
+              "cost": 7,
+              "wire_sha256": "2738798a6bc0cf02b9bba1a17fb16d431796ed4b7f7cbec8a61b7b7f800d3858"
+            },
+            "answer_supported": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 6,
+              "cost": 7,
+              "wire_sha256": "d1ff9aee06a8f982e346c8e678e8832fd93489f0d1f636f5b45b65bced6a03f6"
+            },
+            "answer_available": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 6,
+              "cost": 7,
+              "wire_sha256": "21f563d2b1ae016d55572059e2cd7d736386f89bbc4b8b59deba1520cacdc92f"
+            },
+            "support_status": {
+              "utf8_bytes": 36,
+              "utf8_div4": 9,
+              "codec_tokens": 9,
+              "cost": 9,
+              "wire_sha256": "33136a6f5ad665364980126815bb3b287d32b7a26a3a217d312eb10f0be150fd"
+            },
+            "answer_policy": {
+              "utf8_bytes": 30,
+              "utf8_div4": 8,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "a9709e18fc864af11a502aa82c5d48acd0b0e81f6c45068d5c6d7f0edfc10bfd"
+            },
+            "coverage_policy": {
+              "utf8_bytes": 49,
+              "utf8_div4": 13,
+              "codec_tokens": 11,
+              "cost": 13,
+              "wire_sha256": "98bbd890838f8130bc80fb2553a5d0f923cfa6eb67732c7721cc40c38cf39592"
+            },
+            "query_coverage": {
+              "utf8_bytes": 29,
+              "utf8_div4": 8,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "63ee366abcdb629e8cf6ba647b930fd93cfafa8cab2c299af2bd8513edd0e9c1"
+            },
+            "retrieval_coverage": {
+              "utf8_bytes": 33,
+              "utf8_div4": 9,
+              "codec_tokens": 9,
+              "cost": 9,
+              "wire_sha256": "2cf1f270015c604b3cd17af13dcecb93a4d2bc5912c763f84c353654f8592905"
+            },
+            "facet_coverage": {
+              "utf8_bytes": 32,
+              "utf8_div4": 8,
+              "codec_tokens": 9,
+              "cost": 9,
+              "wire_sha256": "5394be4bd55af04c8de6fe5dacd6f6f5b58abd46b5a04e0f1f93630a4172650c"
+            },
+            "covered_query_ids": {
+              "utf8_bytes": 25,
+              "utf8_div4": 7,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "03fccb1c54ca93a376dd335964890171fbde8f7a63f6be2b32ee08323f43c1f8"
+            },
+            "missing_query_ids": {
+              "utf8_bytes": 41,
+              "utf8_div4": 11,
+              "codec_tokens": 10,
+              "cost": 11,
+              "wire_sha256": "fc0724b51b8fbdbc95ffd05e8249a0e41d398a4a2cc7ed295704a65550d38942"
+            },
+            "missing_facets": {
+              "utf8_bytes": 22,
+              "utf8_div4": 6,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "9d358814adb1d59a97a37257260cad1fcc5a495a091f4f820ff7724208ac2f97"
+            },
+            "facets": {
+              "utf8_bytes": 14,
+              "utf8_div4": 4,
+              "codec_tokens": 6,
+              "cost": 6,
+              "wire_sha256": "788746ce9540bf5adfb5da22e519db6137834f49257b0b510401357bc5b570ac"
+            },
+            "context_quality": {
+              "utf8_bytes": 81,
+              "utf8_div4": 21,
+              "codec_tokens": 21,
+              "cost": 21,
+              "wire_sha256": "b40d8ba44e4c0cb5c6fdc17434b62b8e8f4880b0e0f70e2bcf394af98c55fd1e"
+            },
+            "read_next": {
+              "utf8_bytes": 17,
+              "utf8_div4": 5,
+              "codec_tokens": 6,
+              "cost": 6,
+              "wire_sha256": "1a1f8676d89e71c2f6ab21b53b96e29a9d27b93df3a52fdf0cf4fac0c348fe60"
+            },
+            "edit_ready": {
+              "utf8_bytes": 21,
+              "utf8_div4": 6,
+              "codec_tokens": 6,
+              "cost": 6,
+              "wire_sha256": "5f399abd6c69a308733be95480b8f3d0d2089ce91f7cf61a9f635f97c7e4aad0"
+            },
+            "investigation_allowed": {
+              "utf8_bytes": 31,
+              "utf8_div4": 8,
+              "codec_tokens": 7,
+              "cost": 8,
+              "wire_sha256": "403d3f525b90127c1e9cb58a18348aff5f0c7440858d675808dcf0996f1056c9"
+            },
+            "estimated_tokens": {
+              "utf8_bytes": 26,
+              "utf8_div4": 7,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "b99e3f0ea46fafb16614a98fb83125ab4dbf618b897acf953af9bec1326e7ded"
+            },
+            "context_unassessed": {
+              "utf8_bytes": 28,
+              "utf8_div4": 7,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "8abf816950913d40834aa58ab2f852d8dff8e8ccff31a66668f81c8bd32c7bda"
+            },
+            "admission_contract": {
+              "utf8_bytes": 58,
+              "utf8_div4": 15,
+              "codec_tokens": 16,
+              "cost": 16,
+              "wire_sha256": "1810d2f9dfc6a6130425dae805d71b5ec5fdd28db88c742fc93d904ce0f57fd3"
+            }
+          },
+          "common_fields": {
+            "version_binding": "unversioned",
+            "project_identity": "local:d22efb3b5df286a4ce4272440c5516f4e2c8194db48d2b8dc57d7300cf5b27e0",
+            "authority": "source_of_truth",
+            "scope": "project"
+          },
+          "normalized": {
+            "utf8_bytes": 28705,
+            "utf8_div4": 7177,
+            "codec_tokens": 9008,
+            "cost": 9008,
+            "wire_sha256": "2d90c497ce365aa84bf2c461d7e26b3a4de6f315d08a16e15f86dfde30ae0a89"
+          },
+          "lossless_roundtrip": true,
+          "compatibility": "New source_defaults schema requires negotiated decoder. Not backward-compatible as a drop-in."
+        },
+        "prebudget": {
+          "utf8_bytes": 144210,
+          "utf8_div4": 36053,
+          "codec_tokens": 49108,
+          "cost": 49108,
+          "wire_sha256": "8679d13e6098c7973781f6c7557fbe9195881cd280d42167aeeeedf5c3c19de8"
+        },
+        "feasibility_is_not_product_improvement": true
+      },
+      "observer_events": 848
+    },
+    {
+      "case_id": "V40-E01",
+      "observer_output_exact_equal": true,
+      "off": {
+        "utf8_bytes": 36565,
+        "utf8_div4": 9142,
+        "codec_tokens": 11819,
+        "cost": 11819,
+        "wire_sha256": "72d28f35bd8bcb05b1b2efe6adcfcb14c90dd4a2e73d2164329c9f5eab7c75cb"
+      },
+      "on": {
+        "utf8_bytes": 36565,
+        "utf8_div4": 9142,
+        "codec_tokens": 11819,
+        "cost": 11819,
+        "wire_sha256": "72d28f35bd8bcb05b1b2efe6adcfcb14c90dd4a2e73d2164329c9f5eab7c75cb"
+      },
+      "read_only": true,
+      "diagnostic": {
+        "before_gold": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": true,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": true,
+                  "parts": [
+                    {
+                      "witness_id": "V40-E01/required/set-0/part-0",
+                      "path": "docs/src/use/configure/configuration-files.md",
+                      "line_start": 19,
+                      "line_end": 30,
+                      "covered": true,
+                      "char_start": 584,
+                      "char_end": 1141,
+                      "expected_characters": 557,
+                      "covered_characters": 557,
+                      "missing_char_ranges": [],
+                      "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                      "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 1,
+          "all_documented_claims_covered": true,
+          "missing_documented_claim_ids": [],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [],
+          "errors": []
+        },
+        "original_final_gold": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": false,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": false,
+                  "parts": [
+                    {
+                      "witness_id": "V40-E01/required/set-0/part-0",
+                      "path": "docs/src/use/configure/configuration-files.md",
+                      "line_start": 19,
+                      "line_end": 30,
+                      "covered": false,
+                      "char_start": 584,
+                      "char_end": 1141,
+                      "expected_characters": 557,
+                      "covered_characters": 0,
+                      "missing_char_ranges": [
+                        [
+                          584,
+                          1141
+                        ]
+                      ],
+                      "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                      "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 0,
+          "all_documented_claims_covered": false,
+          "missing_documented_claim_ids": [
+            "required"
+          ],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [
+            "V40-E01/required/set-0/part-0"
+          ],
+          "errors": []
+        },
+        "projection_errors": [],
+        "source_errors": [],
+        "feasible_gold": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": true,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": true,
+                  "parts": [
+                    {
+                      "witness_id": "V40-E01/required/set-0/part-0",
+                      "path": "docs/src/use/configure/configuration-files.md",
+                      "line_start": 19,
+                      "line_end": 30,
+                      "covered": true,
+                      "char_start": 584,
+                      "char_end": 1141,
+                      "expected_characters": 557,
+                      "covered_characters": 557,
+                      "missing_char_ranges": [],
+                      "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                      "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 1,
+          "all_documented_claims_covered": true,
+          "missing_documented_claim_ids": [],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [],
+          "errors": []
+        },
+        "feasible": {
+          "utf8_bytes": 2551,
+          "utf8_div4": 638,
+          "codec_tokens": 811,
+          "cost": 811,
+          "wire_sha256": "7919c08cd8e23866a21d0c62dda1574241befd96d6d3d7af3468df1f37cd0d74"
+        },
+        "selected_whole_ids": [
+          "ev-c47c2b1fdeb26ffb",
+          "ev-6d6e478eedb2ef59"
+        ],
+        "real_recheck_pass": true,
+        "real_budget_checker_pass": true,
+        "public_budget": {
+          "full": {
+            "utf8_bytes": 36565,
+            "utf8_div4": 9142,
+            "codec_tokens": 11819,
+            "cost": 11819,
+            "wire_sha256": "72d28f35bd8bcb05b1b2efe6adcfcb14c90dd4a2e73d2164329c9f5eab7c75cb"
+          },
+          "envelope": {
+            "utf8_bytes": 743,
+            "utf8_div4": 186,
+            "codec_tokens": 194,
+            "cost": 194,
+            "wire_sha256": "fce0f40b05530d16bfff8fb8d01a5b91179177ad82504b50ad2d5b2c2009b648"
+          },
+          "empty_snippets": {
+            "utf8_bytes": 21656,
+            "utf8_div4": 5414,
+            "codec_tokens": 8134,
+            "cost": 8134,
+            "wire_sha256": "5ad2e1af9c7763f36d69f5a11829aefe45c28bfff20789f7b2deacd5c9ce68d1"
+          },
+          "byte_parts": {
+            "envelope": 743,
+            "source_metadata": 20913,
+            "escaped_snippets": 14909
+          },
+          "ordered_codec_deltas": {
+            "envelope": 194,
+            "source_metadata": 7940,
+            "escaped_snippets": 3685
+          },
+          "raw_snippets": {
+            "utf8_bytes": 14354,
+            "standalone_codec_tokens": 3231
+          },
+          "top_level_fields": {
+            "status": {
+              "utf8_bytes": 23,
+              "utf8_div4": 6,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "ba3be31e98ab057a94766ade907fd1b741740657695e1971e12f17ffb24acb94"
+            },
+            "kind": {
+              "utf8_bytes": 24,
+              "utf8_div4": 6,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "8d3c3e6d1bd47f159b32dd7a312a0c1fe7f279e6658376fd7ddda28e9da8fc34"
+            },
+            "context_status": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "e36fad535efb342a0e27bdfe3d7e77ee04e1db5e4f47e8db53f4bf74d150be78"
+            },
+            "context_available": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 6,
+              "cost": 7,
+              "wire_sha256": "2738798a6bc0cf02b9bba1a17fb16d431796ed4b7f7cbec8a61b7b7f800d3858"
+            },
+            "answer_supported": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 6,
+              "cost": 7,
+              "wire_sha256": "d1ff9aee06a8f982e346c8e678e8832fd93489f0d1f636f5b45b65bced6a03f6"
+            },
+            "answer_available": {
+              "utf8_bytes": 27,
+              "utf8_div4": 7,
+              "codec_tokens": 6,
+              "cost": 7,
+              "wire_sha256": "21f563d2b1ae016d55572059e2cd7d736386f89bbc4b8b59deba1520cacdc92f"
+            },
+            "support_status": {
+              "utf8_bytes": 36,
+              "utf8_div4": 9,
+              "codec_tokens": 9,
+              "cost": 9,
+              "wire_sha256": "33136a6f5ad665364980126815bb3b287d32b7a26a3a217d312eb10f0be150fd"
+            },
+            "answer_policy": {
+              "utf8_bytes": 30,
+              "utf8_div4": 8,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "a9709e18fc864af11a502aa82c5d48acd0b0e81f6c45068d5c6d7f0edfc10bfd"
+            },
+            "coverage_policy": {
+              "utf8_bytes": 49,
+              "utf8_div4": 13,
+              "codec_tokens": 11,
+              "cost": 13,
+              "wire_sha256": "98bbd890838f8130bc80fb2553a5d0f923cfa6eb67732c7721cc40c38cf39592"
+            },
+            "query_coverage": {
+              "utf8_bytes": 29,
+              "utf8_div4": 8,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "63ee366abcdb629e8cf6ba647b930fd93cfafa8cab2c299af2bd8513edd0e9c1"
+            },
+            "retrieval_coverage": {
+              "utf8_bytes": 33,
+              "utf8_div4": 9,
+              "codec_tokens": 9,
+              "cost": 9,
+              "wire_sha256": "2cf1f270015c604b3cd17af13dcecb93a4d2bc5912c763f84c353654f8592905"
+            },
+            "facet_coverage": {
+              "utf8_bytes": 32,
+              "utf8_div4": 8,
+              "codec_tokens": 9,
+              "cost": 9,
+              "wire_sha256": "5394be4bd55af04c8de6fe5dacd6f6f5b58abd46b5a04e0f1f93630a4172650c"
+            },
+            "covered_query_ids": {
+              "utf8_bytes": 25,
+              "utf8_div4": 7,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "03fccb1c54ca93a376dd335964890171fbde8f7a63f6be2b32ee08323f43c1f8"
+            },
+            "missing_query_ids": {
+              "utf8_bytes": 41,
+              "utf8_div4": 11,
+              "codec_tokens": 10,
+              "cost": 11,
+              "wire_sha256": "fc0724b51b8fbdbc95ffd05e8249a0e41d398a4a2cc7ed295704a65550d38942"
+            },
+            "missing_facets": {
+              "utf8_bytes": 22,
+              "utf8_div4": 6,
+              "codec_tokens": 7,
+              "cost": 7,
+              "wire_sha256": "9d358814adb1d59a97a37257260cad1fcc5a495a091f4f820ff7724208ac2f97"
+            },
+            "facets": {
+              "utf8_bytes": 14,
+              "utf8_div4": 4,
+              "codec_tokens": 6,
+              "cost": 6,
+              "wire_sha256": "788746ce9540bf5adfb5da22e519db6137834f49257b0b510401357bc5b570ac"
+            },
+            "context_quality": {
+              "utf8_bytes": 81,
+              "utf8_div4": 21,
+              "codec_tokens": 21,
+              "cost": 21,
+              "wire_sha256": "b40d8ba44e4c0cb5c6fdc17434b62b8e8f4880b0e0f70e2bcf394af98c55fd1e"
+            },
+            "read_next": {
+              "utf8_bytes": 17,
+              "utf8_div4": 5,
+              "codec_tokens": 6,
+              "cost": 6,
+              "wire_sha256": "1a1f8676d89e71c2f6ab21b53b96e29a9d27b93df3a52fdf0cf4fac0c348fe60"
+            },
+            "edit_ready": {
+              "utf8_bytes": 21,
+              "utf8_div4": 6,
+              "codec_tokens": 6,
+              "cost": 6,
+              "wire_sha256": "5f399abd6c69a308733be95480b8f3d0d2089ce91f7cf61a9f635f97c7e4aad0"
+            },
+            "investigation_allowed": {
+              "utf8_bytes": 31,
+              "utf8_div4": 8,
+              "codec_tokens": 7,
+              "cost": 8,
+              "wire_sha256": "403d3f525b90127c1e9cb58a18348aff5f0c7440858d675808dcf0996f1056c9"
+            },
+            "estimated_tokens": {
+              "utf8_bytes": 26,
+              "utf8_div4": 7,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "f2fdf7063f0edce3a82fdfbb106b1dfdc05e92e5322e03e88138eaeee09ef189"
+            },
+            "context_unassessed": {
+              "utf8_bytes": 28,
+              "utf8_div4": 7,
+              "codec_tokens": 8,
+              "cost": 8,
+              "wire_sha256": "8abf816950913d40834aa58ab2f852d8dff8e8ccff31a66668f81c8bd32c7bda"
+            },
+            "admission_contract": {
+              "utf8_bytes": 58,
+              "utf8_div4": 15,
+              "codec_tokens": 16,
+              "cost": 16,
+              "wire_sha256": "1810d2f9dfc6a6130425dae805d71b5ec5fdd28db88c742fc93d904ce0f57fd3"
+            }
+          },
+          "common_fields": {
+            "version_binding": "unversioned",
+            "project_identity": "local:cb2b054e7b01192fdf53ae7fb2ea8a17475613ecbe9d2319ddbb0f615934e4c2",
+            "authority": "source_of_truth",
+            "scope": "project"
+          },
+          "normalized": {
+            "utf8_bytes": 29746,
+            "utf8_div4": 7437,
+            "codec_tokens": 9201,
+            "cost": 9201,
+            "wire_sha256": "6eb0a541dd429ba788fe9220a0ffe894ec818d779d462a465740a155e68d3479"
+          },
+          "lossless_roundtrip": true,
+          "compatibility": "New source_defaults schema requires negotiated decoder. Not backward-compatible as a drop-in."
+        },
+        "prebudget": {
+          "utf8_bytes": 217295,
+          "utf8_div4": 54324,
+          "codec_tokens": 73194,
+          "cost": 73194,
+          "wire_sha256": "5054c0e641569d31617fdfb27e651a3d50b2a1e519610f1c32adb2b59f8304ad"
+        },
+        "feasibility_is_not_product_improvement": true
+      },
+      "observer_events": 1293
+    }
+  ],
+  "frozen_inputs_unchanged": true,
+  "contexts": 4,
+  "prepares": 2,
+  "extra_live_diagnostic_rechecks": 2,
+  "model_calls": 0,
+  "boundary": "installed public in-process MCP; not stdio/client/production"
+}

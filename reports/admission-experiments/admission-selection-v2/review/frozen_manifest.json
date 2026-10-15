@@ -1,0 +1,601 @@
+{
+  "schema": "docatlas-review-frozen-manifest-v2",
+  "state": "FROZEN_BEFORE_NEW_INFERENCE",
+  "frozen_at_utc_observed": "2026-10-12T12:30:59.512608+00:00",
+  "declared_research_date": "2026-10-12",
+  "freeze_scope": "all source content/questions/splits/labels/facts/witnesses and review rules; no tuning from holdout",
+  "files": {
+    "corpus.json": {
+      "sha256": "b3d50b4d26433ed428fcbdc4409048a419cfa390a69f2f0d3fb5fedce0685b30",
+      "bytes": 10969
+    },
+    "cases.json": {
+      "sha256": "27fb9085e282c6467db1ffcfda8bf64ecf35a9257cc40d90b67fb93577b52f8b",
+      "bytes": 7171
+    },
+    "oracle.json": {
+      "sha256": "3f602bb76b7f9966cd60106fb63bdd8e9e40778e3fff83462ceb1f3facdd2a37",
+      "bytes": 24082
+    },
+    "calibration_labels.json": {
+      "sha256": "5a1026c15a47e77aaf23e202829c54ae84781bc3c7dd8adec0d9f21f345afa6a",
+      "bytes": 13720
+    },
+    "REVIEW_PREFLIGHT_RU.md": {
+      "sha256": "46412cf1209163a162bcc56f04b05a4170291e1c11c2e9ac0782dfc7c0d28f0c",
+      "bytes": 10390
+    }
+  },
+  "documents": [
+    {
+      "path": "calibration/seed_bank/intake.md",
+      "document_group": "seed_bank",
+      "split": "calibration",
+      "owner": "Банк семян луговых трав",
+      "scope": "seed_bank",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "48bdd39afbc2f42a99f3139fb228f41ef2a74f3507bc1864cfc6ed6e3a8598a9",
+      "utf8_bytes": 603
+    },
+    {
+      "path": "calibration/seed_bank/storage.md",
+      "document_group": "seed_bank",
+      "split": "calibration",
+      "owner": "Банк семян луговых трав",
+      "scope": "seed_bank",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+      "utf8_bytes": 660
+    },
+    {
+      "path": "calibration/seed_bank/quarantine.md",
+      "document_group": "seed_bank",
+      "split": "calibration",
+      "owner": "Банк семян луговых трав",
+      "scope": "seed_bank",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "90c583e48d1893626e237a66512ad16038d2826cb80fbf01e78142584f3a8478",
+      "utf8_bytes": 719
+    },
+    {
+      "path": "calibration/stage_rigging/inspection.md",
+      "document_group": "stage_rigging",
+      "split": "calibration",
+      "owner": "Учебная сцена",
+      "scope": "stage_rigging",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "391829439c63ce844ab284cb3d58f302e4f9e1a9c454315196a3c44c305854b7",
+      "utf8_bytes": 639
+    },
+    {
+      "path": "calibration/stage_rigging/release.md",
+      "document_group": "stage_rigging",
+      "split": "calibration",
+      "owner": "Учебная сцена",
+      "scope": "stage_rigging",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+      "utf8_bytes": 619
+    },
+    {
+      "path": "calibration/stage_rigging/rehearsal.md",
+      "document_group": "stage_rigging",
+      "split": "calibration",
+      "owner": "Учебная сцена",
+      "scope": "stage_rigging",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "2cd090ef13a7dea07b658512d8aedd85ad40614facac346e27ae6889f4fc2cee",
+      "utf8_bytes": 767
+    },
+    {
+      "path": "holdout/ceramic_firing/loading.md",
+      "document_group": "ceramic_firing",
+      "split": "holdout",
+      "owner": "Керамическая мастерская",
+      "scope": "ceramic_firing",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+      "utf8_bytes": 614
+    },
+    {
+      "path": "holdout/ceramic_firing/cooling.md",
+      "document_group": "ceramic_firing",
+      "split": "holdout",
+      "owner": "Керамическая мастерская",
+      "scope": "ceramic_firing",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "utf8_bytes": 773
+    },
+    {
+      "path": "holdout/ceramic_firing/incident.md",
+      "document_group": "ceramic_firing",
+      "split": "holdout",
+      "owner": "Керамическая мастерская",
+      "scope": "ceramic_firing",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "utf8_bytes": 824
+    },
+    {
+      "path": "holdout/tidal_ferry/sailing.md",
+      "document_group": "tidal_ferry",
+      "split": "holdout",
+      "owner": "Приливная переправа",
+      "scope": "tidal_ferry",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+      "utf8_bytes": 623
+    },
+    {
+      "path": "holdout/tidal_ferry/cargo.md",
+      "document_group": "tidal_ferry",
+      "split": "holdout",
+      "owner": "Приливная переправа",
+      "scope": "tidal_ferry",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "utf8_bytes": 604
+    },
+    {
+      "path": "holdout/tidal_ferry/refunds.md",
+      "document_group": "tidal_ferry",
+      "split": "holdout",
+      "owner": "Приливная переправа",
+      "scope": "tidal_ferry",
+      "version": "2026.1",
+      "access": "public",
+      "content_sha256": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "utf8_bytes": 659
+    }
+  ],
+  "split": {
+    "calibration": {
+      "document_groups": [
+        "seed_bank",
+        "stage_rigging"
+      ],
+      "case_ids": [
+        "CAL01",
+        "CAL02",
+        "CAL03",
+        "CAL04",
+        "CAL05",
+        "CAL06"
+      ]
+    },
+    "holdout": {
+      "document_groups": [
+        "ceramic_firing",
+        "tidal_ferry"
+      ],
+      "case_ids": [
+        "HOLD01",
+        "HOLD02",
+        "HOLD03",
+        "HOLD04",
+        "HOLD05",
+        "HOLD06",
+        "HOLD07",
+        "HOLD08"
+      ]
+    }
+  },
+  "case_counts": {
+    "calibration": 6,
+    "holdout": 8
+  },
+  "label_counts_by_split": {
+    "calibration": {
+      "answerable": 4,
+      "all_irrelevant": 2
+    },
+    "holdout": {
+      "answerable": 6,
+      "all_irrelevant": 2
+    }
+  },
+  "witness_coordinates": {
+    "S1": {
+      "source_path": "calibration/seed_bank/intake.md",
+      "content_sha256": "48bdd39afbc2f42a99f3139fb228f41ef2a74f3507bc1864cfc6ed6e3a8598a9",
+      "quote_sha256": "407a760e0271ebf51223658c9c47eb1a5e101ea4c7e4a59a86c9cbdeaa3bfbd3",
+      "utf8_byte_start": 38,
+      "utf8_byte_end_exclusive": 211,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "S2": {
+      "source_path": "calibration/seed_bank/intake.md",
+      "content_sha256": "48bdd39afbc2f42a99f3139fb228f41ef2a74f3507bc1864cfc6ed6e3a8598a9",
+      "quote_sha256": "a7028c54ae646816aa9619e330eb8e8fe97937d6105dad3e3fd3904022e3772f",
+      "utf8_byte_start": 212,
+      "utf8_byte_end_exclusive": 338,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "S3": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "content_sha256": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+      "quote_sha256": "e66cbebf6f99338256c4bfbf42f0782343c89ce702119c6188476fe36c932d65",
+      "utf8_byte_start": 40,
+      "utf8_byte_end_exclusive": 151,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "S4": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "content_sha256": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+      "quote_sha256": "31853041ec296e75c398bed50cc455f5aae8300b7f4125b54a77435c18b26f13",
+      "utf8_byte_start": 152,
+      "utf8_byte_end_exclusive": 379,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "S5": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "content_sha256": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+      "quote_sha256": "55a53dfd122ec7e7f32bb0413d2ed020aa2924f5ebf80e90c824ec59d1d73866",
+      "utf8_byte_start": 380,
+      "utf8_byte_end_exclusive": 555,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "S6": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "content_sha256": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+      "quote_sha256": "a1cd98794b4a2e62d655bb6729cde4d1804025500ec2ed7cc672af0b9d63ff1e",
+      "utf8_byte_start": 556,
+      "utf8_byte_end_exclusive": 659,
+      "line_start_1based": 6,
+      "line_end_1based": 6,
+      "literal_occurrences": 1
+    },
+    "S7": {
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "content_sha256": "90c583e48d1893626e237a66512ad16038d2826cb80fbf01e78142584f3a8478",
+      "quote_sha256": "8f679c332acc81fe0edbbc982a3929bcf00c55080f7d92b172af2d1faa7f1bf9",
+      "utf8_byte_start": 50,
+      "utf8_byte_end_exclusive": 252,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "S8": {
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "content_sha256": "90c583e48d1893626e237a66512ad16038d2826cb80fbf01e78142584f3a8478",
+      "quote_sha256": "8b690a30a739380f9febfa0f84ecf40a6ad9db56d889fe26b7b76d2491587591",
+      "utf8_byte_start": 253,
+      "utf8_byte_end_exclusive": 344,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "S9": {
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "content_sha256": "90c583e48d1893626e237a66512ad16038d2826cb80fbf01e78142584f3a8478",
+      "quote_sha256": "2eb965221aa7ee9b45e757a759a0e2f34123b4cb94c72b3c5f20ab30296e18f7",
+      "utf8_byte_start": 345,
+      "utf8_byte_end_exclusive": 565,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "T1": {
+      "source_path": "calibration/stage_rigging/inspection.md",
+      "content_sha256": "391829439c63ce844ab284cb3d58f302e4f9e1a9c454315196a3c44c305854b7",
+      "quote_sha256": "74c6c2f97a8dd18352cf2fac0074d330799025b7c5ab3e0863e9e03b4661bf1c",
+      "utf8_byte_start": 62,
+      "utf8_byte_end_exclusive": 255,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "T2": {
+      "source_path": "calibration/stage_rigging/inspection.md",
+      "content_sha256": "391829439c63ce844ab284cb3d58f302e4f9e1a9c454315196a3c44c305854b7",
+      "quote_sha256": "634619c3a344d6632449af09ea1d975c28e6d0dd2f2c1e0b38d21180f844589e",
+      "utf8_byte_start": 256,
+      "utf8_byte_end_exclusive": 369,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "T3": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "content_sha256": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+      "quote_sha256": "274f9be29c6e9519d89aa7d8c78758f9265fe719151d2503a4d133e22926807b",
+      "utf8_byte_start": 42,
+      "utf8_byte_end_exclusive": 159,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "T4": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "content_sha256": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+      "quote_sha256": "f6709e02917c3698a8a7d80580317e38e5b9fcd9e083498f34f4a26a27472ce7",
+      "utf8_byte_start": 160,
+      "utf8_byte_end_exclusive": 378,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "T5": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "content_sha256": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+      "quote_sha256": "c4837f1c5762ea649545f74394a4122084376fef7855a54febca7a0966074ad3",
+      "utf8_byte_start": 379,
+      "utf8_byte_end_exclusive": 507,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "T6": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "content_sha256": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+      "quote_sha256": "01e47d5d694670cf760b84e89bf8b030e0c9d6fc2d1d09bf0718087f581e77c2",
+      "utf8_byte_start": 508,
+      "utf8_byte_end_exclusive": 618,
+      "line_start_1based": 6,
+      "line_end_1based": 6,
+      "literal_occurrences": 1
+    },
+    "T7": {
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "content_sha256": "2cd090ef13a7dea07b658512d8aedd85ad40614facac346e27ae6889f4fc2cee",
+      "quote_sha256": "4cc65ed28a8c5036bf79abf902b253f4a7e6a5803ec5a89dba5da49c569ebab9",
+      "utf8_byte_start": 45,
+      "utf8_byte_end_exclusive": 241,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "T8": {
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "content_sha256": "2cd090ef13a7dea07b658512d8aedd85ad40614facac346e27ae6889f4fc2cee",
+      "quote_sha256": "8d4944a8755348723d177595ad158d5a5822af7996ed544a7709629a731c8489",
+      "utf8_byte_start": 242,
+      "utf8_byte_end_exclusive": 370,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "T9": {
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "content_sha256": "2cd090ef13a7dea07b658512d8aedd85ad40614facac346e27ae6889f4fc2cee",
+      "quote_sha256": "2e52364666f863c54d58f4e705833d81518b3321e6a09b72ab1e5a0dd4507f01",
+      "utf8_byte_start": 371,
+      "utf8_byte_end_exclusive": 637,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "C1": {
+      "source_path": "holdout/ceramic_firing/loading.md",
+      "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+      "quote_sha256": "4f267a3c58b9afa3cc2db5f785fd3548a952cec6a741c7592f6422b12167fe43",
+      "utf8_byte_start": 37,
+      "utf8_byte_end_exclusive": 188,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "C2": {
+      "source_path": "holdout/ceramic_firing/loading.md",
+      "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+      "quote_sha256": "4f6f2935350c2dd868df57e73719f3f7dfbda4c502179af919168e7dc5e9daaa",
+      "utf8_byte_start": 189,
+      "utf8_byte_end_exclusive": 319,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "C3": {
+      "source_path": "holdout/ceramic_firing/loading.md",
+      "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+      "quote_sha256": "5d87aea556bb4d06289a48d227c7dc21bd8f0cc3a38a5e757f3276baabeb4f56",
+      "utf8_byte_start": 320,
+      "utf8_byte_end_exclusive": 484,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "C4": {
+      "source_path": "holdout/ceramic_firing/loading.md",
+      "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+      "quote_sha256": "1b7fbfc03c8d9749905f672a7755bf0f7220d7f186d68fd674b9b7d308e14ade",
+      "utf8_byte_start": 485,
+      "utf8_byte_end_exclusive": 613,
+      "line_start_1based": 6,
+      "line_end_1based": 6,
+      "literal_occurrences": 1
+    },
+    "C5": {
+      "source_path": "holdout/ceramic_firing/cooling.md",
+      "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "quote_sha256": "bd239fe99518bde2062e8642a304e2583f46884cc1e2c52f4d39e0eb875b036f",
+      "utf8_byte_start": 44,
+      "utf8_byte_end_exclusive": 224,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "C6": {
+      "source_path": "holdout/ceramic_firing/cooling.md",
+      "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "quote_sha256": "f49ba3c91eb2913c0987eac4a0e0dcd8a6c32e4c34225746857559e12c14ff50",
+      "utf8_byte_start": 225,
+      "utf8_byte_end_exclusive": 396,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "C7": {
+      "source_path": "holdout/ceramic_firing/cooling.md",
+      "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "quote_sha256": "3b5dd91365010ab032ab026434ca402a9be435865e722e0381eddfccf3d42a5f",
+      "utf8_byte_start": 397,
+      "utf8_byte_end_exclusive": 617,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "C8": {
+      "source_path": "holdout/ceramic_firing/cooling.md",
+      "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "quote_sha256": "c2cc9f516498f2a8d4a0ff2be09cadc71764b85d5278917c924440f00e45983f",
+      "utf8_byte_start": 618,
+      "utf8_byte_end_exclusive": 772,
+      "line_start_1based": 6,
+      "line_end_1based": 6,
+      "literal_occurrences": 1
+    },
+    "C9": {
+      "source_path": "holdout/ceramic_firing/incident.md",
+      "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "quote_sha256": "e05b585ba2242b6b5048dae06caa0d250cf40d5f597f4016bc043fec23e45ebb",
+      "utf8_byte_start": 39,
+      "utf8_byte_end_exclusive": 243,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "C10": {
+      "source_path": "holdout/ceramic_firing/incident.md",
+      "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "quote_sha256": "e8b139a4ca6cd4b4e04a0133267d92c0c8ccf242ff5744e9e5473e0303b99e6b",
+      "utf8_byte_start": 244,
+      "utf8_byte_end_exclusive": 446,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "C11": {
+      "source_path": "holdout/ceramic_firing/incident.md",
+      "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "quote_sha256": "b2cedd75507abf2e9de9b3f52017a250feb689ab23a8cc4058acc38f01d703ec",
+      "utf8_byte_start": 447,
+      "utf8_byte_end_exclusive": 689,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "F1": {
+      "source_path": "holdout/tidal_ferry/sailing.md",
+      "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+      "quote_sha256": "c743e4262fb1adf2dd34ecfd0aae18050716e65f7843459dadd0c2ee87d8499a",
+      "utf8_byte_start": 35,
+      "utf8_byte_end_exclusive": 204,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "F2": {
+      "source_path": "holdout/tidal_ferry/sailing.md",
+      "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+      "quote_sha256": "5a6a8ad20f624059cc143515771b2e04acc6f36c4c7e1add6a2ed6921b26fad8",
+      "utf8_byte_start": 205,
+      "utf8_byte_end_exclusive": 385,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "F3": {
+      "source_path": "holdout/tidal_ferry/sailing.md",
+      "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+      "quote_sha256": "a4ec3c58cb54c5eb08f8a9cb5269c40445dac0d50c429039075b891e02054c14",
+      "utf8_byte_start": 386,
+      "utf8_byte_end_exclusive": 497,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "F4": {
+      "source_path": "holdout/tidal_ferry/cargo.md",
+      "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "quote_sha256": "79c9bef5088b99cce025e8d0de9853b2a5d58ac9e50660eb0db4d30e47faade6",
+      "utf8_byte_start": 32,
+      "utf8_byte_end_exclusive": 158,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "F5": {
+      "source_path": "holdout/tidal_ferry/cargo.md",
+      "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "quote_sha256": "00202b86d718134fa323199be01737919a42cf997c267f145c4a9dee555723f0",
+      "utf8_byte_start": 159,
+      "utf8_byte_end_exclusive": 283,
+      "line_start_1based": 4,
+      "line_end_1based": 4,
+      "literal_occurrences": 1
+    },
+    "F6": {
+      "source_path": "holdout/tidal_ferry/cargo.md",
+      "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "quote_sha256": "a40cb08b650ecdfa0cb29d58557f1678fe3e74d767767e2624ab52f47ac78339",
+      "utf8_byte_start": 284,
+      "utf8_byte_end_exclusive": 458,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    },
+    "F7": {
+      "source_path": "holdout/tidal_ferry/cargo.md",
+      "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "quote_sha256": "327c00362f0183926f165c3663f0f06932cc48faad5ad503923100b91fade3b5",
+      "utf8_byte_start": 459,
+      "utf8_byte_end_exclusive": 603,
+      "line_start_1based": 6,
+      "line_end_1based": 6,
+      "literal_occurrences": 1
+    },
+    "F8": {
+      "source_path": "holdout/tidal_ferry/refunds.md",
+      "content_sha256": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "quote_sha256": "22441f215536f42225abe40a363853aa5d8eb481b098b32bec7f4ce46f385e66",
+      "utf8_byte_start": 33,
+      "utf8_byte_end_exclusive": 236,
+      "line_start_1based": 3,
+      "line_end_1based": 3,
+      "literal_occurrences": 1
+    },
+    "F9": {
+      "source_path": "holdout/tidal_ferry/refunds.md",
+      "content_sha256": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "quote_sha256": "278dd69816f7e8e6067454d9a0f84c41a2aa1218a0c579e196737ab1d0ad6f4d",
+      "utf8_byte_start": 400,
+      "utf8_byte_end_exclusive": 532,
+      "line_start_1based": 5,
+      "line_end_1based": 5,
+      "literal_occurrences": 1
+    }
+  },
+  "verification": {
+    "literal_witnesses_verified": 38,
+    "unique_occurrences": true,
+    "oracle_case_metadata_matches": true,
+    "all_positive_cases_have_multiple_source_documents": true,
+    "family_split_disjoint": true,
+    "negative_absence_review": "Independent reviewer read all 12 authored full documents; absent facts are not inferred by substring search",
+    "no_product_model_host_or_test_execution": true
+  },
+  "self_hash": "not included; SHA-256 can be recorded by parent protocol without changing this file"
+}

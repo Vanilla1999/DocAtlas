@@ -56,7 +56,9 @@ def _bounded_direct_projection_errors(
     projection: dict[str, Any], validation_errors: list[str]
 ) -> list[str]:
     errors = list(validation_errors)
-    if projection.get("status") not in {"ok", "truncated"}:
+    if projection.get("schema_version") == 4:
+        errors.append("unsupported_evaluation_requirement:workflow_checks_from_patch_context")
+    if projection.get("result") != "data" or projection.get("completeness") != "complete":
         errors.append("bounded direct requires a successful model-visible projection")
         errors.extend(
             f"projection missing: {item}"
@@ -280,18 +282,18 @@ def action_packet_project_doc_metrics(task: Any, packet: dict[str, Any]) -> dict
         for path in getattr(task, "expected_project_docs", ())
         if str(path).strip()
     }
-    rows = packet.get("source_of_truth") if isinstance(packet.get("source_of_truth"), list) else []
+    rows = packet.get("sources") if isinstance(packet.get("sources"), list) else []
     packet_paths = {
         str(row.get("path") or "").strip().replace("\\", "/").lower()
         for row in rows
         if isinstance(row, dict) and str(row.get("path") or "").strip()
     }
     found = expected & packet_paths
-    target = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
     target_paths = {
         str(row.get("path") or "").strip().replace("\\", "/")
-        for row in target.get("likely_files", [])
-        if isinstance(row, dict) and str(row.get("path") or "").strip()
+        for row in packet.get("assignments", [])
+        if isinstance(row, dict) and row.get("proof_role") == "target_identity"
+        and str(row.get("path") or "").strip()
     }
     return {
         "action_packet_project_docs_total": len(expected),
@@ -303,7 +305,7 @@ def action_packet_project_doc_metrics(task: Any, packet: dict[str, Any]) -> dict
 
 
 def _persist_delivery_prompt_sources(output_dir: Path, packet: dict[str, Any]) -> None:
-    rows = packet.get("source_of_truth") if isinstance(packet.get("source_of_truth"), list) else []
+    rows = packet.get("sources") if isinstance(packet.get("sources"), list) else []
     sources = [
         {
             "evidence_id": row.get("evidence_id"),

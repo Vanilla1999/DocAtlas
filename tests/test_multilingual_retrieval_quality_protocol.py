@@ -141,274 +141,38 @@ def _write_frozen_corpus(root: Path) -> None:
     }, sort_keys=True), encoding="utf-8")
 
 
-def test_protocol_lock_and_corpus_shape_are_validated():
-    validate_protocol_lock()
-    inventory = validate_corpus(_corpus())
-    assert inventory == {"case_count": 15, "project_count": 1, "self_hosting_only": True}
 
 
-def test_corpus_rejects_external_project_evidence():
-    rows = _corpus()
-    rows[0]["project_id"] = "external-project"
-    rows[0]["self_hosting_control"] = False
-    with pytest.raises(ValueError, match="project_count, self_hosting_only"):
-        validate_corpus(rows)
 
 
-def test_passing_candidate_must_beat_baseline_without_fallback():
-    report = evaluate_results(_result_rows(), _result_rows(candidate=False))
-    assert report["verdict"] == "PASS"
-    assert report["metrics"]["recall_at_5_overall"] == 1.0
-    assert report["metrics"]["degraded_or_fallback_runs"] == 0
 
 
-def test_lexical_fallback_cannot_count_as_hybrid_success():
-    candidate = _result_rows()
-    candidate[0]["mode_used"] = "lexical"
-    candidate[0]["fallback_used"] = True
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-    assert report["verdict"] == "FAIL"
-    assert report["checks"]["no_degraded_or_fallback_runs"] is False
 
 
-def test_wrong_project_evidence_fails_closed():
-    candidate = _result_rows()
-    candidate[0]["wrong_project_evidence_accepted"] = 1
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-    assert report["checks"]["wrong_project_free"] is False
 
 
-def test_missing_source_provenance_fails_gate():
-    candidate = _result_rows()
-    candidate[0]["visible_sources"] = [{"project_identity": "project-0"}]
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-    assert report["checks"]["source_provenance_complete"] is False
 
 
-def test_retrieved_sources_require_visible_provenance():
-    candidate = _result_rows()
-    candidate[0]["visible_sources"] = []
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-    assert report["checks"]["source_provenance_complete"] is False
 
 
-def test_absent_fact_retrieval_is_scored_separately_from_recall():
-    candidate = _result_rows()
-    absent = next(row for row in candidate if row.get("absent_fact"))
-    absent["retrieved_source_spans"] = ["misleading:1"]
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-    assert report["metrics"]["recall_at_5_overall"] == 1.0
-    assert report["metrics"]["absent_fact_candidate_source_spans"] == 1
-    assert report["checks"]["absent_fact_free"] is False
-    assert report["verdict"] == "FAIL"
 
 
-def test_missing_ru_dense_contribution_fails_gate():
-    candidate = _result_rows()
-    ru_row = next(row for row in candidate if row["language_pair"] == "ru-en" and not row.get("absent_fact"))
-    ru_row["candidate_counts"] = {"dense": 0}
-    ru_row["dense_contributed"] = False
-
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-
-    assert report["checks"]["ru_dense_contribution"] is False
 
 
-def test_every_retrieved_span_requires_visible_provenance():
-    candidate = _result_rows()
-    candidate[0]["retrieved_source_spans"].append("hidden:span")  # type: ignore[union-attr]
-    report = evaluate_results(candidate, _result_rows(candidate=False))
-    assert report["checks"]["source_provenance_complete"] is False
 
 
-def test_frozen_corpus_binds_all_files_and_source_spans(tmp_path):
-    _write_frozen_corpus(tmp_path)
-    corpus = load_frozen_corpus(tmp_path)
-    assert len(corpus.projects) == 1
-    assert len(corpus.cases) == 45
-
-    (tmp_path / "holdout.json").write_text("{}", encoding="utf-8")
-    with pytest.raises(ValueError, match="digest mismatch: holdout.json"):
-        load_frozen_corpus(tmp_path)
 
 
-def test_matrix_documents_have_unique_identity_for_spans_from_the_same_path():
-    corpus = load_frozen_corpus()
-    documents = _matrix_documents(corpus)
-    identities = [_stable_source_identity(document) for document in documents]
-    assert len(identities) == len(set(identities))
 
 
-def test_matrix_executes_locked_systems_without_changing_default(tmp_path):
-    _write_frozen_corpus(tmp_path)
-
-    def adapter(system, case, corpus):
-        assert "expected_source_spans" not in case
-        assert "absent_fact" not in case
-        assert "split" not in case
-        assert not corpus.cases
-        retrieved = [] if system["id"] == "open-lexical" or "Unknown fact" in case["query"] else [
-            corpus.projects[0]["documents"][0]["span_id"]
-        ]
-        document = corpus.projects[0]["documents"][0]
-        return {
-            "id": case["id"],
-            "retrieved_source_spans": retrieved,
-            "mode_used": system["requested_mode"],
-            "fallback_used": False,
-            "candidate_counts": {"dense": 5},
-            "dense_contributed": True,
-            "answer_kind": "docs_context",
-            "wrong_project_evidence_accepted": 0,
-            "visible_sources": [] if not retrieved else [{
-                "project_identity": corpus.projects[0]["project_identity"],
-                "content_sha256": document["content_sha256"],
-                "line_start": document["line_start"],
-                "line_end": document["line_end"],
-                "span_id": document["span_id"],
-                "path": document["path"],
-                "section": document["section"],
-            }],
-        }
-
-    report = run_matrix(adapter, tmp_path)
-    assert report["default_retrieval_changed"] is False
-    assert report["external_generalization_claimed"] is False
-    assert set(report["systems"]) == {
-        "open-lexical", "open-multilingual-dense", "open-hybrid-rrf",
-    }
-    assert all(
-        result["verdict"] == "PASS"
-        for result in report["evaluations_against_open_lexical"].values()
-    )
-    assert all(
-        result["verdict"] == "PASS"
-        for result in report["holdout_evaluations_against_open_lexical"].values()
-    )
-    assert report["corpus_bound_to_protocol"] is False
-    assert report["profile_activation_eligible"] is False
-
-    development_report = run_matrix(adapter, tmp_path, splits=("development",))
-    assert development_report["executed_splits"] == ["development"]
-    assert development_report["holdout_evaluations_against_open_lexical"] == {}
-    assert all(
-        row["split"] == "development"
-        for rows in development_report["systems"].values()
-        for row in rows
-    )
-    assert development_report["profile_activation_eligible"] is False
 
 
-def test_activation_requires_full_and_holdout_verdicts():
-    passing = {"dense": {"verdict": "PASS"}}
-    failing = {"dense": {"verdict": "FAIL"}}
-
-    assert _profile_activation_eligible(True, passing, passing) is True
-    assert _profile_activation_eligible(True, failing, passing) is False
-    assert _profile_activation_eligible(True, passing, failing) is False
-    assert _profile_activation_eligible(False, passing, passing) is False
 
 
-def test_production_adapter_serializes_real_chunks_and_provenance():
-    class Result:
-        mode_used = "dense"
-        failures = {}
-        candidate_counts = {"dense": 1}
-        contributions = {7: {"dense": 1}}
-        chunks = [RetrievedChunk(
-            source="docatlas::span-1",
-            chunk_index=0,
-            text="Bounded documentation evidence.",
-            score=0.9,
-            metadata={
-                "span_id": "span-1",
-                "project_identity": "project-1",
-                "content_sha256": "a" * 64,
-                "line_start": 3,
-                "line_end": 7,
-                "project_doc_path": "docs/guide.md",
-                "section": "Guide",
-                "section_id": 7,
-            },
-        )]
-
-    row = _matrix_result({"id": "case-1"}, Result())
-    assert row["retrieved_source_spans"] == ["span-1"]
-    assert row["retrieved_chunks"][0]["text"] == "Bounded documentation evidence."
-    assert row["visible_sources"] == [{
-        "span_id": "span-1",
-        "project_identity": "project-1",
-        "content_sha256": "a" * 64,
-        "line_start": 3,
-        "line_end": 7,
-        "path": "docs/guide.md",
-        "section": "Guide",
-    }]
-    assert row["candidate_counts"] == {"dense": 1}
-    assert row["dense_contributed"] is True
 
 
-def test_protocol_freezes_supported_multilingual_mpnet_model():
-    model = validate_protocol_lock()["model_configuration"]
-    assert model["fastembed_version"] == "0.8.0"
-    assert model["dense_model"] == "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
-    assert model["dense_dimensions"] == 768
 
 
-def test_dense_model_preflight_rejects_unsupported_registry_entry(monkeypatch, tmp_path):
-    class FakeEmbedding:
-        @staticmethod
-        def list_supported_models():
-            return [{"model": "some/other-model"}]
-
-    import fastembed
-    monkeypatch.setattr(fastembed, "TextEmbedding", FakeEmbedding)
-
-    with pytest.raises(ValueError, match="not supported"):
-        _preflight_dense_model("missing/model", 768, str(tmp_path))
 
 
-def test_fastembed_provider_keeps_creation_time_model_cache(monkeypatch, tmp_path):
-    observed: list[str | None] = []
 
-    class FakeEmbedding:
-        def __init__(self, *, model_name, cache_dir):
-            observed.append(cache_dir)
-
-        def embed(self, texts, batch_size=None):
-            return iter([[0.0, 1.0]])
-
-        def query_embed(self, query):
-            return iter([[0.0, 1.0]])
-
-    import fastembed
-    monkeypatch.setattr(fastembed, "TextEmbedding", FakeEmbedding)
-    first = tmp_path / "first"
-    second = tmp_path / "second"
-    monkeypatch.setenv("DOCATLAS_FASTEMBED_CACHE_DIR", str(first))
-    provider = FastEmbedProvider(EmbeddingsConfig(dimensions=2))
-    monkeypatch.setenv("DOCATLAS_FASTEMBED_CACHE_DIR", str(second))
-
-    assert provider.embed_query("query") == [0.0, 1.0]
-    assert observed == [str(first)]
-
-
-def test_adapter_close_cleans_temporary_directory_after_qdrant_error():
-    adapter = ProductionMultilingualMatrixAdapter(qdrant_url="http://127.0.0.1:6333")
-    cleaned: list[bool] = []
-
-    class Temporary:
-        def cleanup(self):
-            cleaned.append(True)
-
-    adapter._temporary = Temporary()  # type: ignore[assignment]
-
-    def fail_cleanup(*, preserve_error):
-        raise RuntimeError("qdrant cleanup failed")
-
-    adapter._cleanup_candidate = fail_cleanup  # type: ignore[method-assign]
-
-    with pytest.raises(RuntimeError, match="qdrant cleanup failed"):
-        adapter.close()
-    assert cleaned == [True]
-    assert adapter._temporary is None

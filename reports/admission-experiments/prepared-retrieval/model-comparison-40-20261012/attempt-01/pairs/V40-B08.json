@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B08",
+  "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "f0656711abf39ce7a75e832bdef024f9f9f2b721db6ce14a768664a27725a618",
+      "mini_sha256": "f0656711abf39ce7a75e832bdef024f9f9f2b721db6ce14a768664a27725a618"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "8d9d78f478344a54464546b03d350a061837af1b429e8ce9ecfefc39dcebcd0e",
+      "mini_sha256": "8d9d78f478344a54464546b03d350a061837af1b429e8ce9ecfefc39dcebcd0e"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "f5649c31f8455c939556fdd82a2d4f012f1f8333dfe145e1af8bcc35f8e36362",
+      "mini_sha256": "f5649c31f8455c939556fdd82a2d4f012f1f8333dfe145e1af8bcc35f8e36362"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      18
+    ],
+    "mini": [
+      18
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

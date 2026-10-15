@@ -152,8 +152,8 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         lines.extend([
             "",
             "## Task 33 delivery metrics",
-            "| condition | packet_status | packet_tokens | retained_context | parent_tokens | worker_tokens | system_tokens | retrieval_calls | first_edit | total_latency | evidence_fingerprint |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+            "| condition | packet_result | packet_completeness | packet_tokens | retained_context | parent_tokens | worker_tokens | system_tokens | retrieval_calls | first_edit | total_latency | evidence_fingerprint |",
+            "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
         ])
         for result in results:
             if result.get("condition_id") not in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
@@ -162,7 +162,8 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
             parent_total = metrics.get("total_tokens")
             worker_total = metrics.get("worker_total_tokens")
             lines.append(
-                f"| {result.get('condition_id')} | {metrics.get('action_packet_status', '')} | "
+                f"| {result.get('condition_id')} | {metrics.get('action_packet_result', '')} | "
+                f"{metrics.get('action_packet_completeness', '')} | "
                 f"{metrics.get('action_packet_tokens', '')} | {metrics.get('parent_retained_context_tokens', '')} | "
                 f"{parent_total if parent_total is not None else ''} | {worker_total if worker_total is not None else ''} | "
                 f"{metrics.get('system_total_tokens', '')} | {metrics.get('delivery_retrieval_calls', '')} | "

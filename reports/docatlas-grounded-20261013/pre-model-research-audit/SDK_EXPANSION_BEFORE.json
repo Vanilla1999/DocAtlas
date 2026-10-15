@@ -1,0 +1,2599 @@
+{
+  "boundary": "public SDK/Agent/Dispatcher, prepared SQLite, no mocks/models",
+  "requested_limit": 1,
+  "requested_budget": 100,
+  "small": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/storage.md",
+      "text": "# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/storage.md",
+        "source_path": "docs/storage.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "project_doc_catalog_entry_hash": "sha256:9c3bda121ca9f3b1d6472fffd56b9bccf90c7435d17c7c376510ee81a025dc30",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695124707,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory storage",
+        "section_level": 1,
+        "document_title": "storage",
+        "document_title_hash": "3d48292e4d2714f1",
+        "anchor": "Observatory storage",
+        "content_hash": "978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "retrieval_content_hash": "7b18898cf48123686fc9f6f3dc975ce6a76f7cf2a29b64e2ba36d48c755b9a1b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "63d3966ae3247cac83756493d00a54ddb1bc6a8802849ff4761a5fc6760690e3",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "63d3966ae3247cac83756493d00a54ddb1bc6a8802849ff4761a5fc6760690e3",
+          "token_estimate": 53,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "storage",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/storage.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory storage",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "7b18898cf48123686fc9f6f3dc975ce6a76f7cf2a29b64e2ba36d48c755b9a1b",
+        "stable_chunk_id": "child-13c58ce0bcd1d0f3f053a0c477831d67b1c8bbd1",
+        "vector_id": "de125b47-8287-5c75-92d1-10b11a0f75dc",
+        "parent_logical_id": "parent-6cd41b747a57f5cb0c95a477fdf480b1",
+        "atom_type": "mixed",
+        "atom_id": "atom-aaae6a09cfe57b9382630d0725af39ab",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/storage.md",
+        "source_content_hash": "978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "heading_path": [
+          "Observatory storage"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          256
+        ],
+        "byte_span": [
+          0,
+          256
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 64,
+        "retrieval_token_estimate": 124,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory storage",
+        "section_id": 5155265562721740443,
+        "token_estimate": 64,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 1,
+          "delivery_budget_not_applied": 100
+        },
+        "ranking": {
+          "stable_id": "child-13c58ce0bcd1d0f3f053a0c477831d67b1c8bbd1",
+          "section_id": 5155265562721740443,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.783403983508507e-06
+          },
+          "base_utility": 1.783403983508507e-06,
+          "feature_contributions": {},
+          "final_utility": 1.783403983508507e-06,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.783403983508507e-06,
+          "lexical_score": 1.783403983508507e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/transport.md",
+      "text": "# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/transport.md",
+        "source_path": "docs/transport.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "project_doc_catalog_entry_hash": "sha256:6f7a3901da24ed8ab7c00491436b273c403372d5756671a98e17c31e25e9dd0d",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695179975,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory transport",
+        "section_level": 1,
+        "document_title": "transport",
+        "document_title_hash": "a8e6012e4ab8ed7b",
+        "anchor": "Observatory transport",
+        "content_hash": "a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "retrieval_content_hash": "c62d7ffd10c58833fafd5708800f02859e54285e9ad7a5ec60f4c8b925f4e03b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "3f4d712d0b63a01464d1747bed879d7c8dfb59ac7404717b7252f102e04fbf99",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "3f4d712d0b63a01464d1747bed879d7c8dfb59ac7404717b7252f102e04fbf99",
+          "token_estimate": 54,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "transport",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/transport.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory transport",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "c62d7ffd10c58833fafd5708800f02859e54285e9ad7a5ec60f4c8b925f4e03b",
+        "stable_chunk_id": "child-56b0ca4a8d14a8274213a53bcb114795da1ff989",
+        "vector_id": "61bf22a2-c199-5d1a-a974-2713a06fd9f0",
+        "parent_logical_id": "parent-94604435af32aacec03c168a717fb034",
+        "atom_type": "mixed",
+        "atom_id": "atom-55e0f6186bbde6e737bfd923286f1cde",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/transport.md",
+        "source_content_hash": "a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "heading_path": [
+          "Observatory transport"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          280
+        ],
+        "byte_span": [
+          0,
+          280
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 70,
+        "retrieval_token_estimate": 132,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory transport",
+        "section_id": 4459935862639422560,
+        "token_estimate": 70,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 1,
+          "delivery_budget_not_applied": 100
+        },
+        "ranking": {
+          "stable_id": "child-56b0ca4a8d14a8274213a53bcb114795da1ff989",
+          "section_id": 4459935862639422560,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.783403983508507e-06
+          },
+          "base_utility": 1.783403983508507e-06,
+          "feature_contributions": {},
+          "final_utility": 1.783403983508507e-06,
+          "raw_rank": 2,
+          "final_rank": 2,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.783403983508507e-06,
+          "lexical_score": 1.783403983508507e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/packing.md",
+      "text": "# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/packing.md",
+        "source_path": "docs/packing.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "project_doc_catalog_entry_hash": "sha256:409723a5ec57e82512b05d6ad5d78c55aac728aa3bde64c5f429a0c49548f828",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695064228,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory packing",
+        "section_level": 1,
+        "document_title": "packing",
+        "document_title_hash": "05ec087a76354bd4",
+        "anchor": "Observatory packing",
+        "content_hash": "a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "retrieval_content_hash": "caefdd2db13dc5eeb5f8f711dfcb3fe1804aad553015e970876653ab6d2b2604",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "18392cec3b138dc0bc3538f02594154d460d75f2050559a4a863c4f996cf6727",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "18392cec3b138dc0bc3538f02594154d460d75f2050559a4a863c4f996cf6727",
+          "token_estimate": 53,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "packing",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/packing.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory packing",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "caefdd2db13dc5eeb5f8f711dfcb3fe1804aad553015e970876653ab6d2b2604",
+        "stable_chunk_id": "child-6237f70b3904de873a3516d9bbafe553aca192c5",
+        "vector_id": "c87c0e86-3c8b-5812-a97c-af7d9fb6dd71",
+        "parent_logical_id": "parent-a8a6ce5c5c8fffe7e4f48e910d32df67",
+        "atom_type": "mixed",
+        "atom_id": "atom-5a8029c4078009b7e527a495713908ed",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/packing.md",
+        "source_content_hash": "a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "heading_path": [
+          "Observatory packing"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          271
+        ],
+        "byte_span": [
+          0,
+          271
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 68,
+        "retrieval_token_estimate": 128,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory packing",
+        "section_id": 8121951255414665157,
+        "token_estimate": 68,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 1,
+          "delivery_budget_not_applied": 100
+        },
+        "ranking": {
+          "stable_id": "child-6237f70b3904de873a3516d9bbafe553aca192c5",
+          "section_id": 8121951255414665157,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.7750549069471737e-06
+          },
+          "base_utility": 1.7750549069471737e-06,
+          "feature_contributions": {},
+          "final_utility": 1.7750549069471737e-06,
+          "raw_rank": 3,
+          "final_rank": 3,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.7750549069471737e-06,
+          "lexical_score": 1.7750549069471737e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "tight_text": "### Observatory storage\n\n# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n\n*Source: /tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/storage.md*\n\n---\n\n### Observatory transport\n\n# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n\n*Source: /tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/transport.md*\n\n---\n\n### Observatory packing\n\n# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n\n*Source: /tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/packing.md*",
+  "wide": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/storage.md",
+      "text": "# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/storage.md",
+        "source_path": "docs/storage.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "project_doc_catalog_entry_hash": "sha256:9c3bda121ca9f3b1d6472fffd56b9bccf90c7435d17c7c376510ee81a025dc30",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695124707,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory storage",
+        "section_level": 1,
+        "document_title": "storage",
+        "document_title_hash": "3d48292e4d2714f1",
+        "anchor": "Observatory storage",
+        "content_hash": "978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "retrieval_content_hash": "7b18898cf48123686fc9f6f3dc975ce6a76f7cf2a29b64e2ba36d48c755b9a1b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "63d3966ae3247cac83756493d00a54ddb1bc6a8802849ff4761a5fc6760690e3",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "63d3966ae3247cac83756493d00a54ddb1bc6a8802849ff4761a5fc6760690e3",
+          "token_estimate": 53,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "storage",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/storage.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory storage",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "7b18898cf48123686fc9f6f3dc975ce6a76f7cf2a29b64e2ba36d48c755b9a1b",
+        "stable_chunk_id": "child-13c58ce0bcd1d0f3f053a0c477831d67b1c8bbd1",
+        "vector_id": "de125b47-8287-5c75-92d1-10b11a0f75dc",
+        "parent_logical_id": "parent-6cd41b747a57f5cb0c95a477fdf480b1",
+        "atom_type": "mixed",
+        "atom_id": "atom-aaae6a09cfe57b9382630d0725af39ab",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/storage.md",
+        "source_content_hash": "978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "heading_path": [
+          "Observatory storage"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          256
+        ],
+        "byte_span": [
+          0,
+          256
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 64,
+        "retrieval_token_estimate": 124,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory storage",
+        "section_id": 5155265562721740443,
+        "token_estimate": 64,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 20,
+          "delivery_budget_not_applied": 12000
+        },
+        "ranking": {
+          "stable_id": "child-13c58ce0bcd1d0f3f053a0c477831d67b1c8bbd1",
+          "section_id": 5155265562721740443,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.783403983508507e-06
+          },
+          "base_utility": 1.783403983508507e-06,
+          "feature_contributions": {},
+          "final_utility": 1.783403983508507e-06,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.783403983508507e-06,
+          "lexical_score": 1.783403983508507e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/transport.md",
+      "text": "# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/transport.md",
+        "source_path": "docs/transport.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "project_doc_catalog_entry_hash": "sha256:6f7a3901da24ed8ab7c00491436b273c403372d5756671a98e17c31e25e9dd0d",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695179975,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory transport",
+        "section_level": 1,
+        "document_title": "transport",
+        "document_title_hash": "a8e6012e4ab8ed7b",
+        "anchor": "Observatory transport",
+        "content_hash": "a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "retrieval_content_hash": "c62d7ffd10c58833fafd5708800f02859e54285e9ad7a5ec60f4c8b925f4e03b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "3f4d712d0b63a01464d1747bed879d7c8dfb59ac7404717b7252f102e04fbf99",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "3f4d712d0b63a01464d1747bed879d7c8dfb59ac7404717b7252f102e04fbf99",
+          "token_estimate": 54,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "transport",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/transport.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory transport",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "c62d7ffd10c58833fafd5708800f02859e54285e9ad7a5ec60f4c8b925f4e03b",
+        "stable_chunk_id": "child-56b0ca4a8d14a8274213a53bcb114795da1ff989",
+        "vector_id": "61bf22a2-c199-5d1a-a974-2713a06fd9f0",
+        "parent_logical_id": "parent-94604435af32aacec03c168a717fb034",
+        "atom_type": "mixed",
+        "atom_id": "atom-55e0f6186bbde6e737bfd923286f1cde",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/transport.md",
+        "source_content_hash": "a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "heading_path": [
+          "Observatory transport"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          280
+        ],
+        "byte_span": [
+          0,
+          280
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 70,
+        "retrieval_token_estimate": 132,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory transport",
+        "section_id": 4459935862639422560,
+        "token_estimate": 70,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 20,
+          "delivery_budget_not_applied": 12000
+        },
+        "ranking": {
+          "stable_id": "child-56b0ca4a8d14a8274213a53bcb114795da1ff989",
+          "section_id": 4459935862639422560,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.783403983508507e-06
+          },
+          "base_utility": 1.783403983508507e-06,
+          "feature_contributions": {},
+          "final_utility": 1.783403983508507e-06,
+          "raw_rank": 2,
+          "final_rank": 2,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.783403983508507e-06,
+          "lexical_score": 1.783403983508507e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/packing.md",
+      "text": "# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/packing.md",
+        "source_path": "docs/packing.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "project_doc_catalog_entry_hash": "sha256:409723a5ec57e82512b05d6ad5d78c55aac728aa3bde64c5f429a0c49548f828",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695064228,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory packing",
+        "section_level": 1,
+        "document_title": "packing",
+        "document_title_hash": "05ec087a76354bd4",
+        "anchor": "Observatory packing",
+        "content_hash": "a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "retrieval_content_hash": "caefdd2db13dc5eeb5f8f711dfcb3fe1804aad553015e970876653ab6d2b2604",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "18392cec3b138dc0bc3538f02594154d460d75f2050559a4a863c4f996cf6727",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "18392cec3b138dc0bc3538f02594154d460d75f2050559a4a863c4f996cf6727",
+          "token_estimate": 53,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "packing",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/packing.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory packing",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "caefdd2db13dc5eeb5f8f711dfcb3fe1804aad553015e970876653ab6d2b2604",
+        "stable_chunk_id": "child-6237f70b3904de873a3516d9bbafe553aca192c5",
+        "vector_id": "c87c0e86-3c8b-5812-a97c-af7d9fb6dd71",
+        "parent_logical_id": "parent-a8a6ce5c5c8fffe7e4f48e910d32df67",
+        "atom_type": "mixed",
+        "atom_id": "atom-5a8029c4078009b7e527a495713908ed",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/packing.md",
+        "source_content_hash": "a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "heading_path": [
+          "Observatory packing"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          271
+        ],
+        "byte_span": [
+          0,
+          271
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 68,
+        "retrieval_token_estimate": 128,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory packing",
+        "section_id": 8121951255414665157,
+        "token_estimate": 68,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 20,
+          "delivery_budget_not_applied": 12000
+        },
+        "ranking": {
+          "stable_id": "child-6237f70b3904de873a3516d9bbafe553aca192c5",
+          "section_id": 8121951255414665157,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.7750549069471737e-06
+          },
+          "base_utility": 1.7750549069471737e-06,
+          "feature_contributions": {},
+          "final_utility": 1.7750549069471737e-06,
+          "raw_rank": 3,
+          "final_rank": 3,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.7750549069471737e-06,
+          "lexical_score": 1.7750549069471737e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "wide_text": "### Observatory storage\n\n# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n\n*Source: /tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/storage.md*\n\n---\n\n### Observatory transport\n\n# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n\n*Source: /tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/transport.md*\n\n---\n\n### Observatory packing\n\n# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n\n*Source: /tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/packing.md*",
+  "bare": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/dispatch.md",
+      "text": "- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215694987232,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "265634e27df6dd85c2d92286b4c9cb3aba0f5e63ca288849ee1d7078c3c54990",
+        "retrieval_content_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "stable_chunk_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+        "vector_id": "ef27a1e2-73af-5d99-81de-0853bc5017ec",
+        "parent_logical_id": "parent-afeee37c69b1ec3980ea151efed1d1c9",
+        "atom_type": "list",
+        "atom_id": "atom-debc248ab857ebcf7542f0afe209b272",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          111,
+          1845
+        ],
+        "byte_span": [
+          111,
+          1845
+        ],
+        "line_span": [
+          4,
+          20
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 434,
+        "retrieval_token_estimate": 497,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Optical case dispatch checklist",
+        "section_id": 6710074307218698382,
+        "token_estimate": 434,
+        "docmancer_tokens": 434,
+        "raw_tokens": 484,
+        "savings_percent": 10.3,
+        "runway_multiplier": 1.12,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 1,
+          "admitted_estimated_tokens": 434,
+          "admitted_text_bytes": 1734,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 20,
+          "delivery_budget_not_applied": 12000
+        },
+        "ranking": {
+          "stable_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+          "section_id": 6710074307218698382,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -0.7463635157977063
+          },
+          "base_utility": 0.7463635157977063,
+          "feature_contributions": {},
+          "final_utility": 0.7463635157977063,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 1,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "photograph"
+          ],
+          "matched_terms": [
+            "photograph"
+          ],
+          "exact_terms": [
+            "photograph"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -0.7463635157977063,
+          "lexical_score": 0.7463635157977063,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "photograph"
+            ],
+            "retrieval_text": [
+              "photograph"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "adjacent": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/dispatch.md",
+      "text": "- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215694987232,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "265634e27df6dd85c2d92286b4c9cb3aba0f5e63ca288849ee1d7078c3c54990",
+        "retrieval_content_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "stable_chunk_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+        "vector_id": "ef27a1e2-73af-5d99-81de-0853bc5017ec",
+        "parent_logical_id": "parent-afeee37c69b1ec3980ea151efed1d1c9",
+        "atom_type": "list",
+        "atom_id": "atom-debc248ab857ebcf7542f0afe209b272",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          111,
+          1845
+        ],
+        "byte_span": [
+          111,
+          1845
+        ],
+        "line_span": [
+          4,
+          20
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 434,
+        "retrieval_token_estimate": 497,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Optical case dispatch checklist",
+        "section_id": 6710074307218698382,
+        "token_estimate": 434,
+        "docmancer_tokens": 434,
+        "raw_tokens": 484,
+        "savings_percent": 10.3,
+        "runway_multiplier": 1.12,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 1,
+          "admitted_estimated_tokens": 434,
+          "admitted_text_bytes": 1734,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 20,
+          "delivery_budget_not_applied": 12000
+        },
+        "ranking": {
+          "stable_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+          "section_id": 6710074307218698382,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -0.7463635157977063
+          },
+          "base_utility": 0.7463635157977063,
+          "feature_contributions": {},
+          "final_utility": 0.7463635157977063,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 1,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "photograph"
+          ],
+          "matched_terms": [
+            "photograph"
+          ],
+          "exact_terms": [
+            "photograph"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -0.7463635157977063,
+          "lexical_score": 0.7463635157977063,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "photograph"
+            ],
+            "retrieval_text": [
+              "photograph"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "page": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/dispatch.md",
+      "text": "- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215694987232,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "265634e27df6dd85c2d92286b4c9cb3aba0f5e63ca288849ee1d7078c3c54990",
+        "retrieval_content_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "stable_chunk_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+        "vector_id": "ef27a1e2-73af-5d99-81de-0853bc5017ec",
+        "parent_logical_id": "parent-afeee37c69b1ec3980ea151efed1d1c9",
+        "atom_type": "list",
+        "atom_id": "atom-debc248ab857ebcf7542f0afe209b272",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          111,
+          1845
+        ],
+        "byte_span": [
+          111,
+          1845
+        ],
+        "line_span": [
+          4,
+          20
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 434,
+        "retrieval_token_estimate": 497,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Optical case dispatch checklist",
+        "section_id": 6710074307218698382,
+        "token_estimate": 434,
+        "docmancer_tokens": 434,
+        "raw_tokens": 484,
+        "savings_percent": 10.3,
+        "runway_multiplier": 1.12,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 1,
+          "admitted_estimated_tokens": 434,
+          "admitted_text_bytes": 1734,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 20,
+          "delivery_budget_not_applied": 12000
+        },
+        "ranking": {
+          "stable_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+          "section_id": 6710074307218698382,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -0.7463635157977063
+          },
+          "base_utility": 0.7463635157977063,
+          "feature_contributions": {},
+          "final_utility": 0.7463635157977063,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 1,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "photograph"
+          ],
+          "matched_terms": [
+            "photograph"
+          ],
+          "exact_terms": [
+            "photograph"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -0.7463635157977063,
+          "lexical_score": 0.7463635157977063,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "photograph"
+            ],
+            "retrieval_text": [
+              "photograph"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "dispatcher_acquired": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/storage.md",
+      "text": "# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/storage.md",
+        "source_path": "docs/storage.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "project_doc_catalog_entry_hash": "sha256:9c3bda121ca9f3b1d6472fffd56b9bccf90c7435d17c7c376510ee81a025dc30",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695124707,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory storage",
+        "section_level": 1,
+        "document_title": "storage",
+        "document_title_hash": "3d48292e4d2714f1",
+        "anchor": "Observatory storage",
+        "content_hash": "978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "retrieval_content_hash": "7b18898cf48123686fc9f6f3dc975ce6a76f7cf2a29b64e2ba36d48c755b9a1b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "63d3966ae3247cac83756493d00a54ddb1bc6a8802849ff4761a5fc6760690e3",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "63d3966ae3247cac83756493d00a54ddb1bc6a8802849ff4761a5fc6760690e3",
+          "token_estimate": 53,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "storage",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/storage.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory storage",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "7b18898cf48123686fc9f6f3dc975ce6a76f7cf2a29b64e2ba36d48c755b9a1b",
+        "stable_chunk_id": "child-13c58ce0bcd1d0f3f053a0c477831d67b1c8bbd1",
+        "vector_id": "de125b47-8287-5c75-92d1-10b11a0f75dc",
+        "parent_logical_id": "parent-6cd41b747a57f5cb0c95a477fdf480b1",
+        "atom_type": "mixed",
+        "atom_id": "atom-aaae6a09cfe57b9382630d0725af39ab",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/storage.md",
+        "source_content_hash": "978b77d9f4c12ca74f47407f3f9722d5a25aa312998a52dd5fd6b08e96533a7a",
+        "heading_path": [
+          "Observatory storage"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          256
+        ],
+        "byte_span": [
+          0,
+          256
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 64,
+        "retrieval_token_estimate": 124,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory storage",
+        "section_id": 5155265562721740443,
+        "token_estimate": 64,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 1,
+          "delivery_budget_not_applied": 100,
+          "dispatcher_post_policy_rows": 3
+        },
+        "ranking": {
+          "stable_id": "child-13c58ce0bcd1d0f3f053a0c477831d67b1c8bbd1",
+          "section_id": 5155265562721740443,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.783403983508507e-06
+          },
+          "base_utility": 1.783403983508507e-06,
+          "feature_contributions": {},
+          "final_utility": 1.783403983508507e-06,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.783403983508507e-06,
+          "lexical_score": 1.783403983508507e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        },
+        "query_plan_hash": "0bb9b88b5e3f78bace3b1b7ee7874a23157d11b5cfc825d05c9500c85e34325c",
+        "fusion_config_hash": "c28e568173bf47080e8bf470457c5c2fed8628a19eefae04a4de798659ce2ae6",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 1
+          },
+          "pre_post_rank": 1,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 1
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/transport.md",
+      "text": "# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/transport.md",
+        "source_path": "docs/transport.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "project_doc_catalog_entry_hash": "sha256:6f7a3901da24ed8ab7c00491436b273c403372d5756671a98e17c31e25e9dd0d",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695179975,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory transport",
+        "section_level": 1,
+        "document_title": "transport",
+        "document_title_hash": "a8e6012e4ab8ed7b",
+        "anchor": "Observatory transport",
+        "content_hash": "a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "retrieval_content_hash": "c62d7ffd10c58833fafd5708800f02859e54285e9ad7a5ec60f4c8b925f4e03b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "3f4d712d0b63a01464d1747bed879d7c8dfb59ac7404717b7252f102e04fbf99",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "3f4d712d0b63a01464d1747bed879d7c8dfb59ac7404717b7252f102e04fbf99",
+          "token_estimate": 54,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "transport",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/transport.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory transport",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "c62d7ffd10c58833fafd5708800f02859e54285e9ad7a5ec60f4c8b925f4e03b",
+        "stable_chunk_id": "child-56b0ca4a8d14a8274213a53bcb114795da1ff989",
+        "vector_id": "61bf22a2-c199-5d1a-a974-2713a06fd9f0",
+        "parent_logical_id": "parent-94604435af32aacec03c168a717fb034",
+        "atom_type": "mixed",
+        "atom_id": "atom-55e0f6186bbde6e737bfd923286f1cde",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/transport.md",
+        "source_content_hash": "a635ae40a9e3453da5db102c7fa418e56b2bf14166b245c7b563ec1b6b03bd25",
+        "heading_path": [
+          "Observatory transport"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          280
+        ],
+        "byte_span": [
+          0,
+          280
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 70,
+        "retrieval_token_estimate": 132,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory transport",
+        "section_id": 4459935862639422560,
+        "token_estimate": 70,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 1,
+          "delivery_budget_not_applied": 100,
+          "dispatcher_post_policy_rows": 3
+        },
+        "ranking": {
+          "stable_id": "child-56b0ca4a8d14a8274213a53bcb114795da1ff989",
+          "section_id": 4459935862639422560,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.783403983508507e-06
+          },
+          "base_utility": 1.783403983508507e-06,
+          "feature_contributions": {},
+          "final_utility": 1.783403983508507e-06,
+          "raw_rank": 2,
+          "final_rank": 2,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.783403983508507e-06,
+          "lexical_score": 1.783403983508507e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        },
+        "query_plan_hash": "0bb9b88b5e3f78bace3b1b7ee7874a23157d11b5cfc825d05c9500c85e34325c",
+        "fusion_config_hash": "c28e568173bf47080e8bf470457c5c2fed8628a19eefae04a4de798659ce2ae6",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 2
+          },
+          "pre_post_rank": 2,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 2
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/packing.md",
+      "text": "# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/packing.md",
+        "source_path": "docs/packing.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "project_doc_catalog_entry_hash": "sha256:409723a5ec57e82512b05d6ad5d78c55aac728aa3bde64c5f429a0c49548f828",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215695064228,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Observatory packing",
+        "section_level": 1,
+        "document_title": "packing",
+        "document_title_hash": "05ec087a76354bd4",
+        "anchor": "Observatory packing",
+        "content_hash": "a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "retrieval_content_hash": "caefdd2db13dc5eeb5f8f711dfcb3fe1804aad553015e970876653ab6d2b2604",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "18392cec3b138dc0bc3538f02594154d460d75f2050559a4a863c4f996cf6727",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "18392cec3b138dc0bc3538f02594154d460d75f2050559a4a863c4f996cf6727",
+          "token_estimate": 53,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "packing",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/packing.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Observatory packing",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "caefdd2db13dc5eeb5f8f711dfcb3fe1804aad553015e970876653ab6d2b2604",
+        "stable_chunk_id": "child-6237f70b3904de873a3516d9bbafe553aca192c5",
+        "vector_id": "c87c0e86-3c8b-5812-a97c-af7d9fb6dd71",
+        "parent_logical_id": "parent-a8a6ce5c5c8fffe7e4f48e910d32df67",
+        "atom_type": "mixed",
+        "atom_id": "atom-5a8029c4078009b7e527a495713908ed",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/packing.md",
+        "source_content_hash": "a0fc5dc5627ed41265f7086fcefe79bec99aa3542600b9c3b8db66618cae4a61",
+        "heading_path": [
+          "Observatory packing"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          271
+        ],
+        "byte_span": [
+          0,
+          271
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 68,
+        "retrieval_token_estimate": 128,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Observatory packing",
+        "section_id": 8121951255414665157,
+        "token_estimate": 68,
+        "docmancer_tokens": 202,
+        "raw_tokens": 202,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 3,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 202,
+          "admitted_text_bytes": 807,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 1,
+          "delivery_budget_not_applied": 100,
+          "dispatcher_post_policy_rows": 3
+        },
+        "ranking": {
+          "stable_id": "child-6237f70b3904de873a3516d9bbafe553aca192c5",
+          "section_id": 8121951255414665157,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -1.7750549069471737e-06
+          },
+          "base_utility": 1.7750549069471737e-06,
+          "feature_contributions": {},
+          "final_utility": 1.7750549069471737e-06,
+          "raw_rank": 3,
+          "final_rank": 3,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "observatory"
+          ],
+          "matched_terms": [
+            "observatory"
+          ],
+          "exact_terms": [
+            "observatory"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -1.7750549069471737e-06,
+          "lexical_score": 1.7750549069471737e-06,
+          "field_matches": {
+            "title": [
+              "observatory"
+            ],
+            "body": [
+              "observatory"
+            ],
+            "retrieval_text": [
+              "observatory"
+            ]
+          }
+        },
+        "query_plan_hash": "0bb9b88b5e3f78bace3b1b7ee7874a23157d11b5cfc825d05c9500c85e34325c",
+        "fusion_config_hash": "c28e568173bf47080e8bf470457c5c2fed8628a19eefae04a4de798659ce2ae6",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 3
+          },
+          "pre_post_rank": 3,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 3
+        }
+      }
+    }
+  ],
+  "dispatcher_expanded": [
+    {
+      "source": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project/docs/dispatch.md",
+      "text": "- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-expansion-before-btzxnwxp/project",
+        "project_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "repository_identity": "local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791900215694987232,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "265634e27df6dd85c2d92286b4c9cb3aba0f5e63ca288849ee1d7078c3c54990",
+        "retrieval_content_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "stable_chunk_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+        "vector_id": "ef27a1e2-73af-5d99-81de-0853bc5017ec",
+        "parent_logical_id": "parent-afeee37c69b1ec3980ea151efed1d1c9",
+        "atom_type": "list",
+        "atom_id": "atom-debc248ab857ebcf7542f0afe209b272",
+        "source_identity": "project_file:local:1c67cae786e57136697e04e2e7ec7b57b8125fbcd5717fab320567211b77f50b:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          111,
+          1845
+        ],
+        "byte_span": [
+          111,
+          1845
+        ],
+        "line_span": [
+          4,
+          20
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 434,
+        "retrieval_token_estimate": 497,
+        "generation_id": "gen-b3a809a4f77b4b75a814f764fe03379d",
+        "title": "Optical case dispatch checklist",
+        "section_id": 6710074307218698382,
+        "token_estimate": 434,
+        "docmancer_tokens": 434,
+        "raw_tokens": 484,
+        "savings_percent": 10.3,
+        "runway_multiplier": 1.12,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 1,
+          "admitted_estimated_tokens": 434,
+          "admitted_text_bytes": 1734,
+          "resource_skipped_rows": 0,
+          "delivery_limit_not_applied": 8,
+          "delivery_budget_not_applied": 2400,
+          "dispatcher_post_policy_rows": 1
+        },
+        "ranking": {
+          "stable_id": "child-637e8f72fd7c823cfc959d8400faa25053c83463",
+          "section_id": 6710074307218698382,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -0.7463635157977063
+          },
+          "base_utility": 0.7463635157977063,
+          "feature_contributions": {},
+          "final_utility": 0.7463635157977063,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 1,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "photograph"
+          ],
+          "matched_terms": [
+            "photograph"
+          ],
+          "exact_terms": [
+            "photograph"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -0.7463635157977063,
+          "lexical_score": 0.7463635157977063,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "photograph"
+            ],
+            "retrieval_text": [
+              "photograph"
+            ]
+          }
+        },
+        "query_plan_hash": "2bc78dde6a22c69114a509e38d28a0f4db68fbe9ee98d13b15d6975643705b9e",
+        "fusion_config_hash": "c28e568173bf47080e8bf470457c5c2fed8628a19eefae04a4de798659ce2ae6",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 1
+          },
+          "pre_post_rank": 1,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 1
+        }
+      }
+    }
+  ],
+  "expected_neighbor": "Complete every dispatch checklist step before handing over an optical case.",
+  "documents": {
+    "docs/packing.md": "# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n",
+    "docs/transport.md": "# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n",
+    "docs/storage.md": "# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n",
+    "docs/dispatch.md": "# Optical case dispatch checklist\n\nComplete every dispatch checklist step before handing over an optical case.\n- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n## Filing after arrival\n\nFile the signed dispatch sheet in the room labelled «réception».\n"
+  },
+  "state_unchanged": true
+}

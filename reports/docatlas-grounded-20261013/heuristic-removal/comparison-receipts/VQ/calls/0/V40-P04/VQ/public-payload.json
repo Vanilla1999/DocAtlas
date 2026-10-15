@@ -1,0 +1,182 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-9b108a104f558c5b",
+      "path_or_url": "docs/managing-environments.md",
+      "section": "Managing environments",
+      "snippet": "By default, Poetry will try to use the Python version used during Poetry's installation\nto create the virtual environment for the current project.\n\nHowever, for various reasons, this Python version might not be compatible\nwith the `python` range supported by the project. In this case, Poetry will try\nto find one that is and use it. If it's unable to do so then you will be prompted\nto activate one explicitly, see [Switching environments](#switching-between-environments).",
+      "version_binding": "unversioned",
+      "content_sha256": "65c5cda4671e1300fe9f1fe54ac7a26f0192a8ac6ed9d402825c9ff3bef18746",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 21,
+      "line_end": 27,
+      "source_uri": "docatlas://source/d424197b03656f4465c50f93"
+    },
+    {
+      "evidence_id": "ev-70611f7d30034f52",
+      "path_or_url": "docs/managing-environments.md",
+      "section": "Managing environments > Switching between environments",
+      "snippet": "## Switching between environments\n\nSometimes this might not be feasible for your system, especially Windows where `pyenv`\nis not available, or you simply prefer to have a more explicit control over your environment.\nFor this specific purpose, you can use the `env use` command to tell Poetry\nwhich Python version to use for the current project.\n\n```bash\npoetry env use /full/path/to/python\n```\n\nIf you have the python executable in your `PATH` you can use it:\n\n```bash\npoetry env use python3.7\n```\n\nYou can even just use the minor Python version in this case:\n\n```bash\npoetry env use 3.7\n```\n\nIf you want to disable the explicitly activated virtual environment, you can use the\nspecial `system` Python version to retrieve the default behavior:\n\n```bash\npoetry env use system\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e9e1358430c25e448767b314b3a5946b9a232b31280b7e450259f0ae7dee1460",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 49,
+      "line_end": 78,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/fcfb00ca286138ea25ade9fd"
+    },
+    {
+      "evidence_id": "ev-dddf5e11270d91fd",
+      "path_or_url": "docs/dependency-specification.md",
+      "section": "Dependency specification > Using environment markers > `extra` environment marker > Exclusive extras",
+      "snippet": "#### Exclusive extras\n\n{{% warning %}}\nThe first example will only work completely if you configure Poetry to not re-resolve for installation:\n\n```bash\npoetry config installer.re-resolve false\n```\n\nThis was a new feature of Poetry 2.0 and became the default behavior in Poetry 2.3.\n\n{{% /warning %}}\n\nKeep in mind that all combinations of possible extras available in your project need to be compatible with each other.\nThis means that in order to use differing or incompatible versions across different combinations, you need to make your\nextra markers *exclusive*. For example, the following installs PyTorch from one source repository with CPU versions\nwhen the `cuda` extra is *not* specified, while the other installs from another repository with a separate version set\nfor GPUs when the `cuda` extra *is* specified:\n\n```toml\n[project]\nname = \"torch-example\"\nrequires-python = \">=3.10\"\ndependencies = [\n    \"torch (==2.3.1+cpu) ; extra != 'cuda'\",\n]\n\n[project.optional-dependencies]\ncuda = [\n    \"torch (==2.3.1+cu118)\",\n]\n\n[tool.poetry]\npackage-mode = false\n\n[tool.poetry.dependencies]\ntorch = [\n    { markers = \"extra != 'cuda'\", source = \"pytorch-cpu\"},\n    { markers = \"extra == 'cuda'\", source = \"pytorch-cuda\"},\n ]\n\n[[tool.poetry.source]]\nname = \"pytorch-cpu\"\nurl = \"https://download.pytorch.org/whl/cpu\"\npriority = \"explicit\"\n\n[[tool.poetry.source]]\nname = \"pytorch-cuda\"\nurl = \"https://download.pytorch.org/whl/cu118\"\npriority = \"explicit\"\n```\n\nFor the CPU case, we have to specify `\"extra != 'cuda'\"` because the version specified is not compatible with the\nGPU (`cuda`) version.\n\nThis same logic applies when you want either-or extras:\n\n```toml\n[project]\nname = \"torch-example\"\nrequires-python = \">=3.10\"\n\n[project.optional-dependencies]\ncpu = [\n    \"torch (==2.3.1+cpu)\",\n]\ncuda = [\n    \"torch (==2.3.1+cu118)\",\n]\n\n[tool.poetry]\npackage-mode = false\n\n[tool.poetry.dependencies]\ntorch = [\n    { markers = \"extra == 'cpu' and extra != 'cuda'\", source = \"pytorch-cpu\"},\n    { markers = \"extra == 'cuda' and extra != 'cpu'\", source = \"pytorch-cuda\"},\n ]\n\n[[tool.poetry.source]]\nname = \"pytorch-cpu\"\nurl = \"https://download.pytorch.org/whl/cpu\"\npriority = \"explicit\"\n\n[[tool.poetry.source]]\nname = \"pytorch-cuda\"\nurl = \"https://download.pytorch.org/whl/cu118\"\npriority = \"explicit\"\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "780e20411d9f05ba1dd362b06a0026c305c6306d6aa7233c0cb10d6f505bdff0",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 600,
+      "line_end": 689,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/0ad3c6482af6b810ce98b726"
+    },
+    {
+      "evidence_id": "ev-f6a3fc1c910f3448",
+      "path_or_url": "docs/configuration.md",
+      "section": "Configuration > Available settings > `virtualenvs.use-poetry-python`",
+      "snippet": "### `virtualenvs.use-poetry-python`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_USE_POETRY_PYTHON`\n\n*Introduced in 2.0.0*\n\nBy default, Poetry will use the activated Python version to create a new virtual environment.\nIf set to `true`, the Python version used during Poetry installation is used.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0e9648136eb06b38bd3e6e4c5232d8fff709427d8a2350f1334a72b3bd389f90",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 640,
+      "line_end": 652,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/afde44bc529d45ee453de3e8"
+    },
+    {
+      "evidence_id": "ev-74d743fcc93c0d01",
+      "path_or_url": "docs/configuration.md",
+      "section": "Configuration > Available settings > `virtualenvs.create`",
+      "snippet": "### `virtualenvs.create`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_CREATE`\n\nCreate a new virtual environment if one doesn't already exist.\n\nIf set to `false`, Poetry will not create a new virtual environment. If it detects an already enabled virtual\nenvironment or an existing one in `{cache-dir}/virtualenvs` or `{project-dir}/.venv` it will\ninstall dependencies into them, otherwise it will install dependencies into the systems python environment.\n\n{{% note %}}\nIf Poetry detects it's running within an activated virtual environment, it will never create a new virtual environment,\nregardless of the value set for `virtualenvs.create`.\n{{% /note %}}\n\n{{% note %}}\nBe aware that installing dependencies into the system environment likely upgrade or uninstall existing packages and thus\nbreak other applications. Installing additional Python packages after installing the project might break the Poetry\nproject in return.\n\nThis is why it is recommended to always create a virtual environment. This is also true in Docker containers, as they\nmight contain additional Python packages as well.\n{{% /note %}}\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e2a9a563631238dde186bd5bbdc603c95e912d5ac73de5b7982ecca706a28feb",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 512,
+      "line_end": 539,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/511261bd128ad0a2632dbab0"
+    },
+    {
+      "evidence_id": "ev-6113ba9bb08bcdb1",
+      "path_or_url": "docs/configuration.md",
+      "section": "Configuration > Available settings > `python.installation-dir`",
+      "snippet": "### `python.installation-dir`\n\n**Type**: `string`\n\n**Default**: `{data-dir}/python`\n\n**Environment Variable**: `POETRY_PYTHON_INSTALLATION_DIR`\n\n*Introduced in 2.1.0*\n\nThe directory in which Poetry managed Python versions are installed to.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "5ac46f6b218c4a379ed682137fb1b8cedcd449c7c20a4152ed92963bd29cf535",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 398,
+      "line_end": 409,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/eadbdefa9028ca7021f3d8fb"
+    },
+    {
+      "evidence_id": "ev-45693ecd1abc7b1a",
+      "path_or_url": "docs/managing-environments.md",
+      "section": "Managing environments > Switching between environments",
+      "snippet": "## Switching between environments\n\nSometimes this might not be feasible for your system, especially Windows where `pyenv`\nis not available, or you simply prefer to have a more explicit control over your environment.\nFor this specific purpose, you can use the `env use` command to tell Poetry\nwhich Python version to use for the current project.\n\n```bash\npoetry env use /full/path/to/python\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3330f1870ed576b2bcc2953c745936df41fed8879d7da56992b36aae055e9bd4",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 49,
+      "line_end": 59,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/a275f275fc8991c199a0d9d3"
+    },
+    {
+      "evidence_id": "ev-d0bd75c3c64bc3b7",
+      "path_or_url": "docs/managing-environments.md",
+      "section": "Managing environments > Displaying the environment information",
+      "snippet": "## Displaying the environment information\n\nIf you want to get basic information about the currently activated virtual environment,\nyou can use the `env info` command:\n\n```bash\npoetry env info\n```\n\nwill output something similar to this:\n\n```text\nVirtualenv\nPython:         3.7.1\nImplementation: CPython\nPath:           /path/to/poetry/cache/virtualenvs/test-O3eWbxRl-py3.7\nValid:          True\n\nBase\nPlatform: darwin\nOS:       posix\nPython:   /path/to/main/python\n```\n\nIf you only want to know the path to the virtual environment, you can pass the `--path` option\nto `env info`:\n\n```bash\npoetry env info --path\n```\n\nIf you only want to know the path to the python executable (useful for running mypy from a global environment without installing it in the virtual environment), you can pass the `--executable` option\nto `env info`:\n\n```bash\npoetry env info --executable\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "51f19ab7ca5b50ad9fbf3d86890c67fba4e9e7e4359f48ac9e6be479a83df3f1",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 117,
+      "line_end": 154,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2a0e6be735b9d84efdebb14c"
+    },
+    {
+      "evidence_id": "ev-d9bf914c328ccee5",
+      "path_or_url": "docs/managing-environments.md",
+      "section": "Managing environments",
+      "snippet": "# Managing environments\n\nPoetry makes project environment isolation one of its core features.\n\nWhat this means is that it will always work isolated from your global Python installation.\nTo achieve this, it will first check if it's currently running inside a virtual environment.\nIf it is, it will use it directly without creating a new one. But if it's not, it will use\none that it has already created or create a brand new one for you.\n\nBy default, Poetry will try to use the Python version used during Poetry's installation\nto create the virtual environment for the current project.\n\nHowever, for various reasons, this Python version might not be compatible\nwith the `python` range supported by the project. In this case, Poetry will try\nto find one that is and use it. If it's unable to do so then you will be prompted\nto activate one explicitly, see [Switching environments](#switching-between-environments).\n\n{{% note %}}\nIf you use a tool like [pyenv](https://github.com/pyenv/pyenv) to manage different Python versions,\nyou can switch the current `python` of your shell and Poetry will use it to create\nthe new environment.\n\nFor instance, if your project requires a newer Python than is available with\nyour system, a standard workflow would be:\n\n```bash\npyenv install 3.9.8\npyenv local 3.9.8  # Activate Python 3.9 for the current project\npoetry install\n```\n\n{{% /note %}}\n\n{{% note %}}\nSince version 1.2, Poetry no longer supports managing environments for Python 2.7.\n{{% /note %}}\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "cdd7ec2690891907be20613e9a1dec5a0dc18133e519254d97637d6f2eb85a9f",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 12,
+      "line_end": 48,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/572094c5a64bfa0ecff8f943"
+    },
+    {
+      "evidence_id": "ev-95de7c817799a8bb",
+      "path_or_url": "docs/dependency-specification.md",
+      "section": "Dependency specification > `git` dependencies > Credentials for git dependencies",
+      "snippet": "In cases where you encounter issues with the default implementation, you may wish to\nexplicitly configure the use of the system git client via a shell subprocess call.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f8bdd860c879afe35c724dccf2f42cf29f00baa9d1a3bd1bec75b685c06ac36e",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "line_start": 389,
+      "line_end": 391,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2cda8e76b809c7447ef2c8b0"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/7336b931aabdd473cc0ef613",
+      "path": "docs/dependency-specification.md",
+      "project_identity": "local:35418b180ed360e358465d5290351e01e29520ff12e27ba650000275b6f2a825",
+      "snapshot_sha256": "sha256:92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "line_start": 392,
+      "line_end": 396,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 3652
+}

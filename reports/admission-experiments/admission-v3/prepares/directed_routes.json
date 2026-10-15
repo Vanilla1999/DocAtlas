@@ -1,0 +1,81 @@
+{
+  "seconds": 0.11393467100060661,
+  "expected_paths": [
+    "docs/roles.md",
+    "docs/routes.md"
+  ],
+  "indexed_paths": [
+    "docs/roles.md",
+    "docs/routes.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+      "source_path": "docs/roles.md",
+      "display_text": "# Полномочия на складе\n\nМаршрут складской тележки утверждает диспетчер движения. Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+      "source_path": "docs/roles.md",
+      "display_text": "Контролёр батарей подписывает ведомость запасных батарей на стеллаже 12.\n",
+      "line_start": 5,
+      "line_end": 5
+    },
+    {
+      "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+      "source_path": "docs/routes.md",
+      "display_text": "# Направленные маршруты складской тележки\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+      "source_path": "docs/routes.md",
+      "display_text": "Разрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\n",
+      "line_start": 3,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+      "source_path": "docs/routes.md",
+      "display_text": "Обратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+      "line_start": 5,
+      "line_end": 5
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "d8b93ebb7ca063463fef6bf19b4c33f90816a6615fd0088d199c010d7089e1e0",
+  "storage_path": "/tmp/docatlas-evidence-xqar23wa/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+  "catalog_sha256": "fb954564f2de909f883946b7f9b5d018d55debb8eb1867cdab8d45f8132cb61a",
+  "documents": [
+    {
+      "path": "docs/roles.md",
+      "content_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+      "catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f"
+    },
+    {
+      "path": "docs/routes.md",
+      "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+      "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+    "members": 2,
+    "new_count": 2,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 2,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 2
+  },
+  "status": "EXECUTED"
+}

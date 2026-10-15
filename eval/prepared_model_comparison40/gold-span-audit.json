@@ -1,0 +1,1030 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-12T19:01:03.918493+00:00",
+  "state": "all_original_gold_ranges_recovered_in_bounds_before_runtime",
+  "question_count": 40,
+  "distinct_question_count": 40,
+  "counts_by_answerability": {
+    "within_budget": 24,
+    "partial": 8,
+    "unanswerable": 8
+  },
+  "counts_by_project": {
+    "black": 8,
+    "poetry": 8,
+    "textual": 8,
+    "vite": 8,
+    "eslint": 8
+  },
+  "gold_case_count": 40,
+  "range_count": 32,
+  "source_recovery_all_success": true,
+  "gold_modified": false,
+  "source_bytes_modified": false,
+  "original_gold_sha256": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc",
+  "manual_review_scope": "Read every recovered gold span against its original question, plus targeted searches of all selected source files for unavailable facts. No current model-on/off outputs read; no product or model calls. All referenced spans match their historical subjects.",
+  "notes": [
+    {
+      "case_id": "V40-E05",
+      "classification": "existing_oracle_qualification_limit",
+      "note": "Frozen gold names jiti >=2.2.0 at configuration-files.md:795-809. The same pinned file at lines 811-818 documents a Node.js >=22.13.0 experimental native alternative without jiti. The question does not fix Node version. Keep original gold and partial label; do not treat jiti as a universal unconditional necessity in semantic review. Startup overhead is still absent.",
+      "changed_oracle": false
+    },
+    {
+      "case_id": "V40-V06",
+      "classification": "relation_bound_missing_fact",
+      "note": "server-options.md:390 states a 403 for fs.allow under fs.strict. This is not an explicit status guarantee for the separate fs.deny condition at lines 434 onward. Preserve missing fs_deny_status; do not copy a number from a different relation.",
+      "changed_oracle": false
+    },
+    {
+      "case_id": "V40-P04",
+      "classification": "gold_granularity",
+      "note": "Frozen gold ends at the command inside a code fence, without its closing fence. Literal delivery is an evaluation range, not a structural completeness claim. Gold remains unchanged.",
+      "changed_oracle": false
+    },
+    {
+      "case_id": "V40-B04",
+      "classification": "gold_granularity",
+      "note": "Frozen gold ends before the end of an explanatory sentence at line 237. Required read/write behavior is present earlier in the same frozen range. Gold remains unchanged.",
+      "changed_oracle": false
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "V40-B01",
+      "project_group": "black",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/the_basics.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+          "line_start": 63,
+          "line_end": 65,
+          "char_start": 1931,
+          "char_end": 2017,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+          "quote_sha256": "ff84b17988a30936f80c28fc463edfbe95274b7eea4ac1cf360419ad8631c7a1",
+          "literal_quote": "#### `-l`, `--line-length`\n\nHow many characters per line to allow. The default is 88.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B02",
+      "project_group": "black",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/the_basics.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+          "line_start": 86,
+          "line_end": 88,
+          "char_start": 2576,
+          "char_end": 2803,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+          "quote_sha256": "add4d3794296f47b1a889dadaaea09a8f38fbe1b6ebba70eccc83fc2289d1429",
+          "literal_quote": "By default, Black will infer target versions from the project metadata in\n`pyproject.toml`, specifically the `[project.requires-python]` field. If this does not\nyield conclusive results, Black will use per-file auto-detection.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B03",
+      "project_group": "black",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/the_basics.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+          "line_start": 180,
+          "line_end": 186,
+          "char_start": 5929,
+          "char_end": 6146,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+          "quote_sha256": "2baace0cb119e7d453cd7c66754f761c2863dcae4474589f3eb94e0152c253d6",
+          "literal_quote": "#### `--check`\n\nDon't write the files back, just return the status. _Black_ will exit with:\n\n- code 0 if nothing would change;\n- code 1 if some files would be reformatted; or\n- code 123 if there was an internal error\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B04",
+      "project_group": "black",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/the_basics.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+          "line_start": 232,
+          "line_end": 237,
+          "char_start": 7264,
+          "char_end": 7632,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+          "quote_sha256": "760fd993b7744a7dc5fcc759f721e2f20a68475c349b8eabc0684967440b6eb2",
+          "literal_quote": "#### `--no-cache`\n\nDo not consult or update Black's per-user cache during this run. When `--no-cache` is\nspecified, Black will perform fresh analysis for all files and will neither read from\nnor write to the cache. This is helpful for reproducing formatting results from a clean\nrun, debugging cache-related issues, or ensuring CI executes a fresh formatting analysis\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B05",
+      "project_group": "black",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/the_basics.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+          "line_start": 329,
+          "line_end": 333,
+          "char_start": 11536,
+          "char_end": 11809,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+          "quote_sha256": "1bd1cb00a79136808f22640da38a337be4681b20600504b880e1180e8bd5a16d",
+          "literal_quote": "#### `--force-exclude`\n\nLike `--exclude`, but files and directories matching this regex will be excluded even\nwhen they are passed explicitly as arguments. This is useful when invoking Black\nprogrammatically on changed files, such as in a pre-commit hook or editor plugin.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B06",
+      "project_group": "black",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "blackd_default_port"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/the_basics.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+          "line_start": 490,
+          "line_end": 496,
+          "char_start": 16936,
+          "char_end": 17345,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+          "quote_sha256": "051076253dcb9e43457b46f5fd2b5621c8ac934ab4d21fac033e3c578f089b4a",
+          "literal_quote": "### Where _Black_ looks for the file\n\nBy default _Black_ looks for `pyproject.toml` containing a `[tool.black]` section\nstarting from the common base directory of all files and directories passed on the\ncommand line. If it's not there, it looks in parent directories. It stops looking when\nit finds the file, or a `.git` directory, or a `.hg` directory, or the root of the file\nsystem, whichever comes first.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B07",
+      "project_group": "black",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "cache_retention_days"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/file_collection_and_discovery.md",
+          "line_start": 25,
+          "line_end": 30,
+          "char_start": 1122,
+          "char_end": 1606,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+          "quote_sha256": "b9dfe174cd050f624a48eafdb8a860665537f2795f0e1419b30b664772915a10",
+          "literal_quote": "To override the location of these files on all systems, set the environment variable\n`BLACK_CACHE_DIR` to the preferred location. Alternatively on macOS and Linux, set\n`XDG_CACHE_HOME` to your preferred location. For example, if you want to put the cache\nin the directory you're running _Black_ from, set `BLACK_CACHE_DIR=.cache/black`.\n_Black_ will then write the above files to `.cache/black`. Note that `BLACK_CACHE_DIR`\nwill take precedence over `XDG_CACHE_HOME` if both are set.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B08",
+      "project_group": "black",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-P01",
+      "project_group": "poetry",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/configuration.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/poetry/docs/configuration.md",
+          "line_start": 33,
+          "line_end": 35,
+          "char_start": 858,
+          "char_end": 996,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "quote_sha256": "1e35eec415a5fd00ec53888a1c87b7cd5058cad2f6740cd1d327767a0f0b22d0",
+          "literal_quote": "{{% note %}}\nYour local configuration of Poetry application is stored in the `poetry.toml` file,\nwhich is separate from `pyproject.toml`.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P02",
+      "project_group": "poetry",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/configuration.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/poetry/docs/configuration.md",
+          "line_start": 122,
+          "line_end": 134,
+          "char_start": 3446,
+          "char_end": 4040,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "quote_sha256": "642de5ef2792e225dca1ff3f8959a3a5227fff084c9189185c33cb275f67327e",
+          "literal_quote": "## Configuration sources\n\nWhen a setting is set in multiple places, Poetry applies the following precedence\n(from highest to lowest):\n\n1. Environment variables (for example, `POETRY_VIRTUALENVS_CREATE`)\n2. The local `poetry.toml` file (created with `poetry config --local`)\n3. The global `config.toml` file\n4. The setting's default value\n\nFor repository credentials (`http-basic.*`, `pypi-token.*`), Poetry may also read\nfrom `auth.toml` and the system keyring (for details see [Repositories]({{< relref \"repositories\" >}})).\nEnvironment variables still take precedence over file-based values.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P03",
+      "project_group": "poetry",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/configuration.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/poetry/docs/configuration.md",
+          "line_start": 102,
+          "line_end": 114,
+          "char_start": 2805,
+          "char_end": 3321,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+          "literal_quote": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n```bash\nexport POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory\n```\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P04",
+      "project_group": "poetry",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/managing-environments.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/poetry/docs/managing-environments.md",
+          "line_start": 72,
+          "line_end": 76,
+          "char_start": 2194,
+          "char_end": 2376,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+          "quote_sha256": "d034ac818985866fc4a3610b8e18e8e873b34970e467cb1d71edd9e9d0ddba51",
+          "literal_quote": "If you want to disable the explicitly activated virtual environment, you can use the\nspecial `system` Python version to retrieve the default behavior:\n\n```bash\npoetry env use system\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P05",
+      "project_group": "poetry",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/dependency-specification.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/poetry/docs/dependency-specification.md",
+          "line_start": 87,
+          "line_end": 98,
+          "char_start": 2476,
+          "char_end": 3040,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+          "quote_sha256": "cf0b5946ccca7b63d82adf26bd67948cb4c8c624dfeb4e7015c09434961a795a",
+          "literal_quote": "### Compatible release requirements\n\n**Compatible release requirements** specify a minimal version with the ability to update to later versions of the same level.\nFor example, if you specify a major, minor, and patch version, only patch-level changes are allowed.\nIf you only specify a major, and minor version, then minor- and patch-level changes are allowed.\n\n`~=1.2.3` is an example of a compatible release requirement.\n\n| Requirement | Versions allowed |\n| ----------- | ---------------- |\n| ~=1.2.3     | >=1.2.3 <1.3.0   |\n| ~=1.2       | >=1.2.0 <2.0.0   |\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P06",
+      "project_group": "poetry",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "activated_shell_pid"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/managing-environments.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/poetry/docs/managing-environments.md",
+          "line_start": 79,
+          "line_end": 87,
+          "char_start": 2381,
+          "char_end": 2835,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+          "quote_sha256": "ada7c56e0be50d0aa04a77f33709c052be6364a4d49d4a8131bd6c5ee348f6e5",
+          "literal_quote": "## Activating the environment\n\n{{% note %}}\nLooking for `poetry shell`? It was moved to a plugin: [`poetry-plugin-shell`](https://github.com/python-poetry/poetry-plugin-shell)\n{{% /note %}}\n\nThe `poetry env activate` command prints the activate command of the virtual environment to the console.\nYou can run the output command manually or feed it to the eval command of your shell to activate the environment.\nThis way you won't leave the current shell.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P07",
+      "project_group": "poetry",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-P08",
+      "project_group": "poetry",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-T01",
+      "project_group": "textual",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/reactivity.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/reactivity.md",
+          "line_start": 28,
+          "line_end": 36,
+          "char_start": 840,
+          "char_end": 1260,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+          "quote_sha256": "cbc33f6f4bfec78c34e1dabec95a1c892b829b2b82264571918555639d926b79",
+          "literal_quote": "1. Create a string attribute with a default of `\"Paul\"`\n2. Creates an integer attribute with a default of `0`.\n3. Creates a boolean attribute with a default of `True`.\n\nThe `reactive` constructor accepts a default value as the first positional argument.\n\n!!! information\n\n    Textual uses Python's _descriptor protocol_ to create reactive attributes, which is the same protocol used by the builtin `property` decorator.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T02",
+      "project_group": "textual",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/reactivity.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/reactivity.md",
+          "line_start": 66,
+          "line_end": 72,
+          "char_start": 2449,
+          "char_end": 2866,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+          "quote_sha256": "a071a9629fc2c16cf95ef13ed85de7fbbc826aa51a995681e3b779d7ee4d002d",
+          "literal_quote": "## Smart refresh\n\nThe first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content.\n\n!!! information\n\n    If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T03",
+      "project_group": "textual",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/reactivity.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/reactivity.md",
+          "line_start": 99,
+          "line_end": 110,
+          "char_start": 3604,
+          "char_end": 4054,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+          "quote_sha256": "fcacf8d9ce36b7b360fd1b69d93bf3e29b8140b5202d91491f1c811e3a8de4a7",
+          "literal_quote": "### Disabling refresh\n\nIf you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`.\n\nThe following code illustrates how you create non-refreshing reactive attributes.\n\n```python\nclass MyWidget(Widget):\n    count = var(0)  # (1)!\n```\n\n1. Changing `self.count` wont cause a refresh or layout.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T04",
+      "project_group": "textual",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/reactivity.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/reactivity.md",
+          "line_start": 166,
+          "line_end": 173,
+          "char_start": 6273,
+          "char_end": 6722,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+          "quote_sha256": "815be0e6bddc19f8ae8d89d03fe1574846caf3ba9bfcd7f5bee1cdba044a457c",
+          "literal_quote": "## Watch methods\n\nWatch methods are another superpower.\nTextual will call watch methods when reactive attributes are modified.\nWatch method names begin with `watch_` followed by the name of the attribute, and should accept one or two arguments.\nIf the method accepts a single argument, it will be called with the new assigned value.\nIf the method accepts *two* positional arguments, it will be called with both the *old* value and the *new* value.\n\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T05",
+      "project_group": "textual",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/workers.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/workers.md",
+          "line_start": 55,
+          "line_end": 64,
+          "char_start": 2501,
+          "char_end": 3471,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+          "quote_sha256": "6c3e9d9412ab93d2342b0f5725108dfe168a4d272b06505933d3346a8b62c3bd",
+          "literal_quote": "The `run_worker` method schedules a new *worker* to run `update_weather`, and returns a [Worker][textual.worker.Worker] object. This happens almost immediately, so it won't prevent other messages from being processed. The `update_weather` function is now running concurrently, and will finish a second or two later.\n\n!!! tip\n\n    The [Worker][textual.worker.Worker] object has a few useful methods on it, but you can often ignore it as we did in `weather02.py`.\n\nThe call to `run_worker` also sets `exclusive=True` which solves an additional problem with concurrent network requests: when pulling data from the network, there is no guarantee that you will receive the responses in the same order as the requests.\nFor instance, if you start typing \"Paris\", you may get the response for \"Pari\" *after* the response for \"Paris\", which could show the wrong weather information.\nThe `exclusive` flag tells Textual to cancel all previous workers before starting the new one.\n\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T06",
+      "project_group": "textual",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "guaranteed_cancel_latency"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/workers.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/workers.md",
+          "line_start": 91,
+          "line_end": 94,
+          "char_start": 4932,
+          "char_end": 5194,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+          "quote_sha256": "485b6d87a27d849d5283beca0ae184d0abbc2e35a47f55a6218783bacf1c9bef",
+          "literal_quote": "### Cancelling workers\n\nYou can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].\nThis will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T07",
+      "project_group": "textual",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "thread_scheduling_policy"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/workers.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/textual/docs/guide/workers.md",
+          "line_start": 153,
+          "line_end": 159,
+          "char_start": 8227,
+          "char_end": 8911,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+          "quote_sha256": "15dcc2a0be540adcf682e28215e01ca3b281629f67ff1aeb542e8c12122a2be0",
+          "literal_quote": "You can create threads by setting `thread=True` on the `run_worker` method or the `work` decorator.\nThe API for thread workers is identical to async workers, but there are a few differences you need to be aware of when writing code for thread workers.\n\nThe first difference is that you should **avoid calling methods on your UI directly** from a threaded worker, or setting reactive variables.\nYou can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread.\n\nThe second difference is that you can't cancel threads in the same way as coroutines, but you *can* manually check if the worker was cancelled.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T08",
+      "project_group": "textual",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-V01",
+      "project_group": "vite",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/env-and-mode.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/vite/docs/guide/env-and-mode.md",
+          "line_start": 32,
+          "line_end": 54,
+          "char_start": 1309,
+          "char_end": 2327,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31",
+          "quote_sha256": "f91c87588ea23e08d83c83a8dffd9fab1ef6927204b99242d7778a3f0d2ba03d",
+          "literal_quote": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\nThe parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not. You can test this by adding the following to your code:\n\n```js\nconsole.log(import.meta.env.VITE_SOME_KEY) // \"123\"\nconsole.log(import.meta.env.DB_PASSWORD) // undefined\n```\n\nIf you want to customize the env variables prefix, see the [envPrefix](/config/shared-options.html#envprefix) option.\n\n:::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V02",
+      "project_group": "vite",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/env-and-mode.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/vite/docs/guide/env-and-mode.md",
+          "line_start": 73,
+          "line_end": 81,
+          "char_start": 3071,
+          "char_end": 3802,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31",
+          "quote_sha256": "09b32b07984e189d66ded1dc567fb2f5e60741bf062575581ea19ee6c8ec5269",
+          "literal_quote": ":::tip Env Loading Priorities\n\nAn env file for a specific mode (e.g. `.env.production`) will take higher priority than a generic one (e.g. `.env`).\n\nVite will always load `.env` and `.env.local` in addition to the mode-specific `.env.[mode]` file. Variables declared in mode-specific files will take precedence over those in generic files, but variables defined only in `.env` or `.env.local` will still be available in the environment.\n\nIn addition, environment variables that already exist when Vite is executed have the highest priority and will not be overwritten by `.env` files. For example, when running `VITE_SOME_KEY=123 vite build`.\n\n`.env` files are loaded at the start of Vite. Restart the server after making changes.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V03",
+      "project_group": "vite",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/config/server-options.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/vite/docs/config/server-options.md",
+          "line_start": 63,
+          "line_end": 68,
+          "char_start": 3036,
+          "char_end": 3277,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+          "quote_sha256": "b48785938f00a7a1b05227abba3938f1faf4d42399b3551292d1ea4d6102d77f",
+          "literal_quote": "## server.port\n\n- **Type:** `number`\n- **Default:** `5173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V04",
+      "project_group": "vite",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/config/server-options.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/vite/docs/config/server-options.md",
+          "line_start": 70,
+          "line_end": 74,
+          "char_start": 3278,
+          "char_end": 3429,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+          "quote_sha256": "19338f093410684065efefac4d33b0d44892b605a34f97415df20810acbde612",
+          "literal_quote": "## server.strictPort\n\n- **Type:** `boolean`\n\nSet to `true` to exit if port is already in use, instead of automatically trying the next available port.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V05",
+      "project_group": "vite",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/guide/assets.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/vite/docs/guide/assets.md",
+          "line_start": 108,
+          "line_end": 124,
+          "char_start": 3656,
+          "char_end": 4595,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+          "quote_sha256": "2548971bd60fdcc3cab0a66d1490f97bc76af49ca1fc16982a8e6d3a7d5cacdf",
+          "literal_quote": "## The `public` Directory\n\nIf you have assets that are:\n\n- Never referenced in source code (e.g. `robots.txt`)\n- Must retain the exact same file name (without hashing)\n- ...or you simply don't want to have to import an asset first just to get its URL\n\nThen you can place the asset in a special `public` directory under your project root. Assets in this directory will be served at root path `/` during dev, and copied to the root of the dist directory as-is.\n\nThe directory defaults to `<root>/public`, but can be configured via the [`publicDir` option](/config/shared-options.md#publicdir).\n\nNote that you should always reference `public` assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`.\n\n::: tip Choosing between imports and the `public` directory\n\nIn general, prefer **importing assets** unless you specifically need the guarantees provided by the `public` directory.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V06",
+      "project_group": "vite",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "fs_deny_status"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/config/server-options.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/vite/docs/config/server-options.md",
+          "line_start": 379,
+          "line_end": 384,
+          "char_start": 16109,
+          "char_end": 16261,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+          "quote_sha256": "e329597c168961df61bb6cae9cd23baf394db117beca47c3012010edc6e127b0",
+          "literal_quote": "## server.fs.strict\n\n- **Type:** `boolean`\n- **Default:** `true` (enabled by default since Vite 2.7)\n\nRestrict serving files outside of workspace root.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V07",
+      "project_group": "vite",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-V08",
+      "project_group": "vite",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-E01",
+      "project_group": "eslint",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/src/use/configure/configuration-files.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/configuration-files.md",
+          "line_start": 19,
+          "line_end": 30,
+          "char_start": 584,
+          "char_end": 1142,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+          "literal_quote": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\nIt should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E02",
+      "project_group": "eslint",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/src/use/configure/configuration-files.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/configuration-files.md",
+          "line_start": 782,
+          "line_end": 793,
+          "char_start": 31142,
+          "char_end": 31856,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "quote_sha256": "21c9560771acff5fac8547fc1ebde48c0f41aef68ccd1fc49b902ab318ffbcbf",
+          "literal_quote": "## Configuration File Resolution\n\nWhen ESLint is run on the command line, it determines configuration for each target file by first looking in the directory that contains the file and then searching up ancestor directories until it finds an `eslint.config.*` file. This behavior improves support for monorepos, where subdirectories can have their own configuration files.\n\nYou can prevent this search by using the `-c` or `--config` option on the command line to specify an alternate configuration file, such as:\n\n{{ npx_tabs({\n    package: \"eslint\",\n    args: [\"--config\", \"some-other-file.js\", \"**/*.js\"]\n}) }}\n\nIn this case, ESLint does not search for configuration files and instead uses `some-other-file.js`.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E03",
+      "project_group": "eslint",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/src/use/command-line-interface.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/command-line-interface.md",
+          "line_start": 373,
+          "line_end": 381,
+          "char_start": 13171,
+          "char_end": 13714,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+          "quote_sha256": "41c9ed94707d3db296cb930cb04836f97b31b51304fa29cf8b3a9a931c9cf356",
+          "literal_quote": "#### `--fix-dry-run`\n\nThis option has the same effect as `--fix` with the difference that the fixes are not saved to the file system. Because the default formatter does not output the fixed code, you'll have to use another formatter (e.g. `--format json`) to get the fixes.\n\n- **Argument Type**: No argument.\n\nThis makes it possible to fix code from `stdin` when used with the `--stdin` flag.\n\nThis flag can be useful for integrations (e.g. editor plugins) which need to autofix text from the command line without saving it to the filesystem.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E04",
+      "project_group": "eslint",
+      "answerability": "within_budget",
+      "expected_response": "grounded_answer",
+      "required_claim_count": 1,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [],
+      "gold_ranges": [
+        {
+          "claim_id": "required",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/src/use/configure/ignore.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/ignore.md",
+          "line_start": 24,
+          "line_end": 48,
+          "char_start": 928,
+          "char_end": 2018,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+          "quote_sha256": "6f4f7f3a861ae61767c6410276be423dc148d9d7c05a27d80488ab45d4605b31",
+          "literal_quote": "## Ignore Files\n\nIn your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([globalIgnores([\".config/*\"])]);\n```\n\nThis configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.\n\nBy default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),\n]);\n```\n\nWhen non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E05",
+      "project_group": "eslint",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "jiti_startup_overhead"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/src/use/configure/configuration-files.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/configuration-files.md",
+          "line_start": 795,
+          "line_end": 809,
+          "char_start": 31857,
+          "char_end": 32553,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "quote_sha256": "ccd5d54cd38e1311a8dedb21f239c1af8b461246390443dc99e33fc67c158475",
+          "literal_quote": "## TypeScript Configuration Files\n\nFor Deno and Bun, TypeScript configuration files are natively supported; for Node.js, you must install the optional dev dependency [`jiti`](https://github.com/unjs/jiti) in version 2.2.0 or later in your project (this dependency is not automatically installed by ESLint):\n\n{{ npm_tabs({\n    command: \"install\",\n    packages: [\"jiti\"],\n    args: [\"--save-dev\"]\n}) }}\n\nYou can then create a configuration file with a `.ts`, `.mts`, or `.cts` extension, and export an array of [configuration objects](#configuration-objects).\n\n::: important\nESLint does not perform type checking on your configuration file and does not apply any settings from `tsconfig.json`.\n:::\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E06",
+      "project_group": "eslint",
+      "answerability": "partial",
+      "expected_response": "partial_with_explicit_gap",
+      "required_claim_count": 2,
+      "supported_claim_count": 1,
+      "unavailable_claim_ids": [
+        "auto_worker_count_8_core"
+      ],
+      "gold_ranges": [
+        {
+          "claim_id": "documented_part",
+          "witness_set_index": 0,
+          "part_index": 0,
+          "source_path": "docs/src/use/command-line-interface.md",
+          "local_source_path": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/command-line-interface.md",
+          "line_start": 1020,
+          "line_end": 1028,
+          "char_start": 35795,
+          "char_end": 36152,
+          "span_convention": "Unicode code points [start,end), 1-based inclusive lines",
+          "source_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+          "quote_sha256": "5730caf85f20523286c069218262bdad3a52c96d66b44f0d594ba9dc68273a06",
+          "literal_quote": "#### `--concurrency`\n\nThis option controls the number of worker threads used to lint files.\n\n- **Argument Type**: Int|String. A positive integer, `auto` or `off`.\n- **Multiple Arguments**: No\n- **Default Value**: `off`\n\nThe value `off` causes all files to be linted in the main thread. The value `auto` attempts to determine the best setting automatically.\n",
+          "range_in_bounds": true
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E07",
+      "project_group": "eslint",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    },
+    {
+      "case_id": "V40-E08",
+      "project_group": "eslint",
+      "answerability": "unanswerable",
+      "expected_response": "abstention_or_clarification",
+      "required_claim_count": 1,
+      "supported_claim_count": 0,
+      "unavailable_claim_ids": [
+        "unsupported_request"
+      ],
+      "gold_ranges": []
+    }
+  ]
+}

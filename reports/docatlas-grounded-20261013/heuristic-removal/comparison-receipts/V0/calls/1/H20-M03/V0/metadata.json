@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M03",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "What are MkDocs' default docs_dir and site_dir, how are their relative paths resolved, and what is the default automatic backup interval in hours?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "3842eea28f242c303df25376a4fcfe184b867a48ccaf6aa6b0c0a9950987a80b",
+  "utf8_bytes": 6581,
+  "tokens": 1930,
+  "seconds": 1.3926146319990949,
+  "cpu_seconds": 1.3861540370000114,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

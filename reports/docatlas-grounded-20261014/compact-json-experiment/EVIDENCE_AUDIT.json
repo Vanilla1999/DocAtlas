@@ -1,0 +1,354 @@
+{
+  "cases": [
+    {
+      "case_id": "V40-P03",
+      "pool_count": 167,
+      "full_pool_native_bytes_hashes_ranges": true,
+      "upstream_stages": {
+        "_search_rows.output": {
+          "equal": true,
+          "counts": [
+            167,
+            167
+          ]
+        },
+        "acquire_candidates.output": {
+          "equal": true,
+          "counts": [
+            167,
+            167
+          ]
+        },
+        "select_experimental_candidates.output": {
+          "equal": true,
+          "counts": [
+            167
+          ]
+        },
+        "project_native_rank_context.output": {
+          "equal": true,
+          "counts": [
+            167
+          ]
+        },
+        "project_docs_context.output": {
+          "equal": true,
+          "counts": [
+            167
+          ]
+        }
+      },
+      "prebudget_gold": {
+        "claims": [
+          {
+            "claim_id": "required",
+            "documented": true,
+            "covered": true,
+            "witness_sets": [
+              {
+                "set_index": 0,
+                "covered": true,
+                "parts": [
+                  {
+                    "witness_id": "V40-P03/required/set-0/part-0",
+                    "path": "docs/configuration.md",
+                    "line_start": 102,
+                    "line_end": 114,
+                    "covered": true,
+                    "char_start": 2805,
+                    "char_end": 3320,
+                    "expected_characters": 515,
+                    "covered_characters": 515,
+                    "missing_char_ranges": [],
+                    "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                    "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "required_claim_count": 1,
+        "documented_claim_count": 1,
+        "covered_documented_claim_count": 1,
+        "all_documented_claims_covered": true,
+        "missing_documented_claim_ids": [],
+        "unavailable_requested_claim_ids": [],
+        "missing_witness_ids": [],
+        "errors": []
+      },
+      "targets": [
+        {
+          "position": 10,
+          "evidence_id": "ev-b4d3b6ba91977fb0",
+          "path": "docs/configuration.md",
+          "lines": [
+            102,
+            111
+          ],
+          "chars": [
+            2805,
+            3247
+          ],
+          "raw_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "snippet_sha256": "b41f32dda72225c91cf43dc88a6873e6da713da3855b245739cabec5397709da",
+          "arms": {
+            "A": {
+              "selected": true,
+              "omitted": false,
+              "reason": "retained",
+              "trials": [
+                {
+                  "cost": 2943,
+                  "cap": 12000,
+                  "selected_before": 9
+                }
+              ]
+            },
+            "C": {
+              "selected": true,
+              "omitted": false,
+              "reason": "retained",
+              "trials": [
+                {
+                  "cost": 2668,
+                  "cap": 12000,
+                  "selected_before": 9
+                }
+              ]
+            }
+          }
+        },
+        {
+          "position": 74,
+          "evidence_id": "ev-a812eb10d506dbdf",
+          "path": "docs/configuration.md",
+          "lines": [
+            112,
+            121
+          ],
+          "chars": [
+            3247,
+            3446
+          ],
+          "raw_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "snippet_sha256": "5c7af9651799241fe6a73013580691e0f3aed2179eeeaa0a7f2ef75e47116689",
+          "arms": {
+            "A": {
+              "selected": false,
+              "omitted": true,
+              "reason": "full_DTO_cost_exceeds_12000",
+              "trials": [
+                {
+                  "cost": 12107,
+                  "cap": 12000,
+                  "selected_before": 42
+                }
+              ]
+            },
+            "C": {
+              "selected": false,
+              "omitted": true,
+              "reason": "full_DTO_cost_exceeds_12000",
+              "trials": [
+                {
+                  "cost": 12032,
+                  "cap": 12000,
+                  "selected_before": 46
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "raw_source_sha256": {
+        "docs/managing-environments.md": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+        "docs/configuration.md": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+        "docs/dependency-specification.md": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c"
+      },
+      "selected_binding_counts": {
+        "A": 42,
+        "C": 47
+      },
+      "full_DTO_roundtrip": true,
+      "top_level_schema_equal": true
+    },
+    {
+      "case_id": "V40-E01",
+      "pool_count": 256,
+      "full_pool_native_bytes_hashes_ranges": true,
+      "upstream_stages": {
+        "_search_rows.output": {
+          "equal": true,
+          "counts": [
+            256,
+            256
+          ]
+        },
+        "acquire_candidates.output": {
+          "equal": true,
+          "counts": [
+            256,
+            256
+          ]
+        },
+        "select_experimental_candidates.output": {
+          "equal": true,
+          "counts": [
+            256
+          ]
+        },
+        "project_native_rank_context.output": {
+          "equal": true,
+          "counts": [
+            256
+          ]
+        },
+        "project_docs_context.output": {
+          "equal": true,
+          "counts": [
+            256
+          ]
+        }
+      },
+      "prebudget_gold": {
+        "claims": [
+          {
+            "claim_id": "required",
+            "documented": true,
+            "covered": true,
+            "witness_sets": [
+              {
+                "set_index": 0,
+                "covered": true,
+                "parts": [
+                  {
+                    "witness_id": "V40-E01/required/set-0/part-0",
+                    "path": "docs/src/use/configure/configuration-files.md",
+                    "line_start": 19,
+                    "line_end": 30,
+                    "covered": true,
+                    "char_start": 584,
+                    "char_end": 1141,
+                    "expected_characters": 557,
+                    "covered_characters": 557,
+                    "missing_char_ranges": [],
+                    "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                    "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "required_claim_count": 1,
+        "documented_claim_count": 1,
+        "covered_documented_claim_count": 1,
+        "all_documented_claims_covered": true,
+        "missing_documented_claim_ids": [],
+        "unavailable_requested_claim_ids": [],
+        "missing_witness_ids": [],
+        "errors": []
+      },
+      "targets": [
+        {
+          "position": 137,
+          "evidence_id": "ev-81a761ec39a96882",
+          "path": "docs/src/use/configure/configuration-files.md",
+          "lines": [
+            19,
+            29
+          ],
+          "chars": [
+            584,
+            993
+          ],
+          "raw_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "snippet_sha256": "806e04ca3f9cec0dccecd0879ffdb4d8909a546cd0e6d8710f98fc8e62a69afb",
+          "arms": {
+            "A": {
+              "selected": false,
+              "omitted": true,
+              "reason": "full_DTO_cost_exceeds_12000",
+              "trials": [
+                {
+                  "cost": 12173,
+                  "cap": 12000,
+                  "selected_before": 39
+                }
+              ]
+            },
+            "C": {
+              "selected": false,
+              "omitted": true,
+              "reason": "full_DTO_cost_exceeds_12000",
+              "trials": [
+                {
+                  "cost": 12130,
+                  "cap": 12000,
+                  "selected_before": 43
+                }
+              ]
+            }
+          }
+        },
+        {
+          "position": 141,
+          "evidence_id": "ev-32a300c0f3731199",
+          "path": "docs/src/use/configure/configuration-files.md",
+          "lines": [
+            30,
+            45
+          ],
+          "chars": [
+            993,
+            1324
+          ],
+          "raw_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "snippet_sha256": "2df6394c74e954a23c3660fc0505a1f190571772f63282e05a9bb26dcb46e4d4",
+          "arms": {
+            "A": {
+              "selected": false,
+              "omitted": true,
+              "reason": "full_DTO_cost_exceeds_12000",
+              "trials": [
+                {
+                  "cost": 12173,
+                  "cap": 12000,
+                  "selected_before": 39
+                }
+              ]
+            },
+            "C": {
+              "selected": false,
+              "omitted": true,
+              "reason": "full_DTO_cost_exceeds_12000",
+              "trials": [
+                {
+                  "cost": 12130,
+                  "cap": 12000,
+                  "selected_before": 43
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "raw_source_sha256": {
+        "docs/src/use/command-line-interface.md": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+        "docs/src/use/configure/configuration-files.md": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+        "docs/src/use/configure/ignore.md": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e"
+      },
+      "selected_binding_counts": {
+        "A": 39,
+        "C": 43
+      },
+      "full_DTO_roundtrip": true,
+      "top_level_schema_equal": true
+    }
+  ],
+  "frozen_inputs_unchanged": true,
+  "evaluator_sha256": "32cf91a78807d1cb5709edb140cc1ff62ad4027023cb4a382c702403188921fa",
+  "gold_sha256": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc",
+  "product_calls": 0
+}

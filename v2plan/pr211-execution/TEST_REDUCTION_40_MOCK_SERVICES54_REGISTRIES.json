@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "packet": "/tmp/opencode/pr211-fail-mock-services.json",
+  "sha256": "db4ac6827848ddf427b9f817b9a55811d17adc4db31fbcecf1500d94c7996eb2",
+  "removed": 54, "added": 0,
+  "BASE_status": {"FAIL": 54}, "saved_CI_status": {"FAIL": 54},
+  "failure_text_hashes_verified": 54,
+  "already_absent_prior_count": 3,
+  "prior_boundary": "Three already-absent IDs belong to earlier integrated removals; no new credit.",
+  "final_testfile_hashes": {
+    "tests/test_docs_service.py": "cbaad075bbdf6b40840a58bb9a2670ac8c1736a8f2f8c5d0b0db4a29ad42467e",
+    "tests/test_docs_service_part02.py": "b11cf21060e325ff4f9607f9e307a4d2a4370c3a8f3a2a3c73ede4f90b261f0a",
+    "tests/test_docs_service_part03.py": "82339b4d5dee7ad34423a950ad1981fce884fdc62d7915d6d5a893bf4e4b1d9e",
+    "tests/test_docs_service_part04.py": "399028a91f9ba464c92f5618ef15867ede88db2345325a92a5a493a7c6591733",
+    "tests/test_docs_service_part05.py": "781d4d47812c80fd050cf87b91064156eb92d222b6e6b87c3ee7824daa20fa96",
+    "tests/test_docs_service_part06.py": "29834a6214a5b77ae60186e5c65c9898a69d618ce6e7ad8f9494e87095b92510",
+    "tests/test_docs_service_part07.py": "fdd8a13e3e36a5b0792ab3d43be4d9b0a1a44b4fcacf6ae2bf927fefa94f1d49",
+    "tests/test_docs_service_part08.py": "735074ac697ab49e3b2a941483b9f58b0ec4b0696a2e6f2dddd567d073c56b61",
+    "tests/test_docs_service_part09.py": "e6f07d3b7dd6e7c67a585c7b9dfa53ede064ae1a50fb2447a67ee1f40c5697c5",
+    "tests/test_docs_service_part10.py": "8b5a2c19bebbf55459b5c57219ddcff443e2e011d234cba2e244a530f6a4596d",
+    "tests/test_query_planning.py": "a86cc05ac7b193e511e3b674866538020f2435c610b1b4b4e45ed3d8cc253f25",
+    "tests/test_tool_selection_policy.py": "1c88d28ade48355e3520c30c7697ac19a567d330eee3853f881f441e81954fe2",
+    "tests/test_internal_noise_filter.py": "c93bd3c7be28b9dec8d82b26a94f5bc5675a4d004d3fc86eacc55d1ee5b94904"
+  },
+  "registry_updates": {
+    "tests/diagnostic_labels.json": {
+      "tests/test_docs_service.py": "046ecad101761e2b52ecd92db0ff7e9c4cc460d012012773f5068c88dfcef959",
+      "tests/test_docs_service_part02.py": "e7e0c610a873ea1d4e7bd1aaca0b78d10e976c59a0867a414b129497751a0feb",
+      "tests/test_docs_service_part04.py": "d6e7785108fec0cf3934f8fa7efd0331e8dc430855d13bf2b8691c293b696fb5",
+      "tests/test_docs_service_part05.py": "ddbe31ce77b9d56bd08ee653da0c38786978dfd53a73e7eece37c85f25e16832",
+      "tests/test_docs_service_part06.py": "c34b3224ed1fc1bfddb794bd05977d1781f2296ea28ce576eb42ae41ae4ccd10",
+      "tests/test_docs_service_part07.py": "207874b4cdde095a8cca35756da4c2aaea0bf795ccbbee1ee3fed4de14e450c1",
+      "tests/test_docs_service_part08.py": "6f231eafa94a09904a16153ef32a286cde9f046d5482a59e9d42f61404e6d222",
+      "tests/test_docs_service_part09.py": "b68b3506fd0a68fa7eadf878683fb9ab8bfc9e517d52bdd870900ded03fe289a",
+      "tests/test_docs_service_part10.py": "0732d2351f74fb5f6e0d6d2068e464cd40773766b146e14b983051620991fb64",
+      "tests/test_query_planning.py": "ab48579dbd77185f7299585de6ec564c24b7b4c91d60ce134d2e724400500287",
+      "tests/test_tool_selection_policy.py": "c2bdf39f7063ee0033b2a2960b4f116dd9984e671b9a36d55b004b1ca2020497",
+      "tests/test_internal_noise_filter.py": "28d9a7099cf7f42048bdc4511a1dfe19667145b25ade90b31f0b4d0f30af7055"
+    }
+  },
+  "registry_method": "All54 diagnostic failure-text proposals verified against saved XML. Survivor registry hashes use normalized frozen BASE minus all integrated removals, sorted unique newline-joined SHA256; current textual definitions match survivors. No helpers, consumers or active-path labels removed. Historical findings in source retained rows and audit_sources preserved.",
+  "retained_red_integration_count": 119,
+  "retained_boundary": "Exact119 retained IDs and heterogeneous real filesystem/index/library/public-service boundaries remain hash-bound in original packet; no broad production equivalence or PASS claim.",
+  "deferred_paths": [],
+  "proof": {"run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b", "junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238", "boundary": "Saved core3.11 pre-retirement, not final runtime/collection. Current13 settled file hashes match author receipt. Owner FAIL retirement accepts coverage loss, not product repair/PASS. No runtime/AST/project imports/CI."},
+  "validation": {"partition": 8291, "overlap_previous": 0, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "removed": 838, "added": 1, "net": 837, "projected_after": 7454, "target_gap": 2480, "classified": 1460, "unclassified": 6831},
+  "prior_manifest_sha256": "8bce4c9ec8fd42267bed1d26449af5e486ccd524f235c0ddbbd84052796361e2",
+  "pending": "Active DOCS projectcontextservice/part02, projectmetadatareader, docsimpact/task20/task20part02, docscontextcompoundprojection, context7styleprojectchat, contextlossboundaries; ROOT unifieddocscontext/part02/mcp/mcppart02, mcpcodecontexttool, snippetfirstservices, dictionaryexitdiscovery/patch/corpuspolicy/callableresiduals packets and their registry entries excluded. No overlap with registry changes here; final collection/CI pending."
+}

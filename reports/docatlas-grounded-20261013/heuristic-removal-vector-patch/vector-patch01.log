@@ -1,0 +1,294 @@
+F..F                                                                     [100%]
+=================================== FAILURES ===================================
+__ test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only __
+
+tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ec376f37a0>
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x76ec37718680>
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), <=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.delenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", raising=False)
+            env.delenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", raising=False)
+            inventory = runtime.index_project(service, config, root)
+            snapshots(inventory, root, OPTICS_DOCUMENTS)
+            before, initial_files = database(inventory["storage_path"]), files(root)
+            packets = []
+            for trace in (False, True, False):
+                with query_trace(trace):
+                    payload = context(service, root, OPTICS_QUESTION)
+                assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
+                facts(payload, root, OPTICS_FACTS)
+                packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
+                facts(packed, root, OPTICS_FACTS)
+                assert packed["tokens"] <= 12000
+                packets.append(payload)
+            assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
+            record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
+            old_row = next(row for row in packets[0]["sources"]
+                           if relative_path(row["path_or_url"], root) == "docs/issue.md")
+            read_source(service, old_row, root, OPTICS_DOCUMENTS)
+            partial = context(service, root,
+                              "How must lenses be packed for an observation trip, and what is the helicopter refuelling schedule?")
+            assert not integrity(partial, root, OPTICS_DOCUMENTS)["errors"]
+            facts(partial, root, {"docs/packing.md": OPTICS_FACTS["docs/packing.md"]})
+            assert partial.get("answer_supported") is False and partial.get("answer_available") is False
+            assert partial.get("edit_ready") is False
+            lookup = context(service, root, "Explain the observatory's night-travel checklist.",
+                             lookup_queries=[OPTICS_QUESTION])
+            assert not integrity(lookup, root, OPTICS_DOCUMENTS)["errors"]
+            facts(lookup, root, OPTICS_FACTS)
+            assert lookup.get("answer_supported") is False and lookup.get("edit_ready") is False
+            assert not lookup.get("covered_query_ids")
+            patch_context = context(service, root, OPTICS_QUESTION, context_format="patch_context")
+>           assert patch_context.get("edit_ready") is False
+E           AssertionError: assert None is False
+E            +  where None = <built-in method get of dict object at 0x76ec376ff540>('edit_ready')
+E            +    where <built-in method get of dict object at 0x76ec376ff540> = {'status': 'failed', 'error': {'reason_code': 'validation_error', 'message': 'invalid arguments for get_docs_context at <root>', 'exception_type': None, 'retryable': False, ...}, 'warnings': []}.get
+
+tests/test_heuristic_removal_public_integration.py:97: AssertionError
+----------------------------- Captured stderr call -----------------------------
+{"event":"docatlas_request_start","request_id":"935b84213cfd48d6b31fe92675fef49c","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event": "docatlas_query_trace", "request_id": "935b84213cfd48d6b31fe92675fef49c", "projection_observation": {"schema_version": 1, "callback_stage": "after_model_visible_validation", "delivery_blocked": false, "final_callback": {"kind": "docs_context", "status": "ok", "context_available": true, "answer_supported": false, "answer_available": false, "edit_ready": false, "sources": {"observation": "recorded", "recorded_count": 4, "producer_count": 4, "producer_omitted": 0, "preview_count": 4, "preview_omitted": 0, "items": [{"evidence_id": "ev-c394e39ce5dc3ace"}, {"evidence_id": "ev-418120400e51f375"}, {"evidence_id": "ev-8d45a966fe0f984c"}, {"evidence_id": "ev-39e8e9dac4f15086"}]}}, "upstream_received": {"prepared_parents": {"prepared_enabled": false, "documents": 2, "prepared_hits": 0, "parser_calls": 2, "parser_ms": 0.10716900214902125, "parent_rows": 0, "parent_selects": 0, "prepared_read_ms": 0.0, "prepared_verification_ms": 0.0, "miss_reasons": {"observation": "recorded", "recorded_count": 0, "producer_count": 0, "producer_omitted": 0, "preview_count": 0, "preview_omitted": 0, "items": []}}, "retrieved_candidates": {"observation": "recorded", "recorded_count": 4, "producer_count": null, "producer_omitted": null, "preview_count": 4, "preview_omitted": 0, "items": [{"stable_chunk_id": "child-c4627d03837359f1692833a8b0ce0399fbac4f99", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/issue.md"}, {"stable_chunk_id": "child-4910b93215ce9eff5e162c81ef05b12f650261a2", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/packing.md"}, {"stable_chunk_id": "child-6cce8ae54272def2fab2cdeb70b5853dd75dff37", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/issue.md"}, {"stable_chunk_id": "child-dfecc2e09e88f0112af5ee26471622ac49ba484b", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/packing.md"}]}, "qualification_outcomes": {"observation": "recorded", "recorded_count": 4, "producer_count": null, "producer_omitted": null, "preview_count": 4, "preview_omitted": 0, "items": [{"stable_chunk_id": "child-c4627d03837359f1692833a8b0ce0399fbac4f99", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/issue.md", "query_id": "query-original", "outcome": "rejected", "reason": "source_valid_relevance_unassessed"}, {"stable_chunk_id": "child-4910b93215ce9eff5e162c81ef05b12f650261a2", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/packing.md", "query_id": "query-original", "outcome": "rejected", "reason": "source_valid_relevance_unassessed"}, {"stable_chunk_id": "child-6cce8ae54272def2fab2cdeb70b5853dd75dff37", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/issue.md", "query_id": "query-original", "outcome": "rejected", "reason": "source_valid_relevance_unassessed"}, {"stable_chunk_id": "child-dfecc2e09e88f0112af5ee26471622ac49ba484b", "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/project/docs/packing.md", "query_id": "query-original", "outcome": "rejected", "reason": "source_valid_relevance_unassessed"}]}}, "returned_core_diagnostics": {"ranked_candidates": {"observation": "missing"}, "prepared_qualified_variants": {"observation": "missing"}, "literal_context_admissions": {"observation": "missing"}, "core_payload_sources": {"observation": "missing"}, "decision_trace": {"observation": "missing"}, "joint_work": {"observation": "missing"}, "experimental_budget": {"limit": 12000, "input_cost": 1088, "output_cost": 1088, "measure": "max(o200k_base,utf8_bytes_div4)_mcp_json", "attempts": 0, "native_fallbacks": 0, "source_count": 4}, "experimental_source_recheck": {"checked": 4, "retained": 4, "routes": {"observation": "recorded", "recorded_count": 1, "producer_count": 1, "producer_omitted": 0, "preview_count": 1, "preview_omitted": 0, "items": [{"reason": "source_valid_unassessed", "count": 4}]}}, "experimental_native_restore": {"observation": "missing"}, "context_flow": {"observation": "recorded", "schema_version": 1, "event_count": 14, "omitted_events": 0, "event_limit": 256, "source_limit": 64, "diagnostic_character_limit": 262144, "diagnostic_error_count": 0, "recorded_events": 14, "serialization_omitted_events": 0, "events": [{"sequence": 1, "stage": "core.output", "event": "boundary", "observation": "recorded", "source_count": 4, "source_rows_omitted": 0, "rows": [{"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}], "serialization_omitted_source_rows": 0}, {"sequence": 2, "stage": "decoration.output", "event": "boundary", "observation": "recorded", "source_count": 4, "source_rows_omitted": 0, "rows": [{"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}], "serialization_omitted_source_rows": 0}, {"sequence": 3, "stage": "recheck.input", "event": "boundary", "observation": "recorded", "source_count": 4, "source_rows_omitted": 0, "active": true, "rows": [{"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}], "serialization_omitted_source_rows": 0}, {"sequence": 4, "stage": "recheck.attempt", "event": "recheck_attempt", "observation": "recorded", "call_sequence": 3, "row_ordinal": 0, "attempt_ordinal": 1, "derivation": "native", "seed_ordinal": null, "outcome": "accepted", "checkpoint": "complete", "axis": null, "reason": "source_valid_unassessed", "route": "source_valid_unassessed", "accepted_derivation": "native", "checked_visible_char_start": 0, "checked_visible_char_end": 250, "checked_native_char_start": 0, "checked_native_char_end": 250, "target": {"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, "native": {"source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250}}, {"sequence": 5, "stage": "recheck.row", "event": "recheck_row", "observation": "recorded", "call_sequence": 3, "row_ordinal": 0, "outcome": "retained", "reason": "source_valid_unassessed", "attempts": 1, "seed_count": 4, "seed_source_mismatches": 0, "seed_span_unavailable": 0, "seed_bounds_invalid": 0, "occurrence_available": null, "target": {"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}}, {"sequence": 6, "stage": "recheck.attempt", "event": "recheck_attempt", "observation": "recorded", "call_sequence": 3, "row_ordinal": 1, "attempt_ordinal": 1, "derivation": "native", "seed_ordinal": null, "outcome": "accepted", "checkpoint": "complete", "axis": null, "reason": "source_valid_unassessed", "route": "source_valid_unassessed", "accepted_derivation": "native", "checked_visible_char_start": 0, "checked_visible_char_end": 206, "checked_native_char_start": 0, "checked_native_char_end": 206, "target": {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, "native": {"source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206}}, {"sequence": 7, "stage": "recheck.row", "event": "recheck_row", "observation": "recorded", "call_sequence": 3, "row_ordinal": 1, "outcome": "retained", "reason": "source_valid_unassessed", "attempts": 1, "seed_count": 4, "seed_source_mismatches": 0, "seed_span_unavailable": 0, "seed_bounds_invalid": 0, "occurrence_available": null, "target": {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}}, {"sequence": 8, "stage": "recheck.attempt", "event": "recheck_attempt", "observation": "recorded", "call_sequence": 3, "row_ordinal": 2, "attempt_ordinal": 1, "derivation": "native", "seed_ordinal": null, "outcome": "accepted", "checkpoint": "complete", "axis": null, "reason": "source_valid_unassessed", "route": "source_valid_unassessed", "accepted_derivation": "native", "checked_visible_char_start": 250, "checked_visible_char_end": 323, "checked_native_char_start": 250, "checked_native_char_end": 323, "target": {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, "native": {"source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323}}, {"sequence": 9, "stage": "recheck.row", "event": "recheck_row", "observation": "recorded", "call_sequence": 3, "row_ordinal": 2, "outcome": "retained", "reason": "source_valid_unassessed", "attempts": 1, "seed_count": 4, "seed_source_mismatches": 0, "seed_span_unavailable": 0, "seed_bounds_invalid": 0, "occurrence_available": null, "target": {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}}, {"sequence": 10, "stage": "recheck.attempt", "event": "recheck_attempt", "observation": "recorded", "call_sequence": 3, "row_ordinal": 3, "attempt_ordinal": 1, "derivation": "native", "seed_ordinal": null, "outcome": "accepted", "checkpoint": "complete", "axis": null, "reason": "source_valid_unassessed", "route": "source_valid_unassessed", "accepted_derivation": "native", "checked_visible_char_start": 206, "checked_visible_char_end": 303, "checked_native_char_start": 206, "checked_native_char_end": 303, "target": {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}, "native": {"source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303}}, {"sequence": 11, "stage": "recheck.row", "event": "recheck_row", "observation": "recorded", "call_sequence": 3, "row_ordinal": 3, "outcome": "retained", "reason": "source_valid_unassessed", "attempts": 1, "seed_count": 4, "seed_source_mismatches": 0, "seed_span_unavailable": 0, "seed_bounds_invalid": 0, "occurrence_available": null, "target": {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}}, {"sequence": 12, "stage": "recheck.output", "event": "boundary", "observation": "recorded", "source_count": 4, "source_rows_omitted": 0, "call_sequence": 3, "active": true, "rows": [{"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}], "serialization_omitted_source_rows": 0}, {"sequence": 13, "stage": "budget.input", "event": "boundary", "observation": "recorded", "source_count": 4, "source_rows_omitted": 0, "active": true, "rows": [{"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}], "serialization_omitted_source_rows": 0}, {"sequence": 14, "stage": "budget.output", "event": "boundary", "observation": "recorded", "source_count": 4, "source_rows_omitted": 0, "active": true, "rows": [{"evidence_id": "ev-c394e39ce5dc3ace", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "26da7930d6aa067c3111d0c4", "reference_char_start": 0, "reference_char_end": 250, "line_start": 1, "line_end": 6, "visible_char_start": 0, "visible_char_end": 250, "visible_span_observation": "exact_occurrence", "snippet_sha256": "1d8ce090d2b15fe05211bd992d76386c885118d3ddd4683a7822784547683552", "snippet_characters": 250, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-418120400e51f375", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "c40261cc7ab55479b227f530", "reference_char_start": 0, "reference_char_end": 206, "line_start": 1, "line_end": 7, "visible_char_start": 0, "visible_char_end": 206, "visible_span_observation": "exact_occurrence", "snippet_sha256": "686b210fe6f14806346ef205769daa1f48c8ce6b6e380b26f7bad7c35e9b8d83", "snippet_characters": 206, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-8d45a966fe0f984c", "source_key": "262ad4a41f6fa17824db4c4f", "source_sha256": "6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9", "candidate_key": "6ee5690ae2d9c8e80f081fe5", "reference_char_start": 250, "reference_char_end": 323, "line_start": 7, "line_end": 9, "visible_char_start": 250, "visible_char_end": 323, "visible_span_observation": "exact_occurrence", "snippet_sha256": "238728a877ded2e80dcbc76bea9bdf0d9dbf534c93da238e844bba9cbc433039", "snippet_characters": 73, "snippet_hash_observation": "recorded"}, {"evidence_id": "ev-39e8e9dac4f15086", "source_key": "843b46d1da5c0b24afebcfe4", "source_sha256": "b07638e058cc56dfe9f22d9538e3fe16bcf6779c5bd4b61ca1b2832199487dfd", "candidate_key": "88627d18f88eafc1e66b22c0", "reference_char_start": 206, "reference_char_end": 303, "line_start": 8, "line_end": 10, "visible_char_start": 206, "visible_char_end": 303, "visible_span_observation": "exact_occurrence", "snippet_sha256": "0c96dae7fcf28605c36dad600ddd3f04585d753d21e28a9fd30a4a039a4559bc", "snippet_characters": 97, "snippet_hash_observation": "recorded"}], "serialization_omitted_source_rows": 0}]}}, "primary_attempt": {"observation": "missing"}, "hint_attempt": {"observation": "missing"}, "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."}}
+{"event":"docatlas_request_end","request_id":"935b84213cfd48d6b31fe92675fef49c","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":68.59,"trace_incomplete":false}
+___________ test_vector_runtime_preserves_source_windows_and_access ____________
+
+tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_vector_runtime_preserves_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ec377011c0>
+record_property = <function record_property.<locals>.append_property at 0x76ec346c6f20>
+
+    def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatch, record_property):
+        """Production ingest/runtime with SQLite+sqlite-vec; only embedding HTTP is substituted.
+    
+        The fixed embedding response proves rank delivery/access, not model relevance.
+        """
+        import httpx
+        from docmancer.agent import DocmancerAgent
+        from docmancer.core.config import DocmancerConfig, VectorStoreConfig
+        from docmancer.core.models import Document
+        from docmancer.retrieval.runtime import dispatcher_for_agent
+        from docmancer.core.product_identity import ensure_owned_home
+    
+        home = tmp_path / "home"
+        monkeypatch.setenv("DOCATLAS_HOME", str(home))
+        monkeypatch.setenv("OPENAI_API_KEY", "fixture-only-not-a-credential")
+        monkeypatch.setenv("OPENAI_BASE_URL", "https://embeddings.invalid/v1")
+        monkeypatch.delenv("DOCATLAS_AUTO_VECTORS", raising=False)
+        ensure_owned_home(home)
+        calls = []
+    
+        def embedding_transport(self, request):
+            assert str(request.url) == "https://embeddings.invalid/v1/embeddings"
+            body = json.loads(request.content)
+            calls.append(len(body["input"]))
+            return httpx.Response(200, json={
+                "object": "list", "model": body["model"],
+                "data": [{"object": "embedding", "index": index, "embedding": [1.0, 0.0, 0.0, 0.0]}
+                         for index, _ in enumerate(body["input"])],
+                "usage": {"prompt_tokens": 1, "total_tokens": 1},
+            })
+    
+        monkeypatch.setattr(httpx.HTTPTransport, "handle_request", embedding_transport)
+        config = DocmancerConfig()
+        config.index.db_path = str(tmp_path / "docs.db")
+        config.index.extracted_dir = str(tmp_path / "extracted")
+        config.embeddings.provider = "openai"
+        config.embeddings.model = "text-embedding-3-small"
+        config.embeddings.dimensions = 4
+        config.embeddings.cache = str(tmp_path / "embeddings")
+        config.vector_store = VectorStoreConfig(provider="sqlite-vec", options={"db_path": str(tmp_path / "vec.db")})
+        config.retrieval.default_mode = "hybrid"
+        config.retrieval.max_sections_per_source = 1
+        config.retrieval.hierarchical.auto = True
+        config.retrieval.hierarchical.auto_min_documents = 1
+        text = ("# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n"
+                "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n"
+                "# Observatory archive\n\nObservatory archive retains 41 nights.\n")
+        agent = DocmancerAgent(config=config)
+        agent.ingest_documents([
+            Document(source="observatory.md", content=text, metadata={"format": "markdown"}),
+            Document(source="secret.md", content="# Observatory\n\nObservatory secret is HIDDEN_97.\n",
+                     metadata={"format": "markdown"}),
+        ], with_vectors=True)
+        before = database(config.index.db_path)
+        evidence = []
+        for mode in ("dense", "hybrid"):
+>           result = dispatcher_for_agent(agent, mode=mode).run(
+                "observatory", mode=mode, limit=10, budget=4000, expand="none",
+                filters={"forbidden_sources": ["secret.md"]},
+            )
+
+tests/test_heuristic_removal_public_integration.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<string>:3: in __docatlas_shard_wrapper_run_76ec3945bce0
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <docmancer.retrieval.dispatch.RetrievalDispatcher object at 0x76ebdfd5cf50>
+query = 'observatory', mode = 'hybrid', limit = 10, budget = 4000
+expand = 'none', filters = {'forbidden_sources': ['secret.md']}
+requirements = None, allow_degraded = False
+
+    def run(
+        self,
+        query: str,
+        *,
+        mode: str | None = None,
+        limit: int | None = None,
+        budget: int | None = None,
+        expand: str | None = None,
+        filters: dict | None = None,
+        requirements: Any | None = None,
+        allow_degraded: bool = False,
+    ) -> DispatchResult:
+        configured_mode = getattr(getattr(self.config, "retrieval", None), "default_mode", None)
+        effective_mode = (
+            mode
+            or (configured_mode if isinstance(configured_mode, str) else None)
+            or "lexical"
+        ).lower()
+        from .experimental_acquisition import (
+            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
+            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+        )
+    
+        q_active = effective_mode == "lexical"
+        limit = min(40, limit or self.config.query.default_limit)
+        budget = budget or self.config.query.default_budget
+        per_source_limit = min(40, max(limit * 3, 20))
+    
+        # Only explicit filters choose scope; legacy query routers are inert.
+        merged_filters = self._apply_router(query, filters)
+        backend_filters = compile_backend_filters(merged_filters) or None
+        requested_lanes = (
+            ("lexical", "dense", "sparse")
+            if effective_mode == "hybrid"
+            else (effective_mode,)
+        )
+        query_plan = build_query_plan(
+            query, filters=merged_filters, requested_lanes=requested_lanes, requirements=requirements,
+        )
+        # The dispatcher only expands when this retrieval call or retrieval
+        # configuration requests it. Agent callers apply query.default_expand
+        # explicitly; treating it as implicit here disables compact source caps.
+        retrieval_expand = (
+            expand
+            or getattr(self.config.retrieval, "expand", None)
+        )
+        fusion_config_hash = canonical_hash({
+            "schema_version": "stable-child-rrf-v1",
+            "method": self.config.retrieval.fusion.method or "rrf",
+            "rrf_k": int(self.config.retrieval.fusion.rrf_k or 60),
+            "weights": dict(self.config.retrieval.fusion.weights or {}),
+            "candidate_limits": {"per_lane": 40, "fused": 60},
+            "post_fusion": {
+                "exact_supplement": "explicit-query-only-v1",
+                "intent_rerank": "retriever-order-preserved-v2",
+                "expand": retrieval_expand,
+                "max_sections_per_source": None,
+            },
+        })
+        if q_active:
+            fusion_config_hash = canonical_hash({
+                "schema_version": ACQUISITION_METHOD,
+                "candidate_ceiling": ACQUISITION_CANDIDATES,
+                "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
+                "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
+                "expansion": "none", "source_quota": None,
+            })
+    
+        def finalized(result: DispatchResult) -> DispatchResult:
+            result.query_plan_hash = query_plan.plan_hash
+            result.fusion_config_hash = fusion_config_hash
+            result.requirements_hash = query_plan.requirements_hash
+            result.requirements = query_plan.requirements
+            for final_rank, chunk in enumerate(result.chunks, start=1):
+                metadata = getattr(chunk, "metadata", None)
+                if isinstance(metadata, dict):
+                    metadata["query_plan_hash"] = query_plan.plan_hash
+                    metadata["fusion_config_hash"] = fusion_config_hash
+                    section_id = metadata.get("section_id")
+                    metadata["retrieval_trace"] = {
+                        "requested_mode": effective_mode,
+                        "mode_used": result.mode_used,
+                        "component_ranks": dict(result.contributions.get(section_id, {})),
+                        "pre_post_rank": metadata.pop("_pre_post_rank", final_rank),
+                        "intent_boost": metadata.pop("_intent_boost", 0.0),
+                        "supplemental_rank": metadata.pop("_supplemental_rank", None),
+                        "final_rank": final_rank,
+                    }
+            return result
+    
+        if q_active:
+            chunks = self.store.query(
+                query, limit=ACQUISITION_CANDIDATES,
+                budget=ACQUISITION_ESTIMATED_TOKENS, expand="none",
+                filters=backend_filters,
+            )
+            acquired_count = len(chunks)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            for chunk in chunks:
+                chunk.metadata.setdefault("acquisition", {}).update({
+                    "dispatcher_post_policy_rows": len(chunks),
+                    "delivery_limit_not_applied": limit,
+                    "delivery_budget_not_applied": budget,
+                })
+            return finalized(DispatchResult(
+                chunks=chunks,
+                contributions={
+                    c.metadata.get("section_id"): {"lexical": idx + 1}
+                    for idx, c in enumerate(chunks)
+                    if c.metadata.get("section_id") is not None
+                },
+                mode_used="lexical", candidate_counts={"lexical": acquired_count},
+            ))
+    
+        missing_capabilities: dict[str, str] = {}
+        if effective_mode != "lexical":
+            if self.vector_store is None:
+                missing_capabilities["vector"] = "vector store is not configured"
+            if self.provider is None:
+                missing_capabilities["embedding"] = "embedding provider is not configured"
+        if missing_capabilities and not allow_degraded:
+            raise HybridRetrievalError(missing_capabilities)
+    
+        if effective_mode == "lexical" or missing_capabilities:
+            query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
+            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
+            chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
+            return finalized(DispatchResult(
+                chunks=chunks,
+                contributions={c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if c.metadata.get("section_id") is not None},
+                mode_used=(
+                    "lexical"
+                    if effective_mode == "lexical"
+                    else f"{effective_mode}/lexical_fallback_degraded"
+                ),
+                candidate_counts={"lexical": len(chunks)},
+                failures=missing_capabilities,
+            ))
+    
+        ready_failure = self._vector_readiness_failure(effective_mode)
+        if ready_failure and not allow_degraded:
+>           raise HybridRetrievalError(ready_failure)
+E           docmancer.retrieval._dispatch_shared.HybridRetrievalError: hybrid retrieval failed in 1 source(s): vector: capability_mismatch:sparse_model. Pass --allow-degraded to fall back to the remaining signals, or run `doc-atlas doctor` to diagnose.
+
+docmancer/retrieval/_dispatch_part01.py:209: HybridRetrievalError
+==================================== PASSES ====================================
+_____________ test_public_library_native_context_isolates_versions _____________
+----------------------------- Captured stderr call -----------------------------
+{"event":"docatlas_request_start","request_id":"5639dd3f3f60401c97c36be4cea5b158","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event": "docatlas_query_trace", "request_id": "5639dd3f3f60401c97c36be4cea5b158", "projection_observation": {"schema_version": 1, "callback_stage": "after_model_visible_validation", "delivery_blocked": false, "final_callback": {"kind": "docs_answer", "status": "ok", "context_available": true, "answer_supported": false, "answer_available": false, "edit_ready": false, "sources": {"observation": "recorded", "recorded_count": 1, "producer_count": 1, "producer_omitted": 0, "preview_count": 1, "preview_omitted": 0, "items": [{"evidence_id": "child-f6f8122b176a432af41771a1a9a756c01098ec03"}]}}, "upstream_received": {"prepared_parents": {"observation": "missing"}, "retrieved_candidates": {"observation": "missing"}, "qualification_outcomes": {"observation": "missing"}}, "returned_core_diagnostics": {"observation": "missing"}, "primary_attempt": {"observation": "missing"}, "hint_attempt": {"observation": "missing"}, "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."}}
+{"event":"docatlas_request_end","request_id":"5639dd3f3f60401c97c36be4cea5b158","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":19.092,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"920e6f11f48947998214f95f7d154f0b","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event": "docatlas_query_trace", "request_id": "920e6f11f48947998214f95f7d154f0b", "projection_observation": {"schema_version": 1, "callback_stage": "after_model_visible_validation", "delivery_blocked": false, "final_callback": {"kind": "docs_answer", "status": "ok", "context_available": true, "answer_supported": false, "answer_available": false, "edit_ready": false, "sources": {"observation": "recorded", "recorded_count": 1, "producer_count": 1, "producer_omitted": 0, "preview_count": 1, "preview_omitted": 0, "items": [{"evidence_id": "child-7ac6d748996ecb08b168f52ea20f4d81a671944b"}]}}, "upstream_received": {"prepared_parents": {"observation": "missing"}, "retrieved_candidates": {"observation": "missing"}, "qualification_outcomes": {"observation": "missing"}}, "returned_core_diagnostics": {"observation": "missing"}, "primary_attempt": {"observation": "missing"}, "hint_attempt": {"observation": "missing"}, "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."}}
+{"event":"docatlas_request_end","request_id":"920e6f11f48947998214f95f7d154f0b","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":15.279,"trace_incomplete":false}
+2 failed, 2 passed in 3.38s

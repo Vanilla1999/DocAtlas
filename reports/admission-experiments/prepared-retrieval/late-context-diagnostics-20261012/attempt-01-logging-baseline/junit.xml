@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="12.119" timestamp="2026-10-12T13:12:14.457939-07:00" hostname="ea7bdae9a53c"><testcase classname="tests.test_native_context_preservation_integration" name="test_selected_native_context_survives_public_delivery_with_trace_parity" time="11.530"><properties><property name="scenarios" value="1" /><property name="prepare_calls_attempted" value="1" /><property name="context_calls_attempted" value="2" /><property name="context_calls_returned" value="2" /><property name="source_continuation_calls" value="0" /><property name="answer_generator_calls" value="0" /><property name="model_forwards" value="0" /><property name="optional_model_modules_before" value="{&quot;torch&quot;: false, &quot;transformers&quot;: false, &quot;safetensors&quot;: false}" /><property name="optional_model_modules_after" value="{&quot;torch&quot;: false, &quot;transformers&quot;: false, &quot;safetensors&quot;: false}" /></properties><failure message="AssertionError: {'trace-off': {'complete': False, 'required_char_start': 3278, 'required_char_end': 3428, 'missing_character_count': 1...-on': {'complete': False, 'required_char_start': 3278, 'required_char_end': 3428, 'missing_character_count': 150, ...}}&#10;assert False&#10; +  where False = all(&lt;generator object test_selected_native_context_survives_public_delivery_with_trace_parity.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fbd8055f920&gt;)">tmp_path = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/late-attempt-01-logging-baseline/test_selected_native_context_s0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbd81416ea0&gt;
+state_root = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/late-attempt-01-logging-baseline/test_selected_native_context_s0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7fbd8134bec0&gt;
+
+    def test_selected_native_context_survives_public_delivery_with_trace_parity(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        frozen = json.loads(INPUTS.read_text(encoding="utf-8"))
+        for item in frozen["frozen_corpus_inputs"] + frozen["sources"]:
+            data = (REPO / item.get("repo_path", item["path"])).read_bytes()
+            assert len(data) == item["bytes"] and _sha(data) == item["sha256"], item
+        witness = frozen["expected_final"]["gold_witness"]
+        assert _sha(witness["raw_text"].encode("utf-8")) == witness["raw_sha256"]
+        assert _sha(witness["raw_text"].strip().encode("utf-8")) == witness["outer_trimmed_sha256"]
+        documents = {item["path"]: (REPO / item["repo_path"]).read_text(encoding="utf-8")
+                     for item in frozen["sources"]}
+        raw_lines = documents[witness["path"]].splitlines(keepends=True)
+        assert "".join(raw_lines[witness["line_start"] - 1:witness["line_end"]]) == witness["raw_text"]
+        project = tmp_path / "projects" / frozen["project_group"]
+        output = Path(os.environ.get("PYTEST_DOCATLAS_ARTIFACT_DIR", str(tmp_path / "artifacts"))).resolve()
+        output = output / "V40-V04-budget"
+        assert not output.is_relative_to(project.resolve()) and not output.is_relative_to(state_root.resolve())
+        output.mkdir(parents=True, exist_ok=False)
+        _save(output / "inputs.json", {"frozen_inputs_sha256": _sha(INPUTS.read_bytes()), "inputs": frozen})
+        encoding = tiktoken.get_encoding("o200k_base")
+        imported_before = {name: name in sys.modules for name in ("torch", "transformers", "safetensors")}
+        runtime.write_project(project, documents)
+        operations = {"scenarios": 1, "prepare_calls_attempted": 0, "context_calls_attempted": 0,
+                      "context_calls_returned": 0, "source_continuation_calls": 0, "answer_generator_calls": 0}
+        records = {}
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            assert not output.is_relative_to(Path(config.index.db_path).resolve().parent)
+            for name, value in frozen["configuration"].items():
+                env.setenv(name, value)
+            operations["prepare_calls_attempted"] += 1
+            _save(output / "operations.json", operations)
+            inventory = runtime.index_project(service, config, project)
+            _save(output / "preparation.json", inventory)
+            _committed_documents(inventory, project, documents)
+            original_db, original_files = _database_state(inventory), _file_state(project)
+            arguments = {"question": frozen["question"], "project_path": str(project), "scope": "project"}
+            for enabled in (False, True):
+                mode = "trace-on" if enabled else "trace-off"
+                destination = output / mode
+                destination.mkdir()
+                before_db, before_files = _database_state(inventory), _file_state(project)
+                assert before_db == original_db and before_files == original_files
+                metadata = {"case_id": frozen["case_id"], "mode": "budget", "trace_enabled": enabled,
+                            "arguments": arguments, "status": "started", "same_initial_state": True,
+                            "database_sha256_before": _sha(repr(before_db).encode()),
+                            "files_sha256_before": _sha(repr(before_files).encode())}
+                _save(destination / "metadata.json", metadata)
+                operations["context_calls_attempted"] += 1
+                _save(output / "operations.json", operations)
+                receipts, stderr, payload = [], io.StringIO(), None
+                start, cpu = time.perf_counter(), time.process_time()
+                with experimental_selection_observer(receipts.append) as observation:
+                    try:
+                        with redirect_stderr(stderr), query_trace(enabled):
+                            payload = call_docs_tool_payload("get_docs_context", dict(arguments), service)
+                        metadata["status"] = "returned"
+                        operations["context_calls_returned"] += 1
+                    except Exception as exc:
+                        metadata.update(status="error", error_type=type(exc).__name__, error=str(exc))
+                    finally:
+                        metadata.update(elapsed_seconds=time.perf_counter() - start,
+                                        process_cpu_seconds=time.process_time() - cpu)
+                after_db, after_files = _database_state(inventory), _file_state(project)
+                metadata.update(observation_calls=observation.calls, observation_errors=observation.errors,
+                                database_unchanged=after_db == original_db, files_unchanged=after_files == original_files,
+                                database_sha256_after=_sha(repr(after_db).encode()),
+                                files_sha256_after=_sha(repr(after_files).encode()))
+                if payload is not None:
+                    wire = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
+                    (destination / "public-payload.json").write_bytes(wire)
+                    metadata.update(wire_sha256=_sha(wire), wire_utf8_bytes=len(wire),
+                                    utf8_quarter_proxy=(len(wire) + 3) // 4,
+                                    codec_o200k_base=len(encoding.encode(wire.decode("utf-8"), disallowed_special=())))
+                (destination / "trace.jsonl").write_text(stderr.getvalue(), encoding="utf-8")
+                _save(destination / "selection.json", receipts)
+                _save(destination / "metadata.json", metadata)
+                _save(output / "operations.json", operations)
+                records[mode] = {"payload": payload, "metadata": metadata, "receipts": receipts, "trace": stderr.getvalue()}
+                # A real state mutation stops before another call, never just a missing fact.
+                assert metadata["database_unchanged"] and metadata["files_unchanged"], metadata
+    
+            imported_after = {name: name in sys.modules for name in imported_before}
+            model_forwards = sum(receipt["selection"]["model_forwards"]
+                                 for record in records.values() for receipt in record["receipts"])
+            operations.update(model_forwards=model_forwards, optional_model_modules_before=imported_before,
+                              optional_model_modules_after=imported_after)
+            _save(output / "operations.json", operations)
+            for name, value in operations.items():
+                record_property(name, json.dumps(value) if isinstance(value, dict) else value)
+    
+            # Both outputs and their receipts exist before any completeness decision.
+            coverage = {}
+            for mode, record in records.items():
+                payload, metadata = record["payload"], record["metadata"]
+                assert metadata["status"] == "returned", metadata
+                _assert_packet_sources(payload, project, documents)
+                assert payload["context_available"] is True
+                for flag in ("answer_supported", "answer_available", "edit_ready"):
+                    assert payload[flag] is False
+                for row in payload["sources"]:
+                    assert row["version_binding"] == "unversioned"
+                    assert row["project_identity"] == "local:" + _sha(str(project.resolve()).encode())
+                assert max(metadata["utf8_quarter_proxy"], metadata["codec_o200k_base"]) &lt;= 12000
+                assert metadata["observation_calls"] == len(record["receipts"]) == 1
+                assert metadata["observation_errors"] == []
+                selection = record["receipts"][0]["selection"]
+                assert selection["mode"] == "budget" and selection["model_forwards"] == 0
+                coverage[mode] = _witness_coverage(payload, project, documents, witness)
+            _save(output / "witness-coverage.json", coverage)
+            assert imported_before == imported_after and model_forwards == 0
+            off, on = records["trace-off"], records["trace-on"]
+            assert _semantic_packet(off["payload"]) == _semantic_packet(on["payload"])
+            for field in ("pool", "complete_candidates", "excluded"):
+                assert off["receipts"][0][field] == on["receipts"][0][field], field
+            assert off["receipts"][0]["selection"]["selected_indices"] == on["receipts"][0]["selection"]["selected_indices"]
+            _assert_trace_contract(records)
+&gt;           assert all(result["complete"] for result in coverage.values()), coverage
+E           AssertionError: {'trace-off': {'complete': False, 'required_char_start': 3278, 'required_char_end': 3428, 'missing_character_count': 1...-on': {'complete': False, 'required_char_start': 3278, 'required_char_end': 3428, 'missing_character_count': 150, ...}}
+E           assert False
+E            +  where False = all(&lt;generator object test_selected_native_context_survives_public_delivery_with_trace_parity.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fbd8055f920&gt;)
+
+tests/test_native_context_preservation_integration.py:228: AssertionError</failure></testcase></testsuite></testsuites>

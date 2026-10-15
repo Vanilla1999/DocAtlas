@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-V06",
+  "mode": "mini",
+  "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+  "public_request": {
+    "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/vite.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:45.367713+00:00",
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_before": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.398438834999979,
+  "process_cpu_seconds": 0.39606156499999656,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 972172,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_after": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "wire_sha256": "e809d8322f4f399a9d000d40407601caa9bcb0a3d84186b7aed7fdcded57f6f2",
+  "wire_utf8_bytes": 2738,
+  "utf8_quarter_proxy": 685,
+  "codec_o200k_base": 770,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

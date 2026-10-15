@@ -1,0 +1,91 @@
+{
+  "schema": "p0-final-baseline-linkage-v1",
+  "verdict": "PARTIAL",
+  "acceptance": false,
+  "baseline_rerun": false,
+  "scope": "Existing checkpoint archives, nested tar manifests, local source pins; no external fetch or merge",
+  "pins": {
+    "head": "8d2381d8c9d18498483feaaab918d93dfee47969",
+    "head_tree": "e583d59af4512d0d832fbdb9ed93ce95808ed866",
+    "main_ref_and_merge_base": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+    "clean_worktree": false,
+    "preexisting_product_change": "docmancer/docs/domain/project_retrieval_intent.py",
+    "current_git_diff_docmancer_sha256": "adb3ef546b9612db2dbe297c9c79a4a6fc3e4812d0147b2de85ccbeab940e990",
+    "static_manifest_product_diff_sha256": "486712c4b536f98c94d415c6a3b4352f923813ca12f38622a0192bd28220b1ce",
+    "diff_digest_equality_claimed": false,
+    "uv_lock_sha256": "01cf7436e1bbe9bdf2f0e16a1ac923e1db5fd14145afe269804883a393a1135b",
+    "pyproject_sha256": "e06ebcf9487065c9a046d0077c24b0a4f7e94f0d8385dd0ba26ed74555d97aae",
+    "static_scan_python": "3.14.3",
+    "transition_runtime_python": "3.12.3",
+    "distribution": "doc-atlas 1.3.2 editable",
+    "runtime_environment_applies_to_frozen_pytest": "not independently recorded"
+  },
+  "official_frozen": {
+    "status": "RED_RECORDED_PRECONDITION_FAILURE",
+    "archive": "retrieval-alias-ablation-2026-10-06.tar.gz",
+    "archive_sha256": "14be204be49c4a6e98999114fb99260b50c5ce16e9bf06091cc3318cae424fd0",
+    "member": "pr211-alias-published-direct15-test.log",
+    "member_sha256": "7a42b835eb1d9d336cf26550937535f87803b1868fe059921b22b0aba3133e69",
+    "manifest_head": "8d2381d8c9d18498483feaaab918d93dfee47969",
+    "test": "tests/docs/test_direct_docatlas_questions_15.py::test_direct_docatlas_questions_15_visible_context_covers_all_required_facts",
+    "result": "1 failed in 0.51s",
+    "branch": "_assert_direct_15_sidecar -> README.md Git blob mismatch before retrieval",
+    "expected_git_blob_sha1": "1a1975b2ffaf587f3b752c1966acdb20e7a88468",
+    "actual_git_blob_sha1": "9678dd4d10ca77856e33393ffa8e0db1c7539772",
+    "readme_sha256": "82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb",
+    "sidecar_path": "eval/direct_docatlas_questions_15/cases.json",
+    "sidecar_sha256": "48ddd7030c886cfe3df2959df65e092298823b7c308f240a8644fd03a4571d7e",
+    "sidecar_baseline_commit": "e179471527e009c88f77acbdaeeeeb8ad1c8d316",
+    "request_contract": {"scope": "all", "lookup_queries": "absent", "maximum_sources": 3, "maximum_estimated_tokens": 800},
+    "reconstructed_command_not_execution_record": ".venv/bin/python -m pytest -q tests/docs/test_direct_docatlas_questions_15.py",
+    "archived_exact_command": null,
+    "archived_process_environment": null,
+    "archived_exit_code": null
+  },
+  "diagnostic": {
+    "runner": "../p0_stage_baseline.py",
+    "runner_sha256": "2f0fcd3b6d647febd414f8c8e510bfd3411ae8a3ce8f8fe62f9524ad33e004df",
+    "reconstructed_recipe_not_shell_transcript": ".venv/bin/python <checkpoint>/p0_stage_baseline.py <arm> <output>",
+    "published_intent_sha256": "f6a9f00e4500d9d9c0e531db264a242b63fa43252616037d536f4089c3deee8e",
+    "with_vectors": false,
+    "model_calls": 0,
+    "socket_attempts": 0,
+    "evidence_fields": ["tracked_source_snapshot", "actual_sqlite_index_manifests", "calls", "text_blobs"],
+    "lanes": [
+      {"path": "p0-stages-ru-original.json.gz", "sha256": "a1595d5c7051d3e0d16f959ee68a974c4c41235713c33da8223349932a7ca85a", "useful": "8/15"},
+      {"path": "p0-stages-ru-lookups.json.gz", "sha256": "62a362852462e2ded4e53d2c54d02d5e209239e79beb80da573be5cfaf817efe", "useful": "12/15"},
+      {"path": "p0-stages-en-direct15.json.gz", "sha256": "f8ad795a1a1ab0043c888c746dd4f73a68007bc6d00546edf923eef6b35b7806", "useful": "11/15", "verdict": "FAIL", "positive_passed": "2/15", "errors": 17},
+      {"path": "p0-stages-trust.json.gz", "sha256": "c2fda56d8d3f46adeb60ca49810ebc337b3c8a58a4d9c39b4b0b1b671fee0cbe", "acceptance_gold": false}
+    ],
+    "replaces_official_frozen": false
+  },
+  "subset_controls": [
+    {"path": "p0-config-baseline-pytest.log", "sha256": "afce95472c348fc7db5f9b1ac9c923e05497173bfcbfd6c27d874c8f7d249b6f", "passed": 18},
+    {"path": "p0-connector-baseline-pytest.log", "sha256": "d08581346530e3dff35cce5bc2f68c72c2c59ccc656cbc90d513ada0b57feddc", "passed": 67},
+    {"path": "p0-policy-baseline-pytest.log", "sha256": "60fd075e2f3a3c89fddaaca04c0a9b02a6109991c14bb4acf48f3d8cac8c1325", "passed": 81},
+    {"path": "p0-neighbor-baseline-pytest.log", "sha256": "395e63d1918319cad6e61cd752f0142fcfcd19ad26d5308200160f70f07eeb2f", "passed": 76}
+  ],
+  "historical_controls": {
+    "manifest": "MANIFEST.json",
+    "manifest_sha256": "5d9ed9fae2de0c5f7e88b7c1a88ba8a6a28608fddf587d3435dab09840cc7677",
+    "baseline": "37bfd0668f819935dd9e027bd9d8bf767fcd185a",
+    "example_environment": "parallel-strict-attribute.tar.gz::files/environment.json",
+    "example_python": "3.13.12",
+    "same_p0_head": false,
+    "replaces_required_controls": false
+  },
+  "validation": {
+    "artifact_member_hash_comparisons": 213,
+    "artifact_member_mismatches": [],
+    "validated_manifest_sets": ["MANIFEST.json", "retrieval-alias-ablation-2026-10-06.tar.gz::MANIFEST.json", "p0-stage-wheel-evidence-hashes.json", "p0-candidate-closure-hashes.json"],
+    "product_pins": 383,
+    "lock_config_pins": 2,
+    "product_lock_config_mismatches": [],
+    "hash_consistency_is_acceptance": false
+  },
+  "remaining_evidence": [
+    {"id": "frozen-execution-provenance", "missing": "Archived exact command/process environment/exit record tied to the existing official frozen pytest log", "preferred_action": "Link existing execution record, not repeat a known failure"},
+    {"id": "same-p0-required-controls", "missing": "Same-P0 pinned command/environment/log bundle for core matrix, advanced lineage, adversarial, required-ci/release and applicable P1 jobs", "observed": "EXECUTION_STATUS_RU.md records red checks, but old-head archives and diagnostic subsets do not replace the bundle", "absence_scope": "Inspected checkpoint archives only; no claim about all CI or external worktrees"}
+  ],
+  "gate_effect": "Frozen failure linkage resolved; strict reproducibility/required-control gate remains PARTIAL. No general P0 DONE, P1 entry, release or merge approval. No gold/workflow weakening."
+}

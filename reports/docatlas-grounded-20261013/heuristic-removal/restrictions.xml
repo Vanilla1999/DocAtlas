@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.909" timestamp="2026-10-13T13:24:06.440282+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" time="0.520"><failure message="AssertionError: ('docs/camera.md', '`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.', [])&#10;assert False&#10; +  where False = any(&lt;generator object facts.&lt;locals&gt;.&lt;genexpr&gt; at 0x750e648885f0&gt;)">tmp_path = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-1/test_public_removal_explicit_s0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x750e649c1a90&gt;
+state_root = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-1/test_public_removal_explicit_s0/member-state')
+
+    def test_public_removal_explicit_scope_version_and_foreign_locator(
+        tmp_path, monkeypatch, state_root,
+    ):
+        """2 prepare, 6 contexts; foreign project also indexed, so locator isolation is real."""
+        root, foreign = (tmp_path / "project").resolve(), (tmp_path / "foreign").resolve()
+        runtime.write_project(root, SCOPE_DOCUMENTS)
+        catalog = root / "docatlas.project-docs.yaml"
+        data = yaml.safe_load(catalog.read_bytes())
+        for entry in data["documents"]:
+            if entry["path"] == "modules/imaging/guide.md":
+                entry.update(scope="module", module_path="modules/imaging")
+        catalog.write_text(yaml.safe_dump(data, sort_keys=False))
+        foreign_documents = {"docs/foreign.md": "# Foreign vault\n\n`FOREIGN_VAULT_PIN` unlocks the foreign vault.\n"}
+        runtime.write_project(foreign, foreign_documents)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.setenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", "ALL")
+            env.setenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", "12000")
+            runtime.index_project(service, config, foreign)
+            inventory = runtime.index_project(service, config, root)
+            # A generation contains both explicitly prepared project roots. Check
+            # all pinned bytes here; public contexts below still enforce root scope.
+            snapshots(inventory, root.parent, {
+                **{"project/" + name: text for name, text in SCOPE_DOCUMENTS.items()},
+                **{"foreign/" + name: text for name, text in foreign_documents.items()},
+            })
+            before, root_files, foreign_files = database(inventory["storage_path"]), files(root), files(foreign)
+            project = context(service, root, SHUTTER_QUESTION)
+            assert not integrity(project, root, {"docs/camera.md": SCOPE_DOCUMENTS["docs/camera.md"]})["errors"]
+&gt;           facts(project, root, {"docs/camera.md": ("`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.",)})
+
+tests/test_heuristic_removal_public_integration.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}
+root = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-1/test_public_removal_explicit_s0/project')
+required = {'docs/camera.md': ('`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.',)}
+
+    def facts(payload, root, required):
+        for relative, statements in required.items():
+            delivered = [row["snippet"] for row in payload.get("sources") or []
+                         if Path(row["path_or_url"]) == root / relative]
+            for statement in statements:
+&gt;               assert any(statement in text for text in delivered), (relative, statement, delivered)
+E               AssertionError: ('docs/camera.md', '`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.', [])
+E               assert False
+E                +  where False = any(&lt;generator object facts.&lt;locals&gt;.&lt;genexpr&gt; at 0x750e648885f0&gt;)
+
+tests/test_heuristic_removal_public_integration.py:36: AssertionError</failure></testcase></testsuite></testsuites>

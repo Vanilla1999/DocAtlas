@@ -1,13 +1,4 @@
-"""Generic web fetcher for any documentation site.
-
-Implements the full ingestion pipeline:
-1. Fetch homepage and detect platform
-2. Run discovery chain to find all doc page URLs
-3. Filter, normalize, and deduplicate URLs
-4. Fetch each page with rate limiting and robots.txt compliance
-5. Extract content with trafilatura + markdownify
-6. Deduplicate content and build Document objects
-"""
+"""Shared secure transport, extraction and provenance for finite source members."""
 
 from __future__ import annotations
 
@@ -50,6 +41,7 @@ from docmancer.core.models import Document
 from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
 from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, redact_url
 from docmancer.docs.fetch_transport import DocsHttpClient
+from docmancer.docs.finite_membership import contains, exact_url, finite_members
 from docmancer.docs.github_source_manifest import (
     canonical_github_blob_scope_url,
     normalize_resolved_github_manifest,

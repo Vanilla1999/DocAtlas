@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-P01",
+  "mode": "budget",
+  "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+  "public_request": {
+    "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/poetry.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:12:59.635138+00:00",
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_before": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.8083329719993344,
+  "process_cpu_seconds": 0.8059031650000037,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 917328,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_after": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "wire_sha256": "d83b9b909196d681da84e6e393a984b4cc2fda688ad92db753d0b4b329d8d552",
+  "wire_utf8_bytes": 4244,
+  "utf8_quarter_proxy": 1061,
+  "codec_o200k_base": 1215,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

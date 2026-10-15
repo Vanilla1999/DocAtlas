@@ -1,0 +1,63 @@
+{
+  "contract": "citation-coordinates-v3-2",
+  "adapter_id": "citation-adaptation-v3-2-envelope-authority-empty",
+  "raw_answer_sha256": "b9db4f7eea406c5ed570d78a603a76e04d6e76e5bac93289e56b8162e787e158",
+  "prepared_sha256": "99aadd3576e00ad056eca3edd9909dbc599b0f16e9908600220fb466de091782",
+  "semantic_entailment": "INDEPENDENT_REVIEW_REQUIRED",
+  "status": "EXTRACTED",
+  "generator_output": {
+    "status": "complete",
+    "claims": [
+      {
+        "claim": "В начале запроса указаны поля `interface`, `operation` и `status`, а событие завершения дополнительно содержит диагностические поля `duration_ms` и `trace_incomplete`.",
+        "citations": [
+          {
+            "source_id": "ev-e2fee8fbbe2755c6",
+            "start": 0,
+            "end": 186
+          }
+        ]
+      }
+    ],
+    "missing": []
+  },
+  "claims": [
+    {
+      "claim": "В начале запроса указаны поля `interface`, `operation` и `status`, а событие завершения дополнительно содержит диагностические поля `duration_ms` и `trace_incomplete`.",
+      "citations": [
+        {
+          "source_id": "ev-e2fee8fbbe2755c6",
+          "start": 0,
+          "end": 186,
+          "quote": "- `docatlas_request_start` и `docatlas_request_end` связываются через `request_id`.\n  Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms`\n  и `trace_incomplete`.\n",
+          "quote_sha256": "31415dcc5161adb04dc01b8f84f8dd327d94c6a058c7782e39222daf165d677b",
+          "document_char_range": [
+            1024,
+            1210
+          ],
+          "document_utf8_byte_range": [
+            1510,
+            1736
+          ],
+          "document_lf_line_range": [
+            29,
+            31
+          ],
+          "document_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+          "provenance": {
+            "path_or_url": "README.md",
+            "scope": "project",
+            "version_binding": "unversioned",
+            "line_start": 29,
+            "line_end": 45,
+            "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+            "authority": "source_of_truth",
+            "source_uri": "docatlas://source/2c4670d6a6f41b8b6ccb3398"
+          },
+          "resolvable": true,
+          "verbatim": true
+        }
+      ]
+    }
+  ]
+}

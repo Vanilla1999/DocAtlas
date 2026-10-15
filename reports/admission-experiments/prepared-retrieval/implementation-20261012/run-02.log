@@ -1,0 +1,61 @@
+F
+=================================== FAILURES ===================================
+____ test_source_valid_candidates_deliver_multifacet_bound_read_only_packet ____
+
+tmp_path = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-pytest-run02/test_source_valid_candidates_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc24122a3c0>
+state_root = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-pytest-run02/test_source_valid_candidates_d0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x7fc2412bdd00>
+
+    def test_source_valid_candidates_deliver_multifacet_bound_read_only_packet(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """1 prepare, 2 contexts, at most 2 bounded source reads."""
+        project = tmp_path / "project"
+        runtime.write_project(project, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            inventory = runtime.index_project(service, config, project)
+            _committed_documents(inventory, project, OPTICS_DOCUMENTS)
+            before, files_before = _database_state(inventory), _file_state(project)
+            baseline = _context(service, project, OPTICS_QUESTION)
+>           _assert_packet_sources(baseline, project, OPTICS_DOCUMENTS)
+
+tests/test_prepared_retrieval_integration.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}
+project = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-pytest-run02/test_source_valid_candidates_d0/project')
+documents = {'docs/packing.md': '# Field optics packing\n\nFor an observation trip, lenses travel in rigid cases.\nA rigid case ho...es but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».\n'}
+module_paths = ()
+
+    def _assert_packet_sources(payload, project, documents, *, module_paths=()):
+        assert payload.get("kind") == "docs_context", payload
+        assert payload.get("answer_supported") is not True, payload
+        assert payload.get("answer_available") is not True, payload
+        assert payload.get("edit_ready") is not True, payload
+        identities = set()
+        evidence_ids = []
+        for row in payload.get("sources") or ():
+            relative = _relative_source(row, project)
+            assert relative in documents, row
+            text = documents[relative]
+            lines = text.splitlines()
+            start, end = row["line_start"], row["line_end"]
+            assert type(start) is int and type(end) is int and 1 <= start <= end <= len(lines), row
+            snippet = row["snippet"]
+>           assert snippet and snippet in "\n".join(lines[start - 1:end]), row
+E           AssertionError: {'evidence_id': 'ev-5d08f9e187e258dd', 'path_or_url': 'docs/issue.md', 'section': 'Field optics issue record', 'snippe...t may not sign the issue record.
+E             
+E             ## Archive shelf
+E             
+E             Store completed folders with the tab marked «optique».
+E             ', ...}
+E           assert ('# Field optics issue record\n\nThe issue record for an observation trip goes to the collection custodian.\nThe collec...ses but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».\n' and '# Field optics issue record\n\nThe issue record for an observation trip goes to the collection custodian.\nThe collec...ses but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».\n' in '# Field optics issue record\n\nThe issue record for an observation trip goes to the collection custodian.\nThe collec...cases but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».')
+E            +  where '# Field optics issue record\n\nThe issue record for an observation trip goes to the collection custodian.\nThe collec...cases but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».' = <built-in method join of str object at 0x1556e10>(['# Field optics issue record', '', 'The issue record for an observation trip goes to the collection custodian.', 'The...eness and signs before departure.', 'A courier may carry the packed cases but may not sign the issue record.', '', ...])
+E            +    where <built-in method join of str object at 0x1556e10> = '\n'.join
+
+tests/test_prepared_retrieval_integration.py:248: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_prepared_retrieval_integration.py::test_source_valid_candidates_deliver_multifacet_bound_read_only_packet
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.86s

@@ -1,0 +1,8 @@
+{
+  "safe_private_runtime": "/tmp/docatlas-removal-secure-xs_64g44",
+  "mode": "0o700",
+  "why_outside_preferred_opencode": "Existing member-storage invariant rejects group-writable ancestors; /tmp sticky allows private0700 child. No ancestor mode weakened.",
+  "code_frozen_before_sealed_question_loading": true,
+  "recorded_at_utc": "2026-10-13T10:20:45.143895+00:00",
+  "candidate_wheel_sha256": "16fc2daf0c1fc7ff37b95bded4d595084c60b6fa994606ff92849b6ef960021f"
+}

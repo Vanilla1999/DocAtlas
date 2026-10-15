@@ -1,0 +1,578 @@
+{
+  "excluded": {
+    "tests/test_docs_service_part02.py": "explicit internal query work budget",
+    "tests/evidence_quality_v2/test_corpus.py": "frozen within_budget fixture classification"
+  },
+  "changed_files": 44,
+  "changed_assertions": 81,
+  "changes": [
+    {
+      "path": "tests/docs/_global_evidence_fixtures.py",
+      "line": 27,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/_global_evidence_fixtures.py",
+      "line": 28,
+      "before": "assert len(payload.get('sources') or []) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_compact_context_blocks.py",
+      "line": 88,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_compact_context_blocks.py",
+      "line": 137,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_component_completeness.py",
+      "line": 55,
+      "before": "assert len(projection['sources']) <= 3 and projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_component_coverage.py",
+      "line": 115,
+      "before": "assert projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_component_coverage.py",
+      "line": 270,
+      "before": "assert projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_context_completion_followup.py",
+      "line": 79,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_context_projection_boundaries.py",
+      "line": 198,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_context_projection_boundaries.py",
+      "line": 384,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_context_projection_boundaries.py",
+      "line": 405,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_contiguous_seed_envelope.py",
+      "line": 21,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_contiguous_seed_envelope.py",
+      "line": 106,
+      "before": "assert docs_context_budget_tokens(after) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_contiguous_seed_envelope.py",
+      "line": 107,
+      "before": "assert len(after['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_dependency_version_transition.py",
+      "line": 140,
+      "before": "assert result['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_docs_context_compound_projection.py",
+      "line": 90,
+      "before": "assert projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_docs_context_compound_projection.py",
+      "line": 105,
+      "before": "assert projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_docs_context_compound_projection.py",
+      "line": 125,
+      "before": "assert projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_docs_context_compound_projection.py",
+      "line": 158,
+      "before": "assert projection['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_document_local_rescue.py",
+      "line": 337,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_document_local_rescue.py",
+      "line": 420,
+      "before": "assert 1 <= len(payload.get('sources', [])) <= 3, (payload, captured)",
+      "after": "assert 1 <= len(payload.get('sources', [])), (payload, captured)"
+    },
+    {
+      "path": "tests/docs/test_document_local_rescue.py",
+      "line": 421,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_evidence_admission_sufficiency.py",
+      "line": 239,
+      "before": "assert len(after['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_evidence_set_delivery_acceptance.py",
+      "line": 10,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_evidence_set_delivery_acceptance.py",
+      "line": 11,
+      "before": "assert len(payload['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_exact_document_fallback_context.py",
+      "line": 43,
+      "before": "assert len(result['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_exact_document_fallback_context.py",
+      "line": 44,
+      "before": "assert estimate_projection_tokens(result) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 53,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 96,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 233,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 267,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 410,
+      "before": "assert len(payload.get('sources', [])) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 513,
+      "before": "assert len(paths) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_generic_context_workflows.py",
+      "line": 544,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_host_match_priority.py",
+      "line": 87,
+      "before": "assert len(payload['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_host_match_priority.py",
+      "line": 88,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_host_scope_contract.py",
+      "line": 150,
+      "before": "assert len(paths) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_host_scope_contract.py",
+      "line": 151,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_joint_context_acceptance.py",
+      "line": 51,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_joint_context_acceptance.py",
+      "line": 52,
+      "before": "assert len(payload.get('sources', [])) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_joint_context_invariants.py",
+      "line": 61,
+      "before": "assert docs_context_budget_tokens(out) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_language_packing_experiment.py",
+      "line": 109,
+      "before": "assert 0 < result['budget_tokens'] <= 800",
+      "after": "assert 0 < result['budget_tokens']"
+    },
+    {
+      "path": "tests/docs/test_language_packing_experiment.py",
+      "line": 112,
+      "before": "assert len(result['payload'].get('sources', [])) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_mixed_script_recovery.py",
+      "line": 49,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_model_visible_projection.py",
+      "line": 250,
+      "before": "assert estimate_projection_tokens(first) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_pydantic_direct_context.py",
+      "line": 32,
+      "before": "assert len(result['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_pydantic_direct_context.py",
+      "line": 33,
+      "before": "assert docs_context_budget_tokens(result) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_query_block_delivery.py",
+      "line": 25,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_query_block_delivery.py",
+      "line": 26,
+      "before": "assert len(payload.get('sources', [])) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_query_planning_scope_regressions.py",
+      "line": 319,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_reference_behavior_matrix.py",
+      "line": 55,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_reference_hash_domains.py",
+      "line": 32,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_reference_hash_domains.py",
+      "line": 33,
+      "before": "assert len(payload.get('sources') or ()) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_request_flow_lineage.py",
+      "line": 111,
+      "before": "assert len(payload['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_request_flow_lineage.py",
+      "line": 112,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_retrieval_alias_subject_binding.py",
+      "line": 141,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_retrieval_alias_subject_binding.py",
+      "line": 142,
+      "before": "assert len(payload['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_retrieval_alias_subject_binding.py",
+      "line": 158,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_retrieval_alias_subject_binding.py",
+      "line": 159,
+      "before": "assert len(payload['sources']) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_review_assignment_identity.py",
+      "line": 103,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_review_span_lineage.py",
+      "line": 65,
+      "before": "assert len(payload['sources']) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_self_host_agent_contract_surface.py",
+      "line": 57,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_source_recovery_targeting.py",
+      "line": 264,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_structural_behavior_matrix.py",
+      "line": 40,
+      "before": "assert docs_context_budget_tokens(payload) <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_structural_behavior_matrix.py",
+      "line": 41,
+      "before": "assert len(payload.get('sources') or []) <= 3",
+      "after": null
+    },
+    {
+      "path": "tests/docs/test_v2_acceptance_gaps.py",
+      "line": 32,
+      "before": "assert len(payload.get('sources') or ()) <= 3 and payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/test_action_packet_v4_eval.py",
+      "line": 65,
+      "before": "assert projection['estimated_tokens'] <= 800 and projection['edit_ready'] is False",
+      "after": "assert projection['edit_ready'] is False"
+    },
+    {
+      "path": "tests/test_action_packet_v4_public.py",
+      "line": 285,
+      "before": "assert result['kind'] == 'docs_answer' and result['estimated_tokens'] <= 800",
+      "after": "assert result['kind'] == 'docs_answer'"
+    },
+    {
+      "path": "tests/test_action_packet_v4_public.py",
+      "line": 310,
+      "before": "assert result['kind'] == 'docs_context' and result['estimated_tokens'] <= 800",
+      "after": "assert result['kind'] == 'docs_context'"
+    },
+    {
+      "path": "tests/test_action_packet_v4_public.py",
+      "line": 426,
+      "before": "assert docs['kind'] == 'docs_answer' and docs['estimated_tokens'] <= 800",
+      "after": "assert docs['kind'] == 'docs_answer'"
+    },
+    {
+      "path": "tests/test_dictionary_exit_indexed_mcp.py",
+      "line": 36,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/test_dictionary_exit_inert_sdk_closure.py",
+      "line": 159,
+      "before": "assert len(canonical_projection_bytes(public)) <= 800 * 4",
+      "after": null
+    },
+    {
+      "path": "tests/test_dictionary_exit_literal_needs_mcp.py",
+      "line": 41,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/test_dictionary_exit_public_request.py",
+      "line": 71,
+      "before": "assert len(canonical_projection_bytes(result)) <= 800 * 4",
+      "after": null
+    },
+    {
+      "path": "tests/test_dictionary_exit_public_request.py",
+      "line": 176,
+      "before": "assert len(canonical_projection_bytes(result)) <= 800 * 4",
+      "after": null
+    },
+    {
+      "path": "tests/test_dictionary_exit_public_request.py",
+      "line": 189,
+      "before": "assert len(canonical_projection_bytes(result)) <= 800 * 4",
+      "after": null
+    },
+    {
+      "path": "tests/test_list_introduction_atomicity.py",
+      "line": 66,
+      "before": "assert 0 < len(payload['sources']) <= 3",
+      "after": "assert 0 < len(payload['sources'])"
+    },
+    {
+      "path": "tests/test_list_introduction_atomicity.py",
+      "line": 67,
+      "before": "assert payload['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/test_named_document_context_integration.py",
+      "line": 683,
+      "before": "assert result['estimated_tokens'] <= 800",
+      "after": null
+    },
+    {
+      "path": "tests/test_nl_dictionary_removal_consumer_contract.py",
+      "line": 127,
+      "before": "assert len(canonical_projection_bytes(public)) <= 800 * 4",
+      "after": null
+    },
+    {
+      "path": "tests/test_retrieval_quality_baseline.py",
+      "line": 44,
+      "before": "assert case['metrics']['model_visible_tokens'] <= 800",
+      "after": null
+    }
+  ],
+  "removed_newly_unused_imports": [
+    {
+      "path": "tests/docs/_global_evidence_fixtures.py",
+      "module": "docmancer.docs.application.model_visible_projection_helpers",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_compact_context_blocks.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_contiguous_seed_envelope.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_evidence_set_delivery_acceptance.py",
+      "module": "docmancer.docs.application.model_visible_projection_helpers",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_exact_document_fallback_context.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "estimate_projection_tokens"
+    },
+    {
+      "path": "tests/docs/test_host_match_priority.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_joint_context_acceptance.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_pydantic_direct_context.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_query_block_delivery.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_reference_behavior_matrix.py",
+      "module": "docmancer.docs.application.model_visible_projection_helpers",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_reference_hash_domains.py",
+      "module": "docmancer.docs.application.model_visible_projection_helpers",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_self_host_agent_contract_surface.py",
+      "module": "docmancer.docs.application.model_visible_projection_helpers",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/docs/test_structural_behavior_matrix.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "docs_context_budget_tokens"
+    },
+    {
+      "path": "tests/test_dictionary_exit_inert_sdk_closure.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "canonical_projection_bytes"
+    },
+    {
+      "path": "tests/test_dictionary_exit_public_request.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "canonical_projection_bytes"
+    },
+    {
+      "path": "tests/test_nl_dictionary_removal_consumer_contract.py",
+      "module": "docmancer.docs.application.model_visible_projection",
+      "name": "canonical_projection_bytes"
+    }
+  ]
+}

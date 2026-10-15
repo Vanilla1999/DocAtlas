@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-T02",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-textual",
+  "public_request": {
+    "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-textual/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "7701f07c3937fe37b85c20a5fdc4b771a4cd05e7cb5fe7ec2147649ef971900f",
+  "utf8_bytes": 17172,
+  "tokens": 5026,
+  "seconds": 6.244929708998825,
+  "cpu_seconds": 6.241095251999994,
+  "peak_rss_kib": 206804,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

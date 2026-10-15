@@ -1,0 +1,19 @@
+{
+  "scenarios": 1,
+  "prepare_calls_attempted": 1,
+  "context_calls_attempted": 2,
+  "context_calls_returned": 2,
+  "source_continuation_calls": 0,
+  "answer_generator_calls": 0,
+  "model_forwards": 0,
+  "optional_model_modules_before": {
+    "torch": false,
+    "transformers": false,
+    "safetensors": false
+  },
+  "optional_model_modules_after": {
+    "torch": false,
+    "transformers": false,
+    "safetensors": false
+  }
+}

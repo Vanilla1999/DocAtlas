@@ -246,7 +246,7 @@ def missing_packet_evidence_categories(
 ) -> list[str]:
     packet_paths = {
         str(row.get("path") or "").strip().replace("\\", "/")
-        for row in packet.get("source_of_truth", [])
+        for row in packet.get("sources", [])
         if isinstance(row, dict) and str(row.get("path") or "").strip()
     }
     available: set[str] = set()
@@ -269,7 +269,7 @@ def missing_packet_evidence_paths(
 ) -> list[str]:
     cited_paths = {
         str(row.get("path") or "").strip().replace("\\", "/")
-        for row in packet.get("source_of_truth", [])
+        for row in packet.get("sources", [])
         if isinstance(row, dict) and str(row.get("path") or "").strip()
     }
     evidence_paths = {
@@ -405,75 +405,68 @@ def _deliver_with_worker(
     packet = output.packet
     if not isinstance(packet, dict) or not isinstance(output.usage, WorkerUsage):
         raise IsolatedDeliveryError("isolated_worker_output_contract_violation")
-    objective = (
-        packet.get("task_interpretation", {}).get("objective")
-        if isinstance(packet.get("task_interpretation"), dict)
-        else None
-    )
-    if objective != envelope.task_objective:
-        raise IsolatedDeliveryError("action_packet_objective_mismatch")
+    # evidence.validate(envelope) above owns the objective binding. V4 has no
+    # duplicated task scaffold and document prose is not objective authority.
     errors = validate_action_packet(
         packet,
         evidence_items=evidence.evidence_items,
-        max_tokens=envelope.token_budget,
     )
     if errors:
         raise IsolatedDeliveryError("invalid_action_packet:" + ";".join(errors))
+    if packet["estimated_tokens"] > envelope.token_budget:
+        raise IsolatedDeliveryError("historical_evaluation_packet_token_ceiling_exceeded")
     cited_ids = {
         row.get("evidence_id")
-        for row in packet.get("source_of_truth", [])
+        for row in packet.get("sources", [])
         if isinstance(row, dict) and isinstance(row.get("evidence_id"), str)
     }
-    if packet.get("status") != "insufficient_evidence" and not cited_ids:
+    if packet.get("result") == "data" and not cited_ids:
         raise IsolatedDeliveryError("action_packet_has_no_host_evidence")
     missing_categories = missing_packet_evidence_categories(
         packet,
         evidence.evidence_items,
         envelope.required_evidence_categories,
     )
-    if packet.get("status") != "insufficient_evidence" and missing_categories:
+    if packet.get("result") == "data" and missing_categories:
         raise IsolatedDeliveryError(
             "action_packet_missing_required_evidence_categories:" + ",".join(missing_categories)
         )
     missing_paths = missing_packet_evidence_paths(
         packet, evidence.evidence_items, envelope.required_evidence_paths
     )
-    if packet.get("status") != "insufficient_evidence" and missing_paths:
+    if packet.get("result") == "data" and missing_paths:
         raise IsolatedDeliveryError(
             "action_packet_missing_required_evidence_paths:" + ",".join(missing_paths)
         )
-    target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
     target_paths = {
         str(row.get("path") or "").strip().replace("\\", "/")
-        for row in target_surface.get("likely_files", [])
-        if isinstance(row, dict)
+        for row in packet.get("assignments", [])
+        if isinstance(row, dict) and row.get("proof_role") == "target_identity"
     }
     required_target_files = {
         path for path in envelope.suspected_modules if Path(path).suffix
     }
     missing_modules = sorted(required_target_files - target_paths)
-    if packet.get("status") != "insufficient_evidence" and missing_modules:
+    if packet.get("result") == "data" and missing_modules:
         raise IsolatedDeliveryError(
             "action_packet_missing_required_target_modules:" + ",".join(missing_modules)
         )
-    if evidence.retrieval_issues and packet.get("status") != "insufficient_evidence":
+    if not set(evidence.retrieval_issues).issubset(packet.get("missing", [])):
         raise IsolatedDeliveryError("action_packet_ignored_host_retrieval_issues")
 
     packet_payload = dict(packet)
     projection: dict[str, Any] | None = None
     projection_snapshot: dict[str, dict[str, Any]] | None = None
-    if packet_payload["status"] != "insufficient_evidence":
+    if packet_payload["result"] == "data":
         projection, projection_snapshot = project_patch_context(
             packet=packet_payload,
             evidence_items=evidence.evidence_items,
-            max_tokens=HARD_ACTION_PACKET_TOKENS,
         )
-        if projection.get("status") == "insufficient_evidence":
+        if projection.get("result") != "data":
             raise IsolatedDeliveryError("isolated_model_visible_projection_insufficient")
         projection_errors = validate_model_visible_projection(
             projection,
             snapshot=projection_snapshot,
-            max_tokens=HARD_ACTION_PACKET_TOKENS,
         )
         if projection_errors:
             raise IsolatedDeliveryError(
@@ -489,7 +482,8 @@ def _deliver_with_worker(
         "server_request_id_verified": bool(
             (usage.proof or {}).get("server_request_id_verified", evidence_tier == "causal")
         ),
-        "status": packet_payload["status"],
+        "result": packet_payload["result"],
+        "completeness": packet_payload["completeness"],
         "attempts": 1,
         "retrieval_calls": evidence.retrieval_calls,
         "compressor_identity": compressor_identity,
@@ -530,13 +524,15 @@ def _deliver_with_worker(
     _write_json(attempt_path, {
         "schema_version": 2,
         "status": "completed",
-        "packet_status": packet_payload["status"],
+        "packet_result": packet_payload["result"],
+        "packet_completeness": packet_payload["completeness"],
         "attempts": 1,
         "envelope_fingerprint": envelope.fingerprint,
         "evidence_fingerprint": evidence.fingerprint,
     })
     return {
-        "status": packet_payload["status"],
+        "result": packet_payload["result"],
+        "completeness": packet_payload["completeness"],
         "packet": packet_payload,
         "projection": projection,
         "metrics": metrics,

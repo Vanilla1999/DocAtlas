@@ -196,6 +196,8 @@ def evaluate_actionability(
         warnings.append(f"invalid_model_visible_projection:{projection_error}")
 
     if projection is not None:
+        if projection.get("schema_version") == 4:
+            warnings.append("unsupported_evaluation_requirement:normative_workflow_claims")
         metrics = _projection_metrics(projection, allowed)
         item_text = "\n".join(json.dumps(item, sort_keys=True) for item in items)
         recalled = [req for req in allowed if _requirement_in_text(req, item_text)]
@@ -227,13 +229,10 @@ def evaluate_actionability(
             behavioral_scope_coverage=metrics["behavioral_scope_coverage"],
             citation_fidelity=metrics["citation_fidelity"],
             model_visible_omissions=metrics["model_visible_omissions"],
-            projection_status=str(projection.get("status") or "unknown"),
+            projection_status=str(projection.get("result") or "unknown"),
             projection_tokens=_int_or_none(projection.get("estimated_tokens")),
             projection_omissions=metrics["projection_omissions"],
-            mutation_ready=(
-                bool(projection.get("mutation_ready"))
-                if "mutation_ready" in projection else None
-            ),
+            mutation_ready=None,
             warnings=warnings,
         )
         if result.projection_status in {"ok", "truncated"} and result.mutation_ready is not True:
@@ -316,8 +315,10 @@ def _load_projection(
     errors = validate_model_visible_projection(
         data,
         snapshot=snapshot,
-        max_tokens=2_000,
     )
+    if type(data.get("estimated_tokens")) is int and data["estimated_tokens"] > 2_000:
+        # Historical actionability policy, never a producer/projection cap.
+        errors.append("historical_evaluation_projection_token_ceiling_exceeded")
     if errors:
         return None, ";".join(errors)
     return data, None
@@ -327,6 +328,23 @@ def _projection_metrics(
     projection: dict[str, Any],
     requirements: list[ContractRequirement],
 ) -> dict[str, Any]:
+    if projection.get("schema_version") == 4:
+        sources = _dict_rows(projection.get("sources"))
+        paths = {row.get("path") for row in sources}
+        stable_ids = {row.get("stable_id") for row in sources}
+        assignments = _dict_rows(projection.get("assignments"))
+        valid = sum(row.get("evidence_id") in stable_ids for row in assignments)
+        missing = len(projection.get("missing") or [])
+        # Legacy behavioral/normative rules cannot be certified by v4 data.
+        # Source and assignment visibility remain mechanically measurable.
+        return {
+            "requirement_recall": 0.0, "requirement_precision": 0.0,
+            "critical_invariant_recall": 0.0, "behavioral_scope_coverage": 0.0,
+            "source_coverage": round(sum(bool(set(req.expected_files) & paths)
+                                         for req in requirements) / len(requirements), 4) if requirements else 0.0,
+            "citation_fidelity": round(valid / len(assignments), 4) if assignments else 0.0,
+            "model_visible_omissions": missing, "projection_omissions": {"missing": missing} if missing else {},
+        }
     invariants = _dict_rows(projection.get("invariants"))
     guidance = _dict_rows(projection.get("implementation_guidance"))
     acceptance = _dict_rows(projection.get("acceptance_conditions"))

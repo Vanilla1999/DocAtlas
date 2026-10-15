@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
+from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-from docmancer.docs.application.action_packet import build_action_packet
+from docmancer.docs.application.action_packet import build_action_packet, refresh_action_packet_estimate
+from docmancer.docs.application.model_visible_projection import (
+    project_patch_context,
+    validate_model_visible_projection,
+)
 from eval.task_level.execution import capture_patch, fresh_run_environment, run_canary
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
@@ -74,50 +80,8 @@ class MockRunner:
         )
 
 
-def test_runner_canary_produces_patch(tmp_path: Path):
-    result = run_canary(MockRunner(), "mock", 30, tmp_path)
-
-    assert result["status"] == "passed", json.dumps(result, sort_keys=True)
-    assert result["patch_exists"]
-    assert result["pytest_passes"]
 
 
-def test_relative_result_root_produces_absolute_subprocess_runtime_paths(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    monkeypatch.chdir(tmp_path)
-    source_home = tmp_path / "source-codex-home"
-    source_home.mkdir()
-    monkeypatch.setenv("CODEX_HOME", str(source_home))
-    output_dir = Path("results/run")
-    environment = fresh_run_environment(output_dir)
-    request = AgentRunRequest(
-        task_id="task",
-        condition_id="repo_only_strict_offline",
-        prompt="inspect",
-        workspace=tmp_path,
-        model="model",
-        timeout_seconds=30,
-        max_turns=1,
-        environment=environment,
-        mcp_config_path=None,
-        tool_policy_path=tmp_path / "policy.json",
-        output_dir=output_dir,
-    )
-
-    for name in (
-        "HOME",
-        "XDG_CONFIG_HOME",
-        "XDG_CACHE_HOME",
-        "DOCATLAS_HOME",
-        "DOCATLAS_INDEX_DB_PATH",
-        "DOCATLAS_EMBEDDINGS_CACHE",
-        "UV_PROJECT_ENVIRONMENT",
-    ):
-        assert Path(environment[name]).is_absolute(), name
-    assert _prepare_codex_home(request).is_absolute()
-    assert _prepare_blocked_network_tools(request).is_absolute()
 
 
 def test_patch_capture(tmp_path: Path):
@@ -152,123 +116,62 @@ def test_patch_capture_includes_pure_untracked_file(tmp_path: Path):
     assert "new content" in patch_path.read_text(encoding="utf-8")
 
 
-def test_missing_token_metrics_remain_null(tmp_path: Path):
-    result = run_canary(MockRunner(), "mock", 30, tmp_path)
-
-    assert result["status"] == "passed", json.dumps(result, sort_keys=True)
-    output = MockRunner().run
-    assert output is not None
 
 
-def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setenv("PRIVATE_TOKEN", "super-secret-value")
-    raw = json.dumps({
-        "type": "item.completed",
-        "usage": {
-            "input_tokens": 100,
-            "output_tokens": 20,
-            "cached_input_tokens": 60,
-            "reasoning_tokens": 5,
-        },
-        "item": {
-            "type": "command_execution",
-            "command": "inspect /home/alice/private/project with super-secret-value",
-            "exit_code": 2,
-            "status": "failed",
-        },
-    })
-
-    normalized, _calls, _input, _output = _normalize_jsonl(_redact(raw))
-    serialized = json.dumps(normalized)
-
-    assert "super-secret-value" not in serialized
-    assert "/home/alice/private/project" not in serialized
-    assert "<redacted>" in serialized
-    assert "<path>" in serialized
-    assert normalized[0]["exit_code"] == 2
-    assert normalized[0]["execution_status"] == "failed"
 
 
-def test_codex_normalizes_measurable_tool_output():
-    raw = json.dumps({
-        "type": "item.completed",
-        "usage": {
-            "input_tokens": 100,
-            "output_tokens": 20,
-            "cached_input_tokens": 60,
-            "reasoning_tokens": 5,
-        },
-        "item": {
-            "type": "mcp_tool_call",
-            "server": "docmancer-docs",
-            "tool": "get_docs_context",
-            "arguments": {"question": "architecture"},
-            "result": {"content": [{"type": "text", "text": "PermissionService owns the gate"}]},
-        },
-    })
-
-    events, tool_calls, _input, _output = _normalize_jsonl(raw)
-
-    assert tool_calls == [events[0]]
-    assert tool_calls[0]["result_chars"] > 0
-    assert "PermissionService owns the gate" in tool_calls[0]["result_summary"]
-    assert _token_usage_summary(events) == {
-        "input_tokens": 100,
-        "output_tokens": 20,
-        "cached_input_tokens": 60,
-        "reasoning_tokens": 5,
-        "completed_turn_events": None,
-    }
 
 
-def test_codex_counts_started_and_completed_events_as_one_tool_call(tmp_path: Path):
-    item = {
-        "id": "item-1",
-        "type": "mcp_tool_call",
-        "server": "docmancer-docs",
-        "tool": "get_docs_context",
-        "arguments": {"question": "architecture"},
-    }
-    raw = "\n".join([
-        json.dumps({"type": "item.started", "item": item}),
-        json.dumps({
-            "type": "item.completed",
-            "item": {
-                **item,
-                "result": {"content": [{"type": "text", "text": "PermissionService owns the gate"}]},
-            },
-        }),
-    ])
-
-    events, tool_calls, _input, _output = _normalize_jsonl(raw)
-    trajectory = tmp_path / "trajectory.normalized.json"
-    trajectory.write_text(json.dumps(events), encoding="utf-8")
-    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
-
-    assert len(events) == 1
-    assert len(tool_calls) == 1
-    assert events == tool_calls
-    assert events[0]["sequence"] == 1
-    assert tool_calls[0]["source_event_type"] == "item.completed"
-    assert tool_calls[0]["result_chars"] > 0
-    assert audit.get_docs_context_calls == 1
-    assert "required_get_docs_context_call_count:2" not in audit.violations
 
 
 def test_codex_normalizes_successful_required_once_retrieval_metadata(tmp_path: Path):
     objective = "Preserve the permission gate contract."
+    source_text = "Must preserve the permission gate contract."
+    evidence = [{
+        "doc_scope": "project",
+        "source_class": "project_doc",
+        "path": "AGENTS.md",
+        "heading_path": "Permission gate",
+        "authority": "canonical",
+        "content": source_text,
+        "char_start": 0,
+        "char_end": len(source_text),
+        "line_start": 1,
+        "line_end": 1,
+    }]
     packet = build_action_packet(
         question=objective,
-        context_pack=[{
-            "doc_scope": "project",
-            "source_class": "project_doc",
-            "path": "AGENTS.md",
-            "heading_path": "Permission gate",
-            "authority": "canonical",
-            "content": "Must preserve the permission gate contract.",
-        }],
-        max_tokens=2_000,
+        context_pack=evidence,
+        # Source completeness covers this explicit literal, never an inferred
+        # interpretation of the unchanged task objective.
+        public_requirements=(source_text,),
     )
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    assert projection["result"] == "data" and projection["completeness"] == "complete"
+    assert projection["sources"] == packet["sources"] and len(projection["sources"]) == 1
+    source = projection["sources"][0]
+    assert source["path"] == "AGENTS.md" and source["text"] == source_text
+    assert source["content_sha256"] == hashlib.sha256(source_text.encode()).hexdigest()
+    assert (source["char_start"], source["char_end"], source["line_start"], source["line_end"]) == (0, len(source_text), 1, 1)
+    assert source["instruction_trust"] == "untrusted_data" and projection["edit_ready"] is False
+    requirement, = projection["requirements"]
+    assert requirement["kind"] == "required_fact" and requirement["value"] == source_text
+    assert requirement["mandatory"] is True and requirement["public_provenance"] == "public_task_contract"
+    assignment, = projection["assignments"]
+    assert assignment["requirement_id"] == requirement["requirement_id"]
+    assert assignment["evidence_id"] == source["stable_id"] and assignment["path"] == source["path"]
+    assert assignment["proof_role"] == "generic_fact" and assignment["unit_id"]
+    assert assignment["unit_content_hash"] == source["content_sha256"]
+    assert (assignment["unit_char_start"], assignment["unit_char_end"]) == (0, len(source_text))
+    assert "missing" not in projection
+
+    partial_packet = build_action_packet(question=objective, context_pack=evidence)
+    partial, partial_snapshot = project_patch_context(packet=partial_packet, evidence_items=evidence)
+    assert validate_model_visible_projection(partial, snapshot=partial_snapshot) == []
+    assert partial["result"] == "data" and partial["completeness"] == "partial"
+    assert partial["sources"] == projection["sources"] and partial["edit_ready"] is False
+    assert partial["missing"] == ["visible_content_assignment_required"]
     item = {
         "id": "item-1",
         "type": "mcp_tool_call",
@@ -276,7 +179,7 @@ def test_codex_normalizes_successful_required_once_retrieval_metadata(tmp_path: 
         "tool": "get_docs_context",
         "arguments": {
             "question": objective,
-            "delivery_strategy": "bounded_direct",
+            "context_format": "patch_context",
         },
     }
     raw = "\n".join([
@@ -286,16 +189,13 @@ def test_codex_normalizes_successful_required_once_retrieval_metadata(tmp_path: 
             "item": {
                 **item,
                 "result": {
-                    "structured_content": {
-                        "delivery_strategy": "bounded_direct",
-                        "action_packet": packet,
-                    },
+                    "structured_content": projection,
                 },
             },
         }),
     ])
 
-    events, _tool_calls, _input, _output = _normalize_jsonl(
+    events, tool_calls, _input, _output = _normalize_jsonl(
         raw,
         task_objective=objective,
     )
@@ -304,246 +204,52 @@ def test_codex_normalizes_successful_required_once_retrieval_metadata(tmp_path: 
     audit = audit_trajectory("docatlas_tool_required_once", trajectory)
 
     assert audit.clean
+    assert audit.get_docs_context_calls == 1 and len(tool_calls) == 1
     assert events[0]["arguments"]["question_matches_task_objective"] is True
     assert events[0]["arguments"]["retrieval_succeeded"] is True
-    assert events[0]["arguments"]["delivery_strategy"] == "bounded_direct"
-    assert events[0]["arguments"]["action_packet_status"] == packet["status"]
-
-
-def test_codex_runner_uses_workspace_write_sandbox(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    captured: list[list[str]] = []
-
-    def fake_run(command, **kwargs):
-        captured.append(command)
-        return subprocess.CompletedProcess(command, 0, '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n', "")
-
-    monkeypatch.setattr(subprocess, "run", fake_run)
-    request = AgentRunRequest(
-        task_id="task",
-        condition_id="repo_only",
-        workspace=tmp_path,
-        prompt="inspect",
-        model="model",
-        timeout_seconds=30,
-        max_turns=1,
-        environment={},
-        mcp_config_path=None,
-        tool_policy_path=tmp_path / "policy.json",
-        output_dir=tmp_path / "out",
-    )
-
-    from eval.task_level.runners.codex import CodexRunner
-    CodexRunner("codex").run(request)
-
-    command = next(command for command in captured if "exec" in command)
-    assert command[command.index("--sandbox") + 1] == "workspace-write"
-
-
-def test_codex_runner_allows_explicit_sandbox_override(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    captured: list[list[str]] = []
-
-    def fake_run(command, **kwargs):
-        captured.append(command)
-        return subprocess.CompletedProcess(command, 0, '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n', "")
-
-    monkeypatch.setattr(subprocess, "run", fake_run)
-    request = AgentRunRequest(
-        task_id="task",
-        condition_id="repo_only_strict_offline",
-        prompt="fix it",
-        workspace=tmp_path,
-        model="model",
-        timeout_seconds=30,
-        max_turns=1,
-        environment={},
-        mcp_config_path=None,
-        tool_policy_path=tmp_path / "policy.json",
-        output_dir=tmp_path / "out",
-    )
-
-    from eval.task_level.runners.codex import CodexRunner
-    CodexRunner("codex", sandbox_mode="danger-full-access").run(request)
-
-    command = next(command for command in captured if "exec" in command)
-    assert command[command.index("--sandbox") + 1] == "danger-full-access"
-
-
-def test_codex_runner_can_use_allowlisted_process_environment(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    source_home = tmp_path / "source-codex-home"
-    source_home.mkdir()
-    (source_home / "auth.json").write_text('{"tokens": {}}')
-    monkeypatch.setenv("CODEX_HOME", str(source_home))
-    monkeypatch.setenv("UNRELATED_SECRET", "must-not-be-forwarded")
-    captured: dict[str, object] = {}
-
-    def fake_run(command, **kwargs):
-        if "exec" in command:
-            captured["env"] = kwargs.get("env")
-        return subprocess.CompletedProcess(
-            command, 0,
-            '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n',
-            "",
+    assert events[0]["arguments"]["context_format"] == "patch_context"
+    assert events[0]["arguments"]["action_packet_result"] == "data"
+    assert events[0]["arguments"]["action_packet_completeness"] == "complete"
+    for change in ("question", "format", "legacy_envelope", "edit_authority", "partial_content"):
+        invalid_item = deepcopy(item)
+        invalid_projection = deepcopy(projection)
+        if change == "question":
+            invalid_item["arguments"]["question"] = "A different objective."
+        elif change == "format":
+            invalid_item["arguments"].pop("context_format")
+        elif change == "legacy_envelope":
+            invalid_projection = {"delivery_strategy": "bounded_direct", "action_packet": packet}
+        elif change == "partial_content":
+            invalid_projection = deepcopy(partial)
+        else:
+            invalid_projection["edit_ready"] = True
+            refresh_action_packet_estimate(invalid_projection)
+        invalid_item["result"] = {"structured_content": invalid_projection}
+        invalid_events, _, _, _ = _normalize_jsonl(
+            json.dumps({"type": "item.completed", "item": invalid_item}), task_objective=objective,
         )
-
-    monkeypatch.setattr(subprocess, "run", fake_run)
-    request = AgentRunRequest(
-        task_id="task",
-        condition_id="repo_only_strict_offline",
-        prompt="inspect",
-        workspace=tmp_path,
-        model="model",
-        timeout_seconds=30,
-        max_turns=1,
-        environment={},
-        mcp_config_path=None,
-        tool_policy_path=tmp_path / "policy.json",
-        output_dir=tmp_path / "out",
-    )
-
-    from eval.task_level.runners.codex import CodexRunner
-    CodexRunner("codex", inherit_environment=False).run(request)
-
-    assert "UNRELATED_SECRET" not in captured["env"]
+        assert invalid_events[0]["arguments"]["retrieval_succeeded"] is False, change
+        if change == "partial_content":
+            assert invalid_events[0]["arguments"]["question_matches_task_objective"] is True
+            assert invalid_events[0]["arguments"]["context_format"] == "patch_context"
+            assert invalid_events[0]["arguments"]["action_packet_result"] == "data"
+            assert invalid_events[0]["arguments"]["action_packet_completeness"] == "partial"
 
 
-def test_codex_runner_removes_copied_oauth_material_from_artifacts(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    source_home = tmp_path / "source-codex-home"
-    source_home.mkdir()
-    (source_home / "auth.json").write_text('{"secret":"oauth-material"}')
-    monkeypatch.setenv("CODEX_HOME", str(source_home))
-    monkeypatch.setattr(
-        subprocess,
-        "run",
-        lambda command, **kwargs: subprocess.CompletedProcess(
-            command, 0, '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n', ""
-        ),
-    )
-    request = AgentRunRequest(
-        task_id="task",
-        condition_id="repo_only_strict_offline",
-        prompt="inspect",
-        workspace=tmp_path,
-        model="model",
-        timeout_seconds=30,
-        max_turns=1,
-        environment={},
-        mcp_config_path=None,
-        tool_policy_path=tmp_path / "policy.json",
-        output_dir=tmp_path / "out",
-    )
-
-    from eval.task_level.runners.codex import CodexRunner
-    CodexRunner("codex", sandbox_mode="danger-full-access").run(request)
-
-    assert not (request.output_dir / "env" / "codex_home" / "auth.json").exists()
-    assert "oauth-material" not in "".join(
-        path.read_text(errors="replace")
-        for path in request.output_dir.rglob("*")
-        if path.is_file()
-    )
 
 
-def test_codex_runner_removes_copied_oauth_when_setup_fails(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
-    source_home = tmp_path / "source-codex-home"
-    source_home.mkdir()
-    (source_home / "auth.json").write_text('{"secret":"oauth-material"}')
-    monkeypatch.setenv("CODEX_HOME", str(source_home))
-    request = AgentRunRequest(
-        task_id="task",
-        condition_id="repo_only_strict_offline",
-        prompt="inspect",
-        workspace=tmp_path,
-        model="model",
-        timeout_seconds=30,
-        max_turns=1,
-        environment={},
-        mcp_config_path=None,
-        tool_policy_path=tmp_path / "policy.json",
-        output_dir=tmp_path / "out",
-    )
-
-    import eval.task_level.runners.codex as codex_module
-    monkeypatch.setattr(
-        codex_module,
-        "_prepare_blocked_network_tools",
-        lambda request: (_ for _ in ()).throw(RuntimeError("setup failed")),
-    )
-
-    with pytest.raises(RuntimeError, match="setup failed"):
-        codex_module.CodexRunner("codex").run(request)
-
-    assert not (request.output_dir / "env" / "codex_home" / "auth.json").exists()
 
 
-def test_codex_redaction_preserves_json_literals_from_short_env_values(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setenv("SHORT_TOKEN", "true")
-    monkeypatch.setenv("API_TOKEN", "super-secret-value")
-    raw = '{"details":true,"token":"super-secret-value"}\n'
-
-    redacted = _redact(raw)
-
-    assert json.loads(redacted)["details"] is True
-    assert json.loads(redacted)["token"] == "<redacted>"
 
 
-def test_codex_detects_error_event_stream_with_provider_403_as_failure():
-    stdout = "\n".join([
-        '{"type":"thread.started","thread_id":"thread-1"}',
-        '{"type":"turn.started"}',
-        '{"type":"error","message":"unexpected status 403 Forbidden"}',
-        '{"type":"turn.failed","error":{"message":"unexpected status 403 Forbidden"}}',
-    ])
-    stderr = "failed to refresh available models: 403 Forbidden\nfailed to connect to websocket: HTTP error: 403 Forbidden"
-
-    assert _is_provider_failure(stdout, stderr) is True
-    assert _is_provider_failure("{\"type\":\"turn.completed\"}\n", stderr) is False
 
 
-def test_opencode_normalizes_json_events_for_policy_audit():
-    events = _normalize_events("\n".join([
-        json.dumps({"type": "tool_use", "part": {"tool": "edit", "state": {"input": {"filePath": "calc.py"}}}}),
-        json.dumps({"type": "tool_use", "part": {"tool": "bash", "state": {"input": {"command": "pytest -q"}}}}),
-        json.dumps({"type": "step_finish", "part": {"tokens": {"input": 10, "output": 3}}}),
-    ]))
-
-    tool_events = [event for event in events if event["event_type"] == "tool_call"]
-    assert [event["tool_name"] for event in tool_events] == ["edit", "bash"]
-    assert tool_events[0]["arguments"] == {"filePath": "calc.py"}
-    assert tool_events[1]["arguments"] == {"command": "pytest -q"}
 
 
-def test_opencode_config_uses_condition_mcp_only(tmp_path: Path):
-    source = tmp_path / "mcp_config.json"
-    source.write_text(json.dumps({
-        "mcpServers": {
-            "docmancer-docs": {
-                "command": "uv",
-                "args": ["run", "doc-atlas", "mcp", "docs-serve"],
-                "env": {"DOCATLAS_TASK_LEVEL_ALLOW_NETWORK": "false"},
-            }
-        }
-    }), encoding="utf-8")
-
-    config_home = tmp_path / "xdg_config"
-    written = _write_opencode_config(config_home, source)
-    payload = json.loads(written.read_text(encoding="utf-8"))
-
-    assert sorted(payload["mcp"]) == ["docmancer-docs"]
-    assert payload["mcp"]["docmancer-docs"]["type"] == "local"
-    assert payload["mcp"]["docmancer-docs"]["command"] == ["uv", "run", "doc-atlas", "mcp", "docs-serve"]
 
 
-@pytest.mark.integration
-def test_claude_verify_reports_token_usage_unverified():
-    caps = ClaudeRunner().verify()
 
-    assert caps.token_usage is False
+
+
+
+

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "operation": "preload_mini_runtime",
+  "status": "prepared",
+  "model_load_attempts": 1,
+  "model_loads": 1,
+  "model_load_seconds": 5.573677369000507,
+  "model_import_seconds": 4.170549029997346,
+  "asset_verification_seconds": 0.3307960760030255,
+  "model_forward_attempts": 0,
+  "model_forwards": 0,
+  "lock_wait_seconds": 2.063003194052726e-06,
+  "model": {
+    "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+    "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+    "assets_sha256": {
+      "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+      "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+      "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+      "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+      "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+      "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+    },
+    "device": "cpu",
+    "dtype": "FP32",
+    "torch": "2.10.0+cpu",
+    "transformers": "4.57.1",
+    "threads": 8,
+    "interop_threads": 1,
+    "max_length": 512,
+    "truncation": false,
+    "score": "raw_logits[0,0]",
+    "tie_break": "original_pool_index"
+  },
+  "total_seconds": 5.573983993002912,
+  "host_torch_import_config_seconds": 2.152839350001159,
+  "full_host_preparation_seconds": 7.72699314500278
+}

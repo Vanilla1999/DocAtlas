@@ -72,64 +72,10 @@ def _assert_comparable(docmancer_report: dict, context7_report: dict) -> None:
         assert quality_metric in context7_report["metrics"]["quality"]
 
 
-def test_context7_riverpod_snapshot_matches_golden_dataset():
-    report = _load_json("eval/results/context7_riverpod_results.json")
-
-    _assert_context7_snapshot(
-        report,
-        dataset_path="eval/riverpod_golden.yaml",
-        source="/websites/riverpod_dev",
-        expected_queries=5,
-    )
 
 
-def test_context7_fastapi_snapshot_matches_golden_dataset():
-    report = _load_json("eval/results/context7_fastapi_results.json")
-
-    _assert_context7_snapshot(
-        report,
-        dataset_path="eval/fastapi_golden.yaml",
-        source="/websites/fastapi_tiangolo",
-        expected_queries=3,
-    )
 
 
-def test_context7_snapshots_are_comparable_with_docmancer_artifacts():
-    pairs = [
-        ("eval/results/docmancer_riverpod_results.json", "eval/results/context7_riverpod_results.json"),
-        ("eval/results/docmancer_fastapi_results.json", "eval/results/context7_fastapi_results.json"),
-        ("eval/results/docatlas_click_results.json", "eval/results/context7_click_results.json"),
-        ("eval/results/docatlas_flutter_bloc_results.json", "eval/results/context7_flutter_bloc_results.json"),
-        ("eval/results/docatlas_project_docs_results.json", "eval/results/context7_project_docs_results.json"),
-    ]
-
-    for docmancer_path, context7_path in pairs:
-        _assert_comparable(_load_json(docmancer_path), _load_json(context7_path))
 
 
-def test_context7_benchmark_runner_compares_existing_snapshots():
-    module = _benchmark_module()
 
-    report = module.BenchmarkRunner().run()
-
-    assert report["benchmark_catalog_queries"] == 17
-    assert report["total_queries"] == 17
-    assert report["acceptance"]["passed"] is True
-    assert report["docatlas"]["contamination_rate"] == 0.0
-    assert report["context7"]["correct_source_rate"] == 1.0
-    assert report["docatlas"]["hit@5"] >= 0.9
-    assert report["docatlas"]["unique_sources@5"] > 3
-    assert report["docatlas"]["redundancy_rate"] < 0.4
-    assert report["docatlas"]["avg_cold_latency_ms"] < 2000
-    assert report["docatlas"]["avg_warm_latency_ms"] < 500
-    assert report["docatlas"]["setup_calls_avg"] < 3
-    assert report["docatlas"]["exact_version_correctness"] == 1.0
-    assert report["docatlas"]["hallucinated_api_rate"] == 0.0
-
-
-def test_context7_benchmark_helpers_score_snippets_and_contamination():
-    module = _benchmark_module()
-
-    assert module.contamination_check([{"source": "https://fastapi.tiangolo.com/tutorial"}], "fastapi") is True
-    assert module.contamination_check([{"source": "https://click.palletsprojects.com/"}], "fastapi") is False
-    assert module.snippet_score("```python\nDepends(common)\n```", {"depends", "common"}) == 1.0

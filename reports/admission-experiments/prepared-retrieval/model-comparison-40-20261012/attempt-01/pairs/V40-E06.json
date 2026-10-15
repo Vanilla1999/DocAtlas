@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-E06",
+  "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "a00b2be912beb8b186e60a05d3eced8686932e5d59e8275cffa28a2f2438b6a2",
+      "mini_sha256": "a00b2be912beb8b186e60a05d3eced8686932e5d59e8275cffa28a2f2438b6a2"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "e472856a4434a6225367330e0b6115e5e381452091a38c24c19b2c53f40a927d",
+      "mini_sha256": "e472856a4434a6225367330e0b6115e5e381452091a38c24c19b2c53f40a927d"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "3de6b17dbbaf0f9cf9b7a6106f5cab1d250d12a22f31c359dda0bdf7149d9e20",
+      "mini_sha256": "3de6b17dbbaf0f9cf9b7a6106f5cab1d250d12a22f31c359dda0bdf7149d9e20"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      3
+    ],
+    "mini": [
+      3
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+}

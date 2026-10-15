@@ -31,42 +31,12 @@ _QUOTED_RE = re.compile(r"[`\"']([^`\"'\n]{2,160})[`\"']")
 
 # A hyphen is ambiguous in ordinary prose. Bind unquoted command identities
 # to local command syntax instead of maintaining exceptions for known words.
-_COMMAND_PREFIX_RE = re.compile(
-    r"\b(?:run|execute|invoke|command|subcommand|executable|binary|"
-    r"запусти|запустить|выполни|выполнить|команда|команду|утилита|утилиту)"
-    r"\s+(?:(?:named|called)\s+)?$", re.I,
-)
-_COMMAND_SUFFIX_RE = re.compile(r"^\s+(?:command|subcommand|executable|binary)\b", re.I)
-
-
 def _explicit_command_context(source: str, start: int, end: int) -> bool:
     before, after = source[:start], source[end:]
     return bool(
         not before.strip() and not after.strip(" ?.!\n\t")
-        or _COMMAND_PREFIX_RE.search(before) is not None
-        or _COMMAND_SUFFIX_RE.match(after) is not None
         or re.match(r"^\s+--[A-Za-z]", after) is not None
-        # Preserve a named subject in an explicit action/inventory question.
-        # Unlike an attributive modifier, it occupies the entire subject slot.
-        or (
-            re.fullmatch(r"\s*(?:what|which(?:\s+\w+){1,3})\s+does\s+", before, re.I)
-            and re.match(r"^\s+(?:support|accept|delete|preserve|do|provide|expose)\b", after, re.I)
-        )
-        # A shaped option/API name scoped to a final named command is also
-        # explicit identity, even when the user omitted Markdown quoting.
-        or (
-            re.search(r"\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\s+in\s+$", before)
-            and not after.strip(" ?.!\n\t")
-        )
     )
-
-
-_IRREGULAR_SINGULARS = {
-    "indices": "index",
-    "statuses": "status",
-    "policies": "policy",
-    "categories": "category",
-}
 
 
 def _bounded(value: object) -> str:
@@ -82,19 +52,9 @@ def canonical_technical_term(
     value: object,
     kind: TechnicalTermKind | None = None,
 ) -> str:
-    """Return one separator-stable identity for hashing and matching."""
-
+    """Return a bounded literal identity; separators are significant."""
     raw = _bounded(value)
-    if not raw:
-        return ""
-    resolved = kind or infer_technical_kind(raw)
-    tokens = _tokens(raw)
-    if not tokens:
-        return raw.casefold()[:MAX_TERM_CHARS]
-    joined = "-".join(tokens)[:MAX_TERM_CHARS]
-    if resolved == "env_var":
-        return "_".join(tokens).upper()[:MAX_TERM_CHARS]
-    return joined
+    return raw if kind == "env_var" else raw.casefold()
 
 
 def infer_technical_kind(value: object, *, context: str = "") -> TechnicalTermKind:
@@ -106,12 +66,6 @@ def infer_technical_kind(value: object, *, context: str = "") -> TechnicalTermKi
     if _DOTTED_RE.fullmatch(raw):
         return "config_key" if raw.casefold() == raw and "." in raw else "code_symbol"
     if _SNAKE_RE.fullmatch(raw):
-        if (
-            raw.casefold() == raw
-            and re.search(r"\b(?:flag|option|switch|clear-index|command)\b", context, re.I)
-            and not re.search(r"\b(?:function|method|symbol|api|class|module)\b", context, re.I)
-        ):
-            return "cli_flag"
         return "code_symbol"
     if _CLI_COMMAND_RE.fullmatch(raw):
         return "cli_command"
@@ -119,35 +73,11 @@ def infer_technical_kind(value: object, *, context: str = "") -> TechnicalTermKi
 
 
 def _preferred_spelling(raw: str, kind: TechnicalTermKind) -> str:
-    canonical = canonical_technical_term(raw, kind)
-    if kind == "cli_flag":
-        return f"--{canonical}" if canonical else raw
-    if kind == "cli_command":
-        return canonical or raw
-    if kind == "env_var":
-        return canonical or raw.upper()
     return raw
 
 
 def _aliases(raw: str, kind: TechnicalTermKind) -> tuple[str, ...]:
-    tokens = _tokens(raw)
-    values: list[str] = [_preferred_spelling(raw, kind), raw]
-    if tokens and (
-        len(tokens) > 1
-        or kind in {"cli_command", "cli_flag", "env_var", "config_key", "code_symbol"}
-    ):
-        hyphenated = "-".join(tokens)
-        underscored = "_".join(tokens)
-        spaced = " ".join(tokens)
-        if kind == "cli_flag":
-            values.extend((f"--{hyphenated}", hyphenated, underscored, spaced))
-        elif kind == "cli_command":
-            values.extend((hyphenated, underscored, spaced))
-        elif kind == "env_var":
-            values.extend((underscored.upper(), underscored, hyphenated, spaced))
-        else:
-            values.extend((underscored, hyphenated, spaced))
-    return tuple(dict.fromkeys(value for value in values if value))[:MAX_TERM_ALIASES]
+    return (raw,) if raw else ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -194,40 +124,16 @@ def coerce_technical_term(
 
 
 def controlled_noun_forms(value: object) -> tuple[str, ...]:
-    """Return a bounded surface/singular pair for an already parsed noun.
-
-    This is deliberately not a corpus-wide stemmer.  It is used only after a
-    question grammar has identified the noun as an attribute/item kind.
-    """
-
+    """Literal noun spelling only; no inferred singulars."""
     raw = _bounded(value).casefold()
-    if not raw:
-        return ()
-    forms = [raw]
-    singular = _IRREGULAR_SINGULARS.get(raw)
-    if singular is None:
-        if raw.endswith("ies") and len(raw) > 4:
-            singular = raw[:-3] + "y"
-        elif raw.endswith("ses") and len(raw) > 4:
-            singular = raw[:-2]
-        elif raw.endswith("s") and not raw.endswith("ss") and len(raw) > 3:
-            singular = raw[:-1]
-    if singular and singular != raw:
-        forms.append(singular)
-    return tuple(forms[:2])
+    return (raw,) if raw else ()
 
 
 def _term_pattern(value: object, *, kind: TechnicalTermKind | None = None) -> str:
     raw = _bounded(value)
     if not raw:
         return r"(?!)"
-    resolved = kind or infer_technical_kind(raw)
-    tokens = _tokens(raw)
-    if not tokens:
-        return rf"(?<![A-Za-z0-9_-]){re.escape(raw)}(?![A-Za-z0-9_-])"
-    body = r"[\s_-]+".join(re.escape(token) for token in tokens)
-    prefix = r"(?:--)?" if resolved == "cli_flag" or raw.startswith("--") else ""
-    return rf"(?<![A-Za-z0-9_-]){prefix}{body}(?![A-Za-z0-9_-])"
+    return rf"(?<![\w.:-]){re.escape(raw)}(?![\w.:-])"
 
 
 def term_sequence_spans(value: object, text: object) -> tuple[tuple[int, int], ...]:

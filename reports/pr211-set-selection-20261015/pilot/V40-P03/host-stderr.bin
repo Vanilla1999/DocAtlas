@@ -1,0 +1,25 @@
+Error: Server process exited with code 1
+Error: Managed service port 49374 on 127.0.0.1 is already in use by another process. Configure another port with `opencode service set port <port>` and start the service again.
+    at <anonymous> (/$bunfs/root/chunk-x6242730.js:2:8786) {
+  [cause]: ServeError: 
+      at N (/$bunfs/root/chunk-q8wzwtww.js:52:7706)
+      at applyHandlers (node:events:64:20)
+      at emitError (node:events:44:27)
+      at emitListenErrorNextTick (node:_http_server:134:12)
+      at processTicksAndRejections (unknown:7:39) {
+    [cause]: Error: Failed to start server. Is port 49374 in use?
+        at serve (unknown)
+        at <anonymous> (node:_http_server:359:39)
+        at <anonymous> (node:_http_server:332:33)
+        at <anonymous> (/$bunfs/root/chunk-q8wzwtww.js:52:7744)
+  }
+}
+    at map (unknown:1:11)
+    at reap (/$bunfs/root/chunk-b5fy5cjh.js:2:1203)
+    at <anonymous> (/$bunfs/root/chunk-b5fy5cjh.js:3:6711)
+    at service.ensure (/$bunfs/root/chunk-tbc1ctg4.js:3:732)
+    at service.ensure (definition) (/$bunfs/root/chunk-b5fy5cjh.js:3:5523)
+    at cli.server-connection.resolve (/$bunfs/root/chunk-ywn6maqw.js:2:1149)
+    at cli.server-connection.resolve (definition) (/$bunfs/root/chunk-tbc1ctg4.js:2:402)
+    at cli.api (/$bunfs/root/chunk-3fkjwap5.js:7:21270)
+    at cli.api (definition) (/$bunfs/root/chunk-ywn6maqw.js:2:1109)

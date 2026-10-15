@@ -1,0 +1,319 @@
+{
+  "schema": "pr211-followup-core-acceptance-v1",
+  "repo": "Vanilla1999/DocAtlas",
+  "pull_request": 211,
+  "scope": "Core-only executed evidence; not full acceptance or merge readiness.",
+  "full_acceptance": false,
+  "merge_ready": false,
+  "head_sha": "40032f7be3c6d0822e8c25a2e2c53acf9a46aeea",
+  "tree_sha": "701ba7a4e529e0b197c6d28d4ec9ce7ac7dbdfb4",
+  "checkout_merge_sha": "5736ec7b2ba2dcd55892b6085aff6107bae15e4f",
+  "merge_parents": [
+    "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+    "40032f7be3c6d0822e8c25a2e2c53acf9a46aeea"
+  ],
+  "base_branch_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "baseline_head_sha": "f0ed956ce2c2ba19dc536bbe0ad6dbebb8418fa4",
+  "run_id": 37822521243,
+  "run_attempt": 1,
+  "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37822521243",
+  "run_conclusion": "failure",
+  "checkout_provenance": "Exact PR run head and merge API parents/tree, frozen clean snapshot, pinned default actions/checkout; core giant logs intentionally not downloaded.",
+  "frozen_snapshot_clean": true,
+  "head_and_merge_trees_equal": true,
+  "core_job_definition_unchanged_from_f0": true,
+  "test_command": "pytest tests/ -m \"not advanced and not live and not live_network\" -v --junitxml=\"$RUNNER_TEMP/core-tests-${{ matrix.python-version }}.xml\"",
+  "matrix_rosters_identical": true,
+  "matrix_outcomes_identical": true,
+  "executed_per_python": 8507,
+  "states_per_python": {
+    "failure": 1986,
+    "passed": 6450,
+    "error": 61,
+    "skipped": 10
+  },
+  "roster_ids_sha256": "e6fe4f84c1c5018c63c1f52b972a44a6951aa42e5fe2e834214ecaae389697d0",
+  "roster_outcomes_sha256": "9344538d533260a89dc4152767b3d38ef58d64807247ada6542960ce6d366b70",
+  "digest_encoding": "SHA256 of UTF-8 compact JSON, ensure_ascii=False, sort_keys=True, separators=(comma,colon); sorted list of {nodeid,state}, or sorted nodeid list for roster IDs.",
+  "matrix": [
+    {
+      "python": "3.11",
+      "job_id": 113466915982,
+      "artifact_id": 11570935686,
+      "artifact_name": "pytest-core-3.11-37822521243-1",
+      "artifact_sha256": "4fc7d3bb7581f3a01ec2174103ddbec574f9262e7f6316ff2b7ddfaf236d068b",
+      "artifact_bytes": 564603,
+      "xml_sha256": "da7b5046143bd21f514dc69c9be2134b2480a849760aa656d7daaaff3f648801",
+      "xml_bytes": 7790166,
+      "case_json_sha256": "02685a31a2b030854608fd48656bdc098d77af072b894b10b1f32882b16d02df",
+      "job_conclusion": "failure",
+      "junit_upload_conclusion": "success"
+    },
+    {
+      "python": "3.12",
+      "job_id": 113466915984,
+      "artifact_id": 11570800467,
+      "artifact_name": "pytest-core-3.12-37822521243-1",
+      "artifact_sha256": "376852b8ea07e9a2a0362cadd466c409a69fa1f1a8138fe245cc499d6bc14359",
+      "artifact_bytes": 564675,
+      "xml_sha256": "24ebdeb33e4727e55e85d2ee7a9a0da902b7164192ddac114d4466692038644d",
+      "xml_bytes": 7790375,
+      "case_json_sha256": "c64aad9399786ea1450ada4453015748f10bf211161affb11b28fc4e1a2d547f",
+      "job_conclusion": "failure",
+      "junit_upload_conclusion": "success"
+    },
+    {
+      "python": "3.13",
+      "job_id": 113466915979,
+      "artifact_id": 11569997591,
+      "artifact_name": "pytest-core-3.13-37822521243-1",
+      "artifact_sha256": "25b9dd8c1da1c14a93a3f0e8046fcfb55d4d5259c51b59bab0a20850380c3d3e",
+      "artifact_bytes": 565294,
+      "xml_sha256": "3a2ed03671c0fb7f1ceca1707931762868d3a4458ee829d771d6ba827fa194ec",
+      "xml_bytes": 7790378,
+      "case_json_sha256": "18274757d393ae139c6feeed6bc5d40f601d8a1c55c123d91a3c4f26a753c153",
+      "job_conclusion": "failure",
+      "junit_upload_conclusion": "success"
+    }
+  ],
+  "baseline": {
+    "executed": 8507,
+    "states": {
+      "failure": 2021,
+      "passed": 6415,
+      "error": 61,
+      "skipped": 10
+    },
+    "durable_roster_path": "v2plan/PR211_CONTINUATION_OUTCOMES.json.gz",
+    "durable_roster_sha256": "25d2b819b06bdbec2c785ba5e6648cff18daa44069fb620710dc059f248c9da4",
+    "durable_roster_uncompressed_sha256": "6c9f35798f1a42e05b5933df6233bc85f7e15a3d07bdf97d42b1d3209ae94b93",
+    "filter": "Keep records with core in suites; retain nodeid/state only.",
+    "core_roster_outcomes_sha256": "0aca214edf637db22bd2de5a44be662cb5302e9e61a62313074129f0f971e499"
+  },
+  "delta": {
+    "added": [],
+    "removed": [],
+    "transitions": [
+      {
+        "nodeid": "tests/docs/test_mcp_docs_tools_registration.py::test_agent_templates_include_three_tool_selection_guidance",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[facts-1]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[facts-False]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[facts-None]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[facts-True]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[facts-true]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[snippets-1]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[snippets-False]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[snippets-None]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[snippets-True]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_local_residuals.py::test_generated_requires_boolean_true_even_for_explicit_path[snippets-true]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-\\u0441\\u0433\\u0435\\u043d\\u0435\\u0440\\u0438\\u0440\\u043e\\u0432\\u0430\\u043d\\u043d \\u0444\\u0430\\u0439\\u043b Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-\\u0441\\u0433\\u0435\\u043d\\u0435\\u0440\\u0438\\u0440\\u043e\\u0432\\u0430\\u043d\\u043d\\u044b\\u0439 \\u043a\\u043e\\u0434 Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-alpha.freezed.dart Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-alpha.g.dart Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-alpha.pb.go Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-generated artifact Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-generated code Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[False-generated source Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-\\u0441\\u0433\\u0435\\u043d\\u0435\\u0440\\u0438\\u0440\\u043e\\u0432\\u0430\\u043d\\u043d \\u0444\\u0430\\u0439\\u043b Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-\\u0441\\u0433\\u0435\\u043d\\u0435\\u0440\\u0438\\u0440\\u043e\\u0432\\u0430\\u043d\\u043d\\u044b\\u0439 \\u043a\\u043e\\u0434 Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-alpha.freezed.dart Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-alpha.g.dart Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-alpha.pb.go Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-generated artifact Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-generated code Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[None-generated source Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-\\u0441\\u0433\\u0435\\u043d\\u0435\\u0440\\u0438\\u0440\\u043e\\u0432\\u0430\\u043d\\u043d \\u0444\\u0430\\u0439\\u043b Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-\\u0441\\u0433\\u0435\\u043d\\u0435\\u0440\\u0438\\u0440\\u043e\\u0432\\u0430\\u043d\\u043d\\u044b\\u0439 \\u043a\\u043e\\u0434 Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-alpha.freezed.dart Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-alpha.g.dart Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-alpha.pb.go Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-generated artifact Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-generated code Alpha]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_read_tails.py::test_only_explicit_generated_opt_in_authorizes_source_scanning[True-generated source Alpha]",
+        "before": "failure",
+        "after": "passed"
+      }
+    ],
+    "transition_counts": {
+      "failure->passed": 35
+    },
+    "pass_regressions": [],
+    "policy_transitions": [],
+    "module_transitions": {
+      "tests/docs/test_mcp_docs_tools_registration.py": {
+        "failure->passed": 1
+      },
+      "tests/test_dictionary_exit_local_residuals.py": {
+        "failure->passed": 10
+      },
+      "tests/test_dictionary_exit_read_tails.py": {
+        "failure->passed": 24
+      }
+    }
+  },
+  "reconstruction": {
+    "procedure": "Read and verify historical gzip; filter core; verify baseline outcome digest; require every transition before state; apply exact 35 transitions; sort by nodeid and compare canonical final outcome digest.",
+    "independently_reconstructed_full_8507_roster": true,
+    "baseline_and_reconstructed_digests_verified": true
+  },
+  "interpretation": {
+    "registration_wording_regression": "FAIL to PASS in every Python.",
+    "generated_successors": "All 10 local-residuals +24 read-tails generated-consent cases FAIL to PASS in every Python.",
+    "other_cases": "No added, removed, skipped, error or other state changes; no PASS regression.",
+    "new_integrity_tests_from_f0": "Both retained PASS; no further new tests.",
+    "remaining": "1986 FAIL +61 ERROR +10 SKIP remain per Python. Other workflow, downstream, retrieval, installed/client results are outside this core-only report."
+  },
+  "audit_inputs": [
+    {
+      "file": "40032f7-core-audit-summary.json",
+      "bytes": 167451,
+      "sha256": "1a541d542e352bfca1c38ab5bf9af072461a90319e47ef86cf82bdfa4ace5a22"
+    },
+    {
+      "file": "40032f7-core-provenance.json",
+      "bytes": 6837,
+      "sha256": "729f12cdb69bd9d25236c805d2f803d4c267ca0f1fdf37c905873ac8f8068b1b"
+    },
+    {
+      "file": "40032f7-core-artifacts.json",
+      "bytes": 5894,
+      "sha256": "9e75524528efeb76670b12626a5362bb64b669999db35c5ceed03566c765d0da"
+    }
+  ]
+}

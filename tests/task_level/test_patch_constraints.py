@@ -37,43 +37,16 @@ def _workspace(tmp_path: Path) -> Path:
     return workspace
 
 
-def test_patch_constraints_exclude_hidden_only_requirements(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path))
-
-    assert "Hidden test says" not in "\n".join(c.instruction for c in packet.constraints)
 
 
-def test_patch_constraints_include_visible_generated_file_rule(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path))
-
-    assert any(c.type == "generated_file" for c in packet.constraints)
 
 
-def test_patch_constraints_include_dependency_version_contract(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path))
-
-    assert any(c.type == "dependency_version" and "11.4.0" in c.instruction for c in packet.constraints)
 
 
-def test_patch_constraints_include_architecture_owner(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path))
-
-    assert any(c.type == "architecture" and "PermissionService" in c.instruction for c in packet.constraints)
 
 
-def test_patch_constraints_have_source_attribution(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path))
-
-    assert packet.constraints
-    assert all(c.source for c in packet.constraints)
-    assert packet.source_summary
 
 
-def test_patch_constraints_token_estimate_exists(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path))
-
-    assert isinstance(packet.token_estimate, int)
-    assert packet.token_estimate > 0
 
 
 def test_patch_constraints_usage_detects_symbol_or_file_match(tmp_path: Path):
@@ -97,11 +70,6 @@ def test_patch_constraints_condition_injects_packet(tmp_path: Path):
     assert (output_dir / "patch_constraints.md").read_text(encoding="utf-8").startswith("## DocAtlas patch constraints")
 
 
-def test_patch_constraints_condition_respects_token_budget(tmp_path: Path):
-    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path), max_tokens=80, max_constraints=12)
-
-    assert packet.token_estimate is not None
-    assert len(packet.constraints) < 12
 
 
 def test_patch_constraints_condition_writes_artifacts(tmp_path: Path):

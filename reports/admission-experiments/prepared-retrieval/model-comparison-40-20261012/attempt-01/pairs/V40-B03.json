@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B03",
+  "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "e8377428dc2dd4c20a0eb38f965bf73c15ab945851b996b9653df32abbbcfb64",
+      "mini_sha256": "e8377428dc2dd4c20a0eb38f965bf73c15ab945851b996b9653df32abbbcfb64"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "7bc789f1c93e9239759f0abd74856267ab0932b3c7e9bb3906590af9f11abb99",
+      "mini_sha256": "7bc789f1c93e9239759f0abd74856267ab0932b3c7e9bb3906590af9f11abb99"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "42dc50f287ccd1016d0803f52a2289eb38c66c65780fb272a8ede559190243dc",
+      "mini_sha256": "42dc50f287ccd1016d0803f52a2289eb38c66c65780fb272a8ede559190243dc"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      3
+    ],
+    "mini": [
+      3
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

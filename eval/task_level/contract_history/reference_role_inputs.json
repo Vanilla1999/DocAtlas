@@ -1,0 +1,920 @@
+{
+  "protocol": "reference-role-original-inputs-v1",
+  "phase": "precheck_no_retirement",
+  "base_commit": "7b56e7b61ff28024349ae13d8e60a591788b83cf",
+  "base_tree": "0efae221bcb7a65e1cf18a3e6525f0f9146c89e0",
+  "contract": {
+    "query_mentions": "Only literal syntactic extraction assigns explicit path/symbol roles. Surrounding prose does not nominate a source, subject or symbol.",
+    "bare_shapes": "ARGON requires its existing shaped unresolved occurrence. Other unquoted plain spellings may be absent or preserve exactly their own raw unresolved occurrence; never an explicit or contextual role.",
+    "quoted_stems": "The selected simple quoted stem is symbol_identity and explicit=True in query_mentions for both quote characters.",
+    "catalog_boundary": "resolve_references may bind a double-quoted simple stem to the already-allowed complete catalog; backtick identity stays a symbol on collision. A resolved symbol is not body/source/answer authority.",
+    "source_scope_unchanged": "All native evidence, source-owner, hash, current generation, exact literal, filename/collision, public delivery and raw-body guards remain separate live obligations.",
+    "owning_sources": [
+      {
+        "path": "docmancer/docs/domain/query_reference_binding.py",
+        "sha": "06215d1e4deaa4c56a2c0afac135bd2f2a29a858",
+        "lines": [
+          61,
+          93,
+          229,
+          286
+        ]
+      },
+      {
+        "path": "docmancer/docs/domain/query_terms.py",
+        "sha": "8d047ff87066d43416ae5102038237605ada0a28",
+        "lines": [
+          19,
+          28,
+          57,
+          90,
+          147,
+          150
+        ]
+      },
+      {
+        "path": "docs/adr/0003-context-first-project-reads.md",
+        "sha": "f06b5e797c122c4f24178e02ebb4dafe0520492c"
+      },
+      {
+        "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/NL_DICTIONARY_REMOVAL_COMPLETED_RU.md",
+        "sha": "6b217bc464c4c11f85a288cadf6161ba9b1cf962"
+      }
+    ]
+  },
+  "archives": [
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "archive_path": "eval/task_level/contract_history/query_reference_roles.py.txt",
+      "git_blob_sha": "2b71d1712b19e33a198d4c209549260f24738b8e",
+      "sha256": "8109bda521861fcc4be5c3be57c42b9a4b63dc38eafbb088247fe60525082aa6"
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "archive_path": "eval/task_level/contract_history/reference_behavior_matrix.py.txt",
+      "git_blob_sha": "84f8fdc218fd2ac4fb2ec0962bf698cb1d100012",
+      "sha256": "1c760ae7be2dffeab5b71a1ccdb30163fc2bb465045048bf235a6b2f227bebcf"
+    }
+  ],
+  "module_rosters": [
+    {
+      "path": "tests/docs/test_query_reference_roles.py",
+      "git_blob_sha": "2b71d1712b19e33a198d4c209549260f24738b8e",
+      "test_definitions": 14,
+      "collected_cases_static": 40,
+      "base_node_hash": "84a2969b0b6c5c44f0ce40416f4e5fcce80f5a920d0057f00e5b43fc5e8b96f2"
+    },
+    {
+      "path": "tests/docs/test_reference_behavior_matrix.py",
+      "git_blob_sha": "84f8fdc218fd2ac4fb2ec0962bf698cb1d100012",
+      "test_definitions": 6,
+      "collected_cases_static": 24,
+      "base_node_hash": "03d81d2311a745a82bfecbc12467f538b2e5209c373be173f71557843fa7e8a7"
+    },
+    {
+      "path": "tests/test_dictionary_exit_reference_ranking.py",
+      "git_blob_sha": "27adc50fa21225bb0faa523012efb5d63b6abc37",
+      "test_definitions": 28,
+      "collected_cases_static": 92,
+      "base_node_hash": "4ddedde898079b024137595bac2295e5e51d027da479922d1553083b417dcc7a"
+    }
+  ],
+  "function_mapping": [
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_context_not_case_assigns_role",
+      "definition_line": 7,
+      "decorated_source_char_span": [
+        168,
+        701
+      ],
+      "source_sha256": "4cb234ed39249e1419ee6e99c9a3738d9ad72cf903405c99660afa67e9f38d36",
+      "collected_cases_static": 12,
+      "retire_candidate_cases": 12,
+      "retain_cases": 0,
+      "disposition": "retire_after_own_proof",
+      "reason": "NL context no longer assigns roles or emits explicit occurrences; all12 authored questions retained in replay."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_same_spelling_has_distinct_source_and_symbol_occurrences",
+      "definition_line": 15,
+      "decorated_source_char_span": [
+        701,
+        1097
+      ],
+      "source_sha256": "1f58600b691470c4687459464dbe289956f745dfb9ef14c3f22eabbbf657ef5c",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_mixed_migration",
+      "reason": "Keep two same-spelling occurrences, independent IDs/raw spans; migrate only obsolete role of bare ARGON separately."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_russian_roles_preserve_unicode_offsets",
+      "definition_line": 23,
+      "decorated_source_char_span": [
+        1097,
+        1548
+      ],
+      "source_sha256": "593765e1bd07f3fa8587f0092559e7c0582ae6f89e393a324fbd9e79b4cb73a3",
+      "collected_cases_static": 5,
+      "retire_candidate_cases": 5,
+      "retain_cases": 0,
+      "disposition": "retire_after_own_proof",
+      "reason": "Five prose phrases do not nominate a Cyrillic actor/source; absence or exact unresolved occurrence, never invented explicit role."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_quotes_preserve_contextual_role",
+      "definition_line": 30,
+      "decorated_source_char_span": [
+        1548,
+        1929
+      ],
+      "source_sha256": "0fd55e6d0cf276a833e91b2770a25e9896ad3cf26456c43916021e07e1ecbd62",
+      "collected_cases_static": 4,
+      "retire_candidate_cases": 2,
+      "retain_cases": 2,
+      "disposition": "partial_retire_after_own_proof",
+      "reason": "Retire only in-the-file context row across both quote characters; preserve two constant quoted-symbol cases.",
+      "retire_only_parameter_row": {
+        "argument": "context,role",
+        "value": [
+          "in the file",
+          "source_locator"
+        ]
+      },
+      "keep_parameter_row": {
+        "argument": "context,role",
+        "value": [
+          "constant",
+          "symbol_identity"
+        ]
+      }
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_longest_span_does_not_create_substring_obligations",
+      "definition_line": 35,
+      "decorated_source_char_span": [
+        1929,
+        2408
+      ],
+      "source_sha256": "adf2169731df518709c54a74fc69cb7a2ad1aefbb09f66f8d6dc93859e069a74",
+      "collected_cases_static": 4,
+      "retire_candidate_cases": 0,
+      "retain_cases": 4,
+      "disposition": "keep",
+      "reason": "Exact longest literal path/symbol/flag spans; no substring obligations."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_bare_uppercase_is_not_automatically_subject",
+      "definition_line": 42,
+      "decorated_source_char_span": [
+        2408,
+        2612
+      ],
+      "source_sha256": "50bee13f49b37a968cec64a3ce213d3fd7dd70fa6ae02018ac57a6fd5d30d10e",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep",
+      "reason": "Bare uppercase spelling remains unresolved."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_query_and_offsets_identify_occurrence",
+      "definition_line": 46,
+      "decorated_source_char_span": [
+        2612,
+        2853
+      ],
+      "source_sha256": "282c682541cbc38ebe5710d66711bd201b1f3e9dab774fd83f2da2bd696b18e1",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep",
+      "reason": "Four occurrence IDs are tied to exact raw query/offsets."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_lone_quoted_filename_keeps_strict_identity",
+      "definition_line": 52,
+      "decorated_source_char_span": [
+        2853,
+        3049
+      ],
+      "source_sha256": "efd06a2a201230bdd7a7d844bae3e0e2dda7ac86b958615d54a8099bce4c6263",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_mixed_migration",
+      "reason": "Current complete filename syntax is a locator; preserve strict identity obligation in a later justified migration."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_descriptive_nouns_do_not_invent_source_or_subject",
+      "definition_line": 56,
+      "decorated_source_char_span": [
+        3049,
+        3383
+      ],
+      "source_sha256": "d4925f479d490cca1e69af41e6ed7c98c457f04184f07ee523f36286cee67f1e",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep",
+      "reason": "Ordinary descriptive words do not nominate source/subject."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_slash_comparison_is_not_a_source_path",
+      "definition_line": 60,
+      "decorated_source_char_span": [
+        3383,
+        3572
+      ],
+      "source_sha256": "b6a105094e54a4dc882ad149614678841edde167e6b08eaccfa4a3e4bfcabf16",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep",
+      "reason": "Slash comparison is not a documentation locator."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_weak_source_hypothesis_does_not_invent_a_lowercase_exact_term",
+      "definition_line": 64,
+      "decorated_source_char_span": [
+        3572,
+        4163
+      ],
+      "source_sha256": "06b1a09c08697bde0a3b96d1eb86d1a54383ce45f67639c8f8ede9286ee62127",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_mixed_migration",
+      "reason": "Keep original4 queries and no invented noun hard-exact guard; obsolete CamelCase/constant inference handled separately."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_anaphoric_default_does_not_invent_a_named_subject",
+      "definition_line": 75,
+      "decorated_source_char_span": [
+        4163,
+        4610
+      ],
+      "source_sha256": "28896f460276a4f6a72a9b3cb7d5793c4cafc861f9f32c5f2ae18e6eeecb791b",
+      "collected_cases_static": 5,
+      "retire_candidate_cases": 0,
+      "retain_cases": 5,
+      "disposition": "keep",
+      "reason": "Five pronoun records preserve absence of invented actor plus explicit engine.Stop identity."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_repeated_parse_reuses_immutable_mentions_not_scope_resolution",
+      "definition_line": 82,
+      "decorated_source_char_span": [
+        4610,
+        5630
+      ],
+      "source_sha256": "72cba7b612486aed271c7ecc03016b5161e93074c87875780ee5f345517c7966",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_mixed_migration",
+      "reason": "Cache purity and per-call finite scope resolution remain; old prose locator premise needs separate healthy migration."
+    },
+    {
+      "original_path": "tests/docs/test_query_reference_roles.py",
+      "function": "test_code_paths_are_identities_not_document_locators_without_source_context",
+      "definition_line": 105,
+      "decorated_source_char_span": [
+        5630,
+        6061
+      ],
+      "source_sha256": "0c805075a6dfb8c82d59d37ab0035626d46b9da8671deab67387c179e1edc100",
+      "collected_cases_static": 2,
+      "retire_candidate_cases": 0,
+      "retain_cases": 2,
+      "disposition": "keep",
+      "reason": "Two exact code paths remain symbol identities."
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "function": "test_locator_rename_preserves_command_without_body_change",
+      "definition_line": 9,
+      "decorated_source_char_span": [
+        185,
+        819
+      ],
+      "source_sha256": "30085e9c138c6384f1f8daf02d6f3049ef14da8ea24e6c667e5dc56a4fb2473a",
+      "collected_cases_static": 16,
+      "retire_candidate_cases": 0,
+      "retain_cases": 16,
+      "disposition": "keep_native_quality",
+      "reason": "All16 original English/Russian queries and same command body retained; absent final facts require native boundary diagnosis."
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "function": "test_command_substitution_is_preserved",
+      "definition_line": 17,
+      "decorated_source_char_span": [
+        819,
+        1192
+      ],
+      "source_sha256": "3e4d8835d1004b166bb0a518fc2b256876a87a7bdc55bffdbd686359bc02a806",
+      "collected_cases_static": 3,
+      "retire_candidate_cases": 0,
+      "retain_cases": 3,
+      "disposition": "keep_native_quality",
+      "reason": "Three distinct original command facts must remain delivered."
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "function": "test_exact_case_collision_keeps_document_identity",
+      "definition_line": 24,
+      "decorated_source_char_span": [
+        1192,
+        1779
+      ],
+      "source_sha256": "52f3cfa83a61710c339ebd488126e7cebd446a12d35e46f488c9a1cea00a9b48",
+      "collected_cases_static": 2,
+      "retire_candidate_cases": 0,
+      "retain_cases": 2,
+      "disposition": "keep_native_quality",
+      "reason": "Both complete explicit .md paths plus correct command/source exclusivity remain."
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "function": "test_navigation_only_source_does_not_prove_a_fact",
+      "definition_line": 33,
+      "decorated_source_char_span": [
+        1779,
+        2087
+      ],
+      "source_sha256": "62b295d2c6e239ccf220a1441b29cad367f57bf1ca9af6d267f7ab10d3bacf00",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_native_guard",
+      "reason": "Navigation-only source remains negative; require healthy paired source before credit."
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "function": "test_other_project_index_does_not_invalidate_selected_source",
+      "definition_line": 39,
+      "decorated_source_char_span": [
+        2087,
+        3310
+      ],
+      "source_sha256": "7a2e7afc6fa00782e30bf567f815a373933255a43b2b8c9e5f131cfb1fc5fca6",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_native_guard",
+      "reason": "Selected project stays isolated after another project is indexed."
+    },
+    {
+      "original_path": "tests/docs/test_reference_behavior_matrix.py",
+      "function": "test_forged_heading_trace_does_not_authorize_sibling",
+      "definition_line": 57,
+      "decorated_source_char_span": [
+        3310,
+        4236
+      ],
+      "source_sha256": "f5b3057a6403ba3962039c0068bd59989def5eb36e77fef56ca0db52dda00822",
+      "collected_cases_static": 1,
+      "retire_candidate_cases": 0,
+      "retain_cases": 1,
+      "disposition": "keep_native_guard",
+      "reason": "Forged sibling heading/subject is not source authority; preserve original healthy operand obligation."
+    }
+  ],
+  "function_mapping_sha256": "5fed163b62cd56b36f9479b37200e2f26a9b50d0667c6ae291f42c806f3ba2e2",
+  "replay_inputs": [
+    {
+      "input_index": 0,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "in the file",
+        "role": "source_locator",
+        "name": "ARGON"
+      },
+      "question": "What is documented for in the file ARGON?",
+      "question_sha256": "451afd75e9ab817f181a56d9fc38a17054adcba08eec2b5a39fd117711b2c956",
+      "literal": "ARGON",
+      "literal_span": [
+        35,
+        40
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": true,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 1,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "in the file",
+        "role": "source_locator",
+        "name": "Argon"
+      },
+      "question": "What is documented for in the file Argon?",
+      "question_sha256": "331b3e12d1659b46fc64402e3dab248ca0c48bf904eb3fabdb0c7caa3c1c635a",
+      "literal": "Argon",
+      "literal_span": [
+        35,
+        40
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 2,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "in the file",
+        "role": "source_locator",
+        "name": "argon"
+      },
+      "question": "What is documented for in the file argon?",
+      "question_sha256": "da395c7edf55d02b73022a543cce3124c821e25b9884454dee72b513831ee252",
+      "literal": "argon",
+      "literal_span": [
+        35,
+        40
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 3,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "in the file",
+        "role": "source_locator",
+        "name": "ПАМЯТКА"
+      },
+      "question": "What is documented for in the file ПАМЯТКА?",
+      "question_sha256": "4b3825954f53df56d282857b8e1ffea7bca49926478361642f4ff0695c3b1923",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        35,
+        42
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 4,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "constant",
+        "role": "symbol_identity",
+        "name": "ARGON"
+      },
+      "question": "What is documented for constant ARGON?",
+      "question_sha256": "74e79df7ea80be9ce9e72ddd84d6da2ec370bdc14a5f7aff66eb2d2e1fc445d0",
+      "literal": "ARGON",
+      "literal_span": [
+        32,
+        37
+      ],
+      "historical_role": "symbol_identity",
+      "occurrence_required": true,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 5,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "constant",
+        "role": "symbol_identity",
+        "name": "Argon"
+      },
+      "question": "What is documented for constant Argon?",
+      "question_sha256": "2dda09b3e74036b484b57a6ac07c76d7253987b3d81f226bfbb4e5dfe3c7f3c2",
+      "literal": "Argon",
+      "literal_span": [
+        32,
+        37
+      ],
+      "historical_role": "symbol_identity",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 6,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "constant",
+        "role": "symbol_identity",
+        "name": "argon"
+      },
+      "question": "What is documented for constant argon?",
+      "question_sha256": "f360747ad2f2c25cc757d17fb4e478f40f884115bb6fdc18d26c048a14725b5e",
+      "literal": "argon",
+      "literal_span": [
+        32,
+        37
+      ],
+      "historical_role": "symbol_identity",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 7,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "constant",
+        "role": "symbol_identity",
+        "name": "ПАМЯТКА"
+      },
+      "question": "What is documented for constant ПАМЯТКА?",
+      "question_sha256": "2c10395a8ef8d93f09982066029693674ca0726cb5755e4db756283c8d7a6aa1",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        32,
+        39
+      ],
+      "historical_role": "symbol_identity",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 8,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "library",
+        "role": "semantic_subject",
+        "name": "ARGON"
+      },
+      "question": "What is documented for library ARGON?",
+      "question_sha256": "c9aa3aa822d25fcf08576362c66d8286fbddee43ea8d874c93ed1b894b722d77",
+      "literal": "ARGON",
+      "literal_span": [
+        31,
+        36
+      ],
+      "historical_role": "semantic_subject",
+      "occurrence_required": true,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 9,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "library",
+        "role": "semantic_subject",
+        "name": "Argon"
+      },
+      "question": "What is documented for library Argon?",
+      "question_sha256": "10b2e1c29977098e6fda39e2e3281de7308cebfecb58e5c9a3ed5a92073d3052",
+      "literal": "Argon",
+      "literal_span": [
+        31,
+        36
+      ],
+      "historical_role": "semantic_subject",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 10,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "library",
+        "role": "semantic_subject",
+        "name": "argon"
+      },
+      "question": "What is documented for library argon?",
+      "question_sha256": "3002ad2e0f2999b38b641f80800c1ec931d4f980b43875397708ffc25ad03125",
+      "literal": "argon",
+      "literal_span": [
+        31,
+        36
+      ],
+      "historical_role": "semantic_subject",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 11,
+      "source_function": "test_context_not_case_assigns_role",
+      "source_parameters": {
+        "context": "library",
+        "role": "semantic_subject",
+        "name": "ПАМЯТКА"
+      },
+      "question": "What is documented for library ПАМЯТКА?",
+      "question_sha256": "5abb7189948b42c63e006d5f969f7ab1cfe44e4d6d03c464122795926a52e830",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        31,
+        38
+      ],
+      "historical_role": "semantic_subject",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 12,
+      "source_function": "test_russian_roles_preserve_unicode_offsets",
+      "source_parameters": {
+        "context": "в файле",
+        "role": "source_locator"
+      },
+      "question": "Как работает в файле ПАМЯТКА?",
+      "question_sha256": "8723cbee40661e5cdf605586098d8ef209237015609b1d68edc26dc656103079",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        21,
+        28
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 13,
+      "source_function": "test_russian_roles_preserve_unicode_offsets",
+      "source_parameters": {
+        "context": "из документа",
+        "role": "source_locator"
+      },
+      "question": "Как работает из документа ПАМЯТКА?",
+      "question_sha256": "d816beee51aa4b799528618d1b4fa87d876427d868a8cc228b5296b7f047eff2",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        26,
+        33
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 14,
+      "source_function": "test_russian_roles_preserve_unicode_offsets",
+      "source_parameters": {
+        "context": "константа",
+        "role": "symbol_identity"
+      },
+      "question": "Как работает константа ПАМЯТКА?",
+      "question_sha256": "dc8d1ddd696e6600e101f37b790f7452455884f01f626521024fa597105e0f54",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        23,
+        30
+      ],
+      "historical_role": "symbol_identity",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 15,
+      "source_function": "test_russian_roles_preserve_unicode_offsets",
+      "source_parameters": {
+        "context": "класс",
+        "role": "symbol_identity"
+      },
+      "question": "Как работает класс ПАМЯТКА?",
+      "question_sha256": "91a768ec480e3e0070c8921b4f31908b49c9320d49618bc9b39b8ba0cf0aebdc",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        19,
+        26
+      ],
+      "historical_role": "symbol_identity",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 16,
+      "source_function": "test_russian_roles_preserve_unicode_offsets",
+      "source_parameters": {
+        "context": "библиотека",
+        "role": "semantic_subject"
+      },
+      "question": "Как работает библиотека ПАМЯТКА?",
+      "question_sha256": "3e076d0ab954c6b376e9e7a7b2fd1a048ac20f10992baeac46dfacc922874735",
+      "literal": "ПАМЯТКА",
+      "literal_span": [
+        24,
+        31
+      ],
+      "historical_role": "semantic_subject",
+      "occurrence_required": false,
+      "expected_role": "unresolved",
+      "expected_explicit": false
+    },
+    {
+      "input_index": 17,
+      "source_function": "test_quotes_preserve_contextual_role",
+      "source_parameters": {
+        "context": "in the file",
+        "role": "source_locator",
+        "quote": "`"
+      },
+      "question": "What is documented in the file `ArgonGuide`?",
+      "question_sha256": "8f058118e2781d5f2fb10b79e1bc0d2cb2841314376782bee74ca7f7217661ec",
+      "literal": "ArgonGuide",
+      "literal_span": [
+        32,
+        42
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": true,
+      "expected_role": "symbol_identity",
+      "expected_explicit": true
+    },
+    {
+      "input_index": 18,
+      "source_function": "test_quotes_preserve_contextual_role",
+      "source_parameters": {
+        "context": "in the file",
+        "role": "source_locator",
+        "quote": "\""
+      },
+      "question": "What is documented in the file \"ArgonGuide\"?",
+      "question_sha256": "3aac51eb8cce834cf9218f95b2ae7eceb972412a4e4bdc46997c54902f100a03",
+      "literal": "ArgonGuide",
+      "literal_span": [
+        32,
+        42
+      ],
+      "historical_role": "source_locator",
+      "occurrence_required": true,
+      "expected_role": "symbol_identity",
+      "expected_explicit": true
+    }
+  ],
+  "replay_inputs_sha256": "deef6debbad224f9f3bf0d146654f3b703c3748fc82345058697bd0f91373cf8",
+  "execution_cost": {
+    "selected_original_cases": 19,
+    "remaining_original_cases": 45,
+    "new_test_functions": 0,
+    "new_pytest_parameter_cases": 0,
+    "replay_direct_query_mentions_calls": 19,
+    "retained_initial_query_mentions_calls": 1,
+    "additional_resolve_references_calls": 2,
+    "resolver_calls_reuse_two_already_parsed_questions": true,
+    "archive_file_reads": 2,
+    "crosswalk_file_reads": 1,
+    "native_service_calls": 0,
+    "new_indexing_calls": 0,
+    "in_precheck": "All19 original pytest cases remain collected; this temporarily adds the replay work.",
+    "after_separate_retirement": "19 fewer pytest items, same19 authored query evaluations in one current oracle; no claim of fewer parses or measured wall-clock improvement.",
+    "native_matrix": {
+      "test_functions": 6,
+      "cases": 24,
+      "public_reads": 24,
+      "index_project_calls": 25,
+      "isolated_service_contexts": 24,
+      "indexed_document_submissions": 27,
+      "action": "keep_all"
+    }
+  },
+  "coverage_mapping": {
+    "retired_candidate_function_input_indices": {
+      "test_context_not_case_assigns_role": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "test_russian_roles_preserve_unicode_offsets": [
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "test_quotes_preserve_contextual_role": [
+        17,
+        18
+      ]
+    },
+    "successor": "tests/test_dictionary_exit_reference_ranking.py::test_literal_mentions_keep_sha_unicode_offsets_and_occurrences",
+    "prior_reference92_tests_have_exact_selected_questions": false,
+    "prior_literal104_receipts_are_owning_proof": false,
+    "existing_reference92_guards_retained": [
+      "literal occurrence offsets and unique IDs",
+      "complete/foreign/incomplete catalog and collision",
+      "backtick symbol versus double-quoted catalog nomination",
+      "current source identity/raw/hash/window guards",
+      "actual qualification source binding",
+      "ranking has no inferred semantic priority/authority"
+    ],
+    "exclusions": [
+      "native matrix24",
+      "four mixed role/source/caching tests",
+      "remaining17 current role cases",
+      "all other helpers/imports/selectors and production behavior"
+    ]
+  },
+  "consumer_inventory": {
+    "path": "eval/task_level/contract_history/reference_role_consumers.json",
+    "blob": "431530e745fddb1104f27231d3d5d77a753c61eb",
+    "source_rows": 1291,
+    "source_rows_sha256": "bdbe7e449c2f542d5080648987dd6464c447c626912c66da2f1205d3fc3c00f6",
+    "external_direct_selectors": 0,
+    "scope": "bounded literal source references, not computed dynamic names"
+  },
+  "directed_mutations": [
+    {
+      "name": "reference_nl_context_cannot_promote_bare_locator",
+      "path": "docmancer/docs/domain/query_reference_binding.py",
+      "old": "            role = \"symbol_identity\" if any(c in value for c in \"._/:+-\") else \"unresolved\"",
+      "new": "            role = \"symbol_identity\" if any(c in value for c in \"._/:+-\") else \"unresolved\"\n            if role == \"unresolved\" and \"in the file\" in question:\n                role = \"source_locator\"",
+      "killer": "tests/test_dictionary_exit_reference_ranking.py::test_literal_mentions_keep_sha_unicode_offsets_and_occurrences",
+      "failure_guard": "critical_reference_nl_context_keeps_bare_unresolved",
+      "expected_failures": 1,
+      "intended_input_index": 0,
+      "anchor_count": 1,
+      "source_blob": "06215d1e4deaa4c56a2c0afac135bd2f2a29a858",
+      "source_before_sha256": "0bdf65939526fd19ecc239ce3a3ee67bdaf9d067e184798f0b8f9f9b13ef528b",
+      "source_after_sha256": "cc79163e504c990478576016e947cbfbc7151b8eb89ceecb36e8e86de7bb2d35"
+    },
+    {
+      "name": "reference_nl_context_cannot_promote_quoted_stem",
+      "path": "docmancer/docs/domain/query_reference_binding.py",
+      "old": "        path = suffix in DOCUMENT_SUFFIXES",
+      "new": "        path = suffix in DOCUMENT_SUFFIXES or \"in the file\" in question[:start]",
+      "killer": "tests/test_dictionary_exit_reference_ranking.py::test_literal_mentions_keep_sha_unicode_offsets_and_occurrences",
+      "failure_guard": "critical_reference_nl_context_keeps_quoted_symbol",
+      "expected_failures": 1,
+      "intended_input_index": 17,
+      "anchor_count": 1,
+      "source_blob": "06215d1e4deaa4c56a2c0afac135bd2f2a29a858",
+      "source_before_sha256": "0bdf65939526fd19ecc239ce3a3ee67bdaf9d067e184798f0b8f9f9b13ef528b",
+      "source_after_sha256": "bbf519aa48fd224405f25fce03b4809346ef5eb2fc58d9feeb920f03b878510c"
+    }
+  ],
+  "harness": {
+    "path": "scripts/run_critical_mutation_gate.py",
+    "base_blob": "8b9e6f1e73a6fd855675935ccb6d1da043e3f72e",
+    "proposed_blob": "15413c51f495d09ce11ebd1f48f2b1ea65603fa2",
+    "mode": "100755",
+    "old_baseline_cases": 61,
+    "proposed_baseline_cases": 62,
+    "old_mutants": 41,
+    "proposed_mutants": 43,
+    "added_selector_count": 1,
+    "production_module_already_in_target_import_roster": "docmancer.docs.domain.query_reference_binding",
+    "old_tuple_sha256": "a1711a446045beb6017fb4c47e89b8af3f45958f1332ef0b348d1f790a738322",
+    "old_harness_byte_identical": true
+  },
+  "runtime_proof": {
+    "status": "pending",
+    "own_normal_baseline": null,
+    "own_mutant_receipts": [],
+    "same_sha_core_reference92": null,
+    "retirement_performed": false,
+    "acceptance_rule": "Read actual normal62 baseline with0F/0E/0S and43 intended kills; both added mutations must reach this exact killer and named guard with1F/0E/0S. Check current broader reference92 and source/selector preservation before any later19-case retirement."
+  },
+  "historical_observation": {
+    "origin": "parent-supplied actual130 aggregate, not a per-case proof",
+    "roles": {
+      "pass": 17,
+      "fail": 23
+    },
+    "matrix": {
+      "pass": 1,
+      "fail": 23
+    },
+    "interpretation": "Failure counts do not classify individual cases as obsolete and do not constitute current own acceptance."
+  }
+}

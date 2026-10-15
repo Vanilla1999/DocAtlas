@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_finite_corrections.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_finite_corrections.py": "9588bab75ff72ad572ad643cd69ff0ced0c44bea8f8611cd6545fdfca5a0b49e"
+  }
+}

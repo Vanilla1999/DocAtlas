@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW05",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-pytest",
+  "public_request": {
+    "question": "In pytest 8.3.5, do XFAIL and XPASS fail the suite by default, what changes for XPASS with strict=True, and which ini option changes the strict default?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-pytest/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "acf87f32b082892520309dab7e9f0c30f8c7cbebfab5f1c290aabf9fb63f2fcb",
+  "utf8_bytes": 13920,
+  "tokens": 3588,
+  "seconds": 0.34671999900092487,
+  "cpu_seconds": 0.34511414399997875,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

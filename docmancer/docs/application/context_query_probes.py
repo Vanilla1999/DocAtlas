@@ -10,32 +10,60 @@ from docmancer.docs.domain.query_terms import query_constraint_roles
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
 
+def authoritative_queries(query_plan):
+    """Validate the current literal-plan DTO, never a trace's asserted lane."""
+    if not isinstance(query_plan, dict):
+        return {}
+    original = query_plan.get('original_question')
+    rows = [q for q in query_plan.get('queries') or () if isinstance(q, dict)]
+    counts = {}
+    for q in rows:
+        key = str(q.get('query_id') or '')
+        counts[key] = counts.get(key, 0) + 1
+    result = {}
+    for q in rows:
+        query_id = str(q.get('query_id') or '')
+        if counts[query_id] != 1 or not isinstance(q.get('text'), str) or not q['text'].strip():
+            continue
+        if q.get('public_parent_query_id') or any(q.get(key) for key in ('need_subject', 'need_relation', 'need_context')):
+            continue
+        if query_id == 'query-original':
+            valid = q.get('origin') == 'original' and q.get('relation') == 'direct' and q['text'] == original
+        else:
+            valid = bool(re.fullmatch(r'query-lookup-[1-5]', query_id)) and q.get('origin') == 'host_lookup' and q.get('relation') == 'host_lookup'
+        if valid:
+            result[query_id] = dict(q)
+    return result if 'query-original' in result else {}
+
+
+def literal_query_probe(query):
+    text = query['text']
+    roles = query_constraint_roles(text)
+    return {
+        'query_text': text, 'query_origin': query['origin'], 'relation': query['relation'],
+        'query_terms': list(re.findall(r'[A-Za-zА-Яа-яЁё0-9_.-]{4,}', text.casefold())),
+        'exact_terms': list(roles.hard_exact), 'bound_subjects': list(roles.bound_subjects),
+        'retrieval_anchors': list(roles.retrieval_anchors),
+        'forbidden_catalog_roles': list(query.get('forbidden_catalog_roles') or ()),
+        'forbidden_evidence_terms': list(query.get('forbidden_evidence_terms') or ()),
+    }
+
+
 def independent_query_probes(source, query_plan):
     matches = dict(source.get('retrieval_query_matches') or {})
-    queries = [q for q in query_plan.get('queries') or () if q.get('origin') in {'original', 'host_lookup', 'retrieval_need'} and not q.get('public_parent_query_id')]
+    queries = list(authoritative_queries(query_plan).values())
     terms = {q['query_id']: set(re.findall(r'[A-Za-zА-Яа-яЁё0-9_.-]{4,}', str(q.get('text') or '').casefold())) for q in queries}
     for query in queries:
         query_id = str(query.get('query_id') or '')
         if not query_id or query_id in matches:
             continue
         text = str(query.get('text') or '')
-        probe = {
-            'query_text': text, 'query_origin': query['origin'],
-            'relation': query.get('relation'),
-            'exact_terms': list(query_constraint_roles(text).hard_exact),
-            'bound_subjects': list(query_constraint_roles(text).bound_subjects),
-            'retrieval_anchors': list(query_constraint_roles(text).retrieval_anchors),
-            'forbidden_catalog_roles': list(query.get('forbidden_catalog_roles') or ()),
-            'forbidden_evidence_terms': list(query.get('forbidden_evidence_terms') or ()),
-            'parent_exact_terms': list(query.get('parent_exact_terms') or ()),
-            'need_subject': query.get('need_subject'), 'need_relation': query.get('need_relation'),
-            'need_context': query.get('need_context'),
-        }
+        probe = literal_query_probe(query)
         qualified = qualify_evidence(probe, query_id=query_id, visible_text=str(source.get('snippet') or ''),
             evidence_text=str(source.get('snippet') or ''), catalog_role=str(source.get('catalog_role') or ''),
             candidate={**source.get('_qualification_candidate', {}), **source},
             expected_project_identity=source.get('_expected_project_identity'),
-            lifecycle_intent=source.get('_lifecycle_intent', 'current'))
+            lifecycle_intent=source.get('_lifecycle_intent', 'current'), authoritative_query=query)
         body_matches = set(qualified.trace.get('body_matched_terms') or ())
         if query.get('origin') in {'original', 'retrieval_need'}:
             if qualified.qualified:

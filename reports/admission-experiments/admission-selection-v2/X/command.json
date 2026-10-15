@@ -1,0 +1,5 @@
+[
+  "/tmp/opencode/docatlas-review-evidence/admission-full-20261012/model-runtime/bin/python",
+  "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/run_x_pair.py",
+  "--score"
+]

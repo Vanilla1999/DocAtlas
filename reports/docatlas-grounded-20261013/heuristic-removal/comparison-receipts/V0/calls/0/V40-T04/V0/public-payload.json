@@ -1,0 +1,168 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-51f58930e7ce50ac",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Watch methods",
+      "snippet": "## Watch methods\n\nWatch methods are another superpower.\nTextual will call watch methods when reactive attributes are modified.\nWatch method names begin with `watch_` followed by the name of the attribute, and should accept one or two arguments.\nIf the method accepts a single argument, it will be called with the new assigned value.\nIf the method accepts *two* positional arguments, it will be called with both the *old* value and the *new* value.",
+      "version_binding": "unversioned",
+      "content_sha256": "86f571cc14144f49656c030eb4d2c40b26bcfad24009437deceaa2f0870bb7b8",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 166,
+      "line_end": 172,
+      "source_uri": "docatlas://source/c4409481449764235dd170f5"
+    },
+    {
+      "evidence_id": "ev-4d61420572f968bf",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Validation",
+      "snippet": "## Validation\n\nThe next superpower we will look at is _validation_, which can check and potentially modify a value you assign to a reactive attribute.\n\nIf you add a method that begins with `validate_` followed by the name of your attribute, it will be called when you assign a value to that attribute. This method should accept the incoming value as a positional argument, and return the value to set (which may be the same or a different value).\n\nA common use for this is to restrict numbers to a given range. The following example keeps a count. There is a button to increase the count, and a button to decrease it. The validation ensures that the count will never go above 10 or below zero.\n\n=== \"validate01.py\"\n\n    ```python hl_lines=\"12-18 30 32\"\n    --8<-- \"docs/examples/guide/reactivity/validate01.py\"\n    ```\n\n=== \"validate01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/validate01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/validate01.py\"}\n    ```\n\nIf you click the buttons in the above example it will show the current count. When `self.count` is modified in the button handler, Textual runs `validate_count` which performs the validation to limit the value of count.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "a2c4c557aa9206d46591297f01675187a03aabffa0f5cb8431bdc29eb63f1237",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 139,
+      "line_end": 165,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/7a4c2a6c8df3609bf4b4806e"
+    },
+    {
+      "evidence_id": "ev-90f82d18e6c79029",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Watch methods > When are watch methods called?",
+      "snippet": "### When are watch methods called?\n\nTextual only calls watch methods if the value of a reactive attribute _changes_.\nIf the newly assigned value is the same as the previous value, the watch method is not called.\nYou can override this behavior by passing `always_update=True` to `reactive`.\n\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "fd9568c2ae4a87c086cb988934cb5fb7893eebc162cc065ce9364a8d5c234f5d",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 199,
+      "line_end": 205,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/afee44a98d5693f1fc892b90"
+    },
+    {
+      "evidence_id": "ev-e2c4066154eafa9b",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Compute methods",
+      "snippet": "When the result of `compute_color` changes, Textual will also call `watch_color` since `color` still has the [watch method](#watch-methods) superpower.\n\n!!! note\n\n    Textual will first attempt to call the compute method for a reactive attribute, followed by the validate method, and finally the watch method.\n\n!!! note\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "dee0095b656fb7b7a104e5d11d15730bd8feac04128760128e65919bbedaaf1e",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 338,
+      "line_end": 345,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/4519a8f63f3be4beb319634e"
+    },
+    {
+      "evidence_id": "ev-ef241f6a3d8c5ea0",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Watch methods",
+      "snippet": "## Watch methods\n\nWatch methods are another superpower.\nTextual will call watch methods when reactive attributes are modified.\nWatch method names begin with `watch_` followed by the name of the attribute, and should accept one or two arguments.\nIf the method accepts a single argument, it will be called with the new assigned value.\nIf the method accepts *two* positional arguments, it will be called with both the *old* value and the *new* value.\n\nThe following app will display any color you type into the input. Try it with a valid color in Textual CSS. For example `\"darkorchid\"` or `\"#52de44\"`.\n\n=== \"watch01.py\"\n\n    ```python hl_lines=\"17-19 28\"\n    --8<-- \"docs/examples/guide/reactivity/watch01.py\"\n    ```\n\n    1. Creates a reactive [color][textual.color.Color] attribute.\n    2. Called when `self.color` is changed.\n    3. New color is assigned here.\n\n=== \"watch01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/watch01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/watch01.py\" press=\"d,a,r,k,o,r,c,h,i,d\"}\n    ```\n\nThe color is parsed in `on_input_submitted` and assigned to `self.color`. Because `color` is reactive, Textual also calls `watch_color` with the old and new values.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3eec69e23915be28df885e1f2410474617371f6f9f73df9354b8998b3c893fac",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 166,
+      "line_end": 198,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2f7e1600f5fa604312888ba4"
+    },
+    {
+      "evidence_id": "ev-96017b124e04c540",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Compute methods",
+      "snippet": "## Compute methods\n\nCompute methods are the final superpower offered by the `reactive` descriptor. Textual runs compute methods to calculate the value of a reactive attribute. Compute methods begin with `compute_` followed by the name of the reactive value.\n\nYou could be forgiven in thinking this sounds a lot like Python's property decorator. The difference is that Textual will cache the value of compute methods, and update them when any other reactive attribute changes.\n\nThe following example uses a computed attribute. It displays three inputs for each color component (red, green, and blue). If you enter numbers into these inputs, the background color of another widget changes.\n\n=== \"computed01.py\"\n\n    ```python hl_lines=\"25-26 28-29\"\n    --8<-- \"docs/examples/guide/reactivity/computed01.py\"\n    ```\n\n    1. Combines color components into a Color object.\n    2. The watch method is called when the _result_ of `compute_color` changes.\n\n=== \"computed01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/computed01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/computed01.py\"}\n    ```\n\nNote the `compute_color` method which combines the color components into a [Color][textual.color.Color] object. It will be recalculated when any of the `red` , `green`, or `blue` attributes are modified.\n\nWhen the result of `compute_color` changes, Textual will also call `watch_color` since `color` still has the [watch method](#watch-methods) superpower.\n\n!!! note\n\n    Textual will first attempt to call the compute method for a reactive attribute, followed by the validate method, and finally the watch method.\n\n!!! note\n\n    It is best to avoid doing anything slow or CPU-intensive in a compute method. Textual calls compute methods on an object when _any_ reactive attribute changes.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f448560b842639d4d3ef9f55c4324fa32b447b0aa36049237113eeb1f50d3371",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 308,
+      "line_end": 347,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/23d97808d15f7bfcbd1e1868"
+    },
+    {
+      "evidence_id": "ev-6ef4a4670aeed803",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Reactive attributes",
+      "snippet": "## Reactive attributes\n\nTextual provides an alternative way of adding attributes to your widget or App, which doesn't require adding them to your class constructor (`__init__`). To create these attributes import [reactive][textual.reactive.reactive] from `textual.reactive`, and assign them in the class scope.\n\nThe following code illustrates how to create reactive attributes:\n\n```python\nfrom textual.reactive import reactive\nfrom textual.widget import Widget\n\nclass Reactive(Widget):\n\n    name = reactive(\"Paul\")  # (1)!\n    count = reactive(0) # (2)!\n    is_cool = reactive(True)  # (3)!\n```\n\n1. Create a string attribute with a default of `\"Paul\"`\n2. Creates an integer attribute with a default of `0`.\n3. Creates a boolean attribute with a default of `True`.\n\nThe `reactive` constructor accepts a default value as the first positional argument.\n\n!!! information\n\n    Textual uses Python's _descriptor protocol_ to create reactive attributes, which is the same protocol used by the builtin `property` decorator.\n\nYou can get and set these attributes in the same way as if you had assigned them in an `__init__` method. For instance `self.name = \"Jessica\"`, `self.count += 1`, or `print(self.is_cool)`.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3d99cbd6cf990fd1ee7b5d90e4305ffee6472f5974d68ae8313d9a650aa7109d",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 11,
+      "line_end": 39,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/f44f936526ec367bc951fef2"
+    },
+    {
+      "evidence_id": "ev-2b77d0bc2e367cec",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers > Work decorator",
+      "snippet": "### Work decorator\n\nAn alternative to calling `run_worker` manually is the [work][textual.work] decorator, which automatically generates a worker from the decorated method.\n\nLet's use this decorator in our weather app:\n\n```python title=\"weather03.py\" hl_lines=\"4 22 24\"\n--8<-- \"docs/examples/guide/workers/weather03.py\"\n```\n\nThe addition of `@work(exclusive=True)` converts the `update_weather` coroutine into a regular function which when called will create and start a worker.\nNote that even though `update_weather` is an `async def` function, the decorator means that we don't need to use the `await` keyword when calling it.\n\n!!! tip\n\n    The decorator takes the same arguments as `run_worker`.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ecb38f35e561ebbfe48567abcc906f3cc40fdda69cfe3c23ba36941d35713051",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 65,
+      "line_end": 81,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/fe99b0a6009b2f670b46c5a3"
+    },
+    {
+      "evidence_id": "ev-0dc35a8ab0a5336b",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Data binding",
+      "snippet": "To bind reactive attributes, call [data_bind][textual.dom.DOMNode.data_bind] on a widget.\nThis method accepts reactives (as class attributes) in positional arguments or keyword arguments.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "57270b98a0f0171c7648fe3b4f57665fde39e8eafefc2d7e217493e579fb1047",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 416,
+      "line_end": 418,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/e9df98716aa7f479add36736"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/cb66994c11563be214ca7e0f",
+      "path": "docs/guide/reactivity.md",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "snapshot_sha256": "sha256:16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+      "line_start": 419,
+      "line_end": 455,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 3244
+}

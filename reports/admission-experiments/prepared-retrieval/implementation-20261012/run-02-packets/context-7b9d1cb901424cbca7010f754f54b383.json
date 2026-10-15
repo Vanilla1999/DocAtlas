@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_prepared_retrieval_integration.py::test_source_valid_candidates_deliver_multifacet_bound_read_only_packet",
+  "pytest_current_test": "tests/test_prepared_retrieval_integration.py::test_source_valid_candidates_deliver_multifacet_bound_read_only_packet (call)",
+  "arguments": {
+    "question": "For an observation trip with 11 lenses, how must the lenses be packed and who receives and signs the issue record?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-pytest-run02/test_source_valid_candidates_d0/project",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-5d08f9e187e258dd",
+        "path_or_url": "docs/issue.md",
+        "section": "Field optics issue record",
+        "snippet": "# Field optics issue record\n\nThe issue record for an observation trip goes to the collection custodian.\nThe collection custodian checks completeness and signs before departure.\nA courier may carry the packed cases but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».\n",
+        "version_binding": "unversioned",
+        "content_sha256": "efbe29312dc3ae264ce5a9ef24f59f9b6e23d9377daa1631850afb838e2c999d",
+        "project_identity": "local:4f5097c2b7fcfa132198ac6210fca09605001716ab5909bd9a4f9fa03b9aa216",
+        "line_start": 1,
+        "line_end": 9,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/d56759e58fd9ebc5af7cc21f"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 348
+  },
+  "utf8_quarter_proxy": 365,
+  "public_source_count": 1
+}

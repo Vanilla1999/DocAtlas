@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-V04",
+  "mode": "budget",
+  "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+  "public_request": {
+    "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/vite.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:43.591783+00:00",
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_before": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.6128073939980823,
+  "process_cpu_seconds": 0.610360949000011,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 972092,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_after": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "wire_sha256": "9cc0c47ef7068eaf7e6cf1b6eae1bd75101d1070e2223c697e65b5c2f6248824",
+  "wire_utf8_bytes": 3374,
+  "utf8_quarter_proxy": 844,
+  "codec_o200k_base": 916,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

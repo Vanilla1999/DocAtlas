@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-8aa8b88512b98fdb",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers > Thread workers > Posting messages",
+      "snippet": "#### Posting messages\n\nMost Textual functions are not thread-safe which means you will need to use [call_from_thread][textual.app.App.call_from_thread] to run them from a thread worker.\nAn exception would be [post_message][textual.widget.Widget.post_message] which *is* thread-safe.\nIf your worker needs to make multiple updates to the UI, it is a good idea to send [custom messages](./events.md) and let the message handler update the state of the UI.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e17b8643350f15e8e8ebae40b98d0ea1d427e4fcbb79f1c43d92c9d1e5ab4664",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 177,
+      "line_end": 181,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/1f9f615c63ffd59f0a2ac652"
+    },
+    {
+      "evidence_id": "ev-950815e99c99188e",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers",
+      "snippet": "In this chapter we will explore the topic of *concurrency* and how to use Textual's Worker API to make it easier.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e560855b2abc03c4d7cd5d2d44ae3f9f2cf0cdddff56e3d4dce985599ff2da3a",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 3,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/d59c133d79b5c423f922a401"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/c448fdf401c3eed7b2ba8fd4",
+      "path": "docs/guide/workers.md",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "snapshot_sha256": "sha256:8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "line_start": 5,
+      "line_end": 6,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 615
+}

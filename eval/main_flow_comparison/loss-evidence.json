@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "scope_correction": "Q10 mixed-loss classification below follows the expanded frozen expected answer. For the literal question, C2 alone is sufficient to answer no; project policy is unasked additional context. Q10 therefore also demonstrates rejection of sufficient evidence, without requiring chunk merging. Final 3/10 versus 10/10 is unchanged.",
+  "audit_date": "2026-10-11",
+  "method": "Offline artifact audit; Python stdlib only; SQLite opened with URI mode=ro; no production imports, retrieval execution, tests, network or MCP calls.",
+  "corpus": {
+    "path": "eval/main_flow_comparison/corpus.md",
+    "sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+    "indexed_document": "/home/viadmin/.docatlas-main-flow-comparison-20261011/project/README.md",
+    "matches_indexed_file_and_sources_and_generation_sources": true,
+    "original_sources": [
+      {"path": "docs/main-flow-logging.md", "sha256": "8caced1eb79bbe77531206d35be3080a198747455f661e3b38225cc4c5ab2d0a", "corpus_line_offset": 2},
+      {"path": "docs/main-flow-evaluation.md", "sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334", "corpus_line_offset": 59}
+    ]
+  },
+  "sqlite": {
+    "path": "/home/viadmin/.docatlas-main-flow-comparison-20261011/docatlas-home/mcp-members/members.db",
+    "file_sha256_at_audit": "408b4fb4180edf28ac74128ec19beb1f0200633e7afbcaf061db8c99d3733a80",
+    "active_generation_id": "gen-9895df161f4f48b6ac6c46c5b163220c",
+    "chunk_table": "retrieval_children",
+    "join_key": ["generation_id", "stable_chunk_id"],
+    "char_span_convention": "Python Unicode codepoints, zero-based, end-exclusive",
+    "line_span_convention": "corpus.md / indexed README.md, one-based, inclusive",
+    "all_persisted_display_text_equals_corpus_char_slice": true
+  },
+  "trace": {
+    "path": "eval/main_flow_comparison/docatlas-trace.jsonl",
+    "question_join": "Order of 10 docatlas_query_trace events; run_docatlas.py:83-91 executes frozen questions sequentially after preparation; event itself has no question text.",
+    "retrieved_observations_per_question": 6,
+    "unique_candidate_ids_per_question": 3,
+    "unique_candidate_ids_all_questions": 15,
+    "candidate_occurrences_per_question": 2,
+    "retrieved_preview_omitted": 0,
+    "qualification_preview_omitted": 0,
+    "upstream_producer_count": null,
+    "upstream_producer_omitted": null,
+    "absence_boundary": "not_observed means absent from recorded candidate IDs, not proof that no earlier unrecorded retrieval stage saw the chunk",
+    "qualification_boundary": "Recorded rejected reason proves the observed rejection, not its code-level cause; successful Q2/Q3 also have rejected qualification with later literal-context delivery."
+  },
+  "grounded": {
+    "path": "eval/main_flow_comparison/grounded-results.json",
+    "library": "docatlas-main-flow-20261011",
+    "version": "2f729efe",
+    "result_number_convention": "Result N within the saved response for that question",
+    "quote_match": "Exact quote after whitespace-only normalization; no stemming, translation or semantic expansion",
+    "returned_url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/2f729efe/eval/main_flow_comparison/corpus",
+    "saved_url_verification_status": 404,
+    "correct_corpus_md_saved_status": 200,
+    "new_url_requests_in_audit": 0
+  },
+  "chunks": {
+    "L0": {"stable_chunk_id": "child-e6256df7f100c358e1b3016f609673e87ae2a453", "lines": [3,13], "chars": [44,366], "display_sha256": "a9634beaea7c37cd3ba1940c52624b54a08948e7971734583d3fe86ff554dabc"},
+    "L1": {"stable_chunk_id": "child-d79731dfd6ce3fc08e58ceae1bc9aab348b473d6", "lines": [14,18], "chars": [366,671], "display_sha256": "1cda9352e6f77bf323dc7c626bab6d6e69eb216a7eeb035e14db1be6f8ca4e01"},
+    "L2": {"stable_chunk_id": "child-6e9a993617ed9a222c65877984ef1cb3b54dbdfc", "lines": [19,26], "chars": [671,1002], "display_sha256": "302012e1c45e4204b2474cc4ecd97bd611dd5d17e66ef0549f146a05b6cb8553"},
+    "LH": {"stable_chunk_id": "child-14351b36d269548aa21f155f66ef89f5e020417c", "lines": [27,28], "chars": [1002,1024], "display_sha256": "57df29ab45b5b86c397c393d52c05cfaddb2a8aa6adf8700d118e582f06ced84"},
+    "L3": {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "lines": [29,45], "chars": [1024,2100], "display_sha256": "fca78e50498ae130919876243d2bc8738e13f0f2a6ff6010f2ec5905b2d1ae33"},
+    "E0": {"stable_chunk_id": "child-b716a6a0d98fa8f68ed0c1e6b089423077147820", "lines": [64,65], "chars": [2843,3117], "display_sha256": "18ba0424ba18c7d96dbce455c13927d0ae35cf11d1a9019fd6f3ec3202027fe2"},
+    "C0": {"stable_chunk_id": "child-6a0db2bdd132fda917a592fe2a67d780a9a2ea4c", "lines": [68,68], "chars": [3148,3399], "display_sha256": "3b6205d65916d0eab06e98b19089afda87c1899fe2e3329ae2a26c461b6c8926"},
+    "C1": {"stable_chunk_id": "child-4a0b6449fad6024103d5bf5269ec188a0352ad1b", "lines": [68,68], "chars": [3399,3600], "display_sha256": "915a60ebbf032ed0368ac20524a4e59f0bbe2ec3b2ad04402b0f16f6e520937b"},
+    "C2": {"stable_chunk_id": "child-8a60f814dbd7e3e74c37be5dda21ab3979d5c63a", "lines": [69,69], "chars": [3770,4000], "display_sha256": "608b602bf8c9c9e2ccea0d85ef133d43188d9efd07691f82da05896c0ea59cb1"},
+    "C3": {"stable_chunk_id": "child-a2ed086fab6e6a226aa11fb42b8d1b54578c73aa", "lines": [69,69], "chars": [4000,4198], "display_sha256": "8784daeb3c3e16f838fc5ebc059080d858b525102a24d787ac798012d3ff6adf"},
+    "A0": {"stable_chunk_id": "child-e734e8023d49691954e33dc92200355a202c482e", "lines": [70,70], "chars": [4470,4685], "display_sha256": "d1184cc714c0b02db63276cba6c5a780463ade69c6640cab07928aa11337723d"},
+    "A1": {"stable_chunk_id": "child-55bd80c5c419cd8c57fec5108bfd8adaa5d93d17", "lines": [71,71], "chars": [4685,4948], "display_sha256": "fd2f776b7012751f3f541f04b93d953043a8e86a671f831dee123d0f6ec42fc1"},
+    "A2": {"stable_chunk_id": "child-8a9d5db5905016f0bb2b80a6dee7fed6d3d879b4", "lines": [71,71], "chars": [4948,5148], "display_sha256": "e8381f849d4df814d4a0a78e55cae204121132b4a304598e7a80a4c98b339d79"},
+    "P0": {"stable_chunk_id": "child-1c86d6a05564544840dcb85b4efe4734b21f955c", "lines": [74,75], "chars": [5598,5797], "display_sha256": "11939b8e71c2bbac71d70c0d8fc5eeb95e86d84ea1d8ce7cfdc56bd269e64477"},
+    "P1": {"stable_chunk_id": "child-29ab9d8358047a7185790de7f4c74cac0a292414", "lines": [78,79], "chars": [5848,6128], "display_sha256": "4f574f059117b568ffead9d782eab6cd149c227ad036c0b571e91b3177e0c569"},
+    "P2": {"stable_chunk_id": "child-d38e89a8ed1a45e9e91cb2cdfee23b39c185cb90", "lines": [80,80], "chars": [6128,6327], "display_sha256": "b409901445c3e59aa567bb4c330279870b57d815d8f12e57dab72c5464c92fe9"},
+    "P3": {"stable_chunk_id": "child-708819f861e37a484ed99a21ec5736b51f429c95", "lines": [80,80], "chars": [6327,6495], "display_sha256": "5ead6c8d219ac27157f13ca3d671c49a6b2b8f22f98141b03a5d3d8f014e9423"},
+    "P4": {"stable_chunk_id": "child-21dbda0a38140bf1e94eca82757506f54385e90d", "lines": [81,81], "chars": [6694,6723], "display_sha256": "74993a31adac1d390600b60745b7cf83229fe3c2b44f8ceae64865ff47f6c1c0"},
+    "P5": {"stable_chunk_id": "child-c4e91881644f8b481cc4cf078410b89717afdaf9", "lines": [82,82], "chars": [6723,6919], "display_sha256": "0bef7f982603a5f367fe29795452b925a3de92076b9dd787a1509d171b58dc00"},
+    "P6": {"stable_chunk_id": "child-07e92ea35ff12d17b579b2840d8fd8d6ef0dc069", "lines": [82,82], "chars": [6919,7107], "display_sha256": "a4999c80a4ff1bd34eb63c5855cca1b7575afe24224a22fd99628cb30c27c9d9"},
+    "P7": {"stable_chunk_id": "child-d8f7a139dc419685a249204c319ce5fa38a78f0f", "lines": [83,84], "chars": [7384,7543], "display_sha256": "740e148e136714936c622dd92bb703c27f9bc135d734739974778f51729a1ee0"},
+    "N0": {"stable_chunk_id": "child-9a8cb20e3e4439965350a8a888ab5c14250c0841", "lines": [89,95], "chars": [7770,8589], "display_sha256": "ffb01d4bbd0b03747b2400a3f2310829169cf0b8a050df9be1d4d47485feff21"}
+  },
+  "facts": {
+    "default_off": {"lines": [5,5], "quote": "Подробная диагностика по умолчанию выключена.", "chunks": ["L0"]},
+    "global_flags": {"lines": [14,14], "quote": "Глобальные `--trace` / `--no-trace` указываются **перед подкомандой**.", "chunks": ["L1"]},
+    "flag_priority": {"lines": [15,15], "quote": "Они переопределяют `DOCATLAS_TRACE` на время вызова.", "chunks": ["L1"]},
+    "env_value": {"lines": [16,16], "quote": "только `DOCATLAS_TRACE=1` включает трассу", "chunks": ["L1"]},
+    "env_time": {"lines": [17,17], "quote": "окружения читается при загрузке модуля, поэтому задайте его до запуска процесса.", "chunks": ["L1"]},
+    "stderr": {"lines": [24,24], "quote": "Диагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.", "chunks": ["L2"]},
+    "request_id": {"lines": [29,29], "quote": "`docatlas_request_start` и `docatlas_request_end` связываются через `request_id`.", "chunks": ["L3"]},
+    "request_fields": {"lines": [30,31], "quote": "Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms`\n  и `trace_incomplete`.", "chunks": ["L3"]},
+    "public_paths": {"lines": [32,33], "quote": "Покрыты CLI `query`, `context` и публичный диспетчер Docs MCP\n  (`operation=call_docs_tool_payload`).", "chunks": ["L3"]},
+    "parse_boundary": {"lines": [33,34], "quote": "Ошибки разбора CLI до входа в callback\n  не имеют lifecycle-событий.", "chunks": ["L3"]},
+    "success_not_sufficiency": {"lines": [38,39], "quote": "`success` означает завершение границы вызова, а не достаточность найденных\n  доказательств.", "chunks": ["L3"]},
+    "product_status": {"lines": [40,40], "quote": "результат запроса остаётся источником продуктового статуса.", "chunks": ["L3"]},
+    "diagnostic_failure": {"lines": [41,41], "quote": "Ошибка записи диагностики не должна менять ответ.", "chunks": ["L3"]},
+    "incomplete_start": {"lines": [41,42], "quote": "Пропущенное начало\n  отмечается `trace_incomplete`", "chunks": ["L3"]},
+    "gap_attempt": {"lines": [42,43], "quote": "при сбое завершения предпринимается запись\n  `docatlas_trace_gap`.", "chunks": ["L3"]},
+    "stderr_unavailable": {"lines": [43,44], "quote": "Полностью недоступный stderr не позволяет доставить\n  даже сообщение о пропуске.", "chunks": ["L3"]},
+    "integration_only": {"lines": [74,74], "quote": "**Решение проекта:** новые проверки только интеграционного уровня и выше, согласно [AGENTS.md](../AGENTS.md).", "chunks": ["P0"]},
+    "independent_original": {"lines": [80,80], "quote": "Получить эталон из исходных документов и требований, не из выдачи проверяемого кода.", "chunks": ["P3"]},
+    "hash_span": {"lines": [80,80], "quote": "обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope", "chunks": ["P2"]},
+    "source_quality": {"lines": [71,71], "quote": "Оценка исследовательского результата включает фактическую точность, корректность цитат, полноту и качество источников;", "chunks": ["A1"]},
+    "final_state": {"lines": [71,71], "quote": "приложение рекомендует проверять конечное состояние.", "chunks": ["A2"]},
+    "not_logs_exit0": {"lines": [83,83], "quote": "Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.", "chunks": ["P7"]},
+    "countdown_boundary": {"lines": [69,69], "quote": "**Граница Countdown-Code.** Это исследование обхода награды при доступном для записи верификаторе, а не сравнение unit- и integration-тестов.", "chunks": ["C2"]},
+    "no_automatic_reliability": {"lines": [69,69], "quote": "Работа не доказывает, что интеграционный тест автоматически надёжен или что любой ошибочный ответ является намеренным обходом.", "chunks": ["C3"]},
+    "local_policy": {"lines": [74,74], "quote": "Это локальная стратегия проекта, а не экспериментальный вывод перечисленных публикаций.", "chunks": ["P0"]}
+  },
+  "questions": [
+    {
+      "id": 1, "trace_line": 4, "request_id": "b6e725f9e6cb4b12bc7b11c1d2e4ea98",
+      "recorded_candidates": ["L3","P1","P4"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [
+        {"fact": "default_off", "retrieved_support": [], "grounded_results": [1,5]},
+        {"fact": "global_flags", "retrieved_support": [], "grounded_results": [1,5]}
+      ],
+      "classification": "required_facts_not_observed_in_retrieval",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    },
+    {
+      "id": 2, "trace_line": 7, "request_id": "4792a9ad7a384904a244e52100a59108",
+      "recorded_candidates": ["L2","L1","L0"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [{"fact": "flag_priority", "retrieved_support": ["L1"], "grounded_results": [1]}],
+      "classification": "delivered_via_literal_context_after_qualification_rejection",
+      "literal_context_admissions": 2, "qualified_variants": 0,
+      "docatlas_final": {"status": "ok", "delivery_blocked": false, "sources_field_present": true, "source_count": 1, "evidence": [{"id": "ev-bda31efd80ce22e8", "lines": [14,26]}]},
+      "docatlas_factual_complete": true, "grounded_factual_complete": true
+    },
+    {
+      "id": 3, "trace_line": 10, "request_id": "ddb8242a87134eac85d3f3f1ce7d86bc",
+      "recorded_candidates": ["L1","L2","L0"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [
+        {"fact": "env_value", "retrieved_support": ["L1"], "grounded_results": [1,2]},
+        {"fact": "env_time", "retrieved_support": ["L1"], "grounded_results": [1,2]}
+      ],
+      "classification": "delivered_via_literal_context_after_qualification_rejection",
+      "literal_context_admissions": 2, "qualified_variants": 0,
+      "docatlas_final": {"status": "ok", "delivery_blocked": false, "sources_field_present": true, "source_count": 2, "evidence": [{"id": "ev-058595f071504893", "lines": [14,26]}, {"id": "ev-0751a52da983108c", "lines": [64,65]}]},
+      "docatlas_factual_complete": true, "grounded_factual_complete": true
+    },
+    {
+      "id": 4, "trace_line": 13, "request_id": "7da7339ae8304dd1a5a72060cb959955",
+      "recorded_candidates": ["L3","L2","L1"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [{"fact": "stderr", "retrieved_support": ["L2"], "grounded_results": [1,3]}],
+      "classification": "direct_sufficient_chunk_retrieved_then_qualification_rejected_and_not_delivered",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    },
+    {
+      "id": 5, "trace_line": 16, "request_id": "f98478b3d5314b8d9d4e0ef82dc9cf75",
+      "recorded_candidates": ["L3","C0","C1"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "qualification_overrides": {"L3": {"outcome": "qualified", "reason": "visible_fields"}},
+      "facts": [
+        {"fact": "request_id", "retrieved_support": ["L3"], "grounded_results": [1,2]},
+        {"fact": "request_fields", "retrieved_support": ["L3"], "grounded_results": [1,2]}
+      ],
+      "classification": "qualified_and_delivered", "qualified_variants": 1,
+      "docatlas_final": {"status": "ok", "delivery_blocked": false, "sources_field_present": true, "source_count": 2, "evidence": [{"id": "ev-e2fee8fbbe2755c6", "lines": [29,45]}, {"id": "ev-0751a52da983108c", "lines": [64,65]}]},
+      "docatlas_factual_complete": true, "grounded_factual_complete": true
+    },
+    {
+      "id": 6, "trace_line": 19, "request_id": "1db76a1a1998454baf9a03a89421fe00",
+      "recorded_candidates": ["L3","L2","LH"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "qualification_overrides": {"LH": {"outcome": "rejected", "reason": "metadata_only_evidence"}},
+      "facts": [
+        {"fact": "public_paths", "retrieved_support": ["L3"], "grounded_results": [1,2]},
+        {"fact": "parse_boundary", "retrieved_support": ["L3"], "grounded_results": [1,2]}
+      ],
+      "classification": "direct_sufficient_chunk_retrieved_then_qualification_rejected_and_not_delivered",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    },
+    {
+      "id": 7, "trace_line": 22, "request_id": "8a77be84a0d64b9e804945f87f1b4125",
+      "recorded_candidates": ["L3","L2","L0"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [
+        {"fact": "success_not_sufficiency", "retrieved_support": ["L3"], "grounded_results": [1,3]},
+        {"fact": "product_status", "retrieved_support": ["L3"], "grounded_results": [1,3]}
+      ],
+      "classification": "direct_sufficient_chunk_retrieved_then_qualification_rejected_and_not_delivered",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    },
+    {
+      "id": 8, "trace_line": 25, "request_id": "4632831daaec4a47b3c81de401d4c9bf",
+      "recorded_candidates": ["L3","N0","LH"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "qualification_overrides": {"LH": {"outcome": "rejected", "reason": "metadata_only_evidence"}},
+      "facts": [
+        {"fact": "diagnostic_failure", "retrieved_support": ["L3"], "grounded_results": [1]},
+        {"fact": "incomplete_start", "retrieved_support": ["L3"], "grounded_results": [1]},
+        {"fact": "gap_attempt", "retrieved_support": ["L3"], "grounded_results": [1]},
+        {"fact": "stderr_unavailable", "retrieved_support": ["L3"], "grounded_results": [1]}
+      ],
+      "additional_partial_support": {"chunk": "N0", "lines": [94,94], "quote": "Отказ диагностики не должен менять продуктовый исход относительно такого же запуска без подробных логов."},
+      "classification": "direct_sufficient_chunk_retrieved_then_qualification_rejected_and_not_delivered",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    },
+    {
+      "id": 9, "trace_line": 28, "request_id": "520a02ba37ba450d9807c43528c29d1a",
+      "recorded_candidates": ["A1","L3","A2"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [
+        {"fact": "integration_only", "retrieved_support": [], "grounded_results": [1]},
+        {"fact": "independent_original", "retrieved_support": [], "grounded_results": [2]},
+        {"fact": "hash_span", "retrieved_support": [], "grounded_results": [2]},
+        {"fact": "source_quality", "retrieved_support": ["A1"], "grounded_results": [1]},
+        {"fact": "final_state", "retrieved_support": ["A2"], "grounded_results": [1]},
+        {"fact": "not_logs_exit0", "retrieved_support": [], "grounded_results": [2]}
+      ],
+      "classification": "mixed_partial_fact_qualification_drop_and_required_facts_not_observed_in_retrieval",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    },
+    {
+      "id": 10, "trace_line": 31, "request_id": "ee83edbdea7247f9a93221ed54ba2601",
+      "recorded_candidates": ["C3","C2","A0"],
+      "qualification_default": {"outcome": "rejected", "reason": "insufficient_visible_match"},
+      "facts": [
+        {"fact": "countdown_boundary", "retrieved_support": ["C2"], "grounded_results": [1,2,3]},
+        {"fact": "no_automatic_reliability", "retrieved_support": ["C3"], "grounded_results": [1,2,3]},
+        {"fact": "integration_only", "retrieved_support": [], "grounded_results": [1,2,3]},
+        {"fact": "local_policy", "retrieved_support": [], "grounded_results": [1,2,3]}
+      ],
+      "classification": "main_answer_qualification_drop_plus_local_policy_not_observed_in_retrieval",
+      "docatlas_final": {"status": "insufficient_evidence", "delivery_blocked": true, "sources_field_present": false, "source_count": 0},
+      "docatlas_factual_complete": false, "grounded_factual_complete": true
+    }
+  ],
+  "summary": {
+    "docatlas_factual_complete_questions": [2,3,5],
+    "grounded_factual_complete_questions": [1,2,3,4,5,6,7,8,9,10],
+    "failed_with_all_required_evidence_in_recorded_chunk": [4,6,7,8],
+    "failed_with_partial_required_evidence_rejected": [9,10],
+    "failed_with_no_direct_required_evidence_in_recorded_chunks": [1],
+    "failed_with_some_required_facts_not_observed": [1,9,10],
+    "all_failed_final_sources_absent": true,
+    "code_root_cause_proven_by_this_audit": false
+  }
+}

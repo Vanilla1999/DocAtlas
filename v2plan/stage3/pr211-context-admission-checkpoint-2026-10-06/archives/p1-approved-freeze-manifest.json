@@ -1,0 +1,90 @@
+{
+  "schema": "p1-approved-freeze-v1",
+  "date": "2026-10-06",
+  "status": "P1_DONE",
+  "approved_freeze": true,
+  "p1_done": true,
+  "p2_entry_ready": true,
+  "p2_started": false,
+  "owner_approval": {
+    "response": "Да, утвердить и закрыть",
+    "source": "interactive owner confirmation in this session",
+    "path": "P1_APPROVAL_RU.md",
+    "sha256": "7d53b11e4f7ec529e26271b21939ba134965ac3980a697637eb6d0545ef3b824"
+  },
+  "reference": {
+    "path": "archives/p1-reviewed-reference-manifest.json",
+    "sha256": "1fbb362ebf8c5ee0239227bead8c693680b015dc7452b484afc1869d17aefb91"
+  },
+  "review": {
+    "path": "archives/p1-independent-review-v2.json",
+    "sha256": "bec8804277f7b276c1ad2d31c1d68e3fc3848b8f844923b80fd238d7a8acf4ed"
+  },
+  "reviewed_inputs": {
+    "P1_CONTRACT_RU.md": "e999802fbf420f3db66b6e03f4f7bfcde1242a803c5a4bb139793cd7da902fc1",
+    "p1_contract_corpus.py": "4486f54c81e736e9179f738b2630befd61730fbf70a3953742597db36f50c891",
+    "p1_fixture_draft.py": "aedef1f8133830d98ad4fcb2862de57ca48e678158e3ebc869224005c5eaa496",
+    "archives/p1-contract-corpus-review.json": "fb704db29324346c6e94df5a30ecd89670f66a79e44a7a6c51cc51a3d7cd1f38",
+    "DICTIONARY_EXIT_PLAN_RU.md": "b4264e4221f1077ffc3ecbfb5551954be89fa6f8518bc95f48a0fc2697b70c92",
+    "P1_ACCEPTANCE_DRAFT_RU.md": "28d0d3701f20ef3e975c49d9ed63c7c10b3e5cc5a6794c2fd06319db967ff8f5",
+    "archives/p0-transition-manifest.json": "375cdda976a6e07cea6ae6c95521ee762424c1bc5dd9626a98b37d9ec6a0f91f"
+  },
+  "files": [
+    {
+      "path": "archives/p1-development-reference-v1.json",
+      "sha256": "1f44e0a0efebbc51b4af8c6ea3c202f146f7aa22677ffe0825d9bd661767ad7f",
+      "cases": 88
+    },
+    {
+      "path": "archives/p1-holdout-reference-v1.json",
+      "sha256": "65ca8335fcbf46fbf9607cf5f4a39cbaad7cd797bd0b92ccf2e75afb1f76b4b6",
+      "cases": 136
+    }
+  ],
+  "test_migration_ledger": {
+    "path": "archives/p1-test-migration-ledger.json",
+    "sha256": "308cfecd68ee55e2f9dac91375b62929e0f980d0cd7b9b42edb7a13c04dc8c50",
+    "assertions": 159
+  },
+  "checks": {
+    "cases": 224,
+    "families": 28,
+    "span_checks": 176
+  },
+  "technical_decisions": [
+    "TD01",
+    "TD02",
+    "TD03",
+    "TD04",
+    "TD05",
+    "TD06"
+  ],
+  "test_migration_process_approved": true,
+  "individual_test_changes_authorized": false,
+  "p0": {
+    "status": "ACTIVE_ARCHIVAL_DEBT",
+    "prerequisite_waiver_approved": true,
+    "evidence": "P0_FINAL_BASELINE_LINKAGE_RU.md",
+    "debt": [
+      "exact frozen command/environment/exit provenance",
+      "same-P0 required-control evidence linkage"
+    ]
+  },
+  "resource_limits": {
+    "external_api_cost_usd": 0,
+    "external_replacement_request_calls": 0,
+    "additional_storage_bytes": 2147483648,
+    "warm_p95_delta_seconds": 1,
+    "cold_p95_delta_seconds": 5,
+    "output_search_budget_increase": 0
+  },
+  "pre_execution_requirements": [
+    "pin actual environment/config/serializer/tokenizer/model/prompt/index",
+    "fix paired cold/warm sample protocol before candidate results",
+    "preserve existing required release and typed-proof controls"
+  ],
+  "blind_holdout": false,
+  "source_disjoint_holdout": false,
+  "product_acceptance_passed": false,
+  "merge_authorized": false
+}

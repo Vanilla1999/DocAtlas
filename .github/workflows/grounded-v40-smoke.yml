@@ -1,0 +1,39 @@
+name: Grounded V40 comparison (external comparator)
+on:
+  push:
+    branches: [fix/main-flow-compact-evidence]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  grounded-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install pinned Grounded Docs
+        run: |
+          mkdir -p "$RUNNER_TEMP/grounded-npm"
+          npm install --prefix "$RUNNER_TEMP/grounded-npm" --no-audit --no-fund --no-save @arabold/docs-mcp-server@3.2.1
+          "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" --version
+      - name: Index pinned sources and query all 40 Grounded questions
+        run: |
+          python -m eval.grounded_v40.run \
+            --cli "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" \
+            --output "$RUNNER_TEMP/grounded-v40-full"
+      - name: Preserve exact stdout/stderr of Grounded
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: grounded-v40-full-${{ github.sha }}
+          path: ${{ runner.temp }}/grounded-v40-full/
+          retention-days: 14
+          if-no-files-found: warn

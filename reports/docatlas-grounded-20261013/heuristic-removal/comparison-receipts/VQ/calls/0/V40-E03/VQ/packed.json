@@ -1,0 +1,93 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-16162d776b48003b",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Fix Problems > `--fix-dry-run`",
+      "snippet": "#### `--fix-dry-run`\n\nThis option has the same effect as `--fix` with the difference that the fixes are not saved to the file system. Because the default formatter does not output the fixed code, you'll have to use another formatter (e.g. `--format json`) to get the fixes.\n\n- **Argument Type**: No argument.\n\nThis makes it possible to fix code from `stdin` when used with the `--stdin` flag.\n\nThis flag can be useful for integrations (e.g. editor plugins) which need to autofix text from the command line without saving it to the filesystem.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "d1902553f131f604ecedf310644ebd51f6962962b52be044c16c419ab129c9f8",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 373,
+      "line_end": 382,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/032a2b63166d4fe8232af299"
+    },
+    {
+      "evidence_id": "ev-d8c58cc8641cf56c",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options",
+      "snippet": "## Options\n\nYou can view all the CLI options by running `npx eslint -h`.\n\n```txt\neslint [options] file.js [file.js] [dir]\n\nBasic configuration:\n  --no-config-lookup               Disable look up for eslint.config.*\n  -c, --config path::String        Use this configuration instead of eslint.config.* look up\n  --inspect-config                 Open the config inspector with the current configuration\n  --ext [String]                   Specify additional file extensions to lint\n  --global [String]                Define global variables\n  --parser String                  Specify the parser to be used\n  --parser-options Object          Specify parser options\n\nSpecify Rules and Plugins:\n  --plugin [String]                Specify plugins\n  --rule Object                    Specify rules\n\nFix Problems:\n  --fix                            Automatically fix problems\n  --fix-dry-run                    Automatically fix problems without saving the changes to the file system\n  --fix-type Array                 Specify the types of fixes to apply (directive, problem, suggestion, layout)\n\nIgnore Files:\n  --no-ignore                      Disable use of ignore files and patterns\n  --ignore-pattern [String]        Patterns of files to ignore\n\nUse stdin:\n  --stdin                          Lint code provided on <STDIN> - default: false\n  --stdin-filename String          Specify filename to process STDIN as\n\nHandle Warnings:\n  --quiet                          Report errors only - default: false\n  --max-warnings Int               Number of warnings to trigger nonzero exit code - default: -1\n\nOutput:\n  -o, --output-file path::String   Specify file to write report to\n  -f, --format String              Use a specific output format - default: stylish\n  --color, --no-color              Force enabling/disabling of color\n\nInline configuration comments:\n  --no-inline-config               Prevent comments from changing config or rules\n  --report-unused-disable-directives  Adds reported errors for unused eslint-disable and eslint-enable directives\n  --report-unused-disable-directives-severity String  Chooses severity level for reporting unused eslint-disable and eslint-enable directives - either: off, warn, error, 0, 1, or 2\n  --report-unused-inline-configs String  Adds reported errors for unused eslint inline config comments - either: off, warn, error, 0, 1, or 2\n\nCaching:\n  --cache                          Only check changed files - default: false\n  --cache-file path::String        Path to the cache file. Deprecated: use --cache-location - default: .eslintcache\n  --cache-location path::String    Path to the cache file or directory\n  --cache-strategy String          Strategy to use for detecting changed files in the cache - either: metadata or content - default: metadata\n\nSuppressing Violations:\n  --suppress-all                   Suppress all violations - default: false\n  --suppress-rule [String]         Suppress specific rules\n  --suppressions-location path::String  Specify the location of the suppressions file\n  --prune-suppressions             Prune unused suppressions - default: false\n  --pass-on-unpruned-suppressions  Ignore unused suppressions - default: false\n\nMiscellaneous:\n  --init                           Run config initialization wizard - default: false\n  --env-info                       Output execution environment information - default: false\n  --no-error-on-unmatched-pattern  Prevent errors when pattern is unmatched\n  --exit-on-fatal-error            Exit with exit code 2 in case of fatal error - default: false\n  --no-warn-ignored                Suppress warnings when the file list includes ignored files\n  --pass-on-no-patterns            Exit with exit code 0 in case no file patterns are passed\n  --debug                          Output debugging information\n  -h, --help                       Show help\n  -v, --version                    Output the version number\n  --print-config path::String      Print the configuration for the given file\n  --stats                          Add statistics to the lint report - default: false\n  --flag [String]                  Enable a feature flag\n  --mcp                            Start the ESLint MCP server\n  --concurrency Int|String         Number of linting threads, auto to choose automatically, off for no multithreading - default: off\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "7c789f068ff594a534114f1282f0106063126cf0dbc2ad9b5cfbb1dd1b7c415e",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 81,
+      "line_end": 158,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/279a51bc8816a2db4bdc3e58"
+    },
+    {
+      "evidence_id": "ev-6693fb1b6b9b9203",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Fix Problems > `--fix-dry-run` > `--fix-dry-run` example",
+      "snippet": "##### `--fix-dry-run` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stdin\", \"--fix-dry-run\", \"--format\", \"json\"],\n    previousCommands: [\"getSomeText\"]\n}) }}\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9194689b452e794037c9befcf240515b89fbb243d687d95383ed7e00f986eaff",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 383,
+      "line_end": 390,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/430479fa3247e4bfcbf42705"
+    },
+    {
+      "evidence_id": "ev-8d7b0356d5b2745c",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Fix Problems > `--fix-type`",
+      "snippet": "#### `--fix-type`\n\nThis option allows you to specify the type of fixes to apply when using either `--fix` or `--fix-dry-run`.\n\n- **Argument Type**: String. One of the following fix types:\n    1. `problem` - fix potential errors in the code\n    1. `suggestion` - apply fixes to the code that improve it\n    1. `layout` - apply fixes that do not change the program structure (AST)\n    1. `directive` - apply fixes to inline directives such as `// eslint-disable`\n- **Multiple Arguments**: Yes\n\nThis option is helpful if you are using another program to format your code, but you would still like ESLint to apply other types of fixes.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "4fd116a9d4cac6257a6ec719c0b4800259f94df0a3def0bcebb9ce78269b2d39",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 391,
+      "line_end": 403,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/55b0f61a246d9b94c7d81c86"
+    },
+    {
+      "evidence_id": "ev-e52decaa598f0403",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Fix Problems > `--fix-type` > `--fix-type` example",
+      "snippet": "##### `--fix-type` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"--fix-type\", \"suggestion\", \".\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"--fix-type\", \"suggestion\", \"--fix-type\", \"problem\", \".\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"--fix-type\", \"suggestion,layout\", \".\"]\n}) }}\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "69686d279ed5f754297d8b1b5ca168d1fd19101ac44ce13c2dbb664557ff0844",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 404,
+      "line_end": 420,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/37bdd62885d09d893c36600e"
+    },
+    {
+      "evidence_id": "ev-9e1380c762492a6f",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Fix Problems > `--fix` > `--fix` example",
+      "snippet": "##### `--fix` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"file.js\"]\n}) }}\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "55bccfdfc3a8a3a916864690f91a6d92529d852b8f3c78a138381f506e609ad3",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 366,
+      "line_end": 372,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/81c40229180ccaf2c1b1084f"
+    }
+  ],
+  "tokens": 2698,
+  "utf8_bytes": 9518,
+  "sha256": "ac971bf6645e16aa6fa6939f8ef699ae160e439b22f2835060a126436d3ecdf9",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

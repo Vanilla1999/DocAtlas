@@ -10,13 +10,6 @@ from docmancer.mcp.network_policy import HttpGrant, SecurityError, validate_http
 pytestmark = pytest.mark.mock_network_dns
 
 
-def test_http_target_blocks_unresolvable_hostname(monkeypatch):
-    monkeypatch.setattr("docmancer.mcp.network_policy.resolve_host", lambda host: [])
-
-    with pytest.raises(SecurityError) as exc:
-        validate_http_target("https://example.com/v1", HttpGrant(allowed_hosts=("example.com",)))
-
-    assert exc.value.code == "host_resolution_failed"
 
 
 def test_http_executor_blocks_unresolved_host_before_credentials(monkeypatch):

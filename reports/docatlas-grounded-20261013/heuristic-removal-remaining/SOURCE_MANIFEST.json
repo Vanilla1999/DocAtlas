@@ -1,0 +1,10 @@
+{
+  "base": "91dd2b4e9f0615e9c6ac5c4346c13200accca550",
+  "patch_sha256": "67e5beaf625fc104ad57e0bb08c5e44d5076ecdecea0b1de169e372ae1d134d8",
+  "untracked_included": [
+    "docmancer/retrieval/experimental_acquisition.py",
+    "tests/diagnostic_labels.heuristic_removal.json",
+    "tests/test_heuristic_removal_public_integration.py"
+  ],
+  "boundary": "cumulative worktree product/tests diff; eval helpers retained in previous evidence export"
+}

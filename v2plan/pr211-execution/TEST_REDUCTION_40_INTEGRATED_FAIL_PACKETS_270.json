@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "packets": {
+    "domain103": {
+      "source": "/tmp/opencode/pr211-fail-domain.json",
+      "sha256": "451a4b5ebf0256b41cf7bad1b460e984600fb0a905c8cc989d7db3d94f2c7631",
+      "removed": 103, "added": 0,
+      "BASE_status": {"FAIL": 103}, "saved_CI_status": {"FAIL": 103},
+      "unresolved": [],
+      "author_validation": "Source text and stdlib tokenize only; no project runtime, imports, AST, pytest or install. Advanced XML has no failures in owned files. Prior removals preserved; PASS parameter rows retained.",
+      "module_counts": {
+        "tests/docs/test_admission_role_boundaries.py": 2,
+        "tests/docs/test_answer_units_v2.py": 4,
+        "tests/docs/test_answer_units_v3.py": 8,
+        "tests/docs/test_bound_table_qualification.py": 2,
+        "tests/docs/test_cli_literal_query_binding.py": 16,
+        "tests/docs/test_comparison_treat_frame.py": 10,
+        "tests/docs/test_enumeration_request_terms.py": 7,
+        "tests/docs/test_hyphenated_query_identity.py": 17,
+        "tests/docs/test_independent_query_probes.py": 2,
+        "tests/docs/test_query_reference_roles.py": 4,
+        "tests/docs/test_russian_inquiry_intent.py": 12,
+        "tests/docs/test_source_locator_resolution.py": 19
+      }
+    },
+    "selection167": {
+      "source": "/tmp/opencode/pr211-fail-selection.json",
+      "sha256": "bdcdac44af4690512aa9d29efac0ddf43e84d47717dc4ca1adda41563fd1fd46",
+      "removed": 167, "added": 0,
+      "BASE_status": {"FAIL": 167}, "saved_CI_status": {"FAIL": 167},
+      "unresolved": [{"id": "tests/docs/test_evidence_selection_v2.py::test_permission_frames_select_and_project_decisive_local_evidence", "reason": "Mixed unit and real service sync_project_docs/get_docs_context integration; preserved entire function."}],
+      "author_validation": "Saved FAIL XML, source text and stdlib tokenize only; no project imports/runtime/AST/pytest/install. Helpers retained.",
+      "module_counts": {
+        "tests/docs/test_component_completeness.py": 10,
+        "tests/docs/test_component_coverage.py": 12,
+        "tests/docs/test_context_constraint_roles.py": 8,
+        "tests/docs/test_context_ranking_regressions.py": 14,
+        "tests/docs/test_evidence_admission_sufficiency.py": 28,
+        "tests/docs/test_evidence_qualification.py": 13,
+        "tests/docs/test_evidence_selection.py": 37,
+        "tests/docs/test_evidence_selection_part02.py": 25,
+        "tests/docs/test_evidence_selection_v2.py": 4,
+        "tests/docs/test_evidence_set_dependencies.py": 4,
+        "tests/docs/test_evidence_set_disposition.py": 6,
+        "tests/docs/test_evidence_set_parse_cache.py": 2,
+        "tests/docs/test_gap_directed_candidate_ranking.py": 2,
+        "tests/docs/test_reporting_relation_selection.py": 2
+      }
+    }
+  },
+  "policy": "AGENTS.md owner2026-10-10: recorded FAIL may be retired including protective tests, without successor, cause analysis or independent review. Coverage loss accepted. Deletion is not product fix/PASS.",
+  "proof": {
+    "run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core_junit": "/tmp/opencode/pr211-ci-a4844dfc/pytest-core-3.11-38033112465-1/core-tests-3.11.xml",
+    "core_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "boundary": "Exact frozen BASE identities checked against saved core3.11 before retirement. No final-SHA runtime/collection certification or fresh source-semantic review. Packet hashes bind author source-hash proposals as historical evidence, not verification of the running projection agent's files."
+  },
+  "validation": {"BASE_partition": 8291, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "overlap_previous": 0, "overlap_packets": 0, "prior_removed": 236, "new_removed": 270, "removed": 506, "added": 1, "net": 505, "projected_after": 7786, "target_gap": 2812, "classified": 1208, "unclassified": 7083, "audits_preserved": true},
+  "prior_manifest_sha256": "97b6cbeae6e36c94706830f65770917fd834c311a916923501d0ad543da7fc55",
+  "pending": "Projection agent packet excluded. Selection retains one mixed real-service integration FAIL; diagnostic parameter-ID renumbering pending coordinator action, not new additions or disappearance credit. No tests/labels/production edits or runtime/imports/AST/CI."
+}

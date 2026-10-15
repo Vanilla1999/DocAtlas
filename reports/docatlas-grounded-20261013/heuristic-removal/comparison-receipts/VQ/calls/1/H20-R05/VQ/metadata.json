@@ -1,0 +1,13 @@
+{
+  "case_id": "H20-R05",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-ruff",
+  "public_request": {
+    "question": "What exact numeric exit status does Ruff return when its cache database is corrupted?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/1-ruff/project",
+    "scope": "project"
+  },
+  "status": "started",
+  "model_calls": 0
+}

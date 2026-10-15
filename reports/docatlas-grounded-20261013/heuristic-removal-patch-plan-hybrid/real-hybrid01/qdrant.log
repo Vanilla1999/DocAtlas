@@ -1,0 +1,52 @@
+           _                 _    
+  __ _  __| |_ __ __ _ _ __ | |_  
+ / _` |/ _` | '__/ _` | '_ \| __| 
+| (_| | (_| | | | (_| | | | | |_  
+ \__, |\__,_|_|  \__,_|_| |_|\__| 
+    |_|                           
+
+Version: 1.19.2, build: 016542aa
+Access web UI at http://localhost:6333/dashboard
+Agentic Skills: https://skills.qdrant.tech/
+
+2026-10-13T12:43:39.517903Z ERROR qdrant::settings: Config file via --config-path is not found: /tmp/docatlas-real-hybrid-801ma4sw/qdrant.json
+2026-10-13T12:43:39.761834Z  WARN qdrant::settings: Config file not found: config/config
+2026-10-13T12:43:39.761838Z  WARN qdrant::settings: Config file not found: config/development
+2026-10-13T12:43:40.147657Z  INFO storage::content_manager::consensus::persistent: Initializing new raft state at ./storage/raft_state.json
+2026-10-13T12:43:42.608387Z  INFO qdrant: Distributed mode disabled
+2026-10-13T12:43:42.609571Z  INFO qdrant: Telemetry reporting enabled, id: 9e41a10b-15bd-48d6-bb95-c64aec546fb4
+2026-10-13T12:43:47.098144Z  INFO qdrant::tonic: Qdrant gRPC listening on 6334
+2026-10-13T12:43:47.098164Z  INFO qdrant::tonic: TLS disabled for gRPC API
+2026-10-13T12:43:47.779078Z  WARN qdrant::actix::web_ui: Static content folder for Web UI './static' does not exist
+2026-10-13T12:43:47.779581Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s
+2026-10-13T12:43:47.780108Z  INFO qdrant::actix: TLS disabled for REST API
+2026-10-13T12:43:47.780382Z  INFO qdrant::actix: Qdrant HTTP listening on 6333
+2026-10-13T12:43:47.870303Z  INFO actix_server::builder: starting 23 workers
+2026-10-13T12:43:47.870324Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+2026-10-13T12:43:47.870328Z  INFO actix_server::server: starting service: "actix-web-service-0.0.0.0:6333", workers: 23, listening on: 0.0.0.0:6333
+2026-10-13T12:43:49.160545Z ERROR rustls_platform_verifier::verification::others: failed to verify TLS certificate: invalid peer certificate: certificate not valid for name "telemetry.qdrant.io"; certificate is only valid for DnsName("*.us-east-1.es.amazonaws.com") or DnsName("*.cell-01.us-east-1.es.amazonaws.com")
+2026-10-13T12:43:50.219054Z  INFO actix_server::server: SIGTERM received; starting graceful shutdown
+2026-10-13T12:43:50.219108Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219108Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219122Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219122Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219115Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219132Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219107Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219140Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219144Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219115Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219148Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219112Z  INFO actix_server::accept: accept thread stopped
+2026-10-13T12:43:50.219150Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219144Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219166Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219167Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219175Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219137Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219172Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219172Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219173Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219156Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219179Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:43:50.219155Z  INFO actix_server::worker: shutting down idle worker

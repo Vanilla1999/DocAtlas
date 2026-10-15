@@ -3,12 +3,22 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 from typing import Sequence
 
+from docmancer.docs.tool_choice_eval import (
+    REPEATS,
+    SCENARIOS,
+    THRESHOLDS,
+    _schema_version,
+    installed_guidance,
+    public_tool_schemas,
+    tool_choice_contract_sha256,
+)
 from scripts.opencode_chat_support import (
     DEFAULT_OPENCODE_MODEL,
     OPENCODE_VARIANT,
@@ -43,6 +53,69 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _task21_outcomes_match_current_contract(report: dict, results: list[dict]) -> bool:
+    """Recompute outcome consistency and quality from the recorded decisions."""
+    scenarios = {scenario.scenario_id: scenario for scenario in SCENARIOS}
+    public_names = {"get_docs_context", "prepare_docs", "docs_status"}
+    actions: list[bool] = []
+    retries: list[bool] = []
+    for row in results:
+        scenario = scenarios.get(row.get("scenario_id"))
+        if scenario is None:
+            return False
+        tool = row.get("tool")
+        if tool is not None and not isinstance(tool, str):
+            return False
+        expected_flags = {
+            "first_tool_correct": tool == scenario.expected_first_tool,
+            "legacy_tool_hallucinated": bool(tool and tool not in public_names),
+            "unnecessary_prepare_or_status": (
+                scenario.expected_first_tool not in {"prepare_docs", "docs_status"}
+                and tool in {"prepare_docs", "docs_status"}
+            ),
+        }
+        if any(type(row.get(key)) is not bool or row[key] != value
+               for key, value in expected_flags.items()):
+            return False
+        for key, required, values in (
+            ("next_action_correct", bool(scenario.expected_next_action), actions),
+            ("original_question_retried", scenario.expected_retry_question is not None, retries),
+        ):
+            value = row.get(key)
+            if required:
+                if type(value) is not bool:
+                    return False
+                values.append(value)
+            elif value is not None:
+                return False
+    count = len(results)
+    if not count or not actions or not retries:
+        return False
+    computed = {
+        "first_tool_accuracy": sum(row["first_tool_correct"] for row in results) / count,
+        "legacy_tool_hallucination_rate": sum(row["legacy_tool_hallucinated"] for row in results) / count,
+        "unnecessary_prepare_or_status_rate": sum(row["unnecessary_prepare_or_status"] for row in results) / count,
+        "next_action_copy_accuracy": sum(actions) / len(actions),
+        "original_question_retry_rate": sum(retries) / len(retries),
+    }
+    metrics = report.get("metrics")
+    if not isinstance(metrics, dict) or set(metrics) != set(computed):
+        return False
+    for key, actual in computed.items():
+        recorded = metrics[key]
+        if (not isinstance(recorded, (int, float)) or isinstance(recorded, bool)
+                or not math.isfinite(recorded)
+                or not math.isclose(recorded, actual, rel_tol=0.0, abs_tol=1e-12)):
+            return False
+    return (
+        computed["first_tool_accuracy"] >= THRESHOLDS["first_tool_accuracy"]
+        and computed["legacy_tool_hallucination_rate"] <= THRESHOLDS["legacy_tool_hallucination_rate"]
+        and computed["unnecessary_prepare_or_status_rate"] <= THRESHOLDS["unnecessary_prepare_or_status_rate"]
+        and computed["next_action_copy_accuracy"] >= THRESHOLDS["next_action_copy_accuracy"]
+        and computed["original_question_retry_rate"] >= THRESHOLDS["original_question_retry_rate"]
+    )
+
+
 def _task21_report_reusable() -> bool:
     if not TASK21_REPORT.is_file():
         return False
@@ -50,16 +123,37 @@ def _task21_report_reusable() -> bool:
         report = _load(TASK21_REPORT)
     except (OSError, json.JSONDecodeError):
         return False
-    results = report.get("results") or []
+    if not isinstance(report, dict):
+        return False
+    results = report.get("results")
+    if not isinstance(results, list) or any(not isinstance(row, dict) for row in results):
+        return False
+    adapter = report.get("adapter")
+    if not isinstance(adapter, dict):
+        return False
+    schemas = public_tool_schemas()
+    contract = tool_choice_contract_sha256(guidance=installed_guidance(), tool_schemas=schemas)
+    expected_rows = {(scenario.scenario_id, repeat): scenario.expected_first_tool
+                     for scenario in SCENARIOS for repeat in range(1, REPEATS + 1)}
+    observed_rows = [(row.get("scenario_id"), row.get("repeat")) for row in results]
+    if any(not isinstance(key[0], str) or type(key[1]) is not int for key in observed_rows):
+        return False
     return (
         report.get("passed") is True
+        and report.get("tool_schema_version") == _schema_version(schemas)
+        and report.get("tool_choice_contract_sha256") == contract
+        and report.get("thresholds") == THRESHOLDS
         and report.get("provider_id") == "opencode-chat"
-        and (report.get("adapter") or {}).get("model_version") == REPORT_MODEL
+        and adapter.get("model_version") == REPORT_MODEL
         and report.get("reasoning_effort") == OPENCODE_VARIANT
-        and report.get("scenario_count") == 20
-        and report.get("repeats") == 3
-        and len(results) == 60
+        and report.get("scenario_count") == len(SCENARIOS)
+        and report.get("repeats") == REPEATS
+        and len(results) == len(expected_rows)
+        and set(observed_rows) == set(expected_rows)
+        and all(row.get("expected_tool") == expected_rows[key]
+                for row, key in zip(results, observed_rows))
         and all(item.get("status") != "not_run" for item in results)
+        and _task21_outcomes_match_current_contract(report, results)
     )
 
 

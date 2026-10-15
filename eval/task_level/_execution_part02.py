@@ -435,9 +435,9 @@ def evaluate_agent_patch(
             "delivery_attempts": _optional_int(
                 (isolated_delivery or bounded_direct).get("attempts")
             ),
-            "action_packet_status": action_packet.get("status"),
-            "action_packet_truncated": action_packet.get("status") == "truncated",
-            "action_packet_insufficient_evidence": action_packet.get("status") == "insufficient_evidence",
+            "action_packet_result": action_packet.get("result"),
+            "action_packet_completeness": action_packet.get("completeness"),
+            "action_packet_insufficient_evidence": action_packet.get("completeness") != "complete",
             "action_packet_fidelity": "validated" if action_packet else "not_applicable",
             **packet_evidence_metrics,
             "evidence_fingerprint": (

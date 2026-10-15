@@ -1,0 +1,87 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-33f409970b09f110",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "     ``path/to/my_script`` prefer ``{tox_root}{/}path{/}to{/}my_script``. If your inline script is platform dependent\n     refer to :ref:`platform-specification` on how to select different script per platform.\n\n.. conf::\n   :keys: commands_post\n   :default: <empty list>\n\n   Commands to run after running the :ref:`commands`. Execute regardless of the outcome of both :ref:`commands` and\n   :ref:`commands_pre`. All evaluation and configuration logic applies from :ref:`commands`.\n\n.. conf::\n   :keys: change_dir, changedir\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e6d6fa49340f739ca15d93b8fe8fefb9883a64f8f3a637db48d6b33137d1b90a",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 726,
+      "line_end": 737,
+      "authority": "source_of_truth",
+      "scope": "project"
+    },
+    {
+      "evidence_id": "ev-e440b977fd76946f",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "   tox environments that this environment depends on (must be run after those).\n\n   .. warning::\n\n      ``depends`` does not pull in dependencies into the run target, for example if you select ``py310,py39,coverage``\n      via the ``-e`` tox will only run those three (even if ``coverage`` may specify as ``depends`` other targets too -\n      such as ``py310, py39, py38``). This is solely meant to specify dependencies and order in between a target run\n      set.\n\n.. conf::\n   :keys: commands_pre\n   :default: <empty list>\n",
+      "version_binding": "unversioned",
+      "content_sha256": "eb7103a4340e4fbf7694c2acfe9458c12f3ac95d330e661ec5dbc42e036320c8",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 674,
+      "line_end": 685,
+      "authority": "source_of_truth",
+      "scope": "project"
+    },
+    {
+      "evidence_id": "ev-d6751337fed83d52",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "   :version_added: 3.4\n\n   Commands to run before running the :ref:`commands`. All evaluation and configuration logic applies from\n   :ref:`commands`.\n\n.. conf::\n   :keys: commands\n   :default: <empty list>\n\n   The commands to be called for testing. Only execute if :ref:`commands_pre` succeed. Each line is interpreted as one\n   command; however a command can be split over multiple lines by ending the line with the ``\\`` character.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "12fbd574e80750b53a37cbe6e9f77a5e6cce5228c8598c2a0ec190e13af8e88a",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 686,
+      "line_end": 697,
+      "authority": "source_of_truth",
+      "scope": "project"
+    },
+    {
+      "evidence_id": "ev-201fbbf6f705e034",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "   automatically transforming relative paths specified on the CLI to relative paths respective of the commands executing\n   directory.\n\n.. conf::\n   :keys: ignore_errors\n   :default: False\n\n   When executing the commands keep going even if a sub-command exits with non-zero exit code. The overall status will\n   be \"commands failed\", i.e. tox will exit non-zero in case any command failed. It may be helpful to note that this\n   setting is analogous to the ``-k`` or ``--keep-going`` option of GNU Make.\n\n.. conf::\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ab29c9a9f9e4b0f72c48fe9f462990ace4e0563f37add4a6e9715c1f0910d66a",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 749,
+      "line_end": 760,
+      "authority": "source_of_truth",
+      "scope": "project"
+    },
+    {
+      "evidence_id": "ev-7c9a60f5fb4b8594",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "   Commands to run that will build the package. If any command fails the packaging operation is considered failed and\n   will fail all environments using that package.\n\n.. conf::\n   :keys: ignore_errors\n   :default: False\n   :ref_suffix: external\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "6383d0e42610df4e20d27795b831543f935530f5f34fce99a847516299dbf42f",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 984,
+      "line_end": 991,
+      "authority": "source_of_truth",
+      "scope": "project"
+    },
+    {
+      "evidence_id": "ev-968fa19ee07f7a1d",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "      foo=bar\n    commands = pytest tests\n\nYou could enable ``ignore_errors`` by running:\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox --override env_run_base.ignore_errors=True\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n       tox --override testenv.ignore_errors=True\n\n\nYou could add additional dependencies by running:\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox --override env_run_base.deps+=pytest-xdist\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n       tox --override testenv.deps+=pytest-xdist\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "76bdd8893c40d949c39dd40c083938d15083b721cf86eacc7f3681720e11123a",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 1251,
+      "line_end": 1282,
+      "authority": "source_of_truth",
+      "scope": "project"
+    }
+  ],
+  "tokens": 1760,
+  "utf8_bytes": 5340,
+  "sha256": "0a8b5b5ee5d35016d88c77e145b19865e2d2cd803834a180a570d0953581fc7f",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

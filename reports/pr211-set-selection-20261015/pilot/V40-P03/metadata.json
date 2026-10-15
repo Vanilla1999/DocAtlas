@@ -1,0 +1,18 @@
+{
+  "A": {
+    "seconds": 1.670414215999699,
+    "dto_tokens": 48116,
+    "dto_bytes": 144210,
+    "source_count": 167,
+    "observer_errors": [],
+    "state_unchanged": true
+  },
+  "D": {
+    "seconds": 21.97827242400035,
+    "dto_tokens": 48116,
+    "dto_bytes": 144210,
+    "source_count": 167,
+    "observer_errors": [],
+    "state_unchanged": true
+  }
+}

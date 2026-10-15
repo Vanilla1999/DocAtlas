@@ -1,27 +1,75 @@
 {
-  "schema_version": "project-context-quality-v2-acceptance-v1",
-  "v2_protocol_lock_sha256": "8bb5e41709cd6bb361661ada92b604396bb8e4c6c05bf77ce0b7c11a130deca4",
+  "schema_version": "project-context-quality-v2-acceptance-v3",
+  "v2_protocol_lock_sha256": "616c9d02bf3b15051618755fcbc48b84d66d9fcee84f8384dbf9b77b3558f5e9",
   "legacy_protocol_lock_sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516",
   "lanes": {
     "natural": {
-      "semantic_usefulness": {"minimum": 15, "denominator": 15},
-      "lookup_attribution": {"minimum": 33, "denominator": 36},
-      "safety": {"minimum": 19, "denominator": 19},
-      "budget_compliance": {"minimum": 19, "denominator": 19},
-      "negative_correctness": {"minimum": 2, "denominator": 2},
-      "unsupported_answer_control_correctness": {"minimum": 2, "denominator": 2},
-      "evaluator_verified_full_semantic_component_coverage": {"minimum": 15, "denominator": 15},
-      "false_full_coverage": {"maximum": 0, "denominator": 15}
+      "semantic_usefulness": {
+        "minimum": 15,
+        "denominator": 15
+      },
+      "lookup_attribution": {
+        "minimum": 33,
+        "denominator": 36
+      },
+      "safety": {
+        "minimum": 19,
+        "denominator": 19
+      },
+      "negative_correctness": {
+        "minimum": 2,
+        "denominator": 2
+      },
+      "unsupported_answer_control_correctness": {
+        "minimum": 2,
+        "denominator": 2
+      },
+      "evaluator_verified_full_semantic_component_coverage": {
+        "minimum": 15,
+        "denominator": 15
+      },
+      "false_full_coverage": {
+        "maximum": 0,
+        "denominator": 15
+      },
+      "cost_observation_completeness": {
+        "minimum": 19,
+        "denominator": 19
+      }
     },
     "exposed_paraphrases": {
-      "semantic_usefulness": {"minimum": 5, "denominator": 5},
-      "lookup_attribution": {"minimum": 12, "denominator": 12},
-      "safety": {"minimum": 6, "denominator": 6},
-      "budget_compliance": {"minimum": 6, "denominator": 6},
-      "negative_correctness": {"minimum": 1, "denominator": 1},
-      "unsupported_answer_control_correctness": {"minimum": 0, "denominator": 0},
-      "evaluator_verified_full_semantic_component_coverage": {"minimum": 5, "denominator": 5},
-      "false_full_coverage": {"maximum": 0, "denominator": 5}
+      "semantic_usefulness": {
+        "minimum": 5,
+        "denominator": 5
+      },
+      "lookup_attribution": {
+        "minimum": 12,
+        "denominator": 12
+      },
+      "safety": {
+        "minimum": 6,
+        "denominator": 6
+      },
+      "negative_correctness": {
+        "minimum": 1,
+        "denominator": 1
+      },
+      "unsupported_answer_control_correctness": {
+        "minimum": 0,
+        "denominator": 0
+      },
+      "evaluator_verified_full_semantic_component_coverage": {
+        "minimum": 5,
+        "denominator": 5
+      },
+      "false_full_coverage": {
+        "maximum": 0,
+        "denominator": 5
+      },
+      "cost_observation_completeness": {
+        "minimum": 6,
+        "denominator": 6
+      }
     }
   },
   "legacy_lineage_floor": {
@@ -32,9 +80,19 @@
       "metadata_only_evidence_count",
       "packs_contamination_count",
       "docs_analysis_contamination_count",
-      "false_docs_answer_count",
-      "source_budget_violation_count",
-      "token_budget_violation_count"
-    ]
+      "false_docs_answer_count"
+    ],
+    "schema_version": "legacy-source-fact-acceptance-v2",
+    "acceptance_metric": "verified_original_case_fact_count",
+    "positive_case_count": 15,
+    "contract_path": "eval/project_context_quality/legacy_fact_acceptance_crosswalk.json",
+    "contract_sha256": "07a0baf63be159d1ba8dc6c8595d3b01bc1d2bb209fff781bb635223b5a74cec",
+    "raw_original_query_coverage": "telemetry_with_no_lookup_transfer"
+  },
+  "output_cost_policy": {
+    "objective": "minimize_full_public_dto_without_fixed_output_ceiling",
+    "measurement": "source_count_canonical_utf8_bytes_and_serialized_token_estimate",
+    "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
+    "tokenizer_claim": "serialized_utf8_estimate_not_actual_client_tokens"
   }
 }

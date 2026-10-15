@@ -1,0 +1,3826 @@
+{
+  "case_id": "OLD_SETEXT",
+  "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+  "split": "control",
+  "arm": "V3",
+  "request": {
+    "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+    "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "rows": [
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+        "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+        "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+        "# Logging\n\nLogs flow to disk after each request.\n",
+        "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+        "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+        "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+        "# Packet transport\n\nPackets are delivered after each request.\n",
+        "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+        "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-qk1r9h5i/project/docatlas.project-docs.yaml": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    }
+  },
+  "admission_environment": {
+    "DOCATLAS_EXPERIMENT_ADMISSION": "scalar_label_candidates_v3"
+  },
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-b9d9242363dca0ff",
+        "path_or_url": "docs/setext.md",
+        "section": "Pulse notes",
+        "snippet": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "fd3f49c0e549b7348983b3ff10269f806e7dde67180206fb344de56e7c419683",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "line_start": 1,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/1c5911b05322344d46ad5d9c"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 290,
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "mandatory_component_ids": [],
+        "covered_component_ids": [],
+        "missing_component_ids": [],
+        "evidence_ids": [],
+        "unresolved_residue": [
+          "unverified_original_component_scope"
+        ],
+        "status": "unavailable",
+        "recognized_component_status": "unavailable"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "observed",
+        "projection": "observed",
+        "coverage": "observed",
+        "delivery": "projected"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+        },
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "window_characters": 104,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "telemetry",
+                "pulses",
+                "serialize"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 9,
+              "matched_term_count": 3,
+              "match_ratio": 0.3333,
+              "bm25_cost": -5.292123058895905,
+              "lexical_score": 5.292123058895905,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ],
+                "retrieval_text": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "query_terms": [
+              "when",
+              "do",
+              "telemetry",
+              "pulses",
+              "serialize",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              103
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": {
+            "reason": "policy_valid_original_candidate_v1",
+            "query_id": "query-original",
+            "qualification_reason": "insufficient_visible_match",
+            "coverage_credit": false,
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "path": "docs/setext.md",
+            "body_witnesses": [
+              {
+                "kind": "policy_valid_original_candidate_v1",
+                "relevance_unassessed": true,
+                "text": "Read the handbook for background.",
+                "char_start": 70,
+                "char_end": 103,
+                "block_char_start": 70,
+                "block_char_end": 103,
+                "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+              }
+            ],
+            "body_window": {
+              "char_start": 0,
+              "char_end": 104,
+              "byte_start": 0,
+              "byte_end": 104,
+              "line_start": 1,
+              "line_end": 6
+            }
+          }
+        },
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "window_characters": 104,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "telemetry",
+                "pulses",
+                "serialize"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 9,
+              "matched_term_count": 3,
+              "match_ratio": 0.3333,
+              "bm25_cost": -5.292123058895905,
+              "lexical_score": 5.292123058895905,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ],
+                "retrieval_text": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "query_terms": [
+              "when",
+              "do",
+              "telemetry",
+              "pulses",
+              "serialize",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              103
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": {
+            "reason": "policy_valid_original_candidate_v1",
+            "query_id": "query-original",
+            "qualification_reason": "insufficient_visible_match",
+            "coverage_credit": false,
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "path": "docs/setext.md",
+            "body_witnesses": [
+              {
+                "kind": "policy_valid_original_candidate_v1",
+                "relevance_unassessed": true,
+                "text": "Read the handbook for background.",
+                "char_start": 70,
+                "char_end": 103,
+                "block_char_start": 70,
+                "block_char_end": 103,
+                "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+              }
+            ],
+            "body_window": {
+              "char_start": 0,
+              "char_end": 104,
+              "byte_start": 0,
+              "byte_end": 104,
+              "line_start": 1,
+              "line_end": 6
+            }
+          }
+        }
+      ],
+      "qualification_rejections": [
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2"
+      ],
+      "pre_projection_qualified_ids": [],
+      "ranked_candidate_ids": [
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2"
+      ],
+      "selected_candidate_ids": [],
+      "considered_variants": [],
+      "projection_rejections": [],
+      "final_visible_evidence_ids": [
+        "ev-b9d9242363dca0ff"
+      ],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": false,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "ok",
+          "context_available": true,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "evidence_id": "ev-b9d9242363dca0ff"
+              }
+            ]
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 2,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 2,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md"
+              },
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 2,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 2,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "attempt_kind": "primary",
+          "qualified_variants": 0,
+          "ranked_candidates": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2"
+            ]
+          },
+          "prepared_qualified_variants": {
+            "observation": "recorded",
+            "recorded_count": 0,
+            "producer_count": 0,
+            "producer_omitted": 0,
+            "preview_count": 0,
+            "preview_omitted": 0,
+            "items": []
+          },
+          "literal_context_admissions": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "reason": "policy_valid_original_candidate_v1",
+                "query_id": "query-original",
+                "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "coverage_credit": false,
+                "qualification_reason": "insufficient_visible_match"
+              }
+            ]
+          },
+          "core_payload_sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "ev-b9d9242363dca0ff"
+            ]
+          },
+          "decision_trace": {
+            "schema_version": 1,
+            "variant_attempts": 0,
+            "omitted_events": 0,
+            "selection_events_omitted": 0,
+            "branch_counts": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "branch": "candidate:policy_valid_original_candidate_v1",
+                  "count": 1
+                },
+                {
+                  "branch": "selection:policy_valid_original_candidate_v1",
+                  "count": 1
+                }
+              ]
+            },
+            "events": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "candidate",
+                  "decision": "prepared",
+                  "reason": "policy_valid_original_candidate_v1",
+                  "candidate_key": "764cfd7064b15e6cc7e0718f",
+                  "variant_key": "ace4c59363e499495ce96ea2"
+                },
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "policy_valid_original_candidate_v1",
+                  "candidate_key": "764cfd7064b15e6cc7e0718f",
+                  "variant_key": "ace4c59363e499495ce96ea2"
+                }
+              ]
+            },
+            "selection_events": {
+              "observation": "recorded",
+              "recorded_count": 1,
+              "producer_count": 1,
+              "producer_omitted": 0,
+              "preview_count": 1,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "policy_valid_original_candidate_v1",
+                  "candidate_key": "764cfd7064b15e6cc7e0718f",
+                  "variant_key": "ace4c59363e499495ce96ea2"
+                }
+              ]
+            }
+          }
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                    "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                    "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+                    "path": "docs/setext.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 104,
+                    "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+                    "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "partial_navigational_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                    "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+                    "path": "docs/setext.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 104,
+                    "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                    "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                    "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+                    "path": "docs/setext.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 104,
+                    "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+                    "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": true
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 283,
+                "observed_budget_projection_bytes": 283,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": true,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                    "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+                    "path": "docs/setext.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 104,
+                    "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "success",
+                "reason_code": "partial_navigational_context",
+                "source_count": 1
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": true
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 283,
+                "observed_budget_projection_bytes": 283,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {
+    "ev-b9d9242363dca0ff": {
+      "source": {
+        "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+        "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+        "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "_source_snapshot_sha256": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "canonical_path": "docs/setext.md",
+            "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+          },
+          "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "member_binding": {
+            "doc_scope": "project",
+            "module_path": "",
+            "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+          },
+          "char_start": 0,
+          "char_end": 104,
+          "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "owner": {
+            "text": "# Pulse notes\n",
+            "char_start": 0,
+            "char_end": 14,
+            "scope_start": 0,
+            "scope_end": 104,
+            "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+          "references": [],
+          "scope": {
+            "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "version": "",
+            "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+            "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "references": [],
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+            "member_spans": [
+              [
+                0,
+                13,
+                "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+              ],
+              [
+                15,
+                68,
+                "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          },
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+            "member_spans": [
+              [
+                0,
+                13,
+                "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+              ],
+              [
+                70,
+                103,
+                "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "resolved_version": "",
+        "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+        "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "byte_start": 0,
+        "byte_end": 104,
+        "_source_catalog_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+        "char_start": 0,
+        "char_end": 104,
+        "line_start": 1,
+        "line_end": 6,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "when",
+              "do",
+              "telemetry",
+              "pulses",
+              "serialize",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "bound_subject_context": "# Pulse notes\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              103
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "qualified": false,
+            "qualification_reason": "insufficient_visible_match",
+            "context_only": true,
+            "coverage_kinds": []
+          }
+        },
+        "project_ranking": {
+          "query_intent": "general",
+          "base_score": 1.0,
+          "final_score": 1.0,
+          "original_rank": 0,
+          "selected_rank": 1,
+          "source_weight_reason": "base retrieval score; no topic-derived source weight",
+          "requirement_reason": null,
+          "selected_by": "ranking",
+          "diversity_relaxed": false,
+          "reasons": [
+            "independent qualified query coverage and base retrieval score"
+          ]
+        },
+        "path": "docs/setext.md",
+        "url": null,
+        "title": "Pulse notes",
+        "heading_path": "Pulse notes",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+        "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "display_text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "token_estimate": 26,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+          "path": "docs/setext.md",
+          "url": null,
+          "title": "Pulse notes"
+        },
+        "section": {
+          "title": "Pulse notes",
+          "heading_path": "Pulse notes",
+          "freshness": "current"
+        },
+        "source_provenance": {
+          "owner": "configured_repository",
+          "origin_lane": "project"
+        },
+        "version_exactness": "not_applicable",
+        "repository_authority": "ordinary_repository_document",
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1",
+          "executable_policy": false
+        },
+        "document_data": {
+          "schema": "docmancer-document-data-v1",
+          "instruction_trust": "untrusted_data",
+          "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n"
+        },
+        "authority_root": null,
+        "policy_scope": null,
+        "scope_verified": false,
+        "origin_lane": "project",
+        "canonical_id": null,
+        "library_id": null,
+        "version": null,
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+          "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "_source_snapshot_sha256": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "canonical_path": "docs/setext.md",
+              "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+            },
+            "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+            },
+            "char_start": 0,
+            "char_end": 104,
+            "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+            "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+            "owner": {
+              "text": "# Pulse notes\n",
+              "char_start": 0,
+              "char_end": 14,
+              "scope_start": 0,
+              "scope_end": 104,
+              "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "references": [],
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+              "member_spans": [
+                [
+                  0,
+                  13,
+                  "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                ],
+                [
+                  15,
+                  68,
+                  "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            },
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+              "member_spans": [
+                [
+                  0,
+                  13,
+                  "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                ],
+                [
+                  70,
+                  103,
+                  "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+          "resolved_version": "",
+          "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+          "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "byte_start": 0,
+          "byte_end": 104,
+          "_source_catalog_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+          "char_start": 0,
+          "char_end": 104,
+          "line_start": 1,
+          "line_end": 6,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+          "retrieval_query_ids": [],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "bound_subject_context": "# Pulse notes\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                0,
+                103
+              ],
+              "matched_terms": [],
+              "body_matched_terms": [],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "context_only": true,
+              "literal_context_admission": {
+                "reason": "policy_valid_original_candidate_v1",
+                "query_id": "query-original",
+                "qualification_reason": "insufficient_visible_match",
+                "coverage_credit": false,
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "path": "docs/setext.md",
+                "body_witnesses": [
+                  {
+                    "kind": "policy_valid_original_candidate_v1",
+                    "relevance_unassessed": true,
+                    "text": "Read the handbook for background.",
+                    "char_start": 70,
+                    "char_end": 103,
+                    "block_char_start": 70,
+                    "block_char_end": 103,
+                    "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+                  }
+                ],
+                "body_window": {
+                  "char_start": 0,
+                  "char_end": 104,
+                  "byte_start": 0,
+                  "byte_end": 104,
+                  "line_start": 1,
+                  "line_end": 6
+                }
+              },
+              "coverage_kinds": []
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/setext.md",
+          "url": null,
+          "title": "Pulse notes",
+          "heading_path": "Pulse notes",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "display_text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "token_estimate": 26,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "path": "docs/setext.md",
+            "url": null,
+            "title": "Pulse notes"
+          },
+          "section": {
+            "title": "Pulse notes",
+            "heading_path": "Pulse notes",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_expected_project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "_lifecycle_intent": "current",
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_assigned_requirement_ids": []
+      },
+      "projected_source": {
+        "evidence_id": "ev-b9d9242363dca0ff",
+        "path_or_url": "docs/setext.md",
+        "section": "Pulse notes",
+        "snippet": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "fd3f49c0e549b7348983b3ff10269f806e7dde67180206fb344de56e7c419683",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "line_start": 1,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/1c5911b05322344d46ad5d9c"
+      },
+      "evidence_id": "ev-b9d9242363dca0ff",
+      "path_or_url": "docs/setext.md",
+      "section": "Pulse notes",
+      "snippet": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "fd3f49c0e549b7348983b3ff10269f806e7dde67180206fb344de56e7c419683",
+      "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+      "line_start": 1,
+      "line_end": 6,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/1c5911b05322344d46ad5d9c",
+      "qualification": {
+        "evidence_id": "ev-b9d9242363dca0ff",
+        "path_or_url": "docs/setext.md",
+        "section": "Pulse notes",
+        "snippet": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "fd3f49c0e549b7348983b3ff10269f806e7dde67180206fb344de56e7c419683",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "line_start": 1,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "catalog_role": "other",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "when",
+              "do",
+              "telemetry",
+              "pulses",
+              "serialize",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "bound_subject_context": "# Pulse notes\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              103
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "qualified": false,
+            "qualification_reason": "insufficient_visible_match",
+            "context_only": true,
+            "coverage_kinds": []
+          }
+        },
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+          "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "_source_snapshot_sha256": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "canonical_path": "docs/setext.md",
+              "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+            },
+            "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+            },
+            "char_start": 0,
+            "char_end": 104,
+            "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+            "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+            "owner": {
+              "text": "# Pulse notes\n",
+              "char_start": 0,
+              "char_end": 14,
+              "scope_start": 0,
+              "scope_end": 104,
+              "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+            "references": [],
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+              "member_spans": [
+                [
+                  0,
+                  13,
+                  "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                ],
+                [
+                  15,
+                  68,
+                  "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            },
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+              "member_spans": [
+                [
+                  0,
+                  13,
+                  "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                ],
+                [
+                  70,
+                  103,
+                  "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+          "resolved_version": "",
+          "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+          "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "byte_start": 0,
+          "byte_end": 104,
+          "_source_catalog_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+          "char_start": 0,
+          "char_end": 104,
+          "line_start": 1,
+          "line_end": 6,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+          "retrieval_query_ids": [],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "bound_subject_context": "# Pulse notes\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                0,
+                103
+              ],
+              "matched_terms": [],
+              "body_matched_terms": [],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "context_only": true,
+              "literal_context_admission": {
+                "reason": "policy_valid_original_candidate_v1",
+                "query_id": "query-original",
+                "qualification_reason": "insufficient_visible_match",
+                "coverage_credit": false,
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "path": "docs/setext.md",
+                "body_witnesses": [
+                  {
+                    "kind": "policy_valid_original_candidate_v1",
+                    "relevance_unassessed": true,
+                    "text": "Read the handbook for background.",
+                    "char_start": 70,
+                    "char_end": 103,
+                    "block_char_start": 70,
+                    "block_char_end": 103,
+                    "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+                  }
+                ],
+                "body_window": {
+                  "char_start": 0,
+                  "char_end": 104,
+                  "byte_start": 0,
+                  "byte_end": 104,
+                  "line_start": 1,
+                  "line_end": 6
+                }
+              },
+              "coverage_kinds": []
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/setext.md",
+          "url": null,
+          "title": "Pulse notes",
+          "heading_path": "Pulse notes",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "display_text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "token_estimate": 26,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "path": "docs/setext.md",
+            "url": null,
+            "title": "Pulse notes"
+          },
+          "section": {
+            "title": "Pulse notes",
+            "heading_path": "Pulse notes",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_expected_project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "_lifecycle_intent": "current",
+        "_visible_assignment_hashes": [],
+        "_assigned_requirement_ids": []
+      }
+    }
+  },
+  "pools": [
+    {
+      "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+      "pool": [
+        {
+          "id": "1ca636c3d042529f4c4c1bcf6973c3fd8abb8cf2c0948df4cf99af30ab23584e",
+          "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "text_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "chunk_index": 0,
+          "score": 1.0,
+          "path": "docs/setext.md",
+          "span": [
+            0,
+            104
+          ],
+          "binding": {
+            "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "canonical_path": "docs/setext.md",
+            "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "repository_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/setext.md",
+            "source_path": "docs/setext.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812931976269475,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Pulse notes",
+            "section_level": 1,
+            "document_title": "setext",
+            "document_title_hash": "a11fa25fd80e1f0f",
+            "anchor": "Pulse notes",
+            "content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "retrieval_content_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+              "token_estimate": 50,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "setext",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/setext.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Pulse notes",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+            "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+            "vector_id": "faed611b-6a19-5e07-8faa-e29f10986b72",
+            "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+            "atom_type": "mixed",
+            "atom_id": "atom-02f22f7a564a8518eb896213e4fa19d2",
+            "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "heading_path": [
+              "Pulse notes"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              104
+            ],
+            "byte_span": [
+              0,
+              104
+            ],
+            "line_span": [
+              1,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 26,
+            "retrieval_token_estimate": 84,
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "title": "Pulse notes",
+            "section_id": 9108066182291946725,
+            "token_estimate": 26,
+            "docmancer_tokens": 26,
+            "raw_tokens": 26,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+              "section_id": 9108066182291946725,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -5.292123058896
+              },
+              "base_utility": 5.292123058896,
+              "feature_contributions": {},
+              "final_utility": 5.292123058896,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 1
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "telemetry",
+                "pulses",
+                "serialize"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 9,
+              "matched_term_count": 3,
+              "match_ratio": 0.3333,
+              "bm25_cost": -5.292123058895905,
+              "lexical_score": 5.292123058895905,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ],
+                "retrieval_text": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ]
+              }
+            },
+            "query_plan_hash": "59d4ff5e750ee00cf054e87453a1a79ef3affa13258220ec8fbba14d98b60cd7",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+                "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104,
+              "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+              "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+              "owner": {
+                "text": "# Pulse notes\n",
+                "char_start": 0,
+                "char_end": 14,
+                "scope_start": 0,
+                "scope_end": 104,
+                "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+                "member_spans": [
+                  [
+                    0,
+                    13,
+                    "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                  ],
+                  [
+                    15,
+                    68,
+                    "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              },
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+                "member_spans": [
+                  [
+                    0,
+                    13,
+                    "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                  ],
+                  [
+                    70,
+                    103,
+                    "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "when",
+                  "do",
+                  "telemetry",
+                  "pulses",
+                  "serialize",
+                  "during",
+                  "concurrent",
+                  "checkpoint",
+                  "recovery"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "bound_subject_context": "# Pulse notes\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  103
+                ],
+                "matched_terms": [],
+                "body_matched_terms": [],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 0,
+                "match_ratio": 0.0,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true,
+                "literal_context_admission": {
+                  "reason": "policy_valid_original_candidate_v1",
+                  "query_id": "query-original",
+                  "qualification_reason": "insufficient_visible_match",
+                  "coverage_credit": false,
+                  "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                  "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                  "path": "docs/setext.md",
+                  "body_witnesses": [
+                    {
+                      "kind": "policy_valid_original_candidate_v1",
+                      "relevance_unassessed": true,
+                      "text": "Read the handbook for background.",
+                      "char_start": 70,
+                      "char_end": 103,
+                      "block_char_start": 70,
+                      "block_char_end": 103,
+                      "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+                    }
+                  ],
+                  "body_window": {
+                    "char_start": 0,
+                    "char_end": 104,
+                    "byte_start": 0,
+                    "byte_end": 104,
+                    "line_start": 1,
+                    "line_end": 6
+                  }
+                }
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        }
+      ],
+      "complete_candidates": [
+        {
+          "id": "1ca636c3d042529f4c4c1bcf6973c3fd8abb8cf2c0948df4cf99af30ab23584e",
+          "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "text_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "chunk_index": 0,
+          "score": 1.0,
+          "path": "docs/setext.md",
+          "span": [
+            0,
+            104
+          ],
+          "binding": {
+            "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "canonical_path": "docs/setext.md",
+            "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "repository_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/setext.md",
+            "source_path": "docs/setext.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812931976269475,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Pulse notes",
+            "section_level": 1,
+            "document_title": "setext",
+            "document_title_hash": "a11fa25fd80e1f0f",
+            "anchor": "Pulse notes",
+            "content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "retrieval_content_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+              "token_estimate": 50,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "setext",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/setext.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Pulse notes",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+            "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+            "vector_id": "faed611b-6a19-5e07-8faa-e29f10986b72",
+            "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+            "atom_type": "mixed",
+            "atom_id": "atom-02f22f7a564a8518eb896213e4fa19d2",
+            "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "heading_path": [
+              "Pulse notes"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              104
+            ],
+            "byte_span": [
+              0,
+              104
+            ],
+            "line_span": [
+              1,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 26,
+            "retrieval_token_estimate": 84,
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "title": "Pulse notes",
+            "section_id": 9108066182291946725,
+            "token_estimate": 26,
+            "docmancer_tokens": 26,
+            "raw_tokens": 26,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+              "section_id": 9108066182291946725,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -5.292123058896
+              },
+              "base_utility": 5.292123058896,
+              "feature_contributions": {},
+              "final_utility": 5.292123058896,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 1
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "telemetry",
+                "pulses",
+                "serialize"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 9,
+              "matched_term_count": 3,
+              "match_ratio": 0.3333,
+              "bm25_cost": -5.292123058895905,
+              "lexical_score": 5.292123058895905,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ],
+                "retrieval_text": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ]
+              }
+            },
+            "query_plan_hash": "59d4ff5e750ee00cf054e87453a1a79ef3affa13258220ec8fbba14d98b60cd7",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+                "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104,
+              "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+              "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+              "owner": {
+                "text": "# Pulse notes\n",
+                "char_start": 0,
+                "char_end": 14,
+                "scope_start": 0,
+                "scope_end": 104,
+                "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+                "member_spans": [
+                  [
+                    0,
+                    13,
+                    "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                  ],
+                  [
+                    15,
+                    68,
+                    "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              },
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+                "member_spans": [
+                  [
+                    0,
+                    13,
+                    "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                  ],
+                  [
+                    70,
+                    103,
+                    "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "when",
+                  "do",
+                  "telemetry",
+                  "pulses",
+                  "serialize",
+                  "during",
+                  "concurrent",
+                  "checkpoint",
+                  "recovery"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "bound_subject_context": "# Pulse notes\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  103
+                ],
+                "matched_terms": [],
+                "body_matched_terms": [],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 0,
+                "match_ratio": 0.0,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true,
+                "literal_context_admission": {
+                  "reason": "policy_valid_original_candidate_v1",
+                  "query_id": "query-original",
+                  "qualification_reason": "insufficient_visible_match",
+                  "coverage_credit": false,
+                  "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                  "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                  "path": "docs/setext.md",
+                  "body_witnesses": [
+                    {
+                      "kind": "policy_valid_original_candidate_v1",
+                      "relevance_unassessed": true,
+                      "text": "Read the handbook for background.",
+                      "char_start": 70,
+                      "char_end": 103,
+                      "block_char_start": 70,
+                      "block_char_end": 103,
+                      "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+                    }
+                  ],
+                  "body_window": {
+                    "char_start": 0,
+                    "char_end": 104,
+                    "byte_start": 0,
+                    "byte_end": 104,
+                    "line_start": 1,
+                    "line_end": 6
+                  }
+                }
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "1ca636c3d042529f4c4c1bcf6973c3fd8abb8cf2c0948df4cf99af30ab23584e",
+          "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+          "text_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+          "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "chunk_index": 0,
+          "score": 1.0,
+          "path": "docs/setext.md",
+          "span": [
+            0,
+            104
+          ],
+          "binding": {
+            "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "canonical_path": "docs/setext.md",
+            "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "repository_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/setext.md",
+            "source_path": "docs/setext.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812931976269475,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Pulse notes",
+            "section_level": 1,
+            "document_title": "setext",
+            "document_title_hash": "a11fa25fd80e1f0f",
+            "anchor": "Pulse notes",
+            "content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "retrieval_content_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+              "token_estimate": 50,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "setext",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/setext.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Pulse notes",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+            "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+            "vector_id": "faed611b-6a19-5e07-8faa-e29f10986b72",
+            "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+            "atom_type": "mixed",
+            "atom_id": "atom-02f22f7a564a8518eb896213e4fa19d2",
+            "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+            "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "heading_path": [
+              "Pulse notes"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              104
+            ],
+            "byte_span": [
+              0,
+              104
+            ],
+            "line_span": [
+              1,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 26,
+            "retrieval_token_estimate": 84,
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "title": "Pulse notes",
+            "section_id": 9108066182291946725,
+            "token_estimate": 26,
+            "docmancer_tokens": 26,
+            "raw_tokens": 26,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+              "section_id": 9108066182291946725,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -5.292123058896
+              },
+              "base_utility": 5.292123058896,
+              "feature_contributions": {},
+              "final_utility": 5.292123058896,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 1
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "telemetry",
+                "pulses",
+                "serialize",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "telemetry",
+                "pulses",
+                "serialize"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 9,
+              "matched_term_count": 3,
+              "match_ratio": 0.3333,
+              "bm25_cost": -5.292123058895905,
+              "lexical_score": 5.292123058895905,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ],
+                "retrieval_text": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ]
+              }
+            },
+            "query_plan_hash": "7023ae76d455fd9d60da29e0dfde29cf4c78fd83015d1df422d577cd31e6476f",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+                "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104,
+              "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+              "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+              "owner": {
+                "text": "# Pulse notes\n",
+                "char_start": 0,
+                "char_end": 14,
+                "scope_start": 0,
+                "scope_end": 104,
+                "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+                "member_spans": [
+                  [
+                    0,
+                    13,
+                    "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                  ],
+                  [
+                    15,
+                    68,
+                    "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              },
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+                "member_spans": [
+                  [
+                    0,
+                    13,
+                    "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                  ],
+                  [
+                    70,
+                    103,
+                    "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "when",
+                  "do",
+                  "telemetry",
+                  "pulses",
+                  "serialize",
+                  "during",
+                  "concurrent",
+                  "checkpoint",
+                  "recovery"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "bound_subject_context": "# Pulse notes\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  103
+                ],
+                "matched_terms": [],
+                "body_matched_terms": [],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 0,
+                "match_ratio": 0.0,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true,
+                "literal_context_admission": {
+                  "reason": "policy_valid_original_candidate_v1",
+                  "query_id": "query-original",
+                  "qualification_reason": "insufficient_visible_match",
+                  "coverage_credit": false,
+                  "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                  "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                  "path": "docs/setext.md",
+                  "body_witnesses": [
+                    {
+                      "kind": "policy_valid_original_candidate_v1",
+                      "relevance_unassessed": true,
+                      "text": "Read the handbook for background.",
+                      "char_start": 70,
+                      "char_end": 103,
+                      "block_char_start": 70,
+                      "block_char_end": 103,
+                      "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+                    }
+                  ],
+                  "body_window": {
+                    "char_start": 0,
+                    "char_end": 104,
+                    "byte_start": 0,
+                    "byte_end": 104,
+                    "line_start": 1,
+                    "line_end": 6
+                  }
+                }
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": {
+            "id": "1ca636c3d042529f4c4c1bcf6973c3fd8abb8cf2c0948df4cf99af30ab23584e",
+            "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+            "text_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+            "chunk_index": 0,
+            "score": 1.0,
+            "path": "docs/setext.md",
+            "span": [
+              0,
+              104
+            ],
+            "binding": {
+              "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "canonical_path": "docs/setext.md",
+              "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "repository_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "docs/setext.md",
+              "source_path": "docs/setext.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+              "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791812931976269475,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Pulse notes",
+              "section_level": 1,
+              "document_title": "setext",
+              "document_title_hash": "a11fa25fd80e1f0f",
+              "anchor": "Pulse notes",
+              "content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+              "retrieval_content_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "96fbebda26ecbe3c8631385b1498b7ce96befd02b8cdd45471f46a9a626ca77d",
+                "token_estimate": 50,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "setext",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "docs/setext.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Pulse notes",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "caf232cf58ecde3b1a320d6348d9d97289ab0d75d2b0fdd7658a415c1b4ab660",
+              "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+              "vector_id": "faed611b-6a19-5e07-8faa-e29f10986b72",
+              "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+              "atom_type": "mixed",
+              "atom_id": "atom-02f22f7a564a8518eb896213e4fa19d2",
+              "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+              "source_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+              "heading_path": [
+                "Pulse notes"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                0,
+                104
+              ],
+              "byte_span": [
+                0,
+                104
+              ],
+              "line_span": [
+                1,
+                6
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 26,
+              "retrieval_token_estimate": 84,
+              "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+              "title": "Pulse notes",
+              "section_id": 9108066182291946725,
+              "token_estimate": 26,
+              "docmancer_tokens": 26,
+              "raw_tokens": 26,
+              "savings_percent": 0.0,
+              "runway_multiplier": 1.0,
+              "ranking": {
+                "stable_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "section_id": 9108066182291946725,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -5.292123058896
+                },
+                "base_utility": 5.292123058896,
+                "feature_contributions": {},
+                "final_utility": 5.292123058896,
+                "raw_rank": 1,
+                "final_rank": 1,
+                "rank_delta": 0,
+                "candidate_pool_size": 1
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "when",
+                  "do",
+                  "telemetry",
+                  "pulses",
+                  "serialize",
+                  "during",
+                  "concurrent",
+                  "checkpoint",
+                  "recovery"
+                ],
+                "matched_terms": [
+                  "telemetry",
+                  "pulses",
+                  "serialize"
+                ],
+                "exact_terms": [
+                  "when"
+                ],
+                "missing_exact_terms": [
+                  "when"
+                ],
+                "query_term_count": 9,
+                "matched_term_count": 3,
+                "match_ratio": 0.3333,
+                "bm25_cost": -5.292123058895905,
+                "lexical_score": 5.292123058895905,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "telemetry",
+                    "pulses",
+                    "serialize"
+                  ],
+                  "retrieval_text": [
+                    "telemetry",
+                    "pulses",
+                    "serialize"
+                  ]
+                }
+              },
+              "query_plan_hash": "7023ae76d455fd9d60da29e0dfde29cf4c78fd83015d1df422d577cd31e6476f",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 1
+                },
+                "pre_post_rank": 1,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 1
+              },
+              "_reference_root_plan": {
+                "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "When do telemetry pulses serialize during concurrent checkpoint recovery?": {
+                  "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "version": "",
+                    "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                  "scope": {
+                    "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "version": "",
+                    "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                  },
+                  "canonical_path": "docs/setext.md",
+                  "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+                },
+                "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+                },
+                "char_start": 0,
+                "char_end": 104,
+                "text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+                "raw_document": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+                "owner": {
+                  "text": "# Pulse notes\n",
+                  "char_start": 0,
+                  "char_end": 14,
+                  "scope_start": 0,
+                  "scope_end": 104,
+                  "logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:06f2bba4c68a4f88b672186c96f42873fe65c0fc03834cdae10f0d8dd7819c60",
+                  "member_spans": [
+                    [
+                      0,
+                      13,
+                      "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                    ],
+                    [
+                      15,
+                      68,
+                      "6fba8b45b6e34331d43365aed510e05b531ac287ae43f7fa6438ce87da8aa1ad"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                },
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:e41c1246868904dd1f88cc753f11625fcbb6c5af2bcebc40b82da033fd6ccb88",
+                  "member_spans": [
+                    [
+                      0,
+                      13,
+                      "951ae4653259da98125b65899f30bb642dcbe5710b36a454253da9687d64d59b"
+                    ],
+                    [
+                      70,
+                      103,
+                      "a19bac3163fdd8a0bb68e35c84c9ba4556671a0c2783ac5e538471fa3f6d9cf9"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "when",
+                    "do",
+                    "telemetry",
+                    "pulses",
+                    "serialize",
+                    "during",
+                    "concurrent",
+                    "checkpoint",
+                    "recovery"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 1.0,
+                  "reference_body_query": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+                  "bound_subject_context": "# Pulse notes\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    0,
+                    103
+                  ],
+                  "matched_terms": [],
+                  "body_matched_terms": [],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 0,
+                  "match_ratio": 0.0,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true,
+                  "literal_context_admission": {
+                    "reason": "policy_valid_original_candidate_v1",
+                    "query_id": "query-original",
+                    "qualification_reason": "insufficient_visible_match",
+                    "coverage_credit": false,
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                    "path": "docs/setext.md",
+                    "body_witnesses": [
+                      {
+                        "kind": "policy_valid_original_candidate_v1",
+                        "relevance_unassessed": true,
+                        "text": "Read the handbook for background.",
+                        "char_start": 70,
+                        "char_end": 103,
+                        "block_char_start": 70,
+                        "block_char_end": 103,
+                        "native_discovery_binding_sha256": "b2b25b8bb0bf90e5498dd0662da80b9c37a0937454b742ee6ccc1420a2c10360"
+                      }
+                    ],
+                    "body_window": {
+                      "char_start": 0,
+                      "char_end": 104,
+                      "byte_start": 0,
+                      "byte_end": 104,
+                      "line_start": 1,
+                      "line_end": 6
+                    }
+                  }
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "duplicate_source_chunk",
+          "original_ordinal": 1
+        }
+      ],
+      "selected_indices": null
+    }
+  ],
+  "state_after": {
+    "generation": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "rows": [
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+        "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+        "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+        "# Logging\n\nLogs flow to disk after each request.\n",
+        "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+        "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+        "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+        "# Packet transport\n\nPackets are delivered after each request.\n",
+        "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+        "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-qk1r9h5i/project/docatlas.project-docs.yaml": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    }
+  },
+  "elapsed_seconds": 0.05996022500039544,
+  "integrity_errors": []
+}

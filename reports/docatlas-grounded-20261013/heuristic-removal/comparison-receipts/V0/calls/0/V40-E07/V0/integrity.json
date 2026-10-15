@@ -1,0 +1,71 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    },
+    {
+      "index": 2,
+      "path": "docs/src/use/configure/configuration-files.md",
+      "raw_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "errors": []
+    },
+    {
+      "index": 3,
+      "path": "docs/src/use/configure/configuration-files.md",
+      "raw_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "errors": []
+    },
+    {
+      "index": 4,
+      "path": "docs/src/use/configure/ignore.md",
+      "raw_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "errors": []
+    },
+    {
+      "index": 5,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    },
+    {
+      "index": 6,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    },
+    {
+      "index": 7,
+      "path": "docs/src/use/configure/ignore.md",
+      "raw_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "errors": []
+    },
+    {
+      "index": 8,
+      "path": "docs/src/use/configure/ignore.md",
+      "raw_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "errors": []
+    },
+    {
+      "index": 9,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    },
+    {
+      "index": 10,
+      "path": "docs/src/use/configure/configuration-files.md",
+      "raw_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "errors": []
+    }
+  ]
+}

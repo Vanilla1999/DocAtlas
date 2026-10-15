@@ -1,0 +1,71 @@
+F
+=================================== FAILURES ===================================
+____ test_source_valid_candidates_deliver_multifacet_bound_read_only_packet ____
+
+tmp_path = PosixPath('/workspace/scratch/7ccc1a9e2e54/DocAtlas/pytest-of-root/pytest-0/test_source_valid_candidates_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2cad933cb0>
+state_root = PosixPath('/workspace/scratch/7ccc1a9e2e54/DocAtlas/pytest-of-root/pytest-0/test_source_valid_candidates_d0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x7f2cad719ee0>
+
+    def test_source_valid_candidates_deliver_multifacet_bound_read_only_packet(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """1 prepare, 2 contexts, at most 2 bounded source reads."""
+        project = tmp_path / "project"
+        runtime.write_project(project, OPTICS_DOCUMENTS)
+>       with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_prepared_retrieval_integration.py:328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+eval/evidence_quality_v2/runtime.py:83: in isolated_service
+    _FIXTURE_HOMES[state] = TemporaryDirectory(prefix='docatlas-evidence-', dir='/tmp')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tempfile.py:886: in __init__
+    self.name = mkdtemp(suffix, prefix, dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+suffix = '', prefix = 'docatlas-evidence-', dir = '/tmp'
+
+    def mkdtemp(suffix=None, prefix=None, dir=None):
+        """User-callable function to create and return a unique temporary
+        directory.  The return value is the pathname of the directory.
+    
+        Arguments are as for mkstemp, except that the 'text' argument is
+        not accepted.
+    
+        The directory is readable, writable, and searchable only by the
+        creating user.
+    
+        Caller is responsible for deleting the directory when done with it.
+        """
+    
+        prefix, suffix, dir, output_type = _sanitize_params(prefix, suffix, dir)
+    
+        names = _get_candidate_names()
+        if output_type is bytes:
+            names = map(_os.fsencode, names)
+    
+        for seq in range(TMP_MAX):
+            name = next(names)
+            file = _os.path.join(dir, prefix + name + suffix)
+            _sys.audit("tempfile.mkdtemp", file)
+            try:
+>               _os.mkdir(file, 0o700)
+E               FileNotFoundError: [Errno 2] No such file or directory: '/tmp/docatlas-evidence-vhrcgjnq'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tempfile.py:384: FileNotFoundError
+=============================== warnings summary ===============================
+tests/test_prepared_retrieval_integration.py::test_source_valid_candidates_deliver_multifacet_bound_read_only_packet
+  tests/test_prepared_retrieval_integration.py:322: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_source_valid_candidates_deliver_multifacet_bound_read_only_packet(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_prepared_retrieval_integration.py::test_source_valid_candidates_deliver_multifacet_bound_read_only_packet
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 1 warning in 1.07s

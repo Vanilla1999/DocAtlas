@@ -17,7 +17,7 @@ from docmancer.docs.domain.evidence_set_types import SourceKey, SpanRef, Depende
 from docmancer.docs.domain.need_contracts import compile_need_contracts
 from docmancer.docs.domain.source_dependency_graph import source_graph
 from docmancer.docs.domain.query_terms import documentation_query_terms
-from docmancer.docs.domain.evidence_qualification import _visible_term_present
+from docmancer.docs.domain.evidence_qualification import _visible_term_present, evidence_policy_rejection_reason
 from docmancer.docs.domain.query_reference_binding import (
     QueryMention, ReferencePlan, ResolvedReference, ScopeKey,
 )
@@ -69,7 +69,7 @@ def _current_bundles(records, key: SourceKey) -> tuple[EvidenceSet, ...] | None:
 
 def iter_need_context_variants(
     candidates, *, query_plan: dict[str, Any], expected_project_identity: str | None,
-    max_tokens: int, diagnostics: dict[str, Any],
+    max_tokens: int | None, diagnostics: dict[str, Any],
 ):
     """Yield freshly checked original-byte alternatives, without selecting one."""
     question = str(query_plan.get('original_question') or '')
@@ -79,6 +79,10 @@ def iter_need_context_variants(
     outcomes = diagnostics.setdefault('need_context_fallback', [])
     for original in candidates[:24]:
         if not isinstance(original, Mapping) or original.get('source_class') != 'project_doc':
+            continue
+        if evidence_policy_rejection_reason({}, visible_text='', candidate=original,
+                expected_project_identity=expected_project_identity,
+                lifecycle_intent=original.get('_lifecycle_intent', 'current')) is not None:
             continue
         root = original.get('_reference_root_plan')
         evidence = original.get('_reference_evidence')
@@ -103,18 +107,17 @@ def iter_need_context_variants(
         records = {key: {'source': identity, 'raw_document': raw_document}}
         contracts = compile_need_contracts(question, plan)
         # Use existing finite window/block alternatives, not full-parent rescue.
-        ranges = {(a, b) for a, b in source_block_alternatives(raw).spans if b - a <= 640}
+        ranges = set(source_block_alternatives(raw).spans)
         if any(c.requirement in {'set', 'set_with_explanations'} for c in contracts):
             # Whole introduced lists are finite source structures, not parents.
-            # Their real DTO cost, not a character cap, decides delivery.
+            # The existing finite list enumeration remains a work bound.
             for intro, items in source_graph(raw_document, key).lists:
                 left, right = intro.start, max((s.end for s in items), default=intro.end)
                 if start <= left < right <= end and len(items) <= 8:
                     ranges.add((left - start, right - start))
         for limit in _projection_limits(raw):
             _, a, b = _focused_snippet(raw, (question,), limit=limit)
-            if b - a <= 640:
-                ranges.add((a, b))
+            ranges.add((a, b))
         ranges = sorted(ranges, key=lambda s: (
             not _is_complete_source_span(raw, raw[s[0]:s[1]], span_start=s[0]),
             -(s[1] - s[0]), s[0]))[:16]
@@ -146,24 +149,16 @@ def iter_need_context_variants(
             normalized['retrieval_query_ids'] = []
             decision = context_selection_decision([normalized], public_ids)
             payload = _payload([normalized], decision=decision, query_plan=query_plan)
-            if docs_context_budget_tokens(payload) > max_tokens:
-                continue
             yield dict(original), normalized, contracts, permitted
 
 
 def precedence_context_variants(candidates, **kwargs):
-    """Propose precedence context before selection, never award relation proof.
-
-    A visible precedence verb is a request-shape preference only. Source, exact
-    identities and conditions have already been rechecked by the classifier.
-    Topic-only Navigation passages do not receive this preference.
-    """
+    """Use explicit relation/disposition data, never infer precedence from prose."""
     for original, variant, contracts, dispositions in iter_need_context_variants(candidates, **kwargs):
         needs = {row.need_id for row in dispositions}
         wanted = tuple(contract.need.need_id for contract in contracts
                        if contract.need.relation == 'precedence' and contract.need.need_id in needs)
-        if wanted and re.search(r'\b(?:overrides?|takes?\s+precedence|wins?|has\s+priority)\b',
-                                variant['snippet'], re.I):
+        if wanted:
             yield original, variant, wanted
 
 

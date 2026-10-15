@@ -1,0 +1,34 @@
+{
+  "sha256": "c5971473830a3103bf96a925d9a843fad3d6f47583181e04a15e947bede55550",
+  "raw_sha256": "d4bd5a1029f7edeedac11beafb6a9647bd5e2fd1ec0e6b876766dafef6968dc6",
+  "compressed_bytes": 80326,
+  "rows": 2095,
+  "counts": {
+    "core-3.12": {
+      "failure": 1936,
+      "passed": 6506,
+      "error": 61,
+      "skipped": 10
+    },
+    "advanced": {
+      "passed": 524,
+      "failure": 98
+    }
+  },
+  "families_by_suite": {
+    "core-3.12": {
+      "unclassified": 1104,
+      "changed_callable_contract": 27,
+      "retrieval_or_evidence_contract": 429,
+      "retired_inferred_query_origin": 106,
+      "setup_assertion": 61,
+      "explicit_mutation_required": 71,
+      "explicit_catalog_fixture": 22,
+      "question_or_intent_contract": 177
+    },
+    "advanced": {
+      "changed_callable_contract": 2,
+      "unclassified": 96
+    }
+  }
+}

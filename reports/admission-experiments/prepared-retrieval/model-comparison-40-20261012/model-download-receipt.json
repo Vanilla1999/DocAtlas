@@ -1,0 +1,27 @@
+{
+  "stage": "model_asset_download",
+  "started_at_utc": "2026-10-12T19:00:16.355045+00:00",
+  "command": [
+    "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/bin/hf",
+    "download",
+    "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+    "config.json",
+    "model.safetensors",
+    "sentencepiece.bpe.model",
+    "special_tokens_map.json",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "README.md",
+    "--revision",
+    "1427fd652930e4ba29e8149678df786c240d8825",
+    "--local-dir",
+    "/workspace/scratch/7ccc1a9e2e54/docatlas-model-assets/mini/1427fd652930e4ba29e8149678df786c240d8825",
+    "--max-workers",
+    "2",
+    "--quiet"
+  ],
+  "status": "ERROR",
+  "model_forwards": 0,
+  "exit_code": 1,
+  "wall_seconds": 0.31597404000058305
+}

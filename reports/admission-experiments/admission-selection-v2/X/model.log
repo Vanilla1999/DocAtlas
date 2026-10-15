@@ -1,0 +1,2 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+You are using a model of type xlm-roberta to instantiate a model of type XProvence. This is not supported for all configurations of models and can yield errors.

@@ -21,9 +21,9 @@ def format_context(
         chunks: Retrieved documentation sections.
         style: Output format -- ``"markdown"``, ``"xml"``, or ``"plain"``.
         include_sources: Whether to include source attribution.
-        max_tokens: Approximate token cap (uses ``len(text) / 4`` heuristic).
-            When set, chunks are included in order until the budget is
-            exhausted.
+        max_tokens: Approximate cap, ceil(len(formatted_text) / 4), including
+            attribution and separators. Whole nonfitting windows are omitted;
+            later fitting windows retain input order. Not provider token usage.
 
     Returns:
         Formatted context string ready to embed in a prompt.
@@ -40,7 +40,15 @@ def format_context(
     if formatter is None:
         raise ValueError(f"Unknown style {style!r}. Supported: {list(formatters)}")
 
-    selected = _apply_budget(chunks, max_tokens) if max_tokens else chunks
+    if max_tokens is not None and max_tokens < 0:
+        raise ValueError("max_tokens must be non-negative")
+    selected = chunks
+    if max_tokens is not None:
+        selected = []
+        for chunk in chunks:
+            rendered = formatter([*selected, chunk], include_sources=include_sources)
+            if (len(rendered) + 3) // 4 <= max_tokens:
+                selected.append(chunk)
     return formatter(selected, include_sources=include_sources)
 
 
@@ -84,7 +92,7 @@ def _format_markdown(
         title = chunk.metadata.get("title", "")
         header = f"### {title}" if title else ""
         source_line = f"*Source: {chunk.source}*" if include_sources else ""
-        parts = [p for p in (header, chunk.text.strip(), source_line) if p]
+        parts = [p for p in (header, chunk.text, source_line) if p]
         sections.append("\n\n".join(parts))
     return "\n\n---\n\n".join(sections)
 
@@ -102,7 +110,7 @@ def _format_xml(
         if title:
             safe_title = title.replace("&", "&amp;").replace('"', "&quot;")
             attrs += f' title="{safe_title}"'
-        safe_text = chunk.text.strip().replace("&", "&amp;").replace("<", "&lt;")
+        safe_text = chunk.text.replace("&", "&amp;").replace("<", "&lt;")
         docs.append(f"<doc{attrs}>\n{safe_text}\n</doc>")
     return "\n\n".join(docs)
 
@@ -113,21 +121,7 @@ def _format_plain(
     sections: list[str] = []
     for chunk in chunks:
         if include_sources:
-            sections.append(f"[{chunk.source}]\n{chunk.text.strip()}")
+            sections.append(f"[{chunk.source}]\n{chunk.text}")
         else:
-            sections.append(chunk.text.strip())
+            sections.append(chunk.text)
     return "\n\n".join(sections)
-
-
-def _apply_budget(
-    chunks: list[RetrievedChunk], max_tokens: int
-) -> list[RetrievedChunk]:
-    selected: list[RetrievedChunk] = []
-    used = 0
-    for chunk in chunks:
-        est = len(chunk.text) // 4
-        if used + est > max_tokens and selected:
-            break
-        selected.append(chunk)
-        used += est
-    return selected

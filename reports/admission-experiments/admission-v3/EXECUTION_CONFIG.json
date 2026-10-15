@@ -1,0 +1,192 @@
+{
+  "corpus_file": "/tmp/opencode/docatlas-review-evidence/admission-v3/EXECUTION_CORPUS.json",
+  "cases_file": "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/cases.json",
+  "additional_documents": {
+    "ceramic_firing": {
+      "holdout/ceramic_firing/loading.md": "# Подготовка обжига\n\nСосуд с непросохшим дном нельзя ставить в печь даже для короткого пробного обжига.\nГотовность дна проверяет мастер формовки по контрольному взвешиванию.\nЕсли два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим.\nЭтикетка с номером партии не подтверждает готовность сосуда к обжигу.\n",
+      "holdout/ceramic_firing/cooling.md": "# Охлаждение и выгрузка\n\nПосле обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже.\nДля неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже.\nПриоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже.\nПри неисправном термодатчике дверцу не открывают по расчётному времени охлаждения.\n",
+      "holdout/ceramic_firing/incident.md": "# Неисправность печи\n\nЕсли термодатчик перестал показывать температуру, печник отключает нагрев и отмечает неисправность в журнале.\nВозобновить работу печи разрешает электромеханик после замены датчика и контрольного измерения температуры.\nПосле восстановления датчика дверцу открывают по температурным правилам для соответствующего вида партии, а не по времени простоя.\nТрещины на упаковочном ящике фиксируют отдельно от неисправностей печи.\n"
+    },
+    "tidal_ferry": {
+      "holdout/tidal_ferry/sailing.md": "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+      "holdout/tidal_ferry/cargo.md": "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+      "holdout/tidal_ferry/refunds.md": "# Возврат билетов\n\nЕсли рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета.\nЕсли пассажир не явился на состоявшийся рейс, возврат по правилу отмены не производится.\nЗапись капитана об отмене рейса передаётся кассиру до начала возвратов.\nВозврат платы за экскурсионный катер этими правилами не установлен.\n"
+    },
+    "main": {
+      "README.md": "<!-- Source: docs/main-flow-logging.md -->\n\n# Логи основного потока\n\nПодробная диагностика по умолчанию выключена. Включение не меняет формат\nответа, источники или число продуктовых запросов.\n\n```sh\ndoc-atlas --trace query \"OAuth tokens\" --mode lexical --format json 2>trace.jsonl\ndoc-atlas --trace context --help\ndoc-atlas --trace mcp docs-serve 2>trace.jsonl\n```\n\nГлобальные `--trace` / `--no-trace` указываются **перед подкомандой**.\nОни переопределяют `DOCATLAS_TRACE` на время вызова. Без флага используется\nсуществующая настройка: только `DOCATLAS_TRACE=1` включает трассу; значение\nокружения читается при загрузке модуля, поэтому задайте его до запуска процесса.\n\n```sh\nDOCATLAS_TRACE=1 doc-atlas --no-trace query \"OAuth tokens\" --mode lexical\n```\n\nДля MCP-клиента можно задать `DOCATLAS_TRACE=1` в окружении серверного процесса.\nДиагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.\nОбычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`.\n\n## События и границы\n\n- `docatlas_request_start` и `docatlas_request_end` связываются через `request_id`.\n  Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms`\n  и `trace_incomplete`.\n- Покрыты CLI `query`, `context` и публичный диспетчер Docs MCP\n  (`operation=call_docs_tool_payload`). Ошибки разбора CLI до входа в callback\n  не имеют lifecycle-событий.\n- Существующий `docatlas_query_trace` содержит подробную диагностику проекции\n  MCP и использует тот же `request_id`. Его previews могут включать данные\n  документов; новые lifecycle-события не содержат текст вопроса или документов.\n- `success` означает завершение границы вызова, а не достаточность найденных\n  доказательств. Возвращённые статусы `error`/`failed` и исключения отмечаются\n  как `error`; результат запроса остаётся источником продуктового статуса.\n- Ошибка записи диагностики не должна менять ответ. Пропущенное начало\n  отмечается `trace_incomplete`; при сбое завершения предпринимается запись\n  `docatlas_trace_gap`. Полностью недоступный stderr не позволяет доставить\n  даже сообщение о пропуске.\n\n## Проверка\n\nИнтеграционные сценарии находятся в\n`tests/test_project_context_quality_v2_protocol.py` и\n`tests/test_main_flow_logging_integration.py`: реальные документы и SQLite,\nпубличный MCP-dispatcher и CLI subprocess, OFF/ON/OFF, независимый исходный факт,\nсохранение выдачи и корреляция событий. Это не проверка установленного MCP stdio\nили production-клиента. Выполнение новых проверок ожидает разрешённого CI.\n\nОбоснование стратегии: [результат, источники и трасса](main-flow-evaluation.md).\n\n\n<!-- Source: docs/main-flow-evaluation.md -->\n\n# Оценка основного потока: результат, источники и трасса\n\nИсследовательская записка, 11 октября 2026 года. Ниже — предложение проверки, а не отчёт о реализованных сценариях или полученном PASS.\n\n**Главный вывод:** прохождение проверки-прокси не доказывает решение исходной задачи. Для DocAtlas критерием служат независимо заданные факты документов, допустимые источники и фактическое состояние. Логи помогают объяснить результат, но не являются оракулом корректности.\n\n## Что подтверждают источники\n\n- **[Countdown-Code, arXiv:2603.07084v3](https://arxiv.org/html/2603.07084v3), §§2–4.** В эксперименте модель может менять как условие в `solution.py`, так и верификатор `test.py`. Поэтому `Rproxy=1` (проверка прошла) совместимо с `Rtrue=0` (исходная арифметическая задача не решена). Истинная оценка использует исходное условие и скрыта от модели при обучении. Около 1% загрязнённых SFT-примеров — фактически 1,2% в отфильтрованном наборе — оказалось достаточно, чтобы у ряда исследованных моделей последующее RL резко усилило reward hacking. Это результат конкретной среды, моделей и обучения, а не универсальный порог.\n- **Граница Countdown-Code.** Это исследование обхода награды при доступном для записи верификаторе, а не сравнение unit- и integration-тестов. Перенос на HumanEval/LeetCode (§5) оценивали отдельным монитором; прохождение видимых тестов при провале скрытых само по себе не объявляется reward hacking. Работа не доказывает, что интеграционный тест автоматически надёжен или что любой ошибочный ответ является намеренным обходом.\n- **[Anthropic: Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), 09.01.2026.** Разделены transcript и outcome: сообщение об успешном действии не заменяет проверку конечного состояния. Рекомендованы реальные задачи, изоляция попыток, устойчивые к обходу graders, проверка фактов, полноты и качества источников, чтение трасс для разбора сбоев. Статья прямо допускает unit-тесты для coding agents; запрета на них из неё не следует.\n- **[Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), 13.06.2025.** Оценка исследовательского результата включает фактическую точность, корректность цитат, полноту и качество источников; приложение рекомендует проверять конечное состояние. Production tracing помогал различать плохой запрос, выбор источника и отказ инструмента. Это инженерный опыт конкретной системы, не доказательство качества DocAtlas и не требование фиксировать единственную последовательность вызовов.\n- **[Anthropic: Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), 19.12.2024.** Рекомендованы простые решения, обратная связь от реальной среды, ясные интерфейсы инструментов и усложнение только при измеримом улучшении результата. Прозрачность исполнения полезна, но сама по себе не подтверждает выполнение требований.\n\n**Решение проекта:** новые проверки только интеграционного уровня и выше, согласно [AGENTS.md](../AGENTS.md). Это локальная стратегия проекта, а не экспериментальный вывод перечисленных публикаций.\n\n## Предлагаемый публичный сценарий logging off/on\n\nСначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n\n1. **Независимый эталон.** До запуска зафиксировать исходный вопрос, corpus и его версии, обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения состояния. Получить эталон из исходных документов и требований, не из выдачи проверяемого кода. Проверяемый поток не должен переписывать эталон или критерии ради PASS.\n2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов. Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n4. **Диагностический контракт.** При on трасса должна позволять связать этапы одного вопроса и локализовать причину сбоя; пропуски трассы должны быть явными. При off подробная трасса отключена. В MCP диагностический канал отделён от protocol stdout. Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.\n\nВнутренние mocks не использовать. Если для воспроизводимости подменяется внешний транспорт, явно указать эту границу: такой запуск не доказывает работоспособность живого провайдера.\n\n## Репрезентативные отрицательные проверки\n\nИспользовать небольшое число публичных сценариев с контролируемыми данными, без матриц строковых вариантов:\n\n- **Неверная версия/scope:** добавить похожий документ с конфликтующим фактом вне разрешённой области; ответ обязан опираться на допустимый оригинал.\n- **Нет достаточного основания:** убрать подтверждающий документ; ожидается предусмотренное контрактом сообщение о нехватке данных, без выдуманного факта или цитаты.\n- **Нет доступа/consent:** обратиться к недоступному источнику; проверить отсутствие утечки и неразрешённых изменений состояния в обоих режимах.\n- **Ошибка зависимости или записи логов:** создать отказ на внешней границе; проверить контракт ошибки/восстановления и фактическое состояние. Отказ диагностики не должен менять продуктовый исход относительно такого же запуска без подробных логов.\n\nДля каждого случая заранее задать ожидаемый исход и существенный дефект, который проверка должна обнаружить. Сбой разбирать по трассе исходного вопроса, сохраняя неизменными вопрос и критерии.\n\n## Границы доказательства\n\nИнтеграционный вызов публичного API подтверждает только проверенный поток и данные; installed stdio дополнительно проверяет упаковку и протокол. Реальный клиент и production smoke — отдельные уровни, их успех нельзя приписывать интеграционному запуску. Одна пара off/on не доказывает общую надёжность недетерминированного агента. В отчёте фиксировать сценарии, реальные вызовы, время, обнаруженные дефекты и непроверенные границы; количество assertions и объём логов не являются мерой качества.\n"
+    },
+    "unrelated": {
+      "docs/store.md": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n"
+    }
+  },
+  "additional_cases": [
+    {
+      "id": "DIAG_HOLD03",
+      "document_group": "ceramic_firing",
+      "split": "diagnostic",
+      "scope": "ceramic_firing",
+      "version": "2026.1",
+      "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?"
+    },
+    {
+      "id": "DIAG_HOLD05",
+      "document_group": "tidal_ferry",
+      "split": "diagnostic",
+      "scope": "tidal_ferry",
+      "version": "2026.1",
+      "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?"
+    },
+    {
+      "id": "DIAG_HOLD06",
+      "document_group": "tidal_ferry",
+      "split": "diagnostic",
+      "scope": "tidal_ferry",
+      "version": "2026.1",
+      "question": "Вода на отметке 1,4 метра, причал проверен, на палубе есть место. Кто решает вопрос рейса, можно ли принять незакреплённый груз, кто и когда проверяет закрепление, а достаточно ли закрепления для баллонов с горючим газом на пассажирском рейсе?"
+    },
+    {
+      "id": "Q16",
+      "split": "diagnostic",
+      "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+      "document_group": "main"
+    },
+    {
+      "id": "Q46",
+      "split": "diagnostic",
+      "question": "Можно ли признать PASS, если оба режима логирования дали одинаковый неправильный ответ?",
+      "document_group": "main"
+    },
+    {
+      "id": "OLD_OWNER",
+      "split": "control",
+      "project": "legacy_priority",
+      "question": "How does OtherAPI handle packet delivery during recovery?"
+    },
+    {
+      "id": "OLD_COMPOUND",
+      "split": "control",
+      "project": "legacy_priority",
+      "question": "How does DocAtlas combine batch queue during recovery?"
+    },
+    {
+      "id": "OLD_SETEXT",
+      "split": "control",
+      "project": "legacy_priority",
+      "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?"
+    },
+    {
+      "id": "OLD_SHORTFACT",
+      "split": "control",
+      "project": "legacy_priority",
+      "question": "When do logs flow to disk during concurrent checkpoint recovery?"
+    },
+    {
+      "id": "OLD_UNRELATED",
+      "split": "control",
+      "document_group": "unrelated",
+      "question": "Как DocAtlas отправляет сообщения через квантовый канал?"
+    }
+  ],
+  "admission_arms": {
+    "DefaultOff": {},
+    "B1": {
+      "DOCATLAS_EXPERIMENT_ADMISSION": "policy_candidates_v1"
+    },
+    "V3": {
+      "DOCATLAS_EXPERIMENT_ADMISSION": "scalar_label_candidates_v3"
+    }
+  },
+  "host_case_ids": [
+    "V3CAL01",
+    "V3CAL02",
+    "V3CAL03",
+    "V3H01",
+    "V3H02",
+    "V3H03",
+    "V3H04",
+    "DIAG_HOLD03",
+    "DIAG_HOLD05",
+    "DIAG_HOLD06",
+    "Q16",
+    "Q46",
+    "OLD_OWNER",
+    "OLD_UNRELATED"
+  ],
+  "host_admission_arms": [
+    "B1",
+    "V3"
+  ],
+  "per_case_host_arms": {
+    "Q16": [
+      "B1"
+    ],
+    "Q46": [
+      "B1"
+    ],
+    "OLD_OWNER": [
+      "V3"
+    ],
+    "OLD_UNRELATED": [
+      "V3"
+    ]
+  },
+  "citation_case_ids": [
+    "V3CAL01",
+    "V3H01",
+    "Q16",
+    "Q46"
+  ],
+  "citation_parent_arm": "V3",
+  "planned_workload": {
+    "prepares": 7,
+    "context_attempts": 57,
+    "host_requests": 28,
+    "model_forwards": 0
+  },
+  "frozen_files": {
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/run_v3.py": "c87b599bc7547c093b0182e0efea82723fa87fdd5d92b797b9caa61c99d3c995",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/citation_adaptation.py": "ff5be53e7358e56f9bee119833bb2014348f1c19740e4068ba291fcedd3915ed",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/B_CITATION_CONTRACT_RU.md": "53083e9e9118a436859ac162a3624ff3fac897ce73efcd94fed0dee88bf33cd5",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/CONTRACT_DECISION_RU.md": "a645af1e183ba6d61e68bc9774a78bb626c018558c01c379d6129a10b2a92b0f",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/PROTOCOL_V3_RU.md": "a2c0bee43e569626f508ea05c5fa6238ab748391ed4eece14e528ac2036bd821",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/EXECUTION_CORPUS.json": "a7fcf818dfd5580f45e77b17045e541924dbaab323771744756d199865aa2a86",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/cases.json": "d5fa6155f0c41af71222145278a635c79122cf5761f2d705524850626b15a0bb",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/FREEZE.json": "bab51b5a6c3953454773b69ee6c791f75e387ca891b875b76029e8366e11b082",
+    "/tmp/opencode/docatlas-review-evidence/admission-full-20261012/B_host_runner.py": "c47072e828d0f13c1cd377ab0b83ef2895a43714a9f03f38c9daf0007ddd3152",
+    "/tmp/opencode/docatlas-review-evidence/admission-full-20261012/HOST_PROMPT_RU.txt": "f78a43f62ee1972dc20945d6c1a37d1524823b2a2c778831d86fde2c24276ec1",
+    "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/run_public.py": "bef7f81e1d553d23c4c2ef7baa661c1b7461e13d58e0209397fa87ed90727dd5",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/domain/original_body_discovery.py": "23d8bcb2c45b6007b2bfbe2947ef58a68e107f409761fd16c2fb4df496ecd20c",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/domain/ordinary_body_context.py": "a5523cf48dfa280960eb05f8d64e2af330923022a54862ee42e242e0d9a3eb3b",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/domain/literal_context_admission.py": "324d4e9994d539f5938ac614543f5ebdfbdd0ce6a5b95649a3fdc94bc75e3cc9",
+    "/tmp/opencode/docatlas-compact-review/eval/main_flow_comparison/run_extra40.py": "da6d300518a0f598fcca7a2b5bc96811871bfe27d5428342d49b76d50eccbb84",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/application/_project_docs_service_part03.py": "5e158284d8516796a977fddf56fb5afaf08c2d2bc8618ca3ba9178f9310e84bb",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/application/experimental_candidate_selection.py": "f6961f3f8df68e4fcdf0944fadbeda20e5fc118bc7081002331d68f02e89c2f6",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/CONTROL_PROVENANCE.json": "dcc574a98057e2cdfc5a2ac8bb7daa127e9385c3f11f1d97af8d5b92c7a17b8e",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/CRITERIA_RU.md": "1090cbe692b0b68a02f1b98956f4d5d081d75938d2ee170a90affa45da584d04",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/freeze_saved_inputs.py": "7cd5ca549b295e33ff8a32d77bdff79a497bf8cd073bcb4b72f1d3a7461ce1a7",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/EXECUTION_RU.md": "c90f4cd42232ec9b1a96ceba8e073796bbfc8c139def29f255c7ac343442bd9a",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/directed_routes/docs/roles.md": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/directed_routes/docs/routes.md": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/legacy_priority/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/legacy_priority/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/legacy_priority/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/legacy_priority/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/legacy_priority/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/print_billing/docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/review/inputs/corpus/print_billing/docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+    "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/review/corpus.json": "b3d50b4d26433ed428fcbdc4409048a419cfa390a69f2f0d3fb5fedce0685b30",
+    "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/review/cases.json": "27fb9085e282c6467db1ffcfda8bf64ecf35a9257cc40d90b67fb93577b52f8b",
+    "/tmp/opencode/docatlas-compact-review/eval/main_flow_comparison/corpus.md": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+    "/tmp/opencode/docatlas-compact-review/eval/main_flow_comparison/questions_extra40.json": "5d0618db2bc1ddb18f65ac246b79ecb1adaadeef3a1618ed68d9f5a5784a12dc",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/V3_PRODUCT.patch": "6bf646832abfa7e9ae225504565a0377c6235322a5818f6684f054dc642d2d54",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/A_IMPLEMENTATION_RU.md": "d23fd42cd9d02da11d411934d96887fb3733c3f922468c5bc4c4e1d2a0fe5a2d",
+    "/tmp/opencode/docatlas-compact-review/eval/evidence_quality_v2/runtime.py": "2039734f7a7f056fce30c6cf2b8b9e5d5c040ff46917ebb74bcfe3831706b282",
+    "/tmp/opencode/docatlas-compact-review/scripts/run_project_docs_self_host_gate.py": "aeeb675f44fc2c1709791ab9eee35a3711841e4e817e0339868a32cdc7cb5b92",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/application/_model_visible_docs_support.py": "91b603426a36f4cbadc4daacbac7db1bf9170129f9e20011b1b834a9fa1d689f",
+    "/tmp/opencode/docatlas-compact-review/docmancer/docs/application/model_visible_projection.py": "6e822a4db485c4ca4f36ac3d3ae03c4dbec559a8a378e5aa2d005b168f3deb64"
+  },
+  "citation_parent_by_case": {
+    "Q16": "B1",
+    "Q46": "B1"
+  }
+}

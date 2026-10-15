@@ -1,0 +1,47 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/configuration.md",
+      "raw_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/configuration.md",
+      "raw_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "errors": []
+    },
+    {
+      "index": 2,
+      "path": "docs/dependency-specification.md",
+      "raw_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "errors": []
+    },
+    {
+      "index": 3,
+      "path": "docs/dependency-specification.md",
+      "raw_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "errors": []
+    },
+    {
+      "index": 4,
+      "path": "docs/dependency-specification.md",
+      "raw_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "errors": []
+    },
+    {
+      "index": 5,
+      "path": "docs/dependency-specification.md",
+      "raw_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "errors": []
+    },
+    {
+      "index": 6,
+      "path": "docs/configuration.md",
+      "raw_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "project": "/tmp/docatlas-selection-v2-hgt3qlg9/project",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "domain_version": "2026.1",
+  "document_hashes": {
+    "calibration/stage_rigging/inspection.md": "391829439c63ce844ab284cb3d58f302e4f9e1a9c454315196a3c44c305854b7",
+    "calibration/stage_rigging/release.md": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+    "calibration/stage_rigging/rehearsal.md": "2cd090ef13a7dea07b658512d8aedd85ad40614facac346e27ae6889f4fc2cee"
+  },
+  "generation": "gen-d659116b46de46ec85bce34efe2547ce"
+}

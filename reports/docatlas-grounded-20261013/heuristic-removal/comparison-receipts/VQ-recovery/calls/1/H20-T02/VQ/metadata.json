@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-T02",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-typer",
+  "public_request": {
+    "question": "For Typer's boolean options with only False names, what exact leading-space/slash convention is required, and what do the default and --demo do in the shown example?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-typer/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "429befcd38c3e928f7c1a41de85412ec4ad0bf792aabd4948381a1970d9493ef",
+  "utf8_bytes": 3399,
+  "tokens": 1107,
+  "seconds": 0.17535320200113347,
+  "cpu_seconds": 0.17378061300000525,
+  "peak_rss_kib": 205488,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

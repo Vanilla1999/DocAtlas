@@ -112,13 +112,12 @@ AUDITED_EXTERNAL_CONTEXT_ROOT = TASK_LEVEL_ROOT / "external_context"
 TASK33_EVALUATION_CONTRACTS = load_task_evaluation_contracts()
 TASK23_PROTOCOL_TASKS = load_effective_task23_protocol_tasks()
 BOUNDED_DIRECT_EXECUTION_POLICY = """Host execution policy:
-- The cited project docs have already been reduced to the source-backed patch contract below.
-- Do not reread cited project docs unless an explicit uncertainty requires it.
-- Read only target implementation files needed for the edit.
-- Do not guess test paths; use only checks supplied by the contract.
-- Allow at most one RED validation run and one GREEN validation run.
-- After GREEN, verify the diff against every contract item.
-- Stop when the contract is satisfied and the supplied validation is GREEN.
+- UNSUPPORTED: workflow_checks_from_patch_context.
+- V4 patch evidence is read-only data, not a workflow contract or an edit grant.
+- This historical workflow condition cannot run from v4 patch evidence alone.
+- Historical limits remain at most one RED validation run and one GREEN validation run;
+  these limits do not enable the unsupported condition.
+- Do not invent checks, target permissions, or a successful workflow score.
 """
 
 

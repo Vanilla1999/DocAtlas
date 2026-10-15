@@ -1,0 +1,156 @@
+{
+  "summary": "7 passed in 4.37s",
+  "request_ends": [
+    {
+      "status": "success",
+      "trace_incomplete": false
+    },
+    {
+      "status": "success",
+      "trace_incomplete": false
+    },
+    {
+      "status": "success",
+      "trace_incomplete": false
+    }
+  ],
+  "projections": [
+    {
+      "kind": "docs_context",
+      "source_count": 4,
+      "answer_supported": false,
+      "edit_ready": false,
+      "upstream": {
+        "prepared_parents": {
+          "prepared_enabled": false,
+          "documents": 2,
+          "prepared_hits": 0,
+          "parser_calls": 2,
+          "parser_ms": 0.10542199743213132,
+          "parent_rows": 0,
+          "parent_selects": 0,
+          "prepared_read_ms": 0.0,
+          "prepared_verification_ms": 0.0,
+          "miss_reasons": {
+            "observation": "recorded",
+            "recorded_count": 0,
+            "producer_count": 0,
+            "producer_omitted": 0,
+            "preview_count": 0,
+            "preview_omitted": 0,
+            "items": []
+          }
+        },
+        "retrieved_candidates": {
+          "observation": "recorded",
+          "recorded_count": 4,
+          "producer_count": null,
+          "producer_omitted": null,
+          "preview_count": 4,
+          "preview_omitted": 0,
+          "items": [
+            {
+              "stable_chunk_id": "child-b781cb406be22db9f41a18643a70bf92567d0d41",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/issue.md"
+            },
+            {
+              "stable_chunk_id": "child-beebe57a0ced524edcf53fa8a8de5b210a8faea4",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/packing.md"
+            },
+            {
+              "stable_chunk_id": "child-0e3f4c40005f8bfcb92dcb4b3b9327167fac79d4",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/issue.md"
+            },
+            {
+              "stable_chunk_id": "child-41cc6d2145b7927157f9e528745c3b1d35153ff8",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/packing.md"
+            }
+          ]
+        },
+        "qualification_outcomes": {
+          "observation": "recorded",
+          "recorded_count": 4,
+          "producer_count": null,
+          "producer_omitted": null,
+          "preview_count": 4,
+          "preview_omitted": 0,
+          "items": [
+            {
+              "stable_chunk_id": "child-b781cb406be22db9f41a18643a70bf92567d0d41",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/issue.md",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "source_valid_relevance_unassessed"
+            },
+            {
+              "stable_chunk_id": "child-beebe57a0ced524edcf53fa8a8de5b210a8faea4",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/packing.md",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "source_valid_relevance_unassessed"
+            },
+            {
+              "stable_chunk_id": "child-0e3f4c40005f8bfcb92dcb4b3b9327167fac79d4",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/issue.md",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "source_valid_relevance_unassessed"
+            },
+            {
+              "stable_chunk_id": "child-41cc6d2145b7927157f9e528745c3b1d35153ff8",
+              "document_id": "/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-9/test_public_removal_lifecycle_0/project/docs/packing.md",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "source_valid_relevance_unassessed"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "docs_answer",
+      "source_count": 1,
+      "answer_supported": false,
+      "edit_ready": false,
+      "upstream": {
+        "prepared_parents": {
+          "observation": "missing"
+        },
+        "retrieved_candidates": {
+          "observation": "missing"
+        },
+        "qualification_outcomes": {
+          "observation": "missing"
+        }
+      }
+    },
+    {
+      "kind": "docs_answer",
+      "source_count": 1,
+      "answer_supported": false,
+      "edit_ready": false,
+      "upstream": {
+        "prepared_parents": {
+          "observation": "missing"
+        },
+        "retrieved_candidates": {
+          "observation": "missing"
+        },
+        "qualification_outcomes": {
+          "observation": "missing"
+        }
+      }
+    }
+  ],
+  "boundary": "Optional traces only, not an exhaustive ledger. Public assertions establish output facts and state invariants.",
+  "receipts": {
+    "remaining-final.log": "fe91ffc0036a34c3f2d87f1958b9575a9e016fbac6c23df28047c5d1af68e0d0",
+    "remaining-final.xml": "3524e07d5078bb04586ce7452e42578513b5684bbef7f79c9dfdb42d7bee67db",
+    "remaining01.log": "1706ae087920df5ccb04c9195548f698d16844a99572b5aec90b3f4b32cd2261",
+    "remaining01.xml": "2d63b451b0881de932602c29612716976a90c8642f6bb5a434d1162f5086ec80",
+    "remaining02.log": "388ec5b45ba0f7264d31e57954eb17775e07391b070f7ee0c29e435dd3a45cb9",
+    "remaining02.xml": "28608ba189443801702920b54dbaff91606c8cb10d16e78347484c0dfa0d5fdb",
+    "remaining03.log": "bcfc98a54bbcd03c8bc051ee15b13929e8262b0a28b17f95090613ad0ecee417",
+    "remaining03.xml": "df86ab904f69dccf682d404daffbc3ae35c0306e7ffbf5aac00c0a0329223318"
+  }
+}

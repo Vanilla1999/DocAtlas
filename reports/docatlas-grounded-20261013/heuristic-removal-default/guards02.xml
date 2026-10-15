@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.200" timestamp="2026-10-13T14:18:48.728658+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" time="0.605"><properties><property name="trace_off_on_off_public_context_calls" value="[1, 1, 1]" /></properties><failure message="AssertionError: assert None == 'end_of_source'&#10; +  where None = &lt;built-in method get of dict object at 0x7a2f59f83600&gt;('reason_code')&#10; +    where &lt;built-in method get of dict object at 0x7a2f59f83600&gt; = {'content_sha256': 'sha256:6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9', 'continuation': None, 'line_end': 9, 'line_start': 7, ...}.get">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7a2f5a0afb90&gt;
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7a2f5a0cdee0&gt;
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), &lt;=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.delenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", raising=False)
+            env.delenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", raising=False)
+            inventory = runtime.index_project(service, config, root)
+            snapshots(inventory, root, OPTICS_DOCUMENTS)
+            before, initial_files = database(inventory["storage_path"]), files(root)
+            packets = []
+            for trace in (False, True, False):
+                with query_trace(trace):
+                    payload = context(service, root, OPTICS_QUESTION)
+                assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
+                facts(payload, root, OPTICS_FACTS)
+                packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
+                facts(packed, root, OPTICS_FACTS)
+                assert packed["tokens"] &lt;= 12000
+                packets.append(payload)
+            assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
+            record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
+            old_row = next(row for row in packets[0]["sources"]
+                           if relative_path(row["path_or_url"], root) == "docs/issue.md")
+&gt;           read_source(service, old_row, root, OPTICS_DOCUMENTS)
+
+tests/test_heuristic_removal_public_integration.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+service = &lt;eval.evidence_quality_v2.runtime._FixtureService object at 0x7a2f5a0ad2b0&gt;
+row = {'evidence_id': 'ev-01a9d32c8bcd0ae7', 'path_or_url': 'docs/issue.md', 'section': 'Field optics issue record', 'snippe...eteness and signs before departure.\nA courier may carry the packed cases but may not sign the issue record.\n\n', ...}
+root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0/project')
+documents = {'docs/packing.md': '# Field optics packing\n\nFor an observation trip, lenses travel in rigid cases.\nA rigid case ho...es but may not sign the issue record.\n\n## Archive shelf\n\nStore completed folders with the tab marked «optique».\n'}
+
+    def read_source(service, row, root, documents):
+        """At most one resource per supplied row, no continuation loop."""
+        assert row.get("source_uri"), "public source capability missing"
+        response = read_docs_resource(row["source_uri"], service)
+        assert response is not None
+        payload = json.loads(response["text"])
+        if payload.get("status") == "complete":
+&gt;           assert payload.get("reason_code") == "end_of_source"
+E           AssertionError: assert None == 'end_of_source'
+E            +  where None = &lt;built-in method get of dict object at 0x7a2f59f83600&gt;('reason_code')
+E            +    where &lt;built-in method get of dict object at 0x7a2f59f83600&gt; = {'content_sha256': 'sha256:6153283d87fc5bbfa23994292ae4bc4ef5c10d1550f58f84aac1361e1c505aa9', 'continuation': None, 'line_end': 9, 'line_start': 7, ...}.get
+
+tests/test_heuristic_removal_public_integration.py:46: AssertionError</failure></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" time="0.235"><failure message="AssertionError: assert set() == {'module'}&#10;  &#10;  Extra items in the right set:&#10;  'module'&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7a2f5a109ca0&gt;
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/member-state')
+
+    def test_public_removal_explicit_scope_version_and_foreign_locator(
+        tmp_path, monkeypatch, state_root,
+    ):
+        """2 prepare, 6 contexts; foreign project also indexed, so locator isolation is real."""
+        root, foreign = (tmp_path / "project").resolve(), (tmp_path / "foreign").resolve()
+        runtime.write_project(root, SCOPE_DOCUMENTS)
+        catalog = root / "docatlas.project-docs.yaml"
+        data = yaml.safe_load(catalog.read_bytes())
+        for entry in data["documents"]:
+            if entry["path"] == "modules/imaging/guide.md":
+                entry.update(scope="module", module_path="modules/imaging")
+        catalog.write_text(yaml.safe_dump(data, sort_keys=False))
+        foreign_documents = {"docs/foreign.md": "# Foreign vault\n\n`FOREIGN_VAULT_PIN` unlocks the foreign vault.\n"}
+        runtime.write_project(foreign, foreign_documents)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.delenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", raising=False)
+            env.delenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", raising=False)
+            runtime.index_project(service, config, foreign)
+            inventory = runtime.index_project(service, config, root)
+            # A generation contains both explicitly prepared project roots. Check
+            # all pinned bytes here; public contexts below still enforce root scope.
+            snapshots(inventory, root.parent, {
+                **{"project/" + name: text for name, text in SCOPE_DOCUMENTS.items()},
+                **{"foreign/" + name: text for name, text in foreign_documents.items()},
+            })
+            before, root_files, foreign_files = database(inventory["storage_path"]), files(root), files(foreign)
+            project = context(service, root, SHUTTER_QUESTION)
+            assert not integrity(project, root, {"docs/camera.md": SCOPE_DOCUMENTS["docs/camera.md"]})["errors"]
+            facts(project, root, {"docs/camera.md": ("`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.",)})
+            module = context(service, root, MODULE_QUESTION, scope="module", module_path="modules/imaging")
+            assert not integrity(module, root, SCOPE_DOCUMENTS, ("modules/imaging/guide.md",))["errors"]
+&gt;           assert {row["scope"] for row in module.get("sources") or []} == {"module"}
+E           AssertionError: assert set() == {'module'}
+E             
+E             Extra items in the right set:
+E             'module'
+E             Use -v to get more diff
+
+tests/test_heuristic_removal_public_integration.py:147: AssertionError</failure></testcase></testsuite></testsuites>

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from docmancer.docs.domain.project_answer_contract import LifecycleIntent, lifecycle_intent_for_question
+from docmancer.docs.domain.project_answer_contract import LifecycleIntent
 
 
 ACTIVE_LIFECYCLE = frozenset({"active", "current"})
@@ -36,7 +36,8 @@ def lifecycle_allows(metadata: Mapping[str, Any], intent: LifecycleIntent) -> bo
 
 
 def lifecycle_intent(question: str) -> LifecycleIntent:
-    return lifecycle_intent_for_question(question)
+    # Historical/either access must arrive as an explicit lifecycle value.
+    return "current"
 
 
 __all__ = [

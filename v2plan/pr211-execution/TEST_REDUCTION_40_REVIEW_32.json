@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+  "proof_sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+  "proof_run": "38033112465",
+  "reviewer": "independent-read-only-unit32",
+  "verdict": "APPROVE_STATIC",
+  "full_receipt_sha256": "a6b25f6bdf8cfdc08a0bc16a0407341bb4ba7c8b5db45b6ded5c00d117c80bc1",
+  "scope": "32 exact unit cases in reference-role19, answer-contract-v2-v3-inference and worktree-import-receipt-duplicates; five affected registries and common ledger. No other writer's edits reviewed.",
+  "removed": 32,
+  "baseline_status": {"FAIL": 29, "PASS": 3},
+  "blockers": [],
+  "review_findings": {
+    "role19": "Independently checked44 saved receipts and43 mutation JUnits: healthy62/62, all43 exact expected assertion failures, healthy target identities and no errors/skips.41 guards match exact first lines, two historical unguarded assertions remain unguarded. Own two role mutations reconstructed from proof-SHA source and their hashes verified. Frozen19-input digest, unchanged native24 bodies, broader92PASS and native23FAIL/1PASS preserved. Current role source equals exact reviewed two-deletion/one-decorator-tuple retirement;21 remaining cases unchanged. No new replay or source-quality success claimed.",
+    "contract10": "All ten complete deleted bodies test explicitly canceled inference, aliases, historicalV2/V3 schema/hash or Pascal-name answer authority, not actual lifecycle/source/read outcomes. Named-return proof is downstream of an inferred obligation. _unit and filesystem-path negative body are byte-identical; unused helpers/imports only removed. Own no-inferred-obligations mutation and current62 healthy corroborate contract cancellation, not source-fact/client acceptance.",
+    "harness3": "Each deleted body checks only checkout containment of __file__, not content hash, runtime/source equality or final payload. Explicit harness-only policy retirement is compatible with installed-package-first acceptance; it is not claimed equivalent to separate-process imports. All actual packet/evaluator/selection bodies and source/safety controls unchanged; evaluator's still-used Path import retained. Original C missing-import proof limits acknowledged, not fabricated.",
+    "shared": "Complete8291 baseline partition, no overlap/missing/unknown/status mismatches. Five normalized survivor hashes and top-level declarations match, deletedV2 label/hash absent. No skip/filter/marker/hidden loop.62 physical removals and1 addition, net61/projected8230/gap3256. Original49-reviewed/13-draft fields described the pre-review state accurately; current approval metadata may be advanced without rewriting historical30 review or author proofs."
+  },
+  "reviewed_file_sha256_before_approval_metadata_update": {
+    "tests/docs/test_query_reference_roles.py": "c9e1ddc1c2279b7d1e21376b2d2b832d70ba35ba76b30ad314376d243d09cf8a",
+    "tests/docs/test_project_answer_contract_v3.py": "665923ba0923c776fdb8b8e43c1ad0318ac9986748b245ae8982e640470912f1",
+    "tests/test_action_packet_v4_eval.py": "a0aacd7aa5b072e52d2d1d3dc8b4b96dbe1ef0886381071f5660d23906b0145d",
+    "tests/test_action_packet_v4_public.py": "301e1300fe9fc565e694f648bce640cd4ecb8dcbf85aadc0b813d8544a588041",
+    "tests/test_action_packet_v4_selection.py": "324cf8c0b4a1bd35b63c410baf8a719ed669339ca3127a57b81d25e7235eef92",
+    "tests/diagnostic_labels.json": "23db8e6b5066b030b91d8bd5996d612e5b58ba7c8e3913092388abd39986b5e3",
+    "tests/diagnostic_labels.reference_binding.json": "6967097ce21e558e434dac5ce99c4e822a8e2cde9ad259ee1e626c836c09e38e",
+    "tests/diagnostic_labels.action_packet_v4_eval.json": "f090a5fd148c51c8c9f124a8c0dce7d76e0dfcbe5cb69dfd614c02398d4635df",
+    "tests/diagnostic_labels.action_packet_v4_b.json": "d704574cfa3dece3138b32f28f7b3d3c94c1535e90114ad5936d1ff27771c930",
+    "tests/diagnostic_labels.action_packet_v4_c.json": "a5a6658ac32e40a006fd04fbe2cb13f54eda2dd5df693e273610ee43b9b00eae",
+    "v2plan/pr211-execution/TEST_REDUCTION_40_MANIFEST.json": "b5265a1e85e400a62ef75a0539ad351d65b172e4138db1aeabddda2c4bdcfe55",
+    "v2plan/pr211-execution/TEST_REDUCTION_40_UNIT_RETIREMENT_32.json": "bae38fb7bd5db7db010e6cf56dde61bb61a3bc9b500cd406c094f6faea4482be"
+  },
+  "deleted_file": "tests/docs/test_project_answer_contract_v2.py",
+  "runtime_boundary": "Static source and saved JSON/gzip/JUnit review only; final collection and final-SHA CI pending. No local project runtime/import/AST/pytest/install. No merge-readiness, measured speedup, production/client success or40percent achievement claimed."
+}

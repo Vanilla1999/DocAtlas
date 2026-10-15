@@ -3,56 +3,36 @@ from __future__ import annotations
 
 from ._action_packet_shared import *  # noqa: F401,F403
 
-from ._action_packet_part01 import _authority, _blocked_source_keys, _cited_evidence_ids, _content_text, _extract_facts, _has_actionable_items, _instruction_risk_flags, _item_source_keys, _normalized_source_key, _refresh_estimated_tokens, _section, _source_path, _version_exactness_rank, estimate_action_packet_tokens
+from ._action_packet_part01 import _authority, _blocked_source_keys, _cited_evidence_ids, _content_text, _extract_facts, _has_actionable_items, _item_source_keys, _normalized_source_key, _refresh_estimated_tokens, _section, _source_path, _version_exactness_rank, estimate_action_packet_tokens
 
 def _authority_conflicts(
     items: Iterable[dict[str, Any]], trust_contract: dict[str, Any]
 ) -> list[tuple[str, str]]:
-    constraints: dict[str, dict[str, set[tuple[str, str]]]] = {}
     blocked_sources = _blocked_source_keys(trust_contract)
+    unresolved: set[tuple[str, str]] = set()
     for item in items:
         if (
             _authority(item) != "canonical"
             or item.get("freshness") == "stale"
             or not _source_path(item)
-            or _instruction_risk_flags(item)
             or _item_source_keys(item) & blocked_sources
         ):
             continue
-        identity = _item_identity(item)
-        content = _content_text(item).strip()
-        facts, _ = _extract_facts(content)
-        for fact_type, fact in facts:
-            if fact_type not in {"required", "forbidden"}:
-                continue
-            signature = _constraint_signature(fact)
-            if signature:
-                constraints.setdefault(signature, {}).setdefault(fact_type, set()).add(identity)
-    conflicts: set[tuple[str, str]] = set()
-    for by_type in constraints.values():
-        if by_type.get("required") and by_type.get("forbidden"):
-            conflicts.update(by_type["required"])
-            conflicts.update(by_type["forbidden"])
-    return sorted(conflicts)
+        if _content_text(item).strip() and str(item.get("source_class") or "") not in _CODE_SOURCE_CLASSES:
+            unresolved.add(_item_identity(item))
+    # The compatibility DTO carries unresolved identities, not proven conflict.
+    return sorted(unresolved)
 
 
 def _constraint_signature(value: str) -> str:
-    normalized = re.sub(
-        r"\b(?:must|shall|required|requires?|invariant|do|not|never|forbidden|prohibited|this|is|be)\b",
-        " ",
-        value.lower(),
-    )
-    return " ".join(re.findall(r"[a-z0-9_]+", normalized))
+    """Literal bytes only; never erase negation to invent constraint identity."""
+    return str(value or "")
 
 
 def _may_guide_workflow(item: dict[str, Any]) -> bool:
-    return (
-        _authority(item) == "canonical"
-        and item.get("repository_authority") == "explicit_agent_policy"
-        and item.get("instruction_trust") == "scoped_agent_policy"
-        and bool(item.get("scope_verified"))
-        and not _instruction_risk_flags(item)
-    )
+    # This consumer receives retrieved document data, not host authorization.
+    # No source, issuer, scope, consent boolean or empty risk list changes that.
+    return False
 
 
 def _version_candidate_identity(item: dict[str, Any]) -> tuple[str, str, str]:
@@ -92,7 +72,7 @@ def _validation_bucket(fact: str) -> str:
         lowered,
     ):
         return "compile"
-    if re.search(r"\b(ruff|mypy|lint|go\s+vet)\b", lowered):
+    if re.search(r"\b(ruff|mypy|go\s+vet)\b", lowered):
         return "semantic"
     return "tests"
 
@@ -130,19 +110,9 @@ def _prune_orphan_sources(
 
 
 def _has_behavioral_contract(packet: dict[str, Any]) -> bool:
-    raw_task = packet.get("task_interpretation")
-    task: dict[str, Any] = raw_task if isinstance(raw_task, dict) else {}
-    rows = [
-        *(task.get("acceptance_conditions") or []),
-        *(packet.get("required_invariants") or []),
-        *(packet.get("forbidden_changes") or []),
-        *(packet.get("implementation_guidance") or []),
-    ]
-    return any(
-        classify_normative_modality(str(row.get("text") or "")) is not None
-        for row in rows
-        if isinstance(row, dict)
-    )
+    # Explicit mutation/task DTOs are preserved elsewhere. Their existence, or
+    # rows of quoted prose, does not requalify a source behavioral proposition.
+    return False
 
 
 def _fit_packet(

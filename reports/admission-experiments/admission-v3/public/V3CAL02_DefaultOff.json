@@ -1,0 +1,1300 @@
+{
+  "case_id": "V3CAL02",
+  "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+  "split": "calibration",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+    "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+    "rows": [
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+        "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+        "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md"
+      ],
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+        "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+        "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-3rggox8o/project/docatlas.project-docs.yaml": "faaf0337ca62f262ed23cb36f90a1666aef03ee98039891a41cdd3fc3d3bdb31",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+        },
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "window_characters": 259,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "сколько",
+                "рублей",
+                "составляет",
+                "печатный",
+                "счёт",
+                "за",
+                "один",
+                "заказ",
+                "из",
+                "14",
+                "страниц",
+                "кто",
+                "принимает",
+                "спор",
+                "о",
+                "сумме",
+                "и",
+                "какие",
+                "документы",
+                "ему",
+                "передать"
+              ],
+              "matched_terms": [
+                "счёт",
+                "заказ",
+                "страниц",
+                "принимает",
+                "спор",
+                "о",
+                "сумме",
+                "и"
+              ],
+              "exact_terms": [
+                "сколько"
+              ],
+              "missing_exact_terms": [
+                "сколько"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 8,
+              "match_ratio": 0.381,
+              "bm25_cost": -5.748011559960274,
+              "lexical_score": 5.748011559960274,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "счёт",
+                  "заказ",
+                  "страниц",
+                  "принимает",
+                  "спор",
+                  "о",
+                  "сумме",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "счёт",
+                  "заказ",
+                  "страниц",
+                  "принимает",
+                  "спор",
+                  "о",
+                  "сумме",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/disputes.md",
+                "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+              },
+              "char_start": 31,
+              "char_end": 290
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_terms": [
+              "сколько",
+              "рублей",
+              "составляет",
+              "печатный",
+              "счёт",
+              "за",
+              "один",
+              "заказ",
+              "из",
+              "14",
+              "страниц",
+              "кто",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и",
+              "какие",
+              "документы",
+              "ему",
+              "передать"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "счёт",
+              "заказ",
+              "страниц",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и"
+            ],
+            "body_matched_terms": [
+              "счёт",
+              "заказ",
+              "страниц",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и"
+            ],
+            "matched_term_count": 8,
+            "match_ratio": 0.381,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              31,
+              289
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "window_characters": 247,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "сколько",
+                "рублей",
+                "составляет",
+                "печатный",
+                "счёт",
+                "за",
+                "один",
+                "заказ",
+                "из",
+                "14",
+                "страниц",
+                "кто",
+                "принимает",
+                "спор",
+                "о",
+                "сумме",
+                "и",
+                "какие",
+                "документы",
+                "ему",
+                "передать"
+              ],
+              "matched_terms": [
+                "за",
+                "страниц",
+                "сумме",
+                "и"
+              ],
+              "exact_terms": [
+                "сколько"
+              ],
+              "missing_exact_terms": [
+                "сколько"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 4,
+              "match_ratio": 0.1905,
+              "bm25_cost": -1.0741607534353583,
+              "lexical_score": 1.0741607534353583,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "за",
+                  "страниц",
+                  "сумме",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "за",
+                  "страниц",
+                  "сумме",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/tariff.md",
+                "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+              },
+              "char_start": 26,
+              "char_end": 273
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_terms": [
+              "сколько",
+              "рублей",
+              "составляет",
+              "печатный",
+              "счёт",
+              "за",
+              "один",
+              "заказ",
+              "из",
+              "14",
+              "страниц",
+              "кто",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и",
+              "какие",
+              "документы",
+              "ему",
+              "передать"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "за",
+              "страниц",
+              "сумме",
+              "и"
+            ],
+            "body_matched_terms": [
+              "за",
+              "страниц",
+              "сумме",
+              "и"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.1905,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              26,
+              272
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "window_characters": 259,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "сколько",
+                "рублей",
+                "составляет",
+                "печатный",
+                "счёт",
+                "за",
+                "один",
+                "заказ",
+                "из",
+                "14",
+                "страниц",
+                "кто",
+                "принимает",
+                "спор",
+                "о",
+                "сумме",
+                "и",
+                "какие",
+                "документы",
+                "ему",
+                "передать"
+              ],
+              "matched_terms": [
+                "счёт",
+                "заказ",
+                "страниц",
+                "принимает",
+                "спор",
+                "о",
+                "сумме",
+                "и"
+              ],
+              "exact_terms": [
+                "сколько"
+              ],
+              "missing_exact_terms": [
+                "сколько"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 8,
+              "match_ratio": 0.381,
+              "bm25_cost": -5.748011559960274,
+              "lexical_score": 5.748011559960274,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "счёт",
+                  "заказ",
+                  "страниц",
+                  "принимает",
+                  "спор",
+                  "о",
+                  "сумме",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "счёт",
+                  "заказ",
+                  "страниц",
+                  "принимает",
+                  "спор",
+                  "о",
+                  "сумме",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/disputes.md",
+                "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+              },
+              "char_start": 31,
+              "char_end": 290
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_terms": [
+              "сколько",
+              "рублей",
+              "составляет",
+              "печатный",
+              "счёт",
+              "за",
+              "один",
+              "заказ",
+              "из",
+              "14",
+              "страниц",
+              "кто",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и",
+              "какие",
+              "документы",
+              "ему",
+              "передать"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "счёт",
+              "заказ",
+              "страниц",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и"
+            ],
+            "body_matched_terms": [
+              "счёт",
+              "заказ",
+              "страниц",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и"
+            ],
+            "matched_term_count": 8,
+            "match_ratio": 0.381,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              31,
+              289
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "window_characters": 247,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "сколько",
+                "рублей",
+                "составляет",
+                "печатный",
+                "счёт",
+                "за",
+                "один",
+                "заказ",
+                "из",
+                "14",
+                "страниц",
+                "кто",
+                "принимает",
+                "спор",
+                "о",
+                "сумме",
+                "и",
+                "какие",
+                "документы",
+                "ему",
+                "передать"
+              ],
+              "matched_terms": [
+                "за",
+                "страниц",
+                "сумме",
+                "и"
+              ],
+              "exact_terms": [
+                "сколько"
+              ],
+              "missing_exact_terms": [
+                "сколько"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 4,
+              "match_ratio": 0.1905,
+              "bm25_cost": -1.0741607534353583,
+              "lexical_score": 1.0741607534353583,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "за",
+                  "страниц",
+                  "сумме",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "за",
+                  "страниц",
+                  "сумме",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/tariff.md",
+                "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+              },
+              "char_start": 26,
+              "char_end": 273
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+            "query_terms": [
+              "сколько",
+              "рублей",
+              "составляет",
+              "печатный",
+              "счёт",
+              "за",
+              "один",
+              "заказ",
+              "из",
+              "14",
+              "страниц",
+              "кто",
+              "принимает",
+              "спор",
+              "о",
+              "сумме",
+              "и",
+              "какие",
+              "документы",
+              "ему",
+              "передать"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "за",
+              "страниц",
+              "сумме",
+              "и"
+            ],
+            "body_matched_terms": [
+              "за",
+              "страниц",
+              "сумме",
+              "и"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.1905,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              26,
+              272
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd"
+      ],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 4,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 4,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md"
+              },
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 4,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 4,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 2,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+                    "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                    "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+                    "path": "docs/disputes.md",
+                    "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 31,
+                    "char_end": 290,
+                    "display_content_hash": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+                    "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+                    "project_doc_catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098",
+                    "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+                    "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                    "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+                    "path": "docs/tariff.md",
+                    "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 26,
+                    "char_end": 273,
+                    "display_content_hash": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+                    "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+                    "project_doc_catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3",
+                    "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+                "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+                "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+                "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+                "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "not_found",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [],
+  "state_after": {
+    "generation": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+    "rows": [
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+        "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+        "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md"
+      ],
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+        "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+        "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-3rggox8o/project/docatlas.project-docs.yaml": "faaf0337ca62f262ed23cb36f90a1666aef03ee98039891a41cdd3fc3d3bdb31",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+    }
+  },
+  "elapsed_seconds": 0.043294346000038786,
+  "integrity_errors": []
+}

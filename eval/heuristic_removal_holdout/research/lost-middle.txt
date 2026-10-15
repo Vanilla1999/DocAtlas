@@ -1,0 +1,873 @@
+            Lost in the Middle: How Language Models Use Long Contexts
+
+                 Nelson F. Liu1∗ Kevin Lin2 John Hewitt1                                             Ashwin Paranjape3,4
+                        Michele Bevilacqua3 Fabio Petroni3                                           Percy Liang1
+
+                       1
+                           Stanford University, USA 2 University of California, Berkeley, USA
+                                          3
+                                            Samaya AI, UK 4 Samaya AI, USA
+                                              nfliu@cs.stanford.edu
+
+
+                             Abstract                                           used to process long documents (legal or scien-
+                                                                                tific documents, conversation histories, etc.) or
+        While recent language models have the abil-
+                                                                                when language models are augmented with exter-
+        ity to take long contexts as input, relatively
+        little is known about how well they use                                 nal information (relevant documents from a search
+        longer context. We analyze the performance                              engine, database query results, etc.; Petroni et al.,
+        of language models on two tasks that re-                                2020; Ram et al., 2023; Shi et al., 2023; Mallen
+        quire identifying relevant information in their                         et al., 2023; Schick et al., 2023, inter alia).
+        input contexts: multi-document question an-                                Handling these use-cases requires language
+        swering and key-value retrieval. We find that                           models to successfully operate over long se-
+        performance can degrade significantly when
+                                                                                quences. Existing language models are generally
+        changing the position of relevant information,
+        indicating that current language models do not                          implemented with Transformers (Vaswani et al.,
+        robustly make use of information in long in-                            2017), which require memory and compute that
+        put contexts. In particular, we observe that                            increases quadratically in sequence length. As
+        performance is often highest when relevant in-                          a result, Transformer language models were of-
+        formation occurs at the beginning or end of the                         ten trained with relatively small context windows
+        input context, and significantly degrades when                          (between 512 and 2048 tokens). Recent improve-
+        models must access relevant information in
+                                                                                ments in hardware (e.g., faster GPUs with more
+        the middle of long contexts, even for explicitly
+        long-context models. Our analysis provides a                            memory) and algorithms (Dai et al., 2019; Dao
+        better understanding of how language mod-                               et al., 2022; Poli et al., 2023; Rubin and Berant,
+        els use their input context and provides new                            2023, inter alia) have resulted in language models
+        evaluation protocols for future long-context                            with larger context windows (e.g., 4096, 32K, and
+        language models.                                                        even 100K tokens), but it remains unclear how
+                                                                                these extended-context language models make
+                                                                                use of their input contexts when performing
+                                                                                downstream tasks.
+1       Introduction
+                                                                                   We empirically investigate this question via
+Language models have become an important and                                    controlled experiments with a variety of state-of-
+flexible building block in a variety of user-facing                             the-art open (MPT-30B-Instruct, LongChat-13B
+language technologies, including conversational                                 (16K)) and closed (OpenAI’s GPT-3.5-Turbo and
+interfaces, search and summarization, and collab-                               Anthropic’s Claude-1.3) language models in set-
+orative writing (Shuster et al., 2022; Thoppilan                                tings that require accessing and using information
+et al., 2022; Lee et al., 2022, inter alia). These                              within an input context. In particular, our ex-
+models perform downstream tasks primarily via                                   periments make controlled changes to the input
+prompting: all relevant task specification and data                             context size and the position of the relevant
+to process is formatted as a textual input context,                             information within the input context and study
+and the model returns a generated text comple-                                  their effects on language model performance. If
+tion. These input contexts can contain thousands                                language models can robustly use information
+of tokens, especially when language models are                                  within long input contexts, then their performance
+                                                                                should be minimally affected by the position of
+    ∗
+    Work partially completed as an intern at Samaya AI.                         the relevant information in the input context.
+                                                                          157
+
+              Transactions of the Association for Computational Linguistics, vol. 12, pp. 157–173, 2024. https://doi.org/10.1162/tacl a 00638
+                         Action Editor: Luke Zettlemoyer. Submission batch: 8/2023; Revision batch: 10/2023; Published 2/2024.
+                                c 2024 Association for Computational Linguistics. Distributed under a CC-BY 4.0 license.
+                                                                input context (recency bias), and performance
+                                                                significantly degrades when models must access
+                                                                and use information in the middle of their in-
+                                                                put context (§2.3). For example, when relevant
+                                                                information is placed in the middle of its in-
+                                                                put context, GPT-3.5-Turbo’s performance on the
+                                                                multi-document question task is lower than its per-
+                                                                formance when predicting without any documents
+                                                                (i.e., the closed-book setting; 56.1%). Further-
+                                                                more, we find that models often have identical
+                                                                performance to their extended-context counter-
+                                                                parts, indicating that extended-context models are
+                                                                not necessarily better at using their input context
+                                                                (§2.3).
+                                                                   Given that language models struggle to re-
+                                                                trieve and use relevant information in the
+Figure 1: Changing the location of relevant information         multi-document question answering task, to what
+(in this case, the position of the passage that answers         extent can language models even retrieve from
+an input question) within the language model’s input
+                                                                their input contexts? We study this question with
+context results in a U-shaped performance curve—
+models are better at using relevant information that
+                                                                a synthetic key-value retrieval task, which is de-
+occurs at the very beginning (primacy bias) or                  signed to be a minimal testbed for the basic ability
+end of its input context (recency bias), and per-               to retrieve matching tokens from the input con-
+formance degrades significantly when models must                text. In this task, models are given a collection of
+access and use information located in the middle of its         JSON-formatted key-value pairs and must return
+input context.                                                  the value associated with a specific key. Simi-
+                                                                lar to the multi-document QA task, the key-value
+                                                                retrieval task admits controlled changes to the in-
+   We first experiment with multi-document ques-
+                                                                put context length (adding more key-value pairs)
+tion answering, which requires models to reason
+                                                                and the position of relevant information. Although
+over provided documents to find relevant informa-
+                                                                some models perform the synthetic key-value re-
+tion and use it to answer a given question; this task
+                                                                trieval task perfectly, other models struggle to
+mimics the retrieval-augmented generation setup
+                                                                simply retrieve matching tokens that occur in the
+underlying many commercial generative search
+                                                                middle of their input context and continue to
+and question answering applications (e.g., Bing
+                                                                exhibit a U-shaped performance curve.
+Chat). In this setting, we control (i) the input
+context length by changing the number of docu-                     To better understand why language models
+ments in the input context (akin to retrieving more             struggle to robustly access and use information
+or less documents in retrieval-augmented genera-                in their input contexts, we study the role of model
+tion), and (ii) control the position of the relevant            architecture (decoder-only vs. encoder-decoder),
+information within the input context by changing                query-aware contextualization, and instruction
+the order of the documents to place the rele-                   fine-tuning (§4). We find that:
+vant document at the beginning, middle or end of
+                                                                  • Encoder-decoder models are relatively ro-
+the context.
+                                                                    bust to changes in the position of relevant
+   We find that changing the position of relevant                   information within their input context, but
+information in the input context can substantially                  only when evaluated on sequences within its
+affect model performance, indicating that current                   training-time sequence length. When eval-
+language models do not robustly access and use                      uated on sequences longer than those seen
+information in long input contexts. Furthermore,                    during training, we observe a U-shaped
+we observe a distinctive U-shaped performance                       performance curve (§4.1).
+curve (Figure 1); language model performance
+is highest when relevant information occurs at                    • Query-aware contextualization (placing the
+the very beginning (primacy bias) or end of its                     query before and after the documents or
+
+                                                          158
+         key-value pairs) enables near-perfect perfor-         analyze model performance on multi-document
+         mance on the synthetic key-value task, but            question answering, which requires models to find
+         minimally changes trends in multi-document            relevant information within an input context and
+         QA (§4.2).                                            use it to answer the question. In particular, we
+                                                               make controlled changes to the length of the input
+    • Even base language models (i.e., without
+                                                               context and the position of the relevant informa-
+      instruction fine-tuning) show a U-shaped per-
+                                                               tion and measure changes in task performance.
+      formance curve as we vary the position of
+      relevant information in the input context.
+   Our results indicate that prompting lan-
+                                                               2.1 Experimental Setup
+guage models with longer input contexts is a
+trade-off—providing the language model with                    In the multi-document question answering task,
+more information may help it perform the down-                 the model inputs are (i) a question to answer and
+stream task, but it also increases the amount                  (ii) k documents (e.g., passages from Wikipedia),
+of content that the model must reason over,                    where exactly one of the documents contains the
+potentially decreasing accuracy. To better un-                 answer to the question and k − 1 ‘‘distractor’’
+derstand this trade-off in practice, we perform                documents do not. This task requires the model
+a case study with retriever-reader models on                   to access the document that contains the answer
+open-domain question answering (§5). In con-                   within its input context and use it to answer the
+trast to our controlled multi-document QA task,                question. Figure 2 presents an example.
+where the context always contains exactly one
+                                                                  We instantiate this task with data from
+document that answers the question, none or
+                                                               NaturalQuestions-Open (Lee et al., 2019;
+many of the top k documents may contain the
+                                                               Kwiatkowski et al., 2019), which contains
+answer in the open-domain QA setting. When
+                                                               historical queries issued to the Google search
+retrieving from Wikipedia to answer queries
+                                                               engine, coupled with human-annotated answers
+from NaturalQuestions-Open, we find that model
+                                                               extracted from Wikipedia. In particular, we take
+performance saturates long before retriever re-
+                                                               the 2655 queries where the annotated long answer
+call saturates, indicating that current models
+                                                               is a paragraph (as opposed to a list or a table).
+fail to effectively use additional retrieved doc-
+                                                               We use passages (chunks of at most 100 tokens)
+uments—using 50 documents instead of 20
+                                                               from Wikipedia as documents within our input
+retrieved documents only marginally improves
+                                                               contexts. For each of the queries, we need a
+performance (∼1.5% for GPT-3.5-Turbo and
+                                                               document that contains the answer and k − 1
+∼1% for claude-1.3).
+                                                               distractor documents that do not contain the
+   Our analysis provides a better understanding
+                                                               answer. To obtain a document that answers the
+of how language models use their input context
+                                                               question, we use the Wikipedia paragraph that
+and introduces new evaluation protocols for fu-
+                                                               contains the answer from the NaturalQuestions
+ture long-context models; to claim that a language
+                                                               annotations.
+model can robustly use information within long
+input contexts, it is necessary to show that its                  To collect k − 1 distractor documents that do
+performance is minimally affected by the position              not contain the answer, we use a retrieval system
+of the relevant information in the input context               (Contriever, fine-tuned on MS-MARCO; Izacard
+(e.g., minimal difference in best- and worst-case              et al., 2021) to retrieve the k −1 Wikipedia chunks
+performance). To facilitate further work on un-                that are most relevant to the query and do not
+derstanding and improving how language models                  contain any of the NaturalQuestions-annotated
+use their input context, we release our code and               answers.2,3 In the input context, the distractor
+evaluation data.1
+                                                                  2
+                                                                    Ambiguity in NaturalQuestions-Open means that a small
+2       Multi-Document Question Answering                      number of distractor passages may contain a reasonable
+                                                               answer. We additionally run experiments on subset of unam-
+Our goal is to better understand how language                  biguous questions, finding similar results and conclusions;
+models use their input context. To this end, we                see Appendix A.
+                                                                  3
+                                                                    We also explored using random documents as distractors,
+    1
+        nelsonliu.me/papers/lost-in-the-middle.                see Appendix B for more details.
+
+
+                                                         159
+Figure 2: Example of the multi-document question answering task, with an input context and the desired model
+answer. The document containing the answer is bolded within the input context here for clarity.
+
+
+
+
+Figure 3: Modulating the position of relevant informa-
+tion within the input context for the multi-document
+                                                                    Figure 4: Modulating the input context length of the
+question answering example presented in Figure 2.
+                                                                    multi-document question answering example presented
+Re-ordering the documents in the input context does
+                                                                    in Figure 2. Adding documents that do not contain the
+not affect the desired output.
+                                                                    answer increases the length of the input context, but
+                                                                    does not affect the desired output.
+documents are presented in order of decreasing
+relevance.4                                                         rect answers (as taken from the NaturalQuestions
+   To modulate the position of relevant infor-                      annotations) appear in the predicted output.
+mation within the input context, we adjust the                         Our experimental setup is similar to the
+order of the documents to change the posi-                          needle-in-a-haystack experiments of Ivgi et al.
+tion of the document that contains the answer                       (2023), who compare question answering per-
+(Figure 3). To modulate the input context length                    formance when the relevant paragraph is placed
+in this task, we increase or decrease the number                    (i) at the beginning of the input or (ii) a ran-
+of retrieved documents that do not contain the                      dom position within the input. They find that
+answer (Figure 4).                                                  encoder-decoder models have significantly higher
+   Following Kandpal et al. (2022) and Mallen                       performance when relevant information is placed
+et al. (2023), we use accuracy as our primary                       at the start of the input context. In contrast, we
+evaluation metric, judging whether any of the cor-                  study finer-grained changes in the position of
+                                                                    relevant information.
+   4
+    Since there might be a prior over ‘‘search results’’
+appearing in ranked order, we explored randomly ordering            2.2 Models
+the k − 1 distractor documents and mentioning that the
+documents are randomly ordered in the task description, but         We analyze several state-of-the-art open and
+found the same trends. See Appendix C for more details.             closed language models. We use greedy decoding
+
+                                                              160
+Figure 5: The effect of changing the position of relevant information (document containing the answer) on
+multi-document question answering performance. Lower positions are closer to the start of the input context.
+Performance is highest when relevant information occurs at the very start or end of the context, and rapidly
+degrades when models must reason over information in the middle of their input context.
+
+
+
+when generating outputs and leave exploration of                   Model                     Closed-Book      Oracle
+other decoding methods to future work. We use a                    LongChat-13B (16K)           35.0%         83.4%
+standard set of prompts for each model (Figure 2).                 MPT-30B-Instruct             31.5%         81.9%
+                                                                   GPT-3.5-Turbo                56.1%         88.3%
+Open Models. We experiment with MPT-
+                                                                   GPT-3.5-Turbo (16K)          56.0%         88.6%
+30B-Instruct, which has a maximum context
+                                                                   Claude-1.3                   48.3%         76.1%
+length of 8192 tokens. The model was ini-
+                                                                   Claude-1.3 (100K)            48.2%         76.4%
+tially pre-trained on 1 trillion tokens using
+2048-token sequences, followed by an additional                    Table 1: Closed-book and oracle accuracy of
+sequence length adaptation pre-training phase on                   language models on the multi-document question
+50 billion tokens using 8192-token sequences.                      answering task.
+MPT-30B-Instruct uses ALiBi (Press et al., 2022)
+to represent positional information. We also eval-
+uate LongChat-13B (16K) (Li et al., 2023), which                   2.3 Results and Discussion
+extends the LLaMA-13B (Touvron et al., 2023a)
+                                                                   We experiment with input contexts containing 10,
+context window from 2048 to 16384 tokens by
+                                                                   20, and 30 total documents. Figure 5 presents
+using condensed rotary positional embeddings
+                                                                   multi-document question answering performance
+before fine-tuning with 16384-token sequences.
+                                                                   when varying the position of relevant information
+Closed Models. We use the OpenAI API to                            within the input context. To contextualize model
+experiment with GPT-3.5-Turbo and GPT-3.5-                         performance, we also evaluate on the closed-book
+Turbo (16K).5 GPT-3.5-Turbo has a maximum                          and oracle settings (Table 1). In the closed-book
+context length of 4K tokens, and GPT-3.5-Turbo                     setting, models are not given any documents in
+(16K) is a version with an extended maximum con-                   their input context, and must rely on their paramet-
+text length of 16K tokens. We evaluate Claude-1.3                  ric memory to generate the correct answer. On the
+and Claude-1.3 (100K) with the Anthropic API;                      other hand, in the oracle setting, language models
+Claude-1.3 has a maximum context length of 8K                      are given the single document that contains the
+tokens, and Claude-1.3 (100K) has an extended                      answer and must use it to answer the question.
+context length of 100K tokens.6
+                                                                   Model performance is highest when relevant
+   5
+      We use the 0613 OpenAI model versions.                       information occurs at the beginning or end of
+    6
+      We also evaluate GPT-4 (8K) on a subset of                   its input context. As illustrated in Figure 5,
+multi-document QA experiments, finding similar results and         changing the position of relevant information in
+trends as other models (though GPT-4 has higher absolute
+performance). Evaluating GPT-4 on the full multi-document
+                                                                   the input context leads to substantial decreases
+QA and key-value retrieval experiments would cost upwards          in model performance. In particular, we see a
+of $6000. See Appendix D for GPT-4 results and discussion.         distinctive U-shaped performance curve—models
+
+                                                             161
+Figure 6: Example of the key-value retrieval task, with an input context and the desired model output. Given a
+key, the goal is to return the associated value. All keys and values are 128-bit UUIDs. The relevant key-value pair
+for answering the query is bolded here within the input context for clarity.
+
+
+are often much better at using relevant information          contexts in the multi-document question answer-
+that occurs at the very beginning (primacy bias)             ing task, to what extent can they simply retrieve
+and very end of contexts (recency bias), and suffer          from input contexts? We study this question with
+degraded performance when forced to use infor-               a synthetic key-value retrieval task, which is de-
+mation within the middle of its input context. For           signed to provide a minimal testbed for the basic
+example, GPT-3.5-Turbo’s multi-document QA                   ability to retrieve matching tokens from an input
+performance can drop by more than 20%—in the                 context.
+worst case, performance in 20- and 30-document
+settings is lower than performance without any               3.1 Experimental Setup
+input documents (i.e., closed-book performance;              In our synthetic key-value retrieval task, the inputs
+56.1%). These results indicate that current models           are (i) a string-serialized JSON object with k
+cannot effectively reason over their entire context          key-value pairs, where each of the keys and values
+window when prompted for downstream tasks.                   are unique, randomly generated UUIDs and (ii) a
+                                                             key within the aforementioned JSON object. The
+Extended-context models are not necessarily                  goal is to return the value associated with the
+better at using input context. When the input                specified key. Thus, each JSON object contains
+context fits in the context window of both a model           one relevant key-value pair (where the value is
+and its extended-context counterpart, we see that            to be returned), and k − 1 irrelevant ‘‘distractor’’
+performance between them is nearly identical. For            key-value pairs. Figure 6 provides an example
+example, the 10- and 20-document settings both               input context and its corresponding desired output.
+fit in the context window of GPT-3.5-Turbo and               We again measure accuracy by evaluating whether
+GPT-3.5-Turbo (16K), and we observe that their               the correct value appears in the predicted output.
+performance as a function of position of relative               Our synthetic key-value retrieval task shares
+information is nearly superimposed (solid purple             similar goals with the Little Retrieval Test of
+and dashed brown series in Figure 5). These re-              Papailiopoulos et al. (2023) and the fine-grained
+sults indicate that extended-context models are              line retrieval task of Li et al. (2023), but we ex-
+not necessarily better than their non-extended               plicitly seek to distill and simplify the task by
+counterparts at using their input context.                   removing as much natural language semantics as
+                                                             possible (using random UUIDs instead), since lan-
+3   How Well Can Language Models                             guage features may present potential confounders.
+    Retrieve From Input Contexts?                            For example, Transformer language models may
+                                                             have varying sensitivity to different linguistic
+Given that language models struggle to retrieve              features in their input (O’Connor and Andreas,
+and use information from the middle of their input           2021).
+
+                                                       162
+Figure 7: The effect of changing the input context length and the position of relevant information on key-value
+retrieval performance. Lower positions are closer to the start of the input context. Although some models show
+perfect accuracy on this synthetic task (e.g., Claude-1.3 and Claude-1.3 (100K)), we see again that performance
+is often highest when relevant information is occurs at the very start or end of the context, and rapidly degrades
+when models must retrieve from the middle of the input context.
+
+
+   To modulate the position of relevant infor-              4 Why Are Language Models Not
+mation within the input context, we change the                Robust to Changes in the Position of
+position of the key to retrieve within the serial-            Relevant Information?
+ized JSON object. To modulate the input context
+length, we change the number of input JSON                  Our multi-document question answering and
+key-value pairs k by adding or removing random              key-value retrieval results show that language
+keys, changing the number of distractor key-value           models struggle to robustly access and use infor-
+pairs.                                                      mation in long input contexts, since performance
+                                                            degrades significantly when changing the position
+3.2 Results and Discussion                                  of relevant information. To better understand why,
+                                                            we perform some preliminary investigations into
+We experiment with input contexts containing
+                                                            the role of model architecture (decoder-only vs.
+75, 140, and 300 key-value pairs (500 examples
+                                                            encoder-decoder), query-aware contextualization,
+each). We use the same set of models as the
+                                                            and instruction fine-tuning.
+multi-document question answering experiments,
+see §2.2 for more details.
+   Figure 7 presents key-value retrieval perfor-            4.1 Effect of Model Architecture
+mance. Claude-1.3 and Claude-1.3 (100K) do                  The open models we evaluated are all
+nearly perfectly on all evaluated input context             decoder-only models—at each timestep, they may
+lengths, but other models struggle, especially              only attend to prior tokens. To better understand
+when contexts have 140 or 300 key-value                     the potential effects of model architecture on
+pairs—although the synthetic key-value retrieval            how language model use context, we compare
+task only requires identifying exact match within           decoder-only and encoder-decoder language
+the input context, not all models achieve high              models.
+performance.                                                   We experiment with Flan-T5-XXL (Raffel
+   Similar to our multi-document QA results,                et al., 2020; Chung et al., 2022) and Flan-UL2
+GPT-3.5-Turbo, GPT-3.5-Turbo (16K), and                     (Tay et al., 2023). Flan-T5-XXL is trained with a
+MPT-30B-Instruct have the lowest performance                sequences of 512 tokens (encoder and decoder).
+when they must access key-value pairs in the                Flan-UL2 is initially trained with sequences of
+middle of their input context. LongChat-13B                 512 tokens (encoder and decoder), but is then
+(16K) exhibits a different trend in the 140                 pre-trained for an extra 100K steps with 1024
+key-value setting; we qualitatively observe that            tokens (encoder and decoder) before instruction
+when relevant information is placed at the start            fine-tuning on sequences with 2048 tokens in the
+of the input context, LongChat-13B (16K) tends              encoder and 512 tokens in the decoder. However,
+to generate code to retrieve the key, rather than           since these models use relative positional embed-
+outputting the value directly.                              dings, they can (in principle) extrapolate beyond
+
+                                                      163
+Figure 8: When encoder-decoder models (Flan-UL2 and Flan-T5-XXL) evaluated on sequences that are shorter
+than their encoder’s training-time maximum sequence length (2048 and 512 tokens, respectively), they are
+relatively robust to changes in the position of relevant information within their input context (left subplot). In
+contrast, when these models are evaluated on sequences longer than those seen during training (center and right
+subplots), we observe a U-shaped performance curve—performance is higher when relevant information occurs
+at the beginning or end of the input context, as opposed to the middle of the input context.
+
+
+
+these maximum context lengths; Shaham et al.                 key-value pairs, since the query only appears at
+(2023) find that both models can perform well                the end of the prompt and decoder-only models
+with sequences of up to 8K tokens.                           can only attend to prior tokens at each timestep.
+   Figure 8 compares the performance of                      In contrast, encoder-decoder models (which seem
+decoder-only and encoder-decoder models. When                more robust to changes in the position of rele-
+Flan-UL2 is evaluated on sequences within                    vant information; §4.1) use a bidirectional encoder
+its 2048-token training-time context window                  to contextualize input contexts—can we use
+(Figure 8; left subplot), its performance is rela-           this observation to improve decoder-only mod-
+tively robust to changes in the position of relevant         els by placing the query before and after the
+information within the input context (1.9%                   data, enabling query-aware contextualization of
+absolute difference between best- and worst-case             documents (or key-value pairs)?
+performance). When evaluated on settings with                   We find that query-aware contextualization dra-
+sequences longer than 2048 tokens (Figure 8;                 matically improves performance on the key-value
+center and right), Flan-UL2 performance begins               retrieval task—all models achieve near-perfect
+to degrade when relevant information is placed               performance on the 75, 140, and 300 key-value
+in the middle. Flan-T5-XXL shows a similar                   pair settings. For example, GPT-3.5-Turbo (16K)
+trend, where longer input contexts result in a               with query-aware contextualization achieves per-
+greater performance degradation when placing                 fect performance when evaluated with 300
+relevant information in the middle of the input              key-value pairs.
+context. We hypothesize that encoder-decoder                    In contrast, without query-aware contextual-
+models may make better use of their context                  ization, the worst-case performance is 45.6%
+windows because their bidirectional encoder                  (Figure 7). Despite the significant impact on
+allows processing each document in the context of            key-value retrieval performance, query-aware
+future documents, potentially improving relative             contextualization minimally affects performance
+importance estimation between documents.                     trends in the multi-document question answering
+                                                             task (Figure 9); it slightly improves performance
+4.2 Effect of Query-Aware Contextualization                  when the relevant information is located at the
+Our multi-document QA and key-value retrieval                very beginning of the input context, but slightly
+experiments place the query (i.e., question to an-           decreases performance in other settings.
+swer or key to retrieve) after the data to process
+(i.e., the documents or the key-value pairs). As             4.3 Effect of Instruction Fine-Tuning
+a result, decoder-only models cannot attend to               The models we evaluated are all instruction
+query tokens when contextualizing documents or               fine-tuned—after their initial pre-training, they
+
+                                                       164
+                                                                Figure 10: Multi-document QA performance of
+Figure 9: Query-aware contextualization (placing the
+                                                                MPT-30B-Instruct compared against its base model
+query before and after the documents) does not
+                                                                (i.e., before instruction fine-tuning) MPT-30B. Both
+substantially improve robustness of language mod-
+                                                                models have a U-shaped performance curve, where
+els to changing the position of relevant information
+                                                                performance is much higher when relevant information
+in multi-document QA; performance slightly increases
+                                                                occurs at the start or end of the input context, indicat-
+when relevant information occurs at the very beginning,
+                                                                ing that the instruction fine-tuning process itself is not
+but otherwise slightly decreases.
+                                                                necessarily responsible for these performance trends.
+
+
+undergo supervised fine-tuning on a dataset of                  base model best- and worst-case performance to
+instructions and responses. The task specifica-                 around 4%.
+tion and/or instruction is commonly placed at                      These observations complement prior work,
+the beginning of the input context in super-                    which found that non-instruction fine-tuned lan-
+vised instruction fine-tuning data, which might                 guage models are biased towards recent tokens
+lead instruction fine-tuned language models to                  (i.e., the end of the input context; Khandelwal
+place more weight on the start of the input                     et al., 2018; Press et al., 2021). This recency bias
+context. To better understand the potential ef-                 has been observed in past work when evaluat-
+fects of instruction fine-tuning on how language                ing models on next-word prediction of contiguous
+models use long input contexts, we compare the                  text, a setting where language models minimally
+multi-document question answering performance                   benefit from long-range information (Sun et al.,
+of MPT-30B-Instruct against its base model (i.e.,               2021). In contrast, our results show that language
+before instruction fine-tuning) MPT-30B. We use                 models are capable of using longer-range informa-
+the same experimental setup as §2.                              tion (i.e., the beginning of the input context) when
+   Figure 10 compares the multi-document QA                     prompted with instruction-formatted data. We hy-
+performance of MPT-30B and MPT-30B-Instruct                     pothesize that non-instruction fine-tuned language
+as a function of the position of the relevant in-               models learn to use these long contexts from sim-
+formation in the input context. Surprisingly, we                ilarly formatted data that may occur in Internet
+see that both MPT-30B and MPT-30B-Instruct                      text seen during pre-training, e.g., StackOverflow
+exhibit a U-shaped performance curve, where per-                questions and answers.
+formance is highest when relevant information                      To better understand the effect of additional
+occurs at the very beginning or very end of the                 fine-tuning and model scale, we also experimented
+context. Although the absolute performance of                   with Llama-2 models of varying sizes (7B, 13B,
+MPT-30B-Instruct is uniformly higher than that                  and 70B) with and without additional supervised
+of MPT-30B, their overall performance trends                    fine-tuning and reinforcement learning from hu-
+are similar. We also observe that instruction                   man feedback (Appendix E). We find that the
+fine-tuning slightly reduces the worst-case per-                U-shaped performance curve only appears in suf-
+formance disparity from nearly 10% between the                  ficiently large language models (with or without
+
+                                                          165
+additional fine-tuning)—the 7B Llama-2 models
+are solely recency-biased, while the 13B and 70B
+models exhibit a U-shaped performance curve.
+In addition, we see that the Llama-2 supervised
+fine-tuning and reinforcement learning from hu-
+man feedback procedure slightly mitigates the
+positional bias in smaller models (13B, akin to
+trends shown when comparing MPT-30B and
+MPT-30B-Instruct), but minimally affects trends
+on larger models (70B).
+
+5   Is More Context Is Always Better?
+    A Case Study With Open-Domain QA
+Our results indicate that prompting lan-
+guage models with longer input contexts is a
+                                                           Figure 11: Retriever recall and model performance as a
+trade-off—providing the language model with
+                                                           function of the number of retrieved documents. Model
+more information may help it perform the                   performance saturates long before retriever recall, in-
+downstream task, but it also increases the amount          dicating that the models have difficulty making use of
+of content that the model must reason over, po-            the extra retrieved documents.
+tentially decreasing accuracy. Even if a language
+model can take in 16K tokens, is it actually
+                                                           for GPT-3.5-Turbo and ∼1% for Claude-1.3),
+beneficial to provide 16K tokens of context? The
+                                                           while significantly increasing the input context
+answer to this question is ultimately downstream
+                                                           length (and thus latency and cost). These results,
+task-specific since it depends on the marginal
+                                                           coupled with the observation that models are
+value of the added context and the model’s ability
+                                                           often better at retrieving and using information
+to effectively use long input contexts, but we
+                                                           at the start or end of the input contexts, suggest
+perform a case study with open-domain question
+                                                           that effective reranking of retrieved documents
+answering on NaturalQuestions-Open to better
+                                                           (pushing relevant information closer to the start
+understand this trade-off in existing language
+                                                           of the input context) or ranked list truncation
+models.
+                                                           (retrieving fewer documents when appropriate;
+   We use language models in a standard                    Arampatzis et al., 2009) may be promising direc-
+retriever-reader setup. A retrieval system (Con-           tions for improving how language-model-based
+triever, fine-tuned on MS-MARCO) takes an input            readers use retrieved context.
+query from NaturalQuestions-Open and returns
+the k documents from Wikipedia with the highest            6 Related Work
+relevance score. To condition language models
+on these retrieved documents, we simply include            6.1 Long-Context Language Models
+them in the prompt. We evaluate retriever recall           There is much prior work in designing perfor-
+and reader accuracy (whether any of the annotated          mant language models with cheaper scaling than
+answers appear in the predicted output) as a func-         Transformers in the context length. Many lines of
+tion of the number of retrieved documents k . We           work pursue Transformer variants with attention
+use a subset of NaturalQuestions-Open where the            modifications like recurrence (Dai et al., 2019),
+long answer is a paragraph (as opposed to a table          factorizing attention into computationally less
+or a list).                                                intensive approximations (Beltagy et al., 2020;
+   Figure 11 presents retriever recall and                 Zaheer et al., 2020), or low-rank approximations
+open-domain QA results. We see that reader                 (Wang et al., 2020; Peng et al., 2021). Dao et al.
+model performance saturates long before retriever          (2022) instead provide a faster exact attention by
+performance saturates, indicating that readers             a carefully-crafted IO-aware CUDA kernel. Sepa-
+are not effectively using the extra context.               rately, there are attempts to do away with attention
+Using more than 20 retrieved documents only                entirely to remove quadratic sequence length com-
+marginally improves reader performance (∼1.5%              plexity, often through convolution and/or linear
+
+                                                     166
+RNNs, e.g., in RWKV (Peng, 2023), S4 (Gu et al.,             capable of retrieving any token from their
+2022), or Hyena (Poli et al., 2023). Many prior ef-          contexts.
+forts evaluate perplexity on a diverse web corpus
+as a proxy for the ability to process long contexts;         7 Conclusion
+this work shows that precise knowledge access on
+long contexts may be an added challenge.                     We empirically study how language models use
+                                                             long input contexts via a series of controlled
+6.2 How Do Language Models Use Context?                      experiments. We show that language model per-
+The pioneering work of Khandelwal et al. (2018)              formance degrades significantly when changing
+showed that small LSTM language models make                  the position of relevant information, indicating
+increasingly coarse use of longer-term context;              that models struggle to robustly access and use
+Sankar et al. (2019) found similar results in di-            information in long input contexts. In particular,
+alogue models. In a similar vein, Daniluk et al.             performance is often lowest when models must
+(2017) find that attentive LSTM language mod-                use information in the middle of long input con-
+els tend to mainly use recent history. Petroni               texts. We conduct a preliminary investigation of
+et al. (2020) were among the first to demon-                 the role of (i) model architecture, (ii) query-aware
+strate the potential of combining context from               contextualization, and (iii) instruction fine-tuning
+an information retrieval system with a pretrained            to better understand how they affect how language
+language models for unsupervised question an-                models use context. Finally, we conclude with a
+swering. O’Connor and Andreas (2021) found                   practical case study of open-domain question an-
+that many information-destroying operations had              swering, finding that the performance of language
+marginal effects on Transformer LMs’ predic-                 model readers saturates far before retriever recall.
+tions. Krishna et al. (2022) found that long-context         Our results and analysis provide a better under-
+neural generation in modestly-sized Transformer              standing of how language models use their input
+language models degenerates because models fail              context and provides new evaluation protocols for
+to properly condition on long context. Finally,              future long-context models.
+studying long-context models, Sun et al. (2021)
+found that longer contexts improves prediction               Acknowledgments
+of only a few tokens, an empirical finding con-              We would like to thank Luke Zettlemoyer, who
+sistent with the theory of Sharan et al. (2018),             served as our TACL action editor, and the anony-
+who showed that sequence distributions with                  mous reviewers for their comments and feedback.
+bounded mutual information necessarily lead to               We also thank Claudiu Leoveanu-Condrei, Megan
+marginal average prediction benefits from in-                Leszczynski, Dmytro Okhonko, Maithra Raghu,
+creasingly long context. Qin et al. (2023) analyze           Eric Wallace, and Sang Michael Xie for feedback
+how efficient Transformers perform on a variety              and discussions that helped improve this work.
+of long-context downstream NLP tasks, finding                Further, we are grateful to Sewon Min for her
+that long-context transformers are recency-biased            help with the AmbigQA dataset. This work was
+and do not effectively use long-range context.               supported by the Stanford Center for Research
+6.3 The Serial-Position Effect                               on Foundation Models (CRFM), by OpenAI via
+                                                             an API credits grant to the Stanford CRFM, and
+The U-shaped curve we observe in this work has               by Anthropic via the Claude academic access
+a connection in psychology known as the serial-              program.
+position effect (Ebbinghaus, 1913; Murdock Jr,
+1962), that states that in free-association recall
+of elements from a list, humans tend to best re-             References
+member the first and last elements of the list. The
+serial-position effect plays a role in understand-           Avi Arampatzis, Jaap Kamps, and Stephen
+ing how humans develop short- and long-term                    Robertson. 2009. Where to stop reading a
+memory. Observing a serial-position-like effect                ranked list? Threshold optimization using
+in language models is perhaps surprising, since                truncated score distributions. In Proceedings
+the self-attention mechanisms underlying Trans-                of SIGIR. https://doi.org/10.1145
+former language models is technically equally                  /1571941.1572031
+
+                                                       167
+Iz Beltagy, Matthew E. Peters, and Arman                   Gautier Izacard and Edouard Grave. 2021. Lever-
+  Cohan. 2020. Longformer: The long-document                 aging passage retrieval with generative models
+  transformer. ArXiv:2004.05150.                             for open domain question answering. In Pro-
+Hyung Won Chung, Le Hou, Shayne Longpre,                     ceedings of EACL. https://doi.org/10
+  Barret Zoph, Yi Tay, William Fedus, Yunxuan                .18653/v1/2021.eacl-main.74
+  Li, Xuezhi Wang, Mostafa Dehghani,                       Nikhil Kandpal, Haikang Deng, Adam Roberts,
+  Siddhartha Brahma, Albert Webson, Shixiang                 Eric Wallace, and Colin Raffel. 2022. Large
+  Shane Gu, Zhuyun Dai, Mirac Suzgun,                        language models struggle to learn long-tail
+  Xinyun Chen, Aakanksha Chowdhery, Alex                     knowledge. ArXiv:2211.08411.
+  Castro-Ros, Marie Pellat, Kevin Robinson,
+  Dasha Valter, Sharan Narang, Gaurav Mishra,              Urvashi Khandelwal, He He, Peng Qi, and Dan
+  Adams Yu, Vincent Zhao, Yanping Huang,                     Jurafsky. 2018. Sharp nearby, fuzzy far away:
+  Andrew Dai, Hongkun Yu, Slav Petrov, Ed H.                 How neural language models use context. In
+  Chi, Jeff Dean, Jacob Devlin, Adam Roberts,                Proceedings of ACL. https://doi.org
+  Denny Zhou, Quoc V. Le, and Jason Wei. 2022.               /10.18653/v1/P18-1027
+  Scaling instruction-finetuned language models.           Kalpesh Krishna, Yapei Chang, John Wieting,
+  ArXiv:2210.11416.                                          and Mohit Iyyer. 2022. RankGen: Improving
+Zihang Dai, Zhilin Yang, Yiming Yang, Jaime                  text generation with large ranking models. In
+  Carbonell, Quoc Le, and Ruslan Salakhutdinov.              Proceedings of EMNLP. https://doi.org
+  2019. Transformer-XL: Attentive language                   /10.18653/v1/2022.emnlp-main.15
+  models beyond a fixed-length context. In Pro-            Tom Kwiatkowski, Jennimaria Palomaki, Olivia
+  ceedings of ACL. https://doi.org/10                        Redfield, Michael Collins, Ankur Parikh, Chris
+  .18653/v1/P19-1285                                         Alberti, Danielle Epstein, Illia Polosukhin,
+Michał Daniluk, Tim Rocktäschel, Johannes                   Jacob Devlin, Kenton Lee, Kristina Toutanova,
+ Welbl, and Sebastian Riedel. 2017. Frustrat-                Llion Jones, Matthew Kelcey, Ming-Wei
+ ingly short attention spans in neural language              Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc
+ modeling. In Proceedings of ICLR.                           Le, and Slav Petrov. 2019. Natural Questions:
+                                                             A benchmark for question answering research.
+Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri
+                                                             Transactions of the Association for Computa-
+  Rudra, and Christopher Ré. 2022. FlashAtten-
+                                                             tional Linguistics, 7:452–466. https://doi
+  tion: Fast and memory-efficient exact attention
+                                                             .org/10.1162/tacl_a_00276
+  with IO-awareness. ArXiv:2205.14135.
+Hermann Ebbinghaus. 1913. Memory: A contribu-              Kenton Lee, Ming-Wei Chang, and Kristina
+  tion to experimental psychology. H. A. Ruger &             Toutanova. 2019. Latent retrieval for weakly
+  C. E. Bussenius, Trans. https://doi.org                    supervised open domain question answering.
+  /10.1037/10011-000                                         In Proceedings of ACL. https://doi.org
+                                                             /10.18653/v1/P19-1612
+Albert Gu, Karan Goel, and Christopher Ré.
+  2022. Efficiently modeling long sequences with           Mina Lee, Percy Liang, and Qian Yang. 2022.
+  structured state spaces. In Proceedings of ICLR.          CoAuthor: Designing a human-AI collabo-
+                                                            rative writing dataset for exploring language
+Maor Ivgi, Uri Shaham, and Jonathan                         model capabilities. In Proceedings of CHI.
+ Berant. 2023. Efficient long-text understand-              https://doi.org/10.1145/3491102
+ ing with short-text models. Transactions of                .3502030
+ the Association for Computational Linguis-
+ tics, 11:284–299. https://doi.org/10                      Dacheng Li, Rulin Shao, Anze Xie, Ying Sheng,
+ .1162/tacl_a_00547                                          Lianmin Zheng, Joseph E. Gonzalez, Ion Stoica,
+                                                             Xuezhe Ma, and Hao Zhang. 2023. How long
+Gautier Izacard, Mathilde Caron, Lucas Hosseini,
+                                                             can open-source LLMs truly promise on context
+  Sebastian Riedel, Piotr Bojanowski, Armand
+                                                             length?
+  Joulin, and Edouard Grave. 2021. Unsupervised
+  dense information retrieval with contrastive             Alex Mallen, Akari Asai, Victor Zhong,
+  learning. ArXiv:2112.09118.                                Rajarshi Das, Daniel Khashabi, and Hannaneh
+
+                                                     168
+  Hajishirzi. 2023. When not to trust lan-                  linear biases enables input length extrapolation.
+  guage models: Investigating effectiveness of              In Proceedings of ICLR.
+  parametric and non-parametric memories. In
+                                                          Guanghui Qin, Yukun Feng, and Benjamin
+  Proceedings of ACL. https://doi.org
+                                                            Van Durme. 2023. The NLP task effective-
+  /10.18653/v1/2023.acl-long.546
+                                                            ness of long-range transformers. In Proceedings
+Sewon Min, Julian Michael, Hannaneh Hajishirzi,             of EACL. https://doi.org/10.18653
+  and Luke Zettlemoyer. 2020. AmbigQA:                      /v1/2023.eacl-main.273
+  Answering ambiguous open-domain ques-
+                                                          Colin Raffel, Noam Shazeer, Adam Roberts,
+  tions. In Proceedings of EMNLP. https://
+                                                            Katherine Lee, Sharan Narang, Michael
+  doi.org/10.18653/v1/2020.emnlp
+                                                            Matena, Yanqi Zhou, Wei Li, and Peter J. Liu.
+  -main.466
+                                                            2020. Exploring the limits of transfer learning
+Bennet B. Murdock Jr. 1962. The serial position             with a unified text-to-text Transformer. Journal
+  effect of free recall. Journal of Experimental            of Machine Learning Research, 21(140):1–67.
+  Psychology, 64(5):482. https://doi.org
+                                                          Ori Ram, Yoav Levine, Itay Dalmedigos,
+  /10.1037/h0045106
+                                                            Dor Muhlgay, Amnon Shashua, Kevin
+Joe O’Connor and Jacob Andreas. 2021.                       Leyton-Brown, and Yoav Shoham. 2023.
+  What context features can Transformer lan-                In-context retrieval-augmented language mod-
+  guage models use? In Proceedings of                       els. ArXiv:2302.00083. https://doi.org
+  ACL. https://doi.org/10.18653/v1                          /10.1162/tacl_a_00605
+  /2021.acl-long.70
+                                                          Ohad Rubin and Jonathan Berant. 2023. Long-
+Dimitris Papailiopoulos, Kangwook Lee, and                  range language modeling with self-retrieval.
+  Jy-yong Sohn. 2023. A little retrieval test for           ArXiv:2306.13421.
+  large language models. https://github.com
+  /anadim/the-little-retrieval-test                       Chinnadhurai Sankar, Sandeep Subramanian,
+                                                            Chris Pal, Sarath Chandar, and Yoshua Bengio.
+Bo Peng. 2023. RWKV-LM. https://github                      2019. Do neural dialog systems use the conver-
+  .com/BlinkDL/RWKV-LM                                      sation history effectively? An empirical study.
+Hao Peng, Nikolaos Pappas, Dani Yogatama, Roy               In Proceedings of ACL. https://doi.org
+  Schwartz, Noah Smith, and Lingpeng Kong.                  /10.18653/v1/P19-1004
+  2021. Random feature attention. In Proceedings          Timo Schick, Jane Dwivedi-Yu, Roberto Dessı̀,
+  of ICLR.                                                  Roberta Raileanu, Maria Lomeli, Luke
+Fabio Petroni, Patrick Lewis, Aleksandra                    Zettlemoyer, Nicola Cancedda, and Thomas
+  Piktus, Tim Rocktäschel, Yuxiang Wu, Alexander           Scialom. 2023. Toolformer: Language models
+  H. Miller, and Sebastian Riedel. 2020. How                can teach themselves to use tools.
+  context affects language models’ factual pre-           Uri Shaham, Maor Ivgi, Avia Efrat, Jonathan
+  dictions. In Proceedings of AKBC.                         Berant, and Omer Levy. 2023. ZeroSCROLLS:
+Michael Poli, Stefano Massaroli, Eric Nguyen,               A zero-shot benchmark for long text un-
+ Daniel Y. Fu, Tri Dao, Stephen Baccus, Yoshua              derstanding. ArXiv:2305.14196. https://
+ Bengio, Stefano Ermon, and Christopher Ré.                doi.org/10.18653/v1/2023.findings
+ 2023. Hyena hierarchy: Towards larger con-                 -emnlp.536
+ volutional language models. In Proceedings of            Vatsal Sharan, Sham Kakade, Percy Liang, and
+ ICML.                                                      Gregory Valiant. 2018. Prediction with a short
+Ofir Press, Noah A. Smith, and Mike Lewis.                  memory. In Proceedings of STOC. https://
+  2021. Shortformer: Better language model-                 doi.org/10.18653/v1/K18-3013
+  ing using shorter inputs. In Proceedings of             Weijia Shi, Sewon Min, Michihiro Yasunaga,
+  ACL. https://doi.org/10.18653/v1                         Minjoon Seo, Rich James, Mike Lewis, Luke
+  /2021.acl-long.427                                       Zettlemoyer, and Wen tau Yih. 2023. REPLUG:
+Ofir Press, Noah A. Smith, and Mike Lewis.                 Retrieval-augmented black-box language mod-
+  2022. Train short, test long: Attention with             els. ArXiv:2301.12652.
+
+                                                    169
+Kurt Shuster, Jing Xu, Mojtaba Komeili, Da Ju,             Goyal, Eric Hambro, Faisal Azhar, Aurelien
+  Eric Michael Smith, Stephen Roller, Megan                Rodriguez, Armand Joulin, Edouard Grave,
+  Ung, Moya Chen, Kushal Arora, Joshua Lane,               and Guillaume Lample. 2023a. LLaMA: Open
+  Morteza Behrooz, William Ngan, Spencer Poff,             and efficient foundation language models.
+  Naman Goyal, Arthur Szlam, Y-Lan Boureau,                ArXiv:2302.13971.
+  Melanie Kambadur, and Jason Weston. 2022.
+  BlenderBot 3: A deployed conversational agent          Hugo Touvron, Louis Martin, Kevin Stone,
+  that continually learns to responsibly engage.           Peter Albert, Amjad Almahairi, Yasmine
+  ArXiv:2208.03188.                                        Babaei, Nikolay Bashlykov, Soumya Batra,
+                                                           Prajjwal Bhargava, Shruti Bhosale, Dan Bikel,
+Simeng Sun, Kalpesh Krishna, Andrew                        Lukas Blecher, Cristian Canton Ferrer, Moya
+  Mattarella-Micke, and Mohit Iyyer. 2021.                 Chen, Guillem Cucurull, David Esiobu, Jude
+  Do long-range language models actually use               Fernandes, Jeremy Fu, Wenyin Fu, Brian
+  long-range context? In Proceedings of EMNLP.             Fuller, Cynthia Gao, Vedanuj Goswami,
+                                                           Naman Goyal, Anthony Hartshorn, Saghar
+Yi Tay, Mostafa Dehghani, Vinh Q. Tran, Xavier             Hosseini, Rui Hou, Hakan Inan, Marcin
+  Garcia, Jason Wei, Xuezhi Wang, Hyung Won                Kardas, Viktor Kerkez, Madian Khabsa,
+  Chung, Siamak Shakeri, Dara Bahri, Tal                   Isabel Kloumann, Artem Korenev, Punit Singh
+  Schuster, Huaixiu Steven Zheng, Denny Zhou,              Koura, Marie-Anne Lachaux, Thibaut Lavril,
+  Neil Houlsby, and Donald Metzler. 2023.                  Jenya Lee, Diana Liskovich, Yinghai Lu,
+  UL2: Unifying language learning paradigms.               Yuning Mao, Xavier Martinet, Todor
+  ArXiv:2205.05131.                                        Mihaylov, Pushkar Mishra, Igor Molybog,
+                                                           Yixin Nie, Andrew Poulton, Jeremy
+Romal Thoppilan, Daniel De Freitas, Jamie                  Reizenstein, Rashi Rungta, Kalyan Saladi, Alan
+  Hall, Noam Shazeer, Apoorv Kulshreshtha,                 Schelten, Ruan Silva, Eric Michael Smith,
+  Heng-Tze Cheng, Alicia Jin, Taylor Bos,                  Ranjan Subramanian, Xiaoqing Ellen Tan,
+  Leslie Baker, Yu Du, YaGuang Li, Hongrae                 Binh Tang, Ross Taylor, Adina Williams, Jian
+  Lee, Huaixiu Steven Zheng, Amin Ghafouri,                Xiang Kuan, Puxin Xu, Zheng Yan,
+  Marcelo Menegali, Yanping Huang, Maxim                   Iliyan Zarov, Yuchen Zhang, Angela Fan,
+  Krikun, Dmitry Lepikhin, James Qin, Dehao                Melanie Kambadur, Sharan Narang, Aurelien
+  Chen, Yuanzhong Xu, Zhifeng Chen, Adam                   Rodriguez, Robert Stojnic, Sergey Edunov,
+  Roberts, Maarten Bosma, Vincent Zhao,                    and Thomas Scialom. 2023b. Llama 2:
+  Yanqi Zhou, Chung-Ching Chang, Igor                      Open foundation and fine-tuned chat models.
+  Krivokon, Will Rusch, Marc Pickett, Pranesh              ArXiv:2307.09288.
+  Srinivasan, Laichee Man, Kathleen Meier-
+  Hellstern, Meredith Ringel Morris, Tulsee              Ashish Vaswani, Noam Shazeer, Niki Parmar,
+  Doshi, Renelito Delos Santos, Toju Duke,                 Jakob Uszkoreit, Llion Jones, Aidan N. Gomez,
+  Johnny Soraker, Ben Zevenbergen, Vinodkumar              Łukasz Kaiser, and Illia Polosukhin. 2017.
+  Prabhakaran, Mark Diaz, Ben Hutchinson,                  Attention is all you need. In Proceedings of
+  Kristen Olson, Alejandra Molina, Erin                    NeurIPS.
+  Hoffman-John, Josh Lee, Lora Aroyo, Ravi
+  Rajakumar, Alena Butryna, Matthew Lamm,                Sinong Wang, Belinda Z. Li, Madian Khabsa,
+  Viktoriya Kuzmina, Joe Fenton, Aaron                     Han Fang, and Hao Ma. 2020. Lin-
+  Cohen, Rachel Bernstein, Ray Kurzweil, Blaise            former: Self-attention with linear complexity.
+  Aguera-Arcas, Claire Cui, Marian Croak,                  ArXiv:2006.04768.
+  Ed Chi, and Quoc Le. 2022. LaMDA:
+  Language models for dialog applications.               Manzil Zaheer, Guru Guruganesh, Kumar
+  ArXiv:2201.08239.                                       Avinava Dubey, Joshua Ainslie, Chris
+                                                          Alberti, Santiago Ontanon, Philip Pham,
+Hugo Touvron, Thibaut Lavril, Gautier Izacard,            Anirudh Ravula, Qifan Wang, Li Yang, and
+  Xavier Martinet, Marie-Anne Lachaux,                    Amr Ahmed. 2020. Big Bird: Transformers for
+  Timothée Lacroix, Baptiste Rozière, Naman             longer sequences. In Proceedings of NeurIPS.
+
+                                                   170
+Figure 12: Language model performance on a                    Figure 13: Language model performance on
+unambiguous subset of questions.                              multi-document QA when using random distractors,
+                                                              rather than retrieved distractors.
+
+A Ambiguity in Multi-Document QA
+  Distractor Documents                                        lexical overlap with the query). Figure 13 presents
+                                                              the results of this experiment. Although all models
+Following past work on NaturalQuestions-Open                  have higher absolute accuracy in this setting, they
+(Izacard et al., 2021; Izacard and Grave, 2021, in-           surprisingly still struggle to reason over their entire
+ter alia), we use a Wikipedia dump from late 2018             input context, indicating that their performance
+as our retrieval corpus. However, this standard               degradation is not solely due to an inability to
+Wikipedia dump has a small amount of temporal                 identify relevant documents.
+mismatch with the NaturalQuestions annotations.
+   For example, consider the question ‘‘what nfl              C Randomizing Distractor Order in
+team does robert griffin iii play for’’. The Natural-           Multi-Document QA
+Questions annotated answer is ‘‘currently a free
+agent’’. However, the Wikipedia retrieval corpus              Our prompt instructs the language model to use
+contains the information that he plays for the ‘‘Bal-         the provided search results to answer the ques-
+timore Ravens’’, since he was released from the               tion. There may be a prior in the pre-training or
+team between the Wikipedia dump’s timestamp                   instruction fine-tuning data to treat search results
+and the NaturalQuestions annotation process.                  as sorted by decreasing relevance (i.e., the docu-
+   We use the ambiguity annotations of Min                    ments near the beginning of the input context are
+et al. (2020) to create a subset unambiguous ques-            more likely to be useful than those at the end).
+tions. Experiments on this unambiguous subset of              To validate that our conclusions are not simply a
+the data show similar results and conclusions as              byproduct of this bias, we run experiments with
+the experiments on the full questions collection              the modified instruction ‘‘Write a high-quality an-
+(Figure 12).                                                  swer for the given question using only the provided
+                                                              search results (some of which might be irrelevant).
+B Random Distractors in                                       The search results are ordered randomly.’’ In ad-
+  Multi-Document QA                                           dition, we randomly shuffle the k − 1 distractor
+                                                              documents.
+We also run multi-document question answering                    Figure 14 presents the results of this experiment.
+experiments with random Wikipedia documents as                We continue to see a U-shaped performance curve,
+distractors, which allows us to ablate the impact of          with performance degrading when language mod-
+retrieved distractors (hard negatives). Note that in          els must use information in the middle of their
+this setting, the document containing the answer              input contexts. Comparing the results in §2.3 with
+can often be identified with simple heuristics (e.g.,         those when randomizing the distractor order and
+
+                                                        171
+Figure 14: Language model performance when ran-
+domizing the order of the distractors (rather than            Figure 15: Although GPT-4 has higher absolute perfor-
+presenting them in order of decreasing relevance) and         mance than other models, its performance still degrades
+mentioning as such in the prompt.                             when relevant information occurs in the middle of the
+                                                              input context.
+
+mentioning such in the prompt, we see that ran-
+domization slightly decreases performance when
+the relevant information is at the very beginning
+of the context, and slightly increases performance
+when using information in the middle and end of
+the context.
+
+D GPT-4 Performance
+
+We evaluate GPT-4 (8K) on a subset of 500 ran-
+dom multi-document QA examples with 20 to-
+tal documents in each input context (Figure 15).
+GPT-4 achieves higher absolute performance than
+any other language model, but still shows a
+U-shaped performance curve—its performance is
+highest when relevant information occurs at the
+very start or end of the context, and performance
+degrades when it must use information in the                  Figure 16: Multi-document QA performance (20 total
+middle of its input context.                                  documents) of Llama-2 models of varying sizes (7B,
+                                                              13B, 70B parameters), with and without additional
+E Llama-2 Performance                                         supervised fine-tuning and reinforcement learning
+                                                              from human feedback (‘‘-chat-’’ models).
+We evaluate Llama-2 (Touvron et al., 2023b)
+on multi-document QA with 20 total documents
+in each input context. The Llama tokenizer pro-               supervised fine-tuning and reinforcement learning
+duces longer sequences than the tokenizers for                from human feedback (‘‘-chat-’’ models). The
+our previously-studied models, so we discard 20               results are presented in Figure 16.
+examples (out of 2655) that exceed Llama-2’s                     Comparing Llama-2 models of varying sizes,
+maximum context length of 4096 tokens. We ex-                 we find that only the larger models (13B and
+periment with models of varying sizes (7B, 13B,               70B) exhibit the U-shaped performance curve
+and 70B parameters), with and without additional              (i.e., both primacy and recency bias)—the smallest
+
+                                                        172
+Llama-2 models (7B) are solely recency-biased.            fine-tuning show minimal primacy bias, and are
+Given these results, we hypothesize that prior            largely recency-biased. The 13B base model has
+work (e.g., Khandelwal et al., 2018; Sun et al.,          a dramatic primacy and recency bias—there is
+2021) did not previously observe any primacy              a 20-point accuracy disparity between the best-
+bias in language models because the models they           and worst-case performance. Applying additional
+studied were too small (less than 1B parameters).         fine-tuning to the 13B seems to slightly reduce
+   Comparing between Llama-2 models with and              this bias (10-point worst-case degradation), but
+without additional supervised fine-tuning and re-         the bias remains significant. However, the 70B
+inforcement learning from human feedback, we              models with and without additional fine-tuning
+see that additional fine-tuning dramatically im-          have largely similar trends (showing both pri-
+proves performance on the multi-document QA               macy and recency bias), and additional fine-tuning
+task. The 7B models with and without additional           minimally changes the positional bias severity.
+
+
+
+
+                                                    173
+

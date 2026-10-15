@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-P05",
+  "mode": "budget",
+  "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+  "public_request": {
+    "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/poetry.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:08.083862+00:00",
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_before": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5468073940028262,
+  "process_cpu_seconds": 0.5439702279999921,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 936704,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_after": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "wire_sha256": "6d6eae85fcf46414e4343e6f7f3ab741bbe7342c7f3b5f3a1afee1166e214993",
+  "wire_utf8_bytes": 4526,
+  "utf8_quarter_proxy": 1132,
+  "codec_o200k_base": 1351,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

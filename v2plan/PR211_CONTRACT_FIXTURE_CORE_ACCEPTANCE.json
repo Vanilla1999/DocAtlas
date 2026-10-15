@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "scope": "actual complete core matrix only; no full CI acceptance",
+  "head_sha": "03583656617336a746e9192249467017d6131f29",
+  "tree_sha": "b77cb4c3ed5bd60dd0ab47cd0398f1664bfd6ae1",
+  "merge_sha": "96767d8d8499b28a701bc20055277a7362d63aa3",
+  "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "run_id": 37830452263,
+  "run_attempt": 1,
+  "baseline_head_sha": "3be9c34afa49dcf4278d2910ec29ed37c305225c",
+  "python": [
+    "3.11",
+    "3.12",
+    "3.13"
+  ],
+  "actual_total": 8507,
+  "actual_states": {
+    "failure": 1956,
+    "passed": 6480,
+    "error": 61,
+    "skipped": 10
+  },
+  "baseline_states": {
+    "failure": 1980,
+    "passed": 6456,
+    "error": 61,
+    "skipped": 10
+  },
+  "rosters_identical": true,
+  "outcomes_identical": true,
+  "node_roster_sha256": "e6fe4f84c1c5018c63c1f52b972a44a6951aa42e5fe2e834214ecaae389697d0",
+  "node_outcomes_sha256": "511328b610e38873dc606cd8a8b7e10d44e8b538787d8739fce5b722fe459b00",
+  "transition_counts": {
+    "failure->passed": 24
+  },
+  "transitions": [
+    {
+      "nodeid": "tests/docs/test_model_visible_projection.py::test_oversized_insufficient_projection_uses_a_valid_terminal_fallback[1500]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/docs/test_model_visible_projection.py::test_oversized_insufficient_projection_uses_a_valid_terminal_fallback[2000]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/docs/test_model_visible_projection.py::test_oversized_insufficient_projection_uses_a_valid_terminal_fallback[256]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/docs/test_model_visible_projection.py::test_oversized_insufficient_projection_uses_a_valid_terminal_fallback[300]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_corpus_policy.py::test_installed_templates_render_literal_policy_and_current_identity[claude_code_skill.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_corpus_policy.py::test_installed_templates_render_literal_policy_and_current_identity[claude_desktop_skill.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_corpus_policy.py::test_installed_templates_render_literal_policy_and_current_identity[copilot_instructions.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_corpus_policy.py::test_installed_templates_render_literal_policy_and_current_identity[cursor_agents_md.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_corpus_policy.py::test_installed_templates_render_literal_policy_and_current_identity[project_bootstrap.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_corpus_policy.py::test_installed_templates_render_literal_policy_and_current_identity[skill.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_recovery_diagnostics_do_not_split_or_inherit_clauses[Compare A and B. What is the default?]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_recovery_diagnostics_do_not_split_or_inherit_clauses[If Client.send changes, how does it work and why is it required?]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_recovery_diagnostics_do_not_split_or_inherit_clauses[\\u0415\\u0441\\u043b\\u0438 Client.send \\u0438\\u0437\\u043c\\u0435\\u043d\\u0438\\u0442\\u0441\\u044f, \\u043a\\u0430\\u043a \\u043e\\u043d \\u0440\\u0430\\u0431\\u043e\\u0442\\u0430\\u0435\\u0442 \\u0438 \\u043f\\u043e\\u0447\\u0435\\u043c\\u0443 \\u043d\\u0443\\u0436\\u0435\\u043d?]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_install_github_copilot_project_creates_repo_instructions",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[claude-code-CLAUDE.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[cline-AGENTS.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[codex-AGENTS.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[cursor-AGENTS.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[gemini-AGENTS.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[github-copilot-AGENTS.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_install_cmd.py::test_project_install_writes_compact_docs_mcp_bootstrap[opencode-AGENTS.md]",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_unified_docs_context_mcp.py::test_docmancer_agent_quickstart_resource_exists",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_unified_docs_context_mcp.py::test_get_docs_context_schema",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_unified_docs_context_mcp.py::test_library_workflow_resource_uses_canonical_three_tool_workflow",
+      "before": "failure",
+      "after": "passed"
+    }
+  ],
+  "added": [],
+  "removed": [],
+  "pass_regressions": [],
+  "target_count": 25,
+  "target_states": {
+    "passed": 24,
+    "failure": 1
+  },
+  "remaining_targets": [
+    {
+      "nodeid": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot",
+      "group": "source_continuation_fixture",
+      "before": "failure",
+      "after": "failure",
+      "message": "AssertionError: assert 'query-original' in ['query-lookup-1']"
+    }
+  ],
+  "required_ci": [
+    {
+      "id": 113497770623,
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "module_size_followup": {
+    "nodeid": "tests/docs/test_python_module_policy_and_manifest.py::test_all_repository_python_modules_stay_within_hard_line_budget",
+    "baseline_3be": "passed",
+    "intermediate_4320": "failure",
+    "actual_035_all_three_python": "passed"
+  },
+  "failure_phase": {
+    "compared_same_state_failure_error_nodes": 2017,
+    "only_changed_node": {
+      "nodeid": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot",
+      "state": "failure",
+      "before": {
+        "last_marked_statement": "raise PermissionError(",
+        "location_module": "docmancer/docs/application/_project_docs_service_part02.py",
+        "exception_type": "PermissionError"
+      },
+      "after": {
+        "last_marked_statement": "assert 'query-original' in observed['covered_query_ids']",
+        "location_module": "tests/docs/test_source_continuation.py",
+        "exception_type": "AssertionError"
+      },
+      "before_message": "PermissionError: Project docs synchronization is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, deduplication or orphan deletion.",
+      "after_message": "AssertionError: assert 'query-original' in ['query-lookup-1']"
+    },
+    "other_unchanged_failures_are_not_declared_legacy": true
+  },
+  "matrix_artifacts": [
+    {
+      "python": "3.11",
+      "job_id": 113494143622,
+      "artifact_id": 11572824452,
+      "artifact_name": "pytest-core-3.11-37830452263-1",
+      "artifact_sha256": "3953becf06f9246487335e229e5c12ebcefed244418da95738cc76ec4a6463a1",
+      "artifact_bytes": 553482,
+      "xml_sha256": "d2b503097f8eb6a9182faa42299475d52dd836e074481acd6eac0a31e38bb3b0",
+      "xml_bytes": 7612176,
+      "case_json_sha256": "2a0426ddb02ec3fd24a820ecb614c1f96ed3bdb0f50e77adc38d37dc1b222ee6",
+      "compressed_roster_sha256": "8c311d215da0fa3f636d0e019732580bf871384513de5f58a3c367b72de2b4cc"
+    },
+    {
+      "python": "3.12",
+      "job_id": 113494143912,
+      "artifact_id": 11574161410,
+      "artifact_name": "pytest-core-3.12-37830452263-1",
+      "artifact_sha256": "42b80db1be008b8a268498842478d03d5df5614bd1588a29540cc3d46ac13c97",
+      "artifact_bytes": 553360,
+      "xml_sha256": "7794622ad5534afb383be365eb10fe580ef0693fcbbfb0f778fcff2dbfd52f83",
+      "xml_bytes": 7612388,
+      "case_json_sha256": "9b60360ce5c5313a099778c69c5dc2d39b354378261d9e6e95f81815700c2256",
+      "compressed_roster_sha256": "8c311d215da0fa3f636d0e019732580bf871384513de5f58a3c367b72de2b4cc"
+    },
+    {
+      "python": "3.13",
+      "job_id": 113494143936,
+      "artifact_id": 11573422037,
+      "artifact_name": "pytest-core-3.13-37830452263-1",
+      "artifact_sha256": "93e6f6db45c40b2e8176698577e2076164ea9d16c5007b518b4a62160f22d6d2",
+      "artifact_bytes": 553370,
+      "xml_sha256": "f870476f21a02d9f1f609ebe33fbc96d0de07c8e88752c2525ed24fe5a0dbb43",
+      "xml_bytes": 7612387,
+      "case_json_sha256": "db5c90a796a08d040d96774337db33bde3ba0becd9eef4ab2f3718bc04d4035c",
+      "compressed_roster_sha256": "8c311d215da0fa3f636d0e019732580bf871384513de5f58a3c367b72de2b4cc"
+    }
+  ],
+  "evidence_files": {
+    "0358365-core-audit-summary.json": "675eb75420a8bede979693d68e952e178f5cd43cc5562e5d2b4df2416a18f5e4",
+    "0358365-core-failure-phase-audit.json": "474fb162ee90ff9748b8c050c745c4b3ed478e7e89487cec26c6244e0d3671d3",
+    "0358365-core-provenance.json": "cbaa91aaee82d25d6907d106b15b6fcdfffac388b8df3dd8efa29b12b337699d",
+    "0358365-expected-core-targets.json": "b779d943590cd1ebe4f8dfd9cd1d2d9af7a640669a8b5487a3c380061a5fc3a6"
+  },
+  "reconstruction": {
+    "baseline_roster_path": "3be9c34-core-3.12-roster.json.gz",
+    "baseline_roster_gzip_sha256": "3ebe8cb37113a04a04189ce7b9132f5f3f9aa0c2ae4ee42410fd3b37ece8bcca",
+    "method": "Replace state for exact 24 transition IDs after checking before state. No node additions/removals. Canonical ensure_ascii=False, sort_keys=True, separators=(comma,colon), sorted rows by nodeid.",
+    "all_three_actual_rosters_reconstructed": true
+  },
+  "complete_ci_acceptance": false,
+  "readiness": false,
+  "deferred_retrieval_unchanged": true,
+  "actual_clients": "NOT RUN by this audit"
+}

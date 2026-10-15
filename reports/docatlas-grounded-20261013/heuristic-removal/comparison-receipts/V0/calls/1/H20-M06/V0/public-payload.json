@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-a719609667d05789",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Formatting options > plugins > Search",
+      "snippet": "#### Search\n\nA search plugin is provided by default with MkDocs which uses [lunr.js] as a\nsearch engine. The following config options are available to alter the behavior\nof the search plugin:\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "c32131e9f6e73ed204b694a2b38bf0aad42a2c5ac4fa2a712f509b712313f6ef",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 947,
+      "line_end": 952,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/1073015be2c23f8e0871cfab"
+    },
+    {
+      "evidence_id": "ev-674687d97cedf598",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Formatting options > plugins > Search > **indexing**",
+      "snippet": "Configures what strategy the search indexer will use when building the index\nfor your pages. This property is particularly useful if your project is large\nin scale, and the index takes up an enormous amount of disk space.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "b74eb1f60712015711b4ce0f4b344e5f2195008caf28c5a4704e37423fed438f",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 1048,
+      "line_end": 1051,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/e4fe9318c6d59758e468f594"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/e556325e246f82103099fe1a",
+      "path": "docs/user-guide/configuration.md",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "snapshot_sha256": "sha256:18ef4f7e72a22b07130a8daa42be00fec836b748419b83d3bd035266e0e6e4fb",
+      "line_start": 1052,
+      "line_end": 1057,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 604
+}

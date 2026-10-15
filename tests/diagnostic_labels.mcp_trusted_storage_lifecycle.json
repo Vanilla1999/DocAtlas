@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/test_mcp_trusted_storage_lifecycle.py": "behavioral"},
+  "module_node_hashes": {"tests/test_mcp_trusted_storage_lifecycle.py": "4c2c3c0e9d7f95de22714f482b73cf6c25d547fdd23ed69c691cea424471bbe1"},
+  "node_overrides": {}
+}

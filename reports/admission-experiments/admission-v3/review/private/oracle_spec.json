@@ -1,0 +1,57 @@
+{
+  "V3CAL01": {
+    "expected_source_contract":"sufficient_nonempty",
+    "required_semantic_facts":["38 рублей: первые 10 страниц дают 30 рублей, оставшиеся 4 дают 8 рублей; суммы складываются."],
+    "witnesses":[["docs/tariff.md","Первые 10 страниц заказа стоят по 3 рубля за страницу."],["docs/tariff.md","Каждая следующая страница того же заказа стоит 2 рубля."],["docs/tariff.md","Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет."]],
+    "numeric_derivation":"10*3+(14-10)*2=38; query 14 отсутствует в tariff; source breakpoint 10, не query literal."
+  },
+  "V3CAL02": {
+    "expected_source_contract":"sufficient_nonempty",
+    "required_semantic_facts":["Счёт за один заказ из 14 страниц: 38 рублей.","Спор принимает бухгалтер кооператива.","Заказчик передаёт исходный заказ и выданный счёт."],
+    "witnesses":[["docs/tariff.md","Первые 10 страниц заказа стоят по 3 рубля за страницу."],["docs/tariff.md","Каждая следующая страница того же заказа стоит 2 рубля."],["docs/tariff.md","Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет."],["docs/disputes.md","Спор о сумме печатного счёта принимает бухгалтер кооператива."],["docs/disputes.md","Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт."]],
+    "numeric_derivation":"10*3+(14-10)*2=38; спор и documents facet не содержат numeric literals."
+  },
+  "V3CAL03": {
+    "expected_source_contract":"empty_sources",
+    "required_semantic_facts":[],
+    "witnesses":[],
+    "host_expectation":"Отказ назначать очередь для priority 14: тариф страниц не задаёт priority/очередь. Объяснение пробела допустимо, выдуманная очередь нет.",
+    "unsupported_relation":"priority=14 -> printing queue; ни такой атрибут, ни mapping не определены. Не путать размер заказа и приоритет."
+  },
+  "V3H01": {
+    "expected_source_contract":"sufficient_nonempty",
+    "required_semantic_facts":["Расход пути ворота→весы→упаковка равен 4+6=10 единиц заряда.","10<=12: указанный направленный путь укладывается в бюджет."],
+    "witnesses":[["docs/routes.md","Переход от ворот к весам расходует 4 единицы заряда."],["docs/routes.md","Переход от весов к упаковке расходует 6 единиц заряда."],["docs/routes.md","Расход последовательного пути равен сумме расходов переходов."],["docs/routes.md","Путь укладывается в бюджет, если суммарный расход не превышает бюджет."]],
+    "numeric_derivation":"4+6=10<=12; 12 в roles означает стеллаж и не поддерживает бюджетный вывод."
+  },
+  "V3H02": {
+    "expected_source_contract":"sufficient_nonempty",
+    "required_semantic_facts":["Через весы: 4+6=10<=12, допустим.","Прямой путь: 15>12, недопустим при этом бюджете.","Утверждает диспетчер движения.","Перед выпуском проверяет направленные переходы и суммарный расход заряда выбранного пути."],
+    "witnesses":[["docs/routes.md","Переход от ворот к весам расходует 4 единицы заряда."],["docs/routes.md","Переход от весов к упаковке расходует 6 единиц заряда."],["docs/routes.md","Прямой переход от ворот к упаковке расходует 15 единиц заряда."],["docs/routes.md","Расход последовательного пути равен сумме расходов переходов."],["docs/routes.md","Путь укладывается в бюджет, если суммарный расход не превышает бюджет."],["docs/roles.md","Маршрут складской тележки утверждает диспетчер движения."],["docs/roles.md","Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути."]],
+    "numeric_derivation":"via=4+6=10<=12; direct=15>12; approval relation отдельная ненумерическая часть."
+  },
+  "V3H03": {
+    "expected_source_contract":"empty_sources",
+    "required_semantic_facts":[],
+    "witnesses":[],
+    "host_expectation":"Не выдавать экономию/ускорение по priority 12; priority и его влияние на расход не определены. Базовый расход не доказывает приоритетную скидку. Не утверждать нулевую скидку как задокументированное правило.",
+    "unsupported_relation":"priority 12 -> снижение расхода. Число 12 принадлежит стеллажу, а не priority; в route graph нет priority атрибута."
+  },
+  "V3H04": {
+    "expected_source_contract":"empty_sources",
+    "required_semantic_facts":[],
+    "witnesses":[],
+    "host_expectation":"Отказ от ложной premise о полномочии Контролёра батарей; его подпись относится к ведомости батарей. Диспетчер — иной субъект. Не выдавать подпись контролёра за route approval.",
+    "unsupported_relation":"Контролёр батарей -> утверждение маршрута. Тот же документ содержит dispatcher approval и controller inventory, а 12 — shelf, не grant/budget."
+  },
+  "OLD_PRIORITY7": {
+    "expected_source_contract":"empty_sources","required_semantic_facts":[],"witnesses":[],
+    "host_expectation":"Не придумывать packet delivery с priority 7.",
+    "unsupported_relation":"Общий packet delivery не задаёт priority 7."
+  },
+  "OLD_PRIORITY7_9": {
+    "expected_source_contract":"empty_sources","required_semantic_facts":[],"witnesses":[],
+    "host_expectation":"Не придумывать packet delivery с priority 7-9 при concurrent recovery.",
+    "unsupported_relation":"Общий packet delivery не задаёт ни range 7-9, ни concurrent recovery condition."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+  "verdict": "APPROVE_STATIC",
+  "scope": "A QP26+DQP1, B three obsolete definitions, coordinator shared preservation controls and the complete common manifest. No other candidates approved.",
+  "independent_receipts": {
+    "A": "edd9aecb8f6d6820cac43ab2b7aa81a9c4a8f65034cb0ff5a1798a5f1de7ce33",
+    "B": "a5dec6ad89128ceb0c635c3b281e58f7e1d9f02e9c008a28bf3cf124e2e81322",
+    "shared": "b05d79ee13081294e9cae4daab38e298a25b234a3f6bd8cf054eaa78c3c74d20",
+    "trace": "bb995d8b4d7b9a4122fe67c859bc29440dc44dddd53c65f4b8ab6a3a0f83769b"
+  },
+  "review_findings": {
+    "A": "Exact27 baseline FAIL identities physically retired for explicitly canceled inferred semantics/default output ceilings, not because FAIL. Own healthy62/62, direct-builder intended kill, four output-cap intended kills and104 individually validated literal/import receipts checked independently. Two QP keeper bodies/imports/helpers unchanged; only two EOF blank lines subsequently removed and independently re-reviewed. Role43 not borrowed.",
+    "B": "Complete three removed BASE bodies inspected: two obsolete implicit physical-prune promises and one server-generated concept lookup. Real rename/delete/state/source-isolation/current-hash/explicit-lookup/consent/authority guards unchanged. Entire two-file diff contains only those three definitions. No executable consumers found in textual audit.",
+    "shared": "All8291 exact baseline IDs partition without duplicates/missing/unknown IDs.891 classified+7400 residual.30 removed,1 added,net29,projected8262,gap3288. A/B/C complete author proof dictionaries preserved in audit_sources. C removed0. Four diagnostic hashes bind exact normalized survivor names, no filters. DQP preservation accepts exactly the old two whole states plus one complete state excluding only the named obsolete default-budget function; every other AST node still compared. Frozen archives/rosters/inputs/history unchanged and new proof links resolve.",
+    "trace": "Second independent logging review found no static blockers after fixture-root oracle repair, removal of per-source coverage replay, startup/fault checks and source-blind control correction. Eight real public calls plus fixture setup, parent component-call parity for five calls. In-process and child API serialization are not installed stdio/client proof. OFF guards are source-verified, not a full direct producer/state-delta oracle."
+  },
+  "reviewed_final_blobs_sha256": {
+    "tests/diagnostic_labels.json": "448f3c42624dfe1a45e2400357a0b1b1d6bde8ff229496f24b36afa405adb6e9",
+    "tests/diagnostic_labels.compound_context.json": "a652f2d72ee9bf0f45df116d9fd944b1f563789571768374c8c84ac68b43c797",
+    "tests/docs/test_project_retrieval_alias_contract.py": "17a4d6cd2e6eb20f9dc81934989643a4ef47e118004e3c0ec0fe42f11f82ed9a",
+    "eval/task_level/contract_history/documentation_query_plan_compiler_retirement.json": "f58b5521ec3e795c1596d497fdd8e5cbf26d20d3a86fcf6c6014c043f765f555",
+    "eval/task_level/contract_history/question_plan_v4_retirement.json": "c5c1cabf3d76edc7a7962bc4aaa23b47fe6a0334d4bc10dac16a349a89ab454e",
+    "tests/docs/test_question_plan_v4.py": "67e1c5e63148cc16b91fad7f5f0b303cfc94de45451b621a202ec8cf38664905",
+    "tests/docs/test_documentation_query_plan.py": "49efb38f7729838fb814ab86305aee9f7efe43798bc6ca253fac8e71696ff59c",
+    "tests/test_docs_service.py": "f779207b0d1197a42911f6546ac1d9781856455b6f10ad947329e5d7705fea72",
+    "tests/test_docs_service_part02.py": "f777ec5b23db1bbc63b36ca7bd3ff2354d8beadaadc0463a2ef275d1c832177e",
+    "v2plan/pr211-execution/TEST_REDUCTION_40_MANIFEST.json": "2da4ab967a7add542841d4daea008ca76f5d47a3d9bfec863fd729b2699fb02d"
+  },
+  "runtime_boundary": "Review used source text and independent stdlib processing of saved BASE JSON/gzip/JUnit only. No local project runtime/import/AST/pytest/install. Review is not final collection, final-SHA CI, performance measurement, production smoke, client acceptance or achievement of40%."
+}

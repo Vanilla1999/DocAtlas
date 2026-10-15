@@ -1,0 +1,2392 @@
+{
+  "case_id": "OLD_COMPOUND",
+  "question": "How does DocAtlas combine batch queue during recovery?",
+  "split": "control",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "How does DocAtlas combine batch queue during recovery?",
+    "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "rows": [
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+        "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+        "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+        "# Logging\n\nLogs flow to disk after each request.\n",
+        "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+        "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+        "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+        "# Packet transport\n\nPackets are delivered after each request.\n",
+        "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+        "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-qk1r9h5i/project/docatlas.project-docs.yaml": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+          "parent_logical_id": "parent-fb74f989f26af5761662eea0ea36c312"
+        },
+        {
+          "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-7d9301711d808fb921aaf35863efb15d"
+        },
+        {
+          "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-6dc2bf65f7b7c6ff7207a2a30d8be79a"
+        },
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+        },
+        {
+          "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+          "parent_logical_id": "parent-a74e2906aa419d9e627562569dc23cf6"
+        },
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+        },
+        {
+          "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+          "parent_logical_id": "parent-fb74f989f26af5761662eea0ea36c312"
+        },
+        {
+          "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-7d9301711d808fb921aaf35863efb15d"
+        },
+        {
+          "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-6dc2bf65f7b7c6ff7207a2a30d8be79a"
+        },
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+        },
+        {
+          "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+          "parent_logical_id": "parent-a74e2906aa419d9e627562569dc23cf6"
+        },
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+        "child-49407bf130addef288456500df7bbb2673a30dea",
+        "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+        "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+        "child-49407bf130addef288456500df7bbb2673a30dea",
+        "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+          "parent_logical_id": "parent-fb74f989f26af5761662eea0ea36c312",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+            "window_characters": 81,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [
+                "docatlas",
+                "batch",
+                "queue"
+              ],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 3,
+              "match_ratio": 0.375,
+              "bm25_cost": -4.700573694516178,
+              "lexical_score": 4.700573694516178,
+              "field_matches": {
+                "title": [
+                  "docatlas"
+                ],
+                "body": [
+                  "docatlas",
+                  "batch",
+                  "queue"
+                ],
+                "retrieval_text": [
+                  "docatlas",
+                  "batch",
+                  "queue"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/compounds.md",
+                "content_sha256": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:0d2658834cfb6a0054e56e91ddecbd89360c01b025a8ab0ffd55d3bf440543f0"
+              },
+              "char_start": 0,
+              "char_end": 81
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [
+              "docatlas",
+              "batch",
+              "queue"
+            ],
+            "body_matched_terms": [
+              "docatlas",
+              "batch",
+              "queue"
+            ],
+            "matched_term_count": 3,
+            "match_ratio": 0.375,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              80
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-7d9301711d808fb921aaf35863efb15d",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "f5986f8bf17140b5dab9c224a3273e0fc51d92e86d3964a280e858d695330056",
+            "window_characters": 68,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.680067710537453e-07,
+              "lexical_score": 6.680067710537453e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/owners.md",
+                "content_sha256": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575"
+              },
+              "char_start": 0,
+              "char_end": 68
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              66
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-6dc2bf65f7b7c6ff7207a2a30d8be79a",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "a24b6e0a0d6b74887c40a4a15c9bb1da353750fa8d871fd14b53709b651fc25f",
+            "window_characters": 62,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.680067710537453e-07,
+              "lexical_score": 6.680067710537453e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/owners.md",
+                "content_sha256": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575"
+              },
+              "char_start": 68,
+              "char_end": 130
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              68,
+              129
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+            "window_characters": 49,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.604602510460252e-07,
+              "lexical_score": 6.604602510460252e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/logs.md",
+                "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+              },
+              "char_start": 0,
+              "char_end": 49
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              48
+            ],
+            "lexical_score": 0.85,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+          "parent_logical_id": "parent-a74e2906aa419d9e627562569dc23cf6",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+            "window_characters": 62,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.458674304418985e-07,
+              "lexical_score": 6.458674304418985e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/packets.md",
+                "content_sha256": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:1a43f2e3f0a03043f5e8691b93011a79dcc0a62d3d92e5e602d63c39639a17c1"
+              },
+              "char_start": 0,
+              "char_end": 62
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              61
+            ],
+            "lexical_score": 0.8,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "window_characters": 104,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.319055244195357e-07,
+              "lexical_score": 6.319055244195357e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              103
+            ],
+            "lexical_score": 0.75,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+          "parent_logical_id": "parent-fb74f989f26af5761662eea0ea36c312",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+            "window_characters": 81,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [
+                "docatlas",
+                "batch",
+                "queue"
+              ],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 3,
+              "match_ratio": 0.375,
+              "bm25_cost": -4.700573694516178,
+              "lexical_score": 4.700573694516178,
+              "field_matches": {
+                "title": [
+                  "docatlas"
+                ],
+                "body": [
+                  "docatlas",
+                  "batch",
+                  "queue"
+                ],
+                "retrieval_text": [
+                  "docatlas",
+                  "batch",
+                  "queue"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/compounds.md",
+                "content_sha256": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:0d2658834cfb6a0054e56e91ddecbd89360c01b025a8ab0ffd55d3bf440543f0"
+              },
+              "char_start": 0,
+              "char_end": 81
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [
+              "docatlas",
+              "batch",
+              "queue"
+            ],
+            "body_matched_terms": [
+              "docatlas",
+              "batch",
+              "queue"
+            ],
+            "matched_term_count": 3,
+            "match_ratio": 0.375,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              80
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-7d9301711d808fb921aaf35863efb15d",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "f5986f8bf17140b5dab9c224a3273e0fc51d92e86d3964a280e858d695330056",
+            "window_characters": 68,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.680067710537453e-07,
+              "lexical_score": 6.680067710537453e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/owners.md",
+                "content_sha256": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575"
+              },
+              "char_start": 0,
+              "char_end": 68
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              66
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+          "parent_logical_id": "parent-6dc2bf65f7b7c6ff7207a2a30d8be79a",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "a24b6e0a0d6b74887c40a4a15c9bb1da353750fa8d871fd14b53709b651fc25f",
+            "window_characters": 62,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.680067710537453e-07,
+              "lexical_score": 6.680067710537453e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/owners.md",
+                "content_sha256": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575"
+              },
+              "char_start": 68,
+              "char_end": 130
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              68,
+              129
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+            "window_characters": 49,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.604602510460252e-07,
+              "lexical_score": 6.604602510460252e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/logs.md",
+                "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+              },
+              "char_start": 0,
+              "char_end": 49
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              48
+            ],
+            "lexical_score": 0.85,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+          "parent_logical_id": "parent-a74e2906aa419d9e627562569dc23cf6",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+            "window_characters": 62,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.458674304418985e-07,
+              "lexical_score": 6.458674304418985e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/packets.md",
+                "content_sha256": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:1a43f2e3f0a03043f5e8691b93011a79dcc0a62d3d92e5e602d63c39639a17c1"
+              },
+              "char_start": 0,
+              "char_end": 62
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              61
+            ],
+            "lexical_score": 0.8,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+          "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+            "window_characters": 104,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "how",
+                "does",
+                "docatlas",
+                "combine",
+                "batch",
+                "queue",
+                "during",
+                "recovery"
+              ],
+              "matched_terms": [],
+              "exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "how",
+                "docatlas"
+              ],
+              "query_term_count": 8,
+              "matched_term_count": 0,
+              "match_ratio": 0.0,
+              "bm25_cost": -6.319055244195357e-07,
+              "lexical_score": 6.319055244195357e-07,
+              "field_matches": {
+                "title": [],
+                "body": [],
+                "retrieval_text": []
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/setext.md",
+                "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+              },
+              "char_start": 0,
+              "char_end": 104
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 9,
+                  "end": 17
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "How does DocAtlas combine batch queue during recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "How does DocAtlas combine batch queue during recovery?",
+            "query_terms": [
+              "how",
+              "does",
+              "docatlas",
+              "combine",
+              "batch",
+              "queue",
+              "during",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [],
+            "body_matched_terms": [],
+            "matched_term_count": 0,
+            "match_ratio": 0.0,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              103
+            ],
+            "lexical_score": 0.75,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+        "child-49407bf130addef288456500df7bbb2673a30dea",
+        "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+        "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+        "child-49407bf130addef288456500df7bbb2673a30dea",
+        "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+        "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2"
+      ],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 12,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 12,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md"
+              },
+              {
+                "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md"
+              },
+              {
+                "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md"
+              },
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md"
+              },
+              {
+                "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md"
+              },
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md"
+              },
+              {
+                "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md"
+              },
+              {
+                "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md"
+              },
+              {
+                "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md"
+              },
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md"
+              },
+              {
+                "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md"
+              },
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 12,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 12,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "How does DocAtlas combine batch queue during recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 6,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+                    "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+                    "parent_logical_id": "parent-fb74f989f26af5761662eea0ea36c312",
+                    "path": "docs/compounds.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 81,
+                    "display_content_hash": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:0d2658834cfb6a0054e56e91ddecbd89360c01b025a8ab0ffd55d3bf440543f0",
+                    "project_doc_content_hash": "sha256:b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+                    "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+                    "parent_logical_id": "parent-7d9301711d808fb921aaf35863efb15d",
+                    "path": "docs/owners.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 68,
+                    "display_content_hash": "f5986f8bf17140b5dab9c224a3273e0fc51d92e86d3964a280e858d695330056",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575",
+                    "project_doc_content_hash": "sha256:86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+                    "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+                    "parent_logical_id": "parent-6dc2bf65f7b7c6ff7207a2a30d8be79a",
+                    "path": "docs/owners.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 68,
+                    "char_end": 130,
+                    "display_content_hash": "a24b6e0a0d6b74887c40a4a15c9bb1da353750fa8d871fd14b53709b651fc25f",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575",
+                    "project_doc_content_hash": "sha256:86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                    "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                    "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+                    "path": "docs/logs.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 49,
+                    "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a",
+                    "project_doc_content_hash": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+                    "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+                    "parent_logical_id": "parent-a74e2906aa419d9e627562569dc23cf6",
+                    "path": "docs/packets.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 62,
+                    "display_content_hash": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:1a43f2e3f0a03043f5e8691b93011a79dcc0a62d3d92e5e602d63c39639a17c1",
+                    "project_doc_content_hash": "sha256:3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+                    "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+                    "parent_logical_id": "parent-95e5103d2f9a25c84b15b7388fc158fc",
+                    "path": "docs/setext.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 104,
+                    "display_content_hash": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2",
+                    "project_doc_content_hash": "sha256:1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "How does DocAtlas combine batch queue during recovery?",
+                "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "How does DocAtlas combine batch queue during recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 1,
+                "items": [
+                  {
+                    "requirement_id": "query_symbol:0:docatlas",
+                    "kind": "exact_term",
+                    "value": "DocAtlas",
+                    "mandatory": false,
+                    "public_provenance": "query_exact_term",
+                    "proof_role": "generic_fact"
+                  }
+                ],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "How does DocAtlas combine batch queue during recovery?",
+                "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "How does DocAtlas combine batch queue during recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 1,
+                "items": [
+                  {
+                    "requirement_id": "query_symbol:0:docatlas",
+                    "kind": "exact_term",
+                    "value": "DocAtlas",
+                    "mandatory": false,
+                    "public_provenance": "query_exact_term",
+                    "proof_role": "generic_fact"
+                  }
+                ],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "not_found",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [],
+  "state_after": {
+    "generation": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "rows": [
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+        "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+        "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+        "# Logging\n\nLogs flow to disk after each request.\n",
+        "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+        "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+        "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+        "# Packet transport\n\nPackets are delivered after each request.\n",
+        "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+        "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-qk1r9h5i/project/docatlas.project-docs.yaml": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    }
+  },
+  "elapsed_seconds": 0.06131223500051419,
+  "integrity_errors": []
+}

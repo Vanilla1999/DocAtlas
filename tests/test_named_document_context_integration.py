@@ -1,16 +1,119 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import asdict
+from pathlib import Path
 
 import pytest
 
-from docmancer.agent import DocmancerAgent
-from docmancer.core.config import DocmancerConfig
-from docmancer.docs.application.docs_job_service import DocsJobTracker
-from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload
+from tests._fixture_member_transaction import (
+    cold_fixture_member_service,
+    fixture_member_mutation,
+    fixture_member_state,
+    indexed_fixture_member_service,
+)
+
+
+def test_named_document_fixture_requires_confirmed_hash_bound_members(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    path = project / "README.md"
+    original = b"# Owned fixture\n\nThe member transaction preserves exact bytes.\n"
+    path.write_bytes(original)
+    unselected = project / "unselected.md"
+    unselected.write_text("# Not selected\n\nThis file is outside the fixture grant.\n")
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\ndocuments:\n  - path: README.md\n    role: overview\n"
+        "    scope: project\n    description: Exact member fixture.\n",
+    )
+    cold = cold_fixture_member_service(tmp_path, monkeypatch)
+    grant = fixture_member_mutation(cold, project, ("README.md",), expected_generation_id=None)
+    with pytest.raises(PermissionError, match="no explicit mutation grant"):
+        cold.project_docs.sync_project_docs(str(project), with_vectors=False)
+    for change, error, reason in (
+        ("confirmation", PermissionError, "confirmation"),
+        ("content_hash", ValueError, "document hash precondition"),
+        ("catalog_hash", ValueError, "catalog hash precondition"),
+        ("entry_hash", PermissionError, "not bound to the current catalog entry"),
+        ("missing_generation", PermissionError, "complete member mutation object"),
+        ("wrong_operation", PermissionError, "matching operation"),
+        ("wrong_storage", PermissionError, "host-selected member store"),
+        ("unselected", PermissionError, "not bound to the current catalog entry"),
+    ):
+        invalid = deepcopy(grant)
+        if change == "confirmation":
+            invalid["confirm"] = False
+        elif change == "content_hash":
+            invalid["documents"][0]["content_sha256"] = "0" * 64
+        elif change == "catalog_hash":
+            invalid["catalog_sha256"] = "0" * 64
+        elif change == "entry_hash":
+            invalid["documents"][0]["catalog_entry_hash"] = "sha256:" + "0" * 64
+        elif change == "missing_generation":
+            del invalid["expected_generation_id"]
+        elif change == "wrong_operation":
+            invalid["operation"] = "ingest_project_docs"
+        elif change == "wrong_storage":
+            invalid["storage_path"] = str(project / "index.db")
+        else:
+            invalid["documents"][0]["path"] = "unselected.md"
+        with pytest.raises(error, match=reason):
+            cold.project_docs.sync_project_docs(str(project), mutation=invalid)
+        assert not cold.member_storage_policy.app_home.exists()
+        assert cold._service is None
+        assert path.read_bytes() == original
+        assert "outside the fixture grant" in unselected.read_text()
+    committed = cold.project_docs.sync_project_docs(str(project), mutation=grant)
+    assert committed.status == "success"
+    assert committed.diagnostics["metrics"]["members"] == 1
+    assert committed.diagnostics["metrics"]["sources_deleted"] == 0
+    from contextlib import closing
+    with closing(cold.member_storage_policy.connect()) as conn:
+        rows = conn.execute("SELECT source, content FROM sources").fetchall()
+    assert [(row["source"], row["content"].encode()) for row in rows] == [(str(path), original)]
+    assert "outside the fixture grant" in unselected.read_text()
+
+
+def test_named_document_fixture_cas_preserves_unselected_source(tmp_path, monkeypatch):
+    service, root = _named_document_service(
+        tmp_path, monkeypatch, ["docs/selected.md", "docs/unselected.md"],
+        {"docs/selected.md": "# Selected\n\nInitial selected fixture text.\n",
+         "docs/unselected.md": "# Unselected\n\nUnrelated source must survive a member upsert.\n"},
+    )
+    project = Path(root)
+    policy = service.member_storage_policy
+    first_generation = policy.generation()
+    stale = fixture_member_mutation(
+        service, project, ("docs/selected.md",), expected_generation_id=first_generation,
+    )
+    before = fixture_member_state(service)
+    unrelated = next(row for row in before["sources"] if str(project / "docs/unselected.md") in row)
+    original_files = {path: (project / path).read_bytes()
+                      for path in ("docs/selected.md", "docs/unselected.md")}
+    updated = b"# Selected\n\nExplicitly updated selected fixture text.\n"
+    (project / "docs/selected.md").write_bytes(updated)
+    fresh = fixture_member_mutation(
+        service, project, ("docs/selected.md",), expected_generation_id=first_generation,
+    )
+    with pytest.raises(ValueError, match="document hash precondition"):
+        service.sync_project_docs(root, mutation=stale)
+    assert fixture_member_state(service) == before
+    result = service.sync_project_docs(root, mutation=fresh)
+    assert result.status == "success"
+    assert result.changed_count == 1 and result.new_count == 0
+    assert result.diagnostics["metrics"]["sources_deleted"] == 0
+    assert policy.generation() != first_generation
+    committed = fixture_member_state(service)
+    assert next(row for row in committed["sources"] if str(project / "docs/unselected.md") in row) == unrelated
+    # Reusing the successful request cannot acquire the new generation implicitly.
+    with pytest.raises(ValueError, match="active generation precondition"):
+        service.sync_project_docs(root, mutation=fresh)
+    assert fixture_member_state(service) == committed
+    assert (project / "docs/selected.md").read_bytes() == updated
+    assert (project / "docs/unselected.md").read_bytes() == original_files["docs/unselected.md"]
 
 
 def _named_document_service(
@@ -33,154 +136,11 @@ def _named_document_service(
         for path in paths
     )
     (project / "docatlas.project-docs.yaml").write_text(catalog, encoding="utf-8")
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docmancer.db")
-    config.index.extracted_dir = str(tmp_path / "extracted")
-    service = LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
-    )
-    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
-    return service, str(project)
-
-
-def test_named_plan_is_scoped_complete_and_visible_end_to_end(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
-    project = tmp_path / "project"
-    docs = project / "docs"
-    docs.mkdir(parents=True)
-    plan_path = "docs/IOS_TRUSTED_TIME_PLAN.md"
-    (project / plan_path).write_text(
-        """# iOS Trusted Time Plan
-
-## Source and policy
-ForkSource uses upstream.
-Policy72Hours is proposed; confirmation is required.
-
-## Validation and dependencies
-LocalizationError is not implemented.
-DependencyPin is pinned to the reviewed revision.
-""",
-        encoding="utf-8",
-    )
-    (project / "ARCHITECTURE.md").write_text(
-        """# Architecture
-
-Architecture conventions mention ForkSource, Policy72Hours, LocalizationError,
-TimestampPolicy, and DependencyPin, but do not define the trusted-time plan.
-""",
-        encoding="utf-8",
-    )
-    (project / "docatlas.project-docs.yaml").write_text(
-        """schema_version: 1
-documents:
-  - path: docs/IOS_TRUSTED_TIME_PLAN.md
-    role: roadmap
-    scope: project
-    description: Proposed trusted-time implementation plan.
-    authority: supporting
-    status: active
-    impact: track
-  - path: ARCHITECTURE.md
-    role: project_architecture
-    scope: project
-    description: Current project architecture.
-    authority: source_of_truth
-    status: active
-    impact: track
-""",
-        encoding="utf-8",
-    )
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docmancer.db")
-    config.index.extracted_dir = str(tmp_path / "extracted")
-    service = LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
-    )
-
-    sync = service.sync_project_docs(str(project), with_vectors=False)
-    question = (
-        f"In {plan_path}, summarize ForkSource, Policy72Hours, LocalizationError, "
-        "and DependencyPin."
-    )
-    unified = service.get_docs_context(
-        question,
-        project_path=str(project),
-        mode="project",
-        prepare_project_docs=False,
-    )
-    result = call_docs_tool_payload(
-        "get_docs_context",
-        {
-                "question": question,
-                "project_path": str(project),
-        },
-        service,
+    service, sync = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, paths,
     )
     assert sync.status == "success"
-    assert sync.diagnostics["vector_sync"]["status"] == "not_requested"
-    assert result["status"] == "ok", json.dumps({
-        "public": result,
-        "unified": asdict(unified),
-    }, indent=2, default=str)
-    assert result["kind"] == "docs_context"
-    assert result["support_status"] == "retrieval_only"
-    assert result["answer_supported"] is False
-    assert result["answer_available"] is False
-    assert result["context_available"] is True
-    assert {source["path_or_url"] for source in result["sources"]} == {plan_path}
-    assert "ARCHITECTURE.md" not in {
-        source["path_or_url"] for source in result["sources"]
-    }
-    context = "\n".join(source["snippet"] for source in result["sources"])
-    assert "ForkSource uses upstream" in context
-    assert "LocalizationError is not implemented" in context
-
-
-def test_named_document_single_fact_does_not_expose_unrequested_document_content(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
-    project = tmp_path / "project"
-    docs = project / "docs"
-    docs.mkdir(parents=True)
-    plan_path = "docs/PLAN.md"
-    (project / plan_path).write_text(
-        "# Plan\n\n## Fork source\nForkSource uses upstream.\n\n"
-        "## Internal note\nUnrequestedSecret remains internal.\n",
-        encoding="utf-8",
-    )
-    (project / "docatlas.project-docs.yaml").write_text(
-        "schema_version: 1\ndocuments:\n  - path: docs/PLAN.md\n    role: roadmap\n"
-        "    scope: project\n    description: Plan.\n    authority: source_of_truth\n"
-        "    status: active\n    impact: track\n",
-        encoding="utf-8",
-    )
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docmancer.db")
-    config.index.extracted_dir = str(tmp_path / "extracted")
-    service = LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
-    )
-    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
-    question = f"In {plan_path}, summarize ForkSource."
-    result = call_docs_tool_payload(
-        "get_docs_context",
-        {"question": question, "project_path": str(project)},
-        service,
-    )
-
-    assert result["status"] == "ok", result
-    assert result["kind"] == "docs_context"
-    context = "\n".join(source["snippet"] for source in result["sources"])
-    assert "ForkSource uses upstream" in context
-    assert "UnrequestedSecret" not in context
+    return service, str(project)
 
 
 def test_public_named_document_unknown_locator_fails_closed(tmp_path, monkeypatch):
@@ -547,124 +507,3 @@ def test_real_sqlite_newcomer_topics_reach_expected_project_docs(
     assert expected_text in str(result)
 
 
-def test_real_sqlite_compound_onboarding_maximizes_host_lookup_coverage(
-    tmp_path, monkeypatch,
-):
-    contents = {
-        "docs/product.md": "# Product\n\nPurposeword newcomerword explains the product goal.\n",
-        "docs/architecture.md": "# Architecture\n\nBoundaryword runtimeword explains architecture.\n",
-        "docs/data-flow.md": "# Data flow\n\nFlowword pipelineword explains request flow.\n",
-        "docs/development.md": "# Development\n\nBootstrapword localword explains local setup.\n",
-        "docs/testing.md": "# Testing\n\nTestword pytestword explains test commands.\n",
-    }
-    service, project = _named_document_service(
-        tmp_path, monkeypatch, list(contents), contents,
-    )
-    lookup_queries = [
-        "purposeword newcomerword",
-        "boundaryword runtimeword",
-        "flowword pipelineword",
-        "bootstrapword localword",
-        "testword pytestword",
-    ]
-
-    result = call_docs_tool_payload(
-        "get_docs_context",
-        {
-            "question": "I just joined this project. Help me understand it.",
-            "lookup_queries": lookup_queries,
-            "project_path": project,
-            "scope": "project",
-        },
-        service,
-    )
-
-    assert result["status"] == "ok", result
-    assert result["kind"] == "docs_context"
-    assert result["support_status"] == "retrieval_only"
-    assert result["answer_supported"] is False
-    assert result["answer_available"] is False
-    assert result["edit_ready"] is False
-    assert len(result["sources"]) == 3
-    lookup_ids = {f"query-lookup-{index}" for index in range(1, 6)}
-    covered_lookup_ids = set(result["covered_query_ids"]) & lookup_ids
-    missing_lookup_ids = set(result["missing_query_ids"]) & lookup_ids
-    assert len(covered_lookup_ids) == 3
-    assert len(missing_lookup_ids) == 2
-    assert covered_lookup_ids | missing_lookup_ids == lookup_ids
-    assert "query-original" in result["missing_query_ids"]
-    assert not any(
-        query_id.startswith("query-intent-")
-        for query_id in result["missing_query_ids"]
-    )
-    assert result["estimated_tokens"] <= 800
-
-
-def test_real_sqlite_audited_russian_alias_covers_original_question(
-    tmp_path, monkeypatch,
-):
-    service, project = _named_document_service(
-        tmp_path,
-        monkeypatch,
-        ["README.md"],
-        {"README.md": (
-            "# Local installation setup verification\n\n"
-            "Install DocAtlas locally and run command-line help to verify the setup.\n"
-        )},
-        {"README.md": "overview"},
-    )
-    result = call_docs_tool_payload(
-        "get_docs_context",
-        {
-            "question": "Как установить DocAtlas локально и проверить, что он работает?",
-            "project_path": project,
-        },
-        service,
-    )
-
-    assert result["status"] == "ok", result
-    assert result["sources"][0]["path_or_url"] == "README.md"
-    assert "query-original" in result["covered_query_ids"]
-    assert result["answer_supported"] is False
-
-
-def test_real_sqlite_docs_mcp_intent_excludes_packs_and_adrs(
-    tmp_path, monkeypatch,
-):
-    contents = {
-        "docs/mcp-docs-server.md": (
-            "# Docs MCP server workflow\n\n"
-            "Use get_docs_context, prepare_docs, and docs_status for documentation context.\n"
-        ),
-        "docs/mcp-packs.md": (
-            "# MCP pack commands\n\nUse install-pack and packs-serve for API action packs.\n"
-        ),
-        "docs/adr/mcp.md": "# MCP boundary\n\nHistorical MCP transport decision.\n",
-    }
-    service, project = _named_document_service(
-        tmp_path,
-        monkeypatch,
-        list(contents),
-        contents,
-        {
-            "docs/mcp-docs-server.md": "api_contract",
-            "docs/mcp-packs.md": "api_contract",
-            "docs/adr/mcp.md": "project_architecture",
-        },
-    )
-    result = call_docs_tool_payload(
-        "get_docs_context",
-        {
-            "question": "Как устроен полный процесс работы Docs MCP?",
-            "project_path": project,
-        },
-        service,
-    )
-
-    assert result["status"] == "ok", result
-    paths = {source["path_or_url"] for source in result["sources"]}
-    visible = "\n".join(source["snippet"] for source in result["sources"])
-    assert "docs/mcp-docs-server.md" in paths
-    assert "docs/mcp-packs.md" not in paths
-    assert "docs/adr/mcp.md" not in paths
-    assert "packs-serve" not in visible

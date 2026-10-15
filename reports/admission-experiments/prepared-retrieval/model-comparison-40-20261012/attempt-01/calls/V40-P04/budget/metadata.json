@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-P04",
+  "mode": "budget",
+  "question": "How do you undo an explicitly selected Poetry Python environment and return to default behavior?",
+  "public_request": {
+    "question": "How do you undo an explicitly selected Poetry Python environment and return to default behavior?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/poetry.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:07.385698+00:00",
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_before": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5879412239992234,
+  "process_cpu_seconds": 0.5857402809999996,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 936440,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_after": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "wire_sha256": "6ab9b8ab115239611fac94108cad2c398f9b5c8c40afa733f18eba3cf4eb4ff3",
+  "wire_utf8_bytes": 4042,
+  "utf8_quarter_proxy": 1011,
+  "codec_o200k_base": 1141,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

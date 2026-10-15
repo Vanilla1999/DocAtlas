@@ -1,0 +1,39 @@
+{
+  "source_artifact": "/tmp/opencode/docatlas-review-evidence/admission-full-20261012/live-default-off-controls/pytest/test_public_partial_context_prcurrent/qualification-review-proof.json",
+  "source_artifact_sha256": "78a0513fe9b7b9ba689c8777921b11fccd0effd91beaea1eeb36e1f1c421ee86",
+  "source_definition": "/tmp/opencode/docatlas-compact-review/tests/test_project_context_quality_v2_protocol.py",
+  "source_definition_sha256": "d64a869e694bffa3c34443ae84b8bbfc243f0b24c038b6cbf65e3f22dba1a652",
+  "source_definition_lines": [
+    466,
+    561
+  ],
+  "documents_sha256": {
+    "docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+    "docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+    "docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+    "docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+    "docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49"
+  },
+  "saved_observation_only": {
+    "numeric": {
+      "request": {
+        "question": "How are packets delivered with priority 7.",
+        "project_path": "/tmp/docatlas-admission-controls-av7j3bkb/pytest/test_public_partial_context_pr0/project",
+        "scope": "project"
+      },
+      "support_status": "insufficient_evidence",
+      "source_count": 0
+    },
+    "numeric_range": {
+      "request": {
+        "question": "How are packets delivered with priority 7-9 during concurrent recovery?",
+        "project_path": "/tmp/docatlas-admission-controls-av7j3bkb/pytest/test_public_partial_context_pr0/project",
+        "scope": "project"
+      },
+      "support_status": "insufficient_evidence",
+      "source_count": 0
+    }
+  },
+  "not_executed": true,
+  "v3_new_project_binding_required": true
+}

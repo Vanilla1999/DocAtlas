@@ -28,7 +28,7 @@ from ._commands_part01 import _create_agent_or_raise_lock_error, _effective_conf
     "--sync-saved-docs",
     is_flag=True,
     default=False,
-    help="Incrementally index accepted doc changes from the exact --base/--head Git diff; never writes repository files.",
+    help="Unsupported legacy write flag: an exact Git diff is not a mutation grant. Use prepare_docs with an explicit confirmed member transaction.",
 )
 @click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 def docs_impact_cmd(
@@ -54,6 +54,13 @@ def docs_impact_cmd(
         raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
     if sync_saved_docs and not base:
         raise click.UsageError("--sync-saved-docs requires --base/--head so accepted rename and deletion status is exact.")
+    if sync_saved_docs:
+        # A committed diff is evidence, not the explicit member transaction
+        # grant. Deny this legacy write flag before constructing services/DBs.
+        raise PermissionError(
+            "--sync-saved-docs has no explicit member mutation grant; "
+            "use the authorized prepare_docs member transaction instead."
+        )
     try:
         effective_config_path = _effective_config(config_path)
         config = _load_config(effective_config_path)

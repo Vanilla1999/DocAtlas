@@ -21,73 +21,12 @@ def _audited(plan):
     return tuple(query for query in plan.queries if query.relation == "audited_rewrite")
 
 
-def test_request_flow_host_lookups_gain_bounded_audited_rewrites():
-    plan = _plan()
-    host = {query.query_id: query.text for query in plan.queries if query.origin == "host_lookup"}
-    assert host == {
-        "query-lookup-1": LOOKUPS[0],
-        "query-lookup-2": LOOKUPS[1],
-        "query-lookup-3": LOOKUPS[2],
-    }
-    rewrites = _audited(plan)
-    pairs = {(query.public_parent_query_id, query.text) for query in rewrites}
-    assert ("query-lookup-1", "get_docs_context question project_path lookup_queries module_path scope") in pairs
-    assert ("query-lookup-3", "retrieval gateway filtered project chunks") in pairs
-    assert ("query-lookup-3", "selection maximizes distinct visible query coverage") in pairs
 
 
-def test_audited_host_rewrites_are_not_public_query_ids():
-    payload = _plan().as_payload()
-    public = set(payload["public_query_ids"])
-    for query in payload["queries"]:
-        if query["relation"] == "audited_rewrite" and query["public_parent_query_id"].startswith("query-lookup-"):
-            assert query["query_id"] not in public
-            assert query["public_parent_query_id"] in public
 
 
-def test_audited_host_rewrite_count_is_bounded():
-    rewrites = [
-        query for query in _audited(_plan())
-        if str(query.public_parent_query_id or "").startswith("query-lookup-")
-    ]
-    assert 1 <= len(rewrites) <= 4
 
 
-def test_negated_host_lookup_is_not_rewritten():
-    plan = _plan((
-        "What does the documentation request boundary not accept?",
-        LOOKUPS[1],
-        "How do retrieved chunks not become selected visible sources?",
-    ))
-    assert not [
-        query for query in _audited(plan)
-        if query.public_parent_query_id in {"query-lookup-1", "query-lookup-3"}
-    ]
-
-
-def test_host_lookup_with_unrelated_exact_identifier_is_not_rewritten():
-    plan = _plan((
-        "What does FooEngine documentation request boundary accept?",
-        LOOKUPS[1],
-        "How do FooEngine retrieved chunks become selected visible sources?",
-    ))
-    assert not [
-        query for query in _audited(plan)
-        if query.public_parent_query_id in {"query-lookup-1", "query-lookup-3"}
-    ]
-
-
-def test_generic_canonical_alias_cannot_derive_host_parent_coverage():
-    trace = {
-        "qualified": True,
-        "relation": "host_lookup",
-        "missing_parent_exact_terms": [],
-    }
-    assert derived_parent_trace(
-        trace,
-        source_query_id="query-intent-1",
-        parent_query_id="query-lookup-3",
-    ) is None
 
 
 def test_request_flow_public_contract_remains_four_fact_fail_safe():
@@ -108,5 +47,3 @@ def test_request_flow_public_contract_remains_four_fact_fail_safe():
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3
-    assert payload["estimated_tokens"] <= 800

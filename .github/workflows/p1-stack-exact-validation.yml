@@ -49,7 +49,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        # User-approved support policy: Linux and macOS only; require both macOS architectures.
+        # macos-15 is arm64; macos-15-intel is x86_64 (fresh-install proof: run 37658168235).
+        os: [ubuntu-latest, macos-15, macos-15-intel]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -61,7 +63,13 @@ jobs:
       - run: |
           python -m compileall -q docmancer eval scripts
           doc-atlas --version
-          python scripts/docs_mcp_stdio_smoke.py
+      - name: Verify real installed-wheel Docs MCP
+        shell: bash
+        run: |
+          python -m pip wheel --no-deps --wheel-dir "$RUNNER_TEMP/docs-mcp-wheel" .
+          python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/docs-mcp-wheel/*.whl
+          cd "$RUNNER_TEMP"
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 
   advanced:
     name: p1-stack-advanced-security
@@ -75,9 +83,12 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
-      - run: python -m pip install -e ".[dev]"
+      - name: Install evaluator dependencies
+        id: dependencies
+        run: python -m pip install -e ".[dev]"
       - name: Run production-path contracts
         run: |
+          set -euo pipefail
           pytest tests/ -m advanced -q
           python eval/project_context_quality_protocol.py
           python scripts/run_recovery_contract_gate.py
@@ -87,35 +98,97 @@ jobs:
           python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/project-context-quality-v2-live.json"
           python scripts/run_question_surface_gate.py
           python scripts/run_agent_developer_gate.py
-          python scripts/run_agent_developer_adversarial_gate.py
-          python scripts/run_critical_mutation_gate.py
-          python scripts/run_agent_developer_adversarial_mutation_gate.py
-      - name: Run every P1 evidence contract present on this ref
+      - name: Run Agent Developer adversarial gate
+        id: adversarial
+        run: python scripts/run_agent_developer_adversarial_gate.py
+      - name: Run critical mutation gate
+        run: python scripts/run_critical_mutation_gate.py
+      - name: Run Agent Developer adversarial mutation gate
+        id: adversarial_mutation
+        run: python scripts/run_agent_developer_adversarial_mutation_gate.py
+      - name: Verify historical first-divergence evidence
+        id: first_divergence
+        run: PYTHONPATH=. python scripts/build_agent_developer_first_divergence.py --check
+      - name: Verify historical contract-ablation evidence
+        id: contract_ablation
+        run: PYTHONPATH=. python scripts/build_agent_contract_v2_ablation.py --check
+      - name: Measure current P1.4 quality
+        id: p14_quality
+        run: PYTHONPATH=. python scripts/run_paraphrase_proofability_gate.py --output "$RUNNER_TEMP/p1.4-current-retrieval.json"
+      - name: Verify P1.4 oracle controls
+        id: p14_oracle
+        run: PYTHONPATH=. python scripts/paraphrase_proofability_self_test.py --report "$RUNNER_TEMP/p1.4-current-retrieval.json"
+      - name: Measure current P1.5 quality
+        id: p15_quality
+        run: PYTHONPATH=. python scripts/run_mixed_evidence_provenance_gate.py --output "$RUNNER_TEMP/p1.5-current-provenance.json"
+      - name: Verify P1.5 oracle controls
+        id: p15_oracle
+        run: PYTHONPATH=. python scripts/mixed_evidence_provenance_self_test.py --report "$RUNNER_TEMP/p1.5-current-provenance.json"
+      - name: Measure current P1.6 public delivery
+        id: p16_quality
+        run: PYTHONPATH=. python scripts/run_evidence_is_data_gate.py --output "$RUNNER_TEMP/p1.6-current-delivery.json"
+      - name: Verify P1.6 oracle controls
+        id: p16_oracle
+        run: PYTHONPATH=. python scripts/evidence_is_data_self_test.py --report "$RUNNER_TEMP/p1.6-current-delivery.json"
+      - name: Verify syntax and repository guards
+        id: syntax
         shell: bash
         run: |
           set -euo pipefail
-          for script in \
-            run_agent_developer_first_divergence_gate.py \
-            first_divergence_contract_self_test.py \
-            run_agent_contract_v2_ablation_gate.py \
-            agent_contract_v2_ablation_self_test.py \
-            run_paraphrase_proofability_gate.py \
-            paraphrase_proofability_self_test.py \
-            run_mixed_evidence_provenance_gate.py \
-            mixed_evidence_provenance_self_test.py \
-            run_evidence_is_data_gate.py \
-            evidence_is_data_self_test.py \
-            run_p1_agent_truth_closure_gate.py \
-            p1_agent_truth_closure_self_test.py
-          do
-            if [ -f "scripts/$script" ]; then
-              python "scripts/$script"
-            fi
-          done
           test -z "$(find .github/workflows -maxdepth 1 -type f -name 'temp-p1*' -print -quit)"
           python -m compileall -q docmancer eval scripts tests
           python scripts/check_python_module_size.py
           git diff --check
+      - name: Capture actual current P1 gate outcomes
+        if: ${{ always() }}
+        env:
+          P1_GATE_OUTCOMES: >-
+            {"schema_version":1,"code_commit":"${{ github.sha }}",
+             "run_id":"${{ github.run_id }}","run_attempt":"${{ github.run_attempt }}",
+             "outcomes":{"dependencies":"${{ steps.dependencies.outcome }}",
+             "first_divergence":"${{ steps.first_divergence.outcome }}",
+             "contract_ablation":"${{ steps.contract_ablation.outcome }}",
+             "p14_quality":"${{ steps.p14_quality.outcome }}",
+             "p14_oracle":"${{ steps.p14_oracle.outcome }}",
+             "p15_quality":"${{ steps.p15_quality.outcome }}",
+             "p15_oracle":"${{ steps.p15_oracle.outcome }}",
+             "p16_quality":"${{ steps.p16_quality.outcome }}",
+             "p16_oracle":"${{ steps.p16_oracle.outcome }}",
+             "adversarial":"${{ steps.adversarial.outcome }}",
+             "adversarial_mutation":"${{ steps.adversarial_mutation.outcome }}",
+             "syntax":"${{ steps.syntax.outcome }}"}}
+        run: printf '%s\n' "$P1_GATE_OUTCOMES" > "$RUNNER_TEMP/p1-stack-gate-outcomes.json"
+      - name: Verify current closure quality
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: |
+          PYTHONPATH=. python scripts/run_p1_agent_truth_closure_gate.py \
+            --p14 "$RUNNER_TEMP/p1.4-current-retrieval.json" \
+            --p15 "$RUNNER_TEMP/p1.5-current-provenance.json" \
+            --p16 "$RUNNER_TEMP/p1.6-current-delivery.json" \
+            --gates "$RUNNER_TEMP/p1-stack-gate-outcomes.json" \
+            --output "$RUNNER_TEMP/p1-stack-current-closure.json"
+      - name: Verify current closure oracle controls
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: |
+          PYTHONPATH=. python scripts/p1_agent_truth_closure_self_test.py \
+            --p14 "$RUNNER_TEMP/p1.4-current-retrieval.json" \
+            --p15 "$RUNNER_TEMP/p1.5-current-provenance.json" \
+            --p16 "$RUNNER_TEMP/p1.6-current-delivery.json" \
+            --gates "$RUNNER_TEMP/p1-stack-gate-outcomes.json" \
+            --report "$RUNNER_TEMP/p1-stack-current-closure.json"
+      - name: Upload current P1-stack observations and outcomes
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p1-stack-current-closure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/p1.4-current-retrieval.json
+            ${{ runner.temp }}/p1.5-current-provenance.json
+            ${{ runner.temp }}/p1.6-current-delivery.json
+            ${{ runner.temp }}/p1-stack-gate-outcomes.json
+            ${{ runner.temp }}/p1-stack-current-closure.json
+          if-no-files-found: error
+          retention-days: 14
 
   build:
     name: p1-stack-release-build

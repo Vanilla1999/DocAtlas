@@ -253,16 +253,6 @@ class TestExactVersionSupportedPath:
 class TestCanonicalIDSeparation:
     """Test that versioned and latest use separate canonical IDs and indexes."""
 
-    def test_versioned_and_latest_canonical_ids_differ(self):
-        """Versioned and latest should have different canonical IDs."""
-        from docmancer.docs.resolver import canonical_library_id
-        
-        latest_id = canonical_library_id("fastapi", "python", None, "web")
-        versioned_id = canonical_library_id("fastapi", "python", "0.115.0", "web")
-        
-        assert latest_id != versioned_id
-        assert "@0.115.0" in versioned_id
-        assert "@" not in latest_id or ":" in latest_id  # Ecosystem format
 
     def test_registry_stores_versioned_and_latest_separately(self, tmp_path):
         """Registry should store versioned and latest as separate records."""

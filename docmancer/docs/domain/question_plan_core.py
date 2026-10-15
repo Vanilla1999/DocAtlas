@@ -14,15 +14,8 @@ from docmancer.docs.domain.question_frame_core import (
 from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_technical_term
 
 def _safe_coverage_gap(value: str) -> bool:
-    residue = re.sub(
-        r"\b(?:and\s+also|while\s+also|as\s+well\s+as|along\s+with|"
-        r"and|but|plus|then|also|и\s+также|а\s+также|и|но|плюс|затем)\b",
-        "",
-        value,
-        flags=re.I,
-    )
-    residue = re.sub(r"[\s,;:.!?/\u2013\u2014]+", "", residue)
-    return not residue
+    """Only structural separators may be left uncovered, never NL conjunctions."""
+    return re.fullmatch(r"[\s,;:.!?/\u2013\u2014]*", value) is not None
 
 
 def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionPlan:
@@ -121,8 +114,8 @@ Rule = Callable[[str], QuestionPlan | None]
 
 
 def _clean(value: str) -> str:
-    value = " ".join(str(value or "").strip(" ?!.,:").split())
-    return re.sub(r"^(?:the|a|an)\s+", "", value, flags=re.I)[:160]
+    """Retain original literal bytes within the existing helper budget."""
+    return str(value or "")[:160]
 
 
 def _technical(
@@ -143,9 +136,7 @@ def _normalized_clause(
     *,
     compound: bool = False,
 ) -> str:
-    value = " ".join(clause.text.split())
-    value = strip_request_wrapper(value)
-    return clean_phrase(value) if compound else value
+    return clause.text
 
 
 def _span_pattern(value: str) -> re.Pattern[str] | None:

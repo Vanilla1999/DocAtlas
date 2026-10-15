@@ -89,12 +89,15 @@ def audit_payload(payload: dict, snapshot: dict, root: Path) -> list[str]:
         if not path.is_relative_to(root.resolve()) or not path.is_file():
             errors.append('source escapes the isolated corpus')
             continue
-        text = path.read_text(encoding='utf-8')
+        # Keep original LF/CRLF bytes, including a final line terminator.
+        text = path.read_bytes().decode('utf-8')
+        lines = text.splitlines(keepends=True)
         start, end = source.get('line_start'), source.get('line_end')
         snippet = str(source.get('snippet') or '')
-        if type(start) is not int or type(end) is not int or start < 1 or end < start:
+        if (type(start) is not int or type(end) is not int
+                or start < 1 or end < start or end > len(lines)):
             errors.append('invalid source line range')
-        elif snippet not in '\n'.join(text.splitlines()[start-1:end]):
+        elif snippet not in ''.join(lines[start-1:end]):
             errors.append('source span does not occur inside claimed line range')
         if not snippet or snippet not in text:
             errors.append('noncontiguous or nonexistent source snippet')

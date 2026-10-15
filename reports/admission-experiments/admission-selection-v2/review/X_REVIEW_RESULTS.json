@@ -1,0 +1,428 @@
+{
+  "schema": "docatlas-independent-X-review-v2",
+  "boundary": "real public X-rank parent + adapted client exact-span view; NOT native pruned public DTO validation",
+  "top_errors": [],
+  "joint_mask_checks": [
+    {
+      "case_id": "Q16",
+      "candidate_id": "671de117332febed9692de35e04f3163e8b5b127aaabd07825ed17a42f67a987",
+      "errors": [],
+      "retained_sentences": 1,
+      "dropped_sentences": 6
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "11b3ee2532b9c82ab2317d0b9ab17d81f72240960965b5407172b2ddd98d2759",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 3
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "d792458dc7258fe670c96b8d58372dca2773ddb3068b73daac4e5ddb1af086d2",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 3
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "8b76ea26bc4ab311d0dfba1c781c97fa2cbd1e812fb5703a9047ee3234105f35",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 2
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "ec75c75722fd8e42df8b91ca44f397bfc680566d509a848a7bed2f67276896c9",
+      "errors": [],
+      "retained_sentences": 1,
+      "dropped_sentences": 3
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "270b928b45fe37b739fdb968023ec6df14f423fb761a6c31364bb75d27698d18",
+      "errors": [],
+      "retained_sentences": 1,
+      "dropped_sentences": 2
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "8591ec3c56573b383309afa039431bbf8ccbbf4687e4e8d7cf04dcbc110f716c",
+      "errors": [],
+      "retained_sentences": 1,
+      "dropped_sentences": 2
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "3ef5b423b4e0c43a75af795c5bf0c21e79d099b928db3323b823f1017652ecbe",
+      "errors": [],
+      "retained_sentences": 3,
+      "dropped_sentences": 4
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "70e7686d8e01937efe64438f516444c602fb4c66280cc72320cc191567a51ae2",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 4
+    },
+    {
+      "case_id": "Q16",
+      "candidate_id": "99b4837f4c6d6c48d730fb93616eacf4fdb6c66068c55e5c8453ed5d0709fd22",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 3
+    },
+    {
+      "case_id": "Q46",
+      "candidate_id": "4dd006f838fabdc972bd81f820dcae1bc28873862528ddac0f50b34255b988c0",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 2
+    },
+    {
+      "case_id": "Q46",
+      "candidate_id": "89d3a9fef42fc6e44c411967cb747e3d08ab84d869ef24d8448f2d4456b1496f",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 2
+    },
+    {
+      "case_id": "Q46",
+      "candidate_id": "f1045d72f592b1e85aea1266c1978a14d8e4faeea541246db2061bc0b42febd9",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 3
+    },
+    {
+      "case_id": "Q46",
+      "candidate_id": "29ca211cabaf533be72ac15917b5e265d612fa496a3e196941caf22f15dabf1c",
+      "errors": [],
+      "retained_sentences": 1,
+      "dropped_sentences": 2
+    },
+    {
+      "case_id": "Q46",
+      "candidate_id": "3ef5b423b4e0c43a75af795c5bf0c21e79d099b928db3323b823f1017652ecbe",
+      "errors": [],
+      "retained_sentences": 2,
+      "dropped_sentences": 5
+    },
+    {
+      "case_id": "Q46",
+      "candidate_id": "d5c271c10f09b4bae48a0c861ad228a2e263b27aad786075c6aa9b224fa461de",
+      "errors": [],
+      "retained_sentences": 0,
+      "dropped_sentences": 1
+    }
+  ],
+  "cases": {
+    "Q16": {
+      "errors": [],
+      "parent_checks": [
+        {
+          "id": "ev-e2fee8fbbe2755c6",
+          "errors": [],
+          "span": [
+            1024,
+            2100
+          ]
+        },
+        {
+          "id": "ev-0acd88e101a1dacd",
+          "errors": [],
+          "span": [
+            5797,
+            7726
+          ]
+        },
+        {
+          "id": "ev-0221bb1be2ef5d08",
+          "errors": [],
+          "span": [
+            3148,
+            3770
+          ]
+        }
+      ],
+      "same_complete_primary_universe": true,
+      "Xrank_Mini_same_selected_indices": true,
+      "Xrank_Mini_same_final_public_sources": true,
+      "same_native_ids_for_rank_and_prune": true,
+      "selected_indices": [
+        0,
+        2
+      ],
+      "client_policy_reconstructed_independently": true,
+      "parent_source_policy": "PASS",
+      "excerpt_provenance_note": "line_start/line_end inherited from PUBLIC PARENT envelope, not recomputed exact child lines; exact child spans in sidecar; NOT a validated pruned public DTO",
+      "standalone_punctuation_excerpts": [],
+      "public_new_call_seconds": 0.32244258200080367,
+      "old_B1_capture_seconds": 4.086134780998691,
+      "joint_forward_seconds": 2.105666322993784,
+      "view_build_seconds": 0.009031748999404954,
+      "arms": {
+        "X-rank": {
+          "errors": [],
+          "required_span_delivery": true,
+          "source_count": 3,
+          "source_chars": 3627,
+          "submitted_prompt_chars": 6267,
+          "submitted_prompt_utf8_bytes": 9627,
+          "host_seconds": 6.186256,
+          "semantic_required_facts": "PASS",
+          "grounded_required_relations": "PASS",
+          "unsupported_affirmative_claims": [],
+          "semantic_reason": "Оба completion поля и отличие от начала сохранены; не требуем неasked lifecycle ID или весь диагностический перечень.",
+          "exact_citations": "FAIL",
+          "quotes": [
+            {
+              "source_id": "ev-e2fee8fbbe2755c6",
+              "quote": "Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms` и `trace_incomplete`.",
+              "id_valid": true,
+              "literal_in_submitted_fragment": false,
+              "literal_in_original_document": false,
+              "supports": "У события завершения есть поля `duration_ms` и `trace_incomplete`, которых нет в начале запроса."
+            }
+          ],
+          "raw_answer_sha256": "36884e40f8fa8a563d37a3b14c045228198bf494161cb8d6e935604aabd9a9bf"
+        },
+        "X-prune": {
+          "errors": [],
+          "required_span_delivery": true,
+          "source_count": 4,
+          "source_chars": 2595,
+          "submitted_prompt_chars": 5546,
+          "submitted_prompt_utf8_bytes": 8267,
+          "host_seconds": 3.220084,
+          "semantic_required_facts": "PASS",
+          "grounded_required_relations": "PASS",
+          "unsupported_affirmative_claims": [],
+          "semantic_reason": "Оба completion поля и отличие от начала сохранены; не требуем неasked lifecycle ID или весь диагностический перечень.",
+          "exact_citations": "FAIL",
+          "quotes": [
+            {
+              "source_id": "excerpt-f649e2c7ddb8efb9",
+              "quote": "завершение содержит `duration_ms` и `trace_incomplete`.",
+              "id_valid": true,
+              "literal_in_submitted_fragment": false,
+              "literal_in_original_document": false,
+              "supports": "Событие завершения содержит диагностическую информацию о длительности и полноте трассы."
+            }
+          ],
+          "raw_answer_sha256": "1b44799422c6722793cec8a03a4b4fcce8b3223ca9fe5e92d1ef9b72900e7a2e"
+        }
+      }
+    },
+    "Q46": {
+      "errors": [],
+      "parent_checks": [
+        {
+          "id": "ev-435c4129d5f616b2",
+          "errors": [],
+          "span": [
+            5797,
+            7726
+          ]
+        },
+        {
+          "id": "ev-ee6b0cb2b986ca99",
+          "errors": [],
+          "span": [
+            756,
+            1002
+          ]
+        }
+      ],
+      "same_complete_primary_universe": true,
+      "Xrank_Mini_same_selected_indices": true,
+      "Xrank_Mini_same_final_public_sources": true,
+      "same_native_ids_for_rank_and_prune": true,
+      "selected_indices": [
+        3,
+        4
+      ],
+      "client_policy_reconstructed_independently": true,
+      "parent_source_policy": "PASS",
+      "excerpt_provenance_note": "line_start/line_end inherited from PUBLIC PARENT envelope, not recomputed exact child lines; exact child spans in sidecar; NOT a validated pruned public DTO",
+      "standalone_punctuation_excerpts": [
+        "excerpt-073df080d475e28e"
+      ],
+      "public_new_call_seconds": 0.32446783799969126,
+      "old_B1_capture_seconds": 2.8546582929993747,
+      "joint_forward_seconds": 0.5930971240013605,
+      "view_build_seconds": 0.007236200002807891,
+      "arms": {
+        "X-rank": {
+          "errors": [],
+          "required_span_delivery": true,
+          "source_count": 2,
+          "source_chars": 2175,
+          "submitted_prompt_chars": 4467,
+          "submitted_prompt_utf8_bytes": 7000,
+          "host_seconds": 3.520278,
+          "semantic_required_facts": "PASS",
+          "grounded_required_relations": "PASS",
+          "unsupported_affirmative_claims": [],
+          "semantic_reason": "Явно отказывает PASS одинаковым неправильным ответам; не требуем неasked полного audit checklist.",
+          "exact_citations": "FAIL",
+          "quotes": [
+            {
+              "source_id": "ev-435c4129d5f616b2",
+              "quote": "Два независимых PASS и паритет. В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS.",
+              "id_valid": true,
+              "literal_in_submitted_fragment": false,
+              "literal_in_original_document": false,
+              "supports": "Одинаковые неправильные ответы не являются основанием для PASS; необходимы два независимых успешных результата и проверка их корректности."
+            }
+          ],
+          "raw_answer_sha256": "f7c19a556f9bc5a45310923121a6c1d411a41cfc24cf9cd914d634668026c6cb"
+        },
+        "X-prune": {
+          "errors": [],
+          "required_span_delivery": true,
+          "source_count": 6,
+          "source_chars": 1992,
+          "submitted_prompt_chars": 5606,
+          "submitted_prompt_utf8_bytes": 7995,
+          "host_seconds": 2.678837,
+          "semantic_required_facts": "PASS",
+          "grounded_required_relations": "PASS",
+          "unsupported_affirmative_claims": [],
+          "semantic_reason": "Явно отказывает PASS одинаковым неправильным ответам; не требуем неasked полного audit checklist.",
+          "exact_citations": "PASS",
+          "quotes": [
+            {
+              "source_id": "excerpt-3982181389ad967a",
+              "quote": "Одинаковые неправильные ответы не дают PASS.",
+              "id_valid": true,
+              "literal_in_submitted_fragment": true,
+              "literal_in_original_document": true,
+              "supports": "Одинаковые неправильные ответы не являются основанием для PASS."
+            },
+            {
+              "source_id": "excerpt-3be674da6b42ed4e",
+              "quote": "В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам",
+              "id_valid": true,
+              "literal_in_submitted_fragment": true,
+              "literal_in_original_document": true,
+              "supports": "Результаты обоих режимов должны проверяться на соответствие обязательным фактам и документам."
+            }
+          ],
+          "raw_answer_sha256": "66eed4f76c6cce51a38f070105732ba10cfbc056cb8e1c6cdf89dc29c5d4a988"
+        }
+      }
+    }
+  },
+  "counts": {
+    "new_prepares": 0,
+    "new_public_calls": 2,
+    "joint_forwards": 16,
+    "new_host_attempts": 4,
+    "completed_host_answers": 4
+  },
+  "total_stage_ledger": {
+    "prepares": 7,
+    "context_attempts": 58,
+    "host_requests": 40,
+    "model_forwards": 56
+  },
+  "costs_reported": {
+    "rows": [
+      {
+        "id": "Q16",
+        "arm": "X-rank",
+        "snippet_proxy_tokens": 911,
+        "submitted_prompt_proxy_tokens": 1653,
+        "source_count": 3,
+        "host_seconds": 6.186256,
+        "resident_joint_forward_seconds": 2.105666322993784,
+        "actual_public_requests": 2,
+        "public_seconds": 4.408577362999495,
+        "observed_actual_turn_seconds": 12.700499685993279,
+        "view_build_seconds": 0,
+        "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+      },
+      {
+        "id": "Q16",
+        "arm": "X-prune",
+        "snippet_proxy_tokens": 659,
+        "submitted_prompt_proxy_tokens": 1479,
+        "source_count": 4,
+        "host_seconds": 3.220084,
+        "resident_joint_forward_seconds": 2.105666322993784,
+        "actual_public_requests": 2,
+        "public_seconds": 4.408577362999495,
+        "observed_actual_turn_seconds": 9.743359434992684,
+        "view_build_seconds": 0.009031748999404954,
+        "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+      },
+      {
+        "id": "Q46",
+        "arm": "X-rank",
+        "snippet_proxy_tokens": 519,
+        "submitted_prompt_proxy_tokens": 1141,
+        "source_count": 2,
+        "host_seconds": 3.520278,
+        "resident_joint_forward_seconds": 0.5930971240013605,
+        "actual_public_requests": 2,
+        "public_seconds": 3.179126130999066,
+        "observed_actual_turn_seconds": 7.292501255000426,
+        "view_build_seconds": 0,
+        "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+      },
+      {
+        "id": "Q46",
+        "arm": "X-prune",
+        "snippet_proxy_tokens": 476,
+        "submitted_prompt_proxy_tokens": 1506,
+        "source_count": 6,
+        "host_seconds": 2.678837,
+        "resident_joint_forward_seconds": 0.5930971240013605,
+        "actual_public_requests": 2,
+        "public_seconds": 3.179126130999066,
+        "observed_actual_turn_seconds": 6.458296455003234,
+        "view_build_seconds": 0.007236200002807891,
+        "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+      }
+    ],
+    "codec": "o200k_base proxy NOT billing",
+    "cold_load_seconds": 2.9039846129999205,
+    "forwards": 16,
+    "rss_bytes": 2230779904,
+    "pairing": "same joint scores/retained masks, same native selected IDs, same actual parent public packet",
+    "boundary": "product-integrated ranking + client exact-span pruning; no native pruned public DTO claim"
+  },
+  "cost_accounting_note": "COSTS actual_public_requests=2 per row includes common old B1 capture plus new X-rank call for that case; prune reuses parent, rows must not be summed as new calls. observed_actual_turn_seconds adds already-consumed B1 capture to each hypothetical arm; cold load excluded. Shared pipeline cost counted once for workload, charged equally for hypothetical arm comparison.",
+  "model": {
+    "revision": "f2798d357213c40164bdd79557d6d2e43ca7d8d2",
+    "threshold": 0.3,
+    "cold_load_seconds": 2.9039846129999205,
+    "joint_resident_seconds": 2.6987634469951445,
+    "rss_bytes": 2230779904,
+    "license": "same isolated nonproduction eval restriction; no legal/deployment assurance"
+  },
+  "recommendation": "NO_GENERAL_X_PRUNING_ADOPTION: Q16 small submitted reduction with persistent citation FAIL; Q46 submitted framing growth despite one citation improvement. Known diagnostics only; no holdout evidence.",
+  "verdict_axes": {
+    "requested_version_filtering": "NOT_TESTED",
+    "literal_transport_version_2026_1": "UNSATISFIED",
+    "arbitrary_access_consent_denials": "NOT_TESTED",
+    "pruned_native_public_DTO_validation": "NOT_APPLIED_BY_DESIGN"
+  },
+  "raw_hash_manifest": "X_RAW_HASHES.json",
+  "raw_hash_manifest_sha256": "70fe21057d2098c48d332c7035e61be09ea7b61512f215d894149f8136965648",
+  "proxy_verification": "o200k proxies read from saved COSTS (no tokenizer execution); submitted chars/UTF-8 bytes/source chars independently recomputed",
+  "total_primary_plus_X_ledger": {
+    "prepares": 7,
+    "context_attempts": 56,
+    "host_requests": 40,
+    "model_forwards": 56
+  },
+  "current_ledger_with_ancillary_default_smoke": {
+    "prepares": 7,
+    "context_attempts": 58,
+    "host_requests": 40,
+    "model_forwards": 56
+  },
+  "version_axis_scope_note": "Literal transport2026.1 is UNSATISFIED for independent corpus adaptation; old Q16/Q46 oracle itself expects unversioned project provenance, not a requested2026.1 version."
+}

@@ -1,0 +1,19 @@
+{
+  "status": "setup_only_no_product_import",
+  "python": "/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python",
+  "version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "dependencies": {
+    "mcp": "1.30.0",
+    "tiktoken": "0.11.0",
+    "pytest": "9.1.1",
+    "pytest-asyncio": "1.4.0",
+    "hatchling": "1.26.3",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1"
+  },
+  "shared_environment_mutated": false,
+  "dependency_path": "/tmp/opencode/docatlas-ablation-venv/lib/python3.12/site-packages",
+  "new_environment": "/tmp/opencode/docatlas-heuristic-removal-runtime",
+  "source": "91dd2b4e",
+  "product_calls": 0
+}

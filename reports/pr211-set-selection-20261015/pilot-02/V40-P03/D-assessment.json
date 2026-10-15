@@ -1,0 +1,128 @@
+{
+  "verified_sources": [
+    {
+      "source_index": 0,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-4eedecad9a2aa6fe",
+      "line_start": 102,
+      "line_end": 111,
+      "projection_fingerprint": "c644258651501101e3a9b8db8a150a5a34b5b09e23f9dc2ea90033cd9ec2703e",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2805,
+          3247
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2805,
+          3247
+        ]
+      ]
+    },
+    {
+      "source_index": 1,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-44c3fc1469dd5314",
+      "line_start": 653,
+      "line_end": 662,
+      "projection_fingerprint": "49b40b8410ae272035038b58f97697d5c5dce0f8d74a7366d53e4e74ecbf67d2",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20292,
+          20551
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20292,
+          20551
+        ]
+      ]
+    },
+    {
+      "source_index": 2,
+      "path_or_url": "docs/configuration.md",
+      "relative_path": "docs/configuration.md",
+      "evidence_id": "ev-07ced9f6f9b7324a",
+      "line_start": 663,
+      "line_end": 672,
+      "projection_fingerprint": "d68bdd26e4073ada1cf42dd3b6776e79d72102d944bc699d086ac36347ee9cd8",
+      "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20551,
+          20909
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20551,
+          20909
+        ]
+      ]
+    }
+  ],
+  "oracle": {
+    "claims": [
+      {
+        "claim_id": "required",
+        "documented": true,
+        "covered": false,
+        "witness_sets": [
+          {
+            "set_index": 0,
+            "covered": false,
+            "parts": [
+              {
+                "witness_id": "V40-P03/required/set-0/part-0",
+                "path": "docs/configuration.md",
+                "line_start": 102,
+                "line_end": 114,
+                "covered": false,
+                "char_start": 2805,
+                "char_end": 3320,
+                "expected_characters": 515,
+                "covered_characters": 442,
+                "missing_char_ranges": [
+                  [
+                    3247,
+                    3320
+                  ]
+                ],
+                "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "required_claim_count": 1,
+    "documented_claim_count": 1,
+    "covered_documented_claim_count": 0,
+    "all_documented_claims_covered": false,
+    "missing_documented_claim_ids": [
+      "required"
+    ],
+    "unavailable_requested_claim_ids": [],
+    "missing_witness_ids": [
+      "V40-P03/required/set-0/part-0"
+    ],
+    "errors": []
+  },
+  "source_errors": []
+}

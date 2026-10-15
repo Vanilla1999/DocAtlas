@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-T02",
+  "mode": "mini",
+  "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+  "public_request": {
+    "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/textual.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:18.513432+00:00",
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_before": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "same_initial_state": true,
+  "elapsed_seconds": 1.5176704219993553,
+  "process_cpu_seconds": 8.469953925000013,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 954696,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_after": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "wire_sha256": "74e162a8b8d12a32ef2b50b8546b00dc7f739bf19b359b49f3536e5d5ffe4b0d",
+  "wire_utf8_bytes": 2851,
+  "utf8_quarter_proxy": 713,
+  "codec_o200k_base": 795,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

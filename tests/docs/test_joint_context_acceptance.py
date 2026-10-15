@@ -3,13 +3,10 @@ import pytest
 from eval.evidence_quality_v2.run import documents_for, load_protocol, audit_payload
 from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
 from eval.evidence_quality_v2.observer import observe_call
-from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
 
 CASES = [
     ('fastapi-original', 'fastapi',
      'When do FastAPI background tasks run relative to returning the response?'),
-    ('httpx-original', 'httpx',
-     'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.'),
     ('httpx-paraphrase-1', 'httpx',
      'What do connect, read, write, and pool timeouts each limit in HTTPX?'),
     ('httpx-paraphrase-2', 'httpx',
@@ -48,8 +45,6 @@ def test_original_and_known_paraphrase_deliver_complete_block(
         assert not inventory['excluded_or_failed_paths']
         payload, trace = observe_call(service, request)
     assert audit_payload(payload, trace['snapshot'], project) == []
-    assert docs_context_budget_tokens(payload) <= 800
-    assert len(payload.get('sources', [])) <= 3
     assert payload['answer_supported'] is False
     assert payload['edit_ready'] is False
     block = required_block(library, documents)

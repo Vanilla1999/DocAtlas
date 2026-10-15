@@ -1,0 +1,1019 @@
+{
+  "family": "textual",
+  "root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+  "inventory": {
+    "seconds": 0.09773389299880364,
+    "expected_paths": [
+      "docs/guide/reactivity.md",
+      "docs/guide/workers.md",
+      "docs/widgets/input.md"
+    ],
+    "indexed_paths": [
+      "docs/guide/reactivity.md",
+      "docs/guide/workers.md",
+      "docs/widgets/input.md"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-a26a7f57ad4d4a4e28286840971cae5d2294da9c",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "# Reactivity\n\nTextual's reactive attributes are attributes _with superpowers_. In this chapter we will look at how reactive attributes can simplify your apps.\n\n!!! quote\n\n    With great power comes great responsibility.\n\n    &mdash; Uncle Ben\n\n",
+        "line_start": 1,
+        "line_end": 10
+      },
+      {
+        "stable_chunk_id": "child-5ead24e9fef06d6bbe7ecadcd8d46ee4a71660e3",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Reactive attributes\n\nTextual provides an alternative way of adding attributes to your widget or App, which doesn't require adding them to your class constructor (`__init__`). To create these attributes import [reactive][textual.reactive.reactive] from `textual.reactive`, and assign them in the class scope.\n\nThe following code illustrates how to create reactive attributes:\n\n",
+        "line_start": 11,
+        "line_end": 16
+      },
+      {
+        "stable_chunk_id": "child-9956bd1e7a92c3de8c7ae18e1e7125fc3860ec1f",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "```python\nfrom textual.reactive import reactive\nfrom textual.widget import Widget\n\nclass Reactive(Widget):\n\n    name = reactive(\"Paul\")  # (1)!\n    count = reactive(0) # (2)!\n    is_cool = reactive(True)  # (3)!\n```\n\n1. Create a string attribute with a default of `\"Paul\"`\n2. Creates an integer attribute with a default of `0`.\n3. Creates a boolean attribute with a default of `True`.\n\nThe `reactive` constructor accepts a default value as the first positional argument.\n\n",
+        "line_start": 17,
+        "line_end": 33
+      },
+      {
+        "stable_chunk_id": "child-391aaee56c3935266e25856c4acbdbe7875c7c06",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "!!! information\n\n    Textual uses Python's _descriptor protocol_ to create reactive attributes, which is the same protocol used by the builtin `property` decorator.\n\nYou can get and set these attributes in the same way as if you had assigned them in an `__init__` method. For instance `self.name = \"Jessica\"`, `self.count += 1`, or `print(self.is_cool)`.\n\n",
+        "line_start": 34,
+        "line_end": 39
+      },
+      {
+        "stable_chunk_id": "child-e4f18fd6bc22c5109232c4d8b03160a8d211b4de",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "### Dynamic defaults\n\nYou can also set the default to a function (or other callable). Textual will call this function to get the default value. The following code illustrates a reactive value which will be automatically assigned the current time when the widget is created:\n\n```python\nfrom time import time\nfrom textual.reactive import reactive\nfrom textual.widget import Widget\n\nclass Timer(Widget):\n\n    start_time = reactive(time)  # (1)!\n```\n\n",
+        "line_start": 40,
+        "line_end": 53
+      },
+      {
+        "stable_chunk_id": "child-a3e4893a80d15dcbcfdc851152b33153b2827184",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "1. The `time` function returns the current time in seconds.\n\n",
+        "line_start": 54,
+        "line_end": 55
+      },
+      {
+        "stable_chunk_id": "child-641de3070c78a6f018e8568cec462fb0dec92e79",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "### Typing reactive attributes\n\nThere is no need to specify a type hint if a reactive attribute has a default value, as type checkers will assume the attribute is the same type as the default.\n\nYou may want to add explicit type hints if the attribute type is a superset of the default type. For instance if you want to make an attribute optional. Here's how you would create a reactive string attribute which may be `None`:\n\n",
+        "line_start": 56,
+        "line_end": 61
+      },
+      {
+        "stable_chunk_id": "child-da8910346f960210444db74892ee2fb8a978e175",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "```python\n    name: reactive[str | None] = reactive(\"Paul\")\n```\n\n",
+        "line_start": 62,
+        "line_end": 65
+      },
+      {
+        "stable_chunk_id": "child-228dc6501166607e0e58239bb42345770bf2dbc6",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Smart refresh\n\nThe first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content.\n\n!!! information\n\n    If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates.\n\n",
+        "line_start": 66,
+        "line_end": 73
+      },
+      {
+        "stable_chunk_id": "child-88860638ad7b07cf4549742f852b3cb9f14bbc51",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "Let's look at an example which illustrates this. In the following app, the value of an input is used to update a \"Hello, World!\" type greeting.\n\n=== \"refresh01.py\"\n\n    ```python hl_lines=\"7-13 24\"\n    --8<-- \"docs/examples/guide/reactivity/refresh01.py\"\n    ```\n\n=== \"refresh01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/refresh01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/refresh01.py\" press=\"T,e,x,t,u,a,l\"}\n    ```\n\n",
+        "line_start": 74,
+        "line_end": 92
+      },
+      {
+        "stable_chunk_id": "child-96b0aebb6f88e135824f0b3f4108c67a407ff080",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "The `Name` widget has a reactive `who` attribute. When the app modifies that attribute, a refresh happens automatically.\n\n!!! information\n\n    Textual will check if a value has really changed, so assigning the same value wont prompt an unnecessary refresh.\n\n### Disabling refresh\n\n",
+        "line_start": 93,
+        "line_end": 100
+      },
+      {
+        "stable_chunk_id": "child-0d15ee2dd43669c8a2b8992ba90a2069e1164bea",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "If you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`.\n\nThe following code illustrates how you create non-refreshing reactive attributes.\n\n```python\nclass MyWidget(Widget):\n    count = var(0)  # (1)!\n```\n\n1. Changing `self.count` wont cause a refresh or layout.\n\n",
+        "line_start": 101,
+        "line_end": 111
+      },
+      {
+        "stable_chunk_id": "child-0f97cfe7854d2012752eaf0821531f0a132c5586",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "### Layout\n\nThe smart refresh feature will update the content area of a widget, but will not change its size. If modifying an attribute should change the size of the widget, you can set `layout=True` on the reactive attribute. This ensures that your CSS layout will update accordingly.\n\nThe following example modifies \"refresh01.py\" so that the greeting has an automatic width.\n\n=== \"refresh02.py\"\n\n",
+        "line_start": 112,
+        "line_end": 119
+      },
+      {
+        "stable_chunk_id": "child-05965f697bf1ef90b42412667de40b6f6446fe27",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```python hl_lines=\"10\"\n    --8<-- \"docs/examples/guide/reactivity/refresh02.py\"\n    ```\n\n    1. This attribute will update the layout when changed.\n\n=== \"refresh02.tcss\"\n\n    ```css hl_lines=\"7-9\"\n    --8<-- \"docs/examples/guide/reactivity/refresh02.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/refresh02.py\" press=\"n,a,m,e\"}\n    ```\n\n",
+        "line_start": 120,
+        "line_end": 136
+      },
+      {
+        "stable_chunk_id": "child-fc95b1c13a41b6acbaa67b3cc8297f66dd687b83",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "If you type into the input now, the greeting will expand to fit the content. If you were to set `layout=False` on the reactive attribute, you should see that the box remains the same size when you type.\n\n",
+        "line_start": 137,
+        "line_end": 138
+      },
+      {
+        "stable_chunk_id": "child-4fb7ac50ec104fb2b5211da4281e1e2019a037a3",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Validation\n\nThe next superpower we will look at is _validation_, which can check and potentially modify a value you assign to a reactive attribute.\n\nIf you add a method that begins with `validate_` followed by the name of your attribute, it will be called when you assign a value to that attribute. This method should accept the incoming value as a positional argument, and return the value to set (which may be the same or a different value).\n\n",
+        "line_start": 139,
+        "line_end": 144
+      },
+      {
+        "stable_chunk_id": "child-9eb3484865c6b206dbba89f9f88b58702e209f32",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "A common use for this is to restrict numbers to a given range. The following example keeps a count. There is a button to increase the count, and a button to decrease it. The validation ensures that the count will never go above 10 or below zero.\n\n=== \"validate01.py\"\n\n    ```python hl_lines=\"12-18 30 32\"\n    --8<-- \"docs/examples/guide/reactivity/validate01.py\"\n    ```\n\n=== \"validate01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/validate01.tcss\"\n    ```\n\n",
+        "line_start": 145,
+        "line_end": 158
+      },
+      {
+        "stable_chunk_id": "child-46a57053fd4bae8b8f3701bcacc9a4ef0b0a8399",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/validate01.py\"}\n    ```\n\nIf you click the buttons in the above example it will show the current count. When `self.count` is modified in the button handler, Textual runs `validate_count` which performs the validation to limit the value of count.\n\n",
+        "line_start": 159,
+        "line_end": 165
+      },
+      {
+        "stable_chunk_id": "child-23d1b377ce87b06a4395303aaec48512d7010339",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Watch methods\n\nWatch methods are another superpower.\nTextual will call watch methods when reactive attributes are modified.\nWatch method names begin with `watch_` followed by the name of the attribute, and should accept one or two arguments.\nIf the method accepts a single argument, it will be called with the new assigned value.\nIf the method accepts *two* positional arguments, it will be called with both the *old* value and the *new* value.\n\n",
+        "line_start": 166,
+        "line_end": 173
+      },
+      {
+        "stable_chunk_id": "child-99f266e8737f62c7790586668603b00ee664d42e",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "The following app will display any color you type into the input. Try it with a valid color in Textual CSS. For example `\"darkorchid\"` or `\"#52de44\"`.\n\n=== \"watch01.py\"\n\n    ```python hl_lines=\"17-19 28\"\n    --8<-- \"docs/examples/guide/reactivity/watch01.py\"\n    ```\n\n    1. Creates a reactive [color][textual.color.Color] attribute.\n    2. Called when `self.color` is changed.\n    3. New color is assigned here.\n\n=== \"watch01.tcss\"\n\n",
+        "line_start": 174,
+        "line_end": 187
+      },
+      {
+        "stable_chunk_id": "child-02ab948fdc25d43727a1967f36b29a4d21f5b2f6",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```css\n    --8<-- \"docs/examples/guide/reactivity/watch01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/watch01.py\" press=\"d,a,r,k,o,r,c,h,i,d\"}\n    ```\n\nThe color is parsed in `on_input_submitted` and assigned to `self.color`. Because `color` is reactive, Textual also calls `watch_color` with the old and new values.\n\n",
+        "line_start": 188,
+        "line_end": 198
+      },
+      {
+        "stable_chunk_id": "child-6a2f591b35717628cbd066dd7cb0653af0110780",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "### When are watch methods called?\n\nTextual only calls watch methods if the value of a reactive attribute _changes_.\nIf the newly assigned value is the same as the previous value, the watch method is not called.\nYou can override this behavior by passing `always_update=True` to `reactive`.\n\n\n",
+        "line_start": 199,
+        "line_end": 205
+      },
+      {
+        "stable_chunk_id": "child-cbf22e48f9d73d620500f4f08b68d13eb97c35ca",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "### Dynamically watching reactive attributes\n\nYou can programmatically add watchers to reactive attributes with the method [`watch`][textual.dom.DOMNode.watch].\nThis is useful when you want to react to changes to reactive attributes for which you can't edit the watch methods.\n\n",
+        "line_start": 206,
+        "line_end": 210
+      },
+      {
+        "stable_chunk_id": "child-fb650ae1b5b8c35db606f3060acd5f2d59bff521",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "The example below shows a widget `Counter` that defines a reactive attribute `counter`.\nThe app that uses `Counter` uses the method `watch` to keep its progress bar synced with the reactive attribute:\n\n=== \"dynamic_watch.py\"\n\n    ```python hl_lines=\"9 28-29 31\"\n    --8<-- \"docs/examples/guide/reactivity/dynamic_watch.py\"\n    ```\n\n",
+        "line_start": 211,
+        "line_end": 219
+      },
+      {
+        "stable_chunk_id": "child-c988bb7d2c41c1b68d696af0b05d314ed3428b6a",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    1. `counter` is a reactive attribute defined inside `Counter`.\n    2. `update_progress` is a custom callback that will update the progress bar when `counter` changes.\n    3. We use the method `watch` to set `update_progress` as an additional watcher for the reactive attribute `counter`.\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/dynamic_watch.py\" press=\"enter,enter,enter\"}\n    ```\n\n",
+        "line_start": 220,
+        "line_end": 228
+      },
+      {
+        "stable_chunk_id": "child-405745e793a8f9b8398b18c057832c8e47a388db",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Recompose\n\nAn alternative to a refresh is *recompose*.\nIf you set `recompose=True` on a reactive, then Textual will remove all the child widgets and call [`compose()`][textual.widget.Widget.compose] again, when the reactive attribute changes.\nThe process of removing and mounting new widgets occurs in a single update, so it will appear as though the content has simply updated.\n\nThe following example uses recompose:\n\n=== \"refresh03.py\"\n\n",
+        "line_start": 229,
+        "line_end": 238
+      },
+      {
+        "stable_chunk_id": "child-f7c3cd6c36856a76f0810d539ef9356291dd7759",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```python hl_lines=\"10 12-13\"\n    --8<-- \"docs/examples/guide/reactivity/refresh03.py\"\n    ```\n\n    1. Setting `recompose=True` will cause all child widgets to be removed and `compose` called again to add new widgets.\n    2. This `compose()` method will be called when `who` is changed.\n\n=== \"refresh03.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/refresh03.tcss\"\n    ```\n\n=== \"Output\"\n\n",
+        "line_start": 239,
+        "line_end": 253
+      },
+      {
+        "stable_chunk_id": "child-580016b5681f096bd1ee059f59ade411cea5c9d9",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```{.textual path=\"docs/examples/guide/reactivity/refresh03.py\" press=\"P,a,u,l\"}\n    ```\n\nWhile the end-result is identical to `refresh02.py`, this code works quite differently.\nThe main difference is that recomposing creates an entirely new set of child widgets rather than updating existing widgets.\nSo when the `who` attribute changes, the `Name` widget will replace its `Label` with a new instance (containing updated content).\n\n!!! warning \n\n",
+        "line_start": 254,
+        "line_end": 262
+      },
+      {
+        "stable_chunk_id": "child-4ef497853a939344417dec94559cc0b0892d4072",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    You should avoid storing a reference to child widgets when using recompose.\n    Better to [query](../guide/queries.md) for a child widget when you need them.\n\n",
+        "line_start": 263,
+        "line_end": 265
+      },
+      {
+        "stable_chunk_id": "child-1d8c7bcc6402467a029edcb0414ad7c211209a42",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "It is important to note that any child widgets will have their state reset after a recompose.\nFor simple content, that doesn't matter much.\nBut widgets with an internal state (such as [`DataTable`](../widgets/data_table.md), [`Input`](../widgets/input.md), or [`TextArea`](../widgets/text_area.md)) would not be particularly useful if recomposed.\n\n",
+        "line_start": 266,
+        "line_end": 269
+      },
+      {
+        "stable_chunk_id": "child-a437c8f6e2ed2947f37d6f4cbd35d2ee4a4a0281",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "Recomposing is slightly less efficient than a simple refresh, and best avoided if you need to update rapidly or you have many child widgets.\nThat said, it can often simplify your code.\nLet's look at a practical example.\nFirst a version *without* recompose:\n\n=== \"recompose01.py\"\n\n    ```python hl_lines=\"20 26-27\"\n    --8<-- \"docs/examples/guide/reactivity/recompose01.py\"\n    ```\n\n    1. Called when the `time` attribute changes.\n    2. Update the time once a second.\n\n=== \"Output\"\n\n",
+        "line_start": 270,
+        "line_end": 285
+      },
+      {
+        "stable_chunk_id": "child-e278f0546dfda7de530fb6ccab81c70f752c68bc",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```{.textual path=\"docs/examples/guide/reactivity/recompose01.py\" }\n    ```\n\nThis displays a clock which updates once a second.\nThe code is straightforward, but note how we format the time in two places: `compose()` *and* `watch_time()`.\nWe can simplify this by recomposing rather than refreshing:\n\n=== \"recompose02.py\"\n\n    ```python hl_lines=\"15\"\n    --8<-- \"docs/examples/guide/reactivity/recompose02.py\"\n    ```\n\n=== \"Output\"\n\n",
+        "line_start": 286,
+        "line_end": 300
+      },
+      {
+        "stable_chunk_id": "child-0c1b45042b85fd8bd3c1e25156e74e1254322e54",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```{.textual path=\"docs/examples/guide/reactivity/recompose02.py\" }\n    ```\n\nIn this version, the app is recomposed when the `time` attribute changes, which replaces the `Digits` widget with a new instance and updated time.\nThere's no need for the `watch_time` method, because the new `Digits` instance will already show the current time.\n\n\n",
+        "line_start": 301,
+        "line_end": 307
+      },
+      {
+        "stable_chunk_id": "child-c4b29b7d6aa5cb0be1ed165092f05b914cbcf56d",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Compute methods\n\nCompute methods are the final superpower offered by the `reactive` descriptor. Textual runs compute methods to calculate the value of a reactive attribute. Compute methods begin with `compute_` followed by the name of the reactive value.\n\nYou could be forgiven in thinking this sounds a lot like Python's property decorator. The difference is that Textual will cache the value of compute methods, and update them when any other reactive attribute changes.\n\n",
+        "line_start": 308,
+        "line_end": 313
+      },
+      {
+        "stable_chunk_id": "child-79393b8ab013132ed3616bd57ae6a2ab4bdfa1c6",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "The following example uses a computed attribute. It displays three inputs for each color component (red, green, and blue). If you enter numbers into these inputs, the background color of another widget changes.\n\n=== \"computed01.py\"\n\n    ```python hl_lines=\"25-26 28-29\"\n    --8<-- \"docs/examples/guide/reactivity/computed01.py\"\n    ```\n\n    1. Combines color components into a Color object.\n    2. The watch method is called when the _result_ of `compute_color` changes.\n\n",
+        "line_start": 314,
+        "line_end": 324
+      },
+      {
+        "stable_chunk_id": "child-4ed06f80db054b35fd931f85fe88b6066e4b4d36",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "=== \"computed01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/computed01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/computed01.py\"}\n    ```\n\nNote the `compute_color` method which combines the color components into a [Color][textual.color.Color] object. It will be recalculated when any of the `red` , `green`, or `blue` attributes are modified.\n\n",
+        "line_start": 325,
+        "line_end": 337
+      },
+      {
+        "stable_chunk_id": "child-da73b43d3cd790eded1d94e98ae374b8a222912d",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "When the result of `compute_color` changes, Textual will also call `watch_color` since `color` still has the [watch method](#watch-methods) superpower.\n\n!!! note\n\n    Textual will first attempt to call the compute method for a reactive attribute, followed by the validate method, and finally the watch method.\n\n!!! note\n\n",
+        "line_start": 338,
+        "line_end": 345
+      },
+      {
+        "stable_chunk_id": "child-4d908466624573a363b450baa91e34e8c768f247",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    It is best to avoid doing anything slow or CPU-intensive in a compute method. Textual calls compute methods on an object when _any_ reactive attribute changes.\n\n",
+        "line_start": 346,
+        "line_end": 347
+      },
+      {
+        "stable_chunk_id": "child-16340677b1985f7eb4fa0d168ba9a50bf281b48e",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Setting reactives without superpowers \n\nYou may find yourself in a situation where you want to set a reactive value, but you *don't* want to invoke watchers or the other super powers.\nThis is fairly common in constructors which run prior to mounting; any watcher which queries the DOM may break if the widget has not yet been mounted.\n\n",
+        "line_start": 348,
+        "line_end": 352
+      },
+      {
+        "stable_chunk_id": "child-92292f13c782d147ae9e56c5949309936bb7ca94",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "To work around this issue, you can call [set_reactive][textual.dom.DOMNode.set_reactive] as an alternative to setting the attribute.\nThe `set_reactive` method accepts the reactive attribute (as a class variable) and the new value.\n\nLet's look at an example.\nThe following app is intended to cycle through various greeting when you press ++space++, however it contains a bug.\n\n",
+        "line_start": 353,
+        "line_end": 358
+      },
+      {
+        "stable_chunk_id": "child-5dfd5562aff0674b61cebbbdecb94da023c1c387",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "```python title=\"set_reactive01.py\"\n--8<-- \"docs/examples/guide/reactivity/set_reactive01.py\"\n```\n\n1. Setting this reactive attribute invokes a watcher.\n2. The watcher attempts to update a label before it is mounted.\n\nIf you run this app, you will find Textual raises a `NoMatches` error in `watch_greeting`. \nThis is because the constructor has assigned the reactive before the widget has fully mounted.\n\nThe following app contains a fix for this issue:\n\n",
+        "line_start": 359,
+        "line_end": 370
+      },
+      {
+        "stable_chunk_id": "child-fa871b609b6deeec7927481e9b259bdc3062b6e3",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "=== \"set_reactive02.py\"\n\n    ```python hl_lines=\"33 34\"\n    --8<-- \"docs/examples/guide/reactivity/set_reactive02.py\"\n    ```\n\n    1. The attribute is set via `set_reactive`, which avoids calling the watcher.\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/set_reactive02.py\"}\n    ```\n\nThe line `self.set_reactive(Greeter.greeting, greeting)` sets the `greeting` attribute but doesn't immediately invoke the watcher.\n\n",
+        "line_start": 371,
+        "line_end": 385
+      },
+      {
+        "stable_chunk_id": "child-9502aea5af28bcc7d9c8b28a24b42b91c00d7379",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Mutable reactives\n\nTextual can detect when you set a reactive to a new value, but it can't detect when you _mutate_ a value.\nIn practice, this means that Textual can detect changes to basic types (int, float, str, etc.), but not if you update a collection, such as a list or dict. \n\n",
+        "line_start": 386,
+        "line_end": 390
+      },
+      {
+        "stable_chunk_id": "child-c25021e8945442cf623e86d120ae6f294a946754",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "You can still use collections and other mutable objects in reactives, but you will need to call [`mutate_reactive`][textual.dom.DOMNode.mutate_reactive] after making changes for the reactive superpowers to work.\n\nHere's an example, that uses a reactive list:\n\n=== \"set_reactive03.py\"\n\n    ```python hl_lines=\"16\"\n    --8<-- \"docs/examples/guide/reactivity/set_reactive03.py\"\n    ```\n\n    1. Creates a reactive list of strings.\n    2. Explicitly mutate the reactive list.\n\n",
+        "line_start": 391,
+        "line_end": 403
+      },
+      {
+        "stable_chunk_id": "child-8b6525a414ac66bf6dbe849b0bdad99841560c04",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/set_reactive03.py\" press=\"W,i,l,l,enter\"}\n    ```\n\nNote the call to `mutate_reactive`. Without it, the display would not update when a new name is appended to the list.\n\n",
+        "line_start": 404,
+        "line_end": 410
+      },
+      {
+        "stable_chunk_id": "child-b9d1512995e8ac727fa9b75b6aa92983d4a6e3e6",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "## Data binding\n\nReactive attributes may be *bound* (connected) to attributes on child widgets, so that changes to the parent are automatically reflected in the children.\nThis can simplify working with compound widgets where the value of an attribute might be used in multiple places.\n\nTo bind reactive attributes, call [data_bind][textual.dom.DOMNode.data_bind] on a widget.\nThis method accepts reactives (as class attributes) in positional arguments or keyword arguments.\n\n",
+        "line_start": 411,
+        "line_end": 418
+      },
+      {
+        "stable_chunk_id": "child-03c63ecf073f9e12a28088c8b9cdccdfa488cdf9",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "Let's look at an app that could benefit from data binding.\nIn the following code we have a `WorldClock` widget which displays the time in any given timezone.\n\n\n!!! note\n\n    This example uses the [pytz](https://pypi.org/project/pytz/) library for working with timezones.\n    You can install pytz with `pip install pytz`.\n\n\n=== \"world_clock01.py\"\n\n    ```python\n    --8<-- \"docs/examples/guide/reactivity/world_clock01.py\"\n    ```\n\n",
+        "line_start": 419,
+        "line_end": 434
+      },
+      {
+        "stable_chunk_id": "child-43e0e0b46b033d0f89c1fce6fbd11bba95cc1f14",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    1. Update the `time` reactive attribute of every `WorldClock`.\n\n=== \"world_clock01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/world_clock01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/world_clock01.py\"}\n    ```\n\nWe've added three world clocks for London, Paris, and Tokyo.\nThe clocks are kept up-to-date by watching the app's `time` reactive, and updating the clocks in a loop.\n\n",
+        "line_start": 435,
+        "line_end": 450
+      },
+      {
+        "stable_chunk_id": "child-9701444b399893cab1d6aca6297d1c89373f05d6",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "While this approach works fine, it does require we take care to update every `WorldClock` we mount.\nLet's see how data binding can simplify this.\n\nThe following app calls `data_bind` on the world clock widgets to connect the app's `time` with the widget's `time` attribute:\n\n=== \"world_clock02.py\"\n\n    ```python hl_lines=\"34-36\"\n    --8<-- \"docs/examples/guide/reactivity/world_clock02.py\"\n    ```\n\n",
+        "line_start": 451,
+        "line_end": 461
+      },
+      {
+        "stable_chunk_id": "child-de5d935570593df3e5f81bcefab11c12294cb036",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    1. Bind the `time` attribute, so that changes to `time` will also change the `time` attribute on the `WorldClock` widgets. The `data_bind` method also returns the widget, so we can yield its return value.\n\n=== \"world_clock01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/world_clock01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/world_clock02.py\"}\n    ```\n\n",
+        "line_start": 462,
+        "line_end": 474
+      },
+      {
+        "stable_chunk_id": "child-01df1d655dcfef12c0588ce9d6d4f614cc444565",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "Note how the addition of the `data_bind` methods negates the need for the watcher in `world_clock01.py`.\n\n\n!!! note\n\n    Data binding works in a single direction.\n    Setting `time` on the app updates the clocks.\n    But setting `time` on the clocks will *not* update `time` on the app.\n\n\n",
+        "line_start": 475,
+        "line_end": 484
+      },
+      {
+        "stable_chunk_id": "child-2aa7bc18b2c14ff9c3d02b1b0042c142d55ecdbc",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "In the previous example app, the call to `data_bind(WorldClockApp.time)` worked because both reactive attributes were named `time`.\nIf you want to bind a reactive attribute which has a different name, you can use keyword arguments.\n\nIn the following app we have changed the attribute name on `WorldClock` from `time` to `clock_time`.\nWe can make the app continue to work by changing the `data_bind` call to `data_bind(clock_time=WorldClockApp.time)`:\n\n\n=== \"world_clock03.py\"\n\n",
+        "line_start": 485,
+        "line_end": 493
+      },
+      {
+        "stable_chunk_id": "child-8920bd1e4d0695cc5d2f6366d67b007637e5051b",
+        "source_path": "docs/guide/reactivity.md",
+        "display_text": "    ```python hl_lines=\"34-38\"\n    --8<-- \"docs/examples/guide/reactivity/world_clock03.py\"\n    ```\n\n    1. Uses keyword arguments to bind the `time` attribute of `WorldClockApp` to `clock_time` on `WorldClock`.\n\n=== \"world_clock01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/world_clock01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/world_clock02.py\"}\n    ```\n",
+        "line_start": 494,
+        "line_end": 509
+      },
+      {
+        "stable_chunk_id": "child-8340db9ae73dbfaf26e5a745ff11029af4db393d",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "# Workers\n\nIn this chapter we will explore the topic of *concurrency* and how to use Textual's Worker API to make it easier.\n\n!!! tip \"The Worker API was added in version 0.18.0\"\n\n",
+        "line_start": 1,
+        "line_end": 6
+      },
+      {
+        "stable_chunk_id": "child-f1d8b41b7861c578be1c3566a97ad478e90e1f4c",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "## Concurrency\n\nThere are many interesting uses for Textual which require reading data from an internet service.\nWhen an app requests data from the network it is important that it doesn't prevent the user interface from updating.\nIn other words, the requests should be concurrent (happen at the same time) as the UI updates.\n\n",
+        "line_start": 7,
+        "line_end": 12
+      },
+      {
+        "stable_chunk_id": "child-5f3c5d16ba4fae699e18cfa564e06ce73adb5a7c",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "This is also true for anything that could take a significant time (more than a few milliseconds) to complete.\nFor instance, reading from a [subprocess](https://docs.python.org/3/library/asyncio-subprocess.html#asyncio-subprocess) or doing compute heavy work.\n\n",
+        "line_start": 13,
+        "line_end": 15
+      },
+      {
+        "stable_chunk_id": "child-638e3937d2b8752aed7593ae5377243f6faa59e4",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "Managing this concurrency is a tricky topic, in any language or framework.\nEven for experienced developers, there are gotchas which could make your app lock up or behave oddly.\nTextual's Worker API makes concurrency far less error prone and easier to reason about.\n\n",
+        "line_start": 16,
+        "line_end": 19
+      },
+      {
+        "stable_chunk_id": "child-8c5f6b26d47e89d6e289108663ebca66bf2fff21",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "## Workers\n\nBefore we go into detail, let's see an example that demonstrates a common pitfall for apps that make network requests.\n\nThe following app uses [httpx](https://www.python-httpx.org/) to get the current weather for any given city, by making a request to [wttr.in](https://wttr.in/).\n\n=== \"weather01.py\"\n\n    ```python title=\"weather01.py\"\n    --8<-- \"docs/examples/guide/workers/weather01.py\"\n    ```\n\n=== \"weather.tcss\"\n\n",
+        "line_start": 20,
+        "line_end": 33
+      },
+      {
+        "stable_chunk_id": "child-64f387164149563cbabd58279f25803e7eda52fa",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "    ```css title=\"weather.tcss\"\n    --8<-- \"docs/examples/guide/workers/weather.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/workers/weather01.py\"}\n    ```\n\n",
+        "line_start": 34,
+        "line_end": 42
+      },
+      {
+        "stable_chunk_id": "child-ab76c17ecfa5264aa181bddd15539684d6bfab9f",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "If you were to run this app, you should see weather information update as you type.\nBut you may find that the input is not as responsive as usual, with a noticeable delay between pressing a key and seeing it echoed in screen.\nThis is because we are making a request to the weather API within a message handler, and the app will not be able to process other messages until the request has completed (which may be anything from a few hundred milliseconds to several seconds later).\n\n",
+        "line_start": 43,
+        "line_end": 46
+      },
+      {
+        "stable_chunk_id": "child-a617f6f061d0ef10f50f9c1e9f91b404a3d77e59",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "To resolve this we can use the [run_worker][textual.dom.DOMNode.run_worker] method which runs the `update_weather` coroutine (`async def` function) in the background. Here's the code:\n\n```python title=\"weather02.py\" hl_lines=\"21\"\n--8<-- \"docs/examples/guide/workers/weather02.py\"\n```\n\nThis one line change will make typing as responsive as you would expect from any app.\n\n",
+        "line_start": 47,
+        "line_end": 54
+      },
+      {
+        "stable_chunk_id": "child-f0f94ccb39b2519f957ad4a895dbd7830f0cbccf",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "The `run_worker` method schedules a new *worker* to run `update_weather`, and returns a [Worker][textual.worker.Worker] object. This happens almost immediately, so it won't prevent other messages from being processed. The `update_weather` function is now running concurrently, and will finish a second or two later.\n\n!!! tip\n\n    The [Worker][textual.worker.Worker] object has a few useful methods on it, but you can often ignore it as we did in `weather02.py`.\n\n",
+        "line_start": 55,
+        "line_end": 60
+      },
+      {
+        "stable_chunk_id": "child-fc8d53f92846fae2d2a4ec2ee049916deb309d06",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "The call to `run_worker` also sets `exclusive=True` which solves an additional problem with concurrent network requests: when pulling data from the network, there is no guarantee that you will receive the responses in the same order as the requests.\nFor instance, if you start typing \"Paris\", you may get the response for \"Pari\" *after* the response for \"Paris\", which could show the wrong weather information.\nThe `exclusive` flag tells Textual to cancel all previous workers before starting the new one.\n\n",
+        "line_start": 61,
+        "line_end": 64
+      },
+      {
+        "stable_chunk_id": "child-95e698ccb7369fb624d3cfb933da21f9e3d065ae",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Work decorator\n\nAn alternative to calling `run_worker` manually is the [work][textual.work] decorator, which automatically generates a worker from the decorated method.\n\nLet's use this decorator in our weather app:\n\n```python title=\"weather03.py\" hl_lines=\"4 22 24\"\n--8<-- \"docs/examples/guide/workers/weather03.py\"\n```\n\n",
+        "line_start": 65,
+        "line_end": 74
+      },
+      {
+        "stable_chunk_id": "child-06f365f720709bc7c4855b04dd3cb8439e71f13a",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "The addition of `@work(exclusive=True)` converts the `update_weather` coroutine into a regular function which when called will create and start a worker.\nNote that even though `update_weather` is an `async def` function, the decorator means that we don't need to use the `await` keyword when calling it.\n\n!!! tip\n\n    The decorator takes the same arguments as `run_worker`.\n\n",
+        "line_start": 75,
+        "line_end": 81
+      },
+      {
+        "stable_chunk_id": "child-d0fe528030587295b2aa0df7ee01c2d0a11f4d89",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Worker return values\n\nWhen you run a worker, the return value of the function won't be available until the work has completed.\nYou can check the return value of a worker with the `worker.result` attribute which will initially be `None`, but will be replaced with the return value of the function when it completes.\n\n",
+        "line_start": 82,
+        "line_end": 86
+      },
+      {
+        "stable_chunk_id": "child-ca7a2aa1f28523288dd501c0e52cbd80f5665c7d",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "If you need the return value you can call [worker.wait][textual.worker.Worker.wait] which is a coroutine that will wait for the work to complete.\nBut note that if you do this in a message handler it will also prevent the widget from updating until the worker returns.\nOften a better approach is to handle [worker events](#worker-events) which will notify your app when a worker completes, and the return value is available without waiting.\n\n",
+        "line_start": 87,
+        "line_end": 90
+      },
+      {
+        "stable_chunk_id": "child-1f04bbcda8a07a853e6fe17a501c2d7040371b68",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Cancelling workers\n\nYou can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].\nThis will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely.\n\n",
+        "line_start": 91,
+        "line_end": 95
+      },
+      {
+        "stable_chunk_id": "child-66ba93e1f7c638265adda6dd0c150d2476524a2d",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Worker errors\n\nThe default behavior when a worker encounters an exception is to exit the app and display the traceback in the terminal.\nYou can also create workers which will *not* immediately exit on exception, by setting `exit_on_error=False` on the call to `run_worker` or the `@work` decorator.\n\n",
+        "line_start": 96,
+        "line_end": 100
+      },
+      {
+        "stable_chunk_id": "child-586a266c3141856b294e164c8da4da3f1fe459b1",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Worker lifetime\n\nWorkers are managed by a single [WorkerManager][textual.worker_manager.WorkerManager] instance, which you can access via `app.workers`.\nThis is a container-like object which you iterate over to see your active workers.\n\n",
+        "line_start": 101,
+        "line_end": 105
+      },
+      {
+        "stable_chunk_id": "child-2cc599eb82a6e628c17e4fbc486ec7853db18447",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "Workers are tied to the DOM node (widget, screen, or app) where they are created.\nThis means that if you remove the widget or pop the screen where they are created, then the tasks will be cleaned up automatically.\nSimilarly if you exit the app, any running tasks will be cancelled.\n\n",
+        "line_start": 106,
+        "line_end": 109
+      },
+      {
+        "stable_chunk_id": "child-f6bf31cb6c4a33ec5b95b570a7b2fa7689d82356",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "Worker objects have a `state` attribute which will contain a [WorkerState][textual.worker.WorkerState] enumeration that indicates what the worker is doing at any given time.\nThe `state` attribute will contain one of the following values:\n\n\n",
+        "line_start": 110,
+        "line_end": 113
+      },
+      {
+        "stable_chunk_id": "child-4903c355b0774a168020b01b70a4574589822caf",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "| Value     | Description                                                                         |\n| --------- | ----------------------------------------------------------------------------------- |\n| PENDING   | The worker was created, but not yet started.                                        |\n| RUNNING   | The worker is currently running.                                                    |\n| CANCELLED | The worker was cancelled and is no longer running.                                  |\n| ERROR     | The worker raised an exception, and `worker.error` will contain the exception.      |\n| SUCCESS   | The worker completed successful, and `worker.result` will contain the return value. |\n\n",
+        "line_start": 114,
+        "line_end": 121
+      },
+      {
+        "stable_chunk_id": "child-dabe67b67d9c3e9ecd7f54d9acf887bbc4246027",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "Workers start with a `PENDING` state, then go to `RUNNING`. From there, they will go to `CANCELLED`, `ERROR` or `SUCCESS`.\n\n<div class=\"excalidraw\">\n--8<-- \"docs/images/workers/lifetime.excalidraw.svg\"\n</div>\n\n",
+        "line_start": 122,
+        "line_end": 127
+      },
+      {
+        "stable_chunk_id": "child-e27a9c2fee5b9433555bedfcfb9010d62b5e23a5",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Worker events\n\nWhen a worker changes state, it sends a [Worker.StateChanged][textual.worker.Worker.StateChanged] event to the widget where the worker was created.\nYou can handle this message by defining an `on_worker_state_changed` event handler.\nFor instance, here is how we might log the state of the worker that updates the weather:\n\n```python title=\"weather04.py\" hl_lines=\"4 40-42\"\n--8<-- \"docs/examples/guide/workers/weather04.py\"\n```\n\n",
+        "line_start": 128,
+        "line_end": 137
+      },
+      {
+        "stable_chunk_id": "child-c9ccb9cf313e2468d2714f9f2c97aa09796eba4a",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "If you run the above code with `textual` you should see the worker lifetime events logged in the Textual [console](./devtools.md#console).\n\n```\ntextual run weather04.py --dev\n```\n\n",
+        "line_start": 138,
+        "line_end": 143
+      },
+      {
+        "stable_chunk_id": "child-fa722d252230f2dce16fb527ed938d8d599d3107",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "### Thread workers\n\nIn previous examples we used `run_worker` or the `work` decorator in conjunction with coroutines.\nThis works well if you are using an async API like `httpx`, but if your API doesn't support async you may need to use *threads*.\n\n!!! info \"What are threads?\"\n\n    Threads are a form of concurrency supplied by your Operating System. Threads allow your code to run more than a single function simultaneously.\n\n",
+        "line_start": 144,
+        "line_end": 152
+      },
+      {
+        "stable_chunk_id": "child-16b724f8d53b7e21553cca1496d258de6ef1f0cc",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "You can create threads by setting `thread=True` on the `run_worker` method or the `work` decorator.\nThe API for thread workers is identical to async workers, but there are a few differences you need to be aware of when writing code for thread workers.\n\n",
+        "line_start": 153,
+        "line_end": 155
+      },
+      {
+        "stable_chunk_id": "child-6b5cb6cd77f3adc1635bf61e0e3c137db63e7d4b",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "The first difference is that you should **avoid calling methods on your UI directly** from a threaded worker, or setting reactive variables.\nYou can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread.\n\nThe second difference is that you can't cancel threads in the same way as coroutines, but you *can* manually check if the worker was cancelled.\n\n",
+        "line_start": 156,
+        "line_end": 160
+      },
+      {
+        "stable_chunk_id": "child-f3b05c0bcd4e21c11a2b0fd574cbc6f0e235a304",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "Let's demonstrate thread workers by replacing `httpx` with `urllib.request` (in the standard library).\nThe `urllib` module is not async aware, so we will need to use threads:\n\n```python title=\"weather05.py\" hl_lines=\"1-2 27-44\"\n--8<-- \"docs/examples/guide/workers/weather05.py\"\n```\n\n",
+        "line_start": 161,
+        "line_end": 167
+      },
+      {
+        "stable_chunk_id": "child-2d3a3e4b6911317d1e0795f135af97e1063bad5f",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "In this example, the `update_weather` is not asynchronous (i.e. a regular function).\nThe `@work` decorator has `thread=True` which makes it a thread worker.\nNote the use of [get_current_worker][textual.worker.get_current_worker] which the function uses to check if it has been cancelled or not.\n\n!!! important\n\n    Textual will raise an exception if you add the `work` decorator to a regular function without `thread=True`.\n\n\n",
+        "line_start": 168,
+        "line_end": 176
+      },
+      {
+        "stable_chunk_id": "child-7c43531eb9251424ed10bcb47688fd92eebcaa14",
+        "source_path": "docs/guide/workers.md",
+        "display_text": "#### Posting messages\n\nMost Textual functions are not thread-safe which means you will need to use [call_from_thread][textual.app.App.call_from_thread] to run them from a thread worker.\nAn exception would be [post_message][textual.widget.Widget.post_message] which *is* thread-safe.\nIf your worker needs to make multiple updates to the UI, it is a good idea to send [custom messages](./events.md) and let the message handler update the state of the UI.\n",
+        "line_start": 177,
+        "line_end": 181
+      },
+      {
+        "stable_chunk_id": "child-313a339f9fdab0b2b71616e9a61bbbeb6227b316",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "# Input\n\nA single-line text input widget.\n\n- [x] Focusable\n- [ ] Container\n\n",
+        "line_start": 1,
+        "line_end": 7
+      },
+      {
+        "stable_chunk_id": "child-d6073c02bb33eb07c3c70737136a92b23acbb9ff",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "## Examples\n\n",
+        "line_start": 8,
+        "line_end": 9
+      },
+      {
+        "stable_chunk_id": "child-fcbbfc29e96405f3f519a9a4dab6ad2f7dbcfeb5",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "### A Simple Example\n\nThe example below shows how you might create a simple form using two `Input` widgets.\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/widgets/input.py\" press=\"D,a,r,r,e,n\"}\n    ```\n\n=== \"input.py\"\n\n    ```python\n    --8<-- \"docs/examples/widgets/input.py\"\n    ```\n\n\n",
+        "line_start": 10,
+        "line_end": 25
+      },
+      {
+        "stable_chunk_id": "child-41905b666dadff03ddde713b89988432be5e08ec",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "### Input Types\n\nThe `Input` widget supports a `type` parameter which will prevent the user from typing invalid characters.\nYou can set `type` to any of the following values:\n\n\n",
+        "line_start": 26,
+        "line_end": 31
+      },
+      {
+        "stable_chunk_id": "child-0bd381c5c4a2cec609145bb13a1f3f8ea0680dfb",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "| input.type  | Description                                 |\n| ----------- | ------------------------------------------- |\n| `\"integer\"` | Restricts input to integers.                |\n| `\"number\"`  | Restricts input to a floating point number. |\n| `\"text\"`    | Allow all text (no restrictions).           |\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/widgets/input_types.py\" press=\"1234\"}\n    ```\n\n=== \"input_types.py\"\n\n",
+        "line_start": 32,
+        "line_end": 44
+      },
+      {
+        "stable_chunk_id": "child-05c6f86b325d2564c49f6db23f26ddfb423ac475",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "    ```python\n    --8<-- \"docs/examples/widgets/input_types.py\"\n    ```\n\nIf you set `type` to something other than `\"text\"`, then the `Input` will apply the appropriate [validator](#validating-input).\n\n",
+        "line_start": 45,
+        "line_end": 50
+      },
+      {
+        "stable_chunk_id": "child-dddd483cd2f49756b4255ad85bfa20ec2ee5f180",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "### Restricting Input\n\nYou can limit input to particular characters by supplying the `restrict` parameter, which should be a regular expression.\nThe `Input` widget will prevent the addition of any characters that would cause the regex to no longer match.\nFor instance, if you wanted to limit characters to binary you could set `restrict=r\"[01]*\"`.\n\n!!! note\n\n    The `restrict` regular expression is applied to the full value and not just to the new character.\n\n",
+        "line_start": 51,
+        "line_end": 60
+      },
+      {
+        "stable_chunk_id": "child-b694e7aeb5da3db02ca1e4a6994834a7834f2423",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "### Maximum Length\n\nYou can limit the length of the input by setting `max_length` to a value greater than zero.\nThis will prevent the user from typing any more characters when the maximum has been reached.\n\n",
+        "line_start": 61,
+        "line_end": 65
+      },
+      {
+        "stable_chunk_id": "child-1fe5df1d1344fbb3c652a20d16b0786ccfdc0452",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "### Validating Input\n\nYou can supply one or more *[validators][textual.validation.Validator]* to the `Input` widget to validate the value.\n\n",
+        "line_start": 66,
+        "line_end": 69
+      },
+      {
+        "stable_chunk_id": "child-61d322f271c0d51fdb7e4a584485677ba090cb7c",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "All the supplied validators will run when the value changes, the `Input` is submitted, or focus moves _out_ of the `Input`.\nThe values `\"changed\"`, `\"submitted\"`, and `\"blur\"`, can be passed as an iterable to the `Input` parameter `validate_on` to request that validation occur only on the respective messages.\n(See [`InputValidationOn`][textual.widgets._input.InputValidationOn] and [`Input.validate_on`][textual.widgets.Input.validate_on].)\nFor example, the code below creates an `Input` widget that only gets validated when the value is submitted explicitly:\n\n",
+        "line_start": 70,
+        "line_end": 74
+      },
+      {
+        "stable_chunk_id": "child-74c433c9131673b6a3d5f9ebe1e947ee2dd4aa66",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "```python\ninput = Input(validate_on=[\"submitted\"])\n```\n\nValidation is considered to have failed if *any* of the validators fail.\n\nYou can check whether the validation succeeded or failed inside an [Input.Changed][textual.widgets.Input.Changed], [Input.Submitted][textual.widgets.Input.Submitted], or [Input.Blurred][textual.widgets.Input.Blurred] handler by looking at the `validation_result` attribute on these events.\n\n",
+        "line_start": 75,
+        "line_end": 82
+      },
+      {
+        "stable_chunk_id": "child-084b1b172e2679e5261b958969b1b048aa9c722c",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "In the example below, we show how to combine multiple validators and update the UI to tell the user\nwhy validation failed.\nClick the tabs to see the output for validation failures and successes.\n\n=== \"input_validation.py\"\n\n    ```python hl_lines=\"8-15 31-35 42-45 56-62\"\n    --8<-- \"docs/examples/widgets/input_validation.py\"\n    ```\n\n",
+        "line_start": 83,
+        "line_end": 92
+      },
+      {
+        "stable_chunk_id": "child-d8a1aec239db9b28217d22f8776a067438baf98e",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "    1. `Number` is a built-in `Validator`. It checks that the value in the `Input` is a valid number, and optionally can check that it falls within a range.\n    2. `Function` lets you quickly define custom validation constraints. In this case, we check the value in the `Input` is even.\n    3. `Palindrome` is a custom `Validator` defined below.\n    4. The `Input.Changed` event has a `validation_result` attribute which contains information about the validation that occurred when the value changed.\n    5. Here's how we can implement a custom validator which checks if a string is a palindrome. Note how the description passed into `self.failure` corresponds to the message seen on UI.\n    6. Textual offers default styling for the `-invalid` CSS class (a red border), which is automatically applied to `Input` when validation fails. We can also provide custom styling for the `-valid` class, as seen here. In this case, we add a green border around the `Input` to indicate successful validation.\n\n",
+        "line_start": 93,
+        "line_end": 99
+      },
+      {
+        "stable_chunk_id": "child-14116b648dd3619205c0b4a087d132306491a856",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "=== \"Validation Failure\"\n\n    ```{.textual path=\"docs/examples/widgets/input_validation.py\" press=\"-,2,3\"}\n    ```\n\n=== \"Validation Success\"\n\n    ```{.textual path=\"docs/examples/widgets/input_validation.py\" press=\"4,4\"}\n    ```\n\nTextual offers several [built-in validators][textual.validation] for common requirements,\nbut you can easily roll your own by extending [Validator][textual.validation.Validator],\nas seen for `Palindrome` in the example above.\n\n",
+        "line_start": 100,
+        "line_end": 113
+      },
+      {
+        "stable_chunk_id": "child-bf996a1938f3a839e5c9c0cc7ae2ffd53ffc4889",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "#### Validate Empty\n\nIf you set `valid_empty=True` then empty values will bypass any validators, and empty values will be considered valid.\n\n",
+        "line_start": 114,
+        "line_end": 117
+      },
+      {
+        "stable_chunk_id": "child-ebe8ccc81a609bf6c77ab5d6ec6f094fe2d66719",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "## Reactive Attributes\n\n",
+        "line_start": 118,
+        "line_end": 119
+      },
+      {
+        "stable_chunk_id": "child-203d8ef012e00811fac9fd6ea6f0fc722fbe0d90",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "| Name              | Type   | Default  | Description                                                     |\n| ----------------- | ------ | -------- | --------------------------------------------------------------- |\n| `cursor_blink`    | `bool` | `True`   | True if cursor blinking is enabled.                             |\n| `value`           | `str`  | `\"\"`     | The value currently in the text input.                          |\n| `cursor_position` | `int`  | `0`      | The index of the cursor in the value string.                    |\n| `placeholder`     | `str`  | `\"\"`     | The dimmed placeholder text to display when the input is empty. |\n| `password`        | `bool` | `False`  | True if the input should be masked.                             |\n| `restrict`        | `str`  | `None`   | Optional regular expression to restrict input.                  |\n| `type`            | `str`  | `\"text\"` | The type of the input.                                          |\n| `max_length`      | `int`  | `None`   | Maximum length of the input value.                              |\n| `valid_empty`     | `bool` | `False`  | Allow empty values to bypass validation.                        |\n\n",
+        "line_start": 120,
+        "line_end": 131
+      },
+      {
+        "stable_chunk_id": "child-186ce088cff76cb90ecbab7110aa9ceede3ffb51",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "## Messages\n\n- [Input.Blurred][textual.widgets.Input.Blurred]\n- [Input.Changed][textual.widgets.Input.Changed]\n- [Input.Submitted][textual.widgets.Input.Submitted]\n\n",
+        "line_start": 132,
+        "line_end": 137
+      },
+      {
+        "stable_chunk_id": "child-a46ce5a8c5b827054f80332c3beaba6f52fa6697",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "## Bindings\n\nThe input widget defines the following bindings:\n\n::: textual.widgets.Input.BINDINGS\n    options:\n      show_root_heading: false\n      show_root_toc_entry: false\n\n",
+        "line_start": 138,
+        "line_end": 146
+      },
+      {
+        "stable_chunk_id": "child-868aa5ffb5b72c760648f3e8f13f54ce43c6ca41",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "## Component Classes\n\nThe input widget provides the following component classes:\n\n::: textual.widgets.Input.COMPONENT_CLASSES\n    options:\n      show_root_heading: false\n      show_root_toc_entry: false\n\n",
+        "line_start": 147,
+        "line_end": 155
+      },
+      {
+        "stable_chunk_id": "child-3339195609d50565d10978a1b83efab007a65ca0",
+        "source_path": "docs/widgets/input.md",
+        "display_text": "## Additional Notes\n\n* The spacing around the text content is due to border. To remove it, set `border: none;` in your CSS.\n\n---\n\n\n::: textual.widgets.Input\n    options:\n      heading_level: 2\n",
+        "line_start": 156,
+        "line_end": 165
+      }
+    ],
+    "sqlite_version": "3.53.1",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "5eb52d52f6d90408b58e9be906725d48dfd73281774104d630241fa32dd5b509",
+    "storage_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/docatlas-evidence-72qru2k5/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+    "catalog_sha256": "d863f09c60f5673b38c82b2cafa3336a8f439808ad3706959db2aace3a8a83e6",
+    "documents": [
+      {
+        "path": "docs/guide/reactivity.md",
+        "content_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+        "catalog_entry_hash": "sha256:b3e8c9631a13ae993ed1692afd6eab15634a851586a529f4c8c849174c34ac8f"
+      },
+      {
+        "path": "docs/guide/workers.md",
+        "content_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+        "catalog_entry_hash": "sha256:21c6975922ffbaa87492bf54e8e7ff67d72e35b2e8e2e0b8690534270a4b1b16"
+      },
+      {
+        "path": "docs/widgets/input.md",
+        "content_sha256": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+        "catalog_entry_hash": "sha256:cedc35872da5f63914aeecfde339e30d980c1be08296710bc41f1b701205217d"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "members": 3,
+      "new_count": 3,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 40,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 40
+    }
+  },
+  "snapshot_sources": [
+    {
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "source": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual/docs/guide/reactivity.md",
+      "source_identity": "project_file:local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319:docs/guide/reactivity.md",
+      "content_hash": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+      "path": "docs/guide/reactivity.md",
+      "content_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+      "metadata": {
+        "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+        "project_identity": "local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319",
+        "repository_identity": "local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/guide/reactivity.md",
+        "source_path": "docs/guide/reactivity.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+        "project_doc_catalog_entry_hash": "sha256:b3e8c9631a13ae993ed1692afd6eab15634a851586a529f4c8c849174c34ac8f",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": null,
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791832395640948427,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512
+      },
+      "matches_pinned_source": true
+    },
+    {
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "source": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual/docs/guide/workers.md",
+      "source_identity": "project_file:local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319:docs/guide/workers.md",
+      "content_hash": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "path": "docs/guide/workers.md",
+      "content_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "metadata": {
+        "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+        "project_identity": "local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319",
+        "repository_identity": "local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/guide/workers.md",
+        "source_path": "docs/guide/workers.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+        "project_doc_catalog_entry_hash": "sha256:21c6975922ffbaa87492bf54e8e7ff67d72e35b2e8e2e0b8690534270a4b1b16",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": null,
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791832395641080713,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512
+      },
+      "matches_pinned_source": true
+    },
+    {
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "source": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual/docs/widgets/input.md",
+      "source_identity": "project_file:local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319:docs/widgets/input.md",
+      "content_hash": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+      "path": "docs/widgets/input.md",
+      "content_sha256": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+      "metadata": {
+        "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+        "project_identity": "local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319",
+        "repository_identity": "local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/widgets/input.md",
+        "source_path": "docs/widgets/input.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+        "project_doc_catalog_entry_hash": "sha256:cedc35872da5f63914aeecfde339e30d980c1be08296710bc41f1b701205217d",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": null,
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791832395641289252,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512
+      },
+      "matches_pinned_source": true
+    }
+  ],
+  "prepared_manifest": {
+    "certification": {
+      "canonical_parse_calls": 0,
+      "canonical_parse_ms": 0.0,
+      "certified_sources": 3,
+      "elapsed_ms": 0.9087959988391958,
+      "missed_sources": 0,
+      "sources_seen": 3,
+      "writer_results_reused": 3
+    },
+    "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+    "manifest_schema_version": 1,
+    "misses": {},
+    "parent_parser_revision": "markdown-parent-sections-v1",
+    "sources": {
+      "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual/docs/guide/reactivity.md": {
+        "canonical_rows_sha256": "3b061d2c115312794c2a1df6def13de83e27fafb282b874dd20a8bc4ae29090f",
+        "content_sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+        "parent_count": 15,
+        "source_identity": "project_file:local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319:docs/guide/reactivity.md"
+      },
+      "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual/docs/guide/workers.md": {
+        "canonical_rows_sha256": "b3afb5d252bbf3b9bc7323a69b467ef9529942831ecab0b86b56a50df2376122",
+        "content_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+        "parent_count": 11,
+        "source_identity": "project_file:local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319:docs/guide/workers.md"
+      },
+      "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual/docs/widgets/input.md": {
+        "canonical_rows_sha256": "9908540a90d78ad828d97d54de2fbeaf14571a29688312c5fdfa1171e17c5705",
+        "content_sha256": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+        "parent_count": 13,
+        "source_identity": "project_file:local:e40bd7dfaaf4426025c1bc59a1d0cc69d6387f5cc84972cf936acec1ea802319:docs/widgets/input.md"
+      }
+    }
+  },
+  "initial_database_state": {
+    "schema_sha256": "18f05c77686a61719f5f5338e087f7cce0aabd4d48163ceff4fef41b570e3d85",
+    "tables": {
+      "embedding_upserts": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "generation_sources": {
+        "rows": 3,
+        "sha256": "93fcef9bd2752d5a76b65999afa25cad13cbed7e2d2cc6d32c51495fdd1bfc25"
+      },
+      "generation_vector_upserts": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "index_generations": {
+        "rows": 1,
+        "sha256": "ea50330f46ec1a3c35e8b8048cf358ec200335944145a6d6fe3e168c71a989d8"
+      },
+      "index_state": {
+        "rows": 1,
+        "sha256": "cb7f741c18ef2068ab4d86e523c49edb9bed9875b13388c65df3494a01b0ef4b"
+      },
+      "parent_sections": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "retrieval_children": {
+        "rows": 103,
+        "sha256": "49fb096709ecb29d204a999c4fbf65c2b7c277fdb1596088e228548fa1bdc4b6"
+      },
+      "retrieval_children_fts": {
+        "rows": 103,
+        "sha256": "7fee2db620244aa5fd5304260e99718d460046ee691e28e24be229d9cf15d63e"
+      },
+      "retrieval_children_fts_config": {
+        "rows": 1,
+        "sha256": "ada92526309f86a3a9ffe14c12a523763133e33caef1f59c210553e4cb604c81"
+      },
+      "retrieval_children_fts_data": {
+        "rows": 14,
+        "sha256": "9b9d4bf4bc86f5b5d1d5e6b4199ea156d0ed103b69dd0e55f2263815eb7b8062"
+      },
+      "retrieval_children_fts_docsize": {
+        "rows": 103,
+        "sha256": "9daef3c778d1a0f25d31657559cd79636101f1ba775f77ea02926ff212f6153a"
+      },
+      "retrieval_children_fts_idx": {
+        "rows": 12,
+        "sha256": "cfc2ab4cc9856050e8edce37eb3a86821b9547a622aa8cafe79a510865803497"
+      },
+      "retrieval_fts_projection_state": {
+        "rows": 1,
+        "sha256": "85dbc2f2ccc99bdb329c6868661f4ef0652a6d8c1b691cea37628360d81a5c61"
+      },
+      "retrieval_parents": {
+        "rows": 39,
+        "sha256": "7006910d3f33e5aaf4fccc75d023b1e9eff1406f9fc13e3c08ab54405884707d"
+      },
+      "sections": {
+        "rows": 40,
+        "sha256": "3f8db8f044e14ad53a6e4cbb2c802adbd8798f8b47abf8ec1e4ce32d5ae9e9a6"
+      },
+      "sections_fts": {
+        "rows": 40,
+        "sha256": "73027471564433c29961a6f47643f8f084ee67cbb00f96cd4affa04e5532d1f0"
+      },
+      "sections_fts_config": {
+        "rows": 1,
+        "sha256": "ada92526309f86a3a9ffe14c12a523763133e33caef1f59c210553e4cb604c81"
+      },
+      "sections_fts_data": {
+        "rows": 9,
+        "sha256": "e81478b38d507ba5b6d1192a208d82c6eee5db4bb6fec158d50e01272478fa51"
+      },
+      "sections_fts_docsize": {
+        "rows": 40,
+        "sha256": "ba82640788661d8f89a7fa0c6c7d598b17fab75c115669dfda6f58c41c13a69d"
+      },
+      "sections_fts_idx": {
+        "rows": 7,
+        "sha256": "2ce31d9ffe803d08e0733b7348b9651e20527085189a351848d8276c87a7186f"
+      },
+      "sources": {
+        "rows": 3,
+        "sha256": "56daea1a84624de41141284b347c6bbf89904bd4cf6fcfd2c2dc910f7d504cff"
+      },
+      "sqlite_sequence": {
+        "rows": 1,
+        "sha256": "490ba90a42c70afd94ab500e3fcad66ed8b4fa11c194e28ecbad61e823635f74"
+      }
+    },
+    "sha256": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+  },
+  "initial_file_hashes": {
+    "docatlas.project-docs.yaml": "d863f09c60f5673b38c82b2cafa3336a8f439808ad3706959db2aace3a8a83e6",
+    "docs/guide/reactivity.md": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+    "docs/guide/workers.md": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+    "docs/widgets/input.md": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44"
+  }
+}

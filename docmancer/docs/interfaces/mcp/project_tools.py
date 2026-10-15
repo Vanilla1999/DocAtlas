@@ -425,6 +425,11 @@ def _compact_patch_constraints(result: dict[str, Any]) -> dict[str, Any]:
         "status": result.get("status"),
         "reason_code": result.get("reason_code"),
         "answer_available": result.get("answer_available"),
+        "answer_supported": False,
+        "packet_available": result.get("packet_available", False),
+        "policy_coverage": "unresolved",
+        "mutation_authorized": False,
+        "edit_ready": False,
         "task": result.get("task"),
         "constraints": result.get("constraints") or [],
         "schema_version": result.get("schema_version"),
@@ -605,9 +610,12 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             include_sources=bool(args.get("include_sources") if args.get("include_sources") is not None else True),
         ))
         result.setdefault("tool", "get_patch_constraints")
-        result.setdefault("status", "success")
-        result.setdefault("reason_code", None)
-        result.setdefault("answer_available", bool(result.get("constraints")))
+        # Advisory presence is not policy proof or authorization, even when a
+        # supplied producer claims resolved coverage or includes constraints.
+        result.update(status="insufficient_evidence", reason_code="policy_coverage_unresolved",
+                      packet_available=True, answer_available=False,
+                      answer_supported=False, policy_coverage="unresolved",
+                      mutation_authorized=False, edit_ready=False)
         payload = _compact_patch_constraints(result)
         payload = _compact_mcp_payload(payload)
         return _strip_mcp_debug_noise(payload)

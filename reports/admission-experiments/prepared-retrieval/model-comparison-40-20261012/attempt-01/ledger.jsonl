@@ -1,0 +1,172 @@
+{"at_utc": "2026-10-12T19:12:34.392270+00:00", "operation": "model_preparation", "status": "started", "model_forward_budget": 0}
+{"at_utc": "2026-10-12T19:12:42.119617+00:00", "operation": "model_preparation", "status": "returned", "receipt": {"schema_version": 1, "operation": "preload_mini_runtime", "status": "prepared", "model_load_attempts": 1, "model_loads": 1, "model_load_seconds": 5.573677369000507, "model_import_seconds": 4.170549029997346, "asset_verification_seconds": 0.3307960760030255, "model_forward_attempts": 0, "model_forwards": 0, "lock_wait_seconds": 2.063003194052726e-06, "model": {"model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1", "revision": "1427fd652930e4ba29e8149678df786c240d8825", "assets_sha256": {"model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4", "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77", "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626", "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e", "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d", "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"}, "device": "cpu", "dtype": "FP32", "torch": "2.10.0+cpu", "transformers": "4.57.1", "threads": 8, "interop_threads": 1, "max_length": 512, "truncation": false, "score": "raw_logits[0,0]", "tie_break": "original_pool_index"}, "total_seconds": 5.573983993002912, "host_torch_import_config_seconds": 2.152839350001159, "full_host_preparation_seconds": 7.72699314500278}}
+{"at_utc": "2026-10-12T19:12:42.125933+00:00", "operation": "prepare_docs", "status": "started", "family": "black", "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black"}
+{"at_utc": "2026-10-12T19:12:42.262289+00:00", "operation": "prepare_docs", "status": "returned", "family": "black", "seconds": 0.11186014700069791, "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601", "prepared_manifest": true}
+{"at_utc": "2026-10-12T19:12:42.278412+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B01", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:43.024357+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B01", "mode": "budget", "seconds": 0.7024077710011625, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:43.040983+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B01", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:44.957515+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B01", "mode": "mini", "seconds": 1.8760253459986416, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:45.004877+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B02", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:45.870417+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B02", "mode": "mini", "seconds": 0.8195756029999757, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:45.885080+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B02", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:46.805018+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B02", "mode": "budget", "seconds": 0.8717492089999723, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:46.855458+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B03", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:47.450664+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B03", "mode": "budget", "seconds": 0.5447000690001005, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:47.466385+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B03", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:48.675647+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B03", "mode": "mini", "seconds": 1.1271466680009326, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:48.737346+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B04", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:49.787171+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B04", "mode": "mini", "seconds": 1.003208286001609, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:49.802833+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B04", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:50.529010+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B04", "mode": "budget", "seconds": 0.6826939469974604, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:50.578617+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B05", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:51.453918+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B05", "mode": "budget", "seconds": 0.8199899620012729, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:51.471428+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B05", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:52.336251+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B05", "mode": "mini", "seconds": 0.8158074819984904, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:52.388849+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B06", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:53.434526+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B06", "mode": "mini", "seconds": 0.9971057729999302, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:53.449788+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B06", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:54.106264+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B06", "mode": "budget", "seconds": 0.5883087209986115, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:54.161672+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B07", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:55.065523+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B07", "mode": "budget", "seconds": 0.8590593919980165, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:55.080468+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B07", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:56.787659+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B07", "mode": "mini", "seconds": 1.6620380429994839, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:56.838036+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B08", "mode": "mini"}
+{"at_utc": "2026-10-12T19:12:58.613765+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B08", "mode": "mini", "seconds": 1.7286365969994222, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:58.629409+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-B08", "mode": "budget"}
+{"at_utc": "2026-10-12T19:12:59.385015+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-B08", "mode": "budget", "seconds": 0.7116734109986282, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:12:59.426515+00:00", "operation": "prepare_docs", "status": "started", "family": "poetry", "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry"}
+{"at_utc": "2026-10-12T19:12:59.609695+00:00", "operation": "prepare_docs", "status": "returned", "family": "poetry", "seconds": 0.1555902049985889, "generation_id": "gen-7686561de3654ba5aca3b848c5828a74", "prepared_manifest": true}
+{"at_utc": "2026-10-12T19:12:59.635321+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P01", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:00.503245+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P01", "mode": "budget", "seconds": 0.8083329719993344, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:00.526158+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P01", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:01.552713+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P01", "mode": "mini", "seconds": 0.9576026710019505, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:01.619861+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P02", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:02.973333+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P02", "mode": "mini", "seconds": 1.2860289230011404, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:02.998917+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P02", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:03.636443+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P02", "mode": "budget", "seconds": 0.5855964009970194, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:03.699014+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P03", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:04.320651+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P03", "mode": "budget", "seconds": 0.5709812090026389, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:04.342752+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P03", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:05.878138+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P03", "mode": "mini", "seconds": 1.4848446789983427, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:05.936443+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P04", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:07.363056+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P04", "mode": "mini", "seconds": 1.371960903998115, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:07.385855+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P04", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:08.023924+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P04", "mode": "budget", "seconds": 0.5879412239992234, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:08.084044+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P05", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:08.691636+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P05", "mode": "budget", "seconds": 0.5468073940028262, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:08.712607+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P05", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:10.111491+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P05", "mode": "mini", "seconds": 1.3457709340000292, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:10.173721+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P06", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:10.739716+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P06", "mode": "mini", "seconds": 0.5033709150011418, "source_count": 0, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:10.770585+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P06", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:11.184920+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P06", "mode": "budget", "seconds": 0.3645233909992385, "source_count": 0, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:11.249954+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P07", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:11.892491+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P07", "mode": "budget", "seconds": 0.5893619989983563, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:11.913973+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P07", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:13.286943+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P07", "mode": "mini", "seconds": 1.3231990699969174, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:13.347030+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P08", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:14.652690+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P08", "mode": "mini", "seconds": 1.2551968270017824, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:14.675020+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-P08", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:15.599186+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-P08", "mode": "budget", "seconds": 0.8675868160025857, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:15.645089+00:00", "operation": "prepare_docs", "status": "started", "family": "textual", "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual"}
+{"at_utc": "2026-10-12T19:13:15.757782+00:00", "operation": "prepare_docs", "status": "returned", "family": "textual", "seconds": 0.09773389299880364, "generation_id": "gen-ff62831c9c254fd2950070a08731e799", "prepared_manifest": true}
+{"at_utc": "2026-10-12T19:13:15.771866+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T01", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:16.574018+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T01", "mode": "budget", "seconds": 0.7614636299986159, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:16.587164+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T01", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:18.471319+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T01", "mode": "mini", "seconds": 1.8433090250000532, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:18.513595+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T02", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:20.072628+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T02", "mode": "mini", "seconds": 1.5176704219993553, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:20.085462+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T02", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:20.692243+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T02", "mode": "budget", "seconds": 0.552857426002447, "source_count": 3, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:20.748945+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T03", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:21.937484+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T03", "mode": "budget", "seconds": 1.1398983500002942, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:21.951882+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T03", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:24.071494+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T03", "mode": "mini", "seconds": 2.070007058002375, "source_count": 0, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:24.125454+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T04", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:25.575252+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T04", "mode": "mini", "seconds": 1.390773672999785, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:25.592677+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T04", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:26.252814+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T04", "mode": "budget", "seconds": 0.6181095669999195, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:26.296052+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T05", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:27.093268+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T05", "mode": "budget", "seconds": 0.7525253710009565, "source_count": 3, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:27.106663+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T05", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:28.819157+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T05", "mode": "mini", "seconds": 1.6677631310012657, "source_count": 3, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:28.863647+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T06", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:29.269741+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T06", "mode": "mini", "seconds": 0.3590898520014889, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:29.284121+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T06", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:29.674789+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T06", "mode": "budget", "seconds": 0.3452779190010915, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:29.723457+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T07", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:30.150262+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T07", "mode": "budget", "seconds": 0.38114468200001284, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:30.163411+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T07", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:30.779182+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T07", "mode": "mini", "seconds": 0.5721293999995396, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:30.827106+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T08", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:32.508190+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T08", "mode": "mini", "seconds": 1.636050659999455, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:32.521360+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-T08", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:33.231096+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-T08", "mode": "budget", "seconds": 0.6645320249990618, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:33.267923+00:00", "operation": "prepare_docs", "status": "started", "family": "vite", "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite"}
+{"at_utc": "2026-10-12T19:13:33.387207+00:00", "operation": "prepare_docs", "status": "returned", "family": "vite", "seconds": 0.10151694000160205, "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96", "prepared_manifest": true}
+{"at_utc": "2026-10-12T19:13:33.403627+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V01", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:34.189824+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V01", "mode": "budget", "seconds": 0.7174132760010252, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:34.204969+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V01", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:36.246776+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V01", "mode": "mini", "seconds": 1.992302644001029, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:36.297943+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V02", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:38.393723+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V02", "mode": "mini", "seconds": 2.0432136739982525, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:38.411087+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V02", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:39.593262+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V02", "mode": "budget", "seconds": 1.138026208998781, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:39.641918+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V03", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:40.993008+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V03", "mode": "budget", "seconds": 1.302595855002437, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:41.008382+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V03", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:42.873894+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V03", "mode": "mini", "seconds": 1.817462915998476, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:42.923127+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V04", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:43.574294+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V04", "mode": "mini", "seconds": 0.6038428739993833, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:43.591939+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V04", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:44.255668+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V04", "mode": "budget", "seconds": 0.6128073939980823, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:44.305018+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V05", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:44.867111+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V05", "mode": "budget", "seconds": 0.5138521850021789, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:44.884480+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V05", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:45.308325+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V05", "mode": "mini", "seconds": 0.37033842999881017, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:45.367962+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V06", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:45.817565+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V06", "mode": "mini", "seconds": 0.398438834999979, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:45.832562+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V06", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:46.272530+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V06", "mode": "budget", "seconds": 0.38771509599973797, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:46.322140+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V07", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:46.942121+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V07", "mode": "budget", "seconds": 0.5714277520019095, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:46.958149+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V07", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:47.991447+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V07", "mode": "mini", "seconds": 0.9875486799974169, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:48.041723+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V08", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:48.420126+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V08", "mode": "mini", "seconds": 0.3234947099990677, "source_count": 0, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:48.435931+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-V08", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:48.811800+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-V08", "mode": "budget", "seconds": 0.2940963430010015, "source_count": 0, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:48.859118+00:00", "operation": "prepare_docs", "status": "started", "family": "eslint", "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint"}
+{"at_utc": "2026-10-12T19:13:49.173193+00:00", "operation": "prepare_docs", "status": "returned", "family": "eslint", "seconds": 0.2730879740011005, "generation_id": "gen-df15d05f4629435aaad40c827f158d3d", "prepared_manifest": true}
+{"at_utc": "2026-10-12T19:13:49.213754+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E01", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:50.043576+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E01", "mode": "budget", "seconds": 0.7465718819985341, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:50.082193+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E01", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:51.169713+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E01", "mode": "mini", "seconds": 1.0232278080002288, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:51.254410+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E02", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:52.879671+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E02", "mode": "mini", "seconds": 1.5538136399991345, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:52.922897+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E02", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:53.698980+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E02", "mode": "budget", "seconds": 0.6969408100012515, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:53.801935+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E03", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:54.368410+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E03", "mode": "budget", "seconds": 0.4901731909994851, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:54.406551+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E03", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:55.293977+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E03", "mode": "mini", "seconds": 0.8163333110023814, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:55.390280+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E04", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:56.625170+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E04", "mode": "mini", "seconds": 1.1618433160001587, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:56.662865+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E04", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:57.490037+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E04", "mode": "budget", "seconds": 0.759756096998899, "source_count": 3, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:57.574703+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E05", "mode": "budget"}
+{"at_utc": "2026-10-12T19:13:58.175162+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E05", "mode": "budget", "seconds": 0.5313775510003325, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:58.210981+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E05", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:59.021738+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E05", "mode": "mini", "seconds": 0.73210400699827, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:59.116825+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E06", "mode": "mini"}
+{"at_utc": "2026-10-12T19:13:59.791233+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E06", "mode": "mini", "seconds": 0.6089269030017022, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:13:59.825869+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E06", "mode": "budget"}
+{"at_utc": "2026-10-12T19:14:00.307756+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E06", "mode": "budget", "seconds": 0.41769595699952333, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:14:00.392077+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E07", "mode": "budget"}
+{"at_utc": "2026-10-12T19:14:01.166959+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E07", "mode": "budget", "seconds": 0.696631997001532, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:14:01.205121+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E07", "mode": "mini"}
+{"at_utc": "2026-10-12T19:14:02.751705+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E07", "mode": "mini", "seconds": 1.475965448000352, "source_count": 2, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:14:02.851081+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E08", "mode": "mini"}
+{"at_utc": "2026-10-12T19:14:03.397250+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E08", "mode": "mini", "seconds": 0.4777955829995335, "source_count": 1, "receipt_count": 1, "error": null}
+{"at_utc": "2026-10-12T19:14:03.432353+00:00", "operation": "get_docs_context", "status": "started", "case_id": "V40-E08", "mode": "budget"}
+{"at_utc": "2026-10-12T19:14:03.902263+00:00", "operation": "get_docs_context", "status": "returned", "case_id": "V40-E08", "mode": "budget", "seconds": 0.4034142199998314, "source_count": 1, "receipt_count": 1, "error": null}

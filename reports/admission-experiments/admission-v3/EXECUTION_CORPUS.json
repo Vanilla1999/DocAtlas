@@ -1,0 +1,58 @@
+{
+  "documents": [
+    {
+      "document_group": "directed_routes",
+      "path": "docs/roles.md",
+      "content": "# Полномочия на складе\n\nМаршрут складской тележки утверждает диспетчер движения. Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути.\n\nКонтролёр батарей подписывает ведомость запасных батарей на стеллаже 12.\n",
+      "utf8_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34"
+    },
+    {
+      "document_group": "directed_routes",
+      "path": "docs/routes.md",
+      "content": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+      "utf8_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+    },
+    {
+      "document_group": "legacy_priority",
+      "path": "docs/compounds.md",
+      "content": "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+      "utf8_sha256": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49"
+    },
+    {
+      "document_group": "legacy_priority",
+      "path": "docs/logs.md",
+      "content": "# Logging\n\nLogs flow to disk after each request.\n",
+      "utf8_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+    },
+    {
+      "document_group": "legacy_priority",
+      "path": "docs/owners.md",
+      "content": "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+      "utf8_sha256": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4"
+    },
+    {
+      "document_group": "legacy_priority",
+      "path": "docs/packets.md",
+      "content": "# Packet transport\n\nPackets are delivered after each request.\n",
+      "utf8_sha256": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c"
+    },
+    {
+      "document_group": "legacy_priority",
+      "path": "docs/setext.md",
+      "content": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+      "utf8_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    },
+    {
+      "document_group": "print_billing",
+      "path": "docs/disputes.md",
+      "content": "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+      "utf8_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+    },
+    {
+      "document_group": "print_billing",
+      "path": "docs/tariff.md",
+      "content": "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+      "utf8_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+    }
+  ]
+}

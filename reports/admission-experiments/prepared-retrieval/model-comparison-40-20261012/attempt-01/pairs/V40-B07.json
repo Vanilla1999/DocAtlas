@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B07",
+  "question": "Which environment variable overrides Black's cache directory, and for exactly how many days are cache entries retained?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "14d69ee40ad191dc7e4f9c22a0025511aa590f4140be7b313ff7e749696e7756",
+      "mini_sha256": "14d69ee40ad191dc7e4f9c22a0025511aa590f4140be7b313ff7e749696e7756"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "a4710f99f3183fd3d1abf98f545b527f57499286306f7e0c1e9e0b041c9f15f1",
+      "mini_sha256": "a4710f99f3183fd3d1abf98f545b527f57499286306f7e0c1e9e0b041c9f15f1"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "cd84e6697d56a28706f77d24b166170f08de9af088594e905afbeec0428920ba",
+      "mini_sha256": "cd84e6697d56a28706f77d24b166170f08de9af088594e905afbeec0428920ba"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

@@ -1,6 +1,8 @@
 """Implementation shard 1 for github_models."""
 from __future__ import annotations
 
+from copy import deepcopy
+
 from ._github_models_shared import *  # noqa: F401,F403
 
 
@@ -67,7 +69,8 @@ class GitHubModelsClient:
             payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
         ).encode("utf-8")
         estimated_input_tokens = _estimate_message_tokens(messages)
-        if estimated_input_tokens > _PROVIDER_INPUT_TOKEN_LIMIT:
+        if (estimated_input_tokens > _PROVIDER_INPUT_TOKEN_LIMIT
+            and not any(_has_finalized_v4_patch_data(message) for message in messages)):
             raise RuntimeError(
                 f"{self.provider.provider_id} input budget exceeded: "
                 f"{estimated_input_tokens}>{_PROVIDER_INPUT_TOKEN_LIMIT}"
@@ -311,8 +314,9 @@ class GitHubModelsIsolatedWorker:
             question=envelope.task_objective,
             context_pack=selected,
             trust_contract=evidence.trust_contract,
-            max_tokens=envelope.token_budget,
             retrieval_issues=evidence.retrieval_issues,
+            required_evidence_paths=envelope.required_evidence_paths,
+            required_target_paths=tuple(path for path in envelope.suspected_modules if Path(path).suffix),
         )
         proof = {
             "schema_version": 1,
@@ -450,7 +454,7 @@ def _trajectory_arguments(
             "server": "docmancer-docs",
             "tool": "get_docs_context",
             "project_path": ".",
-            "delivery_strategy": "bounded_direct",
+            "context_format": "patch_context",
         })
         if request is not None and result is not None:
             arguments.update(
@@ -506,24 +510,18 @@ def _required_once_retrieval_metadata(
             loaded = {}
         if isinstance(loaded, dict):
             payload = loaded
-    delivery_strategy = payload.get("delivery_strategy")
-    packet = payload.get("action_packet")
-    packet_status = packet.get("status") if isinstance(packet, dict) else None
-    packet_errors = (
-        validate_action_packet(packet, max_tokens=2_000)
-        if isinstance(packet, dict)
-        else ["ActionPacket missing"]
-    )
+    packet = payload if payload.get("kind") == "patch_context" else None
+    packet_result = packet.get("result") if isinstance(packet, dict) else None
     succeeded = (
         question_matches
-        and delivery_strategy == "bounded_direct"
-        and packet_status in {"ok", "truncated"}
-        and not packet_errors
+        and isinstance(packet, dict) and is_v4_patch_projection(packet)
+        and packet_result == "data" and packet.get("completeness") == "complete"
     )
     return {
         "question_matches_task_objective": question_matches,
         "retrieval_succeeded": succeeded,
-        "action_packet_status": packet_status,
+        "action_packet_result": packet_result,
+        "action_packet_completeness": packet.get("completeness") if isinstance(packet, dict) else None,
     }
 
 
@@ -604,6 +602,31 @@ def _estimate_message_tokens(messages: list[dict[str, str]]) -> int:
     return max(1, (len(serialized) + 3) // 4)
 
 
+def _has_finalized_v4_patch_data(message: dict[str, str]) -> bool:
+    """Recognize inline finalized data without treating it as edit permission."""
+    content = message.get("content", "")
+    decoder = json.JSONDecoder()
+    start = content.find("{")
+    while start != -1:
+        try:
+            payload, end = decoder.raw_decode(content, start)
+        except ValueError:
+            start = content.find("{", start + 1)
+            continue
+        if isinstance(payload, dict) and payload.get("result") == "data":
+            if "kind" not in payload and payload.get("schema_version") == 4:
+                from docmancer.docs.application.action_packet import refresh_action_packet_estimate
+                core = deepcopy(payload)
+                refresh_action_packet_estimate(core)
+                if core.get("estimated_tokens") == payload.get("estimated_tokens"):
+                    payload = {**core, "kind": "patch_context"}
+                    refresh_action_packet_estimate(payload)
+            if is_v4_patch_projection(payload):
+                return True
+        start = content.find("{", end)
+    return False
+
+
 def _bounded_runner_messages(
     base_messages: list[dict[str, str]],
     recent_messages: list[dict[str, str]],
@@ -611,10 +634,16 @@ def _bounded_runner_messages(
     *,
     token_limit: int,
 ) -> tuple[list[dict[str, str]], dict[str, Any]]:
-    recent = [dict(message) for message in recent_messages[-6:]]
+    # Patch data is terminal: retain even old messages and never cut source windows.
+    recent = [dict(message) for index, message in enumerate(recent_messages)
+              if index >= len(recent_messages) - 6 or _has_finalized_v4_patch_data(message)]
     dropped: list[str] = []
     while recent and _estimate_message_tokens([*base_messages, *recent, *pinned_messages]) > token_limit:
-        removed = recent.pop(0)
+        removable = next((index for index, message in enumerate(recent)
+                          if not _has_finalized_v4_patch_data(message)), None)
+        if removable is None:
+            break
+        removed = recent.pop(removable)
         dropped.append(_json_sha256(removed))
     messages = [dict(message) for message in [*base_messages, *recent, *pinned_messages]]
     clipped: list[dict[str, Any]] = []
@@ -623,8 +652,11 @@ def _bounded_runner_messages(
             (len(message.get("content", "")), index)
             for index, message in enumerate(messages)
             if message.get("role") != "system" and len(message.get("content", "")) > 800
+            and not _has_finalized_v4_patch_data(message)
         ]
         if not candidates:
+            if any(_has_finalized_v4_patch_data(message) for message in messages):
+                break  # External context-limit failure is explicit, not lossy delivery.
             raise RuntimeError("hosted model base prompt cannot fit the frozen input budget")
         _length, index = max(candidates)
         content = messages[index]["content"]
@@ -645,6 +677,7 @@ def _bounded_runner_messages(
         "schema_version": 1,
         "input_token_limit": token_limit,
         "estimated_input_tokens": estimate,
+        "protected_patch_data_exceeds_input_budget": estimate > token_limit,
         "dropped_message_sha256": dropped,
         "clipped_messages": clipped,
         "messages_sha256": _json_sha256(messages),

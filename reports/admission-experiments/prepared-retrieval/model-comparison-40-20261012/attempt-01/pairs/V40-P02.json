@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P02",
+  "question": "What is Poetry's configuration precedence from highest to lowest?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "8798e91ac6b197fca1b43a86d6a2f3cc0805c16f2e1bf6b13cabcc6c150582c6",
+      "mini_sha256": "8798e91ac6b197fca1b43a86d6a2f3cc0805c16f2e1bf6b13cabcc6c150582c6"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "caa3fc298939ef5af4fc3f92d4d137c59c58e780bedd486235a23ed8fc237265",
+      "mini_sha256": "caa3fc298939ef5af4fc3f92d4d137c59c58e780bedd486235a23ed8fc237265"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "37e0c827fe9de91afa2f6d52b6a209254f02a8de6532366697607ae009c48b87",
+      "mini_sha256": "37e0c827fe9de91afa2f6d52b6a209254f02a8de6532366697607ae009c48b87"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

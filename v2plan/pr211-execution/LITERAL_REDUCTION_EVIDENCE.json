@@ -1,0 +1,754 @@
+{
+  "commit": "2199002b96253fdaa538515056969713876993a6",
+  "run": 37963786931,
+  "artifact": 11631624539,
+  "zip_sha256": "eafd9b4d52616e713d7fcb1492ac257b152f85d8ad79761c9549db0a8173f3b4",
+  "baseline_counts": {
+    "historical": 702,
+    "compact": 82
+  },
+  "mutants": 51,
+  "verified_mutant_runs": 102,
+  "errors": 0,
+  "skips": 0,
+  "baselines": {
+    "compact": {
+      "case_mode": "compact",
+      "errors": 0,
+      "failures": 0,
+      "input_roster_sha256": "fba7add918af280bdfcdcbc77be066fa8584fe53b1e46f2197e65a42d4041595",
+      "roster_sha256": "a38512f96f2f52037fd3d6d6fe31cfa65469e749c64dda82051478dbc5f223e0",
+      "skipped": 0,
+      "testcase_seconds": 0.009000000000000001,
+      "tests": 82,
+      "wall_seconds": 0.6021962619999783
+    },
+    "historical": {
+      "case_mode": "historical",
+      "errors": 0,
+      "failures": 0,
+      "input_roster_sha256": "fba7add918af280bdfcdcbc77be066fa8584fe53b1e46f2197e65a42d4041595",
+      "roster_sha256": "f95734c90614be039fb00ae042a66c91066816401013452e93da86edccab3e63",
+      "skipped": 0,
+      "testcase_seconds": 0.014,
+      "tests": 702,
+      "wall_seconds": 0.9685477559999924
+    }
+  },
+  "verification": [
+    {
+      "mutation": "literal_whitespace_preservation",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 1,
+      "guard": "literal_original_question"
+    },
+    {
+      "mutation": "literal_whitespace_preservation",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_original_question"
+    },
+    {
+      "mutation": "literal_unicode_normalization",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 1,
+      "guard": "literal_original_question"
+    },
+    {
+      "mutation": "literal_unicode_normalization",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_original_question"
+    },
+    {
+      "mutation": "literal_input_bound",
+      "mode": "historical",
+      "cases": 4,
+      "expected_assertion_failures": 1,
+      "guard": "literal_input_bound"
+    },
+    {
+      "mutation": "literal_input_bound",
+      "mode": "compact",
+      "cases": 4,
+      "expected_assertion_failures": 1,
+      "guard": "literal_input_bound"
+    },
+    {
+      "mutation": "literal_inferred_facets",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_no_inferred_facets"
+    },
+    {
+      "mutation": "literal_inferred_facets",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 7,
+      "guard": "literal_no_inferred_facets"
+    },
+    {
+      "mutation": "literal_missing_unresolved_state",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_unresolved_semantics"
+    },
+    {
+      "mutation": "literal_missing_unresolved_state",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 7,
+      "guard": "literal_unresolved_semantics"
+    },
+    {
+      "mutation": "literal_complete_scope",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_incomplete_scope"
+    },
+    {
+      "mutation": "literal_complete_scope",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 7,
+      "guard": "literal_incomplete_scope"
+    },
+    {
+      "mutation": "literal_legacy_delegation",
+      "mode": "historical",
+      "cases": 10,
+      "expected_assertion_failures": 10,
+      "guard": "literal_compiler_no_legacy_delegation"
+    },
+    {
+      "mutation": "literal_legacy_delegation",
+      "mode": "compact",
+      "cases": 2,
+      "expected_assertion_failures": 2,
+      "guard": "literal_compiler_no_legacy_delegation"
+    },
+    {
+      "mutation": "literal_match_argument_value_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_argument_value_frame"
+    },
+    {
+      "mutation": "literal_match_argument_value_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_argument_value_frame"
+    },
+    {
+      "mutation": "literal_match_before_behavior_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_before_behavior_frame"
+    },
+    {
+      "mutation": "literal_match_before_behavior_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_before_behavior_frame"
+    },
+    {
+      "mutation": "literal_match_contract_scope_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_contract_scope_frame"
+    },
+    {
+      "mutation": "literal_match_contract_scope_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_contract_scope_frame"
+    },
+    {
+      "mutation": "literal_match_comparison_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_comparison_frame"
+    },
+    {
+      "mutation": "literal_match_comparison_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_comparison_frame"
+    },
+    {
+      "mutation": "literal_match_condition_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_condition_frame"
+    },
+    {
+      "mutation": "literal_match_condition_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_condition_frame"
+    },
+    {
+      "mutation": "literal_match_location_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_location_frame"
+    },
+    {
+      "mutation": "literal_match_location_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_location_frame"
+    },
+    {
+      "mutation": "literal_match_decision_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_decision_frame"
+    },
+    {
+      "mutation": "literal_match_decision_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_decision_frame"
+    },
+    {
+      "mutation": "literal_match_premise_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_premise_frame"
+    },
+    {
+      "mutation": "literal_match_premise_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_premise_frame"
+    },
+    {
+      "mutation": "literal_match_purpose_behavior_frame",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:match_purpose_behavior_frame"
+    },
+    {
+      "mutation": "literal_match_purpose_behavior_frame",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_purpose_behavior_frame"
+    },
+    {
+      "mutation": "literal_governance_facets",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:governance_facets"
+    },
+    {
+      "mutation": "literal_governance_facets",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:governance_facets"
+    },
+    {
+      "mutation": "literal_mcp_request_handling",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:mcp_request_handling"
+    },
+    {
+      "mutation": "literal_mcp_request_handling",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:mcp_request_handling"
+    },
+    {
+      "mutation": "literal_provider_request_timeout",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:provider_request_timeout"
+    },
+    {
+      "mutation": "literal_provider_request_timeout",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:provider_request_timeout"
+    },
+    {
+      "mutation": "literal_public_tool_usage",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:public_tool_usage"
+    },
+    {
+      "mutation": "literal_public_tool_usage",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:public_tool_usage"
+    },
+    {
+      "mutation": "literal_public_tools_with_purposes",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:public_tools_with_purposes"
+    },
+    {
+      "mutation": "literal_public_tools_with_purposes",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:public_tools_with_purposes"
+    },
+    {
+      "mutation": "literal_python_version_support",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:python_version_support"
+    },
+    {
+      "mutation": "literal_python_version_support",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:python_version_support"
+    },
+    {
+      "mutation": "literal_semantic_components",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 15,
+      "guard": "literal_adapter:semantic_components"
+    },
+    {
+      "mutation": "literal_semantic_components",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:semantic_components"
+    },
+    {
+      "mutation": "literal_match_action_frame",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_adapter:match_action_frame"
+    },
+    {
+      "mutation": "literal_match_action_frame",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_adapter:match_action_frame"
+    },
+    {
+      "mutation": "literal_match_inventory_frame",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_adapter:match_inventory_frame"
+    },
+    {
+      "mutation": "literal_match_inventory_frame",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_adapter:match_inventory_frame"
+    },
+    {
+      "mutation": "literal_match_requirements_frame",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_adapter:match_requirements_frame"
+    },
+    {
+      "mutation": "literal_match_requirements_frame",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_adapter:match_requirements_frame"
+    },
+    {
+      "mutation": "literal_independent_sentences",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_adapter:independent_sentence_spans"
+    },
+    {
+      "mutation": "literal_independent_sentences",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_adapter:independent_sentence_spans"
+    },
+    {
+      "mutation": "literal_composed_relations",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_adapter:compositional_parts"
+    },
+    {
+      "mutation": "literal_composed_relations",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_adapter:compositional_parts"
+    },
+    {
+      "mutation": "literal_conflict_semantics",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_adapter:conflict_question_plan"
+    },
+    {
+      "mutation": "literal_conflict_semantics",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_adapter:conflict_question_plan"
+    },
+    {
+      "mutation": "literal_unknown_tail_authority",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_unknown_tail_authority"
+    },
+    {
+      "mutation": "literal_unknown_tail_authority",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 5,
+      "guard": "literal_unknown_tail_authority"
+    },
+    {
+      "mutation": "literal_wrapper_erasure",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 1,
+      "guard": "literal_wrapper_identity"
+    },
+    {
+      "mutation": "literal_wrapper_erasure",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_wrapper_identity"
+    },
+    {
+      "mutation": "literal_mask_offset_loss",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_mask_offsets"
+    },
+    {
+      "mutation": "literal_mask_offset_loss",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_mask_offsets"
+    },
+    {
+      "mutation": "literal_quote_paragraph_split",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_quote_paragraph_protection"
+    },
+    {
+      "mutation": "literal_quote_paragraph_split",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_quote_paragraph_protection"
+    },
+    {
+      "mutation": "literal_punctuation_as_semantics",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_paragraphs_only"
+    },
+    {
+      "mutation": "literal_punctuation_as_semantics",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_paragraphs_only"
+    },
+    {
+      "mutation": "literal_path_as_body_identity",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_symbol_path_separation"
+    },
+    {
+      "mutation": "literal_path_as_body_identity",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_symbol_path_separation"
+    },
+    {
+      "mutation": "literal_reference_offset_shift",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_reference_offsets"
+    },
+    {
+      "mutation": "literal_reference_offset_shift",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_reference_offsets"
+    },
+    {
+      "mutation": "literal_lookup_required_credit",
+      "mode": "historical",
+      "cases": 288,
+      "expected_assertion_failures": 288,
+      "guard": "literal_lookup_no_coverage_credit"
+    },
+    {
+      "mutation": "literal_lookup_required_credit",
+      "mode": "compact",
+      "cases": 18,
+      "expected_assertion_failures": 18,
+      "guard": "literal_lookup_no_coverage_credit"
+    },
+    {
+      "mutation": "literal_lookup_parent_promotion",
+      "mode": "historical",
+      "cases": 288,
+      "expected_assertion_failures": 288,
+      "guard": "literal_lookup_no_coverage_credit"
+    },
+    {
+      "mutation": "literal_lookup_parent_promotion",
+      "mode": "compact",
+      "cases": 18,
+      "expected_assertion_failures": 18,
+      "guard": "literal_lookup_no_coverage_credit"
+    },
+    {
+      "mutation": "literal_unknown_tail_hash_loss",
+      "mode": "historical",
+      "cases": 288,
+      "expected_assertion_failures": 36,
+      "guard": "literal_unknown_tail_identity"
+    },
+    {
+      "mutation": "literal_unknown_tail_hash_loss",
+      "mode": "compact",
+      "cases": 18,
+      "expected_assertion_failures": 3,
+      "guard": "literal_unknown_tail_identity"
+    },
+    {
+      "mutation": "literal_answer_authority",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_no_answer_authority"
+    },
+    {
+      "mutation": "literal_answer_authority",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_no_answer_authority"
+    },
+    {
+      "mutation": "literal_mutable_questionplan",
+      "mode": "historical",
+      "cases": 45,
+      "expected_assertion_failures": 45,
+      "guard": "literal_plan_immutable"
+    },
+    {
+      "mutation": "literal_mutable_questionplan",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 7,
+      "guard": "literal_plan_immutable"
+    },
+    {
+      "mutation": "literal_mutable_plannedfacet",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_facet_immutable"
+    },
+    {
+      "mutation": "literal_mutable_plannedfacet",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_facet_immutable"
+    },
+    {
+      "mutation": "literal_mutable_composedpart",
+      "mode": "historical",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_composition_immutable"
+    },
+    {
+      "mutation": "literal_mutable_composedpart",
+      "mode": "compact",
+      "cases": 1,
+      "expected_assertion_failures": 1,
+      "guard": "literal_composition_immutable"
+    },
+    {
+      "mutation": "literal_invalid_clause_negative",
+      "mode": "historical",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_clause_negative",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_clause_length",
+      "mode": "historical",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_clause_length",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_facet_partial",
+      "mode": "historical",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_facet_partial",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_facet_reversed",
+      "mode": "historical",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_facet_reversed",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_plan_negative",
+      "mode": "historical",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_invalid_plan_negative",
+      "mode": "compact",
+      "cases": 5,
+      "expected_assertion_failures": 1,
+      "guard": "literal_invalid_span_dto"
+    },
+    {
+      "mutation": "literal_unicode_semantic_branch",
+      "mode": "historical",
+      "cases": 135,
+      "expected_assertion_failures": 3,
+      "guard": "literal_adapter:match_location_frame"
+    },
+    {
+      "mutation": "literal_unicode_semantic_branch",
+      "mode": "compact",
+      "cases": 9,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:match_location_frame"
+    },
+    {
+      "mutation": "literal_unicode_surface_branch",
+      "mode": "historical",
+      "cases": 105,
+      "expected_assertion_failures": 3,
+      "guard": "literal_adapter:python_version_support"
+    },
+    {
+      "mutation": "literal_unicode_surface_branch",
+      "mode": "compact",
+      "cases": 7,
+      "expected_assertion_failures": 1,
+      "guard": "literal_adapter:python_version_support"
+    },
+    {
+      "mutation": "literal_original_query_credit_lost",
+      "mode": "historical",
+      "cases": 288,
+      "expected_assertion_failures": 288,
+      "guard": "literal_original_coverage_preserved"
+    },
+    {
+      "mutation": "literal_original_query_credit_lost",
+      "mode": "compact",
+      "cases": 18,
+      "expected_assertion_failures": 18,
+      "guard": "literal_original_coverage_preserved"
+    }
+  ]
+}

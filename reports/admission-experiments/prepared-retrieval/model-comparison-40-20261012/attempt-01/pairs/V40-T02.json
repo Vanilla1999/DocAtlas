@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T02",
+  "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "76d5e10ed1fa832bf7d860439ae8e8745630e550ba2323b0fdc93e054093332c",
+      "mini_sha256": "76d5e10ed1fa832bf7d860439ae8e8745630e550ba2323b0fdc93e054093332c"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "f85e670094cc122b0adfd7e63ed0d8d4c28a2e7cc112ed16ab6730484528273d",
+      "mini_sha256": "f85e670094cc122b0adfd7e63ed0d8d4c28a2e7cc112ed16ab6730484528273d"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "26ca5b781373c027ca95c09c7c6cae6ac703f7ddf0ca3a05467f754382d97294",
+      "mini_sha256": "26ca5b781373c027ca95c09c7c6cae6ac703f7ddf0ca3a05467f754382d97294"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      19
+    ],
+    "mini": [
+      19
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

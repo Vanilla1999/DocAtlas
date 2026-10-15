@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-P01",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-poetry",
+  "public_request": {
+    "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-poetry/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "fdfa93923336f1460d62b3ba77ec761a12d19202e68f090f21659997883c03e4",
+  "utf8_bytes": 14367,
+  "tokens": 4402,
+  "seconds": 4.338115681999625,
+  "cpu_seconds": 4.332947336,
+  "peak_rss_kib": 206804,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

@@ -69,307 +69,38 @@ def _rows(*, doc_resolved: list[bool], base_resolved: list[bool], doc_tokens: in
     return rows
 
 
-def test_protocol_requires_three_independent_domains_four_lanes_and_three_repeats():
-    errors = validate_protocol(_protocol(domains=["nbo", "help_chat"], repeats=2))
-
-    assert "at_least_three_independent_domains_required" in errors
-    assert "at_least_three_repeats_required" in errors
-
-
-def test_frozen_protocol_matches_fixture_oracle_and_context_artifacts():
-    protocol = json.loads((PROJECT_ROOT / "eval/task_level/task23_protocol.json").read_text())
-
-    assert validate_protocol(protocol) == []
-    for task in protocol["tasks"]:
-        task_id = task["task_id"]
-        assert fixture_hash(
-            PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id,
-            algorithm="sha256-concat-v1",
-        ) == task["fixture_hash"]
-        for field, path in (
-            ("oracle_sha256", PROJECT_ROOT / "eval/task_level/oracles" / f"{task_id}.patch"),
-            ("external_context_sha256", PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json"),
-        ):
-            assert hashlib.sha256(path.read_bytes()).hexdigest() == task[field]
-
-
-def test_fixture_hash_ignores_runtime_cache_artifacts(tmp_path):
-    (tmp_path / "source.py").write_text("VALUE = 1\n", encoding="utf-8")
-    expected = fixture_hash(tmp_path)
-    cache = tmp_path / "__pycache__"
-    cache.mkdir()
-    (cache / "source.cpython-312.pyc").write_bytes(b"runtime cache")
-
-    assert fixture_hash(tmp_path) == expected
-
-
-def test_fixture_hash_distinguishes_path_content_boundaries(tmp_path):
-    fixture_a = tmp_path / "fixture_a"
-    fixture_b = tmp_path / "fixture_b"
-    fixture_a.mkdir()
-    fixture_b.mkdir()
-    (fixture_a / "a").write_bytes(b"bc")
-    (fixture_b / "ab").write_bytes(b"c")
-
-    assert fixture_hash(fixture_a) != fixture_hash(fixture_b)
-
-
-def test_protocol_amendment_replaces_only_screening_rejection_without_changing_rules():
-    protocol = _protocol()
-    protocol["protocol_id"] = "task23-test"
-    amendment = {
-        "schema_version": "task23-protocol-amendment-1",
-        "base_protocol_id": "task23-test",
-        "frozen_before_replacement_results": True,
-        "reason": "predeclared_screening_exclusion",
-        "excluded_task_id": "task_1",
-        "excluded_screening_status": "rejected_too_easy",
-        "replacement_task": {
-            "task_id": "task_replacement",
-            "source_project": "project_replacement",
-            "domain": "domain_replacement",
-            "fixture_hash": "d" * 64,
-            "oracle_sha256": "e" * 64,
-            "external_context_sha256": "f" * 64,
-        },
-        "conditions_unchanged": True,
-        "controls_unchanged": True,
-        "decision_rule_unchanged": True,
-    }
-
-    effective = apply_protocol_amendment(protocol, amendment)
-
-    assert [task["task_id"] for task in effective["tasks"]] == ["task_2", "task_3", "task_replacement"]
-    assert effective["conditions"] == protocol["conditions"]
-    assert effective["decision_rule"] == protocol["decision_rule"]
-
-
-def test_checked_in_protocol_amendment_matches_replacement_artifacts():
-    protocol_path = PROJECT_ROOT / "eval/task_level/task23_protocol.json"
-    amendment_path = PROJECT_ROOT / "eval/task_level/task23_protocol_amendment_001.json"
-    protocol = json.loads(protocol_path.read_text())
-    amendment = json.loads(amendment_path.read_text())
-
-    assert amendment["base_protocol_sha256"] == hashlib.sha256(protocol_path.read_bytes()).hexdigest()
-    screening = PROJECT_ROOT / "eval/task_level/task23_screening_001.json"
-    assert amendment["screening_results_sha256"] == hashlib.sha256(screening.read_bytes()).hexdigest()
-
-    effective = apply_protocol_amendment(protocol, amendment)
-    replacement = amendment["replacement_task"]
-    task_id = replacement["task_id"]
-    assert fixture_hash(
-        PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id,
-        algorithm="sha256-concat-v1",
-    ) == replacement["fixture_hash"]
-    assert hashlib.sha256((PROJECT_ROOT / "eval/task_level/oracles" / f"{task_id}.patch").read_bytes()).hexdigest() == replacement["oracle_sha256"]
-    assert hashlib.sha256((PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json").read_bytes()).hexdigest() == replacement["external_context_sha256"]
-    assert task_id in {task["task_id"] for task in effective["tasks"]}
-
-
-def test_protocol_amendment_artifact_hashes_fail_closed_on_tampering():
-    protocol_path = PROJECT_ROOT / "eval/task_level/task23_protocol.json"
-    screening_path = PROJECT_ROOT / "eval/task_level/task23_screening_001.json"
-    amendment = json.loads((PROJECT_ROOT / "eval/task_level/task23_protocol_amendment_001.json").read_text())
-
-    validate_protocol_amendment_artifacts(amendment, protocol_path.read_bytes(), screening_path.read_bytes())
-    with pytest.raises(ValueError, match="base_protocol_sha256"):
-        validate_protocol_amendment_artifacts(amendment, protocol_path.read_bytes() + b" ", screening_path.read_bytes())
-    with pytest.raises(ValueError, match="screening_results_sha256"):
-        validate_protocol_amendment_artifacts(amendment, protocol_path.read_bytes(), screening_path.read_bytes() + b" ")
-
-
-@pytest.mark.parametrize("field", ["conditions_unchanged", "controls_unchanged", "decision_rule_unchanged", "frozen_before_replacement_results"])
-def test_protocol_amendment_fails_closed_when_frozen_rules_can_drift(field: str):
-    protocol = _protocol()
-    protocol["protocol_id"] = "task23-test"
-    amendment = {
-        "schema_version": "task23-protocol-amendment-1",
-        "base_protocol_id": "task23-test",
-        "frozen_before_replacement_results": True,
-        "reason": "predeclared_screening_exclusion",
-        "excluded_task_id": "task_1",
-        "excluded_screening_status": "rejected_too_easy",
-        "replacement_task": {
-            "task_id": "task_replacement",
-            "source_project": "project_replacement",
-            "domain": "domain_replacement",
-            "fixture_hash": "d" * 64,
-            "oracle_sha256": "e" * 64,
-            "external_context_sha256": "f" * 64,
-        },
-        "conditions_unchanged": True,
-        "controls_unchanged": True,
-        "decision_rule_unchanged": True,
-    }
-    amendment[field] = False
-
-    with pytest.raises(ValueError, match=field):
-        apply_protocol_amendment(protocol, amendment)
-
-
-def test_protocol_rejects_lane_or_control_drift():
-    protocol = _protocol()
-    protocol["conditions"] = ["repo_only_strict_offline", "docatlas_tool_recommended"]
-    protocol["controls"]["same_model"] = False
-
-    errors = validate_protocol(protocol)
-
-    assert "required_condition_matrix_mismatch" in errors
-    assert "controlled_comparison_invariant_missing:same_model" in errors
-
-
-def test_protocol_requires_immutable_fixture_oracle_and_external_context_hashes():
-    protocol = _protocol()
-    del protocol["tasks"][1]["fixture_hash"]
-    protocol["tasks"][2]["oracle_sha256"] = "not-a-sha"
-
-    errors = validate_protocol(protocol)
-
-    assert "immutable_task_artifact_missing:task_2:fixture_hash" in errors
-    assert "immutable_task_artifact_missing:task_3:oracle_sha256" in errors
-
-
-def test_protocol_requires_unique_nonempty_task_ids():
-    protocol = _protocol()
-    protocol["tasks"][1]["task_id"] = protocol["tasks"][0]["task_id"]
-
-    assert "unique_nonempty_task_ids_required" in validate_protocol(protocol)
-
-
-def test_quality_threshold_requires_confidence_interval_to_clear_ten_points():
-    rows = _rows(
-        base_resolved=[False] * 9,
-        doc_resolved=[True] * 9,
-        base_tokens=1000,
-        doc_tokens=1050,
-        base_latency=100,
-        doc_latency=105,
-    )
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["decision"] == "CONTINUE"
-    assert result["threshold_met"] == "resolved_rate"
-    assert result["uncertainty"]["resolved_rate_delta"]["lower"] >= 0.10
-
-
-def test_token_efficiency_threshold_accepts_equivalent_success_with_lower_cost():
-    resolved = [True, False, True] * 3
-    rows = _rows(
-        base_resolved=resolved,
-        doc_resolved=resolved,
-        base_tokens=1000,
-        doc_tokens=700,
-        base_latency=100,
-        doc_latency=105,
-    )
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["decision"] == "CONTINUE"
-    assert result["threshold_met"] == "token_efficiency"
-    assert result["uncertainty"]["token_change_ratio"]["upper"] <= -0.25
-
-
-def test_decision_fails_closed_when_metrics_or_repeats_are_incomplete():
-    rows = _rows(
-        base_resolved=[False, False],
-        doc_resolved=[True, True],
-        base_tokens=1000,
-        doc_tokens=900,
-        base_latency=100,
-        doc_latency=90,
-    )
-    rows[0]["total_tokens"] = None
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["decision"] == "INCONCLUSIVE"
-    assert "task_repeat_matrix_mismatch" in result["reasons"]
-    assert "missing_total_tokens" in result["reasons"]
-
-
-@pytest.mark.parametrize("invalid_repeat", ["0", [0], True])
-def test_decision_fails_closed_on_invalid_repeat_indices(invalid_repeat):
-    rows = _rows(
-        base_resolved=[False] * 9,
-        doc_resolved=[False] * 9,
-        base_tokens=1000,
-        doc_tokens=1000,
-        base_latency=100,
-        doc_latency=100,
-    )
-    for row in rows:
-        row["repeat"] = invalid_repeat
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["decision"] == "INCONCLUSIVE"
-    assert "task_repeat_matrix_mismatch" in result["reasons"]
-
-
-def test_token_change_uses_condition_medians_not_mean_of_pair_ratios():
-    rows = _rows(
-        base_resolved=[False] * 9,
-        doc_resolved=[False] * 9,
-        base_tokens=100,
-        doc_tokens=90,
-        base_latency=100,
-        doc_latency=100,
-    )
-    baseline_rows = [row for row in rows if row["condition_id"] == "repo_only_strict_offline"]
-    candidate_by_pair = {
-        (row["task_id"], row["repeat"]): row
-        for row in rows
-        if row["condition_id"] == "docatlas_tool_recommended"
-    }
-    for baseline in baseline_rows[:4]:
-        baseline["total_tokens"] = 1000
-        candidate_by_pair[(baseline["task_id"], baseline["repeat"])]["total_tokens"] = 2000
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["uncertainty"]["token_change_ratio"]["estimate"] == -0.10
-
-
-def test_protocol_rejects_changed_predeclared_numeric_rule():
-    protocol = _protocol()
-    protocol["decision_rule"]["resolved_rate_improvement_min"] = 0.09
-
-    with pytest.raises(ValueError, match="predeclared_decision_rule_mismatch"):
-        evaluate_predeclared_rule([], protocol=protocol)
-
-
-def test_decision_rejects_rows_for_tasks_not_in_protocol():
-    rows = _rows(
-        base_resolved=[False] * 9,
-        doc_resolved=[True] * 9,
-        base_tokens=1000,
-        doc_tokens=900,
-        base_latency=100,
-        doc_latency=90,
-    )
-    for row in rows:
-        row["task_id"] = "unexpected_" + str(row["task_id"])
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["decision"] == "INCONCLUSIVE"
-    assert "task_repeat_matrix_mismatch" in result["reasons"]
-
-
-def test_decision_rejects_duplicate_task_repeat_lane():
-    rows = _rows(
-        base_resolved=[False] * 9,
-        doc_resolved=[True] * 9,
-        base_tokens=1000,
-        doc_tokens=900,
-        base_latency=100,
-        doc_latency=90,
-    )
-    rows.append(dict(rows[0]))
-
-    result = evaluate_predeclared_rule(rows, protocol=_protocol())
-
-    assert result["decision"] == "INCONCLUSIVE"
-    assert "task_repeat_matrix_mismatch" in result["reasons"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

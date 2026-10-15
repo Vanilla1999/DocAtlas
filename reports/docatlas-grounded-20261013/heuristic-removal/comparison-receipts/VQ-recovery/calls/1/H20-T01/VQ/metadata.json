@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-T01",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-typer",
+  "public_request": {
+    "question": "In Typer's short-name boolean example, what do -f and -F mean and what is the default; how does that differ from the earlier only --force example's treatment of --no-force?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-typer/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "b8893457d06fe0d9f810113f492e4090111a182f3116187054b879c0d0cf3188",
+  "utf8_bytes": 4668,
+  "tokens": 1525,
+  "seconds": 1.691837239999586,
+  "cpu_seconds": 1.686360639,
+  "peak_rss_kib": 205488,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

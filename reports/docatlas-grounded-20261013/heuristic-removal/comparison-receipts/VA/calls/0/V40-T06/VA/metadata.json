@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-T06",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-textual",
+  "public_request": {
+    "question": "What happens inside a coroutine when Worker.cancel is called, and what maximum cancellation latency does Textual guarantee?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-textual/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "a0d3db47d835af7a8671d12ae7205efc718f0e75a10ce0e138bb08e0cf65d82c",
+  "utf8_bytes": 43025,
+  "tokens": 11783,
+  "seconds": 38.96426703100042,
+  "cpu_seconds": 38.955357573000015,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

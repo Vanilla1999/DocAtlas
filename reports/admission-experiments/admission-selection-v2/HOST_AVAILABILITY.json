@@ -1,0 +1,1 @@
+{"discovery":"opencode api get /api/model", "inference_requests":0, "providerID":"openai", "modelID":"gpt-5.6-luna", "enabled":true,"variant":"medium", "backend_revision":"UNKNOWN", "sampling":"UNKNOWN", "billing":"UNKNOWN", "note":"Only non-sensitive availability metadata retained; provider settings/headers omitted."}

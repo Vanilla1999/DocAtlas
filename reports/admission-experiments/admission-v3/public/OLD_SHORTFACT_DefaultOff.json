@@ -1,0 +1,2278 @@
+{
+  "case_id": "OLD_SHORTFACT",
+  "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+  "split": "control",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+    "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "rows": [
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+        "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+        "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+        "# Logging\n\nLogs flow to disk after each request.\n",
+        "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+        "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+        "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+        "# Packet transport\n\nPackets are delivered after each request.\n",
+        "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+        "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-qk1r9h5i/project/docatlas.project-docs.yaml": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-fdc0e926318664ff",
+        "path_or_url": "docs/logs.md",
+        "section": "Logging",
+        "snippet": "# Logging\n\nLogs flow to disk after each request.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "0cc65ab2cd0b478a3df76d076cdc7f55c77cd805ed83b9acb29d108f94351f93",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/2305b7e5efd4c2fe4f8400a7"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 274,
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "mandatory_component_ids": [],
+        "covered_component_ids": [],
+        "missing_component_ids": [],
+        "evidence_ids": [],
+        "unresolved_residue": [
+          "unverified_original_component_scope"
+        ],
+        "status": "unavailable",
+        "recognized_component_status": "unavailable"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "observed",
+        "projection": "observed",
+        "coverage": "observed",
+        "delivery": "projected"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+        },
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+            "window_characters": 49,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "logs",
+                "flow",
+                "to",
+                "disk",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "logs",
+                "flow",
+                "to",
+                "disk"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 10,
+              "matched_term_count": 4,
+              "match_ratio": 0.4,
+              "bm25_cost": -7.841758094378855,
+              "lexical_score": 7.841758094378855,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "logs",
+                  "flow",
+                  "to",
+                  "disk"
+                ],
+                "retrieval_text": [
+                  "logs",
+                  "flow",
+                  "to",
+                  "disk"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/logs.md",
+                "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+              },
+              "char_start": 0,
+              "char_end": 49
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "query_terms": [
+              "when",
+              "do",
+              "logs",
+              "flow",
+              "to",
+              "disk",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "body_matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.4,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              48
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": {
+            "reason": "ordinary_body_clause_context_v1",
+            "query_id": "query-original",
+            "qualification_reason": "insufficient_visible_match",
+            "coverage_credit": false,
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+            "path": "docs/logs.md",
+            "body_witnesses": [
+              {
+                "kind": "ordinary_body_clause_context_v1",
+                "text": "logs flow to disk",
+                "query_char_start": 8,
+                "query_char_end": 25,
+                "char_start": 11,
+                "char_end": 28,
+                "clause_char_start": 11,
+                "clause_char_end": 47,
+                "content_tokens": [
+                  {
+                    "query_char_start": 8,
+                    "query_char_end": 12,
+                    "char_start": 11,
+                    "char_end": 15
+                  },
+                  {
+                    "query_char_start": 13,
+                    "query_char_end": 17,
+                    "char_start": 16,
+                    "char_end": 20
+                  },
+                  {
+                    "query_char_start": 18,
+                    "query_char_end": 20,
+                    "char_start": 21,
+                    "char_end": 23
+                  },
+                  {
+                    "query_char_start": 21,
+                    "query_char_end": 25,
+                    "char_start": 24,
+                    "char_end": 28
+                  }
+                ],
+                "native_discovery_binding_sha256": "cc7af2789cd88cc69d011ac9088b9bf2608220aa242ecc71c8e873124ef0929b"
+              }
+            ],
+            "body_window": {
+              "char_start": 0,
+              "char_end": 49,
+              "byte_start": 0,
+              "byte_end": 49,
+              "line_start": 1,
+              "line_end": 3
+            }
+          }
+        },
+        {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+            "window_characters": 49,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "do",
+                "logs",
+                "flow",
+                "to",
+                "disk",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "matched_terms": [
+                "logs",
+                "flow",
+                "to",
+                "disk"
+              ],
+              "exact_terms": [
+                "when"
+              ],
+              "missing_exact_terms": [
+                "when"
+              ],
+              "query_term_count": 10,
+              "matched_term_count": 4,
+              "match_ratio": 0.4,
+              "bm25_cost": -7.841758094378855,
+              "lexical_score": 7.841758094378855,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "logs",
+                  "flow",
+                  "to",
+                  "disk"
+                ],
+                "retrieval_text": [
+                  "logs",
+                  "flow",
+                  "to",
+                  "disk"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "scope": {
+                  "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                  "version": "",
+                  "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+                },
+                "canonical_path": "docs/logs.md",
+                "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+              },
+              "char_start": 0,
+              "char_end": 49
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "query_terms": [
+              "when",
+              "do",
+              "logs",
+              "flow",
+              "to",
+              "disk",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "body_matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.4,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              48
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": {
+            "reason": "ordinary_body_clause_context_v1",
+            "query_id": "query-original",
+            "qualification_reason": "insufficient_visible_match",
+            "coverage_credit": false,
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+            "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+            "path": "docs/logs.md",
+            "body_witnesses": [
+              {
+                "kind": "ordinary_body_clause_context_v1",
+                "text": "logs flow to disk",
+                "query_char_start": 8,
+                "query_char_end": 25,
+                "char_start": 11,
+                "char_end": 28,
+                "clause_char_start": 11,
+                "clause_char_end": 47,
+                "content_tokens": [
+                  {
+                    "query_char_start": 8,
+                    "query_char_end": 12,
+                    "char_start": 11,
+                    "char_end": 15
+                  },
+                  {
+                    "query_char_start": 13,
+                    "query_char_end": 17,
+                    "char_start": 16,
+                    "char_end": 20
+                  },
+                  {
+                    "query_char_start": 18,
+                    "query_char_end": 20,
+                    "char_start": 21,
+                    "char_end": 23
+                  },
+                  {
+                    "query_char_start": 21,
+                    "query_char_end": 25,
+                    "char_start": 24,
+                    "char_end": 28
+                  }
+                ],
+                "native_discovery_binding_sha256": "cc7af2789cd88cc69d011ac9088b9bf2608220aa242ecc71c8e873124ef0929b"
+              }
+            ],
+            "body_window": {
+              "char_start": 0,
+              "char_end": 49,
+              "byte_start": 0,
+              "byte_end": 49,
+              "line_start": 1,
+              "line_end": 3
+            }
+          }
+        }
+      ],
+      "qualification_rejections": [
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306"
+      ],
+      "pre_projection_qualified_ids": [],
+      "ranked_candidate_ids": [
+        "child-c280555c33847a1638b96c8c2e9270fd859c3306"
+      ],
+      "selected_candidate_ids": [],
+      "considered_variants": [],
+      "projection_rejections": [],
+      "final_visible_evidence_ids": [
+        "ev-fdc0e926318664ff"
+      ],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": false,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "ok",
+          "context_available": true,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "evidence_id": "ev-fdc0e926318664ff"
+              }
+            ]
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 2,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 2,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md"
+              },
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 2,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 2,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                "document_id": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "attempt_kind": "primary",
+          "qualified_variants": 0,
+          "ranked_candidates": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "child-c280555c33847a1638b96c8c2e9270fd859c3306"
+            ]
+          },
+          "prepared_qualified_variants": {
+            "observation": "recorded",
+            "recorded_count": 0,
+            "producer_count": 0,
+            "producer_omitted": 0,
+            "preview_count": 0,
+            "preview_omitted": 0,
+            "items": []
+          },
+          "literal_context_admissions": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "reason": "ordinary_body_clause_context_v1",
+                "query_id": "query-original",
+                "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "coverage_credit": false,
+                "qualification_reason": "insufficient_visible_match"
+              }
+            ]
+          },
+          "core_payload_sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "ev-fdc0e926318664ff"
+            ]
+          },
+          "decision_trace": {
+            "schema_version": 1,
+            "variant_attempts": 0,
+            "omitted_events": 0,
+            "selection_events_omitted": 0,
+            "branch_counts": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "branch": "candidate:ordinary_body_clause_context_v1",
+                  "count": 1
+                },
+                {
+                  "branch": "selection:ordinary_body_clause_context_v1",
+                  "count": 1
+                }
+              ]
+            },
+            "events": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "candidate",
+                  "decision": "prepared",
+                  "reason": "ordinary_body_clause_context_v1",
+                  "candidate_key": "edee6e92c36f78db97de794d",
+                  "variant_key": "7938fd707f80f67d0232f369"
+                },
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "ordinary_body_clause_context_v1",
+                  "candidate_key": "edee6e92c36f78db97de794d",
+                  "variant_key": "7938fd707f80f67d0232f369"
+                }
+              ]
+            },
+            "selection_events": {
+              "observation": "recorded",
+              "recorded_count": 1,
+              "producer_count": 1,
+              "producer_omitted": 0,
+              "preview_count": 1,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "ordinary_body_clause_context_v1",
+                  "candidate_key": "edee6e92c36f78db97de794d",
+                  "variant_key": "7938fd707f80f67d0232f369"
+                }
+              ]
+            }
+          }
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                    "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                    "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+                    "path": "docs/logs.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 49,
+                    "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a",
+                    "project_doc_content_hash": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "When do logs flow to disk during concurrent checkpoint recovery?",
+                "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "partial_navigational_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                    "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+                    "path": "docs/logs.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 49,
+                    "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+                    "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                    "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+                    "path": "docs/logs.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 49,
+                    "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "project_doc_catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a",
+                    "project_doc_content_hash": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "When do logs flow to disk during concurrent checkpoint recovery?",
+                "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": true
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 219,
+                "observed_budget_projection_bytes": 219,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "project_path": "/tmp/docatlas-v3-qk1r9h5i/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": true,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+                    "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+                    "path": "docs/logs.md",
+                    "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 49,
+                    "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+                    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "success",
+                "reason_code": "partial_navigational_context",
+                "source_count": 1
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": true
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 219,
+                "observed_budget_projection_bytes": 219,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {
+    "ev-fdc0e926318664ff": {
+      "source": {
+        "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+        "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+        "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "_source_snapshot_sha256": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "canonical_path": "docs/logs.md",
+            "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+          },
+          "project_doc_content_hash": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "member_binding": {
+            "doc_scope": "project",
+            "module_path": "",
+            "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+          },
+          "char_start": 0,
+          "char_end": 49,
+          "text": "# Logging\n\nLogs flow to disk after each request.\n",
+          "raw_document": "# Logging\n\nLogs flow to disk after each request.\n",
+          "owner": {
+            "text": "# Logging\n",
+            "char_start": 0,
+            "char_end": 10,
+            "scope_start": 0,
+            "scope_end": 49,
+            "logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+          "references": [],
+          "scope": {
+            "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "version": "",
+            "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "When do logs flow to disk during concurrent checkpoint recovery?": {
+            "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "references": [],
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:edd91dd1ace1dadf49670c11ea6fabac73c23e2aee73f9c980543c8ddaac5d6d",
+            "member_spans": [
+              [
+                0,
+                9,
+                "7068963dda7a59da010dd13121ebf485b44483e214ee8458d0ec14adc7791b14"
+              ],
+              [
+                11,
+                48,
+                "661af6fe0bf8ab0ef205d7584b6c613ddf0cdf96c9e6b53321c72313622e4d88"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "resolved_version": "",
+        "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+        "source_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "byte_start": 0,
+        "byte_end": 49,
+        "_source_catalog_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a",
+        "char_start": 0,
+        "char_end": 49,
+        "line_start": 1,
+        "line_end": 3,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "when",
+              "do",
+              "logs",
+              "flow",
+              "to",
+              "disk",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "bound_subject_context": "# Logging\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              48
+            ],
+            "matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "body_matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 4,
+            "match_ratio": 0.4,
+            "qualified": false,
+            "qualification_reason": "insufficient_visible_match",
+            "context_only": true,
+            "coverage_kinds": []
+          }
+        },
+        "project_ranking": {
+          "query_intent": "general",
+          "base_score": 1.0,
+          "final_score": 1.0,
+          "original_rank": 0,
+          "selected_rank": 1,
+          "source_weight_reason": "base retrieval score; no topic-derived source weight",
+          "requirement_reason": null,
+          "selected_by": "ranking",
+          "diversity_relaxed": false,
+          "reasons": [
+            "independent qualified query coverage and base retrieval score"
+          ]
+        },
+        "path": "docs/logs.md",
+        "url": null,
+        "title": "Logging",
+        "heading_path": "Logging",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+        "content": "# Logging\n\nLogs flow to disk after each request.\n",
+        "display_text": "# Logging\n\nLogs flow to disk after each request.\n",
+        "token_estimate": 12,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+          "path": "docs/logs.md",
+          "url": null,
+          "title": "Logging"
+        },
+        "section": {
+          "title": "Logging",
+          "heading_path": "Logging",
+          "freshness": "current"
+        },
+        "source_provenance": {
+          "owner": "configured_repository",
+          "origin_lane": "project"
+        },
+        "version_exactness": "not_applicable",
+        "repository_authority": "ordinary_repository_document",
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1",
+          "executable_policy": false
+        },
+        "document_data": {
+          "schema": "docmancer-document-data-v1",
+          "instruction_trust": "untrusted_data",
+          "content": "# Logging\n\nLogs flow to disk after each request.\n"
+        },
+        "authority_root": null,
+        "policy_scope": null,
+        "scope_verified": false,
+        "origin_lane": "project",
+        "canonical_id": null,
+        "library_id": null,
+        "version": null,
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+          "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "_source_snapshot_sha256": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "canonical_path": "docs/logs.md",
+              "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+            },
+            "project_doc_content_hash": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+            },
+            "char_start": 0,
+            "char_end": 49,
+            "text": "# Logging\n\nLogs flow to disk after each request.\n",
+            "raw_document": "# Logging\n\nLogs flow to disk after each request.\n",
+            "owner": {
+              "text": "# Logging\n",
+              "char_start": 0,
+              "char_end": 10,
+              "scope_start": 0,
+              "scope_end": 49,
+              "logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "references": [],
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "When do logs flow to disk during concurrent checkpoint recovery?": {
+              "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:edd91dd1ace1dadf49670c11ea6fabac73c23e2aee73f9c980543c8ddaac5d6d",
+              "member_spans": [
+                [
+                  0,
+                  9,
+                  "7068963dda7a59da010dd13121ebf485b44483e214ee8458d0ec14adc7791b14"
+                ],
+                [
+                  11,
+                  48,
+                  "661af6fe0bf8ab0ef205d7584b6c613ddf0cdf96c9e6b53321c72313622e4d88"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+          "resolved_version": "",
+          "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+          "source_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "byte_start": 0,
+          "byte_end": 49,
+          "_source_catalog_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a",
+          "char_start": 0,
+          "char_end": 49,
+          "line_start": 1,
+          "line_end": 3,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+          "retrieval_query_ids": [],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "when",
+                "do",
+                "logs",
+                "flow",
+                "to",
+                "disk",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "bound_subject_context": "# Logging\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                0,
+                48
+              ],
+              "matched_terms": [
+                "logs",
+                "flow",
+                "to",
+                "disk"
+              ],
+              "body_matched_terms": [
+                "logs",
+                "flow",
+                "to",
+                "disk"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.4,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "context_only": true,
+              "literal_context_admission": {
+                "reason": "ordinary_body_clause_context_v1",
+                "query_id": "query-original",
+                "qualification_reason": "insufficient_visible_match",
+                "coverage_credit": false,
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "path": "docs/logs.md",
+                "body_witnesses": [
+                  {
+                    "kind": "ordinary_body_clause_context_v1",
+                    "text": "logs flow to disk",
+                    "query_char_start": 8,
+                    "query_char_end": 25,
+                    "char_start": 11,
+                    "char_end": 28,
+                    "clause_char_start": 11,
+                    "clause_char_end": 47,
+                    "content_tokens": [
+                      {
+                        "query_char_start": 8,
+                        "query_char_end": 12,
+                        "char_start": 11,
+                        "char_end": 15
+                      },
+                      {
+                        "query_char_start": 13,
+                        "query_char_end": 17,
+                        "char_start": 16,
+                        "char_end": 20
+                      },
+                      {
+                        "query_char_start": 18,
+                        "query_char_end": 20,
+                        "char_start": 21,
+                        "char_end": 23
+                      },
+                      {
+                        "query_char_start": 21,
+                        "query_char_end": 25,
+                        "char_start": 24,
+                        "char_end": 28
+                      }
+                    ],
+                    "native_discovery_binding_sha256": "cc7af2789cd88cc69d011ac9088b9bf2608220aa242ecc71c8e873124ef0929b"
+                  }
+                ],
+                "body_window": {
+                  "char_start": 0,
+                  "char_end": 49,
+                  "byte_start": 0,
+                  "byte_end": 49,
+                  "line_start": 1,
+                  "line_end": 3
+                }
+              },
+              "coverage_kinds": []
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/logs.md",
+          "url": null,
+          "title": "Logging",
+          "heading_path": "Logging",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "# Logging\n\nLogs flow to disk after each request.\n",
+          "display_text": "# Logging\n\nLogs flow to disk after each request.\n",
+          "token_estimate": 12,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "path": "docs/logs.md",
+            "url": null,
+            "title": "Logging"
+          },
+          "section": {
+            "title": "Logging",
+            "heading_path": "Logging",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "# Logging\n\nLogs flow to disk after each request.\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_expected_project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "_lifecycle_intent": "current",
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "When do logs flow to disk during concurrent checkpoint recovery?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_assigned_requirement_ids": []
+      },
+      "projected_source": {
+        "evidence_id": "ev-fdc0e926318664ff",
+        "path_or_url": "docs/logs.md",
+        "section": "Logging",
+        "snippet": "# Logging\n\nLogs flow to disk after each request.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "0cc65ab2cd0b478a3df76d076cdc7f55c77cd805ed83b9acb29d108f94351f93",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/2305b7e5efd4c2fe4f8400a7"
+      },
+      "evidence_id": "ev-fdc0e926318664ff",
+      "path_or_url": "docs/logs.md",
+      "section": "Logging",
+      "snippet": "# Logging\n\nLogs flow to disk after each request.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0cc65ab2cd0b478a3df76d076cdc7f55c77cd805ed83b9acb29d108f94351f93",
+      "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+      "line_start": 1,
+      "line_end": 3,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2305b7e5efd4c2fe4f8400a7",
+      "qualification": {
+        "evidence_id": "ev-fdc0e926318664ff",
+        "path_or_url": "docs/logs.md",
+        "section": "Logging",
+        "snippet": "# Logging\n\nLogs flow to disk after each request.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "0cc65ab2cd0b478a3df76d076cdc7f55c77cd805ed83b9acb29d108f94351f93",
+        "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "catalog_role": "other",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "when",
+              "do",
+              "logs",
+              "flow",
+              "to",
+              "disk",
+              "during",
+              "concurrent",
+              "checkpoint",
+              "recovery"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "bound_subject_context": "# Logging\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              48
+            ],
+            "matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "body_matched_terms": [
+              "logs",
+              "flow",
+              "to",
+              "disk"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 4,
+            "match_ratio": 0.4,
+            "qualified": false,
+            "qualification_reason": "insufficient_visible_match",
+            "context_only": true,
+            "coverage_kinds": []
+          }
+        },
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+          "parent_logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a",
+          "display_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "_source_snapshot_sha256": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "canonical_path": "docs/logs.md",
+              "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed"
+            },
+            "project_doc_content_hash": "sha256:94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+            },
+            "char_start": 0,
+            "char_end": 49,
+            "text": "# Logging\n\nLogs flow to disk after each request.\n",
+            "raw_document": "# Logging\n\nLogs flow to disk after each request.\n",
+            "owner": {
+              "text": "# Logging\n",
+              "char_start": 0,
+              "char_end": 10,
+              "scope_start": 0,
+              "scope_end": 49,
+              "logical_id": "parent-d5140bd7dff3c2a5743cb54b5757d99a"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+            "references": [],
+            "scope": {
+              "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+              "version": "",
+              "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "When do logs flow to disk during concurrent checkpoint recovery?": {
+              "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "references": [],
+              "scope": {
+                "project_id": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "version": "",
+                "snapshot_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:edd91dd1ace1dadf49670c11ea6fabac73c23e2aee73f9c980543c8ddaac5d6d",
+              "member_spans": [
+                [
+                  0,
+                  9,
+                  "7068963dda7a59da010dd13121ebf485b44483e214ee8458d0ec14adc7791b14"
+                ],
+                [
+                  11,
+                  48,
+                  "661af6fe0bf8ab0ef205d7584b6c613ddf0cdf96c9e6b53321c72313622e4d88"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+          "resolved_version": "",
+          "source_identity": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+          "source_content_hash": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+          "byte_start": 0,
+          "byte_end": 49,
+          "_source_catalog_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a",
+          "char_start": 0,
+          "char_end": 49,
+          "line_start": 1,
+          "line_end": 3,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+          "retrieval_query_ids": [],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "when",
+                "do",
+                "logs",
+                "flow",
+                "to",
+                "disk",
+                "during",
+                "concurrent",
+                "checkpoint",
+                "recovery"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "bound_subject_context": "# Logging\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                0,
+                48
+              ],
+              "matched_terms": [
+                "logs",
+                "flow",
+                "to",
+                "disk"
+              ],
+              "body_matched_terms": [
+                "logs",
+                "flow",
+                "to",
+                "disk"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.4,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "context_only": true,
+              "literal_context_admission": {
+                "reason": "ordinary_body_clause_context_v1",
+                "query_id": "query-original",
+                "qualification_reason": "insufficient_visible_match",
+                "coverage_credit": false,
+                "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+                "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+                "source_id": "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md",
+                "path": "docs/logs.md",
+                "body_witnesses": [
+                  {
+                    "kind": "ordinary_body_clause_context_v1",
+                    "text": "logs flow to disk",
+                    "query_char_start": 8,
+                    "query_char_end": 25,
+                    "char_start": 11,
+                    "char_end": 28,
+                    "clause_char_start": 11,
+                    "clause_char_end": 47,
+                    "content_tokens": [
+                      {
+                        "query_char_start": 8,
+                        "query_char_end": 12,
+                        "char_start": 11,
+                        "char_end": 15
+                      },
+                      {
+                        "query_char_start": 13,
+                        "query_char_end": 17,
+                        "char_start": 16,
+                        "char_end": 20
+                      },
+                      {
+                        "query_char_start": 18,
+                        "query_char_end": 20,
+                        "char_start": 21,
+                        "char_end": 23
+                      },
+                      {
+                        "query_char_start": 21,
+                        "query_char_end": 25,
+                        "char_start": 24,
+                        "char_end": 28
+                      }
+                    ],
+                    "native_discovery_binding_sha256": "cc7af2789cd88cc69d011ac9088b9bf2608220aa242ecc71c8e873124ef0929b"
+                  }
+                ],
+                "body_window": {
+                  "char_start": 0,
+                  "char_end": 49,
+                  "byte_start": 0,
+                  "byte_end": 49,
+                  "line_start": 1,
+                  "line_end": 3
+                }
+              },
+              "coverage_kinds": []
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/logs.md",
+          "url": null,
+          "title": "Logging",
+          "heading_path": "Logging",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "# Logging\n\nLogs flow to disk after each request.\n",
+          "display_text": "# Logging\n\nLogs flow to disk after each request.\n",
+          "token_estimate": 12,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+            "path": "docs/logs.md",
+            "url": null,
+            "title": "Logging"
+          },
+          "section": {
+            "title": "Logging",
+            "heading_path": "Logging",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "# Logging\n\nLogs flow to disk after each request.\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "When do logs flow to disk during concurrent checkpoint recovery?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "When do logs flow to disk during concurrent checkpoint recovery?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_expected_project_identity": "local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2",
+        "_lifecycle_intent": "current",
+        "_visible_assignment_hashes": [],
+        "_assigned_requirement_ids": []
+      }
+    }
+  },
+  "pools": [],
+  "state_after": {
+    "generation": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "rows": [
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md",
+        "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+        "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/compounds.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md",
+        "# Logging\n\nLogs flow to disk after each request.\n",
+        "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/logs.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md",
+        "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+        "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/owners.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md",
+        "# Packet transport\n\nPackets are delivered after each request.\n",
+        "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/packets.md"
+      ],
+      [
+        "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+        "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md",
+        "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+        "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+        "project_file:local:245d72872e596511f5989b63e2f802d7f29bccc703fc330fabd2b5c52d984ee2:docs/setext.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-qk1r9h5i/project/docatlas.project-docs.yaml": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "/tmp/docatlas-v3-qk1r9h5i/project/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae"
+    }
+  },
+  "elapsed_seconds": 0.060028004001651425,
+  "integrity_errors": []
+}

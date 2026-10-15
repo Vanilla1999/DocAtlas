@@ -1,0 +1,300 @@
+{
+  "boundary": "offline preserved inputs against previous freeze, not rerun/performance claim",
+  "records": [
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/CORPUS_RU.md",
+      "key": "eval/prepared_model_comparison40/CORPUS_RU.md",
+      "sha256": "cf3481e71778ae4ad012423c276f120ffd0dd146823bea822f895203ff617d6c",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/README.md",
+      "key": "eval/prepared_model_comparison40/README.md",
+      "sha256": "b18aa5dbc663e0ed8d709dd5f6a9d12fd0078fc86837b3a49af6a2f73e612138",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/evaluate.py",
+      "key": "eval/prepared_model_comparison40/evaluate.py",
+      "sha256": "32cf91a78807d1cb5709edb140cc1ff62ad4027023cb4a382c702403188921fa",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/gold-span-audit.json",
+      "key": "eval/prepared_model_comparison40/gold-span-audit.json",
+      "sha256": "a45196c1f87896d1cb3520b954b908d504b0e2573fa5de2211184380350b9f24",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/gold_spans.json",
+      "key": "eval/prepared_model_comparison40/gold_spans.json",
+      "sha256": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/questions.json",
+      "key": "eval/prepared_model_comparison40/questions.json",
+      "sha256": "67afaaa42ad71d0036d2cde4f5a7da1b4e9c9b836b53b62ef2658ffdb8af80b5",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/run.py",
+      "key": "eval/prepared_model_comparison40/run.py",
+      "sha256": "5ad3dbf8e0c38df69c26582af81624022b80df0e762e591fedf916d8f5150f99",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/source-manifest.json",
+      "key": "eval/prepared_model_comparison40/source-manifest.json",
+      "sha256": "4622d2f4ccaf6669900ee40af04272620d7641d0a5af23213e03a5ba3b76d9a8",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/source_plan.json",
+      "key": "eval/prepared_model_comparison40/source_plan.json",
+      "sha256": "8ec8b19323f4bc4f7d0737aced62527b210ee4ba1c50cf77b62ccafc38594e9a",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/black/docs/faq.md",
+      "key": "eval/prepared_model_comparison40/sources/black/docs/faq.md",
+      "sha256": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/file_collection_and_discovery.md",
+      "key": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/file_collection_and_discovery.md",
+      "sha256": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+      "key": "eval/prepared_model_comparison40/sources/black/docs/usage_and_configuration/the_basics.md",
+      "sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/eslint/docs/src/use/command-line-interface.md",
+      "key": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/command-line-interface.md",
+      "sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/configuration-files.md",
+      "key": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/configuration-files.md",
+      "sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/ignore.md",
+      "key": "eval/prepared_model_comparison40/sources/eslint/docs/src/use/configure/ignore.md",
+      "sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/poetry/docs/configuration.md",
+      "key": "eval/prepared_model_comparison40/sources/poetry/docs/configuration.md",
+      "sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/poetry/docs/dependency-specification.md",
+      "key": "eval/prepared_model_comparison40/sources/poetry/docs/dependency-specification.md",
+      "sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/poetry/docs/managing-environments.md",
+      "key": "eval/prepared_model_comparison40/sources/poetry/docs/managing-environments.md",
+      "sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/textual/docs/guide/reactivity.md",
+      "key": "eval/prepared_model_comparison40/sources/textual/docs/guide/reactivity.md",
+      "sha256": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/textual/docs/guide/workers.md",
+      "key": "eval/prepared_model_comparison40/sources/textual/docs/guide/workers.md",
+      "sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/textual/docs/widgets/input.md",
+      "key": "eval/prepared_model_comparison40/sources/textual/docs/widgets/input.md",
+      "sha256": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/vite/docs/config/server-options.md",
+      "key": "eval/prepared_model_comparison40/sources/vite/docs/config/server-options.md",
+      "sha256": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/vite/docs/guide/assets.md",
+      "key": "eval/prepared_model_comparison40/sources/vite/docs/guide/assets.md",
+      "sha256": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_model_comparison40/sources/vite/docs/guide/env-and-mode.md",
+      "key": "eval/prepared_model_comparison40/sources/vite/docs/guide/env-and-mode.md",
+      "sha256": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/__init__.py",
+      "key": "eval/prepared_ablation/__init__.py",
+      "sha256": "bd49586fc1a142ecd6d3ec9af8759a460affdb6814cb078367ccdda46f254fd4",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/acquisition.py",
+      "key": "eval/prepared_ablation/acquisition.py",
+      "sha256": "ef60a3cfe4bc6bf60600910d83e7f4d91d9c706df210dfe6f50da42ac20abd32",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/assess.py",
+      "key": "eval/prepared_ablation/assess.py",
+      "sha256": "a059c291e9e662b01a8ef6938e82c0ce45a8a227d8f697c055b0a5e1379023e7",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/blind_packets.py",
+      "key": "eval/prepared_ablation/blind_packets.py",
+      "sha256": "463cd6cd590387b548ed4b1cc810dc08dfdec3104318eaf1e7c64afe9d28a53d",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/comparator.py",
+      "key": "eval/prepared_ablation/comparator.py",
+      "sha256": "b1ebeac5ab2a0a145336ae41d702ec0c6c70fb65bbc016262e54a14f8de1efbe",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/evaluation.py",
+      "key": "eval/prepared_ablation/evaluation.py",
+      "sha256": "a293c28a84b1f0e399354b16be62c7773fb58594c92b0ec99a87bb72b318cf06",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/grounded_run.py",
+      "key": "eval/prepared_ablation/grounded_run.py",
+      "sha256": "5b0f92906a6af165b2e7754180a6a54c7903bf1b28e0f1f890937c604e1d526c",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/FREEZE_MANIFEST.json",
+      "key": "eval/prepared_ablation/holdout/FREEZE_MANIFEST.json",
+      "sha256": "5a82588c7ef0f04a2cfd75deff0e86cbc7386d1ac9546051ae6f57821604ab98",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/acquire_sources.py",
+      "key": "eval/prepared_ablation/holdout/acquire_sources.py",
+      "sha256": "1c0fa95ec692827bbd44f44a7841c4ddd579698383cd5d0708cdcfbbc1aaa344",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/build_dataset.py",
+      "key": "eval/prepared_ablation/holdout/build_dataset.py",
+      "sha256": "7051f1b607b1151d26ac2f29d8a33a8c6b62a3d22edb4ce709b1461743f4cc9c",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/gold-span-audit.json",
+      "key": "eval/prepared_ablation/holdout/gold-span-audit.json",
+      "sha256": "1ab114cd5d6fc655356b58330942cb5eeb7961da167f4d41137894d9552baca0",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/gold_spans.json",
+      "key": "eval/prepared_ablation/holdout/gold_spans.json",
+      "sha256": "0f9ee68a27c85fa409ca77e528f98359137dc883e8042778a6d7a2f9f2c53f19",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/questions.json",
+      "key": "eval/prepared_ablation/holdout/questions.json",
+      "sha256": "fd78b90cbf2094cab0b212e173a540c48bb04f9d90d19d0c2f2c6c8f5567f5d3",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/seal.py",
+      "key": "eval/prepared_ablation/holdout/seal.py",
+      "sha256": "d32e631f7db2c2ae61af977778d2ac1acb00e6a96a655c8a8705e1854e538d3e",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/semantic_rubric.json",
+      "key": "eval/prepared_ablation/holdout/semantic_rubric.json",
+      "sha256": "deb2a8bbf969711cedd4627a6f8f5b1e4a021da9b8bec70fcc117d4b244a7b50",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/source-manifest.json",
+      "key": "eval/prepared_ablation/holdout/source-manifest.json",
+      "sha256": "6790902afc145d76058c452b7e136f0b0d0b8f4e155b308996529be734eba4a7",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/source_plan.json",
+      "key": "eval/prepared_ablation/holdout/source_plan.json",
+      "sha256": "ee1f729aed528d8c608f2c02f1ec69a4ec8df4b7def83fd62e50d38ece78d834",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/sources/mkdocs/docs/user-guide/configuration.md",
+      "key": "eval/prepared_ablation/holdout/sources/mkdocs/docs/user-guide/configuration.md",
+      "sha256": "18ef4f7e72a22b07130a8daa42be00fec836b748419b83d3bd035266e0e6e4fb",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/sources/ruff/docs/configuration.md",
+      "key": "eval/prepared_ablation/holdout/sources/ruff/docs/configuration.md",
+      "sha256": "7e19943254c757015cf023e1dde74f7d951b0d3e4068903e5ca0506d58060dfd",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/sources/typer/docs/tutorial/parameter-types/bool.md",
+      "key": "eval/prepared_ablation/holdout/sources/typer/docs/tutorial/parameter-types/bool.md",
+      "sha256": "aab9cc628a1488d3a97ccfc0de2272825c9395c6ecb330f799c019552ae13f02",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout/sources/uv/docs/concepts/configuration-files.md",
+      "key": "eval/prepared_ablation/holdout/sources/uv/docs/concepts/configuration-files.md",
+      "sha256": "e026002bb6cdb2c2c575fca5ceb29b82981874016d67162baf27693c0e335e91",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/no_network.py",
+      "key": "eval/prepared_ablation/no_network.py",
+      "sha256": "04b67dfd90faf049d7375ff3aaccb477b395fcae28c2ad189b422d58fa6dbaa3",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/run.py",
+      "key": "eval/prepared_ablation/run.py",
+      "sha256": "d2487498e614f7dc84cc247ec7494497e52a276d7bdf62037d44769ea042d856",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/stages.py",
+      "key": "eval/prepared_ablation/stages.py",
+      "sha256": "84e9fe9e14c1dce00b2d2d010c6b75d6ce9e648be69c95972b437ded2e92105f",
+      "matches_previous_freeze": true
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/summarize.py",
+      "key": "eval/prepared_ablation/summarize.py",
+      "sha256": "4b1e4701dd2ef3a6b9003895678d1c33961647e62602e34a16f901399b0972f1",
+      "matches_previous_freeze": true
+    }
+  ],
+  "mismatches": []
+}

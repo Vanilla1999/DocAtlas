@@ -1,0 +1,118 @@
+{
+  "schema":"docatlas-independent-oracle-v2",
+  "visibility":"INDEPENDENT_REVIEW_ONLY; do not give holdout labels to executor before k and all selection/presentation rules are frozen",
+  "witness_convention":"quote is a literal UTF-8 substring of content at source_path in corpus.json; references resolve through witnesses; no generated answer is a source",
+  "witnesses":{
+    "S1":{"source_path":"calibration/seed_bank/intake.md","quote":"Для партии луговых трав с влажностью выше 9 процентов первичную сушку проводит техник приёмки."},
+    "S2":{"source_path":"calibration/seed_bank/intake.md","quote":"До завершения первичной сушки партию не помещают в морозильный шкаф."},
+    "S3":{"source_path":"calibration/seed_bank/storage.md","quote":"После первичной сушки лаборант измеряет влажность повторно."},
+    "S4":{"source_path":"calibration/seed_bank/storage.md","quote":"Перевод партии в морозильный шкаф разрешён только при влажности не выше 9 процентов и наличии подписанного листа всхожести."},
+    "S5":{"source_path":"calibration/seed_bank/storage.md","quote":"Если лист всхожести отсутствует, партия остаётся на стеллаже ожидания независимо от влажности."},
+    "S6":{"source_path":"calibration/seed_bank/storage.md","quote":"Подписывать лист всхожести вправе только агроном банка."},
+    "S7":{"source_path":"calibration/seed_bank/quarantine.md","quote":"При обнаружении живых насекомых партию перемещают в закрытый карантинный контейнер, а не на стеллаж ожидания."},
+    "S8":{"source_path":"calibration/seed_bank/quarantine.md","quote":"Снять карантин может агроном банка после осмотра."},
+    "S9":{"source_path":"calibration/seed_bank/quarantine.md","quote":"Даже после снятия карантина для морозильного хранения нужен подписанный лист всхожести и влажность не выше 9 процентов."},
+    "T1":{"source_path":"calibration/stage_rigging/inspection.md","quote":"Если на страховочном тросе обнаружен разрыв хотя бы одной проволоки, световую балку запрещено поднимать."},
+    "T2":{"source_path":"calibration/stage_rigging/inspection.md","quote":"Обнаруженный дефект записывает в журнал дежурный осветитель."},
+    "T3":{"source_path":"calibration/stage_rigging/release.md","quote":"Замену дефектного страховочного троса выполняет механик сцены."},
+    "T4":{"source_path":"calibration/stage_rigging/release.md","quote":"После замены троса подъём балки разрешается только после нагрузочной проверки и подписи заведующего сценой в журнале."},
+    "T5":{"source_path":"calibration/stage_rigging/release.md","quote":"Устное согласие постановщика не заменяет подпись заведующего сценой."},
+    "T6":{"source_path":"calibration/stage_rigging/release.md","quote":"Нагрузочную проверку нельзя проводить при людях под балкой."},
+    "T7":{"source_path":"calibration/stage_rigging/rehearsal.md","quote":"Перед нагрузочной проверкой дежурный осветитель освобождает площадку под балкой и выставляет ограждение."},
+    "T8":{"source_path":"calibration/stage_rigging/rehearsal.md","quote":"Во время проверки ограждение не снимают даже по просьбе постановщика."},
+    "T9":{"source_path":"calibration/stage_rigging/rehearsal.md","quote":"После завершённой нагрузочной проверки ограждение снимает дежурный осветитель, но подъём балки по-прежнему требует подписи заведующего сценой."},
+    "C1":{"source_path":"holdout/ceramic_firing/loading.md","quote":"Сосуд с непросохшим дном нельзя ставить в печь даже для короткого пробного обжига."},
+    "C2":{"source_path":"holdout/ceramic_firing/loading.md","quote":"Готовность дна проверяет мастер формовки по контрольному взвешиванию."},
+    "C3":{"source_path":"holdout/ceramic_firing/loading.md","quote":"Если два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим."},
+    "C4":{"source_path":"holdout/ceramic_firing/loading.md","quote":"Этикетка с номером партии не подтверждает готовность сосуда к обжигу."},
+    "C5":{"source_path":"holdout/ceramic_firing/cooling.md","quote":"После обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже."},
+    "C6":{"source_path":"holdout/ceramic_firing/cooling.md","quote":"Для неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже."},
+    "C7":{"source_path":"holdout/ceramic_firing/cooling.md","quote":"Приоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже."},
+    "C8":{"source_path":"holdout/ceramic_firing/cooling.md","quote":"При неисправном термодатчике дверцу не открывают по расчётному времени охлаждения."},
+    "C9":{"source_path":"holdout/ceramic_firing/incident.md","quote":"Если термодатчик перестал показывать температуру, печник отключает нагрев и отмечает неисправность в журнале."},
+    "C10":{"source_path":"holdout/ceramic_firing/incident.md","quote":"Возобновить работу печи разрешает электромеханик после замены датчика и контрольного измерения температуры."},
+    "C11":{"source_path":"holdout/ceramic_firing/incident.md","quote":"После восстановления датчика дверцу открывают по температурным правилам для соответствующего вида партии, а не по времени простоя."},
+    "F1":{"source_path":"holdout/tidal_ferry/sailing.md","quote":"При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров."},
+    "F2":{"source_path":"holdout/tidal_ferry/sailing.md","quote":"При уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала."},
+    "F3":{"source_path":"holdout/tidal_ferry/sailing.md","quote":"Проверка причала не заменяет проверку спасательных средств."},
+    "F4":{"source_path":"holdout/tidal_ferry/cargo.md","quote":"Незакреплённый груз не принимают на паром даже при свободной палубе."},
+    "F5":{"source_path":"holdout/tidal_ferry/cargo.md","quote":"Закрепление груза проверяет матрос погрузки до посадки пассажиров."},
+    "F6":{"source_path":"holdout/tidal_ferry/cargo.md","quote":"Баллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления."},
+    "F7":{"source_path":"holdout/tidal_ferry/cargo.md","quote":"Грузовой рейс без пассажиров не освобождает от проверки уровня воды и причала."},
+    "F8":{"source_path":"holdout/tidal_ferry/refunds.md","quote":"Если рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета."},
+    "F9":{"source_path":"holdout/tidal_ferry/refunds.md","quote":"Запись капитана об отмене рейса передаётся кассиру до начала возвратов."}
+  },
+  "cases":[
+    {"id":"CAL01","document_group":"seed_bank","split":"calibration","label":"answerable","required_facts":[
+      {"fact":"При 11 процентах первичную сушку выполняет техник приёмки; до её завершения морозильное хранение запрещено.","source_witnesses":["S1","S2"]},
+      {"fact":"После сушки лаборант повторно измеряет влажность.","source_witnesses":["S3"]},
+      {"fact":"Нужны одновременно влажность не выше 9 процентов и подписанный лист всхожести; без листа партия остаётся на стеллаже ожидания.","source_witnesses":["S4","S5"]},
+      {"fact":"Лист подписывает только агроном банка.","source_witnesses":["S6"]}
+    ],"forbidden_claims":["Достаточно только сушки или только низкой влажности.","Лист подписывает техник или лаборант."]},
+    {"id":"CAL02","document_group":"seed_bank","split":"calibration","label":"answerable","required_facts":[
+      {"fact":"Сейчас нужен закрытый карантинный контейнер, не стеллаж ожидания, поскольку обнаружены живые насекомые.","source_witnesses":["S7"]},
+      {"fact":"Карантин снимает агроном банка после осмотра; подписать лист всхожести вправе только агроном банка.","source_witnesses":["S8","S6"]},
+      {"fact":"Одного снятия карантина недостаточно: нужны подписанный лист и влажность не выше 9 процентов; при заданной влажности отсутствующий лист всё равно мешает морозильному хранению.","source_witnesses":["S9","S4"]}
+    ],"forbidden_claims":["В текущем состоянии оставить партию на обычном стеллаже.","Влажность 8 процентов отменяет карантин или требование листа."]},
+    {"id":"CAL03","document_group":"seed_bank","split":"calibration","label":"all_irrelevant","required_facts":[],"relevant_source_paths":[],"missing_information":["доза фунгицида","срок выдержки перед посевом"],"expected_behavior":"Явно указать отсутствие этих сведений; не предлагать дозу или срок как ответ из корпуса.","current_contract":"EMPTY_SOURCES_REQUIRED"},
+    {"id":"CAL04","document_group":"stage_rigging","split":"calibration","label":"answerable","required_facts":[
+      {"fact":"Даже при разрыве одной проволоки подъём запрещён.","source_witnesses":["T1"]},
+      {"fact":"Дефект в журнал записывает дежурный осветитель; трос заменяет механик сцены.","source_witnesses":["T2","T3"]},
+      {"fact":"После замены нужны нагрузочная проверка и подпись заведующего сценой в журнале.","source_witnesses":["T4"]},
+      {"fact":"При нагрузочной проверке людей под балкой быть не должно.","source_witnesses":["T6"]}
+    ],"forbidden_claims":["Можно поднять балку только для репетиции до ремонта.","Одна замена троса уже даёт допуск."]},
+    {"id":"CAL05","document_group":"stage_rigging","split":"calibration","label":"answerable","required_facts":[
+      {"fact":"Замену троса выполняет механик сцены.","source_witnesses":["T3"]},
+      {"fact":"Дежурный осветитель освобождает площадку и выставляет ограждение перед проверкой.","source_witnesses":["T7"]},
+      {"fact":"Во время проверки ограждение не снимают даже по просьбе постановщика.","source_witnesses":["T8"]},
+      {"fact":"После проверки ограждение снимает дежурный осветитель; это само по себе не разрешает подъём без подписи заведующего сценой.","source_witnesses":["T9","T4"]},
+      {"fact":"Устное согласие постановщика подпись не заменяет.","source_witnesses":["T5"]}
+    ],"forbidden_claims":["Постановщик вправе снять ограждение во время проверки.","Снятие ограждения автоматически разрешает подъём."]},
+    {"id":"CAL06","document_group":"stage_rigging","split":"calibration","label":"all_irrelevant","required_facts":[],"relevant_source_paths":[],"missing_information":["суточная ставка аренды костюма","процент возвращаемого залога при повреждении подкладки"],"expected_behavior":"Явный отказ от численного ответа из-за отсутствия сведений; нельзя выводить ставку из правил сцены.","current_contract":"EMPTY_SOURCES_REQUIRED"},
+    {"id":"HOLD01","document_group":"ceramic_firing","split":"holdout","label":"answerable","required_facts":[
+      {"fact":"Непросохшее дно запрещает даже короткий пробный обжиг; номер партии готовность не подтверждает.","source_witnesses":["C1","C4"]},
+      {"fact":"Мастер формовки проверяет контрольным взвешиванием; одинаковая масса через 12 часов означает просыхание.","source_witnesses":["C2","C3"]},
+      {"fact":"Для глазурованной партии дверца закрыта до 80 градусов или ниже.","source_witnesses":["C5"]},
+      {"fact":"Выгружает печник только при 40 градусах или ниже; открытие дверцы не разрешает немедленную выгрузку.","source_witnesses":["C7"]}
+    ],"forbidden_claims":["Этикетка позволяет обжиг влажного сосуда.","Глазурованную партию можно выгружать при 80 градусах."]},
+    {"id":"HOLD02","document_group":"ceramic_firing","split":"holdout","label":"answerable","required_facts":[
+      {"fact":"При неисправном датчике открывать дверцу по времени ожидания нельзя.","source_witnesses":["C8"]},
+      {"fact":"Печник отключает нагрев и отмечает неисправность в журнале.","source_witnesses":["C9"]},
+      {"fact":"Работу разрешает возобновить электромеханик после замены датчика и контрольного измерения температуры.","source_witnesses":["C10"]},
+      {"fact":"После восстановления нужно температурное правило соответствующей партии, не время простоя; неглазурованную партию можно приоткрыть при 120 градусах или ниже.","source_witnesses":["C11","C6"]}
+    ],"forbidden_claims":["Достаточно расчётного времени охлаждения.","Печник сам разрешает возобновление без контрольного измерения."]},
+    {"id":"HOLD03","document_group":"ceramic_firing","split":"holdout","label":"answerable","required_facts":[
+      {"fact":"Одинаковая масса при взвешиваниях через 12 часов позволяет считать сосуд просохшим.","source_witnesses":["C3"]},
+      {"fact":"При 100 градусах неглазурованную партию можно приоткрыть, поскольку порог 120 градусов или ниже.","source_witnesses":["C6"]},
+      {"fact":"Выгрузка при 100 градусах не разрешена: её выполняет печник только при 40 градусах или ниже.","source_witnesses":["C7"]},
+      {"fact":"Для глазурованной партии дверца должна быть закрыта до 80 градусов или ниже, поэтому при 100 градусах открытие не разрешено.","source_witnesses":["C5"]}
+    ],"forbidden_claims":["Разрешённая приоткрытая дверца означает разрешённую выгрузку.","Порог дверцы одинаков для обоих видов партии."]},
+    {"id":"HOLD04","document_group":"ceramic_firing","split":"holdout","label":"all_irrelevant","required_facts":[],"relevant_source_paths":[],"missing_information":["рецептура пищевой глазури","конус обжига этой рецептуры"],"expected_behavior":"Отсутствие рецептуры и конуса признано; общие сведения об охлаждении не представлены как ответ.","current_contract":"EMPTY_SOURCES_REQUIRED"},
+    {"id":"HOLD05","document_group":"tidal_ferry","split":"holdout","label":"answerable","required_facts":[
+      {"fact":"При 1,3 метра рейс отменяют независимо от числа пассажиров, поскольку это ниже 1,4 метра.","source_witnesses":["F1"]},
+      {"fact":"До начала возвратов кассиру передают запись капитана об отмене.","source_witnesses":["F9"]},
+      {"fact":"Кассир возвращает полную стоимость по предъявлении билета при отмене из-за низкого уровня воды.","source_witnesses":["F8"]}
+    ],"forbidden_claims":["Число пассажиров отменяет водный запрет.","Возврат частичный либо требует документа, не указанного в корпусе."]},
+    {"id":"HOLD06","document_group":"tidal_ferry","split":"holdout","label":"answerable","required_facts":[
+      {"fact":"Ровно 1,4 метра входит в разрешённый диапазон для решения капитана после проверки причала, но не является автоматическим разрешением рейса.","source_witnesses":["F2"]},
+      {"fact":"Незакреплённый груз не принимают даже при свободной палубе.","source_witnesses":["F4"]},
+      {"fact":"Матрос погрузки проверяет закрепление до посадки пассажиров.","source_witnesses":["F5"]},
+      {"fact":"Закрепление не снимает запрет на баллоны с горючим газом на пассажирском рейсе.","source_witnesses":["F6"]}
+    ],"forbidden_claims":["При 1,4 метра рейс всегда отменяется.","Закреплённые баллоны с горючим газом допустимы на пассажирском рейсе."]},
+    {"id":"HOLD07","document_group":"tidal_ferry","split":"holdout","label":"answerable","required_facts":[
+      {"fact":"Грузовой рейс без пассажиров не освобождён от проверки уровня воды и причала.","source_witnesses":["F7"]},
+      {"fact":"При уровне ниже 1,4 метра рейс отменяют независимо от числа пассажиров.","source_witnesses":["F1"]},
+      {"fact":"Проверка причала не заменяет проверку спасательных средств.","source_witnesses":["F3"]}
+    ],"forbidden_claims":["Отсутствие пассажиров отменяет минимальный уровень воды.","Проверка причала заменяет проверку спасательных средств."]},
+    {"id":"HOLD08","document_group":"tidal_ferry","split":"holdout","label":"all_irrelevant","required_facts":[],"relevant_source_paths":[],"missing_information":["мощность двигателя","шаг винта для заданного течения"],"expected_behavior":"Признать отсутствие технических расчётов; не давать численные параметры или выдуманную зависимость как ответ.","current_contract":"EMPTY_SOURCES_REQUIRED"}
+  ],
+  "review_rules":{
+    "positive_completeness":"Every required_fact is mandatory; conditions, negations, responsible actor and temporal order are part of the fact, not optional wording.",
+    "multi_fragment":"All ten answerable cases require at least two distinct source documents; multiple witnesses within one document alone are insufficient for full obligation delivery.",
+    "all_irrelevant":"Topical similarity is not answer support. No source supplies the requested prescription, tariff, recipe or engineering parameters. A refusal by the host does not repair a nonempty CURRENT_CONTRACT source result.",
+    "citations":"Evaluate semantic correctness, relation/owner grounding and literal citation equality separately. Citation must resolve to an allowed document/fragment and exact original bytes; no whitespace repairs.",
+    "policy":"Only requested scope and version 2026.1, public access, original content hash and bound owner/path are allowed. Other groups are cross-scope distractors if present upstream, not alternative evidence. Execution metadata and candidate span validation remain executor obligations.",
+    "unsupported_claims":"Record additional unsupported prescriptions, permissions and quantitative claims separately; oracle is not permission to invent missing details.",
+    "no_adaptation":"No oracle/question/source edits in response to selection or answer outputs. Any flaw is reported as a frozen-data limitation, not repaired in-place."
+  }
+}

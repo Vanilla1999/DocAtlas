@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "boundary": "Metadata only: stdlib JSON/gzip/XML/hash and source-definition text. No runtime, AST, project imports, new review of all unit bodies or final-SHA certification. Exact retired identities are the manifest rows suffixed retired-<packet>.",
+  "packets": {
+    "red59": {"removed": 59, "added": 0, "BASE_status": {"FAIL": 59}, "saved_CI_status": {"FAIL": 59}, "review": {"status": "APPROVE_STATIC", "receipt_sha256": "7cf43195fb7b7621d5cf89e54db22c367b05a48574b2ef4b6f55649117b6e865", "boundary": "Nine author-owned files only; source-semantic approval, not CI, installed stdio, real client, product-quality or merge approval."}},
+    "green4": {"removed": 4, "added": 0, "BASE_status": {"PASS": 4}, "saved_CI_status": {"PASS": 4}, "review": {"status": "APPROVE_STATIC", "receipt_sha256": "c3a67471fd4674be4b7491d0d0bf4e78124ac5992ab69811b5a5011de9f2dcb8", "boundary": "Four facade wrapper duplicates only; no final runtime certification."}},
+    "planning12": {"removed": 12, "added": 0, "BASE_status": {"FAIL": 9, "PASS": 3}, "saved_CI_status": {"FAIL": 9, "PASS": 3}, "authorization": "Completed canceled-contract planning packet; no mandatory independent review per coordinator instruction. Not all cases are FAIL; this is not FAIL-only retirement of the three PASS cases."},
+    "fail81": {
+      "removed": 81, "added": 0, "BASE_status": {"FAIL": 81}, "saved_CI_status": {"FAIL": 81},
+      "module_counts": {
+        "tests/docs/test_compact_context_selection.py": 5,
+        "tests/docs/test_current_source_authority_docs_parity.py": 1,
+        "tests/docs/test_governance_value_proof_p0.py": 9,
+        "tests/docs/test_patch_requirements.py": 4,
+        "tests/docs/test_project_query_intent.py": 1,
+        "tests/docs/test_subject_binding_strength.py": 3,
+        "tests/docs/test_patch_request_plan.py": 24,
+        "tests/docs/test_requested_need_partition.py": 13,
+        "tests/docs/test_model_visible_projection_part02.py": 11,
+        "tests/docs/test_context_trust_gates.py": 10
+      },
+      "identity_derivation": "Frozen BASE expanded identities whose test definitions are absent in precisely these ten modules: six deleted modules, four mixed modules. Exact counts checked against source text and saved core3.11 FAIL. No new domain/selection/projection agent packet counted."
+    },
+    "filtering18": {"removed": 18, "added": 0, "BASE_status": {"FAIL": 18}, "saved_CI_status": {"FAIL": 18}}
+  },
+  "receipt_hashes": {
+    "/tmp/opencode/pr211-unit-package-red.json": "05a3d7d4311069026562dcedcd927aaaf540bb2f4f6d20c7631af5fadf816974",
+    "/tmp/opencode/pr211-unit-review-red.json": "7cf43195fb7b7621d5cf89e54db22c367b05a48574b2ef4b6f55649117b6e865",
+    "/tmp/opencode/pr211-unit-package-green.json": "3637b1c75cad0691a2f2a187ed8b017dcfc7e978d8dc07b8c61076bf919fc3cc",
+    "/tmp/opencode/pr211-unit-review-green.json": "c3a67471fd4674be4b7491d0d0bf4e78124ac5992ab69811b5a5011de9f2dcb8",
+    "/tmp/opencode/pr211-unit-next-planning.json": "03fd6947bf88cf7579bf613faeb1477ec2d71a9f8456ff182d83742a56eed500",
+    "TEST_REDUCTION_FAIL_UNIT_BATCH_81.json": "3179739ff9d4dda0421516dc7ef8b030ad75695e99e5e308808f7c1b9c1a10f6",
+    "TEST_REDUCTION_FAIL_FILTERING_18.json": "73fedc015351e9a4470c1456ade9e2bcc35001aa9499a1a0989fe409eb6c7a0c"
+  },
+  "saved_CI": {"run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b", "junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238", "boundary": "Saved Python3.11 core, before retirement; not final runtime."},
+  "validation": {"BASE_partition": 8291, "duplicate": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "prior_removed": 62, "new_removed": 174, "removed": 236, "added": 1, "net": 235, "projected_after": 8056, "target_gap": 3082, "classified": 967, "unclassified": 7324},
+  "prior_manifest_sha256": "a609487009f9396448c38e4fa5a894279ef21d1aace54d31a83932185158d6cd",
+  "receipt_retention": "Durable compact author/review decisions and exact identities retained here and in manifest, hash-bound to originals; no massive duplicate historical audits. Historical audit_sources and findings preserved.",
+  "pending_unintegrated": "New domain/selection/projection agents: no completed notification received; zero ledger credit. Final collection/CI and runtime savings pending."
+}

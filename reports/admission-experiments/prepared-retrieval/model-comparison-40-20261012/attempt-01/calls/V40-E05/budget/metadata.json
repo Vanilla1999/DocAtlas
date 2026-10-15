@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-E05",
+  "mode": "budget",
+  "question": "What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",
+  "public_request": {
+    "question": "What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/eslint.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:57.574548+00:00",
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_before": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5313775510003325,
+  "process_cpu_seconds": 0.5289471129999868,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 980168,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_after": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "wire_sha256": "1e5afd084ebb41929e788cadafb4be50dcc10581ae2fed06adc2e38d46923f52",
+  "wire_utf8_bytes": 1542,
+  "utf8_quarter_proxy": 386,
+  "codec_o200k_base": 453,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

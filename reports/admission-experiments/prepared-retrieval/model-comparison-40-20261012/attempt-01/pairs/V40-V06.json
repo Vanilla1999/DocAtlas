@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-V06",
+  "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "c020628e56137a69c72a5b89484e8361e1ef98c351befd60ee74c3fd52f631f0",
+      "mini_sha256": "c020628e56137a69c72a5b89484e8361e1ef98c351befd60ee74c3fd52f631f0"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "470ca96f227227fc3368906509638cd25bc7b254cebd31efe9ed394f1bf5a044",
+      "mini_sha256": "470ca96f227227fc3368906509638cd25bc7b254cebd31efe9ed394f1bf5a044"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "eefbf977aa23cb4e8f05d36c2e7ddac0e1c59bf912db82c7057ad7cec66b9796",
+      "mini_sha256": "eefbf977aa23cb4e8f05d36c2e7ddac0e1c59bf912db82c7057ad7cec66b9796"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      1
+    ],
+    "mini": [
+      1
+    ]
+  },
+  "over_budget_pool": false,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+}

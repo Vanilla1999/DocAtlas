@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="4" time="3.382" timestamp="2026-10-13T15:21:54.277152+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" file="tests/test_heuristic_removal_public_integration.py" line="56" time="0.754"><properties><property name="trace_off_on_off_public_context_calls" value="[1, 1, 1]" /></properties><failure message="AssertionError: assert None is False&#10; +  where None = &lt;built-in method get of dict object at 0x76ec376ff540&gt;('edit_ready')&#10; +    where &lt;built-in method get of dict object at 0x76ec376ff540&gt; = {'status': 'failed', 'error': {'reason_code': 'validation_error', 'message': 'invalid arguments for get_docs_context at &lt;root&gt;', 'exception_type': None, 'retryable': False, ...}, 'warnings': []}.get">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x76ec376f37a0&gt;
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_public_removal_lifecycle_0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x76ec37718680&gt;
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), &lt;=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.delenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", raising=False)
+            env.delenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", raising=False)
+            inventory = runtime.index_project(service, config, root)
+            snapshots(inventory, root, OPTICS_DOCUMENTS)
+            before, initial_files = database(inventory["storage_path"]), files(root)
+            packets = []
+            for trace in (False, True, False):
+                with query_trace(trace):
+                    payload = context(service, root, OPTICS_QUESTION)
+                assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
+                facts(payload, root, OPTICS_FACTS)
+                packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
+                facts(packed, root, OPTICS_FACTS)
+                assert packed["tokens"] &lt;= 12000
+                packets.append(payload)
+            assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
+            record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
+            old_row = next(row for row in packets[0]["sources"]
+                           if relative_path(row["path_or_url"], root) == "docs/issue.md")
+            read_source(service, old_row, root, OPTICS_DOCUMENTS)
+            partial = context(service, root,
+                              "How must lenses be packed for an observation trip, and what is the helicopter refuelling schedule?")
+            assert not integrity(partial, root, OPTICS_DOCUMENTS)["errors"]
+            facts(partial, root, {"docs/packing.md": OPTICS_FACTS["docs/packing.md"]})
+            assert partial.get("answer_supported") is False and partial.get("answer_available") is False
+            assert partial.get("edit_ready") is False
+            lookup = context(service, root, "Explain the observatory's night-travel checklist.",
+                             lookup_queries=[OPTICS_QUESTION])
+            assert not integrity(lookup, root, OPTICS_DOCUMENTS)["errors"]
+            facts(lookup, root, OPTICS_FACTS)
+            assert lookup.get("answer_supported") is False and lookup.get("edit_ready") is False
+            assert not lookup.get("covered_query_ids")
+            patch_context = context(service, root, OPTICS_QUESTION, context_format="patch_context")
+&gt;           assert patch_context.get("edit_ready") is False
+E           AssertionError: assert None is False
+E            +  where None = &lt;built-in method get of dict object at 0x76ec376ff540&gt;('edit_ready')
+E            +    where &lt;built-in method get of dict object at 0x76ec376ff540&gt; = {'status': 'failed', 'error': {'reason_code': 'validation_error', 'message': 'invalid arguments for get_docs_context at &lt;root&gt;', 'exception_type': None, 'retryable': False, ...}, 'warnings': []}.get
+
+tests/test_heuristic_removal_public_integration.py:97: AssertionError</failure></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" file="tests/test_heuristic_removal_public_integration.py" line="126" time="0.327" /><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_library_native_context_isolates_versions" file="tests/test_heuristic_removal_public_integration.py" line="171" time="0.311" /><testcase classname="tests.test_heuristic_removal_public_integration" name="test_vector_runtime_preserves_source_windows_and_access" file="tests/test_heuristic_removal_public_integration.py" line="203" time="1.422"><failure message="docmancer.retrieval._dispatch_shared.HybridRetrievalError: hybrid retrieval failed in 1 source(s): vector: capability_mismatch:sparse_model. Pass --allow-degraded to fall back to the remaining signals, or run `doc-atlas doctor` to diagnose.">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-10/test_vector_runtime_preserves_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x76ec377011c0&gt;
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x76ec346c6f20&gt;
+
+    def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatch, record_property):
+        """Production ingest/runtime with SQLite+sqlite-vec; only embedding HTTP is substituted.
+    
+        The fixed embedding response proves rank delivery/access, not model relevance.
+        """
+        import httpx
+        from docmancer.agent import DocmancerAgent
+        from docmancer.core.config import DocmancerConfig, VectorStoreConfig
+        from docmancer.core.models import Document
+        from docmancer.retrieval.runtime import dispatcher_for_agent
+        from docmancer.core.product_identity import ensure_owned_home
+    
+        home = tmp_path / "home"
+        monkeypatch.setenv("DOCATLAS_HOME", str(home))
+        monkeypatch.setenv("OPENAI_API_KEY", "fixture-only-not-a-credential")
+        monkeypatch.setenv("OPENAI_BASE_URL", "https://embeddings.invalid/v1")
+        monkeypatch.delenv("DOCATLAS_AUTO_VECTORS", raising=False)
+        ensure_owned_home(home)
+        calls = []
+    
+        def embedding_transport(self, request):
+            assert str(request.url) == "https://embeddings.invalid/v1/embeddings"
+            body = json.loads(request.content)
+            calls.append(len(body["input"]))
+            return httpx.Response(200, json={
+                "object": "list", "model": body["model"],
+                "data": [{"object": "embedding", "index": index, "embedding": [1.0, 0.0, 0.0, 0.0]}
+                         for index, _ in enumerate(body["input"])],
+                "usage": {"prompt_tokens": 1, "total_tokens": 1},
+            })
+    
+        monkeypatch.setattr(httpx.HTTPTransport, "handle_request", embedding_transport)
+        config = DocmancerConfig()
+        config.index.db_path = str(tmp_path / "docs.db")
+        config.index.extracted_dir = str(tmp_path / "extracted")
+        config.embeddings.provider = "openai"
+        config.embeddings.model = "text-embedding-3-small"
+        config.embeddings.dimensions = 4
+        config.embeddings.cache = str(tmp_path / "embeddings")
+        config.vector_store = VectorStoreConfig(provider="sqlite-vec", options={"db_path": str(tmp_path / "vec.db")})
+        config.retrieval.default_mode = "hybrid"
+        config.retrieval.max_sections_per_source = 1
+        config.retrieval.hierarchical.auto = True
+        config.retrieval.hierarchical.auto_min_documents = 1
+        text = ("# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n"
+                "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n"
+                "# Observatory archive\n\nObservatory archive retains 41 nights.\n")
+        agent = DocmancerAgent(config=config)
+        agent.ingest_documents([
+            Document(source="observatory.md", content=text, metadata={"format": "markdown"}),
+            Document(source="secret.md", content="# Observatory\n\nObservatory secret is HIDDEN_97.\n",
+                     metadata={"format": "markdown"}),
+        ], with_vectors=True)
+        before = database(config.index.db_path)
+        evidence = []
+        for mode in ("dense", "hybrid"):
+&gt;           result = dispatcher_for_agent(agent, mode=mode).run(
+                "observatory", mode=mode, limit=10, budget=4000, expand="none",
+                filters={"forbidden_sources": ["secret.md"]},
+            )
+
+tests/test_heuristic_removal_public_integration.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+&lt;string&gt;:3: in __docatlas_shard_wrapper_run_76ec3945bce0
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;docmancer.retrieval.dispatch.RetrievalDispatcher object at 0x76ebdfd5cf50&gt;
+query = 'observatory', mode = 'hybrid', limit = 10, budget = 4000
+expand = 'none', filters = {'forbidden_sources': ['secret.md']}
+requirements = None, allow_degraded = False
+
+    def run(
+        self,
+        query: str,
+        *,
+        mode: str | None = None,
+        limit: int | None = None,
+        budget: int | None = None,
+        expand: str | None = None,
+        filters: dict | None = None,
+        requirements: Any | None = None,
+        allow_degraded: bool = False,
+    ) -&gt; DispatchResult:
+        configured_mode = getattr(getattr(self.config, "retrieval", None), "default_mode", None)
+        effective_mode = (
+            mode
+            or (configured_mode if isinstance(configured_mode, str) else None)
+            or "lexical"
+        ).lower()
+        from .experimental_acquisition import (
+            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
+            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+        )
+    
+        q_active = effective_mode == "lexical"
+        limit = min(40, limit or self.config.query.default_limit)
+        budget = budget or self.config.query.default_budget
+        per_source_limit = min(40, max(limit * 3, 20))
+    
+        # Only explicit filters choose scope; legacy query routers are inert.
+        merged_filters = self._apply_router(query, filters)
+        backend_filters = compile_backend_filters(merged_filters) or None
+        requested_lanes = (
+            ("lexical", "dense", "sparse")
+            if effective_mode == "hybrid"
+            else (effective_mode,)
+        )
+        query_plan = build_query_plan(
+            query, filters=merged_filters, requested_lanes=requested_lanes, requirements=requirements,
+        )
+        # The dispatcher only expands when this retrieval call or retrieval
+        # configuration requests it. Agent callers apply query.default_expand
+        # explicitly; treating it as implicit here disables compact source caps.
+        retrieval_expand = (
+            expand
+            or getattr(self.config.retrieval, "expand", None)
+        )
+        fusion_config_hash = canonical_hash({
+            "schema_version": "stable-child-rrf-v1",
+            "method": self.config.retrieval.fusion.method or "rrf",
+            "rrf_k": int(self.config.retrieval.fusion.rrf_k or 60),
+            "weights": dict(self.config.retrieval.fusion.weights or {}),
+            "candidate_limits": {"per_lane": 40, "fused": 60},
+            "post_fusion": {
+                "exact_supplement": "explicit-query-only-v1",
+                "intent_rerank": "retriever-order-preserved-v2",
+                "expand": retrieval_expand,
+                "max_sections_per_source": None,
+            },
+        })
+        if q_active:
+            fusion_config_hash = canonical_hash({
+                "schema_version": ACQUISITION_METHOD,
+                "candidate_ceiling": ACQUISITION_CANDIDATES,
+                "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
+                "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
+                "expansion": "none", "source_quota": None,
+            })
+    
+        def finalized(result: DispatchResult) -&gt; DispatchResult:
+            result.query_plan_hash = query_plan.plan_hash
+            result.fusion_config_hash = fusion_config_hash
+            result.requirements_hash = query_plan.requirements_hash
+            result.requirements = query_plan.requirements
+            for final_rank, chunk in enumerate(result.chunks, start=1):
+                metadata = getattr(chunk, "metadata", None)
+                if isinstance(metadata, dict):
+                    metadata["query_plan_hash"] = query_plan.plan_hash
+                    metadata["fusion_config_hash"] = fusion_config_hash
+                    section_id = metadata.get("section_id")
+                    metadata["retrieval_trace"] = {
+                        "requested_mode": effective_mode,
+                        "mode_used": result.mode_used,
+                        "component_ranks": dict(result.contributions.get(section_id, {})),
+                        "pre_post_rank": metadata.pop("_pre_post_rank", final_rank),
+                        "intent_boost": metadata.pop("_intent_boost", 0.0),
+                        "supplemental_rank": metadata.pop("_supplemental_rank", None),
+                        "final_rank": final_rank,
+                    }
+            return result
+    
+        if q_active:
+            chunks = self.store.query(
+                query, limit=ACQUISITION_CANDIDATES,
+                budget=ACQUISITION_ESTIMATED_TOKENS, expand="none",
+                filters=backend_filters,
+            )
+            acquired_count = len(chunks)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            for chunk in chunks:
+                chunk.metadata.setdefault("acquisition", {}).update({
+                    "dispatcher_post_policy_rows": len(chunks),
+                    "delivery_limit_not_applied": limit,
+                    "delivery_budget_not_applied": budget,
+                })
+            return finalized(DispatchResult(
+                chunks=chunks,
+                contributions={
+                    c.metadata.get("section_id"): {"lexical": idx + 1}
+                    for idx, c in enumerate(chunks)
+                    if c.metadata.get("section_id") is not None
+                },
+                mode_used="lexical", candidate_counts={"lexical": acquired_count},
+            ))
+    
+        missing_capabilities: dict[str, str] = {}
+        if effective_mode != "lexical":
+            if self.vector_store is None:
+                missing_capabilities["vector"] = "vector store is not configured"
+            if self.provider is None:
+                missing_capabilities["embedding"] = "embedding provider is not configured"
+        if missing_capabilities and not allow_degraded:
+            raise HybridRetrievalError(missing_capabilities)
+    
+        if effective_mode == "lexical" or missing_capabilities:
+            query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
+            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
+            chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
+            return finalized(DispatchResult(
+                chunks=chunks,
+                contributions={c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if c.metadata.get("section_id") is not None},
+                mode_used=(
+                    "lexical"
+                    if effective_mode == "lexical"
+                    else f"{effective_mode}/lexical_fallback_degraded"
+                ),
+                candidate_counts={"lexical": len(chunks)},
+                failures=missing_capabilities,
+            ))
+    
+        ready_failure = self._vector_readiness_failure(effective_mode)
+        if ready_failure and not allow_degraded:
+&gt;           raise HybridRetrievalError(ready_failure)
+E           docmancer.retrieval._dispatch_shared.HybridRetrievalError: hybrid retrieval failed in 1 source(s): vector: capability_mismatch:sparse_model. Pass --allow-degraded to fall back to the remaining signals, or run `doc-atlas doctor` to diagnose.
+
+docmancer/retrieval/_dispatch_part01.py:209: HybridRetrievalError</failure></testcase></testsuite></testsuites>

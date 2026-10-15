@@ -1,0 +1,72 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_public_mixed_native_context_keeps_project_and_exact_library _______
+
+tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-23/test_public_mixed_native_conte0')
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-23/test_public_mixed_native_conte0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x7ba7d433d580>
+
+    def test_public_mixed_native_context_keeps_project_and_exact_library(tmp_path, state_root, record_property):
+        """One prepared project, one real library index, one mixed public request."""
+        from tests.docs.test_dependency_version_transition import _seed, PACKAGE
+        from docmancer.docs.service import LibraryDocsService
+    
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config):
+            inventory = runtime.index_project(service, config, root)
+            # Explicit fixture provisioning uses the writable service, not the
+            # read-only MCP facade. Both point at this isolated host's real stores.
+>           record = _seed(LibraryDocsService(config=config), "1.0.0", 'MIXED_🧭<a id="raw"></a>_ONLY')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_heuristic_removal_public_integration.py:402: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_dependency_version_transition.py:49: in _seed
+    config = service._index_config_for(record)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/service.py:106: in _index_config_for
+    return self.agent_gateway.index_config_for(record)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/infrastructure/agent_index_gateway.py:84: in index_config_for
+    owned_home = ensure_owned_home(home_resolution.path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/docatlas-default-HXV8YAxA/docatlas-evidence-zqkpzoa_/docatlas_home')
+
+    def ensure_owned_home(
+        path: str | Path | None = None,
+    ) -> Path:
+        """Create/verify a DocAtlas-owned state root before a write.
+    
+        A non-empty directory is never claimed unless it is already DocAtlas-owned
+        Foreign and ambiguous roots always fail closed.
+        """
+    
+        raw = Path(path).expanduser() if path is not None else docatlas_home()
+        inspection = inspect_state(raw)
+        root = inspection.path
+        if inspection.classification == "owned_docatlas":
+            return root
+        if inspection.classification in {"foreign", "ambiguous"}:
+>           raise StateOwnershipError(
+                f"refusing to write unowned state root {root}: {inspection.classification}; "
+                + "; ".join(inspection.reasons)
+            )
+E           docmancer.core.product_identity.StateOwnershipError: refusing to write unowned state root /tmp/docatlas-default-HXV8YAxA/docatlas-evidence-zqkpzoa_/docatlas_home: ambiguous; non-empty state has no DocAtlas ownership marker
+
+docmancer/core/product_identity.py:196: StateOwnershipError
+==================================== PASSES ====================================
+_____________ test_public_library_native_context_isolates_versions _____________
+----------------------------- Captured stderr call -----------------------------
+{"event":"docatlas_request_start","request_id":"86558939d2214a809fa4d0428b693b25","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event": "docatlas_query_trace", "request_id": "86558939d2214a809fa4d0428b693b25", "projection_observation": {"schema_version": 1, "callback_stage": "after_model_visible_validation", "delivery_blocked": false, "final_callback": {"kind": "docs_answer", "status": "ok", "context_available": true, "answer_supported": false, "answer_available": false, "edit_ready": false, "sources": {"observation": "recorded", "recorded_count": 1, "producer_count": 1, "producer_omitted": 0, "preview_count": 1, "preview_omitted": 0, "items": [{"evidence_id": "child-f6f8122b176a432af41771a1a9a756c01098ec03"}]}}, "upstream_received": {"prepared_parents": {"observation": "missing"}, "retrieved_candidates": {"observation": "missing"}, "qualification_outcomes": {"observation": "missing"}}, "returned_core_diagnostics": {"observation": "missing"}, "primary_attempt": {"observation": "missing"}, "hint_attempt": {"observation": "missing"}, "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."}}
+{"event":"docatlas_request_end","request_id":"86558939d2214a809fa4d0428b693b25","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":24.817,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"000e9bb1cb4e48df8a849f837a1cba4a","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event": "docatlas_query_trace", "request_id": "000e9bb1cb4e48df8a849f837a1cba4a", "projection_observation": {"schema_version": 1, "callback_stage": "after_model_visible_validation", "delivery_blocked": false, "final_callback": {"kind": "docs_answer", "status": "ok", "context_available": true, "answer_supported": false, "answer_available": false, "edit_ready": false, "sources": {"observation": "recorded", "recorded_count": 1, "producer_count": 1, "producer_omitted": 0, "preview_count": 1, "preview_omitted": 0, "items": [{"evidence_id": "child-7ac6d748996ecb08b168f52ea20f4d81a671944b"}]}}, "upstream_received": {"prepared_parents": {"observation": "missing"}, "retrieved_candidates": {"observation": "missing"}, "qualification_outcomes": {"observation": "missing"}}, "returned_core_diagnostics": {"observation": "missing"}, "primary_attempt": {"observation": "missing"}, "hint_attempt": {"observation": "missing"}, "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."}}
+{"event":"docatlas_request_end","request_id":"000e9bb1cb4e48df8a849f837a1cba4a","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":34.438,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"6734035bac8a41fda638e98b377247b8","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event": "docatlas_query_trace", "request_id": "6734035bac8a41fda638e98b377247b8", "projection_observation": {"schema_version": 1, "callback_stage": "after_model_visible_validation", "delivery_blocked": false, "final_callback": {"kind": "patch_context", "edit_ready": false, "sources": {"observation": "recorded", "recorded_count": 1, "producer_count": 1, "producer_omitted": 0, "preview_count": 1, "preview_omitted": 0, "items": [{"evidence_id": "ev-c7dbf5657c0c0e95"}]}}, "upstream_received": {"prepared_parents": {"observation": "missing"}, "retrieved_candidates": {"observation": "missing"}, "qualification_outcomes": {"observation": "missing"}}, "returned_core_diagnostics": {"observation": "missing"}, "primary_attempt": {"observation": "missing"}, "hint_attempt": {"observation": "missing"}, "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."}}
+{"event":"docatlas_request_end","request_id":"6734035bac8a41fda638e98b377247b8","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":17.951,"trace_incomplete":false}
+1 failed, 1 passed in 0.97s

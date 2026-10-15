@@ -32,8 +32,7 @@ def _technical_term_for_value(
 ) -> TechnicalTerm | None:
     normalized = _normal(value).strip("`\"'")
     for term in terms:
-        aliases = {_normal(alias).strip("`\"'") for alias in term.aliases}
-        if normalized in aliases or normalized == _normal(term.raw):
+        if normalized == _normal(term.raw):
             return coerce_technical_term(term.raw, preferred_kind) if preferred_kind else term
     if preferred_kind and value.strip():
         return coerce_technical_term(value, preferred_kind)
@@ -48,19 +47,17 @@ def _subject_fields(
         return {}
     return {
         "subject_kind": term.kind,
-        "subject_aliases": term.aliases,
+        "subject_aliases": (),
     }
 
 
 def _clean_phrase(value: str) -> str:
     cleaned = _bounded(str(value or "").strip(" ?!.,:`\"'"))
-    cleaned = re.sub(r"^(?:the|a|an)\s+", "", cleaned, flags=re.I)
     return cleaned
 
 
 def _effect_relation(value: str) -> str:
-    normalized = _normal(value)
-    return "preserve" if normalized in {"preserve", "keep", "retain"} else "delete"
+    return value
 
 
 @dataclass(frozen=True, slots=True)
@@ -193,37 +190,12 @@ class ProjectAnswerContract:
 
 
 def lifecycle_intent_for_question(question: str) -> LifecycleIntent:
-    historical = bool(_HISTORY_RE.search(question or ""))
-    current = bool(_CURRENT_RE.search(question or ""))
-    if historical and current:
-        return "either"
-    if historical:
-        return "historical"
+    # Historical scope must be supplied explicitly, not inferred from prose.
     return "current"
 
 
 def _subjects(question: str) -> list[str]:
-    subjects: list[str] = []
-    for match in _TASK_RE.finditer(question):
-        subjects.append(f"Task {match.group(1)}")
-    for match in _IDENTIFIER_RE.finditer(question):
-        value = next((group for group in match.groups() if group), "")
-        if value:
-            subjects.append(_bounded(value.strip("`")))
-    for term in extract_exact_terms(question):
-        subjects.append(_bounded(term.value.strip("`")))
-    for match in _SEMANTIC_SUBJECT_RE.finditer(question):
-        subjects.append(_bounded(match.group(0)))
-    # Product/title-cased phrases are useful when no code-shaped identifier is present.
-    for match in _PRODUCT_RE.finditer(question):
-        value = _bounded(match.group(0))
-        first = _normal(value).split(" ", 1)[0]
-        if (
-            _normal(value) not in {"what", "which", "how", "task", "status", "python"}
-            and first not in _INTERROGATIVE_AUXILIARIES
-        ):
-            subjects.append(value)
-    return list(dict.fromkeys(value for value in subjects if value))[:MAX_SUBJECTS]
+    return []
 
 
 def _best_subject(question: str, subjects: list[str], *, fallback: str) -> str:
@@ -240,14 +212,10 @@ def _best_subject(question: str, subjects: list[str], *, fallback: str) -> str:
 
 
 def _cardinality(question: str) -> int | None:
-    match = re.search(r"\b(?:exactly|ровно)?\s*(\d{1,2})\b", question, re.I)
+    match = re.search(r"(?<!\w)(\d{1,2})(?!\w)", question)
     if match:
         value = int(match.group(1))
         return value if 1 <= value <= 32 else None
-    normalized = _normal(question)
-    for word, value in _NUMBER_WORDS.items():
-        if re.search(rf"(?<!\w){re.escape(word)}(?!\w)", normalized):
-            return value
     return None
 
 
@@ -318,70 +286,15 @@ def _retrieval_hints(
     subjects: list[str],
     technical_terms: tuple[TechnicalTerm, ...] = (),
 ) -> tuple[str, ...]:
-    hints: list[str] = [*subjects]
-    for term in technical_terms:
-        hints.extend(term.aliases)
-    hints.extend(term.value for term in extract_exact_terms(question))
-    for token in re.findall(r"[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9_+-]{2,}", question):
-        normalized = _normal(token)
-        if normalized not in _STOP_HINTS:
-            hints.append(token)
-    return tuple(dict.fromkeys(_bounded(value) for value in hints if _bounded(value)))[:MAX_RETRIEVAL_HINTS]
+    return ()
 
 
 def _concept_queries(question: str, hints: tuple[str, ...], obligations: list[ProofObligation]) -> tuple[str, ...]:
-    values: list[str] = []
-    semantic_aliases = {
-        "public_tools": "public tools inventory",
-        "public_tool": "public tool command",
-        "invocation": "command call action",
-        "sequence": "workflow steps process",
-        "location": "document path location",
-        "contract_fact": "requirement rule contract",
-        "purpose": "purpose used for controls overrides acknowledges",
-        "delete": "delete remove clear purge derived state",
-        "preserve": "preserve keep retain without deleting",
-        "scope": "supported scopes values project-local global",
-    }
-    for obligation in obligations:
-        parts = [
-            obligation.subject,
-            semantic_aliases.get(str(obligation.attribute), obligation.attribute),
-            semantic_aliases.get(str(obligation.relation), obligation.relation),
-            obligation.target,
-            semantic_aliases.get(str(obligation.item_kind), obligation.item_kind),
-            obligation.context,
-        ]
-        concept = " ".join(part for part in parts if part)
-        if concept:
-            values.append(concept)
-    hint_norm = {_normal(value) for value in hints}
-    residue = " ".join(
-        token for token in re.findall(r"[\w+-]+", question, re.UNICODE)
-        if _normal(token) not in _STOP_HINTS and _normal(token) not in hint_norm
-    )
-    if residue:
-        values.append(residue)
-    return tuple(dict.fromkeys(_bounded(value, 320) for value in values if _bounded(value, 320)))[:MAX_CONCEPT_QUERIES]
+    return ()
 
 
 def _explicit_subjects(question: str, subjects: list[str]) -> list[str]:
-    """Return bounded user-named entities, excluding generic query vocabulary."""
-
-    excluded = {
-        "python", "version", "status", "request", "provider", "workflow",
-        "architecture", "authority", "scope", "timeout", "deadline",
-    }
-    values = [
-        value for value in subjects
-        if _normal(value) not in excluded
-        and (
-            re.search(r"[-_:.]|[a-z][A-Z]", value)
-            or " " in value
-            or value.casefold().startswith("task ")
-        )
-    ]
-    return list(dict.fromkeys(values))[:MAX_SUBJECTS]
+    return []
 
 
 def _append_relation_obligation(
@@ -401,51 +314,15 @@ def _append_relation_obligation(
 
 
 def _inventory_subject(question: str, subjects: list[str]) -> str:
-    explicit = re.search(
-        r"\b((?:[A-Z][A-Za-z0-9-]*\s+)?MCP)(?:\s+server)?\b",
-        question,
-    )
-    if explicit is not None:
-        value = _bounded(explicit.group(1))
-        if value.casefold() != "mcp":
-            return value
-    if re.search(r"\bDocAtlas\b", question, re.I):
-        return "Docs MCP"
-    return _best_subject(
-        question,
-        [value for value in subjects if not _TOOL_RE.fullmatch(value)],
-        fallback="Docs MCP",
-    )
+    return ""
 
 
 def _command_operation(question: str) -> str:
-    exact = [term.value.strip("`") for term in extract_exact_terms(question)]
-    identifiers = [
-        value for value in exact
-        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", value)
-        and value.casefold() not in {"docatlas", "doc_atlas", "docmancer"}
-    ]
-    if identifiers:
-        return identifiers[-1]
-    normalized = _normal(question)
-    aliases = (
-        (r"\bsync(?:hronize)?\s+project\s+docs?\b", "sync_project_docs"),
-        (r"\brefresh\s+library\s+docs?\b", "refresh_library_docs"),
-        (r"\bprefetch\s+library\s+docs?\b", "prefetch_library_docs"),
-        (r"\bclear\s+(?:the\s+)?index\b", "clear_index"),
-    )
-    for pattern, value in aliases:
-        if re.search(pattern, normalized, re.I):
-            return value
-    tail = re.search(r"\bto\s+([A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*){0,3})", question, re.I)
-    return _bounded(tail.group(1).replace(" ", "_")) if tail else "requested operation"
+    return ""
 
 
 def _location_subject(question: str, subjects: list[str]) -> str:
-    tail = _LOCATION_QUESTION_RE.sub("", question, count=1).strip(" ?!.,:")
-    tail = re.sub(r"^(?:the|a|an)\s+", "", tail, flags=re.I)
-    tail = re.sub(r"\bDocAtlas\b\s*", "", tail, flags=re.I).strip()
-    return _bounded(tail) or _best_subject(question, subjects, fallback="document")
+    return ""
 
 
 def _compound_workflow_subjects(question: str) -> tuple[str | None, str | None]:
@@ -471,50 +348,18 @@ def _contract_from_question_plan(
     lifecycle: LifecycleIntent,
     input_limits: tuple[str, ...],
 ) -> ProjectAnswerContract:
-    obligations: list[ProofObligation] = []
-    subjects: list[str] = []
-    technical_terms: list[TechnicalTerm] = []
-    for facet in plan.facets:
-        if facet.subject and facet.subject not in subjects:
-            subjects.append(facet.subject)
-        if facet.subject_kind is not None:
-            technical_terms.append(coerce_technical_term(
-                facet.subject, facet.subject_kind, context=question,
-            ))
-        obligations.append(_obligation(
-            question=question,
-            index=len(obligations),
-            kind=facet.kind,  # type: ignore[arg-type]
-            subject=facet.subject,
-            attribute=facet.attribute,
-            relation=facet.relation,
-            target=facet.target,
-            value_kind=facet.value_kind,  # type: ignore[arg-type]
-            expected_value=facet.expected_value,
-            item_kind=facet.item_kind,
-            response_mode=facet.response_mode,  # type: ignore[arg-type]
-            subject_kind=facet.subject_kind,
-            subject_aliases=facet.subject_aliases,
-            context=facet.context,
-            lifecycle_intent=lifecycle,
-            span_value=facet.span_text or facet.subject,
-            query_span_start=facet.query_span_start,
-            query_span_end=facet.query_span_end,
-        ))
-    hints = _retrieval_hints(question, subjects, tuple(technical_terms))
-    concepts = _concept_queries(question, hints, obligations)
+    # A supplied legacy NL plan is not independent answer/edit authority.
     return ProjectAnswerContract(
         question_hash=canonical_hash(question),
-        retrieval_hints=hints,
-        concept_queries=concepts,
-        subjects=tuple(subjects),
-        proof_obligations=tuple(obligations),
+        retrieval_hints=(),
+        concept_queries=(),
+        subjects=(),
+        proof_obligations=(),
         lifecycle_intent=lifecycle,
         schema_version=PROJECT_ANSWER_CONTRACT_SCHEMA_V4,
         input_limits=input_limits,
-        parse_trace=plan.parse_trace,
-        unresolved_parts=plan.unresolved_parts,
-        component_scope_complete=plan.component_scope_complete,
+        parse_trace=("context_only:literal_request",),
+        component_scope_complete=False,
     )
 
 __all__=['_bounded', '_normal', '_span', '_technical_terms', '_technical_term_for_value', '_subject_fields', '_clean_phrase', '_effect_relation', 'ProofObligation', 'ProjectAnswerContract', 'lifecycle_intent_for_question', '_subjects', '_best_subject', '_cardinality', '_obligation', '_retrieval_hints', '_concept_queries', '_explicit_subjects', '_append_relation_obligation', '_inventory_subject', '_command_operation', '_location_subject', '_compound_workflow_subjects', '_contract_from_question_plan']

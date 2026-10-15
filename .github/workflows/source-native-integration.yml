@@ -1,0 +1,117 @@
+name: Source-native integration
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-native-integration-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-integration:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13']
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_OFFLINE: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Record exact head and preserved stacked ancestry
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/source-native-results"
+          git rev-parse HEAD > "$RUNNER_TEMP/source-native-results/head.txt"
+          for sha in 087d4f22206cfd3db0b18af4a7c2a96e25ec1cec f2feacb5d960f26d77c0b6e838eee5e4e7620e53 91dd2b4e9f0615e9c6ac5c4346c13200accca550 f41885ba9a3396fca2db020936018e439c98dd2a; do
+            git merge-base --is-ancestor "$sha" HEAD
+            echo "$sha preserved" >> "$RUNNER_TEMP/source-native-results/ancestry.txt"
+          done
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Prepare isolated integration evidence paths
+        run: |
+          echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/source-native-tokenizer" >> "$GITHUB_ENV"
+          echo "PYTEST_DOCATLAS_ARTIFACT_DIR=$RUNNER_TEMP/source-native-results/scenarios" >> "$GITHUB_ENV"
+      - name: Install runtime and explicit external-transport test extra
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev --extra embeddings-openai
+          .venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+      - name: Execute real public MCP, SDK, CLI, stdio and storage integration
+        run: |
+          .venv/bin/python -m pytest -v --tb=short -o junit_family=legacy \
+            tests/test_heuristic_removal_public_integration.py \
+            tests/test_public_surface_integration.py \
+            tests/docs/test_module_docs_manifest_e2e.py \
+            tests/test_mcp_trusted_storage_lifecycle.py::test_prepared_module_and_project_scope_isolation \
+            tests/test_prepared_retrieval_review_integration.py \
+            tests/test_native_context_preservation_integration.py \
+            tests/test_experimental_selection_modes_integration.py \
+            tests/test_context_budget_refusal_integration.py \
+            tests/evidence_quality_v2/test_measurement.py \
+            tests/test_project_docs_self_host_fixture.py::test_frozen_catalog_only_changes_isolated_prepared_membership \
+            --junitxml="$RUNNER_TEMP/source-native-results/integration.xml"
+      - name: Preserve execution evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-native-integration-${{ matrix.python }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/source-native-results/
+          retention-days: 30
+          if-no-files-found: error
+
+  installed-v40:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_OFFLINE: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Prepare tokenizer cache
+        run: echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/source-native-tokenizer" >> "$GITHUB_ENV"
+      - name: Build and install the exact candidate in an isolated environment
+        run: |
+          set -euo pipefail
+          python -m pip install uv==0.9.25
+          uv build --wheel --out-dir "$RUNNER_TEMP/candidate-wheel"
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/candidate-installed" uv sync --frozen --no-dev --no-install-project
+          uv pip install --python "$RUNNER_TEMP/candidate-installed/bin/python" --no-deps "$RUNNER_TEMP"/candidate-wheel/*.whl
+          "$RUNNER_TEMP/candidate-installed/bin/python" -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+      - name: Execute frozen V40 with strict quality, identity and whole-DTO budget gates
+        run: |
+          "$RUNNER_TEMP/candidate-installed/bin/python" -I eval/heuristic_removal/ci_acceptance.py \
+            --python "$RUNNER_TEMP/candidate-installed/bin/python" \
+            --wheel "$RUNNER_TEMP"/candidate-wheel/*.whl \
+            --output "$RUNNER_TEMP/source-native-v40"
+      - name: Preserve all public outputs and unchanged-oracle judgments
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-native-v40-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            ${{ runner.temp }}/source-native-v40/
+            ${{ runner.temp }}/candidate-wheel/
+          retention-days: 30
+          if-no-files-found: error

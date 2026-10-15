@@ -1,0 +1,34 @@
+{
+  "base_commit": "8ad44222d19d2e8b886349aa3f0f13f71e9167ba",
+  "boundary": "before first pytest or product runtime in this implementation task",
+  "test_oracle_status": "independently authored; facts, questions, revisions and caps fixed before execution",
+  "files": {
+    "docmancer/core/_sqlite_store_part02.py": "013b23d6307e0f617a7410c891896ebcfe55d5b78e2a032ae7d8d083e3d3feea",
+    "docmancer/core/prepared_parent_sections.py": "d2edc2551f55113dfcf5233be56804380ee08bc9cc2aa2e35267928b08301632",
+    "docmancer/core/structured_chunking.py": "428294f9ce2bfc32d4dd32d06a0f437bfd53749dde8bee3d39436c4ce8ad514e",
+    "docmancer/docs/application/_project_docs_service_part03.py": "bab86e1e91688bc156139b507bf5f8a2cb31db9a403bb40e74cb028e5ae41640",
+    "docmancer/docs/application/docs_context_projection.py": "f99d6bf19894ee02095902063e130e11db5622b3585d234c8ec701f0e1f96299",
+    "docmancer/docs/application/experimental_candidate_selection.py": "d0fc82d2203288dd35bb64b6389d9db6b5d246720ab73ab079bf62d56ddf571f",
+    "docmancer/docs/application/experimental_context_finalization.py": "91ba013d839c8062778fbd38041fa74033c2da59ffb1dce0ed808d7238b8579e",
+    "docmancer/docs/application/joint_context_selection.py": "f5acaeb9be473e81b2d6aec5a0bffed72b217e46a3372f478aefb9bea2db3763",
+    "docmancer/docs/application/projection_decision_trace.py": "5b2f3b2346cd12f392a159e8072b35939a4f3ba995ca17fda126d9701c478924",
+    "docmancer/docs/application/source_reference_evidence.py": "d597728e9445d431dda80d9d483848b3f4b42990c0080ba9a264c7bb7608868b",
+    "docmancer/docs/domain/literal_context_admission.py": "6db6dba750d46f18e837192edab9e03f537bdeacfe3ff27959a0308c6b71fa37",
+    "docmancer/docs/domain/ordinary_body_context.py": "22e1540cfa3b87e07d9209e0dcbb10316fcc6e80902909bff172a7d42526dfaf",
+    "docmancer/docs/domain/original_body_discovery.py": "a5dfebadb4e6b45a5c8672081666c08f722535e39f84edf0ca00c7177ec15ccd",
+    "docmancer/docs/interfaces/mcp/context_tools.py": "6c936d53acf78aa87efedf350b7f1c9173422ae1ba9b3f69828acd11a84246d1",
+    "tests/diagnostic_labels.prepared_retrieval.json": "99835d5272d6da4e69a0a00ec0af006b38dac66f835a8c670d1b50910fb3ac22",
+    "tests/test_prepared_retrieval_integration.py": "6229c0a7cafda83a3bc54a538f8cc0f83b6684247c2a059f2b2db8eac28ba104"
+  },
+  "planned_primary_pass": {
+    "scenarios": 4,
+    "prepare_sync": 5,
+    "contexts": 22,
+    "source_resources_max": 6,
+    "models": 0
+  },
+  "frozen_caps": [
+    12000,
+    900
+  ]
+}

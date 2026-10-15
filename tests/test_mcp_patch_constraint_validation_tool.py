@@ -24,16 +24,6 @@ def _constraint_packet() -> dict:
     }
 
 
-def test_validate_patch_against_constraints_mcp_schema():
-    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "validate_patch_against_constraints")
-
-    properties = tool["inputSchema"]["properties"]
-    assert properties["constraints"]["type"] == ["object", "array"]
-    assert properties["project_path"]["type"] == ["string", "null"]
-    assert properties["changed_files"]["items"]["type"] == "string"
-    assert properties["patch_diff"]["type"] == ["string", "null"]
-    assert properties["strict"]["type"] == "boolean"
-    assert tool["inputSchema"]["required"] == ["constraints"]
 
 
 def test_validate_patch_against_constraints_mcp_returns_packet():

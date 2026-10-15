@@ -1,0 +1,17 @@
+{
+  "base_commit": "304b56e1",
+  "boundary": "source-tree public SDK, real prepared SQLite, no model calls or component mocks",
+  "requested_limit": 1,
+  "requested_budget": 100,
+  "returned_chunks": 3,
+  "formatted_o200k_tokens": 247,
+  "limit_observed": false,
+  "budget_observed": false,
+  "state_unchanged": true,
+  "documents": {
+    "docs/packing.md": "# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n",
+    "docs/transport.md": "# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n",
+    "docs/storage.md": "# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n"
+  },
+  "returned_text": "### Observatory storage\n\n# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n\n*Source: /tmp/docatlas-default-HXV8YAxA/sdk-budget-audit-w20m_rnf/project/docs/storage.md*\n\n---\n\n### Observatory transport\n\n# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n\n*Source: /tmp/docatlas-default-HXV8YAxA/sdk-budget-audit-w20m_rnf/project/docs/transport.md*\n\n---\n\n### Observatory packing\n\n# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n\n*Source: /tmp/docatlas-default-HXV8YAxA/sdk-budget-audit-w20m_rnf/project/docs/packing.md*"
+}

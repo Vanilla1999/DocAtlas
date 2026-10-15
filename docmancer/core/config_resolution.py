@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -68,4 +69,33 @@ def resolve_config(
     return ResolvedConfig(DocmancerConfig(), "defaults", None)
 
 
-__all__ = ["ResolvedConfig", "resolve_config"]
+def resolve_mcp_config(*, explicit_path: str | Path | None = None) -> ResolvedConfig:
+    """Local MCP host configuration only: never discover project/CWD settings.
+
+    The fresh default is separate from the legacy user database. A host override
+    is still subject to MemberStoragePolicy and cannot adopt an existing store.
+    """
+    home = resolve_home().path
+    path = Path(explicit_path) if explicit_path is not None else home / "mcp-members" / PRIMARY_CONFIG_NAME
+    if not path.is_absolute() or ".." in path.parts:
+        raise ValueError("MCP host configuration requires an absolute literal path")
+    for component in (path, *path.parents):
+        if component.is_symlink():
+            raise PermissionError("MCP host configuration cannot use symlinks")
+    if explicit_path is not None and not path.is_file():
+        raise ValueError("explicit MCP host config does not exist")
+    config = DocmancerConfig.from_yaml(path) if path.is_file() else DocmancerConfig()
+    if "db_path" not in config.index.model_fields_set and not os.environ.get("DOCATLAS_INDEX_DB_PATH"):
+        config.index.db_path = str(home / "mcp-members" / "members.db")
+    from docmancer.core.member_storage_policy import MemberStoragePolicy
+    policy = MemberStoragePolicy(home, Path(config.index.db_path), path if path.is_file() else None)
+    policy.validate()
+    if config.index.provider != "sqlite" or config.retrieval.default_mode != "lexical":
+        raise PermissionError("local MCP member storage requires SQLite lexical configuration")
+    # Extraction is never published by member preparation. Any service-derived
+    # storage remains within the same trusted namespace.
+    config.index.extracted_dir = str(policy.db_path.parent / "extracted")
+    return ResolvedConfig(config, "mcp_host", path if path.is_file() else None)
+
+
+__all__ = ["ResolvedConfig", "resolve_config", "resolve_mcp_config"]

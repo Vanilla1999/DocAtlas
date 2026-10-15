@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "packets": {
+    "context125": {
+      "packet": "/tmp/opencode/pr211-fail-context-next.json",
+      "sha256": "c29bc995575e978247cc5ae01c2a78b44439c111b80462b5853d081280564750",
+      "removed": 125,
+      "added": 0,
+      "BASE_status": {
+        "FAIL": 125
+      },
+      "already_absent_prior_count": 0,
+      "retained_red_integration_count": 35,
+      "unresolved": [
+        {
+          "id": "tests/docs/test_docs_impact_task20_part02.py::test_labeled_30_change_corpus_meets_precision_and_recall_gate",
+          "decision": "retained",
+          "reason": "Evaluator invokes filesystem documentation discovery/report pipeline across corpus; not confidently a single-component unit.",
+          "counted_in": "retained_red_integration_ids"
+        }
+      ],
+      "author_validation": "Saved FAIL XML, source text/tokenize/hash only. Every surviving top-level function body and helper is unchanged; whole-function removals and mixed parameter case IDs match recorded FAIL. No runtime/project import/AST/pytest/install.",
+      "final_testfile_hashes": {
+        "tests/docs/test_context7_style_project_chat.py": "de92e373e20f0e1e126ca9d92422f35a7d74b04779e184ea5f607c1938c65d22",
+        "tests/docs/test_context_loss_boundaries.py": "c338d71de4a7509daa8d32e72ed77b065bd5469e757c965e8611efc2f3a4e273",
+        "tests/docs/test_docs_context_compound_projection.py": "9dc02c3415a6c8ad7cc308f061dd43acd5179afc0c57daaeb235d4dc8516dd9e",
+        "tests/docs/test_docs_impact.py": "40634e3bd56ef0ec237a435f9be80edefc9bf6fb4cc4c472b60f9999017eaeae",
+        "tests/docs/test_docs_impact_task20.py": "ac1495a0d3d111c15f94a9172fca1d9021441c415ae86933070bad3e93b095e3",
+        "tests/docs/test_docs_impact_task20_part02.py": "4870255c17f54828733235ad5055fab26f7f25ade390b2b44cbd2249eb94a850",
+        "tests/docs/test_project_context_service.py": "0dfeda5965e9a0f4fc53ee46aee09d9529e8c211e5e56ec95ae0631abb3751d5",
+        "tests/docs/test_project_context_service_part02.py": "38d4661b9d902373ec9454b8902463ed2108b262267d2ad7e3222de92b98a0b3",
+        "tests/docs/test_project_metadata_reader.py": "82241353bc1296c008c170674444152bceebc7250ef9907c707f53dc9214aee7"
+      },
+      "saved_CI_status": {
+        "FAIL": 125
+      }
+    },
+    "unified46": {
+      "packet": "/tmp/opencode/pr211-fail-unified-next.json",
+      "sha256": "433ace265d3c8a7721051b605e45034bc915598aa0d39df9d40859c830dafd91",
+      "removed": 46,
+      "added": 0,
+      "BASE_status": {
+        "FAIL": 46
+      },
+      "already_absent_prior_count": 0,
+      "retained_red_integration_count": 10,
+      "unresolved": [],
+      "author_validation": "Source text and stdlib tokenize/JSON/XML/hash only. All retained function token streams unchanged; only parameter edit removes three explicit saved-FAIL paths and retains both PASS paths. Helpers preserved. No runtime/AST/project imports/pytest/install. Earlier packets and shared fixtures not edited.",
+      "final_testfile_hashes": {
+        "tests/test_unified_docs_context.py": "5afdcb2afe532677185df5c70ef4f71950795096808ad1c7ccbfc8919a36de5f",
+        "tests/test_unified_docs_context_part02.py": "10dacdc6ab147d47f1a4649a05362b99e5de063caacf35eb40d4e47096e9ba01",
+        "tests/test_unified_docs_context_mcp.py": "3719735ca526bcfd12427ecc824c25aa0ba72cee562f8521e0b428c08b7f818e",
+        "tests/test_unified_docs_context_mcp_part02.py": "8315ef19edaf3eac231f689efe7870d16414cae6a74b029ea083783e32f9dbff",
+        "tests/test_mcp_code_context_tool.py": "db8c049f46dc3d0b135f76149e674b3655b7b43245dcef5568a7e1f14f2dfa76",
+        "tests/test_snippet_first_services.py": "a5c3954eced9e74467c62bc54129b0640752adf12edb11983797b47a8dd61767",
+        "tests/test_dictionary_exit_discovery_literals.py": "4440a79e19ef0da491f60105f65b9ac6bb3806873c96da5b4c45157a353f7fe3",
+        "tests/test_dictionary_exit_patch_literals.py": "301678da6daed6adc7913ce0273a81376658d21dc6854b89604904cd33d60aa5",
+        "tests/test_dictionary_exit_corpus_policy.py": "904935ab09d51d1058bc5c8a80b39d4a5e2a113ae3e5012d35bcae97533e982e",
+        "tests/test_dictionary_exit_callable_residuals.py": "c3c21bb349de8bbe211dd2c353d5031d2fcfbbda64c4f7ef135ba2fb78e7c159"
+      },
+      "saved_CI_status": {
+        "FAIL": 46
+      },
+      "failure_text_hashes_verified": 46
+    },
+    "residual19": {
+      "packet": "/tmp/opencode/pr211-fail-residual-next.json",
+      "sha256": "1ba3692dba3b60df5b7a9f5ebcb4e4b2e6472bd1b5cc8ca261e2a9197d1df4bb",
+      "removed": 19,
+      "added": 0,
+      "BASE_status": {
+        "FAIL": 19
+      },
+      "already_absent_prior_count": 1,
+      "retained_red_integration_count": 19,
+      "unresolved": [
+        {
+          "id": "tests/docs/test_patch_plan_context.py::test_patch_plan_context_graph_failure_falls_back_to_existing_discovery",
+          "decision": "retained",
+          "reason": "Graph dependency is replaced, but public patch API still performs actual source discovery/selection; conservatively retained.",
+          "counted_in": "retained_red_integration_ids"
+        },
+        {
+          "id": "tests/docs/test_visible_support_units.py::test_native_inventory_keeps_repeated_body_with_distinct_conditions_as_composites",
+          "decision": "retained",
+          "reason": "Direct helper assertion operates on source produced by actual indexed public request; genuine store setup preserved.",
+          "counted_in": "retained_red_integration_ids"
+        }
+      ],
+      "author_validation": {
+        "tokenize": "passed all assigned source files",
+        "surviving_function_and_helper_bodies": "unchanged",
+        "removed_functions": "only functions with all recorded cases FAIL; no mixed unit parameters in this package",
+        "runtime": "not executed",
+        "project_imports_AST_pytest_install_CI": "not executed",
+        "prior_absent_cases": "not counted as new deletions",
+        "scoped_git_diff_check": "passed after EOF whitespace cleanup"
+      },
+      "final_testfile_hashes": {
+        "tests/docs/test_code_graph.py": "fafe19b4e843573dfb5ea9e2b9bb8fd150c1c7ce2d13af0716259b4afb347332",
+        "tests/docs/test_context_completion_guards.py": "0b4897124dafcd6f805cab4ab482ea03d9a030983878518975776ffb4a768910",
+        "tests/docs/test_context_projection_boundaries.py": "263dcb866dbcb36fa6d19ea93d8e7a5b5aea33ad8b1467d9bf32d2e12a2e6eac",
+        "tests/docs/test_documentation_query_plan.py": "30ea1d358eacbae19e66a48c1c5d41526455ad86b02f2197158a61164287faba",
+        "tests/docs/test_evidence_set_private_plan.py": "59711950be281d4e14e6d6a5bac26c24e0689219163f2f5345ddc939003ca63c",
+        "tests/docs/test_evidence_set_query_execution.py": "00912fabac7c60a5138e0d8e19969f208e49c8e77a30743377706f6a37baca3e",
+        "tests/docs/test_evidence_set_source_preparation.py": "7a5bad61ff6d6d0cd8b41fae105240a9ed2872feef5235bbcbf54f62ae886ec6",
+        "tests/docs/test_list_item_continuation_bridge.py": "d441e486bb56c1af57b7b6d5dde430d051b66af63bad2bb5252e2b31e3c52489",
+        "tests/docs/test_patch_plan_context.py": "b8a61896aaf44506190c54c9afbe4ec33a298f5a6d7ff850809dc668bf813b42",
+        "tests/docs/test_project_code_symbol_queries.py": "c7efcd3b6e12c2b3613e51af030325be29c646584984d053c814d5b743c29ab9",
+        "tests/docs/test_query_block_guards.py": "881f88ab7b995b4f7136c13b71b17e3aa1b1a1fb6b84a2233ed2201ec8b1c15b",
+        "tests/docs/test_request_source_facts.py": "936500c6a6a3c40a89de1b35d52444dba3eded5a7cfa0411fe27de55bde67fbe",
+        "tests/docs/test_savings_metrics_explanation.py": "669f421de7fa4a6a0b835e88c800cea22637229863754590ca0afa995ab6a06f",
+        "tests/docs/test_visible_support_units.py": "2032f9ebe7bd6a97af6b040e34b96014b243c2d88ebc0c54d63aa2435168bde7"
+      },
+      "saved_CI_status": {
+        "FAIL": 19
+      }
+    }
+  },
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "boundary": "Exact saved core3.11 FAIL and frozen BASE identities; pre-retirement, not final collection/CI. Future broad sweep changes receive no credit; current source mismatch affects registry approval only. Owner policy accepts coverage loss, not product fix/PASS. No runtime/AST/project imports/CI."
+  },
+  "registry_updates": {
+    "tests/diagnostic_labels.compound_context.json": {
+      "tests/docs/test_docs_context_compound_projection.py": "54fe733065cbf57a180d86e5db00e08f526b0a31107867c38c11d4437d57fb47",
+      "tests/docs/test_documentation_query_plan.py": "a5e247730bd891de17bd4233c841556219e5a259e3367d07008cf026d53d8d9d"
+    },
+    "tests/diagnostic_labels.context7_project_chat.json": {
+      "tests/docs/test_context7_style_project_chat.py": "e9d7fb8cb65ac087844b1e20c9276b2b5fb1667bfb120e897622b8aecef79d6d"
+    },
+    "tests/diagnostic_labels.context_loss_boundaries.json": {
+      "tests/docs/test_context_loss_boundaries.py": "8aa2f782055d0a68555ba1e2826d6eb6d751606e88dc8e7dd1d476fc18925474"
+    },
+    "tests/diagnostic_labels.dictionary_exit_callable_residuals.json": {
+      "tests/test_dictionary_exit_callable_residuals.py": "66727f50d8c1c965b77a156751253bbf5c67dc204cececb40b0c2d269b5de9c2"
+    },
+    "tests/diagnostic_labels.dictionary_exit_corpus_policy.json": {
+      "tests/test_dictionary_exit_corpus_policy.py": "71e2520391dc09a7ea520d14fda383748f30094576a318dc25b27dddfca7858a"
+    },
+    "tests/diagnostic_labels.dictionary_exit_discovery_literals.json": {
+      "tests/test_dictionary_exit_discovery_literals.py": "9bccd2752d8ed51f5487754714a467c4eb63e7ac21fd6693581d455dc2345df9"
+    },
+    "tests/diagnostic_labels.dictionary_exit_patch_literals.json": {
+      "tests/test_dictionary_exit_patch_literals.py": "38922eea49dd41780f8f7a82c51668ebc0694ec3bc0adabcb3b0d88ad69a5105"
+    },
+    "tests/diagnostic_labels.evidence_sets.json": {
+      "tests/docs/test_evidence_set_private_plan.py": "e06f6fba3b42603a1acfe7ff5885e93b3d6b7c3f22cefce867d0fc3eec92eebb"
+    },
+    "tests/diagnostic_labels.json": {
+      "tests/docs/test_project_code_symbol_queries.py#module_labels": "REMOVE_ABSENT_MODULE",
+      "tests/docs/test_project_code_symbol_queries.py#module_node_hashes": "REMOVE_ABSENT_MODULE",
+      "tests/docs/test_project_context_service.py": "0dd9acda1c800c097123950ec131457b50f078b8866bde56d8d5ad88b584e903",
+      "tests/docs/test_project_context_service_part02.py": "8dfddbb717faa97018ae874a987a1de4d50d8285a78d5b6f0544638f279b5555",
+      "tests/docs/test_project_metadata_reader.py": "cb1f95bfa9dd4e6ecd274f97e23029b851460cfbfcf4657751d1a9e90ec50feb",
+      "tests/docs/test_savings_metrics_explanation.py": "57417ca89b188a8c4277c356d3e0054f264e2827899cd22677bb4eff7b4b40e3",
+      "tests/test_snippet_first_services.py": "2918c601f1827c8fbcf27e1847b41f6076476292dbdee203fe7db9e68239f820",
+      "tests/test_unified_docs_context.py": "3c3423afcb5e1ce3bcadf7ffd2b9931e5ea9264f57582253aa0e47f8d104a06f",
+      "tests/test_unified_docs_context_mcp.py": "5b8d76bf7b9efd21f0b5ebf68c31c356e345bab6dbd6875b16e93de2e8f086e5",
+      "tests/test_unified_docs_context_mcp_part02.py": "a0ebb35d76de2f927f34086bbb0078bee5df92145808791cb611f7cc1f42fb09",
+      "tests/test_unified_docs_context_part02.py": "333c4bea41c84438f7776f9c53f9dbfff722b39481c774f1caa09749b4787229"
+    },
+    "tests/diagnostic_labels.list_item_continuation_bridge.json": {
+      "tests/docs/test_list_item_continuation_bridge.py": "73457742651e467c63a9642e915b7be0ba52f778a983d09d92f689d156a800e5"
+    },
+    "tests/diagnostic_labels.request_source_facts.json": {
+      "tests/docs/test_request_source_facts.py": "e053a5efe0bb3e728d0dbd771bcf362c9f4149232def64c7e7f3ab353e4b616f"
+    }
+  },
+  "registry_method": "Only exact current file SHA matching completed packet after_sha256; normalized BASE minus all integrated removals, sorted unique newline-joined SHA256. Matching source textual definitions confirm surviving normalized sets. All other module entries preserved. Broad writer testfiles never edited.",
+  "source_binding_observed": {
+    "tests/docs/test_context7_style_project_chat.py": "de92e373e20f0e1e126ca9d92422f35a7d74b04779e184ea5f607c1938c65d22",
+    "tests/docs/test_context_loss_boundaries.py": "c338d71de4a7509daa8d32e72ed77b065bd5469e757c965e8611efc2f3a4e273",
+    "tests/docs/test_docs_context_compound_projection.py": "9dc02c3415a6c8ad7cc308f061dd43acd5179afc0c57daaeb235d4dc8516dd9e",
+    "tests/docs/test_docs_impact.py": "40634e3bd56ef0ec237a435f9be80edefc9bf6fb4cc4c472b60f9999017eaeae",
+    "tests/docs/test_docs_impact_task20.py": "ac1495a0d3d111c15f94a9172fca1d9021441c415ae86933070bad3e93b095e3",
+    "tests/docs/test_docs_impact_task20_part02.py": "4870255c17f54828733235ad5055fab26f7f25ade390b2b44cbd2249eb94a850",
+    "tests/docs/test_project_context_service.py": "0dfeda5965e9a0f4fc53ee46aee09d9529e8c211e5e56ec95ae0631abb3751d5",
+    "tests/docs/test_project_context_service_part02.py": "38d4661b9d902373ec9454b8902463ed2108b262267d2ad7e3222de92b98a0b3",
+    "tests/docs/test_project_metadata_reader.py": "82241353bc1296c008c170674444152bceebc7250ef9907c707f53dc9214aee7",
+    "tests/test_unified_docs_context.py": "5afdcb2afe532677185df5c70ef4f71950795096808ad1c7ccbfc8919a36de5f",
+    "tests/test_unified_docs_context_part02.py": "10dacdc6ab147d47f1a4649a05362b99e5de063caacf35eb40d4e47096e9ba01",
+    "tests/test_unified_docs_context_mcp.py": "3719735ca526bcfd12427ecc824c25aa0ba72cee562f8521e0b428c08b7f818e",
+    "tests/test_unified_docs_context_mcp_part02.py": "8315ef19edaf3eac231f689efe7870d16414cae6a74b029ea083783e32f9dbff",
+    "tests/test_mcp_code_context_tool.py": "db8c049f46dc3d0b135f76149e674b3655b7b43245dcef5568a7e1f14f2dfa76",
+    "tests/test_snippet_first_services.py": "a5c3954eced9e74467c62bc54129b0640752adf12edb11983797b47a8dd61767",
+    "tests/test_dictionary_exit_discovery_literals.py": "4440a79e19ef0da491f60105f65b9ac6bb3806873c96da5b4c45157a353f7fe3",
+    "tests/test_dictionary_exit_patch_literals.py": "301678da6daed6adc7913ce0273a81376658d21dc6854b89604904cd33d60aa5",
+    "tests/test_dictionary_exit_corpus_policy.py": "904935ab09d51d1058bc5c8a80b39d4a5e2a113ae3e5012d35bcae97533e982e",
+    "tests/test_dictionary_exit_callable_residuals.py": "c3c21bb349de8bbe211dd2c353d5031d2fcfbbda64c4f7ef135ba2fb78e7c159",
+    "tests/docs/test_code_graph.py": "fafe19b4e843573dfb5ea9e2b9bb8fd150c1c7ce2d13af0716259b4afb347332",
+    "tests/docs/test_context_completion_guards.py": "0b4897124dafcd6f805cab4ab482ea03d9a030983878518975776ffb4a768910",
+    "tests/docs/test_context_projection_boundaries.py": "263dcb866dbcb36fa6d19ea93d8e7a5b5aea33ad8b1467d9bf32d2e12a2e6eac",
+    "tests/docs/test_documentation_query_plan.py": "30ea1d358eacbae19e66a48c1c5d41526455ad86b02f2197158a61164287faba",
+    "tests/docs/test_evidence_set_private_plan.py": "59711950be281d4e14e6d6a5bac26c24e0689219163f2f5345ddc939003ca63c",
+    "tests/docs/test_evidence_set_query_execution.py": "00912fabac7c60a5138e0d8e19969f208e49c8e77a30743377706f6a37baca3e",
+    "tests/docs/test_evidence_set_source_preparation.py": "7a5bad61ff6d6d0cd8b41fae105240a9ed2872feef5235bbcbf54f62ae886ec6",
+    "tests/docs/test_list_item_continuation_bridge.py": "d441e486bb56c1af57b7b6d5dde430d051b66af63bad2bb5252e2b31e3c52489",
+    "tests/docs/test_patch_plan_context.py": "b8a61896aaf44506190c54c9afbe4ec33a298f5a6d7ff850809dc668bf813b42",
+    "tests/docs/test_project_code_symbol_queries.py": "c7efcd3b6e12c2b3613e51af030325be29c646584984d053c814d5b743c29ab9",
+    "tests/docs/test_query_block_guards.py": "881f88ab7b995b4f7136c13b71b17e3aa1b1a1fb6b84a2233ed2201ec8b1c15b",
+    "tests/docs/test_request_source_facts.py": "936500c6a6a3c40a89de1b35d52444dba3eded5a7cfa0411fe27de55bde67fbe",
+    "tests/docs/test_savings_metrics_explanation.py": "669f421de7fa4a6a0b835e88c800cea22637229863754590ca0afa995ab6a06f",
+    "tests/docs/test_visible_support_units.py": "2032f9ebe7bd6a97af6b040e34b96014b243c2d88ebc0c54d63aa2435168bde7"
+  },
+  "deferred_paths": {},
+  "validation": {
+    "partition": 8291,
+    "overlap_previous": 0,
+    "overlap_packets": 0,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0,
+    "removed": 1028,
+    "added": 1,
+    "net": 1027,
+    "projected_after": 7264,
+    "target_gap": 2290,
+    "classified": 1580,
+    "unclassified": 6711
+  },
+  "prior_manifest_sha256": "5551c4264c58483066cbf214449578af8372c1fab6be1f8ade4a8df5a50e59fa",
+  "pending": "Broad sweep packet unintegrated; final collection/CI pending. Unresolved and retained cases listed per completed receipt remain active; packet hashes bind exact original IDs/source limits without redundant audit copies."
+}

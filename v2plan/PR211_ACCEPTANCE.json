@@ -1,0 +1,3790 @@
+{
+  "schema_version": 1,
+  "repository": "Vanilla1999/DocAtlas",
+  "pr": 211,
+  "date_utc": "2026-10-08",
+  "initial_sha": "21fe472d983f394130849d6fd4e582043d58e9ba",
+  "work_branch": "implementation/pr211-merge-readiness",
+  "pr_branch": "integration/stage3-v2-identity-pr1",
+  "source_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d",
+  "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "checkout_merge_sha": "87403a079ac209641edc4b83bd08e9fd37855d46",
+  "source_tree_sha": "2cdd8e5eb4c51cbd4b067e538c43e1fbe5a24023",
+  "merge_tree_sha": "2cdd8e5eb4c51cbd4b067e538c43e1fbe5a24023",
+  "ci": {
+    "run_id": 37808083737,
+    "run_attempt": 1,
+    "event": "pull_request",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083737",
+    "jobs": [
+      {
+        "id": 113417519232,
+        "name": "docs-contract",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Verify documented CLI and public Docs MCP contracts",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 9,
+            "name": "Post Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 10,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519563,
+        "name": "test (3.12)",
+        "status": "completed",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run offline core tests",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 6,
+            "name": "Upload offline core test results",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519593,
+        "name": "platform-smoke (macos-15-intel)",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install cross-platform smoke dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Verify package and CLI surface",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Verify installed Docs MCP over stdio",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519625,
+        "name": "static-contract",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Verify lock and static repository contracts",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Post Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 8,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 9,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519701,
+        "name": "platform-smoke (macos-15)",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install cross-platform smoke dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Verify package and CLI surface",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Verify installed Docs MCP over stdio",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519727,
+        "name": "docs-impact",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install DocAtlas",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Report documentation impact",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 9,
+            "name": "Post Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 10,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519786,
+        "name": "platform-smoke (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install cross-platform smoke dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Verify package and CLI surface",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Verify installed Docs MCP over stdio",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python 3.12",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519816,
+        "name": "test (3.11)",
+        "status": "completed",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python 3.11",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run offline core tests",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 6,
+            "name": "Upload offline core test results",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python 3.11",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519899,
+        "name": "advanced-contract",
+        "status": "completed",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run offline advanced contract and shared-security tests",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 6,
+            "name": "Run recoverable documentation failure gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 7,
+            "name": "Run recoverable documentation failure mutation gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 8,
+            "name": "Run hermetic Context7-style project chat gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 9,
+            "name": "Run Legacy live compatibility report and lineage floor",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 10,
+            "name": "Run V2 project-context acceptance gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 11,
+            "name": "Upload Project Docs quality reports",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 12,
+            "name": "Run question surface regression gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 13,
+            "name": "Run Agent Developer Protocol gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 14,
+            "name": "Run Agent Developer adversarial/token gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 15,
+            "name": "Run critical mutation gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 16,
+            "name": "Run Agent Developer adversarial mutation gate",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 17,
+            "name": "Upload critical mutation gate artifacts",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 18,
+            "name": "Upload offline advanced test results",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 35,
+            "name": "Post Set up Python",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 36,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 37,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519909,
+        "name": "installer-smoke",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Installer smoke tests",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519932,
+        "name": "test (3.13)",
+        "status": "completed",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python 3.13",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run offline core tests",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 6,
+            "name": "Upload offline core test results",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python 3.13",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417519935,
+        "name": "installed-mcp-harness",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Build exact reviewed wheel and install evaluator dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Exercise real stdio MCP and bounded schema repair",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Verify evidence attribution, hash chain, and privacy",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Set up Python",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417520171,
+        "name": "retrieval-evidence",
+        "status": "completed",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Install evaluator dependencies",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Verify frozen retrieval evidence and independent sample",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 6,
+            "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 11,
+            "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 12,
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417521162,
+        "name": "p1-harden-branch",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 113421084012,
+        "name": "required-ci",
+        "status": "completed",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Enforce required CI jobs",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "number": 3,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ]
+  },
+  "release": {
+    "run_id": 37808083795,
+    "run_attempt": 1,
+    "event": "pull_request",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083795",
+    "jobs": [
+      {
+        "id": 113417520010,
+        "name": "build",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Verify dispatched release source is on main",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "number": 4,
+            "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run python -m pip install build \"hatchling<1.27\"",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Run python -m build",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Run if [ -n \"$RELEASE_TAG\" ]; then",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 8,
+            "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 15,
+            "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 16,
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 17,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417832028,
+        "name": "wheel (3.12)",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run python scripts/release_gate.py",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Run python -m pip install dist/*.whl",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Run cd \"$(mktemp -d)\"",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 14,
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 15,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417832071,
+        "name": "wheel (3.11)",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run python scripts/release_gate.py",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Run python -m pip install dist/*.whl",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Run cd \"$(mktemp -d)\"",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 14,
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 15,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417832091,
+        "name": "sdist-and-installer",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run mkdir sdist-wheel",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Run python -m pip install --force-reinstall sdist-wheel/*.whl",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Run cd \"$(mktemp -d)\"",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 8,
+            "name": "Run EXPECTED_VERSION=\"$(python -c 'from docmancer._version import __version__; print(__version__)')\"",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 15,
+            "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 16,
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 17,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113417833418,
+        "name": "wheel (3.13)",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 4,
+            "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 5,
+            "name": "Run python scripts/release_gate.py",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 6,
+            "name": "Run python -m pip install dist/*.whl",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 7,
+            "name": "Run cd \"$(mktemp -d)\"",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 13,
+            "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 14,
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 15,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113418643701,
+        "name": "required-release",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 2,
+            "name": "Enforce required release validation",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "number": 3,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 113418686164,
+        "name": "publish",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 113418686666,
+        "name": "public-platform-smoke (${{ matrix.os }})",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 113418687474,
+        "name": "publish-official-mcp-registry",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "related_workflows": [
+    {
+      "run_id": 37808084222,
+      "name": "P2.2A comparative harness",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808084222",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083824,
+      "name": "Language flow investigation",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083824",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083743,
+      "name": "Direct question validation",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083743",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083736,
+      "name": "P1.6 evidence is data",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083736",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083930,
+      "name": "P1 Agent Truth closure",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083930",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083949,
+      "name": "P2 federated task-pack reopening",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083949",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808084016,
+      "name": "P2.3 Product Truth decision",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808084016",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808084079,
+      "name": "P2.1B positive controls",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808084079",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083797,
+      "name": "P2 Product Truth protocol",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083797",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083876,
+      "name": "P1.5 mixed-evidence provenance",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083876",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083857,
+      "name": "Task 33C pull-request checks",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083857",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083921,
+      "name": "P1.4 paraphrase and proofability",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083921",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808084005,
+      "name": "P2.2B/C execution gate",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808084005",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083791,
+      "name": "P2.1C task pack",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083791",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    },
+    {
+      "run_id": 37808083902,
+      "name": "P1 stack exact validation",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083902",
+      "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d"
+    }
+  ],
+  "runtime": {
+    "phase_boundary": "Source pytest covers cold/default preparation/restart and an advanced positive; the complete prepared advanced scope/version/partial/large matrix is from installed-platform smoke.",
+    "platforms": [
+      {
+        "platform": "platform-smoke (ubuntu-latest)",
+        "job_id": 113417519786,
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083737/job/113417519786",
+        "installed_origin": {
+          "module": "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/docmancer/__init__.py",
+          "prefix": "/opt/hostedtoolcache/Python/3.12.15/x64",
+          "python": "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python"
+        },
+        "stdio_pass": true,
+        "prepared": [
+          {
+            "transport": "structured",
+            "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
+            "library_lineage_note": "Original indexed child lineage retained; carrier is ordinary data, never authority; local authored provenance only",
+            "source_generation_rows_unchanged": true,
+            "library_generation_rows_unchanged": true,
+            "whole_database_bytes_unchanged": false,
+            "whole_database_note": "registry/job initialization can change other tables; distinct from indexed evidence",
+            "matrix": {
+              "all_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 127,
+                "unique_nonoverlap_utf8_bytes": 127,
+                "tool_wire_utf8_bytes": 3004,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 2
+              },
+              "complete": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 1703,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_default": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1271,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_null": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1271,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "large": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "gate": "PASS",
+                "source_text_utf8_bytes": 39372,
+                "unique_nonoverlap_utf8_bytes": 39372,
+                "tool_wire_utf8_bytes": 66605,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 50
+              },
+              "library_missing_version": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "confirmation_required",
+                  "delivery_blocked",
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "retrieval_lane:library",
+                  "retrieval_status:confirmation_required",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 742,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "library_v1": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 102,
+                "unique_nonoverlap_utf8_bytes": 102,
+                "tool_wire_utf8_bytes": 2554,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "library_v2": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 105,
+                "unique_nonoverlap_utf8_bytes": 105,
+                "tool_wire_utf8_bytes": 2569,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_alpha": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 65,
+                "unique_nonoverlap_utf8_bytes": 65,
+                "tool_wire_utf8_bytes": 1659,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_beta": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 62,
+                "unique_nonoverlap_utf8_bytes": 62,
+                "tool_wire_utf8_bytes": 1648,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "delivery_blocked",
+                  "no_admitted_evidence",
+                  "retrieval_lane:project",
+                  "retrieval_status:not_found",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 411,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "partial": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "query_exact:1:absentfixtureconstraint"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 2123,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "project_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 839,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "version_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 633,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              }
+            }
+          },
+          {
+            "transport": "text",
+            "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
+            "library_lineage_note": "Original indexed child lineage retained; carrier is ordinary data, never authority; local authored provenance only",
+            "source_generation_rows_unchanged": true,
+            "library_generation_rows_unchanged": true,
+            "whole_database_bytes_unchanged": false,
+            "whole_database_note": "registry/job initialization can change other tables; distinct from indexed evidence",
+            "matrix": {
+              "all_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 127,
+                "unique_nonoverlap_utf8_bytes": 127,
+                "tool_wire_utf8_bytes": 3224,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 2
+              },
+              "complete": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 1786,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_default": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1380,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_null": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1380,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "large": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "gate": "PASS",
+                "source_text_utf8_bytes": 39372,
+                "unique_nonoverlap_utf8_bytes": 39372,
+                "tool_wire_utf8_bytes": 69467,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 50
+              },
+              "library_missing_version": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "confirmation_required",
+                  "delivery_blocked",
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "retrieval_lane:library",
+                  "retrieval_status:confirmation_required",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 734,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "library_v1": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 102,
+                "unique_nonoverlap_utf8_bytes": 102,
+                "tool_wire_utf8_bytes": 2685,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "library_v2": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 105,
+                "unique_nonoverlap_utf8_bytes": 105,
+                "tool_wire_utf8_bytes": 2700,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_alpha": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 65,
+                "unique_nonoverlap_utf8_bytes": 65,
+                "tool_wire_utf8_bytes": 1742,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_beta": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 62,
+                "unique_nonoverlap_utf8_bytes": 62,
+                "tool_wire_utf8_bytes": 1731,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "delivery_blocked",
+                  "no_admitted_evidence",
+                  "retrieval_lane:project",
+                  "retrieval_status:not_found",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 363,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "partial": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "query_exact:1:absentfixtureconstraint"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 2252,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "project_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 836,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "version_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 617,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "platform": "platform-smoke (macos-15)",
+        "job_id": 113417519701,
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083737/job/113417519701",
+        "installed_origin": {
+          "module": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/docmancer/__init__.py",
+          "prefix": "/Library/Frameworks/Python.framework/Versions/3.12",
+          "python": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python"
+        },
+        "stdio_pass": true,
+        "prepared": [
+          {
+            "transport": "structured",
+            "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
+            "library_lineage_note": "Original indexed child lineage retained; carrier is ordinary data, never authority; local authored provenance only",
+            "source_generation_rows_unchanged": true,
+            "library_generation_rows_unchanged": true,
+            "whole_database_bytes_unchanged": false,
+            "whole_database_note": "registry/job initialization can change other tables; distinct from indexed evidence",
+            "matrix": {
+              "all_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 127,
+                "unique_nonoverlap_utf8_bytes": 127,
+                "tool_wire_utf8_bytes": 3004,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 2
+              },
+              "complete": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 1703,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_default": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1271,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_null": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1271,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "large": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "gate": "PASS",
+                "source_text_utf8_bytes": 39372,
+                "unique_nonoverlap_utf8_bytes": 39372,
+                "tool_wire_utf8_bytes": 66617,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 50
+              },
+              "library_missing_version": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "confirmation_required",
+                  "delivery_blocked",
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "retrieval_lane:library",
+                  "retrieval_status:confirmation_required",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 742,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "library_v1": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 102,
+                "unique_nonoverlap_utf8_bytes": 102,
+                "tool_wire_utf8_bytes": 2557,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "library_v2": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 105,
+                "unique_nonoverlap_utf8_bytes": 105,
+                "tool_wire_utf8_bytes": 2572,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_alpha": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 65,
+                "unique_nonoverlap_utf8_bytes": 65,
+                "tool_wire_utf8_bytes": 1659,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_beta": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 62,
+                "unique_nonoverlap_utf8_bytes": 62,
+                "tool_wire_utf8_bytes": 1648,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "delivery_blocked",
+                  "no_admitted_evidence",
+                  "retrieval_lane:project",
+                  "retrieval_status:not_found",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 411,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "partial": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "query_exact:1:absentfixtureconstraint"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 2123,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "project_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 839,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "version_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 633,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              }
+            }
+          },
+          {
+            "transport": "text",
+            "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
+            "library_lineage_note": "Original indexed child lineage retained; carrier is ordinary data, never authority; local authored provenance only",
+            "source_generation_rows_unchanged": true,
+            "library_generation_rows_unchanged": true,
+            "whole_database_bytes_unchanged": false,
+            "whole_database_note": "registry/job initialization can change other tables; distinct from indexed evidence",
+            "matrix": {
+              "all_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 127,
+                "unique_nonoverlap_utf8_bytes": 127,
+                "tool_wire_utf8_bytes": 3224,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 2
+              },
+              "complete": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 1786,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_default": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1380,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_null": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1380,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "large": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "gate": "PASS",
+                "source_text_utf8_bytes": 39372,
+                "unique_nonoverlap_utf8_bytes": 39372,
+                "tool_wire_utf8_bytes": 69476,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 50
+              },
+              "library_missing_version": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "confirmation_required",
+                  "delivery_blocked",
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "retrieval_lane:library",
+                  "retrieval_status:confirmation_required",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 734,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "library_v1": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 102,
+                "unique_nonoverlap_utf8_bytes": 102,
+                "tool_wire_utf8_bytes": 2688,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "library_v2": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 105,
+                "unique_nonoverlap_utf8_bytes": 105,
+                "tool_wire_utf8_bytes": 2703,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_alpha": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 65,
+                "unique_nonoverlap_utf8_bytes": 65,
+                "tool_wire_utf8_bytes": 1742,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_beta": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 62,
+                "unique_nonoverlap_utf8_bytes": 62,
+                "tool_wire_utf8_bytes": 1731,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "delivery_blocked",
+                  "no_admitted_evidence",
+                  "retrieval_lane:project",
+                  "retrieval_status:not_found",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 363,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "partial": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "query_exact:1:absentfixtureconstraint"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 2252,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "project_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 836,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "version_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 617,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "platform": "platform-smoke (macos-15-intel)",
+        "job_id": 113417519593,
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083737/job/113417519593",
+        "installed_origin": {
+          "module": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/docmancer/__init__.py",
+          "prefix": "/Library/Frameworks/Python.framework/Versions/3.12",
+          "python": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python"
+        },
+        "stdio_pass": true,
+        "prepared": [
+          {
+            "transport": "structured",
+            "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
+            "library_lineage_note": "Original indexed child lineage retained; carrier is ordinary data, never authority; local authored provenance only",
+            "source_generation_rows_unchanged": true,
+            "library_generation_rows_unchanged": true,
+            "whole_database_bytes_unchanged": false,
+            "whole_database_note": "registry/job initialization can change other tables; distinct from indexed evidence",
+            "matrix": {
+              "all_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 127,
+                "unique_nonoverlap_utf8_bytes": 127,
+                "tool_wire_utf8_bytes": 3004,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 2
+              },
+              "complete": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 1703,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_default": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1271,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_null": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1271,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "large": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "gate": "PASS",
+                "source_text_utf8_bytes": 39372,
+                "unique_nonoverlap_utf8_bytes": 39372,
+                "tool_wire_utf8_bytes": 66605,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 50
+              },
+              "library_missing_version": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "confirmation_required",
+                  "delivery_blocked",
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "retrieval_lane:library",
+                  "retrieval_status:confirmation_required",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 742,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "library_v1": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 102,
+                "unique_nonoverlap_utf8_bytes": 102,
+                "tool_wire_utf8_bytes": 2557,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "library_v2": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 105,
+                "unique_nonoverlap_utf8_bytes": 105,
+                "tool_wire_utf8_bytes": 2572,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_alpha": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 65,
+                "unique_nonoverlap_utf8_bytes": 65,
+                "tool_wire_utf8_bytes": 1659,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_beta": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 62,
+                "unique_nonoverlap_utf8_bytes": 62,
+                "tool_wire_utf8_bytes": 1648,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "delivery_blocked",
+                  "no_admitted_evidence",
+                  "retrieval_lane:project",
+                  "retrieval_status:not_found",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 411,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "partial": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "query_exact:1:absentfixtureconstraint"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 2123,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "project_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 839,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "version_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 633,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              }
+            }
+          },
+          {
+            "transport": "text",
+            "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
+            "library_lineage_note": "Original indexed child lineage retained; carrier is ordinary data, never authority; local authored provenance only",
+            "source_generation_rows_unchanged": true,
+            "library_generation_rows_unchanged": true,
+            "whole_database_bytes_unchanged": false,
+            "whole_database_note": "registry/job initialization can change other tables; distinct from indexed evidence",
+            "matrix": {
+              "all_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 127,
+                "unique_nonoverlap_utf8_bytes": 127,
+                "tool_wire_utf8_bytes": 3224,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 2
+              },
+              "complete": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 1786,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_default": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1380,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "docs_null": {
+                "check": "observed",
+                "result": null,
+                "completeness": null,
+                "missing": null,
+                "source_text_utf8_bytes": 93,
+                "unique_nonoverlap_utf8_bytes": 93,
+                "tool_wire_utf8_bytes": 1380,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "large": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "gate": "PASS",
+                "source_text_utf8_bytes": 39372,
+                "unique_nonoverlap_utf8_bytes": 39372,
+                "tool_wire_utf8_bytes": 69483,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 50
+              },
+              "library_missing_version": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "confirmation_required",
+                  "delivery_blocked",
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "retrieval_lane:library",
+                  "retrieval_status:confirmation_required",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 734,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "library_v1": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 102,
+                "unique_nonoverlap_utf8_bytes": 102,
+                "tool_wire_utf8_bytes": 2688,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "library_v2": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 105,
+                "unique_nonoverlap_utf8_bytes": 105,
+                "tool_wire_utf8_bytes": 2703,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_alpha": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 65,
+                "unique_nonoverlap_utf8_bytes": 65,
+                "tool_wire_utf8_bytes": 1742,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_beta": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "complete",
+                "missing": null,
+                "source_text_utf8_bytes": 62,
+                "unique_nonoverlap_utf8_bytes": 62,
+                "tool_wire_utf8_bytes": 1731,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "module_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "delivery_blocked",
+                  "no_admitted_evidence",
+                  "retrieval_lane:project",
+                  "retrieval_status:not_found",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 363,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              },
+              "partial": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "query_exact:1:absentfixtureconstraint"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 2252,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "project_scope": {
+                "check": "observed",
+                "result": "data",
+                "completeness": "partial",
+                "missing": [
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 94,
+                "unique_nonoverlap_utf8_bytes": 94,
+                "tool_wire_utf8_bytes": 836,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 1
+              },
+              "version_mismatch": {
+                "check": "observed",
+                "result": "failure",
+                "completeness": "unavailable",
+                "missing": [
+                  "exact_version:99.0.0",
+                  "no_admitted_evidence",
+                  "visible_content_assignment_required"
+                ],
+                "source_text_utf8_bytes": 0,
+                "unique_nonoverlap_utf8_bytes": 0,
+                "tool_wire_utf8_bytes": 617,
+                "tool_wire_measurement": "serialized CallToolResult, excluding JSON-RPC envelope/framing",
+                "source_count": 0
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "retrieval": {
+      "job_id": 113417520171,
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083737/job/113417520171",
+      "installed_origin": null,
+      "stdio_pass": false,
+      "prepared": [],
+      "retrieval_gate_error": "within-budget full model-visible DTO exceeded the 800-token ceiling"
+    }
+  },
+  "artifacts": [
+    {
+      "id": 11565010207,
+      "name": "pytest-core-3.11-37808083737-1",
+      "digest": "sha256:07061a7a8e09ff471911fc7a8b9a7650d6ed241f00cec31f5a6a55f57c7de38d",
+      "size_in_bytes": 576016,
+      "created_at": "2026-10-08T16:28:56Z",
+      "expires_at": "2026-10-22T16:28:55Z"
+    },
+    {
+      "id": 11564725430,
+      "name": "pytest-core-3.12-37808083737-1",
+      "digest": "sha256:ea0e8f0c62c76d9a9c23b761084867243b69005c91efd5e3b169630c6579bda9",
+      "size_in_bytes": 576769,
+      "created_at": "2026-10-08T16:27:45Z",
+      "expires_at": "2026-10-22T16:27:44Z"
+    },
+    {
+      "id": 11564111102,
+      "name": "retrieval-evidence",
+      "digest": "sha256:a5c16f3414c94a00f24f5740cda66aec2dddf9eeb769125e03b3ec91c8636f76",
+      "size_in_bytes": 20452362,
+      "created_at": "2026-10-08T16:24:21Z",
+      "expires_at": "2026-10-22T16:24:18Z"
+    },
+    {
+      "id": 11563986008,
+      "name": "pytest-advanced-3.12-37808083737-1",
+      "digest": "sha256:72160ee17eb741bf74114db62d4682fc5c2460abd20150f418eb9e2de3a5d4f0",
+      "size_in_bytes": 38583,
+      "created_at": "2026-10-08T16:22:02Z",
+      "expires_at": "2026-10-22T16:22:02Z"
+    },
+    {
+      "id": 11563971827,
+      "name": "pytest-core-3.13-37808083737-1",
+      "digest": "sha256:e7ea4eb65c6edca7bc047cb41f5e4bdc4004b0c81a15c7107c83a3152b39637f",
+      "size_in_bytes": 575804,
+      "created_at": "2026-10-08T16:28:51Z",
+      "expires_at": "2026-10-22T16:28:49Z"
+    }
+  ],
+  "authorization": {
+    "ordinary_fast_forward_push": true,
+    "force_push": false,
+    "merge_performed": false,
+    "release_performed": false,
+    "new_catalog_ceiling_approved": false,
+    "retrieval_work_deferred": true,
+    "local_provider_model_client_downloads_performed": false
+  },
+  "related_workflow_details": {
+    "schema_version": "pr211-ancillary-evidence-v1",
+    "repository": "Vanilla1999/DocAtlas",
+    "head_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d",
+    "observed_at_utc": "2026-10-08T16:31:54.682Z",
+    "evidence_scope": "Read-only existing GitHub Actions job metadata and concise log facts; no local tests or reruns; no full logs retained in this artifact.",
+    "jobs": [
+      {
+        "label": "p1_truth",
+        "run_id": 37808083930,
+        "job_id": 113417520463,
+        "job_name": "p1-agent-truth-closure",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083930/job/113417520463",
+        "actual_checkout_sha": "87403a079ac209641edc4b83bd08e9fd37855d46",
+        "checkout_evidence": "Exact SHA printed by checkout git log",
+        "first_cause": {
+          "classification": "required_support",
+          "message": "ValueError: P1.4 required support failed",
+          "known_contract_relation": "Same required-support/proofability boundary as standalone P1.4; later P1 closure was not run.",
+          "step": "Verify every P1 evidence slice"
+        },
+        "pytest_counts": null,
+        "pytest_summary": null,
+        "skipped_substantive_gates": [
+          "Verify the bounded P1 closure"
+        ],
+        "log_read": "success_once",
+        "passed_before_first_failure": [
+          "Agent Developer P1.2 first-divergence atlas: CHECK PASS (11 tasks; sha256=c31cdc7e83281e9553fefeac4704576f8fcd0a651ea4c928e34207826d1838a3)",
+          "Agent Contract v2 ablation: CHECK PASS"
+        ]
+      },
+      {
+        "label": "language",
+        "run_id": 37808083824,
+        "job_id": 113417521069,
+        "job_name": "observe-flow",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083824/job/113417521069",
+        "actual_checkout_sha": "0a60111dc6de50f78f08239bd3ee9fcc3a31ad0d",
+        "checkout_evidence": "Exact SHA printed by checkout git log",
+        "first_cause": {
+          "classification": "missing_mutation_grant",
+          "message": "PermissionError: Project docs synchronization is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, deduplication or orphan deletion.",
+          "node": "tests/docs/test_language_flow_experiment.py::test_real_frozen_flow_all_witnesses_without_changing_expected_labels",
+          "known_contract_relation": "Existing legacy sync call without explicit member mutation grant; frozen observations after this guard test did not run.",
+          "step": "Guard tests and unchanged frozen-case assertion"
+        },
+        "pytest_counts": {
+          "failed": 1,
+          "passed": 33
+        },
+        "pytest_summary": "1 failed, 33 passed in 2.57s",
+        "skipped_substantive_gates": [
+          "Observe unchanged frozen case",
+          "Replay viewed skill smoke packets and retain raw traces",
+          "Paired unchanged regressions with baseline and flow ordering"
+        ],
+        "log_read": "success_once"
+      },
+      {
+        "label": "p16",
+        "run_id": 37808083736,
+        "job_id": 113417518793,
+        "job_name": "p1-6-adversarial",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083736/job/113417518793",
+        "actual_checkout_sha": "87403a079ac209641edc4b83bd08e9fd37855d46",
+        "checkout_evidence": "Exact SHA printed by checkout git log",
+        "first_cause": {
+          "classification": "legitimate_support_mismatch",
+          "message": "ValueError: P1.6 support mismatch for legitimate_fact_survives_hostile_tail",
+          "known_contract_relation": "Positive legitimate-fact support check failed. This does not establish successful hostile-content control; later verifier checks were not reached.",
+          "step": "Verify hostile documents cannot control the agent boundary"
+        },
+        "pytest_counts": null,
+        "pytest_summary": null,
+        "skipped_substantive_gates": [],
+        "log_read": "success_once"
+      },
+      {
+        "label": "task33c",
+        "run_id": 37808083857,
+        "job_id": 113417521330,
+        "job_name": "safe-validation",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083857/job/113417521330",
+        "actual_checkout_sha": "87403a079ac209641edc4b83bd08e9fd37855d46",
+        "checkout_evidence": "Exact SHA printed by checkout git log",
+        "first_cause": {
+          "classification": "untyped_mutation_intent_expectation",
+          "message": "AssertionError: assert False is True",
+          "node": "tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Build FooHandler]",
+          "known_contract_relation": "Remaining ActionPacket failures include inferred mutation intent, retired max_tokens, legacy DTO/default-format expectations; five reviewed caller failures disappeared.",
+          "step": "Run Task 33C hardening tests"
+        },
+        "pytest_counts": {
+          "failed": 33,
+          "passed": 31
+        },
+        "pytest_summary": "33 failed, 31 passed in 2.99s",
+        "skipped_substantive_gates": [
+          "Static validation"
+        ],
+        "log_read": "success_once",
+        "failed_nodes_by_file": {
+          "tests/docs/test_action_packet.py": 29,
+          "tests/task_level/test_github_models_adapter.py": 3,
+          "tests/task_level/test_task33_isolated_delivery.py": 1
+        }
+      },
+      {
+        "label": "p14",
+        "run_id": 37808083921,
+        "job_id": 113417520548,
+        "job_name": "p1-4-proofability",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083921/job/113417520548",
+        "actual_checkout_sha": "87403a079ac209641edc4b83bd08e9fd37855d46",
+        "checkout_evidence": "Exact SHA printed by checkout git log",
+        "first_cause": {
+          "classification": "required_support",
+          "message": "ValueError: P1.4 required support failed",
+          "known_contract_relation": "Required positive answer_supported expectation fails; the log does not identify the exact failing case or all derived support counts.",
+          "step": "Verify P1.4 candidate discovery and support precision"
+        },
+        "pytest_counts": null,
+        "pytest_summary": null,
+        "skipped_substantive_gates": [],
+        "log_read": "success_once"
+      },
+      {
+        "label": "p15",
+        "run_id": 37808083876,
+        "job_id": 113417519782,
+        "job_name": "p1-5-provenance",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37808083876/job/113417519782",
+        "actual_checkout_sha": "87403a079ac209641edc4b83bd08e9fd37855d46",
+        "checkout_evidence": "Exact SHA printed by checkout git log",
+        "first_cause": {
+          "classification": "claim_local_provenance_mismatches",
+          "message": "P1.5 claim-local provenance is not accepted",
+          "mismatches": [
+            "project_rule_prefers_canonical_policy",
+            "implementation_fact_rejects_external_claim",
+            "dependency_fact_prefers_dependency_docs",
+            "document_statement_binds_exact_path",
+            "two_claims_require_two_allowed_roles"
+          ],
+          "advisory_assignments": [],
+          "known_contract_relation": "Claim-local support/assignment expectations remain unaccepted; empty advisory assignments do not establish positive support.",
+          "step": "Verify claim-local provenance under conflict"
+        },
+        "pytest_counts": null,
+        "pytest_summary": null,
+        "skipped_substantive_gates": [],
+        "log_read": "success_once"
+      }
+    ],
+    "task33c_comparison": {
+      "baseline": {
+        "head_sha": "5bf3b00493577f68c816c90bb667f5ca84eabf75",
+        "actual_checkout_sha": "2f2252616deb2cd64b2a4bcce48f64e894b2bb2d",
+        "job_id": 113409348726,
+        "pytest_counts": {
+          "failed": 38,
+          "passed": 26
+        }
+      },
+      "current": {
+        "job_id": 113417521330,
+        "pytest_counts": {
+          "failed": 33,
+          "passed": 31
+        }
+      },
+      "resolved_failed_nodes": [
+        "tests/task_level/test_github_models_adapter.py::test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_packet",
+        "tests/task_level/test_task33_isolated_delivery.py::test_host_owns_retrieval_evidence_objective_and_usage_contract",
+        "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff",
+        "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_rejects_an_insufficient_model_visible_projection",
+        "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_requires_verified_boundary_and_never_retries"
+      ],
+      "added_failed_nodes": [],
+      "corroborating_caller_pass_evidence": "0a60111-advanced-cases.json contains PASS for the same five nodes on the same source/merge SHA; Task33C -q logs expose the failure set and aggregate counts."
+    },
+    "p1_stack_metadata_only": {
+      "run_id": 37808083902,
+      "logs_read": false,
+      "actual_checkout_sha": null,
+      "checkout_not_observed": "No P1 stack logs were requested.",
+      "jobs": [
+        {
+          "job_id": 113417520807,
+          "name": "p1-stack-release-build",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113417520863,
+          "name": "p1-stack-platform (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113417520911,
+          "name": "p1-stack-platform (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113417520987,
+          "name": "p1-stack-core (3.11)",
+          "status": "completed",
+          "conclusion": "failure",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113417521109,
+          "name": "p1-stack-advanced-security",
+          "status": "completed",
+          "conclusion": "failure",
+          "skipped_substantive_gates": [
+            "Run every P1 evidence contract present on this ref"
+          ]
+        },
+        {
+          "job_id": 113417521150,
+          "name": "p1-stack-platform (macos-15)",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113417521220,
+          "name": "p1-stack-core (3.12)",
+          "status": "completed",
+          "conclusion": "failure",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113417521248,
+          "name": "p1-stack-core (3.13)",
+          "status": "completed",
+          "conclusion": "failure",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113418179486,
+          "name": "p1-stack-release-wheel (3.13)",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113418179491,
+          "name": "p1-stack-release-sdist-installer",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113418179640,
+          "name": "p1-stack-release-wheel (3.11)",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113418179780,
+          "name": "p1-stack-release-wheel (3.12)",
+          "status": "completed",
+          "conclusion": "success",
+          "skipped_substantive_gates": []
+        },
+        {
+          "job_id": 113421573982,
+          "name": "p1-stack-exact",
+          "status": "completed",
+          "conclusion": "failure",
+          "skipped_substantive_gates": []
+        }
+      ]
+    },
+    "limitations": [
+      "Six ancillary results are current 0a evidence; the separately labeled 5bf counts are comparison baseline only.",
+      "First causes are not a complete diagnosis of all failed or skipped assertions.",
+      "No P1-stack or core logs were fetched; P1-stack entries are job metadata only.",
+      "Production, tests, golds and gates were not changed."
+    ]
+  },
+  "related_workflow_details_source_sha256": "0ed9e2eea5bf736ef117111278073b2e74e21d0a86003471478cbb2e7c91612d",
+  "acceptance": "BLOCKED",
+  "counting": {
+    "concrete_node_mapping": "Longest classname prefix matching a repository .py module; remaining class names retained with ::.",
+    "duplicate_testcase_records": 0,
+    "duplicate_policy": "Any duplicate concrete node record aborts assembly; no setup/teardown deduplication or inferred PASS.",
+    "core_matrix_aggregation": "All three rosters and states are identical; count the core roster once, not three times.",
+    "core_advanced_disjoint": true,
+    "existing_skip_reasons": {
+      "story PDF fixture has not been generated": 1,
+      "local Qdrant not running": 9
+    }
+  },
+  "core": {
+    "matrices": [
+      {
+        "python": "3.11",
+        "artifact_id": 11565010207,
+        "artifact_sha256": "07061a7a8e09ff471911fc7a8b9a7650d6ed241f00cec31f5a6a55f57c7de38d",
+        "xml_sha256": "158e01168b19060ce8714284b50a8a7dda8c1c431e43a04d6df0e408f9cb92d4",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "61",
+            "failures": "2403",
+            "skipped": "10",
+            "tests": "8505",
+            "time": "423.970",
+            "timestamp": "2026-10-08T16:21:38.430863+00:00",
+            "hostname": "runnervmmprz5"
+          }
+        ],
+        "executed": 8505,
+        "states": {
+          "failure": 2403,
+          "passed": 6031,
+          "error": 61,
+          "skipped": 10
+        },
+        "roster_ids_sha256": "daa98d287c3400126b6d89d318162389ce6ce1723294b3c4fb221c8d0017f64b",
+        "roster_outcomes_sha256": "4e470cebe28313524223c5c11c3c406d5259883688621c33fca44edeb8196afa"
+      },
+      {
+        "python": "3.12",
+        "artifact_id": 11564725430,
+        "artifact_sha256": "ea0e8f0c62c76d9a9c23b761084867243b69005c91efd5e3b169630c6579bda9",
+        "xml_sha256": "7e7eb87df05628203c222b877495ae59ccedcee1299031f90badcac0f699aa2f",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "61",
+            "failures": "2403",
+            "skipped": "10",
+            "tests": "8505",
+            "time": "363.611",
+            "timestamp": "2026-10-08T16:21:32.005583+00:00",
+            "hostname": "runnervmmprz5"
+          }
+        ],
+        "executed": 8505,
+        "states": {
+          "failure": 2403,
+          "passed": 6031,
+          "error": 61,
+          "skipped": 10
+        },
+        "roster_ids_sha256": "daa98d287c3400126b6d89d318162389ce6ce1723294b3c4fb221c8d0017f64b",
+        "roster_outcomes_sha256": "4e470cebe28313524223c5c11c3c406d5259883688621c33fca44edeb8196afa"
+      },
+      {
+        "python": "3.13",
+        "artifact_id": 11563971827,
+        "artifact_sha256": "e7ea4eb65c6edca7bc047cb41f5e4bdc4004b0c81a15c7107c83a3152b39637f",
+        "xml_sha256": "71d6ee14ef63bdd79da079480a9bb9f9760e4be6f02fe4645db84a67261eae23",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "61",
+            "failures": "2403",
+            "skipped": "10",
+            "tests": "8505",
+            "time": "425.109",
+            "timestamp": "2026-10-08T16:21:38.212010+00:00",
+            "hostname": "runnervmmprz5"
+          }
+        ],
+        "executed": 8505,
+        "states": {
+          "failure": 2403,
+          "passed": 6031,
+          "error": 61,
+          "skipped": 10
+        },
+        "roster_ids_sha256": "daa98d287c3400126b6d89d318162389ce6ce1723294b3c4fb221c8d0017f64b",
+        "roster_outcomes_sha256": "4e470cebe28313524223c5c11c3c406d5259883688621c33fca44edeb8196afa"
+      }
+    ],
+    "all_rosters_and_states_identical": true
+  },
+  "advanced": {
+    "artifact_id": 11563986008,
+    "artifact_sha256": "72160ee17eb741bf74114db62d4682fc5c2460abd20150f418eb9e2de3a5d4f0",
+    "xml_sha256": "dc85dde869e1af69e337225b46305b15f7207c85c352e55e7e2a374d9ab22a41",
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "98",
+        "skipped": "0",
+        "tests": "622",
+        "time": "31.495",
+        "timestamp": "2026-10-08T16:21:28.998107+00:00",
+        "hostname": "runnervmmprz5"
+      }
+    ],
+    "executed": 622,
+    "states": {
+      "passed": 524,
+      "failure": 98
+    },
+    "roster_ids_sha256": "eb4f84c327dcd4ff93e926d9a66177bce7cf4ae5cd7d26b3724529b860ef8920",
+    "roster_outcomes_sha256": "8884db7f9d6d11de5fad39b1c874f71e77d606e5af3eb57f065980a450aff992"
+  },
+  "baseline_b687": {
+    "source_sha": "b68759e65f52317928ba22166248e679098024ae",
+    "ci_run": 37802068737,
+    "core": {
+      "executed": 8505,
+      "states": {
+        "failure": 2451,
+        "passed": 5983,
+        "error": 61,
+        "skipped": 10
+      },
+      "roster_ids_sha256": "daa98d287c3400126b6d89d318162389ce6ce1723294b3c4fb221c8d0017f64b",
+      "roster_outcomes_sha256": "bf9776cdba0042e3899c0d613073bd6c5f45b05a479bdf0b9d954f3defbf6052"
+    },
+    "advanced": {
+      "executed": 622,
+      "states": {
+        "passed": 513,
+        "failure": 109
+      },
+      "roster_ids_sha256": "eb4f84c327dcd4ff93e926d9a66177bce7cf4ae5cd7d26b3724529b860ef8920",
+      "roster_outcomes_sha256": "e247c58040c9105d4101447332be13b05f8b5afb0ec4e5ea7598b8339c1fb4fd"
+    },
+    "delta": {
+      "core": {
+        "added": [],
+        "removed": [],
+        "transitions": [
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_agent_contract_forbids_batching_independent_questions_into_lookups",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_agent_contract_has_explicit_lookup_decomposition_triggers_and_bounds",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_agent_surfaces_repeat_gap_directed_follow_up_rule",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_host_gap_policy_preserves_question_and_targets_missing_fact",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_installed_agent_contract_repeats_question_grouping_rule",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_rendered_agent_contract_teaches_bounded_semantic_decomposition_without_rewrite",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_runtime_lookup_schema_teaches_when_to_add_lookups_without_changing_original",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_question_planning_contract.py::test_runtime_tool_teaches_one_concrete_question_per_call",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_agent_recovery_version_guidance.py::test_advertised_tool_guidance_matches_installed_recovery_and_question_rules",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/docs/test_host_scope_planning_contract.py::test_public_tool_and_agent_template_explain_scope_without_hidden_widening",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_abstention_safety-args10]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_attribution_rejects_changed_snapshot-args7]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_attribution_rejects_same_path_different_identity-args4]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_attribution_uses_same_call_qualified_snapshot-args34]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_attribution_uses_same_call_qualified_snapshot-args35]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_attribution_uses_same_call_qualified_snapshot-args36]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_attribution_uses_same_call_qualified_snapshot-args37]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_exact_public_source_keys-args9]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_expected_public_inventory-args6]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_measures_full_budgets-args2]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_metadata_is_not_top1_fact-args1]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_missing_payload_preserves_case_partitions-args3]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_negative_cannot_authorize-args31]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_negative_cannot_authorize-args32]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_negative_cannot_authorize-args33]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_nonmapping_payloads-args11]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_packs_content_is_intent_scoped-args27]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_packs_content_is_intent_scoped-args28]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_packs_content_is_intent_scoped-args29]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_packs_content_is_intent_scoped-args30]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_payload_baseline-args0]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_positive_passed_count-args12]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_private_qualification_projection-args8]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args13]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args14]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args15]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args16]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args17]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args18]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args19]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args20]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args21]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args22]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args23]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args24]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args25]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_rejects_bad_payloads-args26]",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_release_gate.py::test_stdio_smoke_accepts_structured_content_and_legacy_json_text[_assert_self_host_token_boundary-args5]",
+            "before": "failure",
+            "after": "passed"
+          }
+        ],
+        "pass_regressions": []
+      },
+      "advanced": {
+        "added": [],
+        "removed": [],
+        "transitions": [
+          {
+            "nodeid": "tests/task_level/test_github_models_adapter.py::test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_packet",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_runner_adapter.py::test_codex_normalizes_successful_required_once_retrieval_metadata",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_codex_exploratory.py::test_explicit_exploratory_delivery_is_persisted_as_non_causal",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_host_owns_retrieval_evidence_objective_and_usage_contract",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_rejects_an_insufficient_model_visible_projection",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_requires_verified_boundary_and_never_retries",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_mcp_patch_constraints_tool.py::test_mcp_tool_respects_max_constraints_and_max_tokens",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_mcp_patch_plan_context_output_contract.py::test_patch_plan_context_output_contract_shapes",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_mcp_patch_plan_context_tool.py::test_get_patch_plan_context_compact_source_output_is_json_serializable_and_bounded",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/test_mcp_patch_plan_context_tool.py::test_get_patch_plan_context_normalizes_snake_case_and_pascal_case",
+            "before": "failure",
+            "after": "passed"
+          }
+        ],
+        "pass_regressions": []
+      }
+    }
+  },
+  "middle_5bf": {
+    "source_sha": "5bf3b00493577f68c816c90bb667f5ca84eabf75",
+    "ci_run": 37805723255,
+    "delta_to_source": {
+      "core": {
+        "added": [],
+        "removed": [],
+        "transitions": [],
+        "pass_regressions": []
+      },
+      "advanced": {
+        "added": [],
+        "removed": [],
+        "transitions": [
+          {
+            "nodeid": "tests/task_level/test_github_models_adapter.py::test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_packet",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_runner_adapter.py::test_codex_normalizes_successful_required_once_retrieval_metadata",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_codex_exploratory.py::test_explicit_exploratory_delivery_is_persisted_as_non_causal",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_host_owns_retrieval_evidence_objective_and_usage_contract",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_rejects_an_insufficient_model_visible_projection",
+            "before": "failure",
+            "after": "passed"
+          },
+          {
+            "nodeid": "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_requires_verified_boundary_and_never_retries",
+            "before": "failure",
+            "after": "passed"
+          }
+        ],
+        "pass_regressions": []
+      }
+    }
+  },
+  "catalog": {
+    "canonical_utf8_bytes": 7066,
+    "canonical_sha256": "229b90fb1a58e4255cd5926f726f2d28b6171232491f91b1341e417bea51f397",
+    "ceiling_bytes": 6144,
+    "gate": "FAIL",
+    "output_utf8_bytes": 860,
+    "output_ceiling_exclusive_bytes": 1000,
+    "output_gate": "PASS",
+    "proposed_ceiling_bytes": 7168,
+    "proposal_approved": false,
+    "output_is_included_in_catalog": true,
+    "model_tokens_measured": false
+  },
+  "focus": {
+    "scope_five": [
+      {
+        "nodeid": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[all-None-What constraints apply to `BackendOnlyAnswer`?-packages/backend/README.md]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[all-None-What constraints apply to `ForeignOnlyAnswer`?-None]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[all-packages/backend-What constraints apply to `SharedNeedle`?-packages/backend/README.md]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[module-packages/backend-What constraints apply to `SharedNeedle`?-packages/backend/README.md]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[project-None-What constraints apply to `BackendOnlyAnswer`?-None]",
+        "state": "passed"
+      }
+    ],
+    "delivery_module": [
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_acquisition_observer_uses_real_small_public_route_without_changing_results",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_cold_fixture_grant_never_constructs_selected_storage",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[False]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[True]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_evidence_byte_measurement_unions_overlapping_unicode_source_spans",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_fixture_environment_does_not_inherit_configuration_or_credentials",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_adapter_uses_child_identity_not_selected_id_position",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_all_repeated_child_identities[conflicting_parent]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_all_repeated_child_identities[identical]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_all_repeated_child_identities[invalid_parent]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[bool_span]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[carrier]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[child]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[derived]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[hash]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[line_span]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[missing]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[parent]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[snapshot_bool]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[source]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[source_hash]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[span]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[text]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_consumer_rejects_inconsistent_or_missing_lineage[version]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_library_fixture_versions_have_real_local_provenance_and_distinct_bytes",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_natural_fixture_uses_default_source_bound_children_without_padding",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_patch_validator_preserves_large_utf8_evidence_and_checks_hash",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_ready_fixture_bootstrap_uses_real_store_and_local_catalog_binding",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_adapter_preserves_indexed_snapshot_lineage[1.0.0]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_adapter_preserves_indexed_snapshot_lineage[2.0.0]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_omitted_and_null_format_keep_docs_delivery",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_postprocessing_cannot_rebind_a_transformed_or_derived_child[False]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_postprocessing_cannot_rebind_a_transformed_or_derived_child[True]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[ambiguous]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[duplicate]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[duplicate_parent]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[missing_parent]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[wrong_hash]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[wrong_root]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[wrong_span]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards[wrong_version]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_public_graph_preserves_versions_and_source_spans",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_strict_validator_accepts_failure_and_rejects_unknown_authority",
+        "state": "passed"
+      }
+    ],
+    "actual_source_stdio": [
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[False]",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[True]",
+        "state": "passed"
+      }
+    ],
+    "catalog_equivalence": [
+      {
+        "nodeid": "tests/docs/test_pr211_catalog_equivalence.py::test_pr211_catalog_baseline_is_exact",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_pr211_catalog_equivalence.py::test_pr211_catalog_boundary_acceptance_matches_independent_baseline",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_pr211_catalog_equivalence.py::test_pr211_catalog_preserves_all_remaining_schema_constraints",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_pr211_catalog_equivalence.py::test_pr211_unknown_fields_and_invalid_mutation_never_reach_service",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_pr211_catalog_equivalence.py::test_pr211_vector_field_preserves_nullable_type_and_action_restrictions",
+        "state": "passed"
+      }
+    ],
+    "initial_migrations_and_trust": [
+      {
+        "nodeid": "tests/docs/test_host_scope_contract.py::test_advertised_scope_explains_all_without_adding_a_default",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/docs/test_mcp_docs_tools_registration.py::test_mcp_read_resource_returns_workflow_and_schema_guidance",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_action_packet_v4_public.py::test_documents_remain_bounded_and_non_authorizing",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_delivered_surfaces.py::test_resource_uris_trust_schema_and_bounded_reader_template_unchanged",
+        "state": "passed"
+      }
+    ]
+  },
+  "reviewed_source_and_test_sha256": {
+    ".github/workflows/ci.yml": "499d9595af1d9348f238eed233c54042aa32f27b7ba346620a66ca65545a4b40",
+    "docmancer/mcp/_docs_server_tool_data.py": "04bc8f230f6f751f886aad19e8b57f95840626648ce80fbf0f45a5fe4bedc09e",
+    "scripts/docs_mcp_stdio_smoke.py": "0dc7e73483b3d11f8e4fb1a6390e3807fc92facd9818fd41150f8a9dffed1b92",
+    "tests/diagnostic_labels.pr211_catalog_equivalence.json": "ecc950afeefe6f2764976694c7b86dcec140d5250a3618ff12a93ad89a7aa27a",
+    "tests/docs/_scope_guidance_contract.py": "18021468b93c0b0e00d14074ec6b2d96d4b038fb6a5088d21936a281f882190f",
+    "tests/docs/fixtures/pr211_catalog_21fe472d.json": "ad63f367601a18fe04ec715800be2a935a7496c16beb71df4d1818d258bc06db",
+    "tests/docs/test_agent_question_planning_contract.py": "ef6351f617ac87aebd3f809a7a4a8c53e02c6be9583efab3b835d21308e74c6e",
+    "tests/docs/test_agent_recovery_version_guidance.py": "4930d6eb3ba8de1dfcb0093e4fd8779977d950b41745e796f8fc459882480fbb",
+    "tests/docs/test_compact_docs_surface.py": "ec82c66b3d2693d04322c9b2d0bcb883566ccd4bb5018eee4d9bef697be38065",
+    "tests/docs/test_host_scope_contract.py": "628b08a888c1074b78a5d985d3607953f85eb67f9d9c10f0c416d0acfa94686f",
+    "tests/docs/test_host_scope_planning_contract.py": "9475f3eb5cf1ae2110d233d609cac962f105abb385f2c03a238a6cb68278296b",
+    "tests/docs/test_mcp_docs_tools_registration.py": "9dc2e26e599c481215a5ebc49e7a4f5429c151ceccabb5c53419614fdc28d6ff",
+    "tests/docs/test_pr211_catalog_equivalence.py": "3475753adf1f043b13c9d4b325fc4341bd6bab6129d2de502d88cf6446e78473",
+    "tests/docs/test_trust_contract.py": "27132b9df9d537f15a71813d1662ceb0f62e2ceb413543e27a1c8a4f25e48b77",
+    "tests/task_level/test_github_models_adapter.py": "d72d467f6380553824413376e9bcb047e9f8af42c5754a41aab2a1d6707bf54e",
+    "tests/task_level/test_runner_adapter.py": "36b5783cee52218830f94bd305523361f995432daf782d9db2db3b4b737dcfd4",
+    "tests/task_level/test_task33_codex_exploratory.py": "ad8b7f1a228a4d096e1cc5dd984c0ac05e1f991f6f564c7be70ae683ec7363cf",
+    "tests/task_level/test_task33_isolated_delivery.py": "57fe17f0e563c99855a09e49e13645120d0575b0f798fa9e673bc5d6c40996a7",
+    "tests/test_action_packet_v4_public.py": "dda8365628a9dbbfadecc7894816ad4185f672521c84e48c73b8259b0a2b44ec",
+    "tests/test_dictionary_exit_delivered_surfaces.py": "354f15d5ea9c70ec274025007bf7b8daac49d77bf60280b611ff3f6f9da204a1",
+    "tests/test_docs_mcp_stdio_delivery.py": "f3dd819b05afe3fc8b5ce29673721d88c5da8beddc2c92f8c9474c0d922d4c16",
+    "tests/test_mcp_patch_constraints_tool.py": "1ade00e62d47f508b3c36a3f4e34d01dafdfb1815da143941dafc267c17f6cd2",
+    "tests/test_mcp_patch_plan_context_output_contract.py": "b0baf7c63851cfeb2eb25f9e58a3141b0202316ed7f0ef3eea0c999b72e5e997",
+    "tests/test_mcp_patch_plan_context_tool.py": "430c3e0fde5c48e3b791a35120b01f9223347505d8bd440e541e141f74bc9dd2",
+    "tests/test_release_gate.py": "f741478233833600e9e3c10af591f225a46d29b11560f5303cc7e18c8e4104e4"
+  },
+  "roster_artifact": {
+    "path": "PR211_ACCEPTANCE_OUTCOMES.json.gz",
+    "gzip_bytes": 161797,
+    "gzip_sha256": "a438239d42ee5a722dd5b26507c52318dbe797585042a47fa6fd400d330308a5",
+    "canonical_json_bytes": 1503342,
+    "canonical_json_sha256": "45d4e212e2b268ba9a18082b0e6ce8ffab86bbc2f318669a70c417380c8bb723",
+    "gzip_mtime": 0
+  },
+  "clients": {
+    "Claude Code": "NOT RUN: executable unavailable locally",
+    "Codex": "NOT RUN: executable unavailable locally",
+    "OpenCode": "NOT RUN: executable unavailable locally",
+    "sdk_stdio_is_not_application_visibility": true
+  },
+  "historical_801": {
+    "source_sha": "5310e6da83a09daa0938efa9cf68e2c0f7c99851",
+    "scope": "focused historical run, not full CI",
+    "roster_available_in_this_workspace": false,
+    "equivalence_to_current_roster_claimed": false
+  }
+}

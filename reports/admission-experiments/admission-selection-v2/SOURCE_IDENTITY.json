@@ -1,0 +1,9 @@
+{
+  "head": "4849b8f796d9e3e25e2c49e58562ec6859978411",
+  "new_product_files": {
+    "docmancer/docs/application/_project_docs_service_part03.py": "5e158284d8516796a977fddf56fb5afaf08c2d2bc8618ca3ba9178f9310e84bb",
+    "docmancer/docs/application/experimental_candidate_selection.py": "f6961f3f8df68e4fcdf0944fadbeda20e5fc118bc7081002331d68f02e89c2f6"
+  },
+  "patch_sha256": "9819bf978e8978d9bb3ddfaee8a385b445e8aa6614391bb8a70b8507b39f9755",
+  "note": "Delta for V2 only. Earlier four changes preserved. Do not reapply over current tree."
+}

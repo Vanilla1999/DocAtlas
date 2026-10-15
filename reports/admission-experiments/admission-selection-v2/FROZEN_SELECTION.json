@@ -1,0 +1,10 @@
+{
+  "k": 2,
+  "method": "minimal Mini native provisional sufficient k, confirmed final public calibration",
+  "calibration_sha256": "5a1026c15a47e77aaf23e202829c54ae84781bc3c7dd8adec0d9f21f345afa6a",
+  "timestamp_unix": 1791809095.8659809,
+  "generator_prompt_sha256": "f78a43f62ee1972dc20945d6c1a37d1524823b2a2c778831d86fde2c24276ec1",
+  "holdout_labels_read": false,
+  "presentation": "source_id,text,actual public provenance",
+  "citation_adapter": null
+}

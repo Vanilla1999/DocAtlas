@@ -1,0 +1,734 @@
+{
+  "schema_version": 1,
+  "dataset_id": "NEW20-20261013",
+  "offset_unit": "UTF-8 byte half-open",
+  "cases": [
+    {
+      "id": "NEW01",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Type is inferred from supplied default; absent default implies STRING.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "If no type is provided, the type of the default\nvalue is used.  If no default value is provided, the type is assumed to be\n:data:`STRING`.",
+                "start_byte": 1846,
+                "end_byte": 1984,
+                "start_line": 59,
+                "end_line": 61
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "INT is the example's inferred type because its default is an integer, not the universal default.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "In this case the option is of type :data:`INT` because the default value\nis an integer.",
+                "start_byte": 2906,
+                "end_byte": 2993,
+                "start_line": 96,
+                "end_line": 97
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "All basic value options default to integer."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW02",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "multiple collects all repeated values.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "parameter being provided multiple times and have all the values recorded --\nnot just the last one.",
+                "start_byte": 5561,
+                "end_byte": 5659,
+                "start_line": 198,
+                "end_line": 199
+              },
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "@click.option('--message', '-m', multiple=True)",
+                "start_byte": 5881,
+                "end_byte": 5928,
+                "start_line": 208,
+                "end_line": 208
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "The default must be list/tuple, otherwise it becomes individual characters.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "When passing a ``default`` with ``multiple=True``, the default value\nmust be a list or tuple, otherwise it will be interpreted as a list of\nsingle characters.",
+                "start_byte": 6089,
+                "end_byte": 6247,
+                "start_line": 218,
+                "end_line": 220
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "Plain string default is treated as one complete value."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW03",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "timeout bounds inactivity, not whole download; unspecified timeout does not time out.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "``timeout`` is not a time limit on the entire response download;\n    rather, an exception is raised if the server has not issued a\n    response for ``timeout`` seconds (more precisely, if no bytes have been\n    received on the underlying socket for ``timeout`` seconds). If no timeout is specified explicitly, requests do\n    not time out.",
+                "start_byte": 17872,
+                "end_byte": 18211,
+                "start_line": 542,
+                "end_line": 546
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "0.001 is an explicit example argument, not default.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "requests.get('https://github.com/', timeout=0.001)",
+                "start_byte": 17596,
+                "end_byte": 17646,
+                "start_line": 534,
+                "end_line": 534
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "Requests defaults to timeout=0.001.",
+        "timeout is an overall download deadline."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW04",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Successful JSON decoding does not prove HTTP success; use raise_for_status or expected status_code.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "It should be noted that the success of the call to ``r.json()`` does **not**\nindicate the success of the response.",
+                "start_byte": 5474,
+                "end_byte": 5588,
+                "start_line": 160,
+                "end_line": 161
+              },
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "``r.raise_for_status()`` or check ``r.status_code`` is what you expect.",
+                "start_byte": 5767,
+                "end_byte": 5838,
+                "start_line": 164,
+                "end_line": 164
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "204 or invalid JSON causes requests.exceptions.JSONDecodeError.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "In case the JSON decoding fails, ``r.json()`` raises an exception. For example, if\nthe response gets a 204 (No Content), or if the response contains invalid JSON,\nattempting ``r.json()`` raises ``requests.exceptions.JSONDecodeError``.",
+                "start_byte": 5083,
+                "end_byte": 5317,
+                "start_line": 154,
+                "end_line": 156
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "r.json() success proves HTTP success."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW05",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Neither fails by default.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "Both ``XFAIL`` and ``XPASS`` don't fail the test suite by default.",
+                "start_byte": 9357,
+                "end_byte": 9423,
+                "start_line": 322,
+                "end_line": 322
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "strict=True turns XPASS into suite failure.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "@pytest.mark.xfail(strict=True)",
+                "start_byte": 9535,
+                "end_byte": 9566,
+                "start_line": 327,
+                "end_line": 327
+              },
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "This will make ``XPASS`` (\"unexpectedly passing\") results from this test to fail the test suite.",
+                "start_byte": 9598,
+                "end_byte": 9694,
+                "start_line": 331,
+                "end_line": 331
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F3",
+          "statement": "xfail_strict changes the strict default.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "You can change the default value of the ``strict`` parameter using the\n``xfail_strict`` ini option:",
+                "start_byte": 9696,
+                "end_byte": 9795,
+                "start_line": 333,
+                "end_line": 334
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "XPASS always fails by default."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW06",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Example uses < (3,10), evaluated True during collection.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "@pytest.mark.skipif(sys.version_info < (3, 10), reason=\"requires python3.10 or higher\")",
+                "start_byte": 2875,
+                "end_byte": 2962,
+                "start_line": 94,
+                "end_line": 94
+              },
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "If the condition evaluates to ``True`` during collection, the test function will be skipped,",
+                "start_byte": 2993,
+                "end_byte": 3085,
+                "start_line": 97,
+                "end_line": 97
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "Any condition true suffices; not all.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "If multiple ``skipif`` decorators are applied to a test function, it\nwill be skipped if any of the skip conditions is true.",
+                "start_byte": 4804,
+                "end_byte": 4927,
+                "start_line": 160,
+                "end_line": 161
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "Skip requires all decorators true.",
+        "Example uses >= (3, 10) to skip earlier versions."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW07",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "commands only execute after commands_pre succeeds.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "The commands to be called for testing. Only execute if :ref:`commands_pre` succeed.",
+                "start_byte": 20151,
+                "end_byte": 20234,
+                "start_line": 695,
+                "end_line": 695
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "commands_post executes regardless of commands and commands_pre outcomes.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "Commands to run after running the :ref:`commands`. Execute regardless of the outcome of both :ref:`commands` and\n   :ref:`commands_pre`.",
+                "start_byte": 22562,
+                "end_byte": 22698,
+                "start_line": 733,
+                "end_line": 734
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F3",
+          "statement": "Leading dash ignores failure status of that command.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "The exit code of a command may be ignored (meaning they are always considered successful) by\n   prefixing the command with a dash (``-``)",
+                "start_byte": 20515,
+                "end_byte": 20652,
+                "start_line": 699,
+                "end_line": 700
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F4",
+          "statement": "ignore_errors keeps going but overall failed status/nonzero is retained.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "When executing the commands keep going even if a sub-command exits with non-zero exit code. The overall status will\n   be \"commands failed\", i.e. tox will exit non-zero in case any command failed.",
+                "start_byte": 23498,
+                "end_byte": 23694,
+                "start_line": 756,
+                "end_line": 757
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "ignore_errors makes failed commands successful.",
+        "commands_post is skipped after commands_pre failure."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW08",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Declared default is config.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": ":keys: skip_missing_interpreters\n   :default: config",
+                "start_byte": 7039,
+                "end_byte": 7091,
+                "start_line": 235,
+                "end_line": 236
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "true allows success for missing environments; CLI overrides config.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "Setting this to ``true`` will force ``tox`` to return success even if some of the specified environments were\n   missing.",
+                "start_byte": 7121,
+                "end_byte": 7242,
+                "start_line": 239,
+                "end_line": 240
+              },
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "the command line switch always overrides this setting if passed on the invocation. Setting it to ``config`` means\n   that the value is read from the config file.",
+                "start_byte": 7471,
+                "end_byte": 7632,
+                "start_line": 242,
+                "end_line": 243
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [],
+      "forbidden_claims": [
+        "Declared default is true.",
+        "Config always overrides command line."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW09",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Slash separates enabling/disabling forms and implicitly sets is_flag=True.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "accomplished by defining two flags in one go separated by a slash (``/``)\nfor enabling or disabling the option.  (If a slash is in an option string,\nClick automatically knows that it's a boolean flag and will pass\n``is_flag=True`` implicitly.)",
+                "start_byte": 6851,
+                "end_byte": 7094,
+                "start_line": 251,
+                "end_line": 254
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [
+        "Exact maximum option-name byte length guaranteed by the guide."
+      ],
+      "forbidden_claims": [
+        "A numeric option-name byte limit is documented here."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW10",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Single-option boolean default False remains hidden.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/click/docs/options.rst",
+                "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+                "text": "For single option boolean flags, the default remains hidden if the default\nvalue is False.",
+                "start_byte": 3268,
+                "end_byte": 3358,
+                "start_line": 112,
+                "end_line": 113
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [
+        "Guaranteed help-rendering latency in milliseconds."
+      ],
+      "forbidden_claims": [
+        "The guide supplies a guaranteed help latency."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW11",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "HEAD is the default exception; enable with allow_redirects=True.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "By default Requests will perform location redirection for all verbs except\nHEAD.",
+                "start_byte": 16206,
+                "end_byte": 16286,
+                "start_line": 480,
+                "end_line": 481
+              },
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "requests.head('http://github.com/', allow_redirects=True)",
+                "start_byte": 17168,
+                "end_byte": 17225,
+                "start_line": 517,
+                "end_line": 517
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [
+        "Numeric redirect-hop limit guaranteed by the quickstart."
+      ],
+      "forbidden_claims": [
+        "The quickstart provides a numeric maximum redirect-hop limit."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW12",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Response.history is ordered oldest to most recent response.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/requests/docs/user/quickstart.rst",
+                "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+                "text": "The list is sorted from the oldest to the most recent\nresponse.",
+                "start_byte": 16543,
+                "end_byte": 16606,
+                "start_line": 487,
+                "end_line": 488
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [
+        "Guaranteed disk-retention duration of redirect history."
+      ],
+      "forbidden_claims": [
+        "History is documented as persisted on disk for a fixed duration."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW13",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "--runxfail ignores marker and makes pytest.xfail ineffective.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "pytest --runxfail",
+                "start_byte": 9947,
+                "end_byte": 9964,
+                "start_line": 349,
+                "end_line": 349
+              },
+              {
+                "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+                "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+                "text": "you can force the running and reporting of an ``xfail`` marked test\nas if it weren't marked at all. This also causes :func:`pytest.xfail` to produce no effect.",
+                "start_byte": 9966,
+                "end_byte": 10125,
+                "start_line": 351,
+                "end_line": 352
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [
+        "Production database backup-retention duration."
+      ],
+      "forbidden_claims": [
+        "The skipping guide specifies a database backup retention policy."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW14",
+      "required_facts": [
+        {
+          "id": "F1",
+          "statement": "Default external-command allowlist is empty.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": ":keys: allowlist_externals\n   :default: <empty list>",
+                "start_byte": 16839,
+                "end_byte": 16891,
+                "start_line": 583,
+                "end_line": 584
+              }
+            ]
+          ]
+        },
+        {
+          "id": "F2",
+          "statement": "rm is a named example; * matches every command and is not recommended.",
+          "witness_sets": [
+            [
+              {
+                "path": "corpus/tox/docs/config.rst",
+                "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+                "text": "list ``allowlist_externals=rm`` or ``allowlist_externals=/usr/bin/rm``. If you want to allow all external\n   commands you can use ``allowlist_externals=*`` which will match all commands (not recommended).",
+                "start_byte": 17135,
+                "end_byte": 17339,
+                "start_line": 588,
+                "end_line": 589
+              }
+            ]
+          ]
+        }
+      ],
+      "unavailable_obligations": [
+        "Cryptographic signature verification algorithm for external commands."
+      ],
+      "forbidden_claims": [
+        "The allowlist performs a documented cryptographic signature check."
+      ],
+      "negative_empty_sources": false
+    },
+    {
+      "id": "NEW15",
+      "required_facts": [],
+      "unavailable_obligations": [
+        "Guaranteed parser heap-memory ceiling in bytes."
+      ],
+      "forbidden_claims": [
+        "A heap-memory ceiling is documented."
+      ],
+      "negative_empty_sources": true
+    },
+    {
+      "id": "NEW16",
+      "required_facts": [],
+      "unavailable_obligations": [
+        "Encryption algorithm and key-rotation interval for on-disk history."
+      ],
+      "forbidden_claims": [
+        "On-disk history encryption and key rotation are specified."
+      ],
+      "negative_empty_sources": true
+    },
+    {
+      "id": "NEW17",
+      "required_facts": [],
+      "unavailable_obligations": [
+        "Guaranteed DNS retry count and backoff base."
+      ],
+      "forbidden_claims": [
+        "The quickstart documents automatic retries and numeric backoff parameters."
+      ],
+      "negative_empty_sources": true
+    },
+    {
+      "id": "NEW18",
+      "required_facts": [],
+      "unavailable_obligations": [
+        "Database transaction isolation level for importorskip."
+      ],
+      "forbidden_claims": [
+        "importorskip guarantees a database isolation level."
+      ],
+      "negative_empty_sources": true
+    },
+    {
+      "id": "NEW19",
+      "required_facts": [],
+      "unavailable_obligations": [
+        "Container-image signing algorithm and key rotation for external-command allowlist."
+      ],
+      "forbidden_claims": [
+        "The reference prescribes container signing or key rotation for allowlist_externals."
+      ],
+      "negative_empty_sources": true
+    },
+    {
+      "id": "NEW20",
+      "required_facts": [],
+      "unavailable_obligations": [
+        "Automatic rollback and filesystem snapshot retention on commands_post failure."
+      ],
+      "forbidden_claims": [
+        "commands_post failure triggers documented rollback and snapshot retention."
+      ],
+      "negative_empty_sources": true
+    }
+  ]
+}

@@ -26,10 +26,12 @@ Each library+version has its own independent SQLite index. The `LibraryDocsServi
 
 Project documentation storage is organized as a derived, project-scoped index
 of repository-owned files. Each project identity receives isolated SQLite index
-state and extracted artifacts, so one repository's project docs cannot satisfy
-another repository's query. The filesystem documents remain authoritative; the
-index is a rebuildable cache coordinated by the writer lease and cleanup barrier
-described in [Index cleanup](../docs/index-cleanup.md).
+state in a host-selected private store outside the repository, so one
+repository's project docs cannot satisfy another repository's query. The filesystem documents remain authoritative;
+current document and catalog-entry hashes must match the admitted indexed member.
+Confirmed member upserts are lexical-only and do not publish extracted artifacts.
+The index is derived state; separate physical cleanup is described in
+[Index cleanup](../docs/index-cleanup.md).
 
 ## Retrieval
 
@@ -105,9 +107,10 @@ The resolution happens in `LibraryDocsService.get_docs()` when `project_path` is
 
 `doc-atlas mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus the persistent SQLite registry for known documentation sources.
 
-For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context`; explicit changes return `patch_context`; absent safe evidence returns `insufficient_evidence`. Certified `docs_answer` is reserved for library, dependency, and mixed lanes. Operational retrieval excludes evaluation, planning, and history lanes unless explicitly requested. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.
+For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context` from finite explicit current membership. Missing safe evidence is `status="insufficient_evidence"`. Compatibility `docs_answer` does not confer lexical answer certification; `patch_context` is an explicitly enabled advanced representation, not automatic output for a coding question or permission to edit. Follow only the exact returned `recommended_next_action` or an explicit user lifecycle request, retaining confirmation and source bindings. After verified success and readiness, retry the original question unchanged. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.
 
-Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.
+The original and explicit host lookups have separate lineage. Public documentation reads do not infer query aliases or authorize implementation-code discovery. Context selection rechecks the visible source identity and text; output bytes and tokens are minimized without a fixed response-size acceptance ceiling. Input, source-read, candidate-work, and lifecycle controls remain distinct. Advanced code and repository-map workflows, when explicitly enabled, do not turn navigation evidence into authoritative policy.
+
 
 If the user asks broadly about "the MCP server", distinguish the two surfaces explicitly:
 
@@ -221,32 +224,22 @@ The project-aware docs pipeline runs alongside the library docs pipeline, using 
 
 ### Discovery
 
-`ProjectMetadataReader.discover_docs` scans the repository for documentation files:
-- **Root doc files**: README, ARCHITECTURE.md, CHANGELOG, CONTRIBUTING, SECURITY, LICENSE (by name at project root)
-- **Doc directories**: `docs/`, `doc/`, `wiki/`, `adr/`, `roadmap/`, `runbooks/` (recursively)
-- **Excluded**: `.git`, `venv`, `node_modules`, build directories, caches
+The current public project-docs path requires finite literal entries in
+`docatlas.project-docs.yaml`. It does not infer read membership from README names,
+module directories, recursive roots, or Markdown links. Repo-level and exact
+module membership remain distinct scopes.
 
-Each candidate is hashed (SHA-256, chunked) and tracked with path, reason, size, and mtime for staleness detection.
+Reads compare current file and catalog-entry hashes with the indexed member.
+Changed, deleted, or no-longer-admitted sources cannot supply current evidence.
+`prepare_docs(action="sync_project_docs")` without `mutation` performs no writes.
+A confirmed member upsert binds the exact catalog and source hashes, a trusted
+host-selected store, and the expected generation. It replaces sections only for
+selected members; physical deletion of unselected rows and vector/artifact
+writes are outside this public operation.
 
-### Staleness detection
-
-The service partitions project docs into three states:
-- **Current** — indexed with matching content hash and mtime
-- **Stale** — indexed but content hash or mtime differs; re-index recommended
-- **Ignored** — indexed but no longer discovered (file was deleted or moved)
-
-`get_project_docs` returns results with per-chunk `stale` flags. When stale sources exist, the response includes a `next_actions` entry recommending `ingest_project_docs` before relying on the answers.
-
-### Next action orchestration
-
-When project docs are missing, `get_project_docs` returns structured `next_actions` instead of a generic failure:
-
-1. **No candidates found** — suggests creating a reviewable `ARCHITECTURE.md`, then running `inspect_project_docs` -> `ingest_project_docs` -> `get_project_docs`
-2. **Candidates found but not indexed** — suggests `ingest_project_docs`
-3. **Indexed but stale** — suggests re-ingest
-4. **Exact dependency versions available** — suggests `prepare_docs(action="prefetch_project_dependency_docs")` (requires network, so marked `requires_confirmation: true`)
-
-This creates an agent-discoverable onboarding path where the agent guides itself through the setup steps.
+See [Project docs MCP workflow](../docs/project-docs-mcp-workflow.md) for the
+current preparation and verification sequence. Repository documentation edits
+remain ordinary reviewable Git changes authorized by the user.
 
 ## Packs MCP runtime
 

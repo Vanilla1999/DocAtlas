@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_native_context_preservation_integration.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_native_context_preservation_integration.py": "366bbb9d518781da05b1bf22ceaf02aff7633506f07f55b891c2cb6bce20c364"
+  },
+  "node_overrides": {}
+}

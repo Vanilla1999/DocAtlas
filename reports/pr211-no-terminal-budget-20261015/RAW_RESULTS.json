@@ -1,0 +1,44 @@
+[
+  {
+    "case_id": "V40-P03",
+    "seconds": 1.5446879300002365,
+    "kind": "docs_context",
+    "status": "ok",
+    "reason_code": null,
+    "sources": 167,
+    "wire_bytes": 144210,
+    "codec_tokens": 47851,
+    "database_unchanged": true,
+    "project_files_unchanged": true,
+    "coverage": [
+      {
+        "covered": 515,
+        "expected": 515
+      }
+    ],
+    "source_errors": [],
+    "oracle_errors": [],
+    "oracle_pass": true
+  },
+  {
+    "case_id": "V40-E01",
+    "seconds": 2.292508020999776,
+    "kind": "docs_context",
+    "status": "ok",
+    "reason_code": null,
+    "sources": 256,
+    "wire_bytes": 217053,
+    "codec_tokens": 73612,
+    "database_unchanged": true,
+    "project_files_unchanged": true,
+    "coverage": [
+      {
+        "covered": 557,
+        "expected": 557
+      }
+    ],
+    "source_errors": [],
+    "oracle_errors": [],
+    "oracle_pass": true
+  }
+]

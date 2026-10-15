@@ -1,10 +1,6 @@
 {
-  "schema_version": "project-context-quality-v2-corpus-3",
-  "evaluator_version": "2.4.0",
-  "limits": {
-    "maximum_sources": 3,
-    "maximum_estimated_tokens": 800
-  },
+  "schema_version": "project-context-quality-v2-corpus-5",
+  "evaluator_version": "2.6.0",
   "obligations": {
     "install": {
       "id": "install",
@@ -270,11 +266,11 @@
       "accepted_witnesses": [
         {
           "path": "docs/modules/project-context-retrieval.md",
-          "text": "For compound reads, selection maximizes distinct user-visible query coverage before expanding snippets"
+          "text": "For compound reads, selection accounts for distinct user-visible queries and requalifies coverage against the final visible source fields"
         },
         {
           "path": "docs/mcp-docs-server.md",
-          "text": "Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet"
+          "text": "For compound reads, selection accounts for distinct user-visible queries and requalifies coverage against the final visible source fields"
         }
       ]
     },
@@ -308,11 +304,11 @@
       "accepted_witnesses": [
         {
           "path": "docs/project-docs-mcp-workflow.md",
-          "text": "removes stale indexed sections"
+          "text": "Changed source hashes prevent stale indexed sections from appearing in current retrieval"
         },
         {
           "path": "README.md",
-          "text": "removes stale indexed sections"
+          "text": "Changed source hashes prevent stale indexed sections from appearing in current retrieval"
         }
       ]
     },
@@ -327,11 +323,11 @@
       "accepted_witnesses": [
         {
           "path": "docs/project-docs-mcp-workflow.md",
-          "text": "prunes** orphaned indexed sources"
+          "text": "Deleted files and documents removed from the catalog are excluded from current retrieval"
         },
         {
           "path": "README.md",
-          "text": "prunes orphaned indexed sources"
+          "text": "Deleted files and documents removed from the catalog are excluded from current retrieval"
         }
       ]
     },
@@ -504,7 +500,7 @@
       "accepted_witnesses": [
         {
           "path": "docs/modules/project-context-retrieval.md",
-          "text": "Candidate allocation gives one opportunity to exact-anchor, original-question, and host-query lanes before consuming second candidates"
+          "text": "Candidate allocation gives one opportunity to each explicit query lane before consuming second candidates"
         }
       ]
     },
@@ -520,11 +516,11 @@
       "accepted_witnesses": [
         {
           "path": "docs/modules/evidence-selection.md",
-          "text": "It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation"
+          "text": "It checks catalog membership, project and module scope, freshness, source identity, and visible support for each explicit query before returning evidence"
         },
         {
           "path": "docs/mcp-docs-server.md",
-          "text": "Evidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text"
+          "text": "Evidence selection checks current catalog membership, project and module scope, source identity, freshness, and visible support for each explicit query before returning source-bound context"
         }
       ]
     },
@@ -539,7 +535,7 @@
       "accepted_witnesses": [
         {
           "path": "docs/modules/evidence-selection.md",
-          "text": "bounded candidates into an auditable certification decision"
+          "text": "Evidence selection turns current eligible candidates into source-bound, retrieval-only context"
         }
       ]
     },
@@ -906,7 +902,6 @@
       ],
       "expected_public_query_ids": [
         "query-original",
-        "query-anchor-1",
         "query-lookup-1",
         "query-lookup-2",
         "query-lookup-3"
@@ -1552,5 +1547,14 @@
       ],
       "obligations": []
     }
-  ]
+  ],
+  "output_cost_policy": {
+    "objective": "minimize_full_public_dto_without_fixed_output_ceiling",
+    "measurement": "source_count_canonical_utf8_bytes_and_serialized_token_estimate",
+    "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
+    "tokenizer_claim": "serialized_utf8_estimate_not_actual_client_tokens"
+  },
+  "historical_output_limits": {
+    "maximum_sources": 3
+  }
 }

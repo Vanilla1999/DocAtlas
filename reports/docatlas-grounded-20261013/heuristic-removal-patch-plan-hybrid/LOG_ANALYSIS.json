@@ -1,0 +1,135 @@
+{
+  "pytest_summary": "12 passed in 12.44s",
+  "real_runtime": {
+    "status": "PASS",
+    "runtime_calls": 2,
+    "mocks": false,
+    "dense_model": "BAAI/bge-small-en-v1.5",
+    "sparse_model": "Qdrant/bm25",
+    "binary_sha256": "7dba403e3b1e1b68e8b4ec9f241b6152361a12c58f17d2d8146d1ce343d091a6",
+    "source_sha256": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+    "boundary": "production ingest and retrieval runtime, isolated Qdrant/FastEmbed"
+  },
+  "lanes": [
+    {
+      "mode": "sparse",
+      "counts": {
+        "sparse": 3
+      },
+      "failures": {},
+      "delivered_sources": [
+        "observatory.md",
+        "observatory.md",
+        "observatory.md"
+      ]
+    },
+    {
+      "mode": "hybrid",
+      "counts": {
+        "lexical": 3,
+        "dense": 4,
+        "sparse": 3
+      },
+      "failures": {},
+      "delivered_sources": [
+        "observatory.md",
+        "observatory.md",
+        "observatory.md"
+      ]
+    }
+  ],
+  "trace_ends": [
+    {
+      "event": "docatlas_request_end",
+      "request_id": "af77de3392c74d80927ef80db8a146a3",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 85.118,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "b28654c01076494c95a232cd29dd62bd",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 91.109,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "c034eeb93fcf4337b90243e13d11a051",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 23.831,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "8027dc6ad0944fbb91413be3d1aa6d95",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 20.803,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "25b9072da7f04b5cbb6dce1cad2cce0d",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 18.242,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "5e7538d9710440b78196178fb46cda60",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 11.526,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "e4e9737a9bd443cfa7fe8c6f228b5792",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 8.601,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "594f5d289a454cb7b33c1a0cead0034c",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 9.54,
+      "trace_incomplete": false
+    }
+  ],
+  "sha256": {
+    "patch-plan-final.log": "341e9ea2542b6f86c8748e5a6dc4070afc7b1ba3948b86380dabb6d6f20631b9",
+    "patch-plan-final.xml": "5d6a6f9a6219f4b6c6b25e1a3bf38651ced3ec52a5af8d7cf921b75fc2051485",
+    "patch-plan01.log": "738024c9cd86c9efd1e581c259268b5c34a01b2d22327ae32c319ee4d92f8985",
+    "patch-plan01.xml": "56d7f49903f64a9dbc8e1f42139e95c8e089399bb3454ff693bd2f74c3348a41",
+    "patch-plan02.log": "ede57fb28e676cc0e7cb939518273d18c5f5c5d27cff0f5669808300255c652d",
+    "patch-plan02.xml": "cdca70622ddeff1f4ca0aaa8335406fbba3acc1f9e0a8f0fe16b3b4fbebde1c4",
+    "patch-plan03.log": "7ef5c9328994c0318501d2dbbedc7b04b50ed9c9176aa71359f01320d51eb7d2",
+    "patch-plan03.xml": "b02ffc9442a7dd57f49bd1ec5972f58a34abf15b68acd69522bf787d689dac98",
+    "real-hybrid-final/retrieval.json": "5d68854858b999e4cd8d298527dbad815acc1127ae5b409866462e7e19dc566f",
+    "real-hybrid-final/qdrant.log": "64a6f33416349d216c2f2d0a820abc55bf4c5f3e19e1d2936b36bd559ff44beb",
+    "real-hybrid-final/RESULT.json": "e027f4a44189d0d5472ae0dfbe803cbb06623ef302719ac514b38a0ff57a56fa",
+    "real-hybrid-final.log": "6b67dcf50e3dacb9c698f1d2cdbde349f83393566fefb6a794e76182e131d64e",
+    "real-hybrid01/qdrant.log": "1279fbf1ac747c10098314329952282d7256fc7cc2eadc3ce3680e61f9c45fa5",
+    "real-hybrid01.log": "4eb1562c4227abf3771135f440f974cbc51b4bcc2754242764fd76f4c7efd466",
+    "real-hybrid02/retrieval.json": "4f6fb051bdde14689a53fc106e695b2ac58e0d5288b31c1420a7c35aeec5944c",
+    "real-hybrid02/qdrant.log": "18cb1a60e958b53de16f343762100b617cbcaacab26f00319080538ac5e11bff",
+    "real-hybrid02/RESULT.json": "e027f4a44189d0d5472ae0dfbe803cbb06623ef302719ac514b38a0ff57a56fa",
+    "real-hybrid02.log": "85483161fc0dc0734ab2158df34043f3cb78a273172f20a732b164ea228b5e2b"
+  }
+}

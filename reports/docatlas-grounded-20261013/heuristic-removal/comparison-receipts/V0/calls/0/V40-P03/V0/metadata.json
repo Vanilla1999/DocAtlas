@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-P03",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-poetry",
+  "public_request": {
+    "question": "How are Poetry configuration setting names converted into environment variable names?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-poetry/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "41e70dfdcaf04263fbee755c77a4326ab2a63e4df0f384ba3247aeadb3632494",
+  "utf8_bytes": 14906,
+  "tokens": 4432,
+  "seconds": 4.46372366200012,
+  "cpu_seconds": 4.456770244999998,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

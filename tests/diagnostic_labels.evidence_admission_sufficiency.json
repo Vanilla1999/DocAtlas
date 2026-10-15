@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/docs/test_evidence_admission_sufficiency.py": "behavioral"
-  },
-  "module_node_hashes": {
-    "tests/docs/test_evidence_admission_sufficiency.py": "62b68add0402544f11c39e0f55350391cdf4b13a6b3b2ce78526402be89b0386"
-  },
+  "module_labels": {},
+  "module_node_hashes": {},
   "node_overrides": {}
 }

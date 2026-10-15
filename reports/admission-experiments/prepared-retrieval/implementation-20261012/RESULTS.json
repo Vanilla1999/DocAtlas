@@ -1,0 +1,82 @@
+{
+  "base_commit": "8ad44222d19d2e8b886349aa3f0f13f71e9167ba",
+  "boundary": "editable-installed package; in-process public MCP context/source resource; real SQLite/lexical/member preparation; no model",
+  "unique_scenarios_passed": 6,
+  "new_scenarios": 4,
+  "existing_regression_scenarios": 2,
+  "complete_primary_run": {
+    "prepare_sync": 5,
+    "contexts": 22,
+    "source_resources": 6,
+    "models": 0,
+    "pytest_seconds": 4.01,
+    "runtime_assertions": "PASS",
+    "independent_review": "one terminal attribution defect, fixed and retested in run05"
+  },
+  "focused_fix_retest": {
+    "prepare_sync": 1,
+    "contexts": 4,
+    "source_resources": 0,
+    "models": 0,
+    "pytest_seconds": 1.85,
+    "status": "PASS"
+  },
+  "total_all_attempts": {
+    "prepare_sync": 9,
+    "public_prepare_docs": 7,
+    "existing_service_fixture_prepare": 2,
+    "contexts": 29,
+    "source_resources": 6,
+    "models": 0
+  },
+  "optics": [
+    {
+      "artifact": "run-03-packets/context-91d7d0bc21ad45c0bdcf16bf5561ff98.json",
+      "source_rows": 1,
+      "mcp_json_utf8_bytes": 1460,
+      "mcp_json_utf8_quarter_proxy": 365,
+      "source_paths": [
+        "docs/issue.md"
+      ]
+    },
+    {
+      "artifact": "run-03-packets/context-56232617cbb84f8793941655ad6a7397.json",
+      "source_rows": 4,
+      "mcp_json_utf8_bytes": 3262,
+      "mcp_json_utf8_quarter_proxy": 816,
+      "source_paths": [
+        "docs/issue.md",
+        "docs/packing.md"
+      ]
+    }
+  ],
+  "required_optics_facts": {
+    "default": 2,
+    "experimental": 4,
+    "total": 4
+  },
+  "final_checklist": {
+    "wide_proxy": 906,
+    "bounded_proxy": 758,
+    "cap": 900,
+    "wide_required_steps": 16,
+    "bounded_required_steps": 16,
+    "total_steps": 16,
+    "added_attribution_ids": []
+  },
+  "hard_exact_negative": {
+    "default": "PASS",
+    "experimental": "PASS",
+    "experimental_sources": 0
+  },
+  "claims_not_established": [
+    "general semantic relevance",
+    "set sufficiency scoring",
+    "host generated answer correctness",
+    "model-generated citation correctness",
+    "20 percent speedup",
+    "full host prompt or generation cost",
+    "production/default promotion"
+  ],
+  "verifier_corrections": "See CONTRACT_DECISION_RU.md and execution_ledger.json; original fixtures/questions/facts/revisions/caps unchanged."
+}

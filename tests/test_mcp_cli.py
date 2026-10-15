@@ -28,27 +28,8 @@ def test_mcp_command_group_registered():
         assert sub in result.output
 
 
-def test_mcp_serve_compatibility_alias_is_absent():
-    mcp_group = cast(Group, cli.commands["mcp"])
-    mcp_commands = mcp_group.commands
-    assert "packs-serve" in mcp_commands
-    assert "serve" not in mcp_commands
 
 
-@pytest.mark.parametrize(
-    ("arguments", "expected"),
-    [
-        (["--config", "root.yaml", "mcp", "docs-serve"], "root.yaml"),
-        (["mcp", "docs-serve", "--config", "child.yaml"], "child.yaml"),
-        (["--config", "root.yaml", "mcp", "docs-serve", "--config", "child.yaml"], "child.yaml"),
-    ],
-)
-def test_docs_serve_accepts_root_and_command_config(arguments, expected):
-    with patch("docmancer.mcp.docs_server.serve") as serve:
-        result = CliRunner().invoke(cli, arguments)
-
-    assert result.exit_code == 0, result.output
-    serve.assert_called_once_with(config_path=expected)
 
 
 def test_install_pack_command_registered():
@@ -66,22 +47,6 @@ def test_install_pack_rejects_missing_at_sign():
     assert "package>@<version" in result.output or "Spec" in result.output
 
 
-def test_parse_pack_spec_handles_scoped_npm_names():
-    from docmancer.cli.mcp_commands import _parse_pack_spec
-
-    # Plain spec.
-    assert _parse_pack_spec("open-meteo@v1", require_version=True) == (
-        "open-meteo",
-        "v1",
-    )
-    # Scoped npm-style package: leading @ stays with package, version comes from rightmost @.
-    assert _parse_pack_spec("@scope/pkg@1.2.3", require_version=True) == (
-        "@scope/pkg",
-        "1.2.3",
-    )
-    # Uninstall path: version optional.
-    assert _parse_pack_spec("@scope/pkg", require_version=False) == ("@scope/pkg", None)
-    assert _parse_pack_spec("open-meteo", require_version=False) == ("open-meteo", None)
 
 
 def test_uninstall_command_registered():

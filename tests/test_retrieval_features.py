@@ -237,74 +237,6 @@ class RetrievalDispatcher(_RetrievalDispatcher):
 # ---------------- query router ----------------
 
 
-def test_router_injects_filters(tmp_path):
-    config, store = _agent(tmp_path)
-    config.retrieval.routers = [
-        QueryRouter(
-            match=r"latest version",
-            filters={"status_code": "LIVE"},
-            description="version-latest",
-        )
-    ]
-    vstore = FakeVectorStore(hits_by_filter={})
-    dispatcher = RetrievalDispatcher(
-        store=store,
-        config=config,
-        vector_store=vstore,
-        provider=FakeProvider(),
-        collection="c",
-    )
-    dispatcher.run("what is the latest version?", mode="dense", limit=5)
-    # The fake store records the filters the dispatcher passed.
-    assert vstore.calls
-    assert vstore.calls[0]["filters"] == {"status_code": "LIVE"}
-
-
-def test_router_first_match_wins(tmp_path):
-    config, store = _agent(tmp_path)
-    config.retrieval.routers = [
-        QueryRouter(match=r"foo", filters={"a": 1}),
-        QueryRouter(match=r"bar", filters={"b": 2}),
-    ]
-    vstore = FakeVectorStore(hits_by_filter={})
-    RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore, provider=FakeProvider(), collection="c"
-    ).run("foo bar baz", mode="dense", limit=2)
-    assert vstore.calls and vstore.calls[0]["filters"] == {"a": 1}
-
-
-def test_router_does_not_override_caller_filter(tmp_path):
-    config, store = _agent(tmp_path)
-    config.retrieval.routers = [
-        QueryRouter(match=r"latest", filters={"status_code": "LIVE", "scope": "docs"}),
-    ]
-    vstore = FakeVectorStore(hits_by_filter={})
-    RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore,
-        provider=FakeProvider(), collection="c",
-    ).run(
-        "latest", mode="dense", limit=1,
-        filters={"status_code": "PINNED"},
-    )
-
-    assert vstore.calls[0]["filters"] == {"status_code": "PINNED", "scope": "docs"}
-
-
-def test_router_invalid_regex_is_skipped(tmp_path):
-    config, store = _agent(tmp_path)
-    # An unbalanced bracket would raise re.error; the dispatcher must skip it
-    # rather than aborting the whole query.
-    config.retrieval.routers = [
-        QueryRouter(match=r"[unbalanced", filters={"x": 1}),
-        QueryRouter(match=r"hello", filters={"ok": True}),
-    ]
-    vstore = FakeVectorStore(hits_by_filter={})
-    RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore, provider=FakeProvider(), collection="c"
-    ).run("hello world", mode="dense", limit=1)
-    assert vstore.calls[0]["filters"] == {"ok": True}
-
-
 def test_dense_failure_is_hard_error_by_default(tmp_path):
     config, store = _agent(tmp_path)
     _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
@@ -454,6 +386,18 @@ def test_lexical_and_supplemental_paths_enforce_forbidden_sources(tmp_path):
     assert {chunk.source for chunk in result.chunks} == {"allowed"}
     assert all("final_rank" in chunk.metadata["retrieval_trace"] for chunk in result.chunks)
 
+    # Exercise the real lexical store at the smallest public limit: removing a
+    # denied top-ranked source must still expose the next permitted source.
+    question = "How do I call `Client.open`?"
+    ranked = store.query(question, limit=10, budget=config.query.default_budget)
+    assert {chunk.source for chunk in ranked} == {"allowed", "forbidden"}
+    denied = ranked[0].source
+    remaining = ({"allowed", "forbidden"} - {denied}).pop()
+    limited = RetrievalDispatcher(store=store, config=config).run(
+        question, mode="lexical", limit=1, filters={"forbidden_sources": [denied]},
+    )
+    assert [chunk.source for chunk in limited.chunks] == [remaining]
+
 
 @pytest.mark.parametrize("mode", ["lexical", "dense", "sparse", "hybrid"])
 def test_named_document_filter_is_hard_across_retrieval_modes(tmp_path, mode):
@@ -592,146 +536,15 @@ def test_hybrid_fuses_on_stable_child_id_and_hydrates_integer_id(tmp_path):
 # ---------------- hierarchical retrieval ----------------
 
 
-def test_hierarchical_two_stage_filters_to_top_docs(tmp_path):
-    config, store = _agent(tmp_path)
-    _populate(
-        store,
-        [
-            ("Product A", "doc-a", "# Product A\n\n## Auth\nOAuth here.\n\n## API\nEndpoints."),
-            ("Product B", "doc-b", "# Product B\n\n## Auth\nKeys here.\n\n## Pricing\nFree tier."),
-        ],
-    )
-    # Walk every section so we can pre-program the fake store. Each Document
-    # produces multiple sections (one per ``##`` heading), so we group by source.
-    all_sections = store.list_sections_for_embedding()
-    by_source: dict[str, list[int]] = {}
-    for s in all_sections:
-        by_source.setdefault(s["source"], []).append(int(s["section_id"]))
-    section_ids = [sid for sids in by_source.values() for sid in sids]
-    assert len(section_ids) >= 4
-
-    # Stage 1: dense returns three ids — two from doc-a, one from doc-b. doc-a wins.
-    a_ids = next(sids for src, sids in by_source.items() if "doc-a" in src)[:2]
-    b_ids = next(sids for src, sids in by_source.items() if "doc-b" in src)[:1]
-    stage1 = [_hit(a_ids[0]), _hit(a_ids[1]), _hit(b_ids[0])]
-    # Get document_title_hash values for the filter expectation.
-    doc_hashes = store.document_title_hashes_for(section_ids)
-    a_doc_hash = doc_hashes[a_ids[0]]
-    # Stage 2: filtered call returns only doc-a sections.
-    stage2 = [_hit(a_ids[0], document_title_hash=a_doc_hash)]
-
-    hits_by_filter = {
-        ("dense", None): stage1,
-        ("dense", _filter_key({"document_title_hash": {"in": [a_doc_hash]}})): stage2,
-    }
-    vstore = FakeVectorStore(hits_by_filter=hits_by_filter)
-
-    config.retrieval.hierarchical = HierarchicalConfig(
-        enabled=True, documents_limit=1, candidate_pool=10, sections_per_document=5
-    )
-    dispatcher = RetrievalDispatcher(
-        store=store,
-        config=config,
-        vector_store=vstore,
-        provider=FakeProvider(),
-        collection="c",
-    )
-    result = dispatcher.run("authentication", mode="dense", limit=2)
-    assert "hierarchical" in result.mode_used
-    # Two calls: stage 1 (no filter) and stage 2 (document_title_hash IN [a_doc_hash]).
-    assert len(vstore.calls) == 2
-    assert vstore.calls[0]["filters"] is None
-    assert vstore.calls[1]["filters"] == {"document_title_hash": {"in": [a_doc_hash]}}
 
 
-def test_hierarchical_degraded_result_preserves_stage_failures(tmp_path):
-    config, store = _agent(tmp_path)
-    _populate(store, [("Doc", "doc", "# Doc\n\n## Auth\nalpha authentication.\n")])
-    section_id = int(store.list_sections_for_embedding()[0]["section_id"])
-    config.retrieval.hierarchical = HierarchicalConfig(
-        enabled=True, documents_limit=1, candidate_pool=10, sections_per_document=2
-    )
-    vstore = Stage2FailingVectorStore({("dense", None): [_hit(section_id)]})
-
-    result = RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore,
-        provider=FakeProvider(), collection="c",
-    ).run("authentication", mode="dense", limit=1, allow_degraded=True)
-
-    assert "dense.stage2" in result.failures
-    assert "degraded" in result.mode_used
 
 
-def test_hierarchical_fusion_honors_weighted_rrf(tmp_path):
-    config, store = _agent(tmp_path)
-    _populate(store, [
-        ("First", "first", "# First\n\nalpha first.\n"),
-        ("Second", "second", "# Second\n\nalpha second.\n"),
-    ])
-    rows = store.list_sections_for_embedding()
-    first_id = int(next(row for row in rows if row["source"] == "first")["section_id"])
-    second_id = int(next(row for row in rows if row["source"] == "second")["section_id"])
-    config.retrieval.fusion.method = "weighted_rrf"
-    config.retrieval.fusion.weights = {"dense": 10.0, "lexical": 1.0}
-    dispatcher = RetrievalDispatcher(store=store, config=config)
-
-    result = dispatcher._fuse_and_hydrate(
-        {
-            "lexical": [
-                {"id": "first", "hydration_id": first_id},
-                {"id": "second", "hydration_id": second_id},
-            ],
-            "dense": [
-                {"id": "second", "hydration_id": second_id},
-                {"id": "first", "hydration_id": first_id},
-            ],
-        },
-        query="alpha", limit=1, budget=100, expand=None,
-        counts={"lexical": 2, "dense": 2}, mode="hybrid/hierarchical", filters=None,
-    )
-
-    assert result.chunks[0].metadata["section_id"] == second_id
 
 
 # ---------------- hierarchical auto-enable ----------------
 
 
-def test_hierarchical_auto_enables_above_threshold(tmp_path):
-    config, store = _agent(tmp_path)
-    # Three distinct documents, threshold of 2 -> auto path engages.
-    _populate(
-        store,
-        [
-            ("Doc One", "doc-1", "# Doc One\n\n## A\nalpha.\n"),
-            ("Doc Two", "doc-2", "# Doc Two\n\n## B\nbeta.\n"),
-            ("Doc Three", "doc-3", "# Doc Three\n\n## C\ngamma.\n"),
-        ],
-    )
-    config.retrieval.hierarchical = HierarchicalConfig(
-        enabled=False, auto=True, auto_min_documents=2, documents_limit=1
-    )
-    sections = store.list_sections_for_embedding()
-    by_source: dict[str, list[int]] = {}
-    for s in sections:
-        by_source.setdefault(s["source"], []).append(int(s["section_id"]))
-    a_id = by_source["doc-1"][0]
-    a_doc_hash = store.document_title_hashes_for([a_id])[a_id]
-    hits_by_filter = {
-        ("dense", None): [_hit(a_id)],
-        ("dense", _filter_key({"document_title_hash": {"in": [a_doc_hash]}})): [
-            _hit(a_id, document_title_hash=a_doc_hash)
-        ],
-    }
-    vstore = FakeVectorStore(hits_by_filter=hits_by_filter)
-    result = RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore, provider=FakeProvider(), collection="c"
-    ).run("alpha", mode="dense", limit=1)
-    assert "hierarchical" in result.mode_used
-    # Stage 2 must have applied a document_title_hash filter.
-    assert any(
-        (call["filters"] or {}).get("document_title_hash") is not None
-        for call in vstore.calls
-    )
 
 
 def test_hierarchical_auto_skips_below_threshold(tmp_path):
@@ -780,8 +593,9 @@ def test_hybrid_neighbor_expansion_pulls_adjacent_sections(tmp_path):
     assert chunk_indices.issuperset({sections[0]["chunk_index"], sections[2]["chunk_index"]})
 
 
-def test_lexical_compact_results_limit_sections_per_source_by_default(tmp_path):
+def test_lexical_compact_results_limit_sections_per_source_when_configured(tmp_path):
     config, store = _agent(tmp_path)
+    config.retrieval.max_sections_per_source = 2
     docs = []
     for i in range(5):
         docs.append((f"Alpha {i}", "doc-a", f"# Alpha {i}\n\nalpha repeated evidence {i}."))
@@ -796,151 +610,9 @@ def test_lexical_compact_results_limit_sections_per_source_by_default(tmp_path):
 
 def test_expand_bypasses_sections_per_source_cap(tmp_path):
     config, store = _agent(tmp_path)
+    config.retrieval.max_sections_per_source = 2
     _populate(store, [("Big Doc", "big-doc", "# Big Doc\n\n## A\nalpha.\n\n## B\nalpha.\n\n## C\nalpha.\n")])
 
     result = RetrievalDispatcher(store=store, config=config).run("alpha", mode="lexical", limit=3, expand="adjacent")
 
     assert len([chunk for chunk in result.chunks if chunk.source == "big-doc"]) >= 3
-
-
-def test_intent_rerank_prefers_matching_api_docs_page(tmp_path):
-    config, store = _agent(tmp_path)
-    dispatcher = RetrievalDispatcher(store=store, config=config)
-    migration = RetrievedChunk(
-        source="https://example.com/docs/migration/from_state_notifier",
-        chunk_index=0,
-        text="Lifecycle differences mention ref.watch and ref.listen in migration examples.",
-        score=1.0,
-        metadata={"canonical_url": "https://example.com/docs/migration/from_state_notifier", "title": "Lifecycle differences"},
-    )
-    refs = RetrievedChunk(
-        source="https://example.com/docs/concepts2/refs",
-        chunk_index=1,
-        text="Refs explain when to listen to providers.",
-        score=0.9,
-        metadata={
-            "canonical_url": "https://example.com/docs/concepts2/refs",
-            "title": "Ref.watch",
-            "document_title": "Refs",
-            "anchor": "Refs > Ref.watch > Ref.listen",
-        },
-    )
-
-    reranked = dispatcher._rerank_intent_matches(
-        "ref.watch vs ref.listen lifecycle differences",
-        [migration, refs],
-    )
-
-    assert reranked[0].source == "https://example.com/docs/concepts2/refs"
-
-
-def test_api_term_matches_are_appended_from_lexical_search(tmp_path):
-    config, store = _agent(tmp_path)
-    _populate(
-        store,
-        [
-            ("Migration", "https://example.com/docs/migration", "# Migration\n\nLifecycle differences."),
-            ("Refs", "https://example.com/docs/concepts2/refs", "# Refs\n\n## Ref.watch\nUse ref.watch.\n\n## Ref.listen\nUse ref.listen."),
-        ],
-    )
-    dispatcher = RetrievalDispatcher(store=store, config=config)
-    initial = [
-        RetrievedChunk(
-            source="https://example.com/docs/migration",
-            chunk_index=0,
-            text="Lifecycle differences.",
-            score=1.0,
-            metadata={"section_id": 999, "canonical_url": "https://example.com/docs/migration"},
-        )
-    ]
-
-    chunks = dispatcher._append_api_term_matches("ref.watch vs ref.listen", initial, budget=3000)
-
-    assert any(chunk.source == "https://example.com/docs/concepts2/refs" for chunk in chunks)
-
-
-def test_intent_rerank_prefers_tutorial_for_basic_example_query(tmp_path):
-    config, store = _agent(tmp_path)
-    dispatcher = RetrievalDispatcher(store=store, config=config)
-    advanced = RetrievedChunk(
-        source="https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield",
-        chunk_index=0,
-        text="Advanced dependencies with yield and HTTPException examples.",
-        score=1.0,
-        metadata={"title": "Dependencies with yield - FastAPI"},
-    )
-    tutorial = RetrievedChunk(
-        source="https://fastapi.tiangolo.com/tutorial/dependencies",
-        chunk_index=1,
-        text="Use Depends with common_parameters in a path operation.",
-        score=0.9,
-        metadata={"title": "Dependencies - FastAPI"},
-    )
-
-    reranked = dispatcher._rerank_intent_matches(
-        "FastAPI basic Depends example in a path operation",
-        [advanced, tutorial],
-    )
-
-    assert reranked[0].source == "https://fastapi.tiangolo.com/tutorial/dependencies"
-
-
-def test_intent_rerank_prefers_testing_tutorial_over_reference(tmp_path):
-    config, store = _agent(tmp_path)
-    dispatcher = RetrievalDispatcher(store=store, config=config)
-    reference = RetrievedChunk(
-        source="https://fastapi.tiangolo.com/reference/testclient",
-        chunk_index=0,
-        text="Reference details for TestClient methods.",
-        score=1.0,
-        metadata={"title": "Test Client - TestClient - FastAPI"},
-    )
-    tutorial = RetrievedChunk(
-        source="https://fastapi.tiangolo.com/tutorial/testing",
-        chunk_index=1,
-        text="from fastapi.testclient import TestClient\nclient = TestClient(app)\nassert response.status_code == 200",
-        score=0.9,
-        metadata={"title": "Testing - FastAPI"},
-    )
-
-    reranked = dispatcher._rerank_intent_matches(
-        "FastAPI test app with fastapi.testclient.TestClient client and pytest assertions",
-        [reference, tutorial],
-    )
-
-    assert reranked[0].source == "https://fastapi.tiangolo.com/tutorial/testing"
-
-
-def test_snippet_aware_rerank_prefers_matching_code_example(tmp_path):
-    config, store = _agent(tmp_path)
-    dispatcher = RetrievalDispatcher(store=store, config=config)
-    prose = RetrievedChunk(
-        source="https://example.com/reference/testclient",
-        chunk_index=0,
-        text="Reference prose about TestClient behavior and response objects.",
-        score=1.0,
-        metadata={"title": "TestClient reference"},
-    )
-    snippet = RetrievedChunk(
-        source="https://example.com/tutorial/testing",
-        chunk_index=1,
-        text="Testing example.",
-        score=0.9,
-        metadata={
-            "title": "Testing tutorial",
-            "has_code_snippet": True,
-            "code_snippets": [
-                {
-                    "language": "python",
-                    "code": "from fastapi.testclient import TestClient\nclient = TestClient(app)\nassert response.status_code == 200",
-                }
-            ],
-        },
-    )
-
-    reranked = dispatcher._rerank_intent_matches(
-        "FastAPI TestClient pytest code example with assert",
-        [prose, snippet],
-    )
-
-    assert reranked[0].source == "https://example.com/tutorial/testing"

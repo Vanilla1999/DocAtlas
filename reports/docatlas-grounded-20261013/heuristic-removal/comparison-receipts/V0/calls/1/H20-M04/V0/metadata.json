@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M04",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "How does MkDocs extra_javascript treat a plain .mjs string versus a mapping with a .mjs path regarding type=module, and which integrity hash algorithm is automatically applied?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "3f2de7e9c3c0de278a7d14e5784243d6ba12be3868308a8be19c3ffb872ed6fc",
+  "utf8_bytes": 4480,
+  "tokens": 1320,
+  "seconds": 0.8028181240006234,
+  "cpu_seconds": 0.8013400140000044,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

@@ -1,0 +1,3240 @@
+{
+  "schema_version": "docatlas-pr211-runtime-evidence-v2",
+  "repository": "Vanilla1999/DocAtlas",
+  "recorded_at_utc": "2026-10-10T04:36:00Z",
+  "head": "d76f6ab85e12f482ad6bec1d43040899f4b0a532",
+  "tree": "63bff21aadbfb131082db075ed95ea7e89310e44",
+  "verified_merge": {
+    "sha": "8120a80bbb0309a3ec0bf4add71f568666c76772",
+    "tree": "63bff21aadbfb131082db075ed95ea7e89310e44",
+    "parents": [
+      "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+      "d76f6ab85e12f482ad6bec1d43040899f4b0a532"
+    ]
+  },
+  "workflow_run_id": 38023053227,
+  "diagnostic_reader_job_id": 114129755653,
+  "reader_log": {
+    "utf8_bytes": 592758,
+    "sha256": "5ba00eacb3e432d650c6ef6d5f396db286397487189436fbdeec90940e5042a1",
+    "parsed_record_count": 357,
+    "parse_errors": []
+  },
+  "scope": "Selected exact emitted records plus explicitly labelled interpretations; original full reports remain in the existing CI artifacts.",
+  "claims": {
+    "merge_ready": false,
+    "core_per_python": "7669 = 6062 PASS / 1597 FAIL / 0 ERROR / 10 SKIP on 3.11, 3.12 and 3.13",
+    "retired_58": "Compared with121: DQP70→37 and relation72→47; all58 retired failures account for collection decrease. Three additional live failures remain: one transaction fixture and two retention cases.",
+    "critical": "59 collected baseline entries, one observed failure in the native24-window fixture. No35-mutant credit; mutation loop blocked by baseline.",
+    "critical_first_operand": "The emitted guard is shared by several operands; exact first operand is not available in126 console. Source-proven hash-domain fixture defects are fixed later in127, not asserted as runtime-resolved here.",
+    "recovery": "Own baseline12 PASS and summary33 intended kills. All33 per-mutant observed outcomes were matched to expected case/guard with 0PASS/1FAIL/0ERROR.",
+    "recovery_import_boundary": "This receipt does not claim an independent rehash of every source/import operand from all33 mutants. Console exposes all outcomes but only a subset of detailed module records; CI writer validation is distinct from this receipt review.",
+    "literal_comparison": "Existing historical/compact step16 SUCCESS. Individual51-fault proof is not printed by this reader and is not inferred as retirement authorization.",
+    "quality": "Legacy full source-fact8/15; V2 natural6/15 and paraphrase1/5. V2 request-flow now returns two of four required facts but remains FAIL. Larger source sets include a reported Packs contamination failure; no output ceiling is reinstated and no quality guard is relaxed.",
+    "installed": "Installed reviewed wheel/real stdio job succeeded: selftests7/7 and deterministic scripted task1/1. Actual Claude Code/Codex/OpenCode sessions NOT RUN.",
+    "module_console_attribution": "JUNIT_MODULE records do not contain artifact keys. The selected emitted rows are kept unchanged; per-version totals are provided by JUNIT_COUNTS.",
+    "pending_after_this_snapshot": "127 hash-domain fixture fixes/diagnostic traces;128 ordinary source-bound partial context and6 recovery faults;129 relation source-context precheck. None receives runtime credit from126."
+  },
+  "workflow_runs": [
+    {
+      "id": 38023053260,
+      "name": "Direct question validation",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_number": 591,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053260/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053260/logs",
+      "workflow_id": 354831920
+    },
+    {
+      "id": 38023053266,
+      "name": "P1.6 evidence is data",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 986,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053266/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053266/logs",
+      "workflow_id": 340272118
+    },
+    {
+      "id": 38023053298,
+      "name": "P2.1B positive controls",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 949,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053298/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053298/logs",
+      "workflow_id": 340548313
+    },
+    {
+      "id": 38023053237,
+      "name": "Release artifact gate and publish",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 1662,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053237/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053237/logs",
+      "workflow_id": 295284635
+    },
+    {
+      "id": 38023053174,
+      "name": "P2 federated task-pack reopening",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 930,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053174/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053174/logs",
+      "workflow_id": 340642474
+    },
+    {
+      "id": 38023053199,
+      "name": "Language flow investigation",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 69,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053199/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053199/logs",
+      "workflow_id": 371075584
+    },
+    {
+      "id": 38023053134,
+      "name": "P2.2B/C execution gate",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 936,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053134/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053134/logs",
+      "workflow_id": 340560264
+    },
+    {
+      "id": 38023053223,
+      "name": "Language context diagnostic",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 42,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053223/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053223/logs",
+      "workflow_id": 371014394
+    },
+    {
+      "id": 38023053126,
+      "name": "P2.1C task pack",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 945,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053126/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053126/logs",
+      "workflow_id": 340552030
+    },
+    {
+      "id": 38023053135,
+      "name": "P1.4 paraphrase and proofability",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 1004,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053135/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053135/logs",
+      "workflow_id": 340269916
+    },
+    {
+      "id": 38023053193,
+      "name": "P2.2A comparative harness",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 940,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053193/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053193/logs",
+      "workflow_id": 340557912
+    },
+    {
+      "id": 38023053201,
+      "name": "P2 Product Truth protocol",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 955,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053201/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053201/logs",
+      "workflow_id": 340520362
+    },
+    {
+      "id": 38023053145,
+      "name": "P1 Agent Truth closure",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 981,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053145/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053145/logs",
+      "workflow_id": 340275622
+    },
+    {
+      "id": 38023053171,
+      "name": "P1.5 mixed-evidence provenance",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 994,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053171/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053171/logs",
+      "workflow_id": 340270988
+    },
+    {
+      "id": 38023053167,
+      "name": "Task 33C pull-request checks",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 306,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053167/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053167/logs",
+      "workflow_id": 313516623
+    },
+    {
+      "id": 38023053210,
+      "name": "P2.3 Product Truth decision",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 932,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053210/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053210/logs",
+      "workflow_id": 340602677
+    },
+    {
+      "id": 38023053227,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 1865,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053227/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053227/logs",
+      "workflow_id": 295278983
+    },
+    {
+      "id": 38023053194,
+      "name": "P1 stack exact validation",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_number": 956,
+      "jobs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053194/jobs",
+      "logs_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38023053194/logs",
+      "workflow_id": 340279175
+    }
+  ],
+  "main_jobs": [
+    {
+      "id": 114127988110,
+      "name": "docs-contract",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify documented CLI and public Docs MCP contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 114127988160,
+      "name": "installed-mcp-harness",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Build exact reviewed wheel and install evaluator dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Exercise real stdio MCP and bounded schema repair",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Verify evidence attribution, hash chain, and privacy",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988180,
+      "name": "advanced-contract",
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run offline advanced contract and shared-security tests",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5
+        },
+        {
+          "name": "Run recoverable documentation failure gate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run recoverable documentation failure mutation gate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Run hermetic Context7-style project chat gate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Run Legacy live compatibility report and lineage floor",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9
+        },
+        {
+          "name": "Run V2 project-context acceptance gate",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 10
+        },
+        {
+          "name": "Upload Project Docs quality reports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Run question surface regression gate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Run Agent Developer Protocol gate",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 13
+        },
+        {
+          "name": "Run Agent Developer adversarial/token gate",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 14
+        },
+        {
+          "name": "Run critical mutation gate",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 15
+        },
+        {
+          "name": "Compare historical and compact literal contract tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Run Agent Developer adversarial mutation gate",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17
+        },
+        {
+          "name": "Upload mutation gate evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Upload offline advanced test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        },
+        {
+          "name": "Post Set up Python",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 37
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 39
+        }
+      ]
+    },
+    {
+      "id": 114127988184,
+      "name": "test (3.12)",
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run offline core tests",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5
+        },
+        {
+          "name": "Upload offline core test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988186,
+      "name": "test (3.13)",
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python 3.13",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run offline core tests",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5
+        },
+        {
+          "name": "Upload offline core test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python 3.13",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988200,
+      "name": "docs-impact",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install DocAtlas",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Report documentation impact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 114127988207,
+      "name": "installer-smoke",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Installer smoke tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        }
+      ]
+    },
+    {
+      "id": 114127988208,
+      "name": "test (3.11)",
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python 3.11",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run offline core tests",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5
+        },
+        {
+          "name": "Upload offline core test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python 3.11",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988212,
+      "name": "static-contract",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verify lock and static repository contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Post Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        }
+      ]
+    },
+    {
+      "id": 114127988230,
+      "name": "platform-smoke (macos-15-intel)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install cross-platform smoke dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify package and CLI surface",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Verify installed Docs MCP over stdio",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988270,
+      "name": "retrieval-evidence",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install evaluator dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify frozen retrieval evidence and independent sample",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988272,
+      "name": "platform-smoke (macos-15)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install cross-platform smoke dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify package and CLI surface",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Verify installed Docs MCP over stdio",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988386,
+      "name": "platform-smoke (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install cross-platform smoke dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify package and CLI surface",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Verify installed Docs MCP over stdio",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 114127988853,
+      "name": "p1-harden-branch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": null
+    },
+    {
+      "id": 114129755607,
+      "name": "required-ci",
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Enforce required CI jobs",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 2
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "id": 114129755653,
+      "name": "acceptance-diagnostics",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Download existing core JUnit artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Download existing quality reports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Download existing contract reports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Summarize exact existing executions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Summarize existing quality and contract evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Upload complete diagnostic ledger",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        }
+      ]
+    }
+  ],
+  "selected_records": [
+    {
+      "record_type": "JUNIT_COUNTS",
+      "artifact_file": "pytest-core-3.11-38023053227-1/core-tests-3.11.xml",
+      "xml_sha256": "12808a98f9ef5984147f608dbaba49797e2da3783c2e4b6d2f718a1b43cd6a01",
+      "counts": {
+        "PASS": 6062,
+        "FAIL": 1597,
+        "ERROR": 0,
+        "SKIP": 10
+      },
+      "integrity_issues": []
+    },
+    {
+      "record_type": "JUNIT_COUNTS",
+      "artifact_file": "pytest-core-3.12-38023053227-1/core-tests-3.12.xml",
+      "xml_sha256": "572802584bf65241d32bcaea66ddab45d9f8124c11282c923fc2a52d1aa0ab9a",
+      "counts": {
+        "PASS": 6062,
+        "FAIL": 1597,
+        "ERROR": 0,
+        "SKIP": 10
+      },
+      "integrity_issues": []
+    },
+    {
+      "record_type": "JUNIT_COUNTS",
+      "artifact_file": "pytest-core-3.13-38023053227-1/core-tests-3.13.xml",
+      "xml_sha256": "44843fefc212d45ec252da461bc67a4b601a21709fcc3eb66910bad0891bf0b4",
+      "counts": {
+        "PASS": 6062,
+        "FAIL": 1597,
+        "ERROR": 0,
+        "SKIP": 10
+      },
+      "integrity_issues": []
+    },
+    {
+      "record_type": "JUNIT_MODULE",
+      "module": "tests/docs/test_admission_relation_witnesses.py",
+      "counts": {
+        "PASS": 23,
+        "FAIL": 24
+      },
+      "first_node": "tests/docs/test_admission_relation_witnesses.py::test_keyword_salad_wrong_role_and_unrelated_sentence_never_prove_relation[original-Can a handler for QueueHub be synchronous?-A handler for OtherHub can be synchronous. QueueHub is also documented.]",
+      "first_message": "AssertionError: assert not True\n +  where True = EvidenceQualification(qualified=True, covered_query_ids=(), coverage_kind=None, reason='visible_fields', trace={'query_id': 'query-original', 'text': 'Can a handler for QueueHub be synchronous?', 'origin': 'original', 'coverage_required': True, 'facet_id': None, 'requirement_id': None, 'relation': 'direct', 'public_parent_query_id': None, 'preferred_catalog_roles': (), 'forbidden_catalog_roles': (), 'forbidden_evidence_terms': (), 'parent_exact_te"
+    },
+    {
+      "record_type": "JUNIT_MODULE",
+      "module": "tests/docs/test_documentation_query_plan.py",
+      "counts": {
+        "PASS": 25,
+        "FAIL": 12
+      },
+      "first_node": "tests/docs/test_documentation_query_plan.py::test_context_budget_is_a_product_invariant",
+      "first_message": "assert None == 3\n +  where None = ContextBudget(max_sources=None, max_tokens=None).max_sources"
+    },
+    {
+      "record_type": "JUNIT_MODULE",
+      "module": "tests/test_action_packet_v4_found_window_retention.py",
+      "counts": {
+        "FAIL": 6,
+        "PASS": 31
+      },
+      "first_node": "tests/test_action_packet_v4_found_window_retention.py::test_final_merge_retains_qualified_windows_without_changing_acquisition",
+      "first_message": "assert 32 > 32\n +  where 32 = len([RetrievedChunk(source='/tmp/pytest-of-runner/pytest-0/test_final_merge_retains_quali0/rules.md', chunk_index=0, text='```python\\ndef validate_binding(record):\\n    if record[\"binding_0_0\"] != \"contract-0-0\":\\n        raise ValueError(\"invalid contract 0 field 0\")\\n    if record[\"binding_0_1\"] != \"contract-0-1\":\\n        raise ValueError(\"invalid contract 0 field 1\")\\n    if record[\"binding_0_2\"] != \"contract-0-2\":\\n        raise ValueError(\"invalid contract 0 f"
+    },
+    {
+      "record_type": "JUNIT_MODULE",
+      "module": "tests/test_mcp_delivery_member_transaction.py",
+      "counts": {
+        "PASS": 115,
+        "FAIL": 1
+      },
+      "first_node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+      "first_message": "AssertionError: critical_project_read_acquired_qualified"
+    },
+    {
+      "record_type": "JUNIT_CONSOLE",
+      "omitted_rows": 0,
+      "complete_cases_in_artifact": true
+    },
+    {
+      "record_type": "ARTIFACT_PROVENANCE",
+      "schema_version": 1,
+      "purpose": "existing_artifacts_only_not_gate_acceptance",
+      "run_id": "38023053227",
+      "run_attempt": "1",
+      "checkout_commit": "8120a80bbb0309a3ec0bf4add71f568666c76772",
+      "issues": {
+        "items": [],
+        "report_count": 0,
+        "log_omitted": 0
+      }
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/authoritative-conflict-does-not-stop.json",
+      "sha256": "1981e001c12f273c36bfd688cba2591c3953345db7e149658a4b460bfb8510a3",
+      "bytes": 3751,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "authoritative_conflict",
+          "outcome": "failure",
+          "guard": "recovery_authoritative_conflict_stops"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/baseline.json",
+      "sha256": "496c52e361e30f75846d5257a5dd6b439d2cf2126642ea5b6d3fd222af8eba5a",
+      "bytes": 29106,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 0,
+        "passed": 12
+      },
+      "observed_case_count": 12,
+      "cases": [
+        {
+          "id": "retrieval_miss",
+          "outcome": "passed"
+        },
+        {
+          "id": "original_fragments",
+          "outcome": "passed"
+        },
+        {
+          "id": "operational_precedence",
+          "outcome": "passed"
+        },
+        {
+          "id": "no_semantic_retry",
+          "outcome": "passed"
+        },
+        {
+          "id": "evidence_eligibility",
+          "outcome": "passed"
+        },
+        {
+          "id": "documentation_gap",
+          "outcome": "passed"
+        },
+        {
+          "id": "authoritative_conflict",
+          "outcome": "passed"
+        },
+        {
+          "id": "projection_states",
+          "outcome": "passed"
+        },
+        {
+          "id": "exact_document_recovery",
+          "outcome": "passed"
+        },
+        {
+          "id": "literal_anchor_context",
+          "outcome": "passed"
+        },
+        {
+          "id": "original_discovery_attribution",
+          "outcome": "passed"
+        },
+        {
+          "id": "closed_literal_context",
+          "outcome": "passed"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/closed-literal-context-disabled.json",
+      "sha256": "6b716aaf8a1c7cdddcdc9e1a2175c769f4eb1cc83e634b6deed23ad72fef5309",
+      "bytes": 32016,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_closed_literal_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/closed-literal-context-ignores-extra-conditions.json",
+      "sha256": "27afd10eb8c1b7914402165cf2aa85b2e1a4d6e75b5bf282f984f0dcf9e68139",
+      "bytes": 185109,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_closed_complete_syntax"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/conflict-keeps-operational-action.json",
+      "sha256": "16410cfce2e15a31ae9e7705ac424e1c6001fee8512b4562e7739b8f144203f7",
+      "bytes": 4301,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "authoritative_conflict",
+          "outcome": "failure",
+          "guard": "recovery_conflict_suppresses_actions"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/count-context-bypasses-phrase-witness.json",
+      "sha256": "4da4fdb8b7e10a0d42587be9ef0637b74fe9ebafe3cb7fc230347f57b2e70667",
+      "bytes": 189612,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_count_phrase_body_witness"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/count-context-disabled.json",
+      "sha256": "feb7ca18e3307f96dc678bd605f5a73a68eaafdade71672aa7d3d15720870155",
+      "bytes": 32707,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_count_literal_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/diagnostic-invents-domain-fact.json",
+      "sha256": "45228da1f030c3103f0c24dfef6c44fa9275b2fc3d134c26f9929463091fb1c0",
+      "bytes": 3751,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "original_fragments",
+          "outcome": "failure",
+          "guard": "recovery_original_diagnostic_fragments"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/eligibility-treated-as-retrieval.json",
+      "sha256": "c59b1ce2bfce4b54fc0ea4c1d02b8b4b96f78071e40e6f44628a9440e5a4f4b0",
+      "bytes": 3820,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "evidence_eligibility",
+          "outcome": "failure",
+          "guard": "recovery_ineligible_evidence_class"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/exact-document-fallback-disabled.json",
+      "sha256": "248cc8448de9ffd9196dd9672e72b28400e0f2cd389cd9935c9af4fe7fd1052a",
+      "bytes": 30269,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "exact_document_recovery",
+          "outcome": "failure",
+          "guard": "recovery_exact_document_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/explain-list-borrows-label-substance.json",
+      "sha256": "9609bfe3b7a692975828043a5910d5a724e6e26cb8d89e70b909c47cc0279df5",
+      "bytes": 220182,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_explain_exact_body"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/explain-list-context-disabled.json",
+      "sha256": "0c06b2046490ec44f3ed8ffa9a15d62723f436448c283208f112dd717d35ccf0",
+      "bytes": 35754,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_explain_literal_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/explain-list-context-ignores-tail.json",
+      "sha256": "83fefe514e95536ab535ea4079631bc9ca1d8d4c68c9e20336124d41dd2c47c0",
+      "bytes": 202890,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_explain_complete_syntax"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-casefold-becomes-locator.json",
+      "sha256": "d56b16b4ad687b30784bd5eb38864d5c2fd8c8ce4aee87409dcb96f6382332a8",
+      "bytes": 226905,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_whole_label"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-collision-first-winner.json",
+      "sha256": "73a4a918ceac2707f3d3ae488f6d1d77e97fec53bc0bd588890735596b3fcb4f",
+      "bytes": 5704,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_catalog_ambiguity"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-frame-ignores-extra-clause.json",
+      "sha256": "c7ce1d21aa3fc8b53c1e48c2fb509392a65cf60845ce36cfbd072b0fbc6ad18f",
+      "bytes": 230229,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_complete_syntax"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-global-recheck-only-current-source.json",
+      "sha256": "f88286ab0c3d1e561c3b562bed1094d7bb02b320e588a687b907acb8c3de3be2",
+      "bytes": 4698,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_global_recheck"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-nomination-disabled.json",
+      "sha256": "ae5ab9634a1e2ef3913c1ba7b773da8ee2ed57963e159d202442be29ef364d63",
+      "bytes": 37909,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-partial-stem-becomes-locator.json",
+      "sha256": "ed2c199bf750905b231c10442e0c77ef16b878bc8baf3d48ba958e72790fa9e5",
+      "bytes": 225308,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_whole_label"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-path-filter-hides-collision.json",
+      "sha256": "7228bdc026df47fb52b41833364f3558d46a4de5792ba4bce147a6b0aeaef328",
+      "bytes": 4571,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_path_selection_not_naming_scope"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-target-role-not-rechecked.json",
+      "sha256": "80303eff6da0d7b430e345131becc96f44ad6805f2304f3ed3f508780fd54333",
+      "bytes": 4685,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_filename_reference_roles"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/fts-fallback-bare-operator-token.json",
+      "sha256": "5f6c1548f1ab2258c6645e77ee44be59dd09585b27dfdfca18544c11545cfd55",
+      "bytes": 4066,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_fts_literal_fallback"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/fts-primary-bare-operator-token.json",
+      "sha256": "d00ca7feecfc509a400d4bbc82fccc20206880f2122ba4a5976c11b9f601f6d1",
+      "bytes": 297448,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_fts_literal_primary"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/identifier-only-label-admitted.json",
+      "sha256": "b6ceba8cbdd480b249198175b24baeafe9c5e3d28cdff08e16184a26a1b46aaa",
+      "bytes": 4692,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "literal_anchor_context",
+          "outcome": "failure",
+          "guard": "recovery_literal_body_admission_safety"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/later-lookup-erases-prior-public-credit.json",
+      "sha256": "e3acd943a04b5b550fdfac527e9b64b2f29068701b2c5ddfe32e2bb8b89bd9a2",
+      "bytes": 4746,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "original_discovery_attribution",
+          "outcome": "failure",
+          "guard": "retrieval_original_coverage_survives_lookups"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/legacy-rephrase-regains-authority.json",
+      "sha256": "bd8fec475cf6968effb62db492b5e809768c92d489584bb793c9b482f2ae1702",
+      "bytes": 3616,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "no_semantic_retry",
+          "outcome": "failure",
+          "guard": "recovery_legacy_rephrase_cannot_authorize"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/literal-context-accepts-foreign-catalog.json",
+      "sha256": "190b486f418e4ef5dda80b2c3d9648450a5f6ad4412bc80c9bde0f92086ad02b",
+      "bytes": 4716,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "literal_anchor_context",
+          "outcome": "failure",
+          "guard": "recovery_literal_snapshot_binding"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/literal-context-admission-disabled.json",
+      "sha256": "39e203f3388b9496ff1e954f7c52a4745109409b01646cd7d1bb057fd853014d",
+      "bytes": 47748,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "literal_anchor_context",
+          "outcome": "failure",
+          "guard": "recovery_original_question_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/literal-context-mints-original-credit.json",
+      "sha256": "b15a4d84cc907850933476483342d96a48aa9288f3efffa786b05fa48f87502a",
+      "bytes": 4675,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "literal_anchor_context",
+          "outcome": "failure",
+          "guard": "recovery_partial_no_query_credit"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/local-handoff-auto-executes.json",
+      "sha256": "8353423b21ac10f63fb09b55123138ebe108eec5d1b3dc1204745167bbc5f927",
+      "bytes": 3930,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "retrieval_miss",
+          "outcome": "failure",
+          "guard": "recovery_handoff_not_automatic"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/lookup-only-hit-mints-original-discovery.json",
+      "sha256": "12eb5411bc250c48724820fa743800d598215cb50b9f83f2c47c1002137a34dc",
+      "bytes": 4745,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "original_discovery_attribution",
+          "outcome": "failure",
+          "guard": "retrieval_lookup_cannot_mint_original_discovery"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/operational-reason-masks-conflict.json",
+      "sha256": "33ad8e70264edcff8fa737ab73bee10788626248d2861769a2c53a9cd875e692",
+      "bytes": 4303,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "authoritative_conflict",
+          "outcome": "failure",
+          "guard": "recovery_conflict_suppresses_actions"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/requirements-context-disabled.json",
+      "sha256": "1cce1276edf03cbbe0232cfe943bb6f0b02308d4212c754888c639509c33d47c",
+      "bytes": 32157,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_closed_literal_source_fact"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/requirements-context-extra-modifier.json",
+      "sha256": "c24e3dd9a8039603b9a9fc1bf863967249e94c4eee9eca41dcadf4e0d8b24ab2",
+      "bytes": 186643,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 1,
+        "passed": 0
+      },
+      "observed_case_count": 1,
+      "cases": [
+        {
+          "id": "closed_literal_context",
+          "outcome": "failure",
+          "guard": "recovery_closed_complete_syntax"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "RECOVERY_OPERANDS",
+      "artifact_file": "recovery-contract.json",
+      "sha256": "7a27235fc25f5a5ed1c70ba66bc16a64bb8c0f899f4d5d4a078b6691181fa9d5",
+      "bytes": 29101,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 0,
+        "passed": 12
+      },
+      "observed_case_count": 12,
+      "cases": [
+        {
+          "id": "retrieval_miss",
+          "outcome": "passed"
+        },
+        {
+          "id": "original_fragments",
+          "outcome": "passed"
+        },
+        {
+          "id": "operational_precedence",
+          "outcome": "passed"
+        },
+        {
+          "id": "no_semantic_retry",
+          "outcome": "passed"
+        },
+        {
+          "id": "evidence_eligibility",
+          "outcome": "passed"
+        },
+        {
+          "id": "documentation_gap",
+          "outcome": "passed"
+        },
+        {
+          "id": "authoritative_conflict",
+          "outcome": "passed"
+        },
+        {
+          "id": "projection_states",
+          "outcome": "passed"
+        },
+        {
+          "id": "exact_document_recovery",
+          "outcome": "passed"
+        },
+        {
+          "id": "literal_anchor_context",
+          "outcome": "passed"
+        },
+        {
+          "id": "original_discovery_attribution",
+          "outcome": "passed"
+        },
+        {
+          "id": "closed_literal_context",
+          "outcome": "passed"
+        }
+      ],
+      "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+    },
+    {
+      "record_type": "QUALITY_ARTIFACT",
+      "artifact_file": "project-context-quality-hermetic.json",
+      "sha256": "1886aa7e136adb5b2f0bf1132ad55fafd716fc3aa202c9674159fca6e15a7e05",
+      "bytes": 20630,
+      "schema_version": "project-context-quality-contract-result-v2",
+      "lane": "legacy",
+      "case_count": 16,
+      "verdict": "PASS",
+      "passed_count": 16,
+      "report_only": false,
+      "evaluation_kind": "literal_query_identity_and_lineage_contract",
+      "retrieval_executed": false,
+      "quality_boundary": "useful_source_bound_positive_and_negative_facts_require_separate_live_report"
+    },
+    {
+      "record_type": "QUALITY_ARTIFACT",
+      "artifact_file": "project-context-quality-legacy-live.json",
+      "sha256": "19f77cff51aaebe87a442ef0e3bce462de03481a52a7c94d06551194413e85fa",
+      "bytes": 5118343,
+      "schema_version": "project-answer-quality-live-result-v1",
+      "run_mode": "live_self_host",
+      "lane": "legacy",
+      "case_count": 16,
+      "positive_case_count": 15,
+      "negative_case_count": 1,
+      "metrics": {
+        "top1_relevance": 0.6,
+        "top3_relevance": 0.6,
+        "top3_relevant_count": 9,
+        "mrr": 0.6,
+        "distractor_rate": 0,
+        "historical_source_rate": 0,
+        "mean_query_coverage": 0.4666666666666667,
+        "original_query_covered_count": 0,
+        "direct_coverage_count": 0,
+        "derived_coverage_count": 0,
+        "direct_only_coverage_count": 0,
+        "derived_only_coverage_count": 0,
+        "both_coverage_count": 0,
+        "lookup_coverage_count": 14,
+        "zero_coverage_count": 1,
+        "useful_result_count": 7,
+        "top1_fact_bearing_count": 8,
+        "metadata_only_evidence_count": 0,
+        "packs_contamination_count": 0,
+        "docs_analysis_contamination_count": 0,
+        "false_docs_answer_count": 0,
+        "max_source_count": 1,
+        "max_public_utf8_bytes": 2974,
+        "max_estimated_tokens": 744,
+        "false_abstention_count": 1,
+        "false_supported_count": 0,
+        "operational_contamination_count": 0,
+        "cases_scoring_8_plus": 14,
+        "mean_score": 9.110666666666667,
+        "verified_original_case_fact_count": 8
+      },
+      "legacy_fact_acceptance": {
+        "schema_version": "legacy-source-fact-oracle-result-v1",
+        "verified_original_case_fact_count": 8,
+        "positive_case_count": 15,
+        "verified_case_ids": {
+          "items": [
+            "ru-install",
+            "ru-overview",
+            "ru-contributor",
+            "ru-mcp-flow",
+            "ru-storage",
+            "ru-chunks",
+            "ru-tests",
+            "ru-offline"
+          ],
+          "report_count": 8,
+          "log_omitted": 0
+        },
+        "raw_original_query_covered_count": 0,
+        "errors": {
+          "items": [],
+          "report_count": 0,
+          "log_omitted": 0
+        }
+      },
+      "verdict": "FAIL",
+      "passed_count": 8,
+      "positive_passed_count": 7,
+      "errors": {
+        "items": [
+          "01: failed positive checks=['relevant_source_in_top3']: Как установить DocAtlas локально и проверить, что он работает?",
+          "03: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Какие первые команды выполнить после установки?",
+          "06: failed positive checks=['relevant_source_in_top3', 'required_facts', 'only_allowed_sources']: Как обновить проектную документацию после изменения файлов?",
+          "07: failed positive checks=['relevant_source_in_top3', 'required_facts']: Как настроить проектную документацию для репозитория?",
+          "08: failed positive checks=['required_facts']: Как безопасно проверить и очистить локальный индекс?",
+          "09: failed positive checks=['relevant_source_in_top3', 'required_facts', 'only_allowed_sources']: Что проверить, если проектная документация устарела или ничего не находится?",
+          "12: failed positive checks=['relevant_source_in_top3', 'required_facts', 'only_allowed_sources']: Как выбор доказательств определяет подходящие кандидаты?",
+          "15: failed positive checks=['required_facts']: Какая команда запускает Docs MCP сервер?",
+          "useful onboarding context is below the frozen minimum",
+          "Top-1 fact-bearing context is below the frozen minimum",
+          "relevant context is missing from Top-3 too often",
+          "direct or audited-derived original coverage is below the frozen minimum"
+        ],
+        "report_count": 12,
+        "log_omitted": 0
+      },
+      "input_mode": "question_with_lookups",
+      "report_only": true,
+      "acceptance_role": "legacy_compatibility_report_only",
+      "claim_boundary": "in_process_self_host_not_installed_agent",
+      "deterministic_result_digest": "f9480c50036fc20917b4fc9dc8187d5cb6e891e7e82c102a2b2c1b121269fa8b",
+      "corpus_sha256": "b77ae44e8fb41bc53a6aa6cf584d886ee884ba337302285e4de9af2e4a5d829a"
+    },
+    {
+      "record_type": "QUALITY_ARTIFACT",
+      "artifact_file": "project-context-quality-v2-live.json",
+      "sha256": "78e2a5c49fdd39fda63957da34b44725cf95797474a3183921e71598de70e32a",
+      "bytes": 13303240,
+      "schema_version": "project-context-quality-v2-result-4",
+      "run_mode": "live_self_host",
+      "validation": {
+        "case_count": 25,
+        "lane_counts": {
+          "natural": 19,
+          "exposed_paraphrases": 6
+        },
+        "witness_document_count": 12
+      },
+      "lanes": {
+        "natural": {
+          "status": "BASELINE_REPORT_ONLY",
+          "positive_cases": 15,
+          "negative_cases": 2,
+          "unsupported_answer_control_cases": 2,
+          "metrics": {
+            "semantic_usefulness": {
+              "numerator": 6,
+              "denominator": 15
+            },
+            "lookup_attribution": {
+              "numerator": 21,
+              "denominator": 36
+            },
+            "source_precision": {
+              "numerator": 18,
+              "denominator": 41
+            },
+            "safety": {
+              "numerator": 19,
+              "denominator": 19
+            },
+            "cost_observation_completeness": {
+              "numerator": 19,
+              "denominator": 19
+            },
+            "negative_correctness": {
+              "numerator": 2,
+              "denominator": 2
+            },
+            "unsupported_answer_control_correctness": {
+              "numerator": 2,
+              "denominator": 2
+            },
+            "runtime_claimed_original_retrieval_coverage": {
+              "numerator": 0,
+              "denominator": 15
+            },
+            "evaluator_verified_full_semantic_component_coverage": {
+              "numerator": 6,
+              "denominator": 15
+            },
+            "false_full_coverage": {
+              "numerator": 0,
+              "denominator": 15
+            }
+          },
+          "output_cost": {
+            "total_source_count": 41,
+            "max_source_count": 18,
+            "max_public_utf8_bytes": 16744,
+            "max_serialized_estimated_tokens": 4186
+          },
+          "root_cause_counts": {
+            "lookup_attribution_missing": 1,
+            "none": 2,
+            "precision_loss": 3,
+            "qualification_rejection": 6,
+            "runtime_component_claim_invalid": 7
+          }
+        },
+        "exposed_paraphrases": {
+          "status": "EXPOSED_PARAPHRASES_REPORT_ONLY",
+          "positive_cases": 5,
+          "negative_cases": 1,
+          "unsupported_answer_control_cases": 0,
+          "metrics": {
+            "semantic_usefulness": {
+              "numerator": 1,
+              "denominator": 5
+            },
+            "lookup_attribution": {
+              "numerator": 6,
+              "denominator": 12
+            },
+            "source_precision": {
+              "numerator": 6,
+              "denominator": 10
+            },
+            "safety": {
+              "numerator": 6,
+              "denominator": 6
+            },
+            "cost_observation_completeness": {
+              "numerator": 6,
+              "denominator": 6
+            },
+            "negative_correctness": {
+              "numerator": 1,
+              "denominator": 1
+            },
+            "unsupported_answer_control_correctness": {
+              "numerator": 0,
+              "denominator": 0
+            },
+            "runtime_claimed_original_retrieval_coverage": {
+              "numerator": 0,
+              "denominator": 5
+            },
+            "evaluator_verified_full_semantic_component_coverage": {
+              "numerator": 1,
+              "denominator": 5
+            },
+            "false_full_coverage": {
+              "numerator": 0,
+              "denominator": 5
+            }
+          },
+          "output_cost": {
+            "total_source_count": 10,
+            "max_source_count": 4,
+            "max_public_utf8_bytes": 6163,
+            "max_serialized_estimated_tokens": 1541
+          },
+          "root_cause_counts": {
+            "precision_loss": 1,
+            "qualification_rejection": 3,
+            "runtime_component_claim_invalid": 2
+          }
+        }
+      },
+      "verdict": "REPORT_ONLY",
+      "report_only": true,
+      "claim_boundary": "in_process_current_production_not_installed_agent",
+      "production_runner_verdict": "FAIL",
+      "production_runner_errors": {
+        "items": [
+          "01: failed positive checks=['required_facts', 'only_allowed_sources']: Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+          "02: failed positive checks=['required_facts']: Что это за проект и какую проблему он решает?",
+          "04: failed positive checks=['only_allowed_sources']: Я хочу прислать первое исправление: что сначала прочитать в репозитории и что проверить перед отправкой?",
+          "05: failed positive checks=['required_facts']: Как устроена архитектура проекта и где проходят основные границы модулей?",
+          "06: failed positive checks=['relevant_source_in_top3', 'required_facts', 'no_packs_contamination', 'only_allowed_sources']: Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+          "07: failed positive checks=['only_allowed_sources']: Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+          "08: failed positive checks=['relevant_source_in_top3', 'required_facts', 'only_allowed_sources']: Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+          "09: failed positive checks=['required_facts']: Хочу удалить только производный индекс, а исходники и настройки оставить. Как сначала увидеть план очистки?",
+          "10: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+          "11: failed positive checks=['only_allowed_sources']: Если я работаю с двумя репозиториями, могут ли их индексы смешаться и что считать истиной при расхождении индекса с файлами?",
+          "12: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Как большой документ превращается в родительские секции и небольшие поисковые фрагменты, есть ли у них ограничение размера?",
+          "13: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Как система выбирает доказательства?",
+          "15: failed positive checks=['only_allowed_sources']: Какие публичные инструменты предоставляет Docs MCP?",
+          "16: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'public_query_inventory']: Как долго DocAtlas хранит удалённые документы в индексе перед автоматической очисткой?",
+          "17: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'public_query_inventory']: Какой алгоритм шифрования DocAtlas использует для локальной базы SQLite и где ротируются ключи?",
+          "18: failed positive checks=['required_facts']: Can I try this on my own documents without fetching embedding models, and check the change without network tests?",
+          "19: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+          "20: failed positive checks=['required_facts', 'only_allowed_sources']: I want a dry look at what an index reset would remove, with my source tree and configuration left alone. What is the documented process?",
+          "21: failed positive checks=['required_facts']: A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+          "22: failed positive checks=['only_allowed_sources']: The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+          "useful onboarding context is below the frozen minimum",
+          "Top-1 fact-bearing context is below the frozen minimum",
+          "relevant context is missing from Top-3 too often",
+          "direct or audited-derived original coverage is below the frozen minimum",
+          "packs_contamination_count must be zero"
+        ],
+        "report_count": 25,
+        "log_omitted": 0
+      }
+    },
+    {
+      "record_type": "CONTRACT_ARTIFACT",
+      "artifact_file": "agent-developer-v1.json",
+      "sha256": "b8b33a1ea4c21a9ff2bb403302984d90de0cd5ac31a0de3f051b4ae4643518c1",
+      "bytes": 16024,
+      "schema_version": 1,
+      "metrics": {
+        "cross_module_scope_accuracy": 1,
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "module_dependency_scope_accuracy": 1,
+        "module_only_expected_evidence_rate": 0.25,
+        "module_project_max_context_calls": 2,
+        "recovery_contract_accuracy": 1,
+        "unsupported_edit_ready_false_rate": 1
+      },
+      "errors": {
+        "items": [
+          "cross_module_comparison_supported:1: neither frozen baseline nor target status matched; actual='insufficient_evidence' baseline='ok' target='ok'; mismatches=['positive_context_not_available', 'positive_context_has_no_sources', \"required_fact_missing: 'OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation.'\", \"status='insufficient_evidence' expected='ok'\", 'required sources missing from ()']",
+          "explicit_catalog_module_supported:1: neither frozen baseline nor target status matched; actual='insufficient_evidence' baseline='ok' target='ok'; mismatches=['positive_context_not_available', 'positive_context_has_no_sources', \"required_fact_missing: 'CatalogReader reads product summaries from the local catalog cache.'\", \"status='insufficient_evidence' expected='ok'\", 'required sources missing from ()']",
+          "target metric module_only_expected_evidence_rate=0.25 expected 1.0"
+        ],
+        "report_count": 3,
+        "log_omitted": 0
+      },
+      "protocol": "agent-developer-v1",
+      "baseline_ok": false,
+      "target_ok": false,
+      "task_count": 11,
+      "executed_task_count": 11,
+      "target_closed_tasks": 8,
+      "target_gap_count": 4,
+      "target_gaps": {
+        "items": [
+          {
+            "actual_status": "insufficient_evidence",
+            "gap": "generic_behavior_predicate_stores",
+            "target_status": "ok",
+            "task_id": "module_behavior_named_gap"
+          },
+          {
+            "actual_status": "insufficient_evidence",
+            "gap": "domain_neutral_requirements",
+            "target_status": "ok",
+            "task_id": "module_requirements_named_gap"
+          },
+          {
+            "actual_status": "insufficient_evidence",
+            "gap": "target_not_closed",
+            "target_status": "ok",
+            "task_id": "cross_module_comparison_supported"
+          },
+          {
+            "actual_status": "insufficient_evidence",
+            "gap": "target_not_closed",
+            "target_status": "ok",
+            "task_id": "explicit_catalog_module_supported"
+          }
+        ],
+        "report_count": 4,
+        "log_omitted": 0
+      },
+      "false_supported": 0,
+      "forbidden_source_contamination": 0,
+      "migration_control_count": 1,
+      "migration_controls_ok": false
+    },
+    {
+      "record_type": "CONTRACT_ARTIFACT",
+      "artifact_file": "agent-developer-v2.json",
+      "sha256": "dd2fa544776ed5522c6fd7cc9eb1a83eb475602a1952725fab15ced8b07a2ba5",
+      "bytes": 99999,
+      "schema_version": 2,
+      "passed": false,
+      "errors": {
+        "items": [
+          "Agent Developer Protocol v1 or required migration controls are not target-green",
+          "v1: cross_module_comparison_supported:1: neither frozen baseline nor target status matched; actual='insufficient_evidence' baseline='ok' target='ok'; mismatches=['positive_context_not_available', 'positive_context_has_no_sources', \"required_fact_missing: 'OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation.'\", \"status='insufficient_evidence' expected='ok'\", 'required sources missing from ()']",
+          "v1: explicit_catalog_module_supported:1: neither frozen baseline nor target status matched; actual='insufficient_evidence' baseline='ok' target='ok'; mismatches=['positive_context_not_available', 'positive_context_has_no_sources', \"required_fact_missing: 'CatalogReader reads product summaries from the local catalog cache.'\", \"status='insufficient_evidence' expected='ok'\", 'required sources missing from ()']",
+          "v1: target metric module_only_expected_evidence_rate=0.25 expected 1.0",
+          "v1/module_behavior_named_gap: positive_context_not_available",
+          "v1/module_behavior_named_gap: positive_context_has_no_sources",
+          "v1/module_behavior_named_gap: required_fact_missing: 'OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.'",
+          "v1/module_behavior_named_gap: status='insufficient_evidence' expected='ok'",
+          "v1/module_behavior_named_gap: required sources missing from ()",
+          "v1/module_requirements_named_gap: positive_context_not_available",
+          "v1/module_requirements_named_gap: positive_context_has_no_sources",
+          "v1/module_requirements_named_gap: required_fact_missing: 'OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.'",
+          "v1/module_requirements_named_gap: status='insufficient_evidence' expected='ok'",
+          "v1/module_requirements_named_gap: required sources missing from ()",
+          "v1/cross_module_comparison_supported: positive_context_not_available",
+          "v1/cross_module_comparison_supported: positive_context_has_no_sources",
+          "v1/cross_module_comparison_supported: required_fact_missing: 'OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation.'",
+          "v1/cross_module_comparison_supported: status='insufficient_evidence' expected='ok'",
+          "v1/cross_module_comparison_supported: required sources missing from ()",
+          "v1/explicit_catalog_module_supported: positive_context_not_available",
+          "v1/explicit_catalog_module_supported: positive_context_has_no_sources",
+          "v1/explicit_catalog_module_supported: required_fact_missing: 'CatalogReader reads product summaries from the local catalog cache.'",
+          "v1/explicit_catalog_module_supported: status='insufficient_evidence' expected='ok'",
+          "v1/explicit_catalog_module_supported: required sources missing from ()",
+          "module_behavior_tiny_budget: call 1: positive_context_not_available",
+          "module_behavior_tiny_budget: call 1: positive_context_has_no_sources",
+          "module_behavior_tiny_budget: call 1: required_fact_missing: 'OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.'",
+          "module_behavior_tiny_budget: call 1: status='insufficient_evidence' expected='ok'",
+          "module_behavior_tiny_budget: call 1: required sources missing from ()",
+          "module_requirements_tiny_budget: call 1: positive_context_not_available",
+          "module_requirements_tiny_budget: call 1: positive_context_has_no_sources",
+          "module_requirements_tiny_budget: call 1: required_fact_missing: 'OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.'"
+        ],
+        "report_count": 43,
+        "log_omitted": 11
+      },
+      "protocol": "agent-developer-adversarial-v2",
+      "v1_target_ok": false,
+      "v1_task_count": 11,
+      "adversarial_case_count": 28,
+      "adversarial_passed_cases": 24,
+      "execution_errors": {
+        "items": [],
+        "report_count": 0,
+        "log_omitted": 0
+      },
+      "execution_identity": {
+        "docmancer/docs/application/_project_docs_service_part01.py": {
+          "expected_path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/_project_docs_service_part01.py",
+          "imported_from_checkout": true,
+          "imported_path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/_project_docs_service_part01.py",
+          "sha256": "3a58b23897de94332c89bc712f633946e64aa39ed78d201a18bac5a8a5cdac42"
+        },
+        "docmancer/docs/interfaces/mcp/prefetch_tools.py": {
+          "expected_path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/interfaces/mcp/prefetch_tools.py",
+          "imported_from_checkout": true,
+          "imported_path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/interfaces/mcp/prefetch_tools.py",
+          "sha256": "d6d9fa9d70765b2ddad83c1f17ebbd29e041d0bbd92a1dac9b947d89f21c19b1"
+        },
+        "docmancer/docs/interfaces/mcp/recovery_projection.py": {
+          "expected_path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/interfaces/mcp/recovery_projection.py",
+          "imported_from_checkout": true,
+          "imported_path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/interfaces/mcp/recovery_projection.py",
+          "sha256": "59087794435e089cd9fcb1aa9a88f841df54d7eae89daee788dcbc27c8fe8e0b"
+        },
+        "scripts/run_agent_developer_adversarial_gate.py": {
+          "expected_path": "/home/runner/work/DocAtlas/DocAtlas/scripts/run_agent_developer_adversarial_gate.py",
+          "imported_from_checkout": true,
+          "imported_path": "/home/runner/work/DocAtlas/DocAtlas/scripts/run_agent_developer_adversarial_gate.py",
+          "sha256": "a7f88031fbb7fb2ac843b1509a82138aea62b996b619c094efec2282726e1cca"
+        },
+        "scripts/run_agent_developer_gate.py": {
+          "expected_path": "/home/runner/work/DocAtlas/DocAtlas/scripts/run_agent_developer_gate.py",
+          "imported_from_checkout": true,
+          "imported_path": "/home/runner/work/DocAtlas/DocAtlas/scripts/run_agent_developer_gate.py",
+          "sha256": "187466cba6dc97b3d0433a10d4fe07768840c93d0b4580d9281df639a09dd206"
+        }
+      }
+    },
+    {
+      "record_type": "RECOVERY_ARTIFACT",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/baseline.json",
+      "sha256": "496c52e361e30f75846d5257a5dd6b439d2cf2126642ea5b6d3fd222af8eba5a",
+      "bytes": 29106,
+      "schema_version": "recovery-contract-v2",
+      "counts": {
+        "error": 0,
+        "failure": 0,
+        "passed": 12
+      },
+      "question_sha256": "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b",
+      "source_sha256": "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47",
+      "modules": {
+        "items": [
+          {
+            "module": "docmancer.docs.application.recovery",
+            "path": "docmancer/docs/application/recovery.py",
+            "sha256": "e0d4f36b45e1f75e47c1c237602f7f5d05f45c7d62bbf6ef8366a66724396b2b"
+          },
+          {
+            "module": "docmancer.docs.application.proofability",
+            "path": "docmancer/docs/application/proofability.py",
+            "sha256": "b997fc57cae0fb9f212fcde7d24ba08c5ac88d7a7d54ab1736614a83ae2a2d8d"
+          },
+          {
+            "module": "docmancer.docs.interfaces.mcp.recovery_projection",
+            "path": "docmancer/docs/interfaces/mcp/recovery_projection.py",
+            "sha256": "59087794435e089cd9fcb1aa9a88f841df54d7eae89daee788dcbc27c8fe8e0b"
+          },
+          {
+            "module": "docmancer.docs.application._project_docs_service_part03",
+            "path": "docmancer/docs/application/_project_docs_service_part03.py",
+            "sha256": "a5ed7652e97d0885495fc62db4f0a5ed64b92a30dc56c32da8668e1f2c05faaa"
+          },
+          {
+            "module": "docmancer.docs.application.source_reference_evidence",
+            "path": "docmancer/docs/application/source_reference_evidence.py",
+            "sha256": "c05f9b3d3aea49845b169ddef39a3a7f626052abe114980d932756c7fc4a3c2a"
+          },
+          {
+            "module": "docmancer.docs.application.reference_query_tagging",
+            "path": "docmancer/docs/application/reference_query_tagging.py",
+            "sha256": "61d3d06bb601ac07aae0fd5bda0773e58bf7daff5d14818ba1cd117d70ec9e2a"
+          },
+          {
+            "module": "docmancer.docs.application._docs_context_projection_core",
+            "path": "docmancer/docs/application/_docs_context_projection_core.py",
+            "sha256": "bafd93e9ef1ee7548ed930903b07222795f8253b02faecf05c12253acf52047c"
+          },
+          {
+            "module": "docmancer.docs.domain.project_doc_ranking",
+            "path": "docmancer/docs/domain/project_doc_ranking.py",
+            "sha256": "6826a23587842d2b18369ab2306ded82a1652d6d35a34f414575f4c02b6df9c6"
+          },
+          {
+            "module": "docmancer.docs.domain.literal_context_admission",
+            "path": "docmancer/docs/domain/literal_context_admission.py",
+            "sha256": "9c43fa25e59af31a4bd6118aad7b5ad744f6548afe5ccf42cad7749eb19c5a33"
+          },
+          {
+            "module": "docmancer.docs.domain.query_reference_binding",
+            "path": "docmancer/docs/domain/query_reference_binding.py",
+            "sha256": "0bdf65939526fd19ecc239ce3a3ee67bdaf9d067e184798f0b8f9f9b13ef528b"
+          },
+          {
+            "module": "eval.agent_developer_v1.structural_filename_controls",
+            "path": "eval/agent_developer_v1/structural_filename_controls.py",
+            "sha256": "20a0273c4c63850bfc63495bce44218d583bbf4b2be54f5ce1f1fd4414562d9f"
+          },
+          {
+            "module": "docmancer.core._sqlite_store_part03",
+            "path": "docmancer/core/_sqlite_store_part03.py",
+            "sha256": "926ba50fcec986c28a796e139dd97874de34a2e3402e8c44e126a4149e5652b0"
+          },
+          {
+            "module": "eval.agent_developer_v1.fts_literal_controls",
+            "path": "eval/agent_developer_v1/fts_literal_controls.py",
+            "sha256": "29153b28b4cf2aa7747481d284eddbba447f6fb9bc32996a49a91545b3d300bf"
+          }
+        ],
+        "report_count": 13,
+        "log_omitted": 0
+      },
+      "cases": {
+        "items": [
+          {
+            "id": "retrieval_miss",
+            "outcome": "passed"
+          },
+          {
+            "id": "original_fragments",
+            "outcome": "passed"
+          },
+          {
+            "id": "operational_precedence",
+            "outcome": "passed"
+          },
+          {
+            "id": "no_semantic_retry",
+            "outcome": "passed"
+          },
+          {
+            "id": "evidence_eligibility",
+            "outcome": "passed"
+          },
+          {
+            "id": "documentation_gap",
+            "outcome": "passed"
+          },
+          {
+            "id": "authoritative_conflict",
+            "outcome": "passed"
+          },
+          {
+            "id": "projection_states",
+            "outcome": "passed"
+          },
+          {
+            "id": "exact_document_recovery",
+            "outcome": "passed"
+          },
+          {
+            "id": "literal_anchor_context",
+            "outcome": "passed"
+          },
+          {
+            "id": "original_discovery_attribution",
+            "outcome": "passed"
+          },
+          {
+            "id": "closed_literal_context",
+            "outcome": "passed"
+          }
+        ],
+        "report_count": 12,
+        "log_omitted": 0
+      }
+    },
+    {
+      "record_type": "CONTRACT_ARTIFACT",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/summary.json",
+      "sha256": "5f46ebf0dde35b73e44b507158f957df308734fde050feb888bec29010c3f98d",
+      "bytes": 348,
+      "status": "passed",
+      "baseline_cases": 12,
+      "mutants_killed": 33,
+      "gate_sha256": "c74a7391a047a88c9ba495e3b48cdc6979745a700bd006635126f5544c339710",
+      "frozen_question_sha256": "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b",
+      "frozen_source_sha256": "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
+    },
+    {
+      "record_type": "CRITICAL_BASELINE",
+      "artifact_file": "docmancer-mutation-ny1i3ns5/baseline.junit.xml",
+      "sha256": "b4f91622a87e0ad791572da4cb44cd1b99ef4b4c8ab230886a5af64a43377d16",
+      "observed_case_count": 59,
+      "failures": {
+        "items": [
+          {
+            "classname": "tests.test_mcp_delivery_member_transaction",
+            "name": "test_real_service_retrieves_committed_fixture_member_bytes[none]",
+            "kind": "failure",
+            "message": "AssertionError: critical_project_read_acquired_qualified"
+          }
+        ],
+        "report_count": 1,
+        "log_omitted": 0
+      },
+      "mutation_credit": "not_inferred"
+    },
+    {
+      "record_type": "ARTIFACT_CONSOLE",
+      "omitted_rows": 55,
+      "record_count": 133,
+      "complete_selected_records_in_artifact": true,
+      "original_reports_preserved": true,
+      "omitted_priority_rows": {
+        "CRITICAL_OPERANDS": 0,
+        "RECOVERY_OPERANDS": 0
+      }
+    },
+    {
+      "record_type": "JUNIT_TRACKED",
+      "artifact_file": "pytest-core-3.11-38023053227-1/core-tests-3.11.xml",
+      "xml_sha256": "12808a98f9ef5984147f608dbaba49797e2da3783c2e4b6d2f718a1b43cd6a01",
+      "module": "tests/docs/test_docs_lossless_context_projection.py",
+      "collected": 32,
+      "counts": {
+        "PASS": 32,
+        "FAIL": 0,
+        "ERROR": 0,
+        "SKIP": 0
+      },
+      "nodes": [
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[list]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[table]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[code]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "record_type": "JUNIT_TRACKED",
+      "artifact_file": "pytest-core-3.11-38023053227-1/core-tests-3.11.xml",
+      "xml_sha256": "12808a98f9ef5984147f608dbaba49797e2da3783c2e4b6d2f718a1b43cd6a01",
+      "module": "tests/test_mcp_delivery_member_transaction.py",
+      "collected": 116,
+      "counts": {
+        "PASS": 115,
+        "FAIL": 1,
+        "ERROR": 0,
+        "SKIP": 0
+      },
+      "nodes": [
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[missing]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[owner]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[schema]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[generation_column]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[generation]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[projection]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[vector]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+          "outcome": "FAIL"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[repository]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[worktree_marker]",
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "record_type": "JUNIT_TRACKED",
+      "artifact_file": "pytest-core-3.12-38023053227-1/core-tests-3.12.xml",
+      "xml_sha256": "572802584bf65241d32bcaea66ddab45d9f8124c11282c923fc2a52d1aa0ab9a",
+      "module": "tests/docs/test_docs_lossless_context_projection.py",
+      "collected": 32,
+      "counts": {
+        "PASS": 32,
+        "FAIL": 0,
+        "ERROR": 0,
+        "SKIP": 0
+      },
+      "nodes": [
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[list]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[table]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[code]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "record_type": "JUNIT_TRACKED",
+      "artifact_file": "pytest-core-3.12-38023053227-1/core-tests-3.12.xml",
+      "xml_sha256": "572802584bf65241d32bcaea66ddab45d9f8124c11282c923fc2a52d1aa0ab9a",
+      "module": "tests/test_mcp_delivery_member_transaction.py",
+      "collected": 116,
+      "counts": {
+        "PASS": 115,
+        "FAIL": 1,
+        "ERROR": 0,
+        "SKIP": 0
+      },
+      "nodes": [
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[missing]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[owner]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[schema]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[generation_column]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[generation]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[projection]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[vector]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+          "outcome": "FAIL"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[repository]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[worktree_marker]",
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "record_type": "JUNIT_TRACKED",
+      "artifact_file": "pytest-core-3.13-38023053227-1/core-tests-3.13.xml",
+      "xml_sha256": "44843fefc212d45ec252da461bc67a4b601a21709fcc3eb66910bad0891bf0b4",
+      "module": "tests/docs/test_docs_lossless_context_projection.py",
+      "collected": 32,
+      "counts": {
+        "PASS": 32,
+        "FAIL": 0,
+        "ERROR": 0,
+        "SKIP": 0
+      },
+      "nodes": [
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[list]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[table]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate[code]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "record_type": "JUNIT_TRACKED",
+      "artifact_file": "pytest-core-3.13-38023053227-1/core-tests-3.13.xml",
+      "xml_sha256": "44843fefc212d45ec252da461bc67a4b601a21709fcc3eb66910bad0891bf0b4",
+      "module": "tests/test_mcp_delivery_member_transaction.py",
+      "collected": 116,
+      "counts": {
+        "PASS": 115,
+        "FAIL": 1,
+        "ERROR": 0,
+        "SKIP": 0
+      },
+      "nodes": [
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[missing]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[owner]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[schema]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[generation_column]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[generation]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[projection]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_member_read_rejects_invalid_storage_without_repair[vector]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+          "outcome": "FAIL"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[repository]",
+          "outcome": "PASS"
+        },
+        {
+          "node": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[worktree_marker]",
+          "outcome": "PASS"
+        }
+      ]
+    }
+  ],
+  "recovery_intended_outcomes": [
+    {
+      "name": "local-handoff-auto-executes",
+      "case": "retrieval_miss",
+      "guard": "recovery_handoff_not_automatic",
+      "sha256": "8353423b21ac10f63fb09b55123138ebe108eec5d1b3dc1204745167bbc5f927",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/local-handoff-auto-executes.json"
+    },
+    {
+      "name": "authoritative-conflict-does-not-stop",
+      "case": "authoritative_conflict",
+      "guard": "recovery_authoritative_conflict_stops",
+      "sha256": "1981e001c12f273c36bfd688cba2591c3953345db7e149658a4b460bfb8510a3",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/authoritative-conflict-does-not-stop.json"
+    },
+    {
+      "name": "legacy-rephrase-regains-authority",
+      "case": "no_semantic_retry",
+      "guard": "recovery_legacy_rephrase_cannot_authorize",
+      "sha256": "bd8fec475cf6968effb62db492b5e809768c92d489584bb793c9b482f2ae1702",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/legacy-rephrase-regains-authority.json"
+    },
+    {
+      "name": "diagnostic-invents-domain-fact",
+      "case": "original_fragments",
+      "guard": "recovery_original_diagnostic_fragments",
+      "sha256": "45228da1f030c3103f0c24dfef6c44fa9275b2fc3d134c26f9929463091fb1c0",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/diagnostic-invents-domain-fact.json"
+    },
+    {
+      "name": "eligibility-treated-as-retrieval",
+      "case": "evidence_eligibility",
+      "guard": "recovery_ineligible_evidence_class",
+      "sha256": "c59b1ce2bfce4b54fc0ea4c1d02b8b4b96f78071e40e6f44628a9440e5a4f4b0",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/eligibility-treated-as-retrieval.json"
+    },
+    {
+      "name": "conflict-keeps-operational-action",
+      "case": "authoritative_conflict",
+      "guard": "recovery_conflict_suppresses_actions",
+      "sha256": "16410cfce2e15a31ae9e7705ac424e1c6001fee8512b4562e7739b8f144203f7",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/conflict-keeps-operational-action.json"
+    },
+    {
+      "name": "operational-reason-masks-conflict",
+      "case": "authoritative_conflict",
+      "guard": "recovery_conflict_suppresses_actions",
+      "sha256": "33ad8e70264edcff8fa737ab73bee10788626248d2861769a2c53a9cd875e692",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/operational-reason-masks-conflict.json"
+    },
+    {
+      "name": "exact-document-fallback-disabled",
+      "case": "exact_document_recovery",
+      "guard": "recovery_exact_document_source_fact",
+      "sha256": "248cc8448de9ffd9196dd9672e72b28400e0f2cd389cd9935c9af4fe7fd1052a",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/exact-document-fallback-disabled.json"
+    },
+    {
+      "name": "literal-context-admission-disabled",
+      "case": "literal_anchor_context",
+      "guard": "recovery_original_question_source_fact",
+      "sha256": "39e203f3388b9496ff1e954f7c52a4745109409b01646cd7d1bb057fd853014d",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/literal-context-admission-disabled.json"
+    },
+    {
+      "name": "literal-context-mints-original-credit",
+      "case": "literal_anchor_context",
+      "guard": "recovery_partial_no_query_credit",
+      "sha256": "b15a4d84cc907850933476483342d96a48aa9288f3efffa786b05fa48f87502a",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/literal-context-mints-original-credit.json"
+    },
+    {
+      "name": "identifier-only-label-admitted",
+      "case": "literal_anchor_context",
+      "guard": "recovery_literal_body_admission_safety",
+      "sha256": "b6ceba8cbdd480b249198175b24baeafe9c5e3d28cdff08e16184a26a1b46aaa",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/identifier-only-label-admitted.json"
+    },
+    {
+      "name": "literal-context-accepts-foreign-catalog",
+      "case": "literal_anchor_context",
+      "guard": "recovery_literal_snapshot_binding",
+      "sha256": "190b486f418e4ef5dda80b2c3d9648450a5f6ad4412bc80c9bde0f92086ad02b",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/literal-context-accepts-foreign-catalog.json"
+    },
+    {
+      "name": "later-lookup-erases-prior-public-credit",
+      "case": "original_discovery_attribution",
+      "guard": "retrieval_original_coverage_survives_lookups",
+      "sha256": "e3acd943a04b5b550fdfac527e9b64b2f29068701b2c5ddfe32e2bb8b89bd9a2",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/later-lookup-erases-prior-public-credit.json"
+    },
+    {
+      "name": "lookup-only-hit-mints-original-discovery",
+      "case": "original_discovery_attribution",
+      "guard": "retrieval_lookup_cannot_mint_original_discovery",
+      "sha256": "12eb5411bc250c48724820fa743800d598215cb50b9f83f2c47c1002137a34dc",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/lookup-only-hit-mints-original-discovery.json"
+    },
+    {
+      "name": "closed-literal-context-disabled",
+      "case": "closed_literal_context",
+      "guard": "recovery_closed_literal_source_fact",
+      "sha256": "6b716aaf8a1c7cdddcdc9e1a2175c769f4eb1cc83e634b6deed23ad72fef5309",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/closed-literal-context-disabled.json"
+    },
+    {
+      "name": "closed-literal-context-ignores-extra-conditions",
+      "case": "closed_literal_context",
+      "guard": "recovery_closed_complete_syntax",
+      "sha256": "27afd10eb8c1b7914402165cf2aa85b2e1a4d6e75b5bf282f984f0dcf9e68139",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/closed-literal-context-ignores-extra-conditions.json"
+    },
+    {
+      "name": "requirements-context-disabled",
+      "case": "closed_literal_context",
+      "guard": "recovery_closed_literal_source_fact",
+      "sha256": "1cce1276edf03cbbe0232cfe943bb6f0b02308d4212c754888c639509c33d47c",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/requirements-context-disabled.json"
+    },
+    {
+      "name": "requirements-context-extra-modifier",
+      "case": "closed_literal_context",
+      "guard": "recovery_closed_complete_syntax",
+      "sha256": "c24e3dd9a8039603b9a9fc1bf863967249e94c4eee9eca41dcadf4e0d8b24ab2",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/requirements-context-extra-modifier.json"
+    },
+    {
+      "name": "count-context-disabled",
+      "case": "closed_literal_context",
+      "guard": "recovery_count_literal_source_fact",
+      "sha256": "feb7ca18e3307f96dc678bd605f5a73a68eaafdade71672aa7d3d15720870155",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/count-context-disabled.json"
+    },
+    {
+      "name": "count-context-bypasses-phrase-witness",
+      "case": "closed_literal_context",
+      "guard": "recovery_count_phrase_body_witness",
+      "sha256": "4da4fdb8b7e10a0d42587be9ef0637b74fe9ebafe3cb7fc230347f57b2e70667",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/count-context-bypasses-phrase-witness.json"
+    },
+    {
+      "name": "explain-list-context-disabled",
+      "case": "closed_literal_context",
+      "guard": "recovery_explain_literal_source_fact",
+      "sha256": "0c06b2046490ec44f3ed8ffa9a15d62723f436448c283208f112dd717d35ccf0",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/explain-list-context-disabled.json"
+    },
+    {
+      "name": "explain-list-context-ignores-tail",
+      "case": "closed_literal_context",
+      "guard": "recovery_explain_complete_syntax",
+      "sha256": "83fefe514e95536ab535ea4079631bc9ca1d8d4c68c9e20336124d41dd2c47c0",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/explain-list-context-ignores-tail.json"
+    },
+    {
+      "name": "explain-list-borrows-label-substance",
+      "case": "closed_literal_context",
+      "guard": "recovery_explain_exact_body",
+      "sha256": "9609bfe3b7a692975828043a5910d5a724e6e26cb8d89e70b909c47cc0279df5",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/explain-list-borrows-label-substance.json"
+    },
+    {
+      "name": "filename-nomination-disabled",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_source_fact",
+      "sha256": "ae5ab9634a1e2ef3913c1ba7b773da8ee2ed57963e159d202442be29ef364d63",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-nomination-disabled.json"
+    },
+    {
+      "name": "filename-collision-first-winner",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_catalog_ambiguity",
+      "sha256": "73a4a918ceac2707f3d3ae488f6d1d77e97fec53bc0bd588890735596b3fcb4f",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-collision-first-winner.json"
+    },
+    {
+      "name": "filename-global-recheck-only-current-source",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_global_recheck",
+      "sha256": "f88286ab0c3d1e561c3b562bed1094d7bb02b320e588a687b907acb8c3de3be2",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-global-recheck-only-current-source.json"
+    },
+    {
+      "name": "filename-target-role-not-rechecked",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_reference_roles",
+      "sha256": "80303eff6da0d7b430e345131becc96f44ad6805f2304f3ed3f508780fd54333",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-target-role-not-rechecked.json"
+    },
+    {
+      "name": "filename-frame-ignores-extra-clause",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_complete_syntax",
+      "sha256": "c7ce1d21aa3fc8b53c1e48c2fb509392a65cf60845ce36cfbd072b0fbc6ad18f",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-frame-ignores-extra-clause.json"
+    },
+    {
+      "name": "filename-partial-stem-becomes-locator",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_whole_label",
+      "sha256": "ed2c199bf750905b231c10442e0c77ef16b878bc8baf3d48ba958e72790fa9e5",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-partial-stem-becomes-locator.json"
+    },
+    {
+      "name": "filename-casefold-becomes-locator",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_whole_label",
+      "sha256": "d56b16b4ad687b30784bd5eb38864d5c2fd8c8ce4aee87409dcb96f6382332a8",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-casefold-becomes-locator.json"
+    },
+    {
+      "name": "filename-path-filter-hides-collision",
+      "case": "closed_literal_context",
+      "guard": "recovery_filename_path_selection_not_naming_scope",
+      "sha256": "7228bdc026df47fb52b41833364f3558d46a4de5792ba4bce147a6b0aeaef328",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/filename-path-filter-hides-collision.json"
+    },
+    {
+      "name": "fts-primary-bare-operator-token",
+      "case": "closed_literal_context",
+      "guard": "recovery_fts_literal_primary",
+      "sha256": "d00ca7feecfc509a400d4bbc82fccc20206880f2122ba4a5976c11b9f601f6d1",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/fts-primary-bare-operator-token.json"
+    },
+    {
+      "name": "fts-fallback-bare-operator-token",
+      "case": "closed_literal_context",
+      "guard": "recovery_fts_literal_fallback",
+      "sha256": "5f6c1548f1ab2258c6645e77ee44be59dd09585b27dfdfca18544c11545cfd55",
+      "artifact_file": "docatlas-recovery-evidence-23ccmsfj/fts-fallback-bare-operator-token.json"
+    }
+  ],
+  "short_job_logs": {
+    "p14": {
+      "job_id": 114127987380,
+      "utf8_bytes": 89830,
+      "sha256": "ef9ef18bcdfd2d00661968b4ff6fd3056b0d0b18eb7aeae86f19de74042da65a",
+      "passed_cases": 12,
+      "total_cases": 14,
+      "discovery_passed": 8,
+      "discovery_total": 10,
+      "complete_source_facts_passed": 5,
+      "complete_source_facts_total": 5,
+      "oracle_selftests_passed": 5,
+      "oracle_selftests_total": 5,
+      "execution_errors": 0,
+      "failed_ids": [
+        "alias_order_drafts",
+        "alias_project_retry_rule"
+      ]
+    },
+    "p16": {
+      "job_id": 114127987827,
+      "utf8_bytes": 86759,
+      "sha256": "b4e7b41c8b424863d90b93a525ce99d9558a62f9a8be7b3bf8b721b19819af83",
+      "public_delivery_cases_passed": 6,
+      "public_delivery_cases_total": 6,
+      "complete_source_fact_cases_passed": 1,
+      "complete_source_fact_cases_total": 1,
+      "oracle_selftests_passed": 6,
+      "oracle_selftests_total": 6,
+      "delivery_report_sha256": "ce9359a733f31527fbb6f14666400466f330b1bbcc7336c4b4a9cb79289fea06",
+      "overall_job": "FAIL due to Agent Developer gaps and failing adversarial baseline"
+    },
+    "installed": {
+      "job_id": 114127988160,
+      "sha256": "45bc718e5076da0babd8c12df8d506996073ebd464c516a0c17305133d7fdd83",
+      "utf8_bytes": 74223,
+      "head": "d76f6ab85e12f482ad6bec1d43040899f4b0a532",
+      "merge": "8120a80bbb0309a3ec0bf4add71f568666c76772",
+      "actual_clients": "NOT RUN"
+    }
+  }
+}

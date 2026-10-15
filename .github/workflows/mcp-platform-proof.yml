@@ -1,0 +1,81 @@
+name: MCP finite Linux and macOS proof
+
+# Separate installed-artifact evidence, NOT full CI or a publish/required gate.
+# Existing Windows gates and required aggregators remain unchanged.
+on:
+  push:
+    branches: [implementation/action-packet-v4-integration]
+  # Dispatch is usable only after this workflow exists on the default branch.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  installed-platform-proof:
+    name: Installed MCP proof (${{ matrix.runner }})
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Standard (not paid larger) runners; actual uname is artifact evidence.
+        # GitHub's current standard runner table documents macos-15 as arm64
+        # and macos-15-intel as Intel. No other architecture is claimed.
+        # https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job
+        runner: [ubuntu-latest, macos-15, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # existing repo v5 pin
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # existing repo v6 pin
+        with:
+          python-version: "3.13"
+      # Repo had only an unpinned v6 reference. This is the verified upstream
+      # peeled v6 commit (git ls-remote), not an invented action SHA.
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          enable-cache: false
+      - name: Build exactly one wheel in a separate build environment
+        id: wheel
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          artifacts="$RUNNER_TEMP/mcp-platform-proof-artifacts"
+          mkdir -p "$artifacts"
+          trap 'code=$?; printf "%s\n" "$code" > "$artifacts/build-exit-status.txt"' EXIT
+          exec > >(tee "$artifacts/build.log") 2>&1
+          printf '%s\n' "$SOURCE_SHA" > "$artifacts/source-sha.txt"
+          uname -a > "$artifacts/uname.txt"
+          uname -m > "$artifacts/architecture.txt"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          python -m venv "$RUNNER_TEMP/mcp-proof-build-env"
+          build_python="$RUNNER_TEMP/mcp-proof-build-env/bin/python"
+          "$build_python" -m pip install build
+          # PEP 517 isolation installs only pyproject build-system requirements
+          # (currently hatchling<1.27), never this project's runtime dependencies.
+          # A successful build does NOT prove compiler-free end-user install.
+          "$build_python" -m build --wheel --outdir "$RUNNER_TEMP/mcp-proof-wheel"
+          wheels=("$RUNNER_TEMP/mcp-proof-wheel/"*.whl)
+          test "${#wheels[@]}" -eq 1
+          test -f "${wheels[0]}"
+          printf 'path=%s\n' "${wheels[0]}" >> "$GITHUB_OUTPUT"
+      - name: Fresh managed Python, actual installer, full installed stdio smoke
+        env:
+          PROOF_WHEEL: ${{ steps.wheel.outputs.path }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          bash scripts/docs_mcp_platform_proof.sh "$PROOF_WHEEL" "$SOURCE_SHA" "$RUNNER_TEMP/mcp-platform-proof-artifacts"
+      - name: Preserve evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # existing repo v4.6.2 pin
+        with:
+          name: mcp-platform-proof-${{ matrix.runner }}-${{ github.sha }}
+          path: ${{ runner.temp }}/mcp-platform-proof-artifacts/
+          if-no-files-found: warn
+          retention-days: 14

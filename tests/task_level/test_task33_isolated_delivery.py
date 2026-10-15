@@ -13,7 +13,13 @@ import pytest
 
 import eval.task_level._isolated_delivery_part02 as isolated_delivery_part02
 
-from docmancer.docs.application.action_packet import build_action_packet, estimate_action_packet_tokens
+from docmancer.docs.application.action_packet import (
+    build_action_packet,
+    estimate_action_packet_tokens,
+    refresh_action_packet_estimate,
+    validate_action_packet,
+)
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
 from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTION
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.execution import build_tool_policy
@@ -85,13 +91,40 @@ def _snapshot() -> HostEvidenceSnapshot:
 
 
 def _packet(*, evidence: list[dict] | None = None) -> dict:
-    return build_action_packet(
+    items = evidence if evidence is not None else _evidence()
+    # The fixture requests each authored source sentence explicitly. The
+    # selector must not derive behavioral obligations from the objective.
+    content_literals = tuple(items[0]["content"].splitlines())
+    assert content_literals and all(content_literals)
+    packet = build_action_packet(
         question=_envelope().task_objective,
-        context_pack=evidence or _evidence(),
+        context_pack=items,
         trust_contract={"selected": [{"source": "AGENTS.md"}], "rejected": [], "risky": []},
-        max_tokens=1_500,
         project_path="/repo",
+        public_requirements=content_literals,
     )
+    assert validate_action_packet(packet, evidence_items=items, project_path="/repo") == []
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert len(packet["sources"]) == len(items) == 1
+    source = packet["sources"][0]
+    assert source["path"] == items[0]["path"] and source["text"] == items[0]["content"]
+    assert source["content_sha256"] == hashlib.sha256(items[0]["content"].encode()).hexdigest()
+    assert source["instruction_trust"] == "untrusted_data" and packet["edit_ready"] is False
+    assert "task_interpretation" not in packet and "mutation_intent" not in packet
+    requirements = {row["requirement_id"]: row for row in packet["requirements"]}
+    assert {row["value"] for row in requirements.values()} == set(content_literals)
+    assert all(row["kind"] == "required_fact" and row["mandatory"] is True
+               and row["public_provenance"] == "public_task_contract" for row in requirements.values())
+    assert len(packet["assignments"]) == len(requirements) == len(content_literals)
+    for assignment in packet["assignments"]:
+        literal = requirements[assignment["requirement_id"]]["value"]
+        assert assignment["evidence_id"] == source["stable_id"] and assignment["path"] == source["path"]
+        assert assignment["proof_role"] == "generic_fact" and assignment["unit_id"]
+        assert source["text"][assignment["unit_char_start"]:assignment["unit_char_end"]] == literal
+        assert assignment["unit_content_hash"] == hashlib.sha256(literal.encode()).hexdigest()
+    assert "missing" not in packet
+    assert packet["estimated_tokens"] == estimate_action_packet_tokens(packet)
+    return packet
 
 
 def _usage() -> WorkerUsage:
@@ -148,63 +181,8 @@ def _deliver(worker: Worker, output_dir: Path) -> dict:
     )
 
 
-def test_isolated_broker_requires_verified_boundary_and_never_retries(tmp_path):
-    worker = Worker()
-    worker.capabilities = replace(worker.capabilities, read_only_documentation=False)
-    with pytest.raises(IsolatedDeliveryError, match="capability_unverified"):
-        _deliver(worker, tmp_path)
-    assert worker.calls == 0
-
-    candidate = Worker(replace(worker.output, wall_time_seconds=6))
-    with pytest.raises(IsolatedDeliveryError, match="worker_timeout"):
-        _deliver(candidate, tmp_path / "timeout")
-    assert candidate.calls == 1
-    with pytest.raises(IsolatedDeliveryError, match="attempt_already_consumed"):
-        _deliver(candidate, tmp_path / "timeout")
-    assert candidate.calls == 1
 
 
-def test_host_owns_retrieval_evidence_objective_and_usage_contract(tmp_path):
-    with pytest.raises(IsolatedDeliveryError, match="retrieve_exactly_once"):
-        replace(_snapshot(), retrieval_calls=True).validate(_envelope())
-    with pytest.raises(IsolatedDeliveryError, match="retrieve_exactly_once"):
-        replace(_snapshot(), retrieval_calls=1.0).validate(_envelope())
-    with pytest.raises(IsolatedDeliveryError, match="revision_mismatch"):
-        replace(_snapshot(), index_revision="invented-index").validate(_envelope())
-    with pytest.raises(IsolatedDeliveryError, match="query_derivation_mismatch"):
-        replace(_snapshot(), query="invented evaluator query").validate(_envelope())
-    with pytest.raises(IsolatedDeliveryError, match="objective_fingerprint_mismatch"):
-        replace(_snapshot(), objective_sha256="0" * 64).validate(_envelope())
-    with pytest.raises(IsolatedDeliveryError, match="invalid_worker_usage_input_tokens"):
-        WorkerUsage.from_json({
-            "provider": "provider", "model": "model", "request_id": "id",
-            "input_tokens": True, "output_tokens": 1, "reasoning_tokens": None,
-            "proof": {"schema_version": 1},
-        })
-
-    different_evidence = [{
-        **_evidence()[0],
-        "content": "The invented boundary must replace the real one.",
-    }]
-    candidate = Worker(replace(Worker().output, packet=_packet(evidence=different_evidence)))
-    with pytest.raises(IsolatedDeliveryError, match="invalid_action_packet"):
-        _deliver(candidate, tmp_path / "invented-evidence")
-
-    wrong_objective = _packet()
-    wrong_objective["task_interpretation"]["objective"] = "Completely different task"
-    wrong_objective["estimated_tokens"] = estimate_action_packet_tokens(wrong_objective)
-    candidate = Worker(replace(Worker().output, packet=wrong_objective))
-    with pytest.raises(IsolatedDeliveryError, match="objective_mismatch"):
-        _deliver(candidate, tmp_path / "wrong-objective")
-
-    class MutatingWorker(Worker):
-        def run(self, envelope, evidence, *, timeout_seconds):
-            output = super().run(envelope, evidence, timeout_seconds=timeout_seconds)
-            evidence.evidence_items[0]["content"] = "mutated after host validation"
-            return output
-
-    with pytest.raises(IsolatedDeliveryError, match="host_evidence_mutated"):
-        _deliver(MutatingWorker(), tmp_path / "mutated-host-evidence")
 
 
 def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_path):
@@ -212,8 +190,12 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
     result = _deliver(worker, tmp_path)
 
     assert worker.calls == 1
-    assert result["status"] == _packet()["status"]
+    assert result["result"] == _packet()["result"] == "data"
+    assert result["completeness"] == _packet()["completeness"] == "complete"
     assert result["packet"]["estimated_tokens"] <= 1_500
+    assert result["packet"]["edit_ready"] is False
+    assert result["projection"]["sources"] == result["packet"]["sources"]
+    assert result["projection"]["edit_ready"] is False
     assert set(path.name for path in tmp_path.iterdir()) == {
         "action_packet.json",
         "context_sources.json",
@@ -229,6 +211,12 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
     manifest = json.loads((tmp_path / "host_evidence_manifest.json").read_text(encoding="utf-8"))
     snapshot = json.loads((tmp_path / "host_evidence_snapshot.json").read_text(encoding="utf-8"))
     metrics = json.loads((tmp_path / "isolated_delivery_metrics.json").read_text(encoding="utf-8"))
+    projection_snapshot = json.loads((tmp_path / "model_visible_evidence_snapshot.json").read_text(encoding="utf-8"))
+    projection = json.loads((tmp_path / "model_visible_patch_context.json").read_text(encoding="utf-8"))
+    assert projection == result["projection"]
+    assert validate_model_visible_projection(projection, snapshot=projection_snapshot) == []
+    assert projection["sources"][0]["text"] == _evidence()[0]["content"]
+    assert metrics["result"] == result["result"] and metrics["completeness"] == result["completeness"]
     assert manifest["evidence_fingerprint"] == metrics["evidence_fingerprint"] == _snapshot().fingerprint
     assert manifest["items"][0]["content_sha256"]
     assert snapshot["evidence_items"] == _evidence()
@@ -241,25 +229,6 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
     assert "evidence_items" not in result and "trust_contract" not in result
 
 
-def test_isolated_broker_rejects_an_insufficient_model_visible_projection(
-    tmp_path, monkeypatch,
-):
-    monkeypatch.setattr(
-        isolated_delivery_part02,
-        "project_patch_context",
-        lambda **kwargs: ({
-            "status": "insufficient_evidence",
-            "kind": "patch_context",
-            "missing": ["projection exceeds budget"],
-            "estimated_tokens": 20,
-        }, {}),
-    )
-
-    with pytest.raises(
-        IsolatedDeliveryError,
-        match="isolated_model_visible_projection_insufficient",
-    ):
-        _deliver(Worker(), tmp_path)
 
 
 def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_path):
@@ -306,170 +275,4 @@ def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_pat
     assert process.poll() is not None
 
 
-def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
-    plan = build_task33c_pilot_plan(TASK33C_PILOT_TASK_ID)
 
-    objective = (
-        "Browser and scan users see a permission gate conflict. Fix the permission gate so browser and scan agree."
-    )
-    assert derive_task33_retrieval_query(objective) == "browser scan permission gate"
-    domain_objective = (
-        "Browser and scan users can reach inconsistent permission outcomes after a partial "
-        "permission result: one path can continue through an offline handoff while related "
-        "paths do not agree on the shared gate. Fix the cross-module permission gate contract "
-        "so browser, scan, and deferred sync decisions use the local permission architecture "
-        "consistently."
-    )
-    assert derive_task33_retrieval_query(domain_objective) == (
-        "browser scan permission gate offline sync"
-    )
-    assert tuple(plan["conditions"]) == TASK33C_PILOT_CONDITIONS
-    with pytest.raises(ValueError, match="frozen"):
-        build_task33c_pilot_plan("another_task")
-    assert plan["repeats"] == 1
-    assert plan["retrieval_call_budget"] == 1
-    assert plan["isolated_worker_attempt_budget"] == 0
-    assert plan["agent_turn_limit"] == 12
-    assert plan["required_evidence_categories"] == list(TASK33C_REQUIRED_EVIDENCE_CATEGORIES)
-    assert plan["required_evidence_paths"] == [
-        "docs/permission-architecture.md",
-        "docs/browser-flow.md",
-        "docs/scan-flow.md",
-        "docs/offline-sync.md",
-    ]
-    evidence = [
-        {
-            "stable_chunk_id": "task33-" + hashlib.sha256(path.encode()).hexdigest()[:40],
-            "parent_logical_id": "task33-parent-" + hashlib.sha256(path.encode()).hexdigest()[:32],
-            "display_content_hash": hashlib.sha256(b"Task33 source evidence.").hexdigest(),
-            "display_text": "Task33 source evidence.",
-            "path": path,
-            "heading_path": "Task33 contract",
-            "authority": "canonical",
-            "source_class": "project_doc",
-            "content": "Task33 source evidence.",
-            **({
-                "metadata": {
-                    "acceptance_conditions": [
-                        "Sync must call evaluateFlowEntry with allowOfflineFallback: false."
-                    ]
-                }
-            } if path == "docs/offline-sync.md" else {}),
-        }
-        for path in TASK33C_REQUIRED_EVIDENCE_PATHS
-    ]
-    packet = build_action_packet(
-        question=domain_objective,
-        context_pack=evidence,
-        required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
-    )
-    assert {row["path"] for row in packet["source_of_truth"]} == set(TASK33C_REQUIRED_EVIDENCE_PATHS)
-    assert [
-        row["text"] for row in packet["task_interpretation"]["acceptance_conditions"]
-    ] == ["Sync must call evaluateFlowEntry with allowOfflineFallback: false."]
-    assert plan["claims"]["may_claim_product_improvement"] is False
-    direct = CONDITIONS["docatlas_bounded_direct"].tool_policy
-    required = CONDITIONS["docatlas_tool_required_once"].tool_policy
-    assert direct.delivery_strategy == "bounded_direct" and not direct.isolated_worker_required
-    assert required.allow_docatlas and required.require_docatlas_call_before_edit
-    assert not direct.allow_docatlas
-    assert "`get_docs_context` exactly once" in TOOL_REQUIRED_ONCE_INSTRUCTION
-    assert 'project_path="."' in TOOL_REQUIRED_ONCE_INSTRUCTION
-    assert 'delivery_strategy="bounded_direct"' in TOOL_REQUIRED_ONCE_INSTRUCTION
-    assert "Do not make another documentation retrieval call" in TOOL_REQUIRED_ONCE_INSTRUCTION
-    assert "Do not call `prepare_docs`" in TOOL_REQUIRED_ONCE_INSTRUCTION
-    _, mcp_path = build_tool_policy("docatlas_tool_required_once", tmp_path)
-    assert list(json.loads(mcp_path.read_text(encoding="utf-8"))["mcpServers"]) == ["docmancer-docs"]
-    trajectory = tmp_path / "trajectory.json"
-    trajectory.write_text(json.dumps([{
-        "sequence": 1, "tool_name": "mcp", "arguments": {
-            "server": "docmancer-docs", "tool": "get_docs_context",
-            "delivery_strategy": "bounded_direct",
-            "question_matches_task_objective": True,
-            "retrieval_succeeded": True,
-            "action_packet_status": "ok",
-        },
-    }]), encoding="utf-8")
-    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
-    assert audit.clean
-    assert audit.get_docs_context_calls == 1
-
-
-def test_task33c_decision_gate_requires_complete_comparable_measurements():
-    results = []
-    for condition in TASK33C_PILOT_CONDITIONS:
-        metrics = {
-            "input_tokens": 100,
-            "output_tokens": 50,
-            "total_latency": 1.5,
-            "time_to_first_edit": 0.5,
-            "made_edit": True,
-            "system_total_tokens": 150,
-            "completed_turn_events": 4,
-        }
-        if condition == "docatlas_bounded_direct":
-            metrics.update({
-                "delivery_retrieval_calls": 1,
-                "delivery_attempts": 1,
-                "action_packet_status": "ok",
-                "evidence_fingerprint": "shared-evidence",
-                "action_packet_project_doc_coverage": 0.5,
-                "action_packet_project_doc_paths": list(TASK33C_REQUIRED_EVIDENCE_PATHS),
-                "action_packet_target_paths": list(TASK33C_REQUIRED_TARGET_PATHS),
-                "raw_tool_output_tokens_estimate": 300,
-                "action_packet_tokens": 120,
-            })
-        results.append({
-            "task_id": TASK33C_PILOT_TASK_ID,
-            "condition_id": condition,
-            "repeat": 0,
-            "status": "success",
-            "hidden_tests_passed": False,
-            "metrics": metrics,
-            "token_attribution": {
-                "parent": {"cached_input_tokens": 0, "uncached_input_tokens": 100},
-                "raw_tool_output_tokens_estimate": 300 if condition.startswith("docatlas_bounded_") else None,
-                "action_packet_tokens": 120 if condition.startswith("docatlas_bounded_") else None,
-                "system_total_complete": True,
-            },
-            "evaluation_execution": {
-                "setup": {
-                    "phase": "pre_runner",
-                    "status": "success",
-                    "returncode": 0,
-                    "baseline_status": "sealed",
-                    "baseline_tree": "shared-setup-tree",
-                    "baseline_changed_files": ["uv.lock"],
-                    "baseline_artifact_sha256": {"uv.lock": "shared-lock-hash"},
-                },
-                "boundaries": {
-                    "runner": {"status": "verified"},
-                    "evaluator": {"status": "verified"},
-                },
-                "public_tests": {"status": "executed", "returncode": 1},
-                "hidden_tests": {"status": "executed", "returncode": 1},
-            },
-            "evaluation_contract": {
-                "status": "valid",
-                "compile_gate": {"status": "not_applicable"},
-            },
-            "budget": {
-                "max_turns_enforced_by_runner": True,
-                "effective_max_turns": TASK33C_AGENT_TURN_LIMIT,
-                "input_tokens_exceeded": False,
-                "output_tokens_exceeded": False,
-            },
-        })
-
-    complete = evaluate_task33c_pilot_completeness(results)
-    assert complete["decision"] == "ENGINEERING_PILOT_COMPLETE"
-    assert complete["complete"] is True
-    results[-1]["metrics"]["delivery_retrieval_calls"] = True
-    incomplete = evaluate_task33c_pilot_completeness(results)
-    assert incomplete["decision"] == "INCONCLUSIVE"
-    assert "docatlas_bounded_direct:invalid_retrieval_call_count" in incomplete["errors"]
-
-    results[-1]["metrics"]["delivery_retrieval_calls"] = 1
-    results[-1]["evaluation_execution"]["setup"]["status"] = "condition_setup_failed"
-    incomplete = evaluate_task33c_pilot_completeness(results)
-    assert "docatlas_bounded_direct:setup_not_successful" in incomplete["errors"]

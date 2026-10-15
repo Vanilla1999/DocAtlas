@@ -1,0 +1,285 @@
+# R2–R5 read/packet residual exit — bounded implementation
+
+2026-10-07. Worktree `/tmp/opencode/docatlas-final-read-packet-42c72bd6`,
+baseline `42c72bd6d37700b6fe04890c25e8c4ac45bc9e57`.
+Прочитан exact FINAL_DICTIONARY_EXIT_INVENTORY_RU.md, R2–R5 и секции 3/5.
+Один worker, без shared-consumer concurrency, secondary allocation, агентов,
+network, commit/push и чтения/изменения primary. **Это scoped exit, не full
+dictionary-free, full-quality или release claim.**
+
+## Изменения и границы
+
+- R2: expansion одинаково сохраняет текущую exact bound quote независимо от
+  must/never/command wording. Неоднозначное расположение и превышение прежнего
+  window budget отклоняются; actual requalification, assignment retention,
+  query/component witnesses и serialized token budget остаются.
+- R3: modality всегда unknown (`None`); fact extraction возвращает `([], 0)`.
+  Нет required/forbidden/validation credit от prose, critical-fact ranking bonus
+  или promotion canonical quote в invariant. Behavioral readiness adapter False:
+  наличие source metadata, task DTO или произвольных rows не является proof.
+  Оригинальные selected display bytes остаются bounded cited context.
+- Exact command recognizer и shell-metacharacter veto сохранены; `run pytest`
+  больше не command grammar. Даже `pytest`/`cargo test` не становятся runnable
+  validation через prose extractor. Python declaration grammar сохранена.
+- R4: inferred qualifiers пусты; patch projected_text равен visible display,
+  без строк из hidden parent content, paths/symbol metadata или patch-fact regex.
+  Camel→snake requirement alias удалён, literal boundaries остаются.
+  Dedup требует равенства display bytes перед любым stable-ID/hash/overlap/near
+  shortcut; разные negation/case/punctuation bytes не сливаются.
+- Polarity unknown; constraint signature — literal bytes без удаления negation.
+  Несколько разных canonical quote windows требуют manual review, а не NL
+  certainty. Selector записывает `unresolved_authority_conflict:manual_review`
+  в missing requirements и `manual_review_required` reason: это **не proven
+  conflict**, и потому quote-only projection не теряет все sources. Один literal
+  window не требует cross-statement agreement inference и сохраняет технический
+  assignment contract; docs-answer всё равно context-only. Packet compatibility
+  uncertainty сохраняет существующий `authority_conflict` DTO enum, но сообщение
+  явно говорит об unknown agreement/manual review, не proven contradiction.
+- R5: suffix/stem/consonant-y credit удалён из qualification и shared token
+  pattern; nonexact retrieval требует literal spelling. Dormant relation-binding
+  adapters False; anonymous `query-relation-*` lane negative с reason
+  `unsupported_relation_qualification`, без manual negation inference.
+- Source/project/library/version/snapshot provenance, hashes/span IDs, consent,
+  assignment capacity, view visibility, exact structured contracts и DTO ABI
+  не заменялись NL reasoning; старые tests/gold/thresholds/config не изменялись.
+
+## Safety debt и parent dependencies
+
+`_DANGEROUS_CONTENT_PATTERNS` сохранён и помечен negative-only NL safety debt.
+`docs/domain/content_trust.py` не owned и не изменялся. Отсутствие risk finding
+не даёт safe/executable/edit permission. Поэтому **full dictionary-free claim
+недопустим**. Остальные R1/R6–R12, corpus/local allocations — вне этого slice.
+Обязательных production edits вне allowlist для этого slice не обнаружено.
+Не расширялись source membership, explicit policy roots или network consent.
+
+## Tests — normal conftest, offline, без waiver
+
+Общий prefix всех pytest commands:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 DOCATLAS_OFFLINE=1 .venv/bin/python -m pytest -p no:cacheprovider -q
+```
+
+1. `tests/test_dictionary_exit_read_packet_residuals.py`: **32 passed**.
+   New-only behavioral diagnostic shard с hash-bound base node inventory.
+   Actual packet/selector/qualification/public projection callers проверяются;
+   expansion test изолирует focusing/requalification/cost через monkeypatch,
+   но выполняет retention/assignment/component/query guards. Не выдаётся за
+   полностью end-to-end default envelope differential.
+2. Все `tests/test_dictionary_exit_*.py` плюс
+   `tests/docs/test_mcp_token_footprint.py tests/docs/test_mcp_boundary.py
+   tests/docs/test_finalized_mcp_output_integrity.py tests/test_support_surface_policy.py
+   tests/docs/test_target_security.py tests/docs/test_content_trust.py`:
+   **1708 passed / 6 failed / 1 existing multipart warning, 5.62s**.
+   Exact six reds ниже; пять dictionary reds retained.
+3. Final focused new + technical guard run:
+   `tests/test_dictionary_exit_read_packet_residuals.py
+   tests/docs/test_content_trust.py tests/docs/test_target_security.py
+   tests/docs/test_finalized_mcp_output_integrity.py tests/docs/test_mcp_token_footprint.py
+   tests/test_dictionary_exit_selector_visibility.py tests/test_dictionary_exit_projection.py
+   tests/test_dictionary_exit_reference_ranking.py`:
+   **287 passed / 1 existing multipart warning, 1.47s**.
+4. Old mixed run:
+   `tests/docs/test_action_packet.py tests/docs/test_action_packet_part02.py
+   tests/docs/test_action_packet_semantic_density.py tests/docs/test_evidence_qualification.py
+   tests/docs/test_evidence_selection.py tests/docs/test_evidence_selection_part02.py
+   tests/docs/test_evidence_selection_v2.py tests/docs/test_context_projection_boundaries.py
+   tests/docs/test_reference_projection_retention.py tests/docs/test_relation_preserving_projection.py`:
+   **95 passed / 147 failed, 16.37s**. Baseline old-mixed run не повторялся;
+   число новых regressions не заявляется. В том числе несовместимые assertions
+   про modality, morphology, observed qualifiers, semantic proof и snake alias
+   оставлены неизменными. Exact red nodes ниже.
+
+Run logs/JUnit (не production artifacts):
+`/tmp/opencode/read-packet-dictionary-results.{log,xml}` и
+`/tmp/opencode/read-packet-legacy-results.{log,xml}`.
+Initial new-shard collection fail-closed до добавления authorized new shard;
+initial tests имели wrong Omission attribute и обнаружили quote-suppression от
+unknown, записанного как proven conflict. Исправлены только новые tests/owned
+production; финальные результаты выше. Initial exploratory `python` unavailable,
+использован existing `.venv/bin/python`. Никаких assertion/gold floor waivers.
+
+### Retained exact dictionary/security reds
+
+```text
+tests/test_dictionary_exit_admission_literals.py::test_application_adapter_really_calls_default_hook_but_unknown_is_consumer_debt
+tests/test_dictionary_exit_discovery_literals.py::test_explicit_api_templates_and_package_pages_are_not_topic_tables
+tests/test_dictionary_exit_discovery_literals.py::test_actual_dart_resolver_caller_preserves_root_and_version_provenance
+tests/test_dictionary_exit_discovery_literals.py::test_removed_ecosystem_alias_does_not_expand_caller_target[pub]
+tests/test_dictionary_exit_discovery_literals.py::test_removed_ecosystem_alias_does_not_expand_caller_target[flutter]
+tests/docs/test_mcp_boundary.py::test_patch_constraints_debug_compaction_preserves_contract_fields
+```
+
+## Exact owned files — SHA256
+
+Checkpoint self-hash возвращается отдельно parent, не записан рекурсивно.
+
+```text
+93e9c6db983408b850d975c7a66b81b66406dff7ee4fb0e09f9bb0fd6b7baaca docmancer/docs/application/_action_packet_part01.py
+0dac03f18cf31d666839a6a5328ac958e11e8a35131e2c657f89d092b8978fe7 docmancer/docs/application/_action_packet_part02.py
+c9ef48fab56c82437f008f370d7e1654d21df70b539bafc5ae6f2523d0051805 docmancer/docs/application/_action_packet_part03.py
+242f902a3cbf690c59526cb183d329998eaff7949dc5412e72844e0963f2a43f docmancer/docs/application/_action_packet_shared.py
+fa564db7bc7cf3d0e31aa0955b33ebda1a83bb10daaf26325c4549e3358ef783 docmancer/docs/application/_docs_context_projection_core.py
+1e66aa2da2a2315417b7a769f93763f859222f68d1569d9c0a194218100f5173 docmancer/docs/application/_evidence_selection_part02.py
+d80a5ea13faef99d1385b3176168a051e71262e3e245ab07dc940dc56becaffc docmancer/docs/application/_evidence_selection_part03.py
+30122bf22ce03b3de987ee1c2dd53a52ea5bf6e6580f716f54e9882090fcc1fc docmancer/docs/application/_evidence_selection_shared.py
+8d69a0046b13b3bc40e6e6a592a1b0ecacd4bda182603589420c632023185700 docmancer/docs/application/action_packet.py
+fd58d93041b55c8a57157f0fc118dfcfb67a93625932de4dfaf57438bd61592b docmancer/docs/application/evidence_candidates.py
+3bfe10520df657ea16e646e5317fce6cf06b7e1c46103bfa0a7d7c36adc4ddbb docmancer/docs/domain/evidence_qualification.py
+de87153f11fd00b874995b54b460010321ac21f2eb4ed7a1e8bad0328e757c87 docmancer/docs/domain/normative_language.py
+f307750447918c3d1cc2dbafdb1ebb7a9b77726a90d1f1afec0c7b6f08cc2e48 docmancer/docs/domain/technical_tokens.py
+0659f2f76fd6e0a37b55e73f0cb801a88672c41535405f978fe43bd086aec638 tests/test_dictionary_exit_read_packet_residuals.py
+52542c139c20e9bc4be825023733528f1302dfa5f0c11936320cc3bcf065f381 tests/diagnostic_labels.read_packet_residuals.json
+```
+
+### Old mixed exact red node ledger
+
+```text
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Build FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Write FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Develop FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Introduce FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Replace FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Edit FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Migrate FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[Code FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[\u041d\u0430\u043f\u0438\u0448\u0438 FooHandler]
+tests/docs/test_action_packet.py::test_every_routed_change_request_has_mutation_intent[\u0420\u0430\u0437\u0440\u0430\u0431\u043e\u0442\u0430\u0439 FooHandler]
+tests/docs/test_action_packet.py::test_mutation_readiness_does_not_infer_constraints_from_user_wording
+tests/docs/test_action_packet.py::test_patch_request_plan_separates_mutation_and_preserve_targets
+tests/docs/test_action_packet.py::test_patch_request_plan_keeps_implicit_targets_fail_closed[Fix the permission architecture.]
+tests/docs/test_action_packet.py::test_patch_request_plan_keeps_implicit_targets_fail_closed[Update the relevant files.]
+tests/docs/test_action_packet.py::test_patch_request_plan_keeps_implicit_targets_fail_closed[\u0418\u0441\u043f\u0440\u0430\u0432\u044c \u0441\u0432\u044f\u0437\u0430\u043d\u043d\u044b\u0435 \u043c\u043e\u0434\u0443\u043b\u0438.]
+tests/docs/test_action_packet.py::test_named_permission_patch_resolves_all_decisive_fixture_targets_without_formatter_loss
+tests/docs/test_action_packet.py::test_unique_source_path_alias_resolves_but_ambiguous_alias_does_not
+tests/docs/test_action_packet.py::test_post_format_sufficiency_fails_closed_when_public_fact_is_not_rendered
+tests/docs/test_action_packet.py::test_post_format_sufficiency_fails_closed_when_exact_symbol_is_dropped
+tests/docs/test_action_packet.py::test_selected_document_terms_survive_action_packet_formatting
+tests/docs/test_action_packet.py::test_patch_handler_uses_action_packet_completeness_for_explicit_target
+tests/docs/test_action_packet.py::test_untargeted_patch_recovery_includes_safe_document_navigation
+tests/docs/test_action_packet.py::test_post_format_sufficiency_accepts_camel_case_symbol_in_snake_case_source_path
+tests/docs/test_action_packet.py::test_validator_rejects_truncated_packets_with_unclosed_required_evidence
+tests/docs/test_action_packet.py::test_display_only_canonical_child_is_rendered_and_hash_bound
+tests/docs/test_action_packet.py::test_python_imports_do_not_create_normative_facts_but_prose_does
+tests/docs/test_action_packet.py::test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
+tests/docs/test_action_packet_part02.py::test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cited
+tests/docs/test_action_packet_part02.py::test_safe_project_docs_preserve_cannot_and_phase_scope_as_source_backed_guidance
+tests/docs/test_action_packet_part02.py::test_action_packet_truncates_whole_items_and_fails_closed_without_evidence
+tests/docs/test_action_packet_part02.py::test_required_evidence_and_targets_survive_packet_budget
+tests/docs/test_action_packet_part02.py::test_constraints_only_requires_canonical_source_backed_constraints
+tests/docs/test_action_packet_semantic_density.py::test_description_then_fix_is_one_shared_change_intent_but_examples_are_not
+tests/docs/test_action_packet_semantic_density.py::test_selector_prefers_normative_browser_fragment_over_shorter_introduction
+tests/docs/test_action_packet_semantic_density.py::test_source_fact_witness_prefers_explicit_config_value_over_shorter_prohibition
+tests/docs/test_action_packet_semantic_density.py::test_exact_task_packet_keeps_behavioral_contracts_under_visible_2000_token_ceiling
+tests/docs/test_evidence_qualification.py::test_projection_preserves_lifecycle_facts[current-storage-ok]
+tests/docs/test_evidence_qualification.py::test_projection_preserves_lifecycle_facts[historical-historical storage-ok]
+tests/docs/test_evidence_qualification.py::test_projection_preserves_lifecycle_facts[completed-historical storage-ok]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[True-get_docs_context]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[True-docs/runtime.md]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[True---no-vectors]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[True-DOCATLAS_HOME]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[False-get_docs_context]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[False-docs/runtime.md]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[False---no-vectors]
+tests/docs/test_evidence_qualification.py::test_original_projection_normalizes_exact_terms_without_hidden_coverage[False-DOCATLAS_HOME]
+tests/docs/test_evidence_selection.py::test_governance_facets_cannot_be_proved_by_dependency_pin_alone
+tests/docs/test_evidence_selection.py::test_governance_facets_are_proved_by_project_document_propositions
+tests/docs/test_evidence_selection.py::test_metadata_does_not_prove_project_answer_term
+tests/docs/test_evidence_selection.py::test_authoritative_source_identity_can_bind_behavior_subject
+tests/docs/test_evidence_selection.py::test_project_term_and_query_symbol_share_one_canonical_obligation
+tests/docs/test_evidence_selection.py::test_broad_behavior_and_usage_facets_are_context_only_even_when_locally_proved
+tests/docs/test_evidence_selection.py::test_project_answer_requires_recall_and_authority_invariant_facets
+tests/docs/test_evidence_selection.py::test_broad_relational_comparison_is_context_only_even_when_locally_proved
+tests/docs/test_evidence_selection.py::test_proof_roles_and_qualifiers_are_bound_into_assignments
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[generic_fact]
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[document_identity]
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[target_identity]
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[document_statement]
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[project_rule]
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[implementation_fact]
+tests/docs/test_evidence_selection.py::test_every_proof_role_has_positive_and_negative_authority_proof[dependency_fact]
+tests/docs/test_evidence_selection.py::test_observed_typed_qualifiers_bind_without_a_second_requirement_contract
+tests/docs/test_evidence_selection.py::test_mixed_aggregate_applies_global_document_span_and_token_bounds
+tests/docs/test_evidence_selection.py::test_selector_returns_one_immutable_auditable_support_decision
+tests/docs/test_evidence_selection.py::test_support_decision_preserves_full_canonical_requirement_ids_without_collisions
+tests/docs/test_evidence_selection.py::test_requirement_set_extracts_lowercase_comparison_and_result_access_facets
+tests/docs/test_evidence_selection.py::test_requirement_set_extracts_non_kotlin_comparison_and_passive_result_access_facets
+tests/docs/test_evidence_selection.py::test_library_code_group_is_a_canonical_requirement_and_needs_one_code_block
+tests/docs/test_evidence_selection.py::test_comparison_requirement_span_uses_the_matched_repeated_rhs
+tests/docs/test_evidence_selection.py::test_backticked_comparison_requirement_span_uses_the_raw_matched_identifiers
+tests/docs/test_evidence_selection.py::test_every_query_derived_library_requirement_has_one_exact_query_span[When should I use ASYNC instead of Launch, and how do I obtain its result?]
+tests/docs/test_evidence_selection.py::test_every_query_derived_library_requirement_has_one_exact_query_span[When should I use `ASYNC` instead of `Launch`, and how do I obtain its result?]
+tests/docs/test_evidence_selection.py::test_every_query_derived_library_requirement_has_one_exact_query_span[gather is familiar. Compare create_task with gather and explain how the scheduled task result is obtained]
+tests/docs/test_evidence_selection.py::test_every_query_derived_library_requirement_has_one_exact_query_span[Compare `create_task` with `gather` and explain how the result is obtained]
+tests/docs/test_evidence_selection.py::test_every_query_derived_library_requirement_has_one_exact_query_span[I am comparing create_task and gather; how is the result obtained?]
+tests/docs/test_evidence_selection.py::test_every_query_derived_library_requirement_has_one_exact_query_span[I am comparing `create_task` and `gather`; how is the result obtained?]
+tests/docs/test_evidence_selection.py::test_library_docs_profile_requires_one_item_to_cover_query_entities_and_facets
+tests/docs/test_evidence_selection.py::test_named_symbol_behavior_local_proof_can_authorize_project_docs_answer
+tests/docs/test_evidence_selection.py::test_wrong_exact_version_cannot_win_with_a_higher_score
+tests/docs/test_evidence_selection.py::test_registered_exact_version_url_satisfies_the_exact_version_requirement
+tests/docs/test_evidence_selection_part02.py::test_valid_display_hash_and_reported_token_mismatch_are_audited
+tests/docs/test_evidence_selection_part02.py::test_exact_overlap_and_near_duplicates_are_collapsed_without_text_merging
+tests/docs/test_evidence_selection_part02.py::test_mandatory_reservation_prefers_short_complete_evidence
+tests/docs/test_evidence_selection_part02.py::test_bounded_repair_replaces_one_long_cover_with_two_short_items
+tests/docs/test_evidence_selection_part02.py::test_candidate_cap_is_applied_after_requirement_aware_ranking
+tests/docs/test_evidence_selection_part02.py::test_canonical_authority_conflict_is_disclosed_and_blocks_success
+tests/docs/test_evidence_selection_part02.py::test_exact_identifier_coverage_uses_boundaries_not_substrings
+tests/docs/test_evidence_selection_part02.py::test_non_legal_query_omits_legal_authority_from_visible_evidence
+tests/docs/test_evidence_selection_part02.py::test_legal_intent_can_select_legal_authority
+tests/docs/test_evidence_selection_part02.py::test_patch_selection_omits_prefix_identifier_conflict_after_exact_match
+tests/docs/test_evidence_selection_part02.py::test_project_usage_negation_does_not_prove_usage
+tests/docs/test_evidence_selection_part02.py::test_project_request_query_requires_mcp_server_as_well_as_request
+tests/docs/test_evidence_selection_part02.py::test_project_relation_facets_require_a_concrete_mechanism[How does the MCP server process a tool request?-The MCP server routes each tool request to a handler, which validates and dispatches it.-The MCP server receives a tool request.-request_handling]
+tests/docs/test_evidence_selection_part02.py::test_project_relation_facets_require_a_concrete_mechanism[What is the architecture of the MCP server?-The server routes requests through the transport to the handler service.-The MCP server architecture has a service.-architecture]
+tests/docs/test_evidence_selection_part02.py::test_project_relation_facets_require_a_concrete_mechanism[What keeps the MCP server responsive?-A background worker processes queued tasks asynchronously so the event loop does not block.-The MCP server is responsive.-responsiveness]
+tests/docs/test_evidence_selection_part02.py::test_requirement_input_limits_are_bounded_and_fail_closed
+tests/docs/test_evidence_selection_part02.py::test_project_behavior_question_requires_behavior_for_every_entity
+tests/docs/test_evidence_selection_part02.py::test_project_mechanism_how_question_does_not_require_workflow
+tests/docs/test_evidence_selection_part02.py::test_each_requirement_has_one_deterministic_witness
+tests/docs/test_evidence_selection_part02.py::test_relation_facets_reject_unrelated_or_single_step_matches[Explain the docs_status workflow-docs_status then runs health checks.-workflow:docs_status]
+tests/docs/test_evidence_selection_part02.py::test_relation_facets_reject_unrelated_or_single_step_matches[What is the architecture of the MCP server?-The MCP server exists. The service exists. Requests route through transport.-architecture]
+tests/docs/test_evidence_selection_part02.py::test_relation_facets_reject_unrelated_or_single_step_matches[What keeps the MCP server responsive?-The MCP server is asynchronous. A worker handles metrics.-responsiveness]
+tests/docs/test_evidence_selection_v2.py::test_selector_rejects_branding_and_chooses_inventory_witness
+tests/docs/test_evidence_selection_v2.py::test_selector_rejects_wrong_command_and_materializes_call
+tests/docs/test_evidence_selection_v2.py::test_witness_scoped_fitting_does_not_charge_the_surrounding_chunk
+tests/docs/test_evidence_selection_v2.py::test_location_and_workflow_materialize_valid_canonical_projection
+tests/docs/test_evidence_selection_v2.py::test_permission_frames_select_and_project_decisive_local_evidence
+tests/docs/test_context_projection_boundaries.py::test_path_only_projection_uses_the_current_exact_topic_guard
+tests/docs/test_context_projection_boundaries.py::test_stronger_explicit_lookup_precedes_generated_alias_bonus
+tests/docs/test_context_projection_boundaries.py::test_complete_qualified_variant_precedes_mid_sentence_prefix
+tests/docs/test_context_projection_boundaries.py::test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context
+tests/docs/test_context_projection_boundaries.py::test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates
+tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+tests/docs/test_reference_projection_retention.py::test_serialized_reference_window_retains_valid_evidence
+tests/docs/test_reference_projection_retention.py::test_crop_cannot_inherit_a_removed_exact_symbol
+tests/docs/test_reference_projection_retention.py::test_source_switch_cannot_reuse_binding[path-Other.md]
+tests/docs/test_reference_projection_retention.py::test_source_switch_cannot_reuse_binding[project_identity-repo:other]
+tests/docs/test_reference_projection_retention.py::test_source_switch_cannot_reuse_binding[_source_snapshot_sha256-sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]
+tests/docs/test_reference_projection_retention.py::test_source_switch_cannot_reuse_binding[generation_id-snapshot:other]
+tests/docs/test_reference_projection_retention.py::test_source_switch_cannot_reuse_binding[resolved_version-v99]
+tests/docs/test_reference_projection_retention.py::test_trace_bindings_do_not_override_current_source
+tests/docs/test_reference_projection_retention.py::test_missing_plan_cannot_reuse_prequalified_trace
+tests/docs/test_reference_projection_retention.py::test_projection_requalification_performs_no_io
+tests/docs/test_reference_projection_retention.py::test_structural_continuation_revalidates_source_and_current_bytes[path_or_url-Other.md]
+tests/docs/test_reference_projection_retention.py::test_structural_continuation_revalidates_source_and_current_bytes[generation_id-snapshot:other]
+tests/docs/test_reference_projection_retention.py::test_structural_continuation_revalidates_source_and_current_bytes[snippet-Fabricated continuation.]
+tests/docs/test_reference_projection_retention.py::test_default_and_exception_survive_with_a_named_source
+tests/docs/test_reference_projection_retention.py::test_disabled_condition_is_not_replaced_by_enabled_example
+tests/docs/test_reference_projection_retention.py::test_full_projector_replays_prepared_snapshot_without_io
+tests/docs/test_reference_projection_retention.py::test_application_does_not_relabel_old_generation_as_current
+tests/docs/test_reference_projection_retention.py::test_independent_lookup_keeps_own_identity_without_claiming_root_support
+tests/docs/test_reference_projection_retention.py::test_anaphoric_default_keeps_exact_symbol_and_exit_value[orbit.Stop-0]
+tests/docs/test_reference_projection_retention.py::test_anaphoric_default_keeps_exact_symbol_and_exit_value[kernel.Halt-3]
+tests/docs/test_reference_projection_retention.py::test_unanswerable_new_sentence_does_not_hide_answerable_local_fact
+tests/docs/test_reference_projection_retention.py::test_source_reference_context_derives_missing_line_span_from_attested_bytes
+tests/docs/test_reference_projection_retention.py::test_source_reference_context_keeps_exact_whitespace_inside_attested_span
+tests/docs/test_relation_preserving_projection.py::test_condition_bearing_permission_rule_survives_bounded_admission
+tests/docs/test_relation_preserving_projection.py::test_balanced_sibling_relation_beats_one_sided_topical_span
+tests/docs/test_relation_preserving_projection.py::test_explicit_alternative_list_prefers_span_retaining_all_user_terms
+tests/docs/test_relation_preserving_projection.py::test_permission_summary_beats_single_conditional_example
+tests/docs/test_relation_preserving_projection.py::test_permission_caveat_beats_redundant_returned_action_example
+tests/docs/test_relation_preserving_projection.py::test_insufficient_evidence_action_prefers_procedural_span_over_state_definition
+tests/docs/test_relation_preserving_projection.py::test_decision_question_prefers_mechanism_over_state_taxonomy
+tests/docs/test_relation_preserving_projection.py::test_projection_keeps_structurally_derived_same_atom_continuation_without_public_coverage
+tests/docs/test_relation_preserving_projection.py::test_negated_relation_probe_rejects_positive_only_evidence
+```

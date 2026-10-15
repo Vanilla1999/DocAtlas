@@ -1,0 +1,60 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-c8491f13d22286ae",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Build directories > extra_javascript",
+      "snippet": "### extra_javascript\n\nSet a list of JavaScript files in your `docs_dir` to be included by the theme, as `<script>` tags.\n\n> NEW: **Changed in version 1.5:**\n>\n> Older versions of MkDocs supported only a plain list of strings, but now several additional config keys are available: `type`, `async`, `defer`.\n\nSee the examples and what they produce:\n\n```yaml\nextra_javascript:\n  - some_plain_javascript.js       # <script src=\"some_plain_javascript.js\"></script>\n        # New behavior in MkDocs 1.5:\n  - implicitly_as_module.mjs       # <script src=\"implicitly_as_module.mjs\" type=\"module\"></script>\n        # Config keys only supported since MkDocs 1.5:\n  - path: explicitly_as_module.mjs # <script src=\"explicitly_as_module.mjs\" type=\"module\"></script>\n    type: module\n  - path: deferred_plain.js        # <script src=\"deferred_plain.js\" defer></script>\n    defer: true\n  - path: scripts/async_module.mjs # <script src=\"scripts/async_module.mjs\" type=\"module\" async></script>\n    type: module\n    async: true\n```\n\nSo, each item can be either:\n\n* a plain string, or\n* a mapping that has the required `path` key and 3 optional keys `type` (string), `async` (boolean), `defer` (boolean).\n\nOnly the plain string variant detects the `.mjs` extension and adds `type=\"module\"`, otherwise `type: module` must be written out regardless of extension.\n\n**default**: `[]` (an empty list).\n\nNOTE: `*.js` and `*.css` files, just like any other type of file, are always copied from `docs_dir` into the site's deployed copy, regardless if they're linked to the pages via the above configs or not.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "fb7807bee4bb72a5e56372e38a84f9a0d926c25787a913a1c04528848323e611",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 591,
+      "line_end": 626,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/02e7cfcd979f054a1739a9a9"
+    },
+    {
+      "evidence_id": "ev-761bd4dd47e4fd99",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Project information > edit_uri",
+      "snippet": "> NOTE:\n> On a few known hosts (specifically GitHub, Bitbucket and GitLab), the\n> `edit_uri` is derived from the 'repo_url' and does not need to be set\n> manually. Simply defining a `repo_url` will automatically populate the\n> `edit_uri` configs setting.\n>\n> For example, for a GitHub- or GitLab-hosted repository, the `edit_uri`\n> would be automatically set as `edit/master/docs/` (Note the `edit` path\n> and `master` branch).\n>\n> For a Bitbucket-hosted repository, the equivalent `edit_uri` would be\n> automatically set as `src/default/docs/` (note the `src` path and `default`\n> branch).\n>\n> To use a different URI than the default (for example a different branch),\n> simply set the `edit_uri` to your desired string. If you do not want any\n> \"edit URL link\" displayed on your pages, then set `edit_uri` to an empty\n> string to disable the automatic setting.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "4af03c9c085ea783e087c9127b7e993b60f71e8711d8414e7fb359cf3f5a84ca",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 114,
+      "line_end": 132,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/4d72328ade845c20b1d39457"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1035
+}

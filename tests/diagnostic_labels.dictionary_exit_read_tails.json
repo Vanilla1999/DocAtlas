@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_read_tails.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_read_tails.py": "87999b70723ffdd30856f420da8bc665849ffb2ccde1328c55431d7eccb80592"
+  }
+}

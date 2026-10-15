@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_project_docs_self_host_fixture.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_project_docs_self_host_fixture.py": "81691e3d34091aa1e9090591525950ef77c5b4f27c438a42e1b0553605f3c1d8"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "trace-off": {
+    "complete": false,
+    "required_char_start": 3278,
+    "required_char_end": 3428,
+    "missing_character_count": 150,
+    "first_missing_character": 3278,
+    "contributing_evidence_ids": []
+  },
+  "trace-on": {
+    "complete": false,
+    "required_char_start": 3278,
+    "required_char_end": 3428,
+    "missing_character_count": 150,
+    "first_missing_character": 3278,
+    "contributing_evidence_ids": []
+  }
+}

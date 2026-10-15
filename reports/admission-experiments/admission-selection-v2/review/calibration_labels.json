@@ -1,0 +1,269 @@
+{
+  "schema": "docatlas-calibration-label-export-v2",
+  "source_oracle_sha256": "3f602bb76b7f9966cd60106fb63bdd8e9e40778e3fff83462ceb1f3facdd2a37",
+  "allowed_use": "calibration-only operational k choice; never pass labels or witness spans to host/ranker",
+  "witness_convention": "quote is a literal UTF-8 substring of content at source_path in corpus.json; references resolve through witnesses; no generated answer is a source",
+  "witnesses": {
+    "S1": {
+      "source_path": "calibration/seed_bank/intake.md",
+      "quote": "Для партии луговых трав с влажностью выше 9 процентов первичную сушку проводит техник приёмки."
+    },
+    "S2": {
+      "source_path": "calibration/seed_bank/intake.md",
+      "quote": "До завершения первичной сушки партию не помещают в морозильный шкаф."
+    },
+    "S3": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "quote": "После первичной сушки лаборант измеряет влажность повторно."
+    },
+    "S4": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "quote": "Перевод партии в морозильный шкаф разрешён только при влажности не выше 9 процентов и наличии подписанного листа всхожести."
+    },
+    "S5": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "quote": "Если лист всхожести отсутствует, партия остаётся на стеллаже ожидания независимо от влажности."
+    },
+    "S6": {
+      "source_path": "calibration/seed_bank/storage.md",
+      "quote": "Подписывать лист всхожести вправе только агроном банка."
+    },
+    "S7": {
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "quote": "При обнаружении живых насекомых партию перемещают в закрытый карантинный контейнер, а не на стеллаж ожидания."
+    },
+    "S8": {
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "quote": "Снять карантин может агроном банка после осмотра."
+    },
+    "S9": {
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "quote": "Даже после снятия карантина для морозильного хранения нужен подписанный лист всхожести и влажность не выше 9 процентов."
+    },
+    "T1": {
+      "source_path": "calibration/stage_rigging/inspection.md",
+      "quote": "Если на страховочном тросе обнаружен разрыв хотя бы одной проволоки, световую балку запрещено поднимать."
+    },
+    "T2": {
+      "source_path": "calibration/stage_rigging/inspection.md",
+      "quote": "Обнаруженный дефект записывает в журнал дежурный осветитель."
+    },
+    "T3": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "quote": "Замену дефектного страховочного троса выполняет механик сцены."
+    },
+    "T4": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "quote": "После замены троса подъём балки разрешается только после нагрузочной проверки и подписи заведующего сценой в журнале."
+    },
+    "T5": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "quote": "Устное согласие постановщика не заменяет подпись заведующего сценой."
+    },
+    "T6": {
+      "source_path": "calibration/stage_rigging/release.md",
+      "quote": "Нагрузочную проверку нельзя проводить при людях под балкой."
+    },
+    "T7": {
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "quote": "Перед нагрузочной проверкой дежурный осветитель освобождает площадку под балкой и выставляет ограждение."
+    },
+    "T8": {
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "quote": "Во время проверки ограждение не снимают даже по просьбе постановщика."
+    },
+    "T9": {
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "quote": "После завершённой нагрузочной проверки ограждение снимает дежурный осветитель, но подъём балки по-прежнему требует подписи заведующего сценой."
+    }
+  },
+  "cases": [
+    {
+      "id": "CAL01",
+      "document_group": "seed_bank",
+      "split": "calibration",
+      "label": "answerable",
+      "required_facts": [
+        {
+          "fact": "При 11 процентах первичную сушку выполняет техник приёмки; до её завершения морозильное хранение запрещено.",
+          "source_witnesses": [
+            "S1",
+            "S2"
+          ]
+        },
+        {
+          "fact": "После сушки лаборант повторно измеряет влажность.",
+          "source_witnesses": [
+            "S3"
+          ]
+        },
+        {
+          "fact": "Нужны одновременно влажность не выше 9 процентов и подписанный лист всхожести; без листа партия остаётся на стеллаже ожидания.",
+          "source_witnesses": [
+            "S4",
+            "S5"
+          ]
+        },
+        {
+          "fact": "Лист подписывает только агроном банка.",
+          "source_witnesses": [
+            "S6"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Достаточно только сушки или только низкой влажности.",
+        "Лист подписывает техник или лаборант."
+      ]
+    },
+    {
+      "id": "CAL02",
+      "document_group": "seed_bank",
+      "split": "calibration",
+      "label": "answerable",
+      "required_facts": [
+        {
+          "fact": "Сейчас нужен закрытый карантинный контейнер, не стеллаж ожидания, поскольку обнаружены живые насекомые.",
+          "source_witnesses": [
+            "S7"
+          ]
+        },
+        {
+          "fact": "Карантин снимает агроном банка после осмотра; подписать лист всхожести вправе только агроном банка.",
+          "source_witnesses": [
+            "S8",
+            "S6"
+          ]
+        },
+        {
+          "fact": "Одного снятия карантина недостаточно: нужны подписанный лист и влажность не выше 9 процентов; при заданной влажности отсутствующий лист всё равно мешает морозильному хранению.",
+          "source_witnesses": [
+            "S9",
+            "S4"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "В текущем состоянии оставить партию на обычном стеллаже.",
+        "Влажность 8 процентов отменяет карантин или требование листа."
+      ]
+    },
+    {
+      "id": "CAL03",
+      "document_group": "seed_bank",
+      "split": "calibration",
+      "label": "all_irrelevant",
+      "required_facts": [],
+      "relevant_source_paths": [],
+      "missing_information": [
+        "доза фунгицида",
+        "срок выдержки перед посевом"
+      ],
+      "expected_behavior": "Явно указать отсутствие этих сведений; не предлагать дозу или срок как ответ из корпуса.",
+      "current_contract": "EMPTY_SOURCES_REQUIRED"
+    },
+    {
+      "id": "CAL04",
+      "document_group": "stage_rigging",
+      "split": "calibration",
+      "label": "answerable",
+      "required_facts": [
+        {
+          "fact": "Даже при разрыве одной проволоки подъём запрещён.",
+          "source_witnesses": [
+            "T1"
+          ]
+        },
+        {
+          "fact": "Дефект в журнал записывает дежурный осветитель; трос заменяет механик сцены.",
+          "source_witnesses": [
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "fact": "После замены нужны нагрузочная проверка и подпись заведующего сценой в журнале.",
+          "source_witnesses": [
+            "T4"
+          ]
+        },
+        {
+          "fact": "При нагрузочной проверке людей под балкой быть не должно.",
+          "source_witnesses": [
+            "T6"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Можно поднять балку только для репетиции до ремонта.",
+        "Одна замена троса уже даёт допуск."
+      ]
+    },
+    {
+      "id": "CAL05",
+      "document_group": "stage_rigging",
+      "split": "calibration",
+      "label": "answerable",
+      "required_facts": [
+        {
+          "fact": "Замену троса выполняет механик сцены.",
+          "source_witnesses": [
+            "T3"
+          ]
+        },
+        {
+          "fact": "Дежурный осветитель освобождает площадку и выставляет ограждение перед проверкой.",
+          "source_witnesses": [
+            "T7"
+          ]
+        },
+        {
+          "fact": "Во время проверки ограждение не снимают даже по просьбе постановщика.",
+          "source_witnesses": [
+            "T8"
+          ]
+        },
+        {
+          "fact": "После проверки ограждение снимает дежурный осветитель; это само по себе не разрешает подъём без подписи заведующего сценой.",
+          "source_witnesses": [
+            "T9",
+            "T4"
+          ]
+        },
+        {
+          "fact": "Устное согласие постановщика подпись не заменяет.",
+          "source_witnesses": [
+            "T5"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Постановщик вправе снять ограждение во время проверки.",
+        "Снятие ограждения автоматически разрешает подъём."
+      ]
+    },
+    {
+      "id": "CAL06",
+      "document_group": "stage_rigging",
+      "split": "calibration",
+      "label": "all_irrelevant",
+      "required_facts": [],
+      "relevant_source_paths": [],
+      "missing_information": [
+        "суточная ставка аренды костюма",
+        "процент возвращаемого залога при повреждении подкладки"
+      ],
+      "expected_behavior": "Явный отказ от численного ответа из-за отсутствия сведений; нельзя выводить ставку из правил сцены.",
+      "current_contract": "EMPTY_SOURCES_REQUIRED"
+    }
+  ],
+  "review_rules": {
+    "positive_completeness": "Every required_fact is mandatory; conditions, negations, responsible actor and temporal order are part of the fact, not optional wording.",
+    "multi_fragment": "All ten answerable cases require at least two distinct source documents; multiple witnesses within one document alone are insufficient for full obligation delivery.",
+    "all_irrelevant": "Topical similarity is not answer support. No source supplies the requested prescription, tariff, recipe or engineering parameters. A refusal by the host does not repair a nonempty CURRENT_CONTRACT source result.",
+    "citations": "Evaluate semantic correctness, relation/owner grounding and literal citation equality separately. Citation must resolve to an allowed document/fragment and exact original bytes; no whitespace repairs.",
+    "policy": "Only requested scope and version 2026.1, public access, original content hash and bound owner/path are allowed. Other groups are cross-scope distractors if present upstream, not alternative evidence. Execution metadata and candidate span validation remain executor obligations.",
+    "unsupported_claims": "Record additional unsupported prescriptions, permissions and quantitative claims separately; oracle is not permission to invent missing details.",
+    "no_adaptation": "No oracle/question/source edits in response to selection or answer outputs. Any flaw is reported as a frozen-data limitation, not repaired in-place."
+  }
+}

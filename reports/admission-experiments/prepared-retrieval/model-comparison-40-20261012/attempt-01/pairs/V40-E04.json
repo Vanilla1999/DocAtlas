@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-E04",
+  "question": "What are ESLint's default globally ignored paths and default JavaScript file patterns?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "84274a93413585a4a667a04f5f02b9487ef98213d3a30fa6c37a1a2487ee60ff",
+      "mini_sha256": "84274a93413585a4a667a04f5f02b9487ef98213d3a30fa6c37a1a2487ee60ff"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "aa46b4a1ee82e296ea68a70d6cc9cc59c33e44346b39fefeb70776ee1e0ea248",
+      "mini_sha256": "aa46b4a1ee82e296ea68a70d6cc9cc59c33e44346b39fefeb70776ee1e0ea248"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "1f55306cd94a7ba7ed41940cdf0a5ad9e4fb1b255ce527b846f1aa97193c8916",
+      "mini_sha256": "1f55306cd94a7ba7ed41940cdf0a5ad9e4fb1b255ce527b846f1aa97193c8916"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      10
+    ],
+    "mini": [
+      10
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+}

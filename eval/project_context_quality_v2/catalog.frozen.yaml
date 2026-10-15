@@ -1,0 +1,116 @@
+schema_version: 1
+# Literal read membership only; routing metadata is not action permission.
+code_files: []
+documents:
+  - path: README.md
+    role: overview
+    scope: project
+    module_path: null
+    description: Project overview, capabilities, and entry points.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: CONTRIBUTING.md
+    role: development
+    scope: project
+    module_path: null
+    description: Development and contribution workflow.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/INDEX.md
+    role: overview
+    scope: project
+    module_path: null
+    description: Canonical index of maintained project documentation.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/PROJECT_MAP.md
+    role: project_architecture
+    scope: project
+    module_path: null
+    description: Repository subsystem map and contributor reading entry points.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: wiki/Architecture.md
+    role: project_architecture
+    scope: project
+    module_path: null
+    description: Runtime architecture, indexing, project storage, and per-project isolation.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/adr/0003-context-first-project-reads.md
+    role: development
+    scope: project
+    module_path: null
+    description: Decision record for retrieval-only project reads, host synthesis, and the three-tool public MCP surface.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/mcp-docs-server.md
+    role: api_contract
+    scope: project
+    module_path: null
+    description: Public three-tool Docs MCP contract, context-first lifecycle, routing, and quality gates.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/testing.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: Provider-free test commands, pytest markers, and live-test boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/project-docs-mcp-workflow.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: Project documentation sync, query, and exact dependency prefetch workflow.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: wiki/Supported-Sources.md
+    role: api_contract
+    scope: project
+    module_path: null
+    description: Supported documentation source types and local file formats.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: wiki/Commands.md
+    role: api_contract
+    scope: project
+    module_path: null
+    description: Maintained CLI commands for local setup, ingest, search, and diagnostics.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/index-cleanup.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: Preview and confirmed cleanup of derived index state while preserving sources and configuration.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/modules/project-context-retrieval.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs
+    description: Documentation retrieval application, gateway, query lineage, and source qualification boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/modules/evidence-selection.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs
+    description: Current source eligibility, visible evidence selection, fidelity, and absence of answer authorization.
+    authority: source_of_truth
+    status: active
+    impact: track

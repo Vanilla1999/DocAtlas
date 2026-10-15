@@ -1,0 +1,153 @@
+{
+  "schema": "p0-neighbor-probes-v1",
+  "python": "3.12.3",
+  "source_hashes": {
+    "docmancer/_internal/shard_compat.py": "e5f71ff861bb459d7a09029324341878ce6c998a95fc515e3fbfe59a64e27285",
+    "docmancer/docs/application/_patch_constraints_service_part02.py": "5d68876f843e15710e092ff2bddf6602e9a60fb85734d88944e5f7106f370dcd",
+    "docmancer/docs/application/_patch_review_service_part02.py": "7832d65e75c47e92f925891b4a9f6ce421357ea2b4269bae20f0891ab40bf044",
+    "docmancer/docs/discovery_candidates.py": "d3fa5ee7ed9cfaa89d19f98e8a13b26f751f4502484bcc868a2b7a5b08fefa1c"
+  },
+  "helper_origins": [
+    {
+      "name": "_PatchConstraintsServicePart02._task_terms",
+      "bridge": true,
+      "wrapper_globals": "docmancer.docs.application.patch_constraints_service",
+      "implementation": "docmancer.docs.application._patch_constraints_service_part02"
+    },
+    {
+      "name": "_PatchReviewServicePart02._task_symbol_tokens",
+      "bridge": true,
+      "wrapper_globals": "docmancer.docs.application.patch_review_service",
+      "implementation": "docmancer.docs.application._patch_review_service_part02"
+    }
+  ],
+  "task_cases": [
+    {
+      "question": "закрыть меню",
+      "constraint_terms": [
+        "закрыть меню",
+        "closeMenu",
+        "close",
+        "hide",
+        "dismiss",
+        "drawer"
+      ],
+      "review_terms": [
+        "closemenu",
+        "закрыть",
+        "закрытьменю",
+        "меню"
+      ]
+    },
+    {
+      "question": "close menu",
+      "constraint_terms": [
+        "close menu",
+        "closeMenu",
+        "close",
+        "hide",
+        "dismiss",
+        "drawer"
+      ],
+      "review_terms": [
+        "close",
+        "closemenu",
+        "menu"
+      ]
+    },
+    {
+      "question": "быстрая информация",
+      "constraint_terms": [
+        "быстрая информация",
+        "openInfo",
+        "info",
+        "information"
+      ],
+      "review_terms": [
+        "openinfo",
+        "быстрая",
+        "быстраяинформация",
+        "информация"
+      ]
+    },
+    {
+      "question": "scan",
+      "constraint_terms": [],
+      "review_terms": [
+        "gotoscandocinit",
+        "scan"
+      ]
+    },
+    {
+      "question": "скан",
+      "constraint_terms": [],
+      "review_terms": [
+        "gotoscandocinit",
+        "скан"
+      ]
+    }
+  ],
+  "discovery_cases": [
+    {
+      "library": "fastapi",
+      "ecosystem": "python",
+      "candidates": [
+        {
+          "library": "fastapi",
+          "ecosystem": "python",
+          "name": "FastAPI documentation",
+          "docs_url": "https://fastapi.tiangolo.com/",
+          "confidence": "high",
+          "why": "candidate matched python ecosystem and fastapi query"
+        }
+      ]
+    },
+    {
+      "library": "FASTAPI",
+      "ecosystem": "python",
+      "candidates": [
+        {
+          "library": "fastapi",
+          "ecosystem": "python",
+          "name": "FastAPI documentation",
+          "docs_url": "https://fastapi.tiangolo.com/",
+          "confidence": "high",
+          "why": "candidate matched python ecosystem and fastapi query"
+        }
+      ]
+    },
+    {
+      "library": "fastapi server",
+      "ecosystem": "python",
+      "candidates": []
+    },
+    {
+      "library": "unknown-library",
+      "ecosystem": "python",
+      "candidates": []
+    },
+    {
+      "library": "riverpod",
+      "ecosystem": "flutter",
+      "candidates": [
+        {
+          "library": "riverpod",
+          "ecosystem": "dart",
+          "name": "Riverpod official guide",
+          "docs_url": "https://riverpod.dev/",
+          "confidence": "high",
+          "why": "Official Riverpod guide documentation (preferred over pub.dev API)"
+        },
+        {
+          "library": "riverpod",
+          "ecosystem": "dart",
+          "name": "Riverpod pub.dev API reference",
+          "docs_url": "https://pub.dev/documentation/riverpod/latest/",
+          "confidence": "medium",
+          "why": "pub.dev API reference (fallback)"
+        }
+      ]
+    }
+  ],
+  "limitations": "Synthetic helper observations, not end-to-end quality or approval of registry authority."
+}

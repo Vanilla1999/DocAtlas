@@ -1,0 +1,46 @@
+{
+  "seconds": 0.10763328000030015,
+  "expected_paths": [
+    "docs/store.md"
+  ],
+  "indexed_paths": [
+    "docs/store.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-123408692f06468404c164f6c98eed19074a12cb",
+      "source_path": "docs/store.md",
+      "display_text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "20a9b40b074de2aae4a081201ede425e1980fa91d5d5424ded81807a36101c0e",
+  "storage_path": "/tmp/docatlas-evidence-fmxy910t/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-8ea7bb76b04d48bc8b860aef96d1c95c",
+  "catalog_sha256": "685ed06b29ae06e4dcc1934026a761d817ed9d73edec64cf128aa8aedcc08b03",
+  "documents": [
+    {
+      "path": "docs/store.md",
+      "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+      "catalog_entry_hash": "sha256:3557387f2bba2122aeed7515b080f8512bf7a2ea9a0636d98ef3f108efdeb882"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-8ea7bb76b04d48bc8b860aef96d1c95c",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 1,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 1
+  },
+  "status": "EXECUTED"
+}

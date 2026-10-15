@@ -23,7 +23,7 @@ ROLES = {
 AUTHORITIES = {"source_of_truth", "supporting", "historical", "generated"}
 STATUSES = {"active", "completed", "superseded"}
 IMPACT_POLICIES = {"track", "search_only"}
-TOP_LEVEL_FIELDS = ("schema_version", "documents", "roots")
+TOP_LEVEL_FIELDS = ("schema_version", "documents", "roots", "code_files")
 DOCUMENT_FIELDS = (
     "path", "role", "scope", "description", "module_path", "authority", "status", "impact",
 )
@@ -99,6 +99,7 @@ class ProjectDocCatalog:
     entries: list[ProjectDocCatalogEntry] = field(default_factory=list)
     roots: list[ProjectDocCatalogRoot] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    code_files: tuple[str, ...] = ()
 
 
 def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
@@ -143,6 +144,27 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog documents must be a list."])
     if not isinstance(raw_roots, list):
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog roots must be a list."])
+    if raw_roots:
+        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[
+            "Project docs roots do not declare finite membership; list literal documents instead."
+        ])
+    raw_code_files = data.get("code_files", [])
+    if not isinstance(raw_code_files, list) or len(raw_code_files) > MAX_CATALOG_DOCUMENTS:
+        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["code_files must be a bounded list of literal paths."])
+    code_files: list[str] = []
+    for value in raw_code_files:
+        if not isinstance(value, str) or not _literal_path(value):
+            return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["code_files requires exact repository-relative paths."])
+        candidate = root / value
+        if _has_symlink_component(root, PurePosixPath(value)) or not candidate.is_file():
+            return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["code_files must reference non-symlinked regular files."])
+        try:
+            candidate.resolve().relative_to(root.resolve())
+        except (OSError, ValueError):
+            return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["code_files resolves outside the repository."])
+        if value in code_files:
+            return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["duplicate code_files path."])
+        code_files.append(value)
     warnings: list[str] = []
     entries: list[ProjectDocCatalogEntry] = []
     roots: list[ProjectDocCatalogRoot] = []
@@ -182,7 +204,15 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
         roots.append(catalog_root)
     if warnings:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=warnings)
-    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, roots, [])
+    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, roots, [], tuple(code_files))
+
+
+def _literal_path(value: str) -> bool:
+    pure = PurePosixPath(value)
+    return bool(value and value == pure.as_posix() and not pure.is_absolute()
+                and not any(part in {".", ".."} for part in pure.parts)
+                and not any(char in value for char in "\\*?[]\x00")
+                and not (pure.parts and pure.parts[0].endswith(":")))
 
 
 def _validated_root(root: Path, raw: Any) -> tuple[ProjectDocCatalogRoot | None, str | None]:
@@ -270,6 +300,8 @@ def _validated_entry(root: Path, raw: Any) -> tuple[ProjectDocCatalogEntry | Non
         if field_name in raw and raw[field_name] is not None and not isinstance(raw[field_name], str):
             return None, f"{field_name} must be a string."
     raw_path = str(raw.get("path") or "").replace("\\", "/")
+    if not _literal_path(str(raw.get("path") or "")):
+        return None, "path must be an exact repository-relative literal."
     if raw_path.startswith("/"):
         return None, "path must stay within the repository."
     relative = raw_path.strip("/")

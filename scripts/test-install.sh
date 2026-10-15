@@ -124,6 +124,8 @@ run_install() { # remaining args passed to install.sh; runs with clean HOME
 
 # none -> succeeds, registers nothing
 run_install none || fail "install.sh none exited $?"
+grep -qx 'uv tool install --upgrade --managed-python --python 3.13 --no-build doc-atlas' "$CALL_LOG" \
+  || fail "install: expected managed Python 3.13 with source builds disabled"
 grep -q "claude mcp add" "$CALL_LOG" && fail "'none' should not register any agent"
 pass "agent 'none': no registration"
 
@@ -160,15 +162,63 @@ CFG="$RUN_HOME/.config/opencode/opencode.json"
 python3 - "$CFG" <<'PY' || fail "opencode: config content mismatch"
 import json, sys
 d = json.load(open(sys.argv[1]))
-srv = d["mcp"]["docatlas-docs"]
+assert set(d["mcp"]) == {"servers"}, d
+assert set(d["mcp"]["servers"]) == {"docatlas-docs"}, d
+srv = d["mcp"]["servers"]["docatlas-docs"]
 assert srv == {
     "type": "local",
     "command": ["doc-atlas", "mcp", "docs-serve"],
-    "enabled": True,
     "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
 }, srv
 PY
 pass "agent 'opencode' (via env): JSON config merged"
+
+# Migrate an existing custom name without losing user keys or disabled state.
+H="$(mktemp -d)"; CFG="$H/oc.json"
+cat >"$CFG" <<'JSON'
+{
+  "theme": "dark",
+  "mcp": {
+    "user-docs": {
+      "type": "local",
+      "command": ["doc-atlas", "mcp", "docs-serve"],
+      "enabled": false,
+      "timeout": 12345,
+      "environment": {"USER_SETTING": "keep"}
+    },
+    "servers": {
+      "other": {"type": "local", "command": ["x"], "disabled": true}
+    }
+  }
+}
+JSON
+cp "$CFG" "$STUB_ROOT/original.json"
+env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG="$CFG" \
+    sh "$INSTALL_SH" opencode >/dev/null 2>&1 || fail "opencode preservation run failed"
+python3 - "$CFG" <<'PY' || fail "opencode: user keys/name/state preservation mismatch"
+import json, sys
+d = json.load(open(sys.argv[1]))
+assert d["theme"] == "dark", d
+assert set(d["mcp"]) == {"servers"}, d
+assert set(d["mcp"]["servers"]) == {"user-docs", "other"}, d
+assert d["mcp"]["servers"]["other"] == {
+    "type": "local", "command": ["x"], "disabled": True,
+}, d
+assert d["mcp"]["servers"]["user-docs"] == {
+    "type": "local",
+    "command": ["doc-atlas", "mcp", "docs-serve"],
+    "disabled": True,
+    "timeout": 12345,
+    "environment": {"USER_SETTING": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+}, d
+PY
+cmp -s "$CFG.bak" "$STUB_ROOT/original.json" || fail "opencode: original backup not preserved"
+cp "$CFG" "$STUB_ROOT/merged.json"
+env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG="$CFG" \
+    sh "$INSTALL_SH" opencode >/dev/null 2>&1 || fail "opencode preservation re-run failed"
+cmp -s "$CFG" "$STUB_ROOT/merged.json" || fail "opencode: re-run changed config"
+cmp -s "$CFG.bak" "$STUB_ROOT/original.json" || fail "opencode: re-run overwrote backup"
+pass "agent 'opencode': user keys/name/disabled state preserved, re-run unchanged"
 
 # opencode with a custom OPENCODE_CONFIG path -> writes there, not the default
 H="$(mktemp -d)"; CUSTOM="$H/custom/oc.json"
@@ -202,34 +252,28 @@ grep -q "claude mcp add --scope user docatlas-docs" "$CALL_LOG" \
 [ -f "$H/.config/opencode/opencode.json" ] || fail "pipe positional form: opencode config not written"
 pass "README pipe form: cat scripts/install.sh | sh -s -- claude-code opencode"
 
-# opencode with an existing JSONC config (comments + trailing comma) -> merged,
-# existing keys preserved, comments dropped on rewrite
+# JSONC needing an update must be refused without dropping comments or writing.
 H="$(mktemp -d)"; JC="$H/oc.jsonc"
 cat >"$JC" <<'JSONC'
 {
   // user theme
   "theme": "dark",
   "mcp": {
-    "other": { "type": "local", "command": ["x"], "enabled": true },
+    "servers": {
+      "other": { "type": "local", "command": ["x"], "disabled": true },
+    },
   },
 }
 JSONC
+cp "$JC" "$STUB_ROOT/original.jsonc"
 env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG="$JC" \
-    sh "$INSTALL_SH" opencode >/dev/null 2>&1 || fail "opencode JSONC run failed"
-python3 - "$JC" <<'PY' || fail "opencode: JSONC merge/preservation mismatch"
-import json, sys
-d = json.load(open(sys.argv[1]))
-assert d["theme"] == "dark", d
-assert d["mcp"]["other"] == {"type": "local", "command": ["x"], "enabled": True}, d
-assert d["mcp"]["docatlas-docs"] == {
-    "type": "local",
-    "command": ["doc-atlas", "mcp", "docs-serve"],
-    "enabled": True,
-    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
-}, d
-PY
-[ -f "$JC.bak" ] || fail "opencode: JSONC rewrite did not keep a .bak"
-pass "agent 'opencode': JSONC parsed, existing keys preserved, .bak kept"
+    sh "$INSTALL_SH" opencode >"$STUB_ROOT/out.log" 2>&1 || fail "opencode JSONC run failed"
+grep -q 'JSONC update requires manual editing; refusing to drop comments' "$STUB_ROOT/out.log" \
+  || fail "opencode: expected explicit JSONC refusal"
+cmp -s "$JC" "$STUB_ROOT/original.jsonc" || fail "opencode: JSONC refusal changed bytes"
+[ ! -e "$JC.bak" ] || fail "opencode: JSONC refusal created a backup"
+[ ! -e "$H/.config/opencode/opencode.json" ] || fail "opencode: JSONC refusal wrote duplicate config"
+pass "agent 'opencode': JSONC refused, bytes unchanged, no backup or duplicate config"
 
 # unknown explicit agent (positional) -> hard failure
 if run_install codx 2>/dev/null; then

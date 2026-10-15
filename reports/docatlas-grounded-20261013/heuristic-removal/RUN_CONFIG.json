@@ -1,0 +1,62 @@
+{
+  "runtime_authorized": true,
+  "authorization_reference": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/CONTRACT_DECISIONS.md",
+  "baseline_python": "/tmp/opencode/docatlas-heuristic-removal-baseline-runtime/bin/python",
+  "candidate_python": "/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python",
+  "baseline_wheel": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/wheels/baseline/doc_atlas-1.3.2-py3-none-any.whl",
+  "candidate_wheel": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/wheels/candidate/doc_atlas-1.3.2-py3-none-any.whl",
+  "code_freeze_manifest": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/CODE_FREEZE.json",
+  "code_freeze_sha256": "5929a3b5c7d5a67227e07f012429bd818786aebcd717921fbd65a8c079842e91",
+  "datasets": [
+    {
+      "path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+      "count": 40,
+      "arms": [
+        "V0",
+        "VQ",
+        "VA",
+        "VS",
+        "VALL"
+      ]
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+      "count": 20,
+      "arms": [
+        "V0",
+        "VQ",
+        "VA",
+        "VS",
+        "VALL"
+      ]
+    },
+    {
+      "path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+      "count": 20,
+      "arms": [
+        "V0",
+        "VALL"
+      ],
+      "oracle_schema": "D_literal_byte_witness_sets_v1"
+    }
+  ],
+  "limits": {
+    "context_calls": 340,
+    "call_seconds": 60,
+    "prepare_seconds": 180,
+    "wall_seconds": 1800
+  },
+  "common": {},
+  "trace": false,
+  "packing_tokens": 12000,
+  "tokenizer_cache_dir": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/tokenizer-cache",
+  "freeze_files": [
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/wheels/baseline/doc_atlas-1.3.2-py3-none-any.whl",
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/wheels/candidate/doc_atlas-1.3.2-py3-none-any.whl",
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/tokenizer-cache/fb374d419588a4632f3f557e76b4b70aebbca790",
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/PROTOCOL.md",
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/CODE_FREEZE.json",
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout/FREEZE_MANIFEST.json",
+    "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/CONTRACT_DECISIONS.md"
+  ]
+}

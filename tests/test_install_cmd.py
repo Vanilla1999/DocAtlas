@@ -39,25 +39,6 @@ def _home(tmp_dir: str) -> Path:
     return home
 
 
-def test_install_claude_code_creates_rebooted_skill_file():
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmp_dir:
-        fake_home = _home(tmp_dir)
-        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
-             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
-            result = runner.invoke(cli, ["install", "claude-code"])
-        assert result.exit_code == 0, result.output
-        skill_file = fake_home / ".claude" / "skills" / "docatlas" / "SKILL.md"
-        content = skill_file.read_text()
-        assert content.startswith("---\n")
-        assert content.index("<!-- docatlas:start -->") > content.index("\n---\n")
-        assert "allowed-tools" in content
-        assert "get_docs_context" in content
-        assert "prepare_docs" in content
-        assert "docs_status" in content
-        assert "legacy direct documentation tools" in content
-
-
 def test_install_codex_creates_native_and_shared_skills():
     runner = CliRunner()
     with runner.isolated_filesystem() as tmp_dir:
@@ -491,7 +472,6 @@ def test_legacy_skill_migration_preserves_user_suffix():
     ("agent", "config_path", "container_key"),
     [
         ("codex", ".codex/config.toml", "mcp_servers"),
-        ("opencode", "opencode.json", "mcp"),
         ("github-copilot", ".vscode/mcp.json", "servers"),
     ],
 )

@@ -1,0 +1,15 @@
+{
+  "analysis_base_commit": "013ae088cd2a041e88755f88f4e3c4c1a772b122",
+  "new_product_requests": 0,
+  "product_modified": false,
+  "artifact_sha256": {
+    "questions.json": "2b88e653b4726747d4ee55682d159744bc1b7dcfc8ac525ee830a688ec401f67",
+    "corpus.md": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+    "docatlas-results.json": "dceea023700ba1844b5425dd15b51c27aa3db4675a7053288f974d2ef2a85877",
+    "grounded-results.json": "7b88afde31cfb2825f56f7a04f472868af89c9b7cfb1296606c2f7ece9fc902e",
+    "docatlas-trace.jsonl": "42d753f6ca3985ee392136c5b2440c81192895ac3124bf17baf6aa56c33ded30",
+    "answers.json": "871be71b0f9a151649839e84d2ffe344c38e911f02eb7fc24209e624c231c12f",
+    "url-verification.json": "68ccfc17dca716ce1805ef31cddff11a0145e8d26cbb7405354c8888a61119fa"
+  },
+  "scope": "Read-only post-hoc analysis of existing ten-question run. No new empirical causal intervention."
+}

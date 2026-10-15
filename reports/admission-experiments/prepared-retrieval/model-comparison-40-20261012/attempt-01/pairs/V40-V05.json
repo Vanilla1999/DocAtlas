@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-V05",
+  "question": "How are files in Vite's public directory served and how should public/icon.png be referenced from source code?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "ab1ad43a7a261f30e9398db6b1cdd50802460658ea9ec768ace8cec6f0eec864",
+      "mini_sha256": "ab1ad43a7a261f30e9398db6b1cdd50802460658ea9ec768ace8cec6f0eec864"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "e7d5e14f395a767ceff2400b4db3ecb6e607a0785d221584518060d711c680b1",
+      "mini_sha256": "e7d5e14f395a767ceff2400b4db3ecb6e607a0785d221584518060d711c680b1"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "fab55d533da84f95ef9ee8b4d43b1216b1e48b2887acea265bac0a414ae53b6f",
+      "mini_sha256": "fab55d533da84f95ef9ee8b4d43b1216b1e48b2887acea265bac0a414ae53b6f"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      1
+    ],
+    "mini": [
+      1
+    ]
+  },
+  "over_budget_pool": false,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+}

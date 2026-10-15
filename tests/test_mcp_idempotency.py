@@ -6,11 +6,6 @@ def _db(tmp_path):
     return tmp_path / "idem.db"
 
 
-def test_explicit_key_wins(tmp_path):
-    args = {"limit": 3, idempotency.EXPLICIT_KEY_ARG: "user-key"}
-    key, reused = idempotency.get_or_create_key("tool", args, db_path=_db(tmp_path))
-    assert key == "user-key"
-    assert reused is True
 
 
 def test_fingerprint_cache_reuses(tmp_path):

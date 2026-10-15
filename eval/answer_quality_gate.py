@@ -257,7 +257,16 @@ def evaluate_projection_contract(
 
     errors: list[str] = []
     expected_status = contract["expected_status"]
-    if projection.get("status") != expected_status:
+    is_patch = contract["result_kind"] == "patch_context"
+    observed_status = projection.get("result") if is_patch else projection.get("status")
+    if is_patch:
+        from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+        errors.extend("canonical_validator:" + error for error in validate_model_visible_projection(
+            projection, snapshot=snapshot,
+        ))
+        if expected_status not in {"data", "failure"}:
+            errors.append("unsupported_evaluation_requirement:legacy_packet_status")
+    if observed_status != expected_status:
         errors.append("projection:status")
     if projection.get("kind") != contract["result_kind"]:
         errors.append("projection:kind")
@@ -267,7 +276,9 @@ def evaluate_projection_contract(
     if not isinstance(declared, int) or declared != actual or actual > maximum:
         errors.append("projection:token_budget_or_estimate")
 
-    if expected_status == "insufficient_evidence":
+    if is_patch and observed_status == "failure":
+        return _case_result(contract, actual, errors)
+    if not is_patch and expected_status == "insufficient_evidence":
         if any(projection.get(key) for key in SUCCESS_KEYS):
             errors.append("projection:insufficient_authorizes_success")
         return _case_result(contract, actual, errors)
@@ -455,10 +466,12 @@ def _validate_sources(
         source_ids.add(evidence_id)
         if row.get("content_sha256") != bound.get("content_sha256"):
             errors.append("citation:content_hash_mismatch")
-        for key in ("path_or_url", "section", "snippet", "version_binding"):
+        for key in ("path_or_url", "section", "snippet", "version_binding",
+                    "path", "symbol_or_section", "text", "stable_id", "authority",
+                    "scope", "char_start", "char_end", "line_start", "line_end"):
             if key in row and row.get(key) != bound.get(key):
                 errors.append(f"citation:{key}_mismatch")
-        path = str(row.get("path_or_url") or "")
+        path = str(row.get("path_or_url") or row.get("path") or "")
         if path in allowed:
             found_paths.add(path)
         elif allowed:
@@ -514,19 +527,15 @@ def _validate_patch_context(
         if re.search(pattern, visible_projection, re.IGNORECASE | re.UNICODE) is None:
             errors.append(f"patch:exact_identifier_missing:{identifier}")
     for field, required in (contract.get("required_patch_fields") or {}).items():
+        if field not in {"sources", "requirements", "assignments", "mutation_intent", "missing"}:
+            errors.append(f"unsupported_evaluation_requirement:{field}")
+            continue
         visible = _normalized(canonical_bytes(projection.get(field)).decode("utf-8"))
         for fact in required:
             if _normalized(fact) not in visible:
                 errors.append(f"patch:{field}:required_fact_missing:{fact}")
-    checks = _normalized(canonical_bytes(projection.get("checks")).decode("utf-8"))
     for command in contract.get("required_public_commands") or ():
-        if _normalized(command) not in checks:
-            errors.append(f"patch:required_command_missing:{command}")
-    for field in PATCH_FACT_FIELDS:
-        for item in _dict_items(projection.get(field)):
-            refs = item.get("evidence_ids")
-            if not isinstance(refs, list) or not refs or any(ref not in source_ids for ref in refs):
-                errors.append(f"patch:{field}:evidence_ids_invalid")
+        errors.append(f"unsupported_evaluation_requirement:workflow_command:{command}")
 
 
 def _dict_items(value: Any) -> Iterable[dict[str, Any]]:

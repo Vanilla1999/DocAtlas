@@ -1,0 +1,109 @@
+{
+  "seconds": 0.11381655800141743,
+  "expected_paths": [
+    "docs/compounds.md",
+    "docs/logs.md",
+    "docs/owners.md",
+    "docs/packets.md",
+    "docs/setext.md"
+  ],
+  "indexed_paths": [
+    "docs/compounds.md",
+    "docs/logs.md",
+    "docs/owners.md",
+    "docs/packets.md",
+    "docs/setext.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-d9835e62e4f939024d0103b7f2c472c74aa1e722",
+      "source_path": "docs/compounds.md",
+      "display_text": "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n",
+      "line_start": 1,
+      "line_end": 3
+    },
+    {
+      "stable_chunk_id": "child-c280555c33847a1638b96c8c2e9270fd859c3306",
+      "source_path": "docs/logs.md",
+      "display_text": "# Logging\n\nLogs flow to disk after each request.\n",
+      "line_start": 1,
+      "line_end": 3
+    },
+    {
+      "stable_chunk_id": "child-49407bf130addef288456500df7bbb2673a30dea",
+      "source_path": "docs/owners.md",
+      "display_text": "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-e7bbb8b638f46426d28e668714b5e7db8ee80a80",
+      "source_path": "docs/owners.md",
+      "display_text": "# DeliveryEngine\n\nPacket delivery resumes after each request.\n",
+      "line_start": 5,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-02ede65c49b84444f00e807ca08072d040a60ce2",
+      "source_path": "docs/packets.md",
+      "display_text": "# Packet transport\n\nPackets are delivered after each request.\n",
+      "line_start": 1,
+      "line_end": 3
+    },
+    {
+      "stable_chunk_id": "child-fa81d65da93a06c9070f27b74f2b1e5ae03df6a2",
+      "source_path": "docs/setext.md",
+      "display_text": "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\nRead the handbook for background.\n",
+      "line_start": 1,
+      "line_end": 6
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "65569d99c365a27d74d1dc5b11fffcd93428ad7f3ae67a41394a89cbc2d66cdb",
+  "storage_path": "/tmp/docatlas-evidence-nkvlz6py/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+  "catalog_sha256": "ce7e6b671bc8390e8b7e53a6e205d42b088b049439366f077a1cbb22aa4417c3",
+  "documents": [
+    {
+      "path": "docs/compounds.md",
+      "content_sha256": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+      "catalog_entry_hash": "sha256:0d2658834cfb6a0054e56e91ddecbd89360c01b025a8ab0ffd55d3bf440543f0"
+    },
+    {
+      "path": "docs/logs.md",
+      "content_sha256": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+      "catalog_entry_hash": "sha256:41b3ec67180a8e95d33678c38b4c2e818452a86f9b367cbf060f841154505b3a"
+    },
+    {
+      "path": "docs/owners.md",
+      "content_sha256": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+      "catalog_entry_hash": "sha256:fb9ea9d3016f5b244a6c7f8a6ddd199eb761d6895f871c96a510813eb34fa575"
+    },
+    {
+      "path": "docs/packets.md",
+      "content_sha256": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+      "catalog_entry_hash": "sha256:1a43f2e3f0a03043f5e8691b93011a79dcc0a62d3d92e5e602d63c39639a17c1"
+    },
+    {
+      "path": "docs/setext.md",
+      "content_sha256": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+      "catalog_entry_hash": "sha256:446acd95353096a804a1249cbc39c811350fed73d44f1d723f3f62088fb1fcb2"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-ae7fe8f303954903859df9cc5c6ffdbf",
+    "members": 5,
+    "new_count": 5,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 6,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 6
+  },
+  "status": "EXECUTED"
+}

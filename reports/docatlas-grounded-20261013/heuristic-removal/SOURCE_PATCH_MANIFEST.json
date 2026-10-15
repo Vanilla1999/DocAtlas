@@ -1,0 +1,22 @@
+{
+  "base_commit": "91dd2b4e9f0615e9c6ac5c4346c13200accca550",
+  "patch_sha256": "22f087489dbebeb830e555706b7ae78426d1edc492a0e18cbe5b0242261255d6",
+  "untracked_code_files": [
+    "docmancer/docs/application/experimental_heuristic_removal.py",
+    "docmancer/retrieval/experimental_acquisition.py",
+    "eval/heuristic_removal/__init__.py",
+    "eval/heuristic_removal/assess.py",
+    "eval/heuristic_removal/config.template.json",
+    "eval/heuristic_removal/installed_stdio.py",
+    "eval/heuristic_removal/receipts.py",
+    "eval/heuristic_removal/run.py",
+    "tests/diagnostic_labels.heuristic_removal.json",
+    "tests/test_heuristic_removal_public_integration.py"
+  ],
+  "corpus_oracle_research_archive": "HOLDOUT_DATA.tar.xz",
+  "historical_inputs_archive": "OPEN_REGRESSION_INPUTS.tar.xz",
+  "commits": 0,
+  "pushes": 0,
+  "production_promoted": false,
+  "measurement_code_after_interruption": "FROZEN_RUN_V4.json, product wheel unchanged"
+}

@@ -1,0 +1,194 @@
+diff --git a/docmancer/docs/application/experimental_candidate_selection.py b/docmancer/docs/application/experimental_candidate_selection.py
+index 3c0c15fa..83f9c491 100644
+--- a/docmancer/docs/application/experimental_candidate_selection.py
++++ b/docmancer/docs/application/experimental_candidate_selection.py
+@@ -5,14 +5,44 @@ qualification, or authority. Downstream validators remain unchanged.
+ """
+ from contextlib import contextmanager
+ from contextvars import ContextVar
++from copy import deepcopy
++from dataclasses import dataclass, field
++import hashlib
++import json
++from typing import Any
+ 
+ from docmancer.docs.domain.original_body_discovery import (
+     original_body_discovery_binding,
++    experimental_selector_settings,
+     policy_candidate_admission_active,
+     source_valid_candidate_admission_active,
+ )
+ 
+ _SELECTOR = ContextVar("experimental_native_candidate_selector", default=None)
++_OBSERVER = ContextVar("experimental_native_selection_observer", default=None)
++
++
++@dataclass
++class SelectionObservation:
++    """Diagnostics returned to a host observer; never source authorization."""
++
++    calls: int = 0
++    errors: list[str] = field(default_factory=list)
++
++
++@contextmanager
++def experimental_selection_observer(observer):
++    """Observe copies after selection; diagnostic failures cannot change it.
++
++    A host can inspect the yielded state's errors to detect missing receipts.
++    No original candidate object is exposed through this observer.
++    """
++    state = SelectionObservation()
++    token = _OBSERVER.set((observer, state))
++    try:
++        yield state
++    finally:
++        _OBSERVER.reset(token)
+ 
+ 
+ @contextmanager
+@@ -25,10 +55,67 @@ def experimental_candidate_selector(selector):
+         _SELECTOR.reset(token)
+ 
+ 
++def _diagnostic_value(value, *, key=""):
++    if key == "raw_document" and isinstance(value, str):
++        return {"sha256": hashlib.sha256(value.encode("utf-8")).hexdigest(), "characters": len(value)}
++    if isinstance(value, dict):
++        return {str(name): _diagnostic_value(item, key=str(name)) for name, item in value.items()}
++    if isinstance(value, (list, tuple)):
++        return [_diagnostic_value(item) for item in value]
++    if value is None or isinstance(value, (str, bool, int, float)):
++        return value
++    return {"type": type(value).__qualname__, "value": str(value)}
++
++
++def _candidate_receipt(chunk):
++    metadata = _diagnostic_value(chunk.metadata or {})
++    reference = metadata.get("_reference_evidence") or {}
++    source = reference.get("source") or {}
++    text_hash = hashlib.sha256(chunk.text.encode("utf-8")).hexdigest()
++    identity = [source, reference.get("char_start"), reference.get("char_end"), chunk.chunk_index, text_hash]
++    return {
++        "id": hashlib.sha256(json.dumps(identity, ensure_ascii=False, sort_keys=True,
++                                       separators=(",", ":")).encode("utf-8")).hexdigest(),
++        "source": chunk.source, "chunk_index": chunk.chunk_index, "score": chunk.score,
++        "text": chunk.text, "text_sha256": text_hash,
++        "path": source.get("canonical_path"),
++        "span": [reference.get("char_start"), reference.get("char_end")],
++        "binding": source, "metadata": metadata,
++    }
++
++
++def _observe_selection(question, pool, excluded, original, selection):
++    configured = _OBSERVER.get()
++    if configured is None:
++        return
++    observer, state = configured
++    state.calls += 1
++    try:
++        # Constructing the verbose receipt is strictly optional. Raw documents
++        # are represented by hashes; the exact native model inputs remain text.
++        receipt = {
++            "schema_version": 1, "question": question,
++            "pool": [_candidate_receipt(chunk) for chunk in pool],
++            "complete_candidates": [_candidate_receipt(chunk) for chunk in original],
++            "excluded": [{"candidate": _candidate_receipt(chunk), "reason": reason,
++                          "original_ordinal": ordinal} for chunk, reason, ordinal in excluded],
++            "selection": selection,
++        }
++        observer(deepcopy(receipt))
++    except Exception as exc:
++        state.errors.append(type(exc).__name__ + ": " + str(exc))
++
++
+ def select_experimental_candidates(candidates, *, question):
+     selector = _SELECTOR.get()
+-    if selector is None or not (policy_candidate_admission_active() or source_valid_candidate_admission_active()):
++    if not (policy_candidate_admission_active() or source_valid_candidate_admission_active()):
+         return candidates
++    config = None
++    if selector is None:
++        from .experimental_selection_modes import configured_selector
++        config = configured_selector(experimental_selector_settings())
++        if config is None:
++            return candidates
+     pool, excluded, seen = [], [], set()
+     for ordinal, chunk in enumerate(candidates):
+         metadata = chunk.metadata or {}
+@@ -44,12 +131,26 @@ def select_experimental_candidates(candidates, *, question):
+         else:
+             seen.add(key)
+             pool.append(chunk)
+-    indices = selector(question, tuple(pool), tuple(excluded), tuple(candidates))
++    if selector is not None:
++        indices = selector(question, tuple(pool), tuple(excluded), tuple(candidates))
++        selection: dict[str, Any] = {"mode": "callback", "status": "callback",
++                                     "model_forward_attempts": 0, "model_forwards": 0}
++    else:
++        from .experimental_selection_modes import choose_configured_candidates, SelectorExecutionError
++        try:
++            indices, selection = choose_configured_candidates(question, tuple(pool), config)
++        except SelectorExecutionError as exc:
++            _observe_selection(question, pool, excluded, candidates, exc.receipt)
++            raise
+     if indices is None:
+         # Observation/control preserves B1's original downstream behavior.
++        selection["selected_indices"] = None
++        _observe_selection(question, pool, excluded, candidates, selection)
+         return candidates
+     indices = tuple(indices)
+     if (any(type(index) is not int or not 0 <= index < len(pool) for index in indices)
+             or len(set(indices)) != len(indices)):
+         raise ValueError("experimental selector returned invalid candidate indices")
++    selection["selected_indices"] = list(indices)
++    _observe_selection(question, pool, excluded, candidates, selection)
+     return [pool[index] for index in indices]
+diff --git a/docmancer/docs/domain/original_body_discovery.py b/docmancer/docs/domain/original_body_discovery.py
+index 9c06b888..ee95dd10 100644
+--- a/docmancer/docs/domain/original_body_discovery.py
++++ b/docmancer/docs/domain/original_body_discovery.py
+@@ -26,6 +26,7 @@ class _BodyRead:
+     active: bool = True
+     experiment_admission: str | None = None
+     experiment_context_max_tokens: int | None = None
++    experiment_selector_settings: tuple[str | None, str | None, str | None] | None = None
+ 
+ 
+ _BODY_READ: ContextVar[_BodyRead | None] = ContextVar("ordinary_original_body_read", default=None)
+@@ -63,6 +64,10 @@ def original_body_read_scope(handler):
+             mode = os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION")
+             if mode in {"policy_candidates_v1", "scalar_label_candidates_v3", "source_valid_candidates_v1"}:
+                 state.experiment_admission = mode
++            state.experiment_selector_settings = tuple(os.environ.get(key) for key in (
++                "DOCATLAS_EXPERIMENT_SELECTOR", "DOCATLAS_EXPERIMENT_SELECTOR_TOP_K",
++                "DOCATLAS_EXPERIMENT_MINI_PATH",
++            ))
+             # The common experimental packet cap is independent of admission.
+             # Capture it once, including for the unchanged V3/default control.
+             raw_cap = os.environ.get("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS")
+@@ -109,6 +114,12 @@ def experimental_context_max_tokens() -> int | None:
+     return state.experiment_context_max_tokens if state is not None and state.active else None
+ 
+ 
++def experimental_selector_settings() -> tuple[str | None, str | None, str | None] | None:
++    """Host configuration captured at the original read, never from wire data."""
++    state = _BODY_READ.get()
++    return state.experiment_selector_settings if state is not None and state.active else None
++
++
+ def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -> str | None:
+     state = _BODY_READ.get()
+     if state is None or not state.active or question != state.question:
+diff --git a/pyproject.toml b/pyproject.toml
+index 0f6844a9..8fb54a26 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -53,6 +53,7 @@ dependencies = [
+ browser = ["playwright>=1.40.0"]
+ crawl4ai = ["crawl4ai>=0.4.0"]
+ dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0"]
++reranker-mini = ["torch==2.10.0", "transformers==4.57.1", "safetensors>=0.7,<0.9"]
+ embeddings-voyage = ["voyageai>=0.2.0"]
+ embeddings-openai = ["openai>=1.0.0"]
+ embeddings-cohere = ["cohere>=5.0.0"]

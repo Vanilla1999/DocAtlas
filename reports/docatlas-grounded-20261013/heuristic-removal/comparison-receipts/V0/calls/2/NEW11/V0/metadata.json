@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW11",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-requests",
+  "public_request": {
+    "question": "For Requests 2.32.3, which verb does not follow redirects by default, how can I enable it, and what numeric redirect-hop limit is guaranteed by this quickstart?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-requests/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "1601598b848bd93f58d66083c35bdee69c61df0006756663bad53d022698d588",
+  "utf8_bytes": 647,
+  "tokens": 172,
+  "seconds": 0.3871022380008071,
+  "cpu_seconds": 0.3845057089999955,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

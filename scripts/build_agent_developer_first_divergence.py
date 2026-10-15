@@ -16,7 +16,9 @@ from eval.agent_developer_v1.first_divergence import (
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TASKS = ROOT / "eval/agent_developer_v1/tasks.json"
-DEFAULT_ORACLE = ROOT / "eval/agent_developer_v1/expected_trajectories.json"
+# Reproduce the historical atlas with the oracle to which its retained report
+# was bound. A changed current oracle must not rewrite historical expectations.
+DEFAULT_ORACLE = ROOT / "eval/agent_developer_v1/results/first-divergence-oracle-5a36a15.json"
 DEFAULT_REPORT = ROOT / "eval/agent_developer_v1/results/model-benchmark.json"
 DEFAULT_ATLAS = (
     ROOT / "eval/agent_developer_v1/results/first-divergence-atlas.json"

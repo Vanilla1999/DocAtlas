@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_literal_needs_mcp.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_literal_needs_mcp.py": "01931debd7d1c5f5bdb4d1cb382ec93f438e337ba6c75ff2bfcbe02ebbf1a1e9"
+  }
+}

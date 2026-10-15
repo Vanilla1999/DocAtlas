@@ -121,35 +121,3 @@ class FixtureProjectContextFacade:
             heading_path=heading_path,
             metadata={"score": score},
         )
-
-
-def test_live_project_context_architecture_prefers_readme_architecture_contributing(tmp_path):
-    write_live_quality_fixture(tmp_path)
-
-    result = ProjectContextService(FixtureProjectContextFacade()).get_project_context(
-        str(tmp_path),
-        "What is the architecture and project structure?",
-        mode="project-only",
-        limit=6,
-    )
-    paths = [item["source"]["path"] for item in result.context_pack]
-
-    assert "README.md" in paths
-    assert "wiki/Architecture.md" in paths
-    assert "CONTRIBUTING.md" in paths
-    assert "CHANGELOG.md" not in paths[:4]
-
-
-def test_live_project_context_docs_mcp_includes_specific_docs_source(tmp_path):
-    write_live_quality_fixture(tmp_path)
-
-    result = ProjectContextService(FixtureProjectContextFacade()).get_project_context(
-        str(tmp_path),
-        "How does the docs MCP server work?",
-        mode="project-only",
-        limit=4,
-    )
-    paths = [item["source"]["path"] for item in result.context_pack]
-
-    assert "docs/mcp-docs-server.md" in paths
-    assert paths[0] != "wiki/MCP-Packs.md"

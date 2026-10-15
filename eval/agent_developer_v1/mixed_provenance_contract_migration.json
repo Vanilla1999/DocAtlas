@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "protocol": "mixed-provenance-current-contract-migration-v1",
+  "frozen_protocol_sha256": "4559d02bd17977965dc8b7baf19471b3a00d56f5ee09dc37fc6de341aa757d71",
+  "historical_report_sha256": "542ab4377d0ce5473dfffe0eced0331eff22fa2e31af1f65b4ff0f1680da7e47",
+  "current_report_protocol": "mixed-evidence-provenance-retrieval-v2",
+  "lookup_queries": [],
+  "authority": "source_facts_never_answer_or_edit_permission",
+  "remote_input": "original_frozen_urls_and_text_at_dns_http_boundary",
+  "remote_preparation": "actual_public_manifest_job_and_record_specific_index",
+  "atomic_library_staging_claimed": false,
+  "cost_policy": "measure_and_minimize_without_fixed_output_ceiling",
+  "infrastructure_member": {
+    "path": "FIXTURE_STATE.md",
+    "text": "This document provisions the isolated fixture store.\n",
+    "only_when": "no_authored_project_document",
+    "purpose": "explicit_cold_member_store_grant_not_question_evidence"
+  },
+  "crosswalk": [
+    {
+      "id": "project_rule_prefers_canonical_policy",
+      "question": "What is RetryPolicyLimit?",
+      "historical_expected_supported": true,
+      "historical_public_requirements": [
+        {
+          "value": "RetryPolicyLimit",
+          "proof_role": "project_rule"
+        }
+      ],
+      "historical_required_evidence_paths": [],
+      "host_request_binding": {
+        "project": true
+      },
+      "required_full_fact_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "current_obligation": "all_original_allowed_source_facts_visible_and_bound",
+      "source_role_mapping": [
+        {
+          "path_or_url": "ARCHITECTURE.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "39d533681cc4c6f62c097051ee7cf1a29b4dba85c6ebd15d75a005845d07c3fe",
+          "current_lane": "project",
+          "may_satisfy_original_fact": true
+        },
+        {
+          "path_or_url": "https://advisory.example/retries",
+          "source_class": "external_advisory",
+          "historical_authority": "supporting",
+          "source_text_sha256": "536a93e5c365d8d5acbdc11a3dff3c11fb86a4dc1f95288ddeb3ac0fb1196df3",
+          "current_lane": "separate_library_record",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "external-advisory",
+          "path_or_url": "https://advisory.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
+      ]
+    },
+    {
+      "id": "project_rule_rejects_advisory_only",
+      "question": "What is RetryPolicyLimit?",
+      "historical_expected_supported": false,
+      "historical_public_requirements": [
+        {
+          "value": "RetryPolicyLimit",
+          "proof_role": "project_rule"
+        }
+      ],
+      "historical_required_evidence_paths": [],
+      "host_request_binding": {
+        "project": true
+      },
+      "required_full_fact_sources": [],
+      "current_obligation": "no_wrong_role_source_credited_and_no_authority",
+      "source_role_mapping": [
+        {
+          "path_or_url": "https://advisory.example/retries",
+          "source_class": "external_advisory",
+          "historical_authority": "supporting",
+          "source_text_sha256": "536a93e5c365d8d5acbdc11a3dff3c11fb86a4dc1f95288ddeb3ac0fb1196df3",
+          "current_lane": "separate_library_record",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "external-advisory-only",
+          "path_or_url": "https://advisory.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
+      ]
+    },
+    {
+      "id": "implementation_fact_rejects_external_claim",
+      "question": "What is OrdersDraftPersistence?",
+      "historical_expected_supported": true,
+      "historical_public_requirements": [
+        {
+          "value": "OrdersDraftPersistence",
+          "proof_role": "implementation_fact"
+        }
+      ],
+      "historical_required_evidence_paths": [],
+      "host_request_binding": {
+        "project": true
+      },
+      "required_full_fact_sources": [
+        "packages/orders/README.md"
+      ],
+      "current_obligation": "all_original_allowed_source_facts_visible_and_bound",
+      "source_role_mapping": [
+        {
+          "path_or_url": "packages/orders/README.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "a8f4c812de58bacb0d2a987b3d04fe6ae3af757e942e4e4b6b2f44b8269d1140",
+          "current_lane": "project",
+          "may_satisfy_original_fact": true
+        },
+        {
+          "path_or_url": "https://blog.example/orders",
+          "source_class": "external_advisory",
+          "historical_authority": "supporting",
+          "source_text_sha256": "0d873a169c7c45078529f274bc64a4a0240b6fb51be10b7d0cdeff63cbe6fe22",
+          "current_lane": "separate_library_record",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "external-implementation-claim",
+          "path_or_url": "https://blog.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
+      ]
+    },
+    {
+      "id": "dependency_fact_prefers_dependency_docs",
+      "question": "What is TenacityRetryingContract?",
+      "historical_expected_supported": true,
+      "historical_public_requirements": [
+        {
+          "value": "TenacityRetryingContract",
+          "proof_role": "dependency_fact"
+        }
+      ],
+      "historical_required_evidence_paths": [],
+      "host_request_binding": {
+        "library": "python:tenacity@8.2.3:reference",
+        "version": "8.2.3"
+      },
+      "required_full_fact_sources": [
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "current_obligation": "all_original_allowed_source_facts_visible_and_bound",
+      "source_role_mapping": [
+        {
+          "path_or_url": "https://tenacity.readthedocs.io/en/8.2.3/",
+          "source_class": "dependency_docs",
+          "historical_authority": "official",
+          "source_text_sha256": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+          "current_lane": "separate_library_record",
+          "may_satisfy_original_fact": true
+        },
+        {
+          "path_or_url": "docs/tenacity-notes.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "aceeeed5b30c078e9a0b98c71b5d34b8436acb091898e67289b475014792db9a",
+          "current_lane": "project",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "dependency-docs",
+          "path_or_url": "https://tenacity.readthedocs.io/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
+      ]
+    },
+    {
+      "id": "dependency_fact_rejects_project_guess_only",
+      "question": "What is TenacityRetryingContract?",
+      "historical_expected_supported": false,
+      "historical_public_requirements": [
+        {
+          "value": "TenacityRetryingContract",
+          "proof_role": "dependency_fact"
+        }
+      ],
+      "historical_required_evidence_paths": [],
+      "host_request_binding": {
+        "library": "python:tenacity@8.2.3:reference",
+        "version": "8.2.3"
+      },
+      "required_full_fact_sources": [],
+      "current_obligation": "no_wrong_role_source_credited_and_no_authority",
+      "source_role_mapping": [
+        {
+          "path_or_url": "docs/tenacity-notes.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "aceeeed5b30c078e9a0b98c71b5d34b8436acb091898e67289b475014792db9a",
+          "current_lane": "project",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": []
+    },
+    {
+      "id": "document_statement_binds_exact_path",
+      "question": "What does the release policy say about ImmutableReleaseTag?",
+      "historical_expected_supported": true,
+      "historical_public_requirements": [
+        {
+          "value": "ImmutableReleaseTag",
+          "proof_role": "document_statement"
+        }
+      ],
+      "historical_required_evidence_paths": [
+        "docs/release-policy.md"
+      ],
+      "host_request_binding": {
+        "project": true
+      },
+      "required_full_fact_sources": [
+        "docs/release-policy.md"
+      ],
+      "current_obligation": "all_original_allowed_source_facts_visible_and_bound",
+      "source_role_mapping": [
+        {
+          "path_or_url": "docs/release-policy.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "78e16dbdaa8adc812e85ef6506506d05e32dc3c60d034def7c3438fa77e8275f",
+          "current_lane": "project",
+          "may_satisfy_original_fact": true
+        },
+        {
+          "path_or_url": "docs/release-notes.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "bc40198cf90e1ff9880c36e7f66546cee2b0d5d4aa30a0f22b066d222dd4bbcc",
+          "current_lane": "project",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": []
+    },
+    {
+      "id": "two_claims_require_two_allowed_roles",
+      "question": "Explain ProjectRetryRule and TenacityRetryingContract.",
+      "historical_expected_supported": true,
+      "historical_public_requirements": [
+        {
+          "value": "ProjectRetryRule",
+          "proof_role": "project_rule"
+        },
+        {
+          "value": "TenacityRetryingContract",
+          "proof_role": "dependency_fact"
+        }
+      ],
+      "historical_required_evidence_paths": [],
+      "host_request_binding": {
+        "project": true,
+        "library": "python:tenacity@8.2.3:reference",
+        "version": "8.2.3"
+      },
+      "required_full_fact_sources": [
+        "ARCHITECTURE.md",
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "current_obligation": "all_original_allowed_source_facts_visible_and_bound",
+      "source_role_mapping": [
+        {
+          "path_or_url": "ARCHITECTURE.md",
+          "source_class": "project_file",
+          "historical_authority": "source_of_truth",
+          "source_text_sha256": "7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411",
+          "current_lane": "project",
+          "may_satisfy_original_fact": true
+        },
+        {
+          "path_or_url": "https://tenacity.readthedocs.io/en/8.2.3/",
+          "source_class": "dependency_docs",
+          "historical_authority": "official",
+          "source_text_sha256": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+          "current_lane": "separate_library_record",
+          "may_satisfy_original_fact": true
+        },
+        {
+          "path_or_url": "https://advisory.example/mixed",
+          "source_class": "external_advisory",
+          "historical_authority": "supporting",
+          "source_text_sha256": "21f580d7b710f011e9240cedc17ff86abae482bbc5ddff35411c80de034c723b",
+          "current_lane": "separate_library_record",
+          "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "dependency-api",
+          "path_or_url": "https://tenacity.readthedocs.io/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        },
+        {
+          "target_id": "advisory-conflict",
+          "path_or_url": "https://advisory.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
+      ]
+    }
+  ],
+  "protocol_control_member": {
+    "text": "User-agent: *\nDisallow:\n",
+    "purpose": "explicit_finite_http_prerequisite_not_question_evidence",
+    "indexing_contract": "all_explicit_members_are_indexed",
+    "may_satisfy_original_fact": false,
+    "may_be_model_visible": false
+  },
+  "project_source_representation": {
+    "committed_child_class": "project_file",
+    "snapshot_context_class": "project_doc",
+    "child_binding": "same_path_stable_chunk_generation",
+    "project_owner": "explicit_request_project_identity",
+    "scope": "project",
+    "authority": "source_of_truth"
+  },
+  "library_source_representation": {
+    "snapshot_top": "raw_candidate_fields",
+    "snapshot_metadata": "raw_candidate_metadata_fields",
+    "join_rule": "all_present_claims_must_agree",
+    "content_hash_alias": "stored_content_hash_equals_display_content_hash",
+    "version_alias": "candidate_version_equals_resolved_version",
+    "coordinates": "exact_integer_char_byte_line_pairs_and_scalar_edges",
+    "child_binding": "same_path_stable_chunk_generation_and_full_lineage",
+    "exactness": "top_boolean_metadata_boolean_or_sqlite_integer_exact_true_required"
+  }
+}

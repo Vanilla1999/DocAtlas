@@ -1,0 +1,689 @@
+{
+  "schema_version": 1,
+  "protocol": "literal-contract-reduction-comparison-v1",
+  "historical_baseline": {
+    "commit": "99106c9",
+    "artifact_zip_sha256": "9c47b5d0d25ae34d0f4c2bd478be619e75a231e93beec9080728b9281e8f7e17",
+    "cases": 702,
+    "roster_sha256": "f95734c90614be039fb00ae042a66c91066816401013452e93da86edccab3e63"
+  },
+  "test_files": [
+    "tests/docs/test_question_span_coverage.py",
+    "tests/test_dictionary_exit_legacy_compilers.py"
+  ],
+  "case_counts": {
+    "historical": [
+      303,
+      399
+    ],
+    "compact": [
+      33,
+      49
+    ]
+  },
+  "mutations": [
+    {
+      "property": "raw-whitespace",
+      "mutation": {
+        "name": "literal_whitespace_preservation",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "    raw = str(question or \"\")[:4000]",
+        "new": "    raw = \" \".join(str(question or \"\").split())[:4000]",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_original_question"
+      }
+    },
+    {
+      "property": "raw-unicode",
+      "mutation": {
+        "name": "literal_unicode_normalization",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "    raw = str(question or \"\")[:4000]",
+        "new": "    raw = __import__(\"unicodedata\").normalize(\"NFC\", str(question or \"\"))[:4000]",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_original_question"
+      }
+    },
+    {
+      "property": "input-work-bound",
+      "mutation": {
+        "name": "literal_input_bound",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "    raw = str(question or \"\")[:4000]",
+        "new": "    raw = str(question or \"\")[:4001]",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_empty_and_bounded_questions_never_become_complete_empty_plans",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_input_bound"
+      }
+    },
+    {
+      "property": "no-inferred-semantics",
+      "mutation": {
+        "name": "literal_inferred_facets",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "        clauses=(raw,),",
+        "new": "        clauses=(raw,),\n        facets=(PlannedFacet(\"behavior\", \"Client.send\"),),",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "expected_failures": 45,
+        "compact_expected_failures": 7,
+        "failure_guard": "literal_no_inferred_facets"
+      }
+    },
+    {
+      "property": "no-complete-empty-plan",
+      "mutation": {
+        "name": "literal_missing_unresolved_state",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "        unresolved_parts=(\"unresolved_question_semantics\",),",
+        "new": "        unresolved_parts=(),",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "expected_failures": 45,
+        "compact_expected_failures": 7,
+        "failure_guard": "literal_unresolved_semantics"
+      }
+    },
+    {
+      "property": "no-inferred-scope",
+      "mutation": {
+        "name": "literal_complete_scope",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "        parse_trace=(\"fail_closed:untyped_question\",),\n        component_scope_complete=False,",
+        "new": "        parse_trace=(\"fail_closed:untyped_question\",),\n        component_scope_complete=True,",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "expected_failures": 45,
+        "compact_expected_failures": 7,
+        "failure_guard": "literal_incomplete_scope"
+      }
+    },
+    {
+      "property": "no-hidden-normalizer",
+      "mutation": {
+        "name": "literal_legacy_delegation",
+        "path": "docmancer/docs/domain/question_plan.py",
+        "old": "    return _compile_question_plan_core(raw)",
+        "new": "    _compile_atomic_question(raw)  # mutation: re-enable a legacy prose producer\n    return _compile_question_plan_core(raw)",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_compiler_does_not_delegate_to_normalizers_or_legacy_generators",
+        "expected_failures": 10,
+        "compact_expected_failures": 2,
+        "failure_guard": "literal_compiler_no_legacy_delegation"
+      }
+    },
+    {
+      "property": "distinct-api:match_argument_value_frame",
+      "mutation": {
+        "name": "literal_match_argument_value_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_argument_value_frame(question: str) -> ArgumentValueFrame | None:\n    return None",
+        "new": "def match_argument_value_frame(question: str) -> ArgumentValueFrame | None:\n    return ArgumentValueFrame('allow_network', 'caller', 'prepare_docs')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_argument_value_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_before_behavior_frame",
+      "mutation": {
+        "name": "literal_match_before_behavior_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_before_behavior_frame(question: str) -> BeforeBehaviorFrame | None:\n    return None",
+        "new": "def match_before_behavior_frame(question: str) -> BeforeBehaviorFrame | None:\n    return BeforeBehaviorFrame('prepare_docs', 'fetch sources')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_before_behavior_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_contract_scope_frame",
+      "mutation": {
+        "name": "literal_match_contract_scope_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_contract_scope_frame(question: str) -> ContractScopeFrame | None:\n    return None",
+        "new": "def match_contract_scope_frame(question: str) -> ContractScopeFrame | None:\n    return ContractScopeFrame('storage', 'cleanup', 'refresh')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_contract_scope_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_comparison_frame",
+      "mutation": {
+        "name": "literal_match_comparison_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_comparison_frame(question: str) -> ComparisonFrame | None:\n    return None",
+        "new": "def match_comparison_frame(question: str) -> ComparisonFrame | None:\n    return ComparisonFrame('Client.send', 'Client.read')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_comparison_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_condition_frame",
+      "mutation": {
+        "name": "literal_match_condition_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_condition_frame(question: str) -> ConditionFrame | None:\n    return None",
+        "new": "def match_condition_frame(question: str) -> ConditionFrame | None:\n    return ConditionFrame('index', 'stale', 'condition')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_condition_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_location_frame",
+      "mutation": {
+        "name": "literal_match_location_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_location_frame(question: str) -> LocationFrame | None:\n    return None",
+        "new": "def match_location_frame(question: str) -> LocationFrame | None:\n    return LocationFrame('Client.send')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_location_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_decision_frame",
+      "mutation": {
+        "name": "literal_match_decision_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_decision_frame(question: str) -> DecisionFrame | None:\n    return None",
+        "new": "def match_decision_frame(question: str) -> DecisionFrame | None:\n    return DecisionFrame('permission', 'caller', 'remove files')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_decision_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_premise_frame",
+      "mutation": {
+        "name": "literal_match_premise_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_premise_frame(question: str) -> PremiseFrame | None:\n    return None",
+        "new": "def match_premise_frame(question: str) -> PremiseFrame | None:\n    return PremiseFrame('prepare_docs', 'delete files', 'premise_check', 'always')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_premise_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_purpose_behavior_frame",
+      "mutation": {
+        "name": "literal_match_purpose_behavior_frame",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_purpose_behavior_frame(question: str) -> PurposeBehaviorFrame | None:\n    return None",
+        "new": "def match_purpose_behavior_frame(question: str) -> PurposeBehaviorFrame | None:\n    return PurposeBehaviorFrame('prepare_docs', 'synchronize sources')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_purpose_behavior_frame"
+      }
+    },
+    {
+      "property": "distinct-api:governance_facets",
+      "mutation": {
+        "name": "literal_governance_facets",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def governance_facets(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def governance_facets(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:governance_facets"
+      }
+    },
+    {
+      "property": "distinct-api:mcp_request_handling",
+      "mutation": {
+        "name": "literal_mcp_request_handling",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def mcp_request_handling(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def mcp_request_handling(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:mcp_request_handling"
+      }
+    },
+    {
+      "property": "distinct-api:provider_request_timeout",
+      "mutation": {
+        "name": "literal_provider_request_timeout",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def provider_request_timeout(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def provider_request_timeout(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:provider_request_timeout"
+      }
+    },
+    {
+      "property": "distinct-api:public_tool_usage",
+      "mutation": {
+        "name": "literal_public_tool_usage",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def public_tool_usage(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def public_tool_usage(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:public_tool_usage"
+      }
+    },
+    {
+      "property": "distinct-api:public_tools_with_purposes",
+      "mutation": {
+        "name": "literal_public_tools_with_purposes",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def public_tools_with_purposes(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def public_tools_with_purposes(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:public_tools_with_purposes"
+      }
+    },
+    {
+      "property": "distinct-api:python_version_support",
+      "mutation": {
+        "name": "literal_python_version_support",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def python_version_support(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def python_version_support(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:python_version_support"
+      }
+    },
+    {
+      "property": "distinct-api:semantic_components",
+      "mutation": {
+        "name": "literal_semantic_components",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def semantic_components(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def semantic_components(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 15,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:semantic_components"
+      }
+    },
+    {
+      "property": "distinct-api:match_action_frame",
+      "mutation": {
+        "name": "literal_match_action_frame",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "def match_action_frame(question: str) -> ActionFrame | None:\n    return None",
+        "new": "def match_action_frame(question: str) -> ActionFrame | None:\n    return ActionFrame('sync', 'sources')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_adapter:match_action_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_inventory_frame",
+      "mutation": {
+        "name": "literal_match_inventory_frame",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "def match_inventory_frame(question: str) -> InventoryFrame | None:\n    return None",
+        "new": "def match_inventory_frame(question: str) -> InventoryFrame | None:\n    return InventoryFrame('indexing', 'formats', 'format')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_adapter:match_inventory_frame"
+      }
+    },
+    {
+      "property": "distinct-api:match_requirements_frame",
+      "mutation": {
+        "name": "literal_match_requirements_frame",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "def match_requirements_frame(question: str) -> RequirementsFrame | None:\n    return None",
+        "new": "def match_requirements_frame(question: str) -> RequirementsFrame | None:\n    return RequirementsFrame('mobile')",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_adapter:match_requirements_frame"
+      }
+    },
+    {
+      "property": "distinct-api:independent_sentence_spans",
+      "mutation": {
+        "name": "literal_independent_sentences",
+        "path": "docmancer/docs/domain/need_composition.py",
+        "old": "def independent_sentence_spans(question: str) -> tuple[tuple[int, int], ...]:\n    \"\"\"Punctuation cannot certify independent requests or semantic scope.\"\"\"\n    return ()",
+        "new": "def independent_sentence_spans(question: str) -> tuple[tuple[int, int], ...]:\n    \"\"\"Punctuation cannot certify independent requests or semantic scope.\"\"\"\n    return ((0, len(question)),)",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_adapter:independent_sentence_spans"
+      }
+    },
+    {
+      "property": "distinct-api:compositional_parts",
+      "mutation": {
+        "name": "literal_composed_relations",
+        "path": "docmancer/docs/domain/need_composition.py",
+        "old": "def compositional_parts(question: str) -> tuple[ComposedPart, ...]:\n    \"\"\"Untyped text supplies no relation, count, condition, or dependency.\"\"\"\n    return ()",
+        "new": "def compositional_parts(question: str) -> tuple[ComposedPart, ...]:\n    \"\"\"Untyped text supplies no relation, count, condition, or dependency.\"\"\"\n    return (ComposedPart(0, len(question), 'inferred', ((0, len(question)),)),)",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_adapter:compositional_parts"
+      }
+    },
+    {
+      "property": "distinct-api:conflict_question_plan",
+      "mutation": {
+        "name": "literal_conflict_semantics",
+        "path": "docmancer/docs/domain/compositional_question_plan.py",
+        "old": "def conflict_question_plan(question: str) -> QuestionPlan | None:\n    return None",
+        "new": "def conflict_question_plan(question: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"comparison\", \"A\", target=\"B\"),))",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_adapter:conflict_question_plan"
+      }
+    },
+    {
+      "property": "unknown-tail-authority",
+      "mutation": {
+        "name": "literal_unknown_tail_authority",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "    return not str(value or \"\").strip()",
+        "new": "    return True  # mutation: accept unknown prose as semantically safe",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "expected_failures": 45,
+        "compact_expected_failures": 5,
+        "failure_guard": "literal_unknown_tail_authority"
+      }
+    },
+    {
+      "property": "wrapper-whitespace-offsets",
+      "mutation": {
+        "name": "literal_wrapper_erasure",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "def strip_request_wrapper(value: str) -> str:\n    \"\"\"Compatibility identity: no natural-language wrapper is erased.\"\"\"\n    return str(value or \"\")",
+        "new": "def strip_request_wrapper(value: str) -> str:\n    \"\"\"Compatibility identity: no natural-language wrapper is erased.\"\"\"\n    return str(value or \"\").strip()",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_nl_heads_wrappers_and_connectives_do_not_erase_or_split_text",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_wrapper_identity"
+      }
+    },
+    {
+      "property": "quote-link-mask-offsets",
+      "mutation": {
+        "name": "literal_mask_offset_loss",
+        "path": "docmancer/docs/domain/need_composition.py",
+        "old": "    return _PROTECTED.sub(lambda m: 'x' * len(m[0]), question)",
+        "new": "    return _PROTECTED.sub(lambda m: 'x' * (len(m[0]) - 1), question)",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_mask_preserves_literal_offsets_and_unquoted_syntax",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_mask_offsets"
+      }
+    },
+    {
+      "property": "quote-protected-paragraphs",
+      "mutation": {
+        "name": "literal_quote_paragraph_split",
+        "path": "docmancer/docs/domain/need_composition.py",
+        "old": "    return _PROTECTED.sub(lambda m: 'x' * len(m[0]), question)",
+        "new": "    return question  # mutation: quotation delimiters are no longer protected",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_exact_paragraph_spans_protect_quotes_links_and_program_syntax",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_quote_paragraph_protection"
+      }
+    },
+    {
+      "property": "structural-offsets",
+      "mutation": {
+        "name": "literal_punctuation_as_semantics",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "    for match in re.finditer(r\"\\r?\\n[ \\t]*\\r?\\n(?:[ \\t]*\\r?\\n)*\", masked):",
+        "new": "    for match in re.finditer(r\"\\r?\\n[ \\t]*\\r?\\n(?:[ \\t]*\\r?\\n)*|(?<=[.!?]) +\", masked):",
+        "killer": "tests/docs/test_question_span_coverage.py::test_clause_scanner_preserves_original_offsets_and_noun_coordination",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_paragraphs_only"
+      }
+    },
+    {
+      "property": "source-path-body-separation",
+      "mutation": {
+        "name": "literal_path_as_body_identity",
+        "path": "docmancer/docs/domain/question_retrieval_needs.py",
+        "old": "    return tuple(mention for mention in query_mentions(question)\n                 if mention.explicit and mention.syntax_role == \"symbol_identity\"\n                 and not any(separator in mention.text for separator in (\"/\", \"\\\\\")))",
+        "new": "    return tuple(mention for mention in query_mentions(question) if mention.explicit)",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_literal_retrieval_identity_cache_and_source_paths_survive_without_plan_facets",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_symbol_path_separation"
+      }
+    },
+    {
+      "property": "source-reference-offsets",
+      "mutation": {
+        "name": "literal_reference_offset_shift",
+        "path": "docmancer/docs/domain/query_reference_binding.py",
+        "old": "    return tuple(QueryMention(f\"{query_id}:{a}:{b}\", a, b, question[a:b], role, explicit)",
+        "new": "    return tuple(QueryMention(f\"{query_id}:{a}:{b}\", a + 1, b + 1, question[a:b], role, explicit)",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_literal_retrieval_identity_cache_and_source_paths_survive_without_plan_facets",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_reference_offsets"
+      }
+    },
+    {
+      "property": "explicit-lookup-no-coverage-credit",
+      "mutation": {
+        "name": "literal_lookup_required_credit",
+        "path": "docmancer/docs/domain/documentation_query_plan.py",
+        "old": "            f\"query-lookup-{index}\", text, \"host_lookup\", False, relation=\"host_lookup\",",
+        "new": "            f\"query-lookup-{index}\", text, \"host_lookup\", True, relation=\"host_lookup\",",
+        "killer": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "expected_failures": 288,
+        "compact_expected_failures": 18,
+        "failure_guard": "literal_lookup_no_coverage_credit"
+      }
+    },
+    {
+      "property": "explicit-lookup-no-parent-credit",
+      "mutation": {
+        "name": "literal_lookup_parent_promotion",
+        "path": "docmancer/docs/domain/documentation_query_plan.py",
+        "old": "            f\"query-lookup-{index}\", text, \"host_lookup\", False, relation=\"host_lookup\",",
+        "new": "            f\"query-lookup-{index}\", text, \"host_lookup\", False, relation=\"exact_anchor\",\n            public_parent_query_id=\"query-original\",",
+        "killer": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "expected_failures": 288,
+        "compact_expected_failures": 18,
+        "failure_guard": "literal_lookup_no_coverage_credit"
+      }
+    },
+    {
+      "property": "unknown-tail-question-identity",
+      "mutation": {
+        "name": "literal_unknown_tail_hash_loss",
+        "path": "docmancer/docs/domain/_project_answer_contract_part02.py",
+        "old": "    source_question = str(question or \"\")",
+        "new": "    source_question = str(question or \"\").split(\",\")[0]",
+        "killer": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "expected_failures": 36,
+        "compact_expected_failures": 3,
+        "failure_guard": "literal_unknown_tail_identity"
+      }
+    },
+    {
+      "property": "no-answer-authority",
+      "mutation": {
+        "name": "literal_answer_authority",
+        "path": "docmancer/docs/domain/project_answer_contract.py",
+        "old": "def can_authorize_docs_answer(contract: ProjectAnswerContract) -> bool:\n    return False",
+        "new": "def can_authorize_docs_answer(contract: ProjectAnswerContract) -> bool:\n    return True",
+        "killer": "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_no_answer_authority"
+      }
+    },
+    {
+      "property": "explicit-dto-immutability:QuestionPlan",
+      "mutation": {
+        "name": "literal_mutable_questionplan",
+        "path": "docmancer/docs/domain/question_plan_core.py",
+        "old": "@dataclass(frozen=True, slots=True)\nclass QuestionPlan:",
+        "new": "@dataclass(frozen=False, slots=True)\nclass QuestionPlan:",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "expected_failures": 45,
+        "compact_expected_failures": 7,
+        "failure_guard": "literal_plan_immutable"
+      }
+    },
+    {
+      "property": "explicit-dto-immutability:PlannedFacet",
+      "mutation": {
+        "name": "literal_mutable_plannedfacet",
+        "path": "docmancer/docs/domain/question_plan_core.py",
+        "old": "@dataclass(frozen=True, slots=True)\nclass PlannedFacet:",
+        "new": "@dataclass(frozen=False, slots=True)\nclass PlannedFacet:",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_explicit_dtos_keep_field_shapes_and_do_not_require_prose_approval",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_facet_immutable"
+      }
+    },
+    {
+      "property": "explicit-dto-immutability:ComposedPart",
+      "mutation": {
+        "name": "literal_mutable_composedpart",
+        "path": "docmancer/docs/domain/need_composition.py",
+        "old": "@dataclass(frozen=True, slots=True)\nclass ComposedPart:",
+        "new": "@dataclass(frozen=False, slots=True)\nclass ComposedPart:",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_explicit_dtos_keep_field_shapes_and_do_not_require_prose_approval",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_composition_immutable"
+      }
+    },
+    {
+      "property": "invalid-span:clause_negative",
+      "mutation": {
+        "name": "literal_invalid_clause_negative",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "            self.start < 0\n",
+        "new": "            False\n",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_existing_span_validation_still_rejects_invalid_dtos",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_invalid_span_dto"
+      }
+    },
+    {
+      "property": "invalid-span:clause_length",
+      "mutation": {
+        "name": "literal_invalid_clause_length",
+        "path": "docmancer/docs/domain/question_frame_core.py",
+        "old": "            or len(self.text) != self.end - self.start\n",
+        "new": "            or False\n",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_existing_span_validation_still_rejects_invalid_dtos",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_invalid_span_dto"
+      }
+    },
+    {
+      "property": "invalid-span:facet_partial",
+      "mutation": {
+        "name": "literal_invalid_facet_partial",
+        "path": "docmancer/docs/domain/question_plan_core.py",
+        "old": "        if (self.query_span_start is None) != (self.query_span_end is None):",
+        "new": "        if False:  # mutation: accept an incomplete facet span",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_existing_span_validation_still_rejects_invalid_dtos",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_invalid_span_dto"
+      }
+    },
+    {
+      "property": "invalid-span:facet_reversed",
+      "mutation": {
+        "name": "literal_invalid_facet_reversed",
+        "path": "docmancer/docs/domain/question_plan_core.py",
+        "old": "            and (self.query_span_start < 0 or self.query_span_end <= self.query_span_start)",
+        "new": "            and False  # mutation: accept a reversed facet span",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_existing_span_validation_still_rejects_invalid_dtos",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_invalid_span_dto"
+      }
+    },
+    {
+      "property": "invalid-span:plan_negative",
+      "mutation": {
+        "name": "literal_invalid_plan_negative",
+        "path": "docmancer/docs/domain/question_plan_core.py",
+        "old": "            if start < 0 or end <= start:",
+        "new": "            if end <= start:  # mutation: accept a negative consumed offset",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_existing_span_validation_still_rejects_invalid_dtos",
+        "expected_failures": 1,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_invalid_span_dto"
+      }
+    },
+    {
+      "property": "non-ASCII-semantic-branch",
+      "mutation": {
+        "name": "literal_unicode_semantic_branch",
+        "path": "docmancer/docs/domain/question_semantic_frames.py",
+        "old": "def match_location_frame(question: str) -> LocationFrame | None:\n    return None",
+        "new": "def match_location_frame(question: str) -> LocationFrame | None:\n    return LocationFrame('Client.send') if any(ord(ch) > 127 for ch in question) else None",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "expected_failures": 3,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:match_location_frame"
+      }
+    },
+    {
+      "property": "non-ASCII-surface-branch",
+      "mutation": {
+        "name": "literal_unicode_surface_branch",
+        "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+        "old": "def python_version_support(q: str) -> QuestionPlan | None:\n    return None",
+        "new": "def python_version_support(q: str) -> QuestionPlan | None:\n    return QuestionPlan(facets=(PlannedFacet(\"behavior\", \"Client.send\"),)) if any(ord(ch) > 127 for ch in q) else None",
+        "killer": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "expected_failures": 3,
+        "compact_expected_failures": 1,
+        "failure_guard": "literal_adapter:python_version_support"
+      }
+    },
+    {
+      "property": "original-query-credit-independent-of-lookups",
+      "mutation": {
+        "name": "literal_original_query_credit_lost",
+        "path": "docmancer/docs/domain/documentation_query_plan.py",
+        "old": "    queries = [DocumentationLookup(\"query-original\", question, \"original\")]",
+        "new": "    queries = [DocumentationLookup(\"query-original\", question, \"original\", False)]",
+        "killer": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "expected_failures": 288,
+        "compact_expected_failures": 18,
+        "failure_guard": "literal_original_coverage_preserved"
+      }
+    }
+  ]
+}

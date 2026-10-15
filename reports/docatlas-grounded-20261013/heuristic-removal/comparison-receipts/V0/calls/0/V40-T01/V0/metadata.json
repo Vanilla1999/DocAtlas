@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-T01",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-textual",
+  "public_request": {
+    "question": "What does the first positional argument to Textual reactive specify?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-textual/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "dbce43465b9649f94006e690716aa71cd1412b8c3d157e15f20845146b637aa5",
+  "utf8_bytes": 16491,
+  "tokens": 4665,
+  "seconds": 11.73660789600035,
+  "cpu_seconds": 11.718100528999997,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

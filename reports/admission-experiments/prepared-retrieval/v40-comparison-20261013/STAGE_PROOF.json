@@ -1,0 +1,948 @@
+{
+  "schema_version": 1,
+  "description": "Independent diagnostic over frozen gold line windows and recorded V40 selection receipts; line overlap, not semantic entailment.",
+  "cases": [
+    {
+      "id": "V40-P05",
+      "frozen_gold": {
+        "path": "docs/dependency-specification.md",
+        "lines": [
+          87,
+          98
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 12,
+        "gold_lines": 12,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 4,
+            "start": 93,
+            "end": 99,
+            "overlap": 6,
+            "id": "b8a96dc09b84b6703d3259a4985577f6b027b05ff137ecfae9ac2d5205ce8a4f"
+          },
+          {
+            "index": 7,
+            "start": 87,
+            "end": 92,
+            "overlap": 6,
+            "id": "78308bc42629ed26dcbe411b35a77d8cf9f023b626d25f28b46807682d8c31b1"
+          },
+          {
+            "index": 22,
+            "start": 93,
+            "end": 99,
+            "overlap": 6,
+            "id": "b8a96dc09b84b6703d3259a4985577f6b027b05ff137ecfae9ac2d5205ce8a4f"
+          },
+          {
+            "index": 25,
+            "start": 87,
+            "end": 92,
+            "overlap": 6,
+            "id": "78308bc42629ed26dcbe411b35a77d8cf9f023b626d25f28b46807682d8c31b1"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 12,
+        "gold_lines": 12,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 2,
+            "start": 93,
+            "end": 99,
+            "overlap": 6,
+            "id": "b8a96dc09b84b6703d3259a4985577f6b027b05ff137ecfae9ac2d5205ce8a4f"
+          },
+          {
+            "index": 5,
+            "start": 87,
+            "end": 92,
+            "overlap": 6,
+            "id": "78308bc42629ed26dcbe411b35a77d8cf9f023b626d25f28b46807682d8c31b1"
+          }
+        ]
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 12,
+        "uncovered": [
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 22,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            93,
+            99
+          ]
+        },
+        {
+          "original_ordinal": 25,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            87,
+            92
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-P06",
+      "frozen_gold": {
+        "path": "docs/managing-environments.md",
+        "lines": [
+          79,
+          87
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 9,
+        "gold_lines": 9,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 0,
+            "start": 79,
+            "end": 88,
+            "overlap": 9,
+            "id": "fa927c7387ad6f6f3bc770640762ec75889851cf6cbd8e5d08e917b09d13869d"
+          },
+          {
+            "index": 20,
+            "start": 79,
+            "end": 88,
+            "overlap": 9,
+            "id": "fa927c7387ad6f6f3bc770640762ec75889851cf6cbd8e5d08e917b09d13869d"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 0,
+        "gold_lines": 9,
+        "uncovered": [
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87
+        ],
+        "overlapping_candidates": []
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 9,
+        "uncovered": [
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [],
+      "excluded_gold": [
+        {
+          "original_ordinal": 0,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            79,
+            88
+          ]
+        },
+        {
+          "original_ordinal": 20,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            79,
+            88
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-T02",
+      "frozen_gold": {
+        "path": "docs/guide/reactivity.md",
+        "lines": [
+          66,
+          72
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 0,
+        "gold_lines": 7,
+        "uncovered": [
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72
+        ],
+        "overlapping_candidates": []
+      },
+      "admitted": {
+        "covered_gold_lines": 0,
+        "gold_lines": 7,
+        "uncovered": [
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72
+        ],
+        "overlapping_candidates": []
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 7,
+        "uncovered": [
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": []
+    },
+    {
+      "id": "V40-T03",
+      "frozen_gold": {
+        "path": "docs/guide/reactivity.md",
+        "lines": [
+          99,
+          110
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 12,
+        "gold_lines": 12,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 2,
+            "start": 101,
+            "end": 111,
+            "overlap": 10,
+            "id": "d3c4577094254a208b5c8f57b3db078baaaa762b9791a9e27fa3e3e04a21b6bd"
+          },
+          {
+            "index": 15,
+            "start": 93,
+            "end": 100,
+            "overlap": 2,
+            "id": "0909af69ee73cf232eacaf2966dbf5aabb63785d40b32232d00b158060d219b1"
+          },
+          {
+            "index": 22,
+            "start": 101,
+            "end": 111,
+            "overlap": 10,
+            "id": "d3c4577094254a208b5c8f57b3db078baaaa762b9791a9e27fa3e3e04a21b6bd"
+          },
+          {
+            "index": 35,
+            "start": 93,
+            "end": 100,
+            "overlap": 2,
+            "id": "0909af69ee73cf232eacaf2966dbf5aabb63785d40b32232d00b158060d219b1"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 12,
+        "gold_lines": 12,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 2,
+            "start": 101,
+            "end": 111,
+            "overlap": 10,
+            "id": "d3c4577094254a208b5c8f57b3db078baaaa762b9791a9e27fa3e3e04a21b6bd"
+          },
+          {
+            "index": 15,
+            "start": 93,
+            "end": 100,
+            "overlap": 2,
+            "id": "0909af69ee73cf232eacaf2966dbf5aabb63785d40b32232d00b158060d219b1"
+          }
+        ]
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 12,
+        "uncovered": [
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 22,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            101,
+            111
+          ]
+        },
+        {
+          "original_ordinal": 35,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            93,
+            100
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-T07",
+      "frozen_gold": {
+        "path": "docs/guide/workers.md",
+        "lines": [
+          153,
+          159
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 7,
+        "gold_lines": 7,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 2,
+            "start": 156,
+            "end": 160,
+            "overlap": 4,
+            "id": "56f00e7e634d9ad70d139fc9ec93ef1d1f5a15ccddbf8350624eeb49831b6909"
+          },
+          {
+            "index": 6,
+            "start": 153,
+            "end": 155,
+            "overlap": 3,
+            "id": "715acdde65ee0a67a4c24d75d8f051f6ffbb67a543b26b7b59d5169447157af1"
+          },
+          {
+            "index": 21,
+            "start": 156,
+            "end": 160,
+            "overlap": 4,
+            "id": "56f00e7e634d9ad70d139fc9ec93ef1d1f5a15ccddbf8350624eeb49831b6909"
+          },
+          {
+            "index": 25,
+            "start": 153,
+            "end": 155,
+            "overlap": 3,
+            "id": "715acdde65ee0a67a4c24d75d8f051f6ffbb67a543b26b7b59d5169447157af1"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 0,
+        "gold_lines": 7,
+        "uncovered": [
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159
+        ],
+        "overlapping_candidates": []
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 7,
+        "uncovered": [
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 2,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            156,
+            160
+          ]
+        },
+        {
+          "original_ordinal": 6,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            153,
+            155
+          ]
+        },
+        {
+          "original_ordinal": 21,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            156,
+            160
+          ]
+        },
+        {
+          "original_ordinal": 25,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            153,
+            155
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-V03",
+      "frozen_gold": {
+        "path": "docs/config/server-options.md",
+        "lines": [
+          63,
+          68
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 6,
+        "gold_lines": 6,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 4,
+            "start": 63,
+            "end": 69,
+            "overlap": 6,
+            "id": "d7923d7dee37bb6afbf08da4e0ef59030c2dc14c9070d551ad563cf26cb029d3"
+          },
+          {
+            "index": 22,
+            "start": 63,
+            "end": 69,
+            "overlap": 6,
+            "id": "d7923d7dee37bb6afbf08da4e0ef59030c2dc14c9070d551ad563cf26cb029d3"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 6,
+        "gold_lines": 6,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 2,
+            "start": 63,
+            "end": 69,
+            "overlap": 6,
+            "id": "d7923d7dee37bb6afbf08da4e0ef59030c2dc14c9070d551ad563cf26cb029d3"
+          }
+        ]
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 6,
+        "uncovered": [
+          63,
+          64,
+          65,
+          66,
+          67,
+          68
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 22,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            63,
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-V06",
+      "frozen_gold": {
+        "path": "docs/config/server-options.md",
+        "lines": [
+          379,
+          384
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 6,
+        "gold_lines": 6,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 0,
+            "start": 379,
+            "end": 385,
+            "overlap": 6,
+            "id": "35225ffbb1eb39f388b744fc08e2d3c02f65670ddce1703d4daa7501fd252b98"
+          },
+          {
+            "index": 20,
+            "start": 379,
+            "end": 385,
+            "overlap": 6,
+            "id": "35225ffbb1eb39f388b744fc08e2d3c02f65670ddce1703d4daa7501fd252b98"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 0,
+        "gold_lines": 6,
+        "uncovered": [
+          379,
+          380,
+          381,
+          382,
+          383,
+          384
+        ],
+        "overlapping_candidates": []
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 6,
+        "uncovered": [
+          379,
+          380,
+          381,
+          382,
+          383,
+          384
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 0,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            379,
+            385
+          ]
+        },
+        {
+          "original_ordinal": 20,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            379,
+            385
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-E01",
+      "frozen_gold": {
+        "path": "docs/src/use/configure/configuration-files.md",
+        "lines": [
+          19,
+          30
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 0,
+        "gold_lines": 12,
+        "uncovered": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "overlapping_candidates": []
+      },
+      "admitted": {
+        "covered_gold_lines": 0,
+        "gold_lines": 12,
+        "uncovered": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "overlapping_candidates": []
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 12,
+        "uncovered": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": []
+    },
+    {
+      "id": "V40-E04",
+      "frozen_gold": {
+        "path": "docs/src/use/configure/ignore.md",
+        "lines": [
+          24,
+          48
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 15,
+        "gold_lines": 25,
+        "uncovered": [
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "overlapping_candidates": [
+          {
+            "index": 3,
+            "start": 24,
+            "end": 34,
+            "overlap": 11,
+            "id": "69a7bffe8977abc98d90a1d90ced924e0dd9b9242f30f75dcd1722d79f6c9fce"
+          },
+          {
+            "index": 4,
+            "start": 35,
+            "end": 38,
+            "overlap": 4,
+            "id": "585a9a913768d81df00f0885902f8829d4df8c5307c18cb612db0ad303c7ae51"
+          },
+          {
+            "index": 10,
+            "start": 24,
+            "end": 34,
+            "overlap": 11,
+            "id": "69a7bffe8977abc98d90a1d90ced924e0dd9b9242f30f75dcd1722d79f6c9fce"
+          },
+          {
+            "index": 11,
+            "start": 35,
+            "end": 38,
+            "overlap": 4,
+            "id": "585a9a913768d81df00f0885902f8829d4df8c5307c18cb612db0ad303c7ae51"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 15,
+        "gold_lines": 25,
+        "uncovered": [
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "overlapping_candidates": [
+          {
+            "index": 3,
+            "start": 24,
+            "end": 34,
+            "overlap": 11,
+            "id": "69a7bffe8977abc98d90a1d90ced924e0dd9b9242f30f75dcd1722d79f6c9fce"
+          },
+          {
+            "index": 4,
+            "start": 35,
+            "end": 38,
+            "overlap": 4,
+            "id": "585a9a913768d81df00f0885902f8829d4df8c5307c18cb612db0ad303c7ae51"
+          }
+        ]
+      },
+      "selected": {
+        "covered_gold_lines": 0,
+        "gold_lines": 25,
+        "uncovered": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "overlapping_candidates": []
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 10,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            24,
+            34
+          ]
+        },
+        {
+          "original_ordinal": 11,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            35,
+            38
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V40-E05",
+      "frozen_gold": {
+        "path": "docs/src/use/configure/configuration-files.md",
+        "lines": [
+          795,
+          809
+        ]
+      },
+      "complete": {
+        "covered_gold_lines": 15,
+        "gold_lines": 15,
+        "uncovered": [],
+        "overlapping_candidates": [
+          {
+            "index": 0,
+            "start": 795,
+            "end": 804,
+            "overlap": 10,
+            "id": "87b566b44b2a023af0bd40e4b90ee42b9795d4a9300403c2c861f9dd50d87e76"
+          },
+          {
+            "index": 1,
+            "start": 795,
+            "end": 804,
+            "overlap": 10,
+            "id": "87b566b44b2a023af0bd40e4b90ee42b9795d4a9300403c2c861f9dd50d87e76"
+          },
+          {
+            "index": 4,
+            "start": 805,
+            "end": 810,
+            "overlap": 5,
+            "id": "b425881c3e1a010783b0302b7ce2f8c1c99664067a302b9a61e7a85362499595"
+          },
+          {
+            "index": 23,
+            "start": 805,
+            "end": 810,
+            "overlap": 5,
+            "id": "b425881c3e1a010783b0302b7ce2f8c1c99664067a302b9a61e7a85362499595"
+          }
+        ]
+      },
+      "admitted": {
+        "covered_gold_lines": 10,
+        "gold_lines": 15,
+        "uncovered": [
+          805,
+          806,
+          807,
+          808,
+          809
+        ],
+        "overlapping_candidates": [
+          {
+            "index": 0,
+            "start": 795,
+            "end": 804,
+            "overlap": 10,
+            "id": "87b566b44b2a023af0bd40e4b90ee42b9795d4a9300403c2c861f9dd50d87e76"
+          }
+        ]
+      },
+      "selected": {
+        "covered_gold_lines": 10,
+        "gold_lines": 15,
+        "uncovered": [
+          805,
+          806,
+          807,
+          808,
+          809
+        ],
+        "overlapping_candidates": [
+          {
+            "index": 0,
+            "start": 795,
+            "end": 804,
+            "overlap": 10,
+            "id": "87b566b44b2a023af0bd40e4b90ee42b9795d4a9300403c2c861f9dd50d87e76"
+          }
+        ]
+      },
+      "selection_indices": [
+        0,
+        1
+      ],
+      "excluded_gold": [
+        {
+          "original_ordinal": 1,
+          "reason": "duplicate_source_chunk",
+          "line_span": [
+            795,
+            804
+          ]
+        },
+        {
+          "original_ordinal": 4,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            805,
+            810
+          ]
+        },
+        {
+          "original_ordinal": 23,
+          "reason": "no_checked_original_admission",
+          "line_span": [
+            805,
+            810
+          ]
+        }
+      ]
+    }
+  ]
+}

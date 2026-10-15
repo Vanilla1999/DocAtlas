@@ -1,0 +1,61 @@
+[
+  {
+    "case_id": "V40-P03",
+    "arms": {
+      "A": {
+        "seconds": 1.670414215999699,
+        "dto_tokens": 48116,
+        "dto_bytes": 144210,
+        "source_count": 167,
+        "observer_errors": [],
+        "state_unchanged": true,
+        "source_errors": [],
+        "oracle_errors": [],
+        "coverage": [
+          {
+            "covered": 515,
+            "expected": 515
+          }
+        ],
+        "oracle_pass": true
+      },
+      "D": {
+        "seconds": 21.97827242400035,
+        "dto_tokens": 48116,
+        "dto_bytes": 144210,
+        "source_count": 167,
+        "observer_errors": [],
+        "state_unchanged": true,
+        "source_errors": [],
+        "oracle_errors": [],
+        "coverage": [
+          {
+            "covered": 515,
+            "expected": 515
+          }
+        ],
+        "oracle_pass": true
+      }
+    },
+    "same_pool": true,
+    "exact_delivery": false,
+    "immutable_rows": true,
+    "selector": {
+      "model_id": "openai/gpt-5.6-luna#medium",
+      "runtime": "OpenCode stateless /api/experimental/generate; openai provider",
+      "token_counter": "o200k_base_approximate_plus_wrapper_allowance",
+      "wrapper_token_allowance": 64,
+      "input_tokens_estimated": 21227,
+      "output_reserve": 8192,
+      "max_input_tokens": 100000,
+      "context_tokens": 400000,
+      "pool_sha256": "6d6aad7a1124eb974661664a1be52599eda18a5543e2049dfbb1678ef7b3a257",
+      "model_attempts": 1,
+      "status": "model_error",
+      "output_tokens_estimated": 0,
+      "seconds": 20.30695007600025,
+      "error_type": "RuntimeError"
+    },
+    "pass": false
+  }
+]

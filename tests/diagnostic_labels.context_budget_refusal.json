@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_context_budget_refusal_integration.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_context_budget_refusal_integration.py": "d805d099d7703eb3caeefebc685f033e0fcfba6e8b938e38e1979c7fbc41a92f"
+  },
+  "node_overrides": {}
+}

@@ -1,0 +1,116 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-303ced0e566179a8",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Smart refresh",
+      "snippet": "## Smart refresh\n\nThe first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content.\n\n!!! information\n\n    If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates.\n\nLet's look at an example which illustrates this. In the following app, the value of an input is used to update a \"Hello, World!\" type greeting.\n\n=== \"refresh01.py\"\n\n    ```python hl_lines=\"7-13 24\"\n    --8<-- \"docs/examples/guide/reactivity/refresh01.py\"\n    ```\n\n=== \"refresh01.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/refresh01.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/refresh01.py\" press=\"T,e,x,t,u,a,l\"}\n    ```\n\nThe `Name` widget has a reactive `who` attribute. When the app modifies that attribute, a refresh happens automatically.\n\n!!! information\n\n    Textual will check if a value has really changed, so assigning the same value wont prompt an unnecessary refresh.\n\n### Disabling refresh\n\nIf you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`.\n\nThe following code illustrates how you create non-refreshing reactive attributes.\n\n```python\nclass MyWidget(Widget):\n    count = var(0)  # (1)!\n```\n\n1. Changing `self.count` wont cause a refresh or layout.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "aaaddb3d79f012b968646695c12efa4bd5ac24713d8d531d131f8df70ebfe0f7",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 66,
+      "line_end": 111,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/499a0d9517826d4429a32894"
+    },
+    {
+      "evidence_id": "ev-b45b138d8382e4ce",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Reactive attributes",
+      "snippet": "## Reactive attributes\n\nTextual provides an alternative way of adding attributes to your widget or App, which doesn't require adding them to your class constructor (`__init__`). To create these attributes import [reactive][textual.reactive.reactive] from `textual.reactive`, and assign them in the class scope.\n\nThe following code illustrates how to create reactive attributes:\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "934e533f197ddc35061a9223e3e8dc934f525a542f1fe3eecc1fb9308fb0a97d",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 11,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/c675a38c1f4f5a498e6fd558"
+    },
+    {
+      "evidence_id": "ev-8a2697f5d4efe700",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Reactive attributes",
+      "snippet": "## Reactive attributes\n\nTextual provides an alternative way of adding attributes to your widget or App, which doesn't require adding them to your class constructor (`__init__`). To create these attributes import [reactive][textual.reactive.reactive] from `textual.reactive`, and assign them in the class scope.\n\nThe following code illustrates how to create reactive attributes:\n\n```python\nfrom textual.reactive import reactive\nfrom textual.widget import Widget\n\nclass Reactive(Widget):\n\n    name = reactive(\"Paul\")  # (1)!\n    count = reactive(0) # (2)!\n    is_cool = reactive(True)  # (3)!\n```\n\n1. Create a string attribute with a default of `\"Paul\"`\n2. Creates an integer attribute with a default of `0`.\n3. Creates a boolean attribute with a default of `True`.\n\nThe `reactive` constructor accepts a default value as the first positional argument.\n\n!!! information\n\n    Textual uses Python's _descriptor protocol_ to create reactive attributes, which is the same protocol used by the builtin `property` decorator.\n\nYou can get and set these attributes in the same way as if you had assigned them in an `__init__` method. For instance `self.name = \"Jessica\"`, `self.count += 1`, or `print(self.is_cool)`.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3d99cbd6cf990fd1ee7b5d90e4305ffee6472f5974d68ae8313d9a650aa7109d",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 11,
+      "line_end": 39,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/f44f936526ec367bc951fef2"
+    },
+    {
+      "evidence_id": "ev-47c080d23e7a85b9",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity",
+      "snippet": "# Reactivity\n\nTextual's reactive attributes are attributes _with superpowers_. In this chapter we will look at how reactive attributes can simplify your apps.\n\n!!! quote\n\n    With great power comes great responsibility.\n\n    &mdash; Uncle Ben\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "6664e97ca9c94cd631265765e4f39b12364565ee69a741af6dfade7bbe3f6c0a",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 1,
+      "line_end": 10,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/08e3c9977d843e7f3c6991d4"
+    },
+    {
+      "evidence_id": "ev-daa175b907587a29",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Watch methods > Dynamically watching reactive attributes",
+      "snippet": "### Dynamically watching reactive attributes\n\nYou can programmatically add watchers to reactive attributes with the method [`watch`][textual.dom.DOMNode.watch].\nThis is useful when you want to react to changes to reactive attributes for which you can't edit the watch methods.\n\nThe example below shows a widget `Counter` that defines a reactive attribute `counter`.\nThe app that uses `Counter` uses the method `watch` to keep its progress bar synced with the reactive attribute:\n\n=== \"dynamic_watch.py\"\n\n    ```python hl_lines=\"9 28-29 31\"\n    --8<-- \"docs/examples/guide/reactivity/dynamic_watch.py\"\n    ```\n\n    1. `counter` is a reactive attribute defined inside `Counter`.\n    2. `update_progress` is a custom callback that will update the progress bar when `counter` changes.\n    3. We use the method `watch` to set `update_progress` as an additional watcher for the reactive attribute `counter`.\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/dynamic_watch.py\" press=\"enter,enter,enter\"}\n    ```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "a2d4b710de5be83444e229420c05a581fe228cb69736d9b70a52ef5cf3f73bf2",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 206,
+      "line_end": 228,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/168d76d907b4a0b98f593abe"
+    },
+    {
+      "evidence_id": "ev-7993acf8678ebcc0",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Data binding",
+      "snippet": "While this approach works fine, it does require we take care to update every `WorldClock` we mount.\nLet's see how data binding can simplify this.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "244b2feaedf99deb4fd3ae4d585f9bc968649cc088097c04e078d416db3b027d",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 451,
+      "line_end": 453,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/f4595f7dd6957b5cb4fbe7c5"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 2065
+}

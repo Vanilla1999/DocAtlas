@@ -1,0 +1,1 @@
+{"status":"complete","claims":[{"claim":"В начале запроса указаны поля `interface`, `operation` и `status`, а событие завершения дополнительно содержит диагностические поля `duration_ms` и `trace_incomplete`.","citations":[{"source_id":"ev-e2fee8fbbe2755c6","start":0,"end":186}]}],"missing":[]}

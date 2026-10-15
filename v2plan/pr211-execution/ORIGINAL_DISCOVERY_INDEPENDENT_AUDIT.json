@@ -1,0 +1,21 @@
+{
+  "review": "APPROVE for ordinary PR CI; runtime and intended kills pending",
+  "base_sha": "118e5d17af58679f3b109fb69e10586bc2423c72",
+  "files": {
+    "docmancer/docs/application/reference_query_tagging.py": "61d3d06bb601ac07aae0fd5bda0773e58bf7daff5d14818ba1cd117d70ec9e2a",
+    "docmancer/docs/application/_project_docs_service_part03.py": "c7f3f4e5c4a0684217b71c68cf1668c64799154efc74d9cd981d5ed6c41ae26a",
+    "tests/docs/test_discovery_independent_qualification.py": "293ca65690bc2c361c3ef6f4658f3211f73470538a51af85cf6681df13ea6831",
+    "tests/diagnostic_labels.global_evidence.json": "2c321d34758eb2dd75a5f3e56f24491e5395edbeeead103cfc193a2d284ee8a3",
+    "tests/docs/test_context_loss_boundaries.py": "df2a614fe8c8d7a601a1f53c8bc8ee7839884e2988915850362fa0ba1aba3438",
+    "scripts/run_recovery_contract_gate.py": "7d063e4584faf922e42e11794c5178124ff31c34d0b54491df4170848216dfc8",
+    "scripts/run_recovery_mutation_gate.py": "7b115e7177e1f471cdc315fe9f63ceb86132629f56ec03dcd8e6f839d2097537"
+  },
+  "checks": {
+    "python_ast_and_compile_only": true,
+    "mutation_anchors_unique_and_parseable": 14,
+    "case_roster": 11,
+    "public_original_only_and_lookup_controls_source_review": true,
+    "diagnostic_module_node_hash": true,
+    "no_local_repository_execution": true
+  }
+}

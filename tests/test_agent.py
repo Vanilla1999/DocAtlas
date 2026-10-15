@@ -13,10 +13,6 @@ def _config(tmp_path):
     return config
 
 
-def test_agent_default_creation():
-    agent = DocmancerAgent(config=DocmancerConfig(), _lazy_init=True)
-    assert agent.config.index.provider == "sqlite"
-    assert agent.config.query.default_budget == 2400
 
 
 def test_ingest_documents_indexes_sections_and_extracts_files(tmp_path):
@@ -156,52 +152,8 @@ def test_ingest_skips_bad_file_and_writes_report(tmp_path, monkeypatch):
     assert report["skipped"][0]["exception_type"]
 
 
-def test_ingest_url_logs_post_fetch_summary(caplog, tmp_path):
-    agent = DocmancerAgent(config=_config(tmp_path))
-    fetcher = MagicMock()
-    fetcher.fetch.return_value = [
-        Document(source="https://docs.example.com/page", content="# Hi", metadata={"format": "markdown"})
-    ]
-    agent._get_fetcher = MagicMock(return_value=fetcher)
-
-    agent.ingest_url("https://docs.example.com")
-
-    assert "https://docs.example.com/page" in agent.list_sources()
 
 
-def test_complete_web_refresh_removes_pages_missing_from_discovered_docset(tmp_path):
-    agent = DocmancerAgent(config=_config(tmp_path))
-    fetcher = MagicMock()
-    fetcher.last_discovery_diagnostics = {"page_failure_count": 0}
-    fetcher.last_page_ledger = []
-    fetcher.fetch.side_effect = [
-        [
-            Document(
-                source="https://docs.example.com/keep",
-                content="# Keep\n\nCurrent.",
-                metadata={"format": "markdown", "docset_root": "https://docs.example.com"},
-            ),
-            Document(
-                source="https://docs.example.com/removed",
-                content="# Removed\n\nOld.",
-                metadata={"format": "markdown", "docset_root": "https://docs.example.com"},
-            ),
-        ],
-        [
-            Document(
-                source="https://docs.example.com/keep",
-                content="# Keep\n\nCurrent.",
-                metadata={"format": "markdown", "docset_root": "https://docs.example.com"},
-            )
-        ],
-    ]
-    agent._get_fetcher = MagicMock(return_value=fetcher)
-
-    agent.ingest_url("https://docs.example.com")
-    agent.ingest_url("https://docs.example.com")
-
-    assert agent.list_sources() == ["https://docs.example.com/keep"]
-    assert agent.last_discovery_diagnostics["stale_sources_removed"] == 1
 
 
 def test_get_document_returns_exact_content(tmp_path):

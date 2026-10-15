@@ -1,0 +1,2113 @@
+{
+  "root": "/tmp/opencode/pr211-no-budget-runtime/projects/eslint",
+  "inventory": {
+    "seconds": 0.28412259800006723,
+    "expected_paths": [
+      "docs/src/use/command-line-interface.md",
+      "docs/src/use/configure/configuration-files.md",
+      "docs/src/use/configure/ignore.md"
+    ],
+    "indexed_paths": [
+      "docs/src/use/command-line-interface.md",
+      "docs/src/use/configure/configuration-files.md",
+      "docs/src/use/configure/ignore.md"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-157f4e6d9f51902a6f3d3b10ccf4b0e2d802cb01",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "---\ntitle: Command Line Interface Reference\neleventyNavigation:\n    key: command line interface\n    parent: use eslint\n    title: Command Line Interface Reference\n    order: 4\n---\n\n{%- from 'components/npm_tabs.macro.html' import npm_tabs with context %}\n{%- from 'components/npx_tabs.macro.html' import npx_tabs %}\n\nThe ESLint Command Line Interface (CLI) lets you execute linting from the terminal. The CLI has a variety of options that you can pass to configure ESLint.\n\n",
+        "line_start": 1,
+        "line_end": 14
+      },
+      {
+        "stable_chunk_id": "child-239282e98c05d09bd55d8b1abd463d47c8abd641",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "## Run the CLI\n\nESLint requires [Node.js](https://nodejs.org/) for installation. Follow the instructions in the [Getting Started Guide](getting-started) to install ESLint.\n\nMost users use [`npx`](https://docs.npmjs.com/cli/v8/commands/npx) to run ESLint on the command line like this:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"[options]\", \"[file|dir|glob]*\"]\n}) }}\n\nSuch as:\n\n",
+        "line_start": 15,
+        "line_end": 27
+      },
+      {
+        "stable_chunk_id": "child-d0240b8448223d84ff45432968107497723a121c",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"file1.js\", \"file2.js\"],\n    comment: \"Run on two files\"\n}) }}\n\nor\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"lib/**\"],\n    comment: \"Run on multiple files\"\n}) }}\n\n",
+        "line_start": 28,
+        "line_end": 41
+      },
+      {
+        "stable_chunk_id": "child-4d9143880e03db1dc616f5481d044acf33dee530",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "Please note that when passing a glob as a parameter, it is expanded by your shell. The results of the expansion can vary depending on your shell, and its configuration. If you want to use node `glob` syntax, you have to quote your parameter (using double quotes if you need it to run in Windows), as follows:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"lib/**\\\"\"]\n}) }}\n\n",
+        "line_start": 42,
+        "line_end": 48
+      },
+      {
+        "stable_chunk_id": "child-1020387127017f286f894e25f2140cdbb0048d4e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "You can also omit the file arguments and ESLint will use `.`. For instance, these two lines perform the same operation:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\".\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: []\n}) }}\n\n**Note:** You can also use alternative package managers such as [Yarn](https://yarnpkg.com/) or [pnpm](https://pnpm.io/) to run ESLint. For pnpm use `pnpm dlx eslint` and for Yarn use `yarn dlx eslint`.\n\n",
+        "line_start": 49,
+        "line_end": 62
+      },
+      {
+        "stable_chunk_id": "child-b9ae0295b12a19590f41348ea9c03ca01fb597ea",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "## Pass Multiple Values to an Option\n\nOptions that accept multiple values can be specified by repeating the option or with a comma-delimited list (other than [`--ignore-pattern`](#--ignore-pattern), which does not allow the second style).\n\nExamples of options that accept multiple values:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--global\", \"describe\", \"--global\", \"it\",  \"tests/\"]\n}) }}\n\nOR\n\n",
+        "line_start": 63,
+        "line_end": 75
+      },
+      {
+        "stable_chunk_id": "child-02ecc548904e1711d136c3015d086c20fd3eca52",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--global\", \"describe,it\", \"tests/\"]\n}) }}\n\n",
+        "line_start": 76,
+        "line_end": 80
+      },
+      {
+        "stable_chunk_id": "child-b2207e69eb3973f86e13108bf037faa78f6cc536",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "## Options\n\nYou can view all the CLI options by running `npx eslint -h`.\n\n",
+        "line_start": 81,
+        "line_end": 84
+      },
+      {
+        "stable_chunk_id": "child-d1c9aceadc3ca665aa70f9367e49ff1794fc9d97",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "```txt\neslint [options] file.js [file.js] [dir]\n\nBasic configuration:\n  --no-config-lookup               Disable look up for eslint.config.*\n  -c, --config path::String        Use this configuration instead of eslint.config.* look up\n  --inspect-config                 Open the config inspector with the current configuration\n  --ext [String]                   Specify additional file extensions to lint\n  --global [String]                Define global variables\n",
+        "line_start": 85,
+        "line_end": 93
+      },
+      {
+        "stable_chunk_id": "child-087eed5430c220640f011ecaa744385a1264677c",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --parser String                  Specify the parser to be used\n  --parser-options Object          Specify parser options\n\nSpecify Rules and Plugins:\n  --plugin [String]                Specify plugins\n  --rule Object                    Specify rules\n\nFix Problems:\n  --fix                            Automatically fix problems\n  --fix-dry-run                    Automatically fix problems without saving the changes to the file system\n",
+        "line_start": 94,
+        "line_end": 103
+      },
+      {
+        "stable_chunk_id": "child-863eddc42225522d20c5783e7abec54212376116",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --fix-type Array                 Specify the types of fixes to apply (directive, problem, suggestion, layout)\n\nIgnore Files:\n  --no-ignore                      Disable use of ignore files and patterns\n  --ignore-pattern [String]        Patterns of files to ignore\n\nUse stdin:\n  --stdin                          Lint code provided on <STDIN> - default: false\n  --stdin-filename String          Specify filename to process STDIN as\n\nHandle Warnings:\n",
+        "line_start": 104,
+        "line_end": 114
+      },
+      {
+        "stable_chunk_id": "child-9ceff65bf282277e1b643cbfabfee5ccf4f2ffdc",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --quiet                          Report errors only - default: false\n  --max-warnings Int               Number of warnings to trigger nonzero exit code - default: -1\n\nOutput:\n  -o, --output-file path::String   Specify file to write report to\n  -f, --format String              Use a specific output format - default: stylish\n  --color, --no-color              Force enabling/disabling of color\n\nInline configuration comments:\n",
+        "line_start": 115,
+        "line_end": 123
+      },
+      {
+        "stable_chunk_id": "child-200c2de42910ef4f7c86b5c39c1409d32641e6a4",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --no-inline-config               Prevent comments from changing config or rules\n  --report-unused-disable-directives  Adds reported errors for unused eslint-disable and eslint-enable directives\n  --report-unused-disable-directives-severity String  Chooses severity level for reporting unused eslint-disable and eslint-enable directives - either: off, warn, error, 0, 1, or 2\n",
+        "line_start": 124,
+        "line_end": 126
+      },
+      {
+        "stable_chunk_id": "child-d2a3aadcf3b4c8f47932a65911df537398d21618",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --report-unused-inline-configs String  Adds reported errors for unused eslint inline config comments - either: off, warn, error, 0, 1, or 2\n\nCaching:\n  --cache                          Only check changed files - default: false\n  --cache-file path::String        Path to the cache file. Deprecated: use --cache-location - default: .eslintcache\n  --cache-location path::String    Path to the cache file or directory\n",
+        "line_start": 127,
+        "line_end": 132
+      },
+      {
+        "stable_chunk_id": "child-31fe653946ecbd9fc8608006b3bc3ded319257c7",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --cache-strategy String          Strategy to use for detecting changed files in the cache - either: metadata or content - default: metadata\n\nSuppressing Violations:\n  --suppress-all                   Suppress all violations - default: false\n  --suppress-rule [String]         Suppress specific rules\n  --suppressions-location path::String  Specify the location of the suppressions file\n  --prune-suppressions             Prune unused suppressions - default: false\n",
+        "line_start": 133,
+        "line_end": 139
+      },
+      {
+        "stable_chunk_id": "child-417f625f1496d6a66024c55d97e8894f54ad76a5",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --pass-on-unpruned-suppressions  Ignore unused suppressions - default: false\n\nMiscellaneous:\n  --init                           Run config initialization wizard - default: false\n  --env-info                       Output execution environment information - default: false\n  --no-error-on-unmatched-pattern  Prevent errors when pattern is unmatched\n  --exit-on-fatal-error            Exit with exit code 2 in case of fatal error - default: false\n",
+        "line_start": 140,
+        "line_end": 146
+      },
+      {
+        "stable_chunk_id": "child-4c168ebf83bac73ccc9d05621466a04fdf285bd5",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --no-warn-ignored                Suppress warnings when the file list includes ignored files\n  --pass-on-no-patterns            Exit with exit code 0 in case no file patterns are passed\n  --debug                          Output debugging information\n  -h, --help                       Show help\n  -v, --version                    Output the version number\n  --print-config path::String      Print the configuration for the given file\n",
+        "line_start": 147,
+        "line_end": 152
+      },
+      {
+        "stable_chunk_id": "child-cfd9be0f21221f60e721d0565ffce1dc30bc8782",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "  --stats                          Add statistics to the lint report - default: false\n  --flag [String]                  Enable a feature flag\n  --mcp                            Start the ESLint MCP server\n  --concurrency Int|String         Number of linting threads, auto to choose automatically, off for no multithreading - default: off\n```\n\n",
+        "line_start": 153,
+        "line_end": 158
+      },
+      {
+        "stable_chunk_id": "child-26703f06eec5b142ed72ff4555bb386a055b9424",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Basic Configuration\n\n",
+        "line_start": 159,
+        "line_end": 160
+      },
+      {
+        "stable_chunk_id": "child-0ad7aa6db59326f7bf761fc23005e7b074c728f9",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--no-config-lookup`\n\nDisables use of configuration from files.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 161,
+        "line_end": 166
+      },
+      {
+        "stable_chunk_id": "child-a8c56bf63273d7fa7c142760c315e4565e47e3ce",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--no-config-lookup` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--no-config-lookup\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 167,
+        "line_end": 173
+      },
+      {
+        "stable_chunk_id": "child-57cba886704012c64768f70fa6e66a58749b4cd0",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `-c`, `--config`\n\nThis option allows you to specify an additional configuration file for ESLint (see [Configure ESLint](configure/) for more).\n\n- **Argument Type**: String. Path to file.\n- **Multiple Arguments**: No\n\n",
+        "line_start": 174,
+        "line_end": 180
+      },
+      {
+        "stable_chunk_id": "child-9d3b019b48eae02e9aa0c3fa0f4cebe8fb3ec4be",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `-c`, `--config` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-c\", \"~/my.eslint.config.js\", \"file.js\"]\n}) }}\n\nThis example uses the configuration file at `~/my.eslint.config.js`, which is used instead of searching for an `eslint.config.js` file.\n\n",
+        "line_start": 181,
+        "line_end": 189
+      },
+      {
+        "stable_chunk_id": "child-41d2a5d3397eeaa62ccd6b6b2e433f4293b5870f",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--inspect-config`\n\nThis option runs `npx @eslint/config-inspector@latest` to start the [config inspector](https://github.com/eslint/config-inspector). You can use the config inspector to better understand what your configuration is doing and which files it applies to. When you use this flag, the CLI does not perform linting.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 190,
+        "line_end": 195
+      },
+      {
+        "stable_chunk_id": "child-b9abb3f7ad6293e72bf73eeab0c63636aa5381ba",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--inspect-config` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--inspect-config\"]\n}) }}\n\n",
+        "line_start": 196,
+        "line_end": 202
+      },
+      {
+        "stable_chunk_id": "child-56cbce8ff5d79b54d9abbc345777fb6c747d8ae0",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--ext`\n\nThis option allows you to specify additional file extensions to lint.\n\n- **Argument Type**: String. File extension.\n- **Multiple Arguments**: Yes\n- **Default Value**: By default, ESLint lints files with extensions `.js`, `.mjs`, `.cjs`, and additional extensions [specified in the configuration file](configure/configuration-files#specify-files-with-arbitrary-extensions).\n\n",
+        "line_start": 203,
+        "line_end": 210
+      },
+      {
+        "stable_chunk_id": "child-37915013117a11b7c6397895f43d5153fa9f8a86",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "This option is primarily intended for use in combination with the [`--no-config-lookup`](#--no-config-lookup) option, since in that case there is no configuration file in which the additional extensions would be specified.\n\n",
+        "line_start": 211,
+        "line_end": 212
+      },
+      {
+        "stable_chunk_id": "child-1f85c19c8743202b3227a7f21e2986d821a671a8",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--ext` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\".\", \"--ext\", \".ts\"],\n    comment: \"Include .ts files\"\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\".\", \"--ext\", \".ts\", \"--ext\", \".tsx\"],\n    comment: \"Include .ts and .tsx files\"\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\".\", \"--ext\", \".ts,.tsx\"],\n    comment: \"Also include .ts and .tsx files\"\n}) }}\n\n",
+        "line_start": 213,
+        "line_end": 232
+      },
+      {
+        "stable_chunk_id": "child-3321a5539c31b49b41097163520e75e5c48437a6",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--global`\n\nThis option defines global variables so that they are not flagged as undefined by the [`no-undef`](../rules/no-undef) rule.\n\n- **Argument Type**: String. Name of the global variable. Any specified global variables are assumed to be read-only by default, but appending `:true` to a variable's name ensures that `no-undef` also allows writes.\n- **Multiple Arguments**: Yes\n\n",
+        "line_start": 233,
+        "line_end": 239
+      },
+      {
+        "stable_chunk_id": "child-4d6aa7a278cc398787d34022cfe80e21a6ef420b",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--global` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--global\", \"require,exports:true\", \"file.js\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--global\", \"require\", \"--global\", \"exports:true\"]\n}) }}\n\n",
+        "line_start": 240,
+        "line_end": 251
+      },
+      {
+        "stable_chunk_id": "child-4c6008bd077c1be1ab258b3db808e0f170ee34b4",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--parser`\n\nThis option allows you to specify a parser to be used by ESLint.\n\n- **Argument Type**: String. Parser to be used by ESLint.\n- **Multiple Arguments**: No\n- **Default Value**: `espree`\n\n",
+        "line_start": 252,
+        "line_end": 259
+      },
+      {
+        "stable_chunk_id": "child-23d1b0ea39520fa71edddfa05681bf6e2efde9d8",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--parser` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--parser\", \"@typescript-eslint/parser\", \"file.ts\"],\n    comment: \"Use TypeScript ESLint parser\"\n}) }}\n\n",
+        "line_start": 260,
+        "line_end": 267
+      },
+      {
+        "stable_chunk_id": "child-949003d6dc33fd582f0a246e7b5012dcccf76995",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--parser-options`\n\nThis option allows you to specify parser options to be used by ESLint. The available parser options are determined by the parser being used.\n\n- **Argument Type**: Key/value pair separated by colon (`:`).\n- **Multiple Arguments**: Yes\n\n",
+        "line_start": 268,
+        "line_end": 274
+      },
+      {
+        "stable_chunk_id": "child-8148f1225e24c533df5f5c26e4b7eb359f7947c1",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--parser-options` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stdin\", \"--parser-options\", \"ecmaVersion:6\"],\n    comment: \"fails with a parsing error\",\n    previousCommands: [\"echo \\'3 ** 4\\'\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stdin\", \"--parser-options\", \"ecmaVersion:7\"],\n    comment: \"succeeds, yay!\",\n    previousCommands: [\"echo \\'3 ** 4\\'\"]\n}) }}\n\n",
+        "line_start": 275,
+        "line_end": 290
+      },
+      {
+        "stable_chunk_id": "child-f7f04f61d9df281680e55c76086ef66df3b95f94",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Specify Rules and Plugins\n\n",
+        "line_start": 291,
+        "line_end": 292
+      },
+      {
+        "stable_chunk_id": "child-84c7ac0718a9bd10cd434b9136f028d9886f27f9",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--plugin`\n\nThis option specifies a plugin to load.\n\n- **Argument Type**: String. Plugin name. You can optionally omit the prefix `eslint-plugin-` from the plugin name.\n- **Multiple Arguments**: Yes\n\nBefore using the plugin, you have to install it using npm.\n\n",
+        "line_start": 293,
+        "line_end": 301
+      },
+      {
+        "stable_chunk_id": "child-14773d67402720fe09aee0317fe8edeb9602f298",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--plugin` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--plugin\", \"jquery\", \"file.js\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--plugin\", \"eslint-plugin-mocha\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 302,
+        "line_end": 313
+      },
+      {
+        "stable_chunk_id": "child-eda75cfe38bf4d9c3386076171ed446dce286434",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--rule`\n\nThis option specifies the rules to be used.\n\n- **Argument Type**: Rules and their configuration specified with [levn](https://github.com/gkz/levn#levn--) format.\n- **Multiple Arguments**: Yes\n\nThese rules are merged with any rules specified with configuration files. If the rule is defined in a plugin, you have to prefix the rule ID with the plugin name and a `/`.\n\n",
+        "line_start": 314,
+        "line_end": 322
+      },
+      {
+        "stable_chunk_id": "child-93be6c79999ebb3af74b4e48981bdbaad7e4e44a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "To ignore rules in configuration files and only run rules specified in the command line, use the `--rule` flag in combination with the [`--no-config-lookup`](#--no-config-lookup) flag.\n\n",
+        "line_start": 323,
+        "line_end": 324
+      },
+      {
+        "stable_chunk_id": "child-8072e1ca9cbca64099a683813ff19f2b1c56b9f0",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--rule` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--rule\", \"\\'quotes: [error, double]\\'\"],\n    comment: \"Apply single rule\"\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--rule\", \"\\'guard-for-in: error\\'\", \"--rule\", \"\\'brace-style: [error, 1tbs]\\'\"],\n    comment: \"Apply multiple rules\"\n}) }}\n\n",
+        "line_start": 325,
+        "line_end": 338
+      },
+      {
+        "stable_chunk_id": "child-b32ce5303ec8cc46f569f1823173f0e7f75c7d18",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--rule\", \"\\'jquery/dollar-sign: error\\'\"],\n    comment: \"Apply rule from jquery plugin\"\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--rule\", \"\\'quotes: [error, double]\\'\", \"--no-config-lookup\"],\n    comment: \"Only apply rule from the command line\"\n}) }}\n\n",
+        "line_start": 339,
+        "line_end": 350
+      },
+      {
+        "stable_chunk_id": "child-f644d78f0e336a1eef8b08b4592003f5d222b748",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Fix Problems\n\n",
+        "line_start": 351,
+        "line_end": 352
+      },
+      {
+        "stable_chunk_id": "child-11299998c87a6210e9629bc92a0ec90c786a04c3",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--fix`\n\nThis option instructs ESLint to try to [fix](core-concepts#rule-fixes) as many issues as possible. The fixes are made to the actual files themselves and only the remaining unfixed issues are output.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 353,
+        "line_end": 358
+      },
+      {
+        "stable_chunk_id": "child-7a4fdc9fc89e2ec1023866686fd8722e61e6cb30",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "Not all problems are fixable using this option, and the option does not work in these situations:\n\n1. This option throws an error when code is piped to ESLint.\n1. This option has no effect on code that uses a processor, unless the processor opts into allowing autofixes.\n\nIf you want to fix code from `stdin` or otherwise want to get the fixes without actually writing them to the file, use the [`--fix-dry-run`](#--fix-dry-run) option.\n\n",
+        "line_start": 359,
+        "line_end": 365
+      },
+      {
+        "stable_chunk_id": "child-2c9f3030f44c3303ebcf3cb59b901c8c48547667",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--fix` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 366,
+        "line_end": 372
+      },
+      {
+        "stable_chunk_id": "child-e6aa923f7cf14ce1eeca4b966e33fec4bb9447de",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--fix-dry-run`\n\nThis option has the same effect as `--fix` with the difference that the fixes are not saved to the file system. Because the default formatter does not output the fixed code, you'll have to use another formatter (e.g. `--format json`) to get the fixes.\n\n- **Argument Type**: No argument.\n\nThis makes it possible to fix code from `stdin` when used with the `--stdin` flag.\n\n",
+        "line_start": 373,
+        "line_end": 380
+      },
+      {
+        "stable_chunk_id": "child-e988614c104718b7012a4a993fedaa41ca2f1507",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "This flag can be useful for integrations (e.g. editor plugins) which need to autofix text from the command line without saving it to the filesystem.\n\n",
+        "line_start": 381,
+        "line_end": 382
+      },
+      {
+        "stable_chunk_id": "child-ee9f6a167d618a3eba12bd2063f5aa48ad15d02d",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--fix-dry-run` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stdin\", \"--fix-dry-run\", \"--format\", \"json\"],\n    previousCommands: [\"getSomeText\"]\n}) }}\n\n",
+        "line_start": 383,
+        "line_end": 390
+      },
+      {
+        "stable_chunk_id": "child-dff5309104063796268eb76e86e4bc855fd56323",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--fix-type`\n\nThis option allows you to specify the type of fixes to apply when using either `--fix` or `--fix-dry-run`.\n\n",
+        "line_start": 391,
+        "line_end": 394
+      },
+      {
+        "stable_chunk_id": "child-8158a99fd575fc31a99d417e957022e842d55613",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "- **Argument Type**: String. One of the following fix types:\n    1. `problem` - fix potential errors in the code\n    1. `suggestion` - apply fixes to the code that improve it\n    1. `layout` - apply fixes that do not change the program structure (AST)\n    1. `directive` - apply fixes to inline directives such as `// eslint-disable`\n- **Multiple Arguments**: Yes\n\n",
+        "line_start": 395,
+        "line_end": 401
+      },
+      {
+        "stable_chunk_id": "child-220806f99ce2167149b022db65d17d96286b7281",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "This option is helpful if you are using another program to format your code, but you would still like ESLint to apply other types of fixes.\n\n",
+        "line_start": 402,
+        "line_end": 403
+      },
+      {
+        "stable_chunk_id": "child-385bb0c960812018d49734d88e30b63ca495376e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--fix-type` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"--fix-type\", \"suggestion\", \".\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"--fix-type\", \"suggestion\", \"--fix-type\", \"problem\", \".\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--fix\", \"--fix-type\", \"suggestion,layout\", \".\"]\n}) }}\n\n",
+        "line_start": 404,
+        "line_end": 420
+      },
+      {
+        "stable_chunk_id": "child-372684943591fb7d8f0d4bfe91730eb6671ff14f",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Ignore Files\n\n",
+        "line_start": 421,
+        "line_end": 422
+      },
+      {
+        "stable_chunk_id": "child-e7ab9fe80cf15ad1ee7b149fc5d218f1f060f9f6",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--no-ignore`\n\nDisables excluding of files from [`--ignore-pattern`](#--ignore-pattern) flags and the `ignores` property in configuration.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 423,
+        "line_end": 428
+      },
+      {
+        "stable_chunk_id": "child-e487d5d586ca31e22b6ade050fbe3a2dcc1e0188",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--no-ignore` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--no-ignore\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 429,
+        "line_end": 435
+      },
+      {
+        "stable_chunk_id": "child-a6a8c8d6d9e6fc161de542eb3bb39005c1a0140d",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--ignore-pattern`\n\nThis option allows you to specify patterns of files to ignore.\n\n- **Argument Type**: String. The supported syntax is the same as for [`ignores` patterns](configure/configuration-files#exclude-files-with-ignores), which use [minimatch](https://www.npmjs.com/package/minimatch) syntax. You should quote your patterns in order to avoid shell interpretation of glob patterns.\n- **Multiple Arguments**: Yes\n\n",
+        "line_start": 436,
+        "line_end": 442
+      },
+      {
+        "stable_chunk_id": "child-4ee8e73cfda279c12ae6119a550dfe4e4dc2d263",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--ignore-pattern` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--ignore-pattern\", \"\\\"/lib/\\\"\", \"--ignore-pattern\", \"\\\"/src/vendor/*\\\"\", \".\"]\n}) }}\n\n",
+        "line_start": 443,
+        "line_end": 449
+      },
+      {
+        "stable_chunk_id": "child-3a183bdc0a5e9ba8ec5e7cd9018df585e9703009",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Use stdin\n\n",
+        "line_start": 450,
+        "line_end": 451
+      },
+      {
+        "stable_chunk_id": "child-3c829a19b4f05e17ce80e6870be10c8d90b40700",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--stdin`\n\nThis option tells ESLint to read and lint source code from STDIN instead of from files. You can use this to pipe code to ESLint.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 452,
+        "line_end": 457
+      },
+      {
+        "stable_chunk_id": "child-5371ccb2c8e69237cd8f44c3e8b955418ce54f74",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--stdin` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stdin\"],\n    previousCommands: [\"cat myFile.js\"]\n}) }}\n\n",
+        "line_start": 458,
+        "line_end": 465
+      },
+      {
+        "stable_chunk_id": "child-a9ac97fa901b4965187b0c256134222aa98e8ffe",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--stdin-filename`\n\nThis option allows you to specify a filename to process STDIN as.\n\n- **Argument Type**: String. Path to file.\n- **Multiple Arguments**: No\n\nThis is useful when processing files from STDIN and you have rules which depend on the filename.\n\n",
+        "line_start": 466,
+        "line_end": 474
+      },
+      {
+        "stable_chunk_id": "child-8f7826a403f42765f669147037edc67fe58801c0",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--stdin-filename` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stdin\", \"--stdin-filename\", \"myfile.js\"],\n    previousCommands: [\"cat myFile.js\"]\n}) }}\n\n",
+        "line_start": 475,
+        "line_end": 482
+      },
+      {
+        "stable_chunk_id": "child-7913e40e9e1c90b6365dab9a2934b0f79b7acff8",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Handle Warnings\n\n",
+        "line_start": 483,
+        "line_end": 484
+      },
+      {
+        "stable_chunk_id": "child-40c4c8d179a67ee3fc6ac7f3e97982d7c5b63526",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--quiet`\n\nThis option allows you to disable reporting on warnings and running of rules set to warn. If you enable this option, only errors are reported by ESLint and only rules set to error will be run.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 485,
+        "line_end": 490
+      },
+      {
+        "stable_chunk_id": "child-00863bd6b3c28197e5c1fcb2c82c6be750d7b09a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--quiet` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--quiet\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 491,
+        "line_end": 497
+      },
+      {
+        "stable_chunk_id": "child-5b008a55bb59a94cc458cb7df9096d6f5b185d51",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--max-warnings`\n\nThis option allows you to specify a warning threshold, which can be used to force ESLint to exit with an error status if there are too many warning-level rule violations in your project.\n\n- **Argument Type**: Integer. The maximum number of warnings to allow. To prevent this behavior, do not use this option or specify `-1` as the argument.\n- **Multiple Arguments**: No\n\n",
+        "line_start": 498,
+        "line_end": 504
+      },
+      {
+        "stable_chunk_id": "child-56fcb273dac9a28e945de334f8b18991e1cfaad0",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "Normally, if ESLint runs and finds no errors (only warnings), it exits with a success exit status. However, if `--max-warnings` is specified and the total warning count is greater than the specified threshold, ESLint exits with an error status.\n\n::: important\nWhen used alongside `--quiet`, this will cause rules marked as warn to still be run, but not reported.\n:::\n\n",
+        "line_start": 505,
+        "line_end": 510
+      },
+      {
+        "stable_chunk_id": "child-ae438a81e76d378c873476bb3abbabe542f9baec",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--max-warnings` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--max-warnings\", \"10\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 511,
+        "line_end": 517
+      },
+      {
+        "stable_chunk_id": "child-58303c765c3f8a4cf3ac3e8f31ded1d48465f254",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Output\n\n",
+        "line_start": 518,
+        "line_end": 519
+      },
+      {
+        "stable_chunk_id": "child-1b1ee1da423b0a58e4726ee5c13120fe227cc471",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `-o`, `--output-file`\n\nWrite the output of linting results to a specified file.\n\n- **Argument Type**: String. Path to file.\n- **Multiple Arguments**: No\n\n",
+        "line_start": 520,
+        "line_end": 526
+      },
+      {
+        "stable_chunk_id": "child-c3d6885115807d365a733c92def4fe2976495990",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `-o`, `--output-file` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-o\", \"./test/test.html\"]\n}) }}\n\n",
+        "line_start": 527,
+        "line_end": 533
+      },
+      {
+        "stable_chunk_id": "child-ded3cf49b1d49015dc433f91e3149589feb5a554",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `-f`, `--format`\n\nThis option specifies the output format for the console.\n\n- **Argument Type**: String. One of the [built-in formatters](formatters/) or a custom formatter.\n- **Multiple Arguments**: No\n- **Default Value**: [`stylish`](formatters/#stylish)\n\nIf you are using a custom formatter defined in a local file, you can specify the path to the custom formatter file.\n\n",
+        "line_start": 534,
+        "line_end": 543
+      },
+      {
+        "stable_chunk_id": "child-bcf129f3a4b738b08ea1ff41ad5ec57a4898396b",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "An npm-installed formatter is resolved with or without `eslint-formatter-` prefix.\n\nWhen specified, the given format is output to the console. If you'd like to save that output into a file, you can do so on the command line like so:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-f\", \"json\", \"file.js\", \">\", \"results.json\"],\n    comment: \"Saves the output into the `results.json` file.\"\n}) }}\n\n",
+        "line_start": 544,
+        "line_end": 553
+      },
+      {
+        "stable_chunk_id": "child-068a5b9a78c729ff2a2195e05de7425ea24cdd8f",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `-f`, `--format` example\n\nUse the built-in `json` formatter:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--format\", \"json\", \"file.js\"]\n}) }}\n\nUse a local custom formatter:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-f\", \"./customformat.js\", \"file.js\"]\n}) }}\n\nUse an npm-installed formatter:\n\n{{ npm_tabs({\n    command: \"install\",\n    packages: [\"eslint-formatter-pretty\"],\n    args: []\n}) }}\n\n",
+        "line_start": 554,
+        "line_end": 577
+      },
+      {
+        "stable_chunk_id": "child-99cf7fc561e55c3a81b3626484b4a0e7764f2d2e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "Then run one of the following commands\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-f\", \"pretty\", \"file.js\"]\n}) }}\n\nor alternatively\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-f\", \"eslint-formatter-pretty\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 578,
+        "line_end": 591
+      },
+      {
+        "stable_chunk_id": "child-6ded63d752cbe4de0cf7d1620a4ab9a5277fd76a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--color` and `--no-color`\n\nThese options force the enabling/disabling of colorized output.\n\n- **Argument Type**: No argument.\n\nYou can use these options to override the default behavior, which is to enable colorized output unless no TTY is detected, such as when piping `eslint` through `cat` or `less`.\n\n::: warning\n\n",
+        "line_start": 592,
+        "line_end": 601
+      },
+      {
+        "stable_chunk_id": "child-03091c1fedebc76cebcc3fd466a2500d043c91c3",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "When neither `--color` nor `--no-color` is specified, the formatter may decide whether to colorize the output based on the runtime environment. For example, when using the default `stylish` formatter under Node.js, [`FORCE_COLOR`](https://nodejs.org/api/cli.html#force_color1-2-3), [`NO_COLOR`](https://nodejs.org/api/cli.html#no_colorany), or [`NODE_DISABLE_COLORS`](https://nodejs.org/api/cli.html#node_disable_colors1) environment variables may affect whether colors are used.\n\n",
+        "line_start": 602,
+        "line_end": 603
+      },
+      {
+        "stable_chunk_id": "child-40b40a971e2fb5eed4def5de1da5a1c6c4d31792",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": ":::\n\n",
+        "line_start": 604,
+        "line_end": 605
+      },
+      {
+        "stable_chunk_id": "child-fe8e7975c20bc20d2e9068a636c64093be242050",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--color` and `--no-color` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--color\", \"file.js\", \"|\", \"cat\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--no-color\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 606,
+        "line_end": 617
+      },
+      {
+        "stable_chunk_id": "child-7d9c604bdd2a26ca9a47ba812e30257fcaf86371",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Inline Configuration Comments\n\n",
+        "line_start": 618,
+        "line_end": 619
+      },
+      {
+        "stable_chunk_id": "child-83b84cb766e3ca5ec3e0c6632fbb9c61c679882d",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--no-inline-config`\n\nThis option prevents inline comments like `/*eslint-disable*/` or\n`/*global foo*/` from having any effect.\n\n- **Argument Type**: No argument.\n\nThis allows you to set an ESLint config without files modifying it. All inline config comments are ignored, such as:\n\n- `/*eslint-disable*/`\n- `/*eslint-enable*/`\n- `/*global*/`\n- `/*eslint*/`\n- `// eslint-disable-line`\n- `// eslint-disable-next-line`\n\n",
+        "line_start": 620,
+        "line_end": 635
+      },
+      {
+        "stable_chunk_id": "child-18e672fe99d3695cc0e4ee2ff24cf6ac5e6b0e50",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--no-inline-config` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--no-inline-config\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 636,
+        "line_end": 642
+      },
+      {
+        "stable_chunk_id": "child-070ae9382be4bda15ae609feffef27630648bfad",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--report-unused-disable-directives`\n\nThis option causes ESLint to report directive comments like `// eslint-disable-line` when no errors would have been reported on that line anyway.\n\n- **Argument Type**: No argument.\n\nThis can be useful to prevent future errors from unexpectedly being suppressed, by cleaning up old `eslint-disable` and `eslint-enable` comments which are no longer applicable.\n\n",
+        "line_start": 643,
+        "line_end": 650
+      },
+      {
+        "stable_chunk_id": "child-6debdec7b7dbe63102bee38a9bff12cfb4cfee07",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "::: warning\nWhen using this option, it is possible that new errors start being reported whenever ESLint or custom rules are upgraded.\n\n",
+        "line_start": 651,
+        "line_end": 653
+      },
+      {
+        "stable_chunk_id": "child-ae829d8ae8b8406e261604d4ca24c54ee56bfe6a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "For example, suppose a rule has a bug that causes it to report a false positive, and an `eslint-disable` comment is added to suppress the incorrect report. If the bug is then fixed in a patch release of ESLint, the `eslint-disable` comment becomes unused since ESLint is no longer generating an incorrect report. This results in a new reported error for the unused directive if the `--report-unused-disable-directives` option is used.\n:::\n\n",
+        "line_start": 654,
+        "line_end": 656
+      },
+      {
+        "stable_chunk_id": "child-b3a469e35054c362d9ea376837b340b24aa5ef20",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--report-unused-disable-directives` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--report-unused-disable-directives\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 657,
+        "line_end": 663
+      },
+      {
+        "stable_chunk_id": "child-225831f3099b9ad6d24b6fe2713587afeb2cf13b",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--report-unused-disable-directives-severity`\n\nSame as [`--report-unused-disable-directives`](#--report-unused-disable-directives), but allows you to specify the severity level (`error`, `warn`, `off`) of the reported errors. Only one of these two options can be used at a time.\n\n",
+        "line_start": 664,
+        "line_end": 667
+      },
+      {
+        "stable_chunk_id": "child-3c63adcee6b05fe3ddfa515644389a2cc8336f24",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "- **Argument Type**: String. One of the following values:\n    1. `off` (or `0`)\n    1. `warn` (or `1`)\n    1. `error` (or `2`)\n- **Multiple Arguments**: No\n- **Default Value**: By default, `linterOptions.reportUnusedDisableDirectives` configuration setting is used (which defaults to `\"warn\"`).\n\n",
+        "line_start": 668,
+        "line_end": 674
+      },
+      {
+        "stable_chunk_id": "child-ea52a023d53cd1f7024b59dc1ce9ed97f6504428",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--report-unused-disable-directives-severity` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--report-unused-disable-directives-severity\", \"warn\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 675,
+        "line_end": 681
+      },
+      {
+        "stable_chunk_id": "child-4f3747f80c56a7c8a22d5c519b1f27d4fb115067",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--report-unused-inline-configs`\n\nThis option causes ESLint to report inline config comments like `/* eslint rule-name: \"error\" */` whose rule severity and any options match what's already been configured.\n\n",
+        "line_start": 682,
+        "line_end": 685
+      },
+      {
+        "stable_chunk_id": "child-492718c36758951db324c8eabc5d6ec78bc97b65",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "- **Argument Type**: String. One of the following values:\n    1. `off` (or `0`)\n    1. `warn` (or `1`)\n    1. `error` (or `2`)\n- **Multiple Arguments**: No\n- **Default Value**: By default, `linterOptions.reportUnusedInlineConfigs` configuration setting is used (which defaults to `\"off\"`).\n\n",
+        "line_start": 686,
+        "line_end": 692
+      },
+      {
+        "stable_chunk_id": "child-97a58baf4edaa42d6fa8d1eaa95d2949f0851b03",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "This can be useful to keep files clean and devoid of misleading clutter.\nInline config comments are meant to change ESLint's behavior in some way: if they change nothing, there is no reason to leave them in.\n\n",
+        "line_start": 693,
+        "line_end": 695
+      },
+      {
+        "stable_chunk_id": "child-bf4e2787b06c0f7040ec77919a1012ed00abee7c",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--report-unused-inline-configs` example\n\n```shell\nnpx eslint --report-unused-inline-configs error file.js\n```\n\n",
+        "line_start": 696,
+        "line_end": 701
+      },
+      {
+        "stable_chunk_id": "child-936c34592c094edf1300338772c56c953a993044",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Caching\n\n",
+        "line_start": 702,
+        "line_end": 703
+      },
+      {
+        "stable_chunk_id": "child-cf769b118879047fb08bbf31453b03b4b1f4c28c",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--cache`\n\nStore the info about processed files in order to only operate on the changed ones. Enabling this option can dramatically improve ESLint's run time performance by ensuring that only changed files are linted.\nThe cache is stored in `.eslintcache` by default.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 704,
+        "line_end": 710
+      },
+      {
+        "stable_chunk_id": "child-5233a076e076a37c36e01e05be53885c16c17553",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "If you run ESLint with `--cache` and then run ESLint without `--cache`, the `.eslintcache` file will be deleted. This is necessary because the results of the lint might change and make `.eslintcache` invalid. If you want to control when the cache file is deleted, then use `--cache-location` to specify an alternate location for the cache file.\n\n",
+        "line_start": 711,
+        "line_end": 712
+      },
+      {
+        "stable_chunk_id": "child-dbf64ba11a12b6064b94cd3eda137757f85737ea",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "Autofixed files are not placed in the cache. Subsequent linting that does not trigger an autofix will place it in the cache.\n\n",
+        "line_start": 713,
+        "line_end": 714
+      },
+      {
+        "stable_chunk_id": "child-7ae49f14101538b4ee676cd88ff65e85cb1c273c",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "ESLint determines whether a cached result is still valid from the file itself (its contents or metadata, depending on `--cache-strategy`) and the configuration. It does not track dependencies between files, so a file's cached results are reused even when another file it depends on has changed. Rules whose results depend on other files can therefore report stale results. This includes type-aware rules, such as those in [`@typescript-eslint/eslint-plugin`](https://typescript-eslint.io/packages/eslint-plugin), and rules that resolve imports across modules, such as those in [`eslint-plugin-import`](https://github.com/import-js/eslint-plugin-import) and [`eslint-plugin-import-x`](https://github.com/un-ts/eslint-plugin-import-x).\n\n",
+        "line_start": 715,
+        "line_end": 716
+      },
+      {
+        "stable_chunk_id": "child-42d8c5db7666d082d7379c646197407b5fd34b9d",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "For example, if a module is changed in a way that introduces a problem in an unchanged file that imports it, `--cache` does not report that problem until the importing file or the configuration changes. The opposite can also happen: a problem that has already been fixed in another file continues to be reported. Run ESLint without `--cache` when you need accurate results from such rules. See [Can I use ESLint's `--cache` with typescript-eslint?](https://typescript-eslint.io/troubleshooting/faqs/eslint/#can-i-use-eslints---cache-with-typescript-eslint) for more details.\n\n",
+        "line_start": 717,
+        "line_end": 718
+      },
+      {
+        "stable_chunk_id": "child-2ca437f921f80df2b780c7d96dfae1c24964708e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--cache` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--cache\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 719,
+        "line_end": 725
+      },
+      {
+        "stable_chunk_id": "child-fd03905160aab2c61887af7a7df7fdc0b4386e2a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--cache-file`\n\n**Deprecated**: Use `--cache-location` instead.\n\nPath to the cache file. If none specified `.eslintcache` is used. The file is created in the directory where the `eslint` command is executed.\n\n",
+        "line_start": 726,
+        "line_end": 731
+      },
+      {
+        "stable_chunk_id": "child-9c826a5136927c40f48a165da26b4926601678fb",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--cache-location`\n\nSpecify the path to the cache location. Can be a file or a directory.\n\n",
+        "line_start": 732,
+        "line_end": 735
+      },
+      {
+        "stable_chunk_id": "child-1bef54580bc57b3ea7d9fe34093ba422bb36a57d",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "- **Argument Type**: String. Path to file or directory. If a directory is specified, a cache file is created inside the specified folder. The name of the file is based on the hash of the current working directory, e.g.: `.cache_hashOfCWD`.\n- **Multiple Arguments**: No\n- **Default Value**: If no location is specified, `.eslintcache` is used. The file is created in the directory where the `eslint` command is executed.\n\n",
+        "line_start": 736,
+        "line_end": 739
+      },
+      {
+        "stable_chunk_id": "child-39a25d3861b696bd15e54e7e8196f53fe6ee7352",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "If the directory for the cache does not exist make sure you add a trailing `/` on \\*nix systems or `\\` on Windows. Otherwise, the path is assumed to be a file.\n\n",
+        "line_start": 740,
+        "line_end": 741
+      },
+      {
+        "stable_chunk_id": "child-07de875c3af8159a046924e06dca96277aea11d9",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--cache-location` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--cache\", \"--cache-location\", \"\\\"/Users/user/.eslintcache/\\\"\"]\n}) }}\n\n",
+        "line_start": 742,
+        "line_end": 748
+      },
+      {
+        "stable_chunk_id": "child-3f6a54a881d9befc52fedd949330210fc2f2f240",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--cache-strategy`\n\nStrategy for the cache to use for detecting changed files.\n\n- **Argument Type**: String. One of the following values:\n    1. `metadata`\n    1. `content`\n- **Multiple Arguments**: No\n- **Default Value**: `metadata`\n\n",
+        "line_start": 749,
+        "line_end": 758
+      },
+      {
+        "stable_chunk_id": "child-81986e9aa121e066e5474123df9fa4498ebb10f5",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "The `content` strategy can be useful in cases where the modification time of your files changes even if their contents have not. For example, this can happen during git operations like [`git clone`](https://git-scm.com/docs/git-clone) because git does not track file modification time.\n\n",
+        "line_start": 759,
+        "line_end": 760
+      },
+      {
+        "stable_chunk_id": "child-f8662c5ae57e6661adf83e3e00582e6c88c1a1e5",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--cache-strategy` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--cache\", \"--cache-strategy\", \"content\"]\n}) }}\n\n",
+        "line_start": 761,
+        "line_end": 767
+      },
+      {
+        "stable_chunk_id": "child-9143062b99cf2a1b5bef35ce88d45d47d198f83a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Suppress Violations\n\n",
+        "line_start": 768,
+        "line_end": 769
+      },
+      {
+        "stable_chunk_id": "child-2e5da7550d35aaa6ee8c58c2f3b85880f7b084ac",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--suppress-all`\n\nSuppresses existing violations, so that they are not being reported in subsequent runs. It allows you to enable one or more lint rules and be notified only when new violations show up. The suppressions are stored in `eslint-suppressions.json` by default, unless otherwise specified by `--suppressions-location`. The file gets updated with the new suppressions.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 770,
+        "line_end": 775
+      },
+      {
+        "stable_chunk_id": "child-fbd1dbb67a703c05d283b3806a9cb4011cf8702d",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--suppress-all` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--suppress-all\"]\n}) }}\n\n",
+        "line_start": 776,
+        "line_end": 782
+      },
+      {
+        "stable_chunk_id": "child-f20132d33aee9c22f1b52970bf8bd8745d210666",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--suppress-rule`\n\nSuppresses violations for specific rules, so that they are not being reported in subsequent runs. Similar to `--suppress-all`, the suppressions are stored in `eslint-suppressions.json` by default, unless otherwise specified by `--suppressions-location`. The file gets updated with the new suppressions.\n\n- **Argument Type**: String. Rule ID.\n- **Multiple Arguments**: Yes\n\n",
+        "line_start": 783,
+        "line_end": 789
+      },
+      {
+        "stable_chunk_id": "child-62ee9da73eb22ace384c37da7cfb6b39ba329bb3",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--suppress-rule` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--suppress-rule\", \"no-console\", \"--suppress-rule\", \"indent\"]\n}) }}\n\n",
+        "line_start": 790,
+        "line_end": 796
+      },
+      {
+        "stable_chunk_id": "child-fcb49da1c22f2ce1d5027a92d3951b31bbdcd33e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--suppressions-location`\n\nSpecify the path to the suppressions location. Can be a file or a directory.\n\n",
+        "line_start": 797,
+        "line_end": 800
+      },
+      {
+        "stable_chunk_id": "child-f9290ee48eef5b62555bbd8c759b30e65d764bfe",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "- **Argument Type**: String. Path to file or directory. If a directory is specified, a suppressions file is created inside the specified folder. The name of the file is based on the hash of the current working directory, e.g.: `suppressions_hashOfCWD`\n- **Multiple Arguments**: No\n- **Default Value**: If no location is specified, `eslint-suppressions.json` is used. The file is created in the directory where the `eslint` command is executed.\n\n",
+        "line_start": 801,
+        "line_end": 804
+      },
+      {
+        "stable_chunk_id": "child-8e9bf22821515f284a0c508ab4a9bcd188e779c7",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--suppressions-location` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--suppressions-location\", \"\\\".eslint-suppressions-example.json\\\"\"]\n}) }}\n\n",
+        "line_start": 805,
+        "line_end": 811
+      },
+      {
+        "stable_chunk_id": "child-076c00d87022d0681d636ef4afcde3cd5ade6354",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--prune-suppressions`\n\nPrune unused suppressions from the suppressions file. This option is useful when you addressed one or more of the suppressed violations.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 812,
+        "line_end": 817
+      },
+      {
+        "stable_chunk_id": "child-1bcf9227cd5a702a6fe46a6dfc55ec1d51a7df91",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--prune-suppressions` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--prune-suppressions\"]\n}) }}\n\n",
+        "line_start": 818,
+        "line_end": 824
+      },
+      {
+        "stable_chunk_id": "child-3f166b24657b8244c8b4e47f186e8c5edb2dc5c2",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--pass-on-unpruned-suppressions`\n\nIgnore unused suppressions. By default, ESLint exits with exit code `2` and displays an error message if there are unused suppressions in the suppressions file. When you use this flag, unused suppressions do not affect the exit code and ESLint doesn't output an error about unused suppressions.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 825,
+        "line_end": 830
+      },
+      {
+        "stable_chunk_id": "child-b093072bb10d4cd76489676efa1ece9c50cfbc2f",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--pass-on-unpruned-suppressions` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"src/**/*.js\\\"\", \"--pass-on-unpruned-suppressions\"]\n}) }}\n\n",
+        "line_start": 831,
+        "line_end": 837
+      },
+      {
+        "stable_chunk_id": "child-c57c960ec08ebd2778e1af00d3e793de09301e3a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "### Miscellaneous\n\n",
+        "line_start": 838,
+        "line_end": 839
+      },
+      {
+        "stable_chunk_id": "child-969b359d726dc16b8dc08e8fee7ccae4a73939a6",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--init`\n\nThis option runs `npm init @eslint/config` to start the config initialization wizard. It's designed to help new users quickly create an `eslint.config.js` file by answering a few questions. When you use this flag, the CLI does not perform linting.\n\n- **Argument Type**: No argument.\n\nThe resulting configuration file is created in the current directory.\n\n",
+        "line_start": 840,
+        "line_end": 847
+      },
+      {
+        "stable_chunk_id": "child-9242882fe18b9aed044f8f6b38bc4239f7f0e0f4",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--init` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--init\"]\n}) }}\n\n",
+        "line_start": 848,
+        "line_end": 854
+      },
+      {
+        "stable_chunk_id": "child-59ca952cb0800d294a50cc0db3c5af7854518ae7",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--env-info`\n\nThis option outputs information about the execution environment, including the version of Node.js, npm, and local and global installations of ESLint.\n\n- **Argument Type**: No argument.\n\nThe ESLint team may ask for this information to help solve bugs. When you use this flag, the CLI does not perform linting.\n\n",
+        "line_start": 855,
+        "line_end": 862
+      },
+      {
+        "stable_chunk_id": "child-f302caeb60e3ba3ac9e42ce301d42fe6e3d4a850",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--env-info` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--env-info\"]\n}) }}\n\n",
+        "line_start": 863,
+        "line_end": 869
+      },
+      {
+        "stable_chunk_id": "child-3fdd99d13de9cef36e0b33d5e07454629fd449af",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--no-error-on-unmatched-pattern`\n\nThis option prevents errors when a quoted glob pattern is unmatched. This does not prevent errors when your shell can't match a glob.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 870,
+        "line_end": 875
+      },
+      {
+        "stable_chunk_id": "child-8f84ee5b24603d0321f1cdaf510f971069c1fb3a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--no-error-on-unmatched-pattern` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--no-error-on-unmatched-pattern\", \"--ext\", \".ts\", \"\\\"lib/*\\\"\"]\n}) }}\n\n",
+        "line_start": 876,
+        "line_end": 882
+      },
+      {
+        "stable_chunk_id": "child-6d9cd9a98391b1b5e62d0c45b6723f9bd35d1fb4",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--exit-on-fatal-error`\n\nThis option causes ESLint to exit with exit code 2 if one or more fatal parsing errors occur. Without this option, ESLint reports fatal parsing errors as rule violations.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 883,
+        "line_end": 888
+      },
+      {
+        "stable_chunk_id": "child-4b58518c7f99fc352803ba15202c650646cf778a",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--exit-on-fatal-error` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--exit-on-fatal-error\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 889,
+        "line_end": 895
+      },
+      {
+        "stable_chunk_id": "child-c755d1413e34cd54404fe885e13127a5b8b1873b",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--no-warn-ignored`\n\nThis option suppresses both `File ignored by default` and `File ignored because of a matching ignore pattern` warnings when an ignored filename is passed explicitly. It is useful when paired with `--max-warnings 0` as it will prevent exit code 1 due to the aforementioned warning.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 896,
+        "line_end": 901
+      },
+      {
+        "stable_chunk_id": "child-0adcbe7c6d77867ab032376e1555ad561c44d189",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--no-warn-ignored` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--no-warn-ignored\", \"--max-warnings\", \"0\", \"ignored-file.js\"]\n}) }}\n\n",
+        "line_start": 902,
+        "line_end": 908
+      },
+      {
+        "stable_chunk_id": "child-deb1decefc87a71357fab1833833c7b013da0d25",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--pass-on-no-patterns`\n\nThis option allows ESLint to exit with code 0 when no file or directory patterns are passed. Without this option, ESLint assumes you want to use `.` as the pattern.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 909,
+        "line_end": 914
+      },
+      {
+        "stable_chunk_id": "child-21af437adb12b54d80d83fdf9d1146ab745c542f",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--pass-on-no-patterns` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--pass-on-no-patterns\"]\n}) }}\n\n",
+        "line_start": 915,
+        "line_end": 921
+      },
+      {
+        "stable_chunk_id": "child-c8e22a5928cc01ae142f2ebb463d076b510c6b4f",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--debug`\n\nThis option outputs debugging information to the console. Add this flag to an ESLint command line invocation in order to get extra debugging information while the command runs.\n\n- **Argument Type**: No argument.\n\nThis information is useful when you're seeing a problem and having a hard time pinpointing it. The ESLint team may ask for this debugging information to help solve bugs.\n\n",
+        "line_start": 922,
+        "line_end": 929
+      },
+      {
+        "stable_chunk_id": "child-c81df13fa164b5af694342b63228160da0f827eb",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--debug` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--debug\", \"test.js\"]\n}) }}\n\n",
+        "line_start": 930,
+        "line_end": 936
+      },
+      {
+        "stable_chunk_id": "child-2b7dd22e5f86738ff4e0a9acf2375a21e3d4fd77",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `-h`, `--help`\n\nThis option outputs the help menu, displaying all of the available options. All other options are ignored when this is present. When you use this flag, the CLI does not perform linting.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 937,
+        "line_end": 942
+      },
+      {
+        "stable_chunk_id": "child-be4f73b8563a3964729e3d17a06c6b78529db056",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `-h`, `--help` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--help\"]\n}) }}\n\n",
+        "line_start": 943,
+        "line_end": 949
+      },
+      {
+        "stable_chunk_id": "child-34306b2b3696566e530a7584880b5454ee276aa4",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `-v`, `--version`\n\nThis option outputs the current ESLint version onto the console. All other options are ignored when this is present. When you use this flag, the CLI does not perform linting.\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 950,
+        "line_end": 955
+      },
+      {
+        "stable_chunk_id": "child-80d6665b4ffdf6ab6e7b73ded0ec10935869d39e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `-v`, `--version` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--version\"]\n}) }}\n\n",
+        "line_start": 956,
+        "line_end": 962
+      },
+      {
+        "stable_chunk_id": "child-42b02c950f44657091cfbd1dd1a7b8fa4ea4fbd1",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--print-config`\n\nThis option outputs the configuration to be used for the file passed. When present, no linting is performed and only config-related options are valid. When you use this flag, the CLI does not perform linting.\n\n- **Argument Type**: String. Path to file.\n- **Multiple Arguments**: No\n\n",
+        "line_start": 963,
+        "line_end": 969
+      },
+      {
+        "stable_chunk_id": "child-1583402ebb8cf269054b4da00f4254ba4ca58277",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--print-config` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--print-config\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 970,
+        "line_end": 976
+      },
+      {
+        "stable_chunk_id": "child-a6ac01a04f9dabb0cfaad49367bddbeefef92f0e",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--stats`\n\nThis option adds a series of detailed performance statistics (see [Stats type](../extend/stats#-stats-type)) such as the _parse_-, _fix_- and _lint_-times (time per rule) to [`result`](../integrate/nodejs-api#-lintresult-type) objects that are passed to the formatter (see [Stats CLI usage](../extend/stats#cli-usage)).\n\n- **Argument Type**: No argument.\n\n",
+        "line_start": 977,
+        "line_end": 982
+      },
+      {
+        "stable_chunk_id": "child-f0369c8a9525915266453283c7c1541f3eab75ee",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "This option is intended for use with custom formatters that display statistics. It can also be used with the built-in `json` formatter.\n\n",
+        "line_start": 983,
+        "line_end": 984
+      },
+      {
+        "stable_chunk_id": "child-cb0c167475e6232d823a8f669c874a3ad2ac91a1",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--stats` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--stats\", \"--format\", \"json\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 985,
+        "line_end": 991
+      },
+      {
+        "stable_chunk_id": "child-e6bc794af463d2ef2d0cae17b5de6b4b297d23ce",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--flag`\n\nThis option enables one or more feature flags for ESLint.\n\n- **Argument Type**: String. A feature identifier.\n- **Multiple Arguments**: Yes\n\n",
+        "line_start": 992,
+        "line_end": 998
+      },
+      {
+        "stable_chunk_id": "child-bbc8e111b36f0b8862762569209a20d3421fff9c",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--flag` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--flag\", \"x_feature\", \"file.js\"]\n}) }}\n\n",
+        "line_start": 999,
+        "line_end": 1005
+      },
+      {
+        "stable_chunk_id": "child-43f77412dcdf7ab5339bc597d447d839b0163f03",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--mcp`\n\nThis option starts the ESLint MCP server for use with AI agents.\n\n- **Argument Type**: No argument.\n- **Multiple Arguments**: No\n\n",
+        "line_start": 1006,
+        "line_end": 1012
+      },
+      {
+        "stable_chunk_id": "child-07ab3770a5e7d110eeff6b25bc859f658f0e4b10",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--mcp` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--mcp\"]\n}) }}\n\n",
+        "line_start": 1013,
+        "line_end": 1019
+      },
+      {
+        "stable_chunk_id": "child-53611ad64398a292ec8da1725c50b93497cb6005",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "#### `--concurrency`\n\nThis option controls the number of worker threads used to lint files.\n\n- **Argument Type**: Int|String. A positive integer, `auto` or `off`.\n- **Multiple Arguments**: No\n- **Default Value**: `off`\n\nThe value `off` causes all files to be linted in the main thread. The value `auto` attempts to determine the best setting automatically.\n\n",
+        "line_start": 1020,
+        "line_end": 1029
+      },
+      {
+        "stable_chunk_id": "child-eca43b50006ff5707f71a1c7b670f7c685dd02f3",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "##### `--concurrency` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"--concurrency\", \"auto\"]\n}) }}\n\n",
+        "line_start": 1030,
+        "line_end": 1036
+      },
+      {
+        "stable_chunk_id": "child-b1b197816ad5664eaba1165acccb333153d4ddf4",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "## Exit Codes\n\n",
+        "line_start": 1037,
+        "line_end": 1038
+      },
+      {
+        "stable_chunk_id": "child-4223917c200d1af106f13b72973e8fcc69314b75",
+        "source_path": "docs/src/use/command-line-interface.md",
+        "display_text": "When linting files, ESLint exits with one of the following exit codes:\n\n- `0`: Linting was successful and there are no linting errors. If the [`--max-warnings`](#--max-warnings) flag is set to `n`, the number of linting warnings is at most `n`.\n- `1`: Linting was successful and there is at least one linting error, or there are more linting warnings than allowed by the [`--max-warnings`](#--max-warnings) option.\n- `2`: Linting was unsuccessful due to a configuration problem or an internal error.\n",
+        "line_start": 1039,
+        "line_end": 1043
+      },
+      {
+        "stable_chunk_id": "child-c3186863ab68ba12e7decc0305f273bbd6d558d3",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "---\ntitle: Configuration Files\neleventyNavigation:\n    key: configuration files\n    parent: configure\n    title: Configuration Files\n    order: 1\n---\n\n{%- from 'components/npx_tabs.macro.html' import npx_tabs %}\n{%- from 'components/npm_tabs.macro.html' import npm_tabs with context %}\n\n::: tip\nThis page explains how to use flat config files.\n:::\n\n",
+        "line_start": 1,
+        "line_end": 16
+      },
+      {
+        "stable_chunk_id": "child-af3b93c13de5b4f065151dfbd573af29899afa54",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "You can put your ESLint project configuration in a configuration file. You can include built-in rules, how you want them enforced, plugins with custom rules, shareable configurations, which files you want rules to apply to, and more.\n\n",
+        "line_start": 17,
+        "line_end": 18
+      },
+      {
+        "stable_chunk_id": "child-9f486d482a3738ad4499152039ba507b6a818fa4",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\n",
+        "line_start": 19,
+        "line_end": 29
+      },
+      {
+        "stable_chunk_id": "child-83a53e0efb9d6026ec4480dfb264caef248816d6",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "It should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t\t\"prefer-const\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 30,
+        "line_end": 45
+      },
+      {
+        "stable_chunk_id": "child-5caa68878b87efaf70ca110542d20fd0f0614daf",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "In this example, the `defineConfig()` helper is used to define a configuration array with just one configuration object. The configuration object enables two rules: `semi` and `prefer-const`. These rules are applied to all of the files ESLint processes using this config file.\n\nIf your project specifies `\"type\": \"commonjs\"` in its `package.json` file, then `eslint.config.js` must be in CommonJS format, such as:\n\n",
+        "line_start": 46,
+        "line_end": 49
+      },
+      {
+        "stable_chunk_id": "child-76c67c17c18e9b7fff04fab2c5e5f691347dc432",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nconst { defineConfig } = require(\"eslint/config\");\n\nmodule.exports = defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t\t\"prefer-const\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 50,
+        "line_end": 63
+      },
+      {
+        "stable_chunk_id": "child-1672ecacdc39831eacd527a14b6fbb51b2e442d8",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "## Configuration Objects\n\nEach configuration object contains all of the information ESLint needs to execute on a set of files. Each configuration object is made up of these properties:\n\n- `name` - A name for the configuration object. This is used in error messages and [config inspector](https://github.com/eslint/config-inspector) to help identify which configuration object is being used. ([Naming Convention](#configuration-naming-conventions))\n",
+        "line_start": 64,
+        "line_end": 68
+      },
+      {
+        "stable_chunk_id": "child-9baaf44666723a136538a9f96a3e6c790f29acb6",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "- `basePath` - A string specifying the path to a subdirectory to which the configuration object should apply to. It can be a relative or an absolute path.\n- `files` - An array of glob patterns indicating the files that the configuration object should apply to. If not specified, the configuration object applies to all files matched by any other configuration object.\n",
+        "line_start": 69,
+        "line_end": 70
+      },
+      {
+        "stable_chunk_id": "child-35505208d54a1a68f347520f67392e2a67935485",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "- `ignores` - An array of glob patterns indicating the files that the configuration object should not apply to. If not specified, the configuration object applies to all files matched by `files`. If `ignores` is used without any other keys in the configuration object, then the patterns act as [global ignores](#globally-ignore-files-with-ignores) and it gets applied to every configuration object.\n",
+        "line_start": 71,
+        "line_end": 71
+      },
+      {
+        "stable_chunk_id": "child-2fa02d9745f6d12527aab44b33aa12b9ef275083",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "- `extends` - An array of strings, configuration objects, or configuration arrays that contain additional configuration to apply.\n- `language` - A string specifying the [language](../../extend/languages) used for linting, in the format `\"pluginName/languageName\"`, e.g. `\"markdown/commonmark\"`. (default: `\"js/js\"` for JavaScript)\n",
+        "line_start": 72,
+        "line_end": 73
+      },
+      {
+        "stable_chunk_id": "child-a4434e2f0265c4dca79347d713eaaf4122b29eae",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "- `languageOptions` - An object containing settings related to how the specified language is configured for linting. For JavaScript, the settings are:\n    - `ecmaVersion` - The version of ECMAScript to support. May be any year (i.e., `2022`) or version (i.e., `5`). Set to `\"latest\"` for the most recent supported version. (default: `\"latest\"`)\n",
+        "line_start": 74,
+        "line_end": 75
+      },
+      {
+        "stable_chunk_id": "child-a041e47a85b335a569635920d9fdba3fb23bab5f",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "    - `sourceType` - The type of JavaScript source code. Possible values are `\"script\"` for traditional script files, `\"module\"` for ECMAScript modules (ESM), and `\"commonjs\"` for CommonJS files. (default: `\"module\"` for `.js` and `.mjs` files; `\"commonjs\"` for `.cjs` files)\n    - `globals` - An object specifying additional objects that should be added to the global scope during linting.\n",
+        "line_start": 76,
+        "line_end": 77
+      },
+      {
+        "stable_chunk_id": "child-e9594b4b5e44129be8b40b18973bc47ffd3ca51f",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "    - `parser` - An object containing a `parse()` method or a `parseForESLint()` method. (default: [`espree`](https://github.com/eslint/js/tree/main/packages/espree))\n    - `parserOptions` - An object specifying additional options that are passed directly to the `parse()` or `parseForESLint()` method on the parser. The available options are parser-dependent.\n- `linterOptions` - An object containing settings related to the linting process.\n",
+        "line_start": 78,
+        "line_end": 80
+      },
+      {
+        "stable_chunk_id": "child-be413ac7eac2fa8a4b1d1a4d864c27436c62dd0e",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "    - `noInlineConfig` - A Boolean value indicating if inline configuration is allowed.\n    - `reportUnusedDisableDirectives` - A severity string indicating if and how unused disable and enable directives should be tracked and reported. For legacy compatibility, `true` is equivalent to `\"warn\"` and `false` is equivalent to `\"off\"`. (default: `\"warn\"`).\n",
+        "line_start": 81,
+        "line_end": 82
+      },
+      {
+        "stable_chunk_id": "child-c5e96170e118eb12044535c8c0805599cd439a3b",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "    - `reportUnusedInlineConfigs` - A severity string indicating if and how unused inline configs should be tracked and reported. (default: `\"off\"`)\n- `processor` - Either an object containing `preprocess()` and `postprocess()` methods or a string indicating the name of a processor inside of a plugin (i.e., `\"pluginName/processorName\"`).\n",
+        "line_start": 83,
+        "line_end": 84
+      },
+      {
+        "stable_chunk_id": "child-62b0b69d19afd9082031c73c49bb7f63b6efd91d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "- `plugins` - An object containing a name-value mapping of plugin names to plugin objects. When `files` is specified, these plugins are only available to the matching files.\n- `rules` - An object containing the configured rules. When `files` or `ignores` are specified, these rule configurations are only available to the matching files.\n- `settings` - An object containing name-value pairs of information that should be available to all rules.\n\n",
+        "line_start": 85,
+        "line_end": 88
+      },
+      {
+        "stable_chunk_id": "child-45fadf03c8d4943e306fd6118e838574207fe3a5",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Specify `files` and `ignores`\n\n",
+        "line_start": 89,
+        "line_end": 90
+      },
+      {
+        "stable_chunk_id": "child-7983811129a982240e34d1fe20f7db241d61be73",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "::: tip\nPatterns specified in `files` and `ignores` use [`minimatch`](https://www.npmjs.com/package/minimatch) syntax and are evaluated relative to the location of the `eslint.config.js` file. If using an alternate config file via the `--config` command line option, then all patterns are evaluated relative to the current working directory. In case the configuration object has the `basePath` property with a relative path, the subdirectory it specifies is evaluated relative to the location of the `eslint.config.js` file (or relative to the current working directory if using an alternate config file via the `--config` command line option). In configuration objects with the `basePath` property, patterns specified in `files` and `ignores` are evaluated relative to the subdirectory represented by the `basePath`.\n:::\n\n",
+        "line_start": 91,
+        "line_end": 94
+      },
+      {
+        "stable_chunk_id": "child-c8aa518a49bde4fcc40f3e36924bad575df8b180",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "You can use a combination of `files` and `ignores` to determine which files the configuration object should apply to and which not. Here's an example:\n\n",
+        "line_start": 95,
+        "line_end": 96
+      },
+      {
+        "stable_chunk_id": "child-184ccacff5ae82b87505b41c5135b3389b7c77a2",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t// matches all files ending with .js\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n\n\t// matches all files ending with .js except those in __tests\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tignores: [\"__tests/**\"],\n\t\trules: {\n\t\t\t\"no-console\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 97,
+        "line_end": 120
+      },
+      {
+        "stable_chunk_id": "child-892d69acf6d01bdc40793d7b6928793bb5e16fd8",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Configuration objects without `files` or `ignores` are automatically applied to any file that is matched by any other configuration object. For example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t// matches all files because it doesn't specify the `files` or `ignores` key\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 121,
+        "line_end": 136
+      },
+      {
+        "stable_chunk_id": "child-504a71470491dd1c06336aef2def910d8a224465",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "With this configuration, the `semi` rule is enabled for all files that match the default files in ESLint. So if you pass `example.js` to ESLint, the `semi` rule is applied. If you pass a non-JavaScript file, like `example.txt`, the `semi` rule is not applied because there are no other configuration objects that match that filename. (ESLint outputs an error message letting you know that the file was ignored due to missing configuration.)\n\n",
+        "line_start": 137,
+        "line_end": 138
+      },
+      {
+        "stable_chunk_id": "child-8ed428d0045a575d3147e436f538afc49efc6781",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "::: important\nBy default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. Those files are always matched unless you explicitly exclude them using [global ignores](#globally-ignore-files-with-ignores).\nIf your configuration object includes other patterns, the rules in configuration objects without a `files` key will also apply to these patterns.\n\n",
+        "line_start": 139,
+        "line_end": 142
+      },
+      {
+        "stable_chunk_id": "child-e364fca692524bf00bf3b5c46a5bc1c8d6bdeeb3",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Therefore, when using ESLint for non-JS files as well, it is more appropriate to create a configuration object that includes `files: [\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]` and place the relevant rules there.\n:::\n\n",
+        "line_start": 143,
+        "line_end": 145
+      },
+      {
+        "stable_chunk_id": "child-43ffbaee7118ee41aef5d544c95955247518b1a4",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Specify files with arbitrary extensions\n\n",
+        "line_start": 146,
+        "line_end": 147
+      },
+      {
+        "stable_chunk_id": "child-6e7e02e3573cffa05e07898c49f377b48dc48a87",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "To lint files with extensions other than the default `.js`, `.cjs` and `.mjs`, include them in `files` with a pattern in the format of `\"**/*.extension\"`. Any pattern will work except if it is `*` or if it ends with `/*` or `/**`.\nFor example, to lint TypeScript files with `.ts`, `.cts` and `.mts` extensions, you would specify a configuration object like this:\n\n",
+        "line_start": 148,
+        "line_end": 150
+      },
+      {
+        "stable_chunk_id": "child-7dfd8859062c8b88309774d2cb48264aefb3c91d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.ts\", \"**/*.cts\", \"**/*.mts\"],\n\t},\n\t// ...other config\n]);\n```\n\n",
+        "line_start": 151,
+        "line_end": 162
+      },
+      {
+        "stable_chunk_id": "child-a18190767370fd3244aa64d5208c56f78b799593",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Specify files without extension\n\nFiles without an extension can be matched with the pattern `!(*.*)`. For example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/!(*.*)\"],\n\t},\n\t// ...other config\n]);\n```\n\n",
+        "line_start": 163,
+        "line_end": 178
+      },
+      {
+        "stable_chunk_id": "child-f0ea3c195559a68ea7dc1dddcf0bf2b626902a67",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "The above config lints files without extension besides the default `.js`, `.cjs` and `.mjs` extensions in all directories.\n::: tip\nFilenames starting with a dot, such as `.gitignore`, are considered to have only an extension without a base name. In the case of `.gitignore`, the extension is `gitignore`, so the file matches the pattern `\"**/.gitignore\"` but not `\"**/*.gitignore\"`.\n:::\n\n",
+        "line_start": 179,
+        "line_end": 183
+      },
+      {
+        "stable_chunk_id": "child-da95d7057c29af7276431d2415260384c1fa411d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Specify files with an AND operation\n\nMultiple patterns can be matched against the same file by using an array of strings inside of the `files` array. For example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [[\"src/*\", \"**/*.js\"]],\n\t},\n\t// ...other config\n]);\n```\n\n",
+        "line_start": 184,
+        "line_end": 199
+      },
+      {
+        "stable_chunk_id": "child-848b6bb768fef044320559790e032a0086014654",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "The pattern `[\"src/*\", \"**/*.js\"]` matches when a file is both inside of the `src` directory and also ends with `.js`. This approach can be helpful when you're dynamically calculating the value of the `files` array and want to avoid potential errors by trying to combine multiple glob patterns into a single string.\n\n",
+        "line_start": 200,
+        "line_end": 201
+      },
+      {
+        "stable_chunk_id": "child-e5de3f0585b47fbaeef84a27ea3fc8e424faddd8",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Exclude files with `ignores`\n\nYou can limit which files a configuration object applies to by specifying a combination of `files` and `ignores` patterns. For example, you may want certain rules to apply only to files in your `src` directory:\n\n",
+        "line_start": 202,
+        "line_end": 205
+      },
+      {
+        "stable_chunk_id": "child-9ddd10b1f1b86e8042972a77d09044e5ad233abc",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"src/**/*.js\"],\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 206,
+        "line_end": 219
+      },
+      {
+        "stable_chunk_id": "child-45dfa0d15aa60da425f6c3c44a69450587b9dc01",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Here, only the JavaScript files in the `src` directory have the `semi` rule applied. If you run ESLint on files in another directory, this configuration object is skipped. By adding `ignores`, you can also remove some of the files in `src` from this configuration object:\n\n",
+        "line_start": 220,
+        "line_end": 221
+      },
+      {
+        "stable_chunk_id": "child-b06227e126af9ee2bc5377446ed78ecf9f73d376",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"src/**/*.js\"],\n\t\tignores: [\"**/*.config.js\"],\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 222,
+        "line_end": 236
+      },
+      {
+        "stable_chunk_id": "child-40c5cb2195b30b86ea8dc201759872fc261f5fb2",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "This configuration object matches all JavaScript files in the `src` directory except those that end with `.config.js`. You can also use negation patterns in `ignores` to exclude files from the ignore patterns, such as:\n\n",
+        "line_start": 237,
+        "line_end": 238
+      },
+      {
+        "stable_chunk_id": "child-9f18fb6f166691cbe1ed0a5714435cf08e0d2c41",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"src/**/*.js\"],\n\t\tignores: [\"**/*.config.js\", \"!**/eslint.config.js\"],\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n]);\n```\n\nHere, the configuration object excludes files ending with `.config.js` except for `eslint.config.js`. That file still has `semi` applied.\n\n",
+        "line_start": 239,
+        "line_end": 255
+      },
+      {
+        "stable_chunk_id": "child-820e8324adca914dc8fc9ce5bbdabb15bfe18365",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Non-global `ignores` patterns can only match file names. A pattern like `\"dir-to-exclude/\"` will not ignore anything. To ignore everything in a particular directory, a pattern like `\"dir-to-exclude/**\"` should be used instead.\n\n",
+        "line_start": 256,
+        "line_end": 257
+      },
+      {
+        "stable_chunk_id": "child-6d4c8c055300df354f24279223737d373ec35bc1",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "If `ignores` is used without `files` and there are other keys (such as `rules`), then the configuration object applies to all linted files except the ones excluded by `ignores`, for example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tignores: [\"**/*.config.js\"],\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 258,
+        "line_end": 273
+      },
+      {
+        "stable_chunk_id": "child-a5bc8faffd2de28f42e6b11a04c21b28e71452e0",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "This configuration object applies to all JavaScript files except those ending with `.config.js`. Effectively, this is like having `files` set to `**/*`. In general, it's a good idea to always include `files` if you are specifying `ignores`.\n\n",
+        "line_start": 274,
+        "line_end": 275
+      },
+      {
+        "stable_chunk_id": "child-ccf158a87a85a8f17e8950dd5719df9ae530f9da",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Note that when `files` is not specified, negated `ignores` patterns do not cause any matching files to be linted automatically.\nESLint only lints files that are matched either by default or by a `files` pattern that is not `*` and does not end with `/*` or `/**`.\n\n",
+        "line_start": 276,
+        "line_end": 278
+      },
+      {
+        "stable_chunk_id": "child-ceeb9649e4ac265a74e9a13aae1956c05f00bc3f",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "::: tip\nUse the [config inspector](https://github.com/eslint/config-inspector) (`--inspect-config` in the CLI) to test which config objects apply to a specific file.\n:::\n\n",
+        "line_start": 279,
+        "line_end": 282
+      },
+      {
+        "stable_chunk_id": "child-5a4ad75cf2487e1f0e1f8e352317fd8dc6b2def2",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Globally ignore files with `ignores`\n\nDepending on how the `ignores` property is used, it can behave as non-global `ignores` or as global `ignores`.\n\n",
+        "line_start": 283,
+        "line_end": 286
+      },
+      {
+        "stable_chunk_id": "child-8359ef5f011e71cd951d03b5edda90fa7920bf26",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "- When `ignores` is used without any other keys (besides `name`) in the configuration object, then the patterns act as global ignores. This means they apply to every configuration object (not only to the configuration object in which it is defined). Global `ignores` allows you not to have to copy and keep the `ignores` property synchronized in more than one configuration object.\n- If `ignores` is used with other properties in the same configuration object, then the patterns act as non-global ignores. This way `ignores` applies only to the configuration object in which it is defined.\n\n",
+        "line_start": 287,
+        "line_end": 289
+      },
+      {
+        "stable_chunk_id": "child-bc441a2552ab22acc03a4739767f8bf31675738b",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Global and non-global `ignores` have some usage differences:\n\n- patterns in non-global `ignores` only match the files (`dir/filename.js`) or files within directories (`dir/**`)\n- patterns in global `ignores` can match directories (`dir/`) in addition to the patterns that non-global ignores supports.\n\n",
+        "line_start": 290,
+        "line_end": 294
+      },
+      {
+        "stable_chunk_id": "child-88a06e6d22c8a7b3f6f4102e5dce6fc663e2b2d3",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "For all uses of `ignores`:\n\n- The patterns you define are added after the default ESLint patterns, which are `[\"**/node_modules/\", \".git/\"]`.\n- The patterns always match files and directories that begin with a dot, such as `.foo.js` or `.fixtures`, unless those files are explicitly ignored. The only dot directory ignored by default is `.git`.\n\n",
+        "line_start": 295,
+        "line_end": 299
+      },
+      {
+        "stable_chunk_id": "child-f23e0d34da48e4bcf83eeb97b2ae6e0a79f74a96",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\n// Example of global ignores\nexport default defineConfig([\n    {\n      ignores: [\".config/\", \"dist/\", \"tsconfig.json\"] // acts as global ignores, due to the absence of other properties\n    },\n    { ... }, // ... other configuration object, inherit global ignores\n    { ... }, // ... other configuration object, inherit global ignores\n]);\n\n// Example of non-global ignores\nexport default defineConfig([\n    {\n      ignores: [\".config/**\", \"dir1/script1.js\"],\n      rules: { ... } // the presence of this property dictates non-global ignores\n    },\n    {\n      ignores: [\"other-dir/**\", \"dist/script2.js\"],\n      rules: { ... } // the presence of this property dictates non-global ignores\n    },\n]);\n```\n\n",
+        "line_start": 300,
+        "line_end": 325
+      },
+      {
+        "stable_chunk_id": "child-0cd558e679644539c0e08d748a0616e5e0f65c57",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "To avoid confusion, use the `globalIgnores()` helper function to clearly indicate which ignores are meant to be global. Here's the previous example rewritten to use `globalIgnores()`:\n\n",
+        "line_start": 326,
+        "line_end": 327
+      },
+      {
+        "stable_chunk_id": "child-a7be52e0b5082e1f906c7a3dacb4ed04fd41a317",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\n// Example of global ignores\nexport default defineConfig([\n    globalIgnores([\".config/\", \"dist/\", \"tsconfig.json\"]),\n    { ... }, // ... other configuration object, inherit global ignores\n    { ... }, // ... other configuration object, inherit global ignores\n]);\n\n// Example of non-global ignores\nexport default defineConfig([\n    {\n      ignores: [\".config/**\", \"dir1/script1.js\"],\n      rules: { ... } // the presence of this property dictates non-global ignores\n    },\n    {\n      ignores: [\"other-dir/**\", \"dist/script2.js\"],\n      rules: { ... } // the presence of this property dictates non-global ignores\n    },\n]);\n```\n\n",
+        "line_start": 328,
+        "line_end": 351
+      },
+      {
+        "stable_chunk_id": "child-96d297226fc5022690f4d63f47f1dd51dbb54da1",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "For more information and examples on configuring rules regarding `ignores`, see [Ignore Files](ignore).\n\n",
+        "line_start": 352,
+        "line_end": 353
+      },
+      {
+        "stable_chunk_id": "child-2b1283f30f49ae6c665b60538f29839454c84154",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Specify base path\n\nYou can optionally specify `basePath` to apply the configuration object to a specific subdirectory (including its subdirectories).\n\n",
+        "line_start": 354,
+        "line_end": 357
+      },
+      {
+        "stable_chunk_id": "child-09952cede64ebafcbe9b82c0ac5846bffa8710da",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t// matches all files in tests and its subdirectories\n\t{\n\t\tbasePath: \"tests\",\n\t\trules: {\n\t\t\t\"no-undef\": \"error\",\n\t\t},\n\t},\n\n\t// matches all files ending with spec.js in tests and its subdirectories\n\t{\n\t\tbasePath: \"tests\",\n\t\tfiles: [\"**/*.spec.js\"],\n\t\tlanguageOptions: {\n\t\t\tglobals: {\n\t\t\t\tit: \"readonly\",\n\t\t\t\tdescribe: \"readonly\",\n\t\t\t},\n\t\t},\n\t},\n\n\t// globally ignores tests/fixtures directory\n\t{\n\t\tbasePath: \"tests\",\n\t\tignores: [\"fixtures/\"],\n\t},\n]);\n```\n\n",
+        "line_start": 358,
+        "line_end": 390
+      },
+      {
+        "stable_chunk_id": "child-b0af3883247fa6eb4276c5fcfd067dbd977b126f",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "In combination with [`extends`](#extending-configurations), multiple configuration objects can be applied to the same subdirectory by specifying `basePath` only once, like this:\n\n",
+        "line_start": 391,
+        "line_end": 392
+      },
+      {
+        "stable_chunk_id": "child-db16aadcabe6c7f576e13de23bf77eba7d854967",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tbasePath: \"tests\",\n\t\textends: [\n\t\t\t// matches all files in tests and its subdirectories\n\t\t\t{\n\t\t\t\trules: {\n\t\t\t\t\t\"no-undef\": \"error\",\n\t\t\t\t},\n\t\t\t},\n\n\t\t\t// matches all files ending with spec.js in tests and its subdirectories\n\t\t\t{\n\t\t\t\tfiles: [\"**/*.spec.js\"],\n\t\t\t\tlanguageOptions: {\n\t\t\t\t\tglobals: {\n\t\t\t\t\t\tit: \"readonly\",\n\t\t\t\t\t\tdescribe: \"readonly\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\n\t\t\t// globally ignores tests/fixtures directory\n\t\t\t{\n\t\t\t\tignores: [\"fixtures/\"],\n\t\t\t},\n\t\t],\n\t},\n]);\n```\n\n",
+        "line_start": 393,
+        "line_end": 427
+      },
+      {
+        "stable_chunk_id": "child-7dc3ef47aec78ee9901abdd4d908029b6c57d7ab",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Cascading Configuration Objects\n\nWhen more than one configuration object matches a given filename, the configuration objects are merged with later objects overriding previous objects when there is a conflict. For example:\n\n",
+        "line_start": 428,
+        "line_end": 431
+      },
+      {
+        "stable_chunk_id": "child-357c6c5eb1f4b31c1db41d0b70fd1f23a96ddf94",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tlanguageOptions: {\n\t\t\tglobals: {\n\t\t\t\tMY_CUSTOM_GLOBAL: \"readonly\",\n\t\t\t},\n\t\t},\n\t},\n\t{\n\t\tfiles: [\"tests/**/*.js\"],\n\t\tlanguageOptions: {\n\t\t\tglobals: {\n\t\t\t\tit: \"readonly\",\n\t\t\t\tdescribe: \"readonly\",\n\t\t\t},\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 432,
+        "line_end": 456
+      },
+      {
+        "stable_chunk_id": "child-b74cf267c9bb2eb78d2b8d38f8dd342e7df50cc5",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Using this configuration, all JavaScript files define a custom global object defined called `MY_CUSTOM_GLOBAL` while those JavaScript files in the `tests` directory have `it` and `describe` defined as global objects in addition to `MY_CUSTOM_GLOBAL`. For any JavaScript file in the `tests` directory, both configuration objects are applied, so `languageOptions.globals` are merged to create a final result.\n\n",
+        "line_start": 457,
+        "line_end": 458
+      },
+      {
+        "stable_chunk_id": "child-6516574d4362e7548a87547ac7261cb28a31e529",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Configure Linter Options\n\nOptions specific to the linting process can be configured using the `linterOptions` object. These effect how linting proceeds and does not affect how the source code of the file is interpreted.\n\n",
+        "line_start": 459,
+        "line_end": 462
+      },
+      {
+        "stable_chunk_id": "child-8e52d9aae18f736bed22a1b2fc83f9cba8c11044",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Disable Inline Configuration\n\nInline configuration is implemented using an `/*eslint*/` comment, such as `/*eslint semi: error*/`. You can disallow inline configuration by setting `noInlineConfig` to `true`. When enabled, all inline configuration is ignored. Here's an example:\n\n",
+        "line_start": 463,
+        "line_end": 466
+      },
+      {
+        "stable_chunk_id": "child-80dc7553a0aab63c8dafaeb835025d953d0c10bf",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tlinterOptions: {\n\t\t\tnoInlineConfig: true,\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 467,
+        "line_end": 480
+      },
+      {
+        "stable_chunk_id": "child-3ba5ba6ab9483f9ac478ea9818d19d6063595cbd",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Report Unused Disable Directives\n\n",
+        "line_start": 481,
+        "line_end": 482
+      },
+      {
+        "stable_chunk_id": "child-59a9bdaef2bb34963cdfa2d82955e84999a68ec0",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Disable and enable directives such as `/*eslint-disable*/`, `/*eslint-enable*/` and `/*eslint-disable-next-line*/` are used to disable ESLint rules around certain portions of code. As code changes, it's possible for these directives to no longer be needed because the code has changed in such a way that the rule is no longer triggered. You can enable reporting of these unused disable directives by setting the `reportUnusedDisableDirectives` option to a severity string, as in this example:\n\n",
+        "line_start": 483,
+        "line_end": 484
+      },
+      {
+        "stable_chunk_id": "child-af41cac701647264aa2743bef1fee06e176da38d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tlinterOptions: {\n\t\t\treportUnusedDisableDirectives: \"error\",\n\t\t},\n\t},\n]);\n```\n\nThis setting defaults to `\"warn\"`.\n\n",
+        "line_start": 485,
+        "line_end": 500
+      },
+      {
+        "stable_chunk_id": "child-3c991e815dafc37c6c56fa4f690929a3c3f1d5b1",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "You can override this setting using the [`--report-unused-disable-directives`](../command-line-interface#--report-unused-disable-directives) or the [`--report-unused-disable-directives-severity`](../command-line-interface#--report-unused-disable-directives-severity) command line options.\n\nFor legacy compatibility, `true` is equivalent to `\"warn\"` and `false` is equivalent to `\"off\"`.\n\n",
+        "line_start": 501,
+        "line_end": 504
+      },
+      {
+        "stable_chunk_id": "child-e0bd4eda37b279a500d6bdb4176da52127329658",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Report Unused Inline Configs\n\n",
+        "line_start": 505,
+        "line_end": 506
+      },
+      {
+        "stable_chunk_id": "child-a60ce1ff1ca28b966118368326127e88fbd2de26",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Inline config comments such as `/* eslint rule-name: \"error\" */` are used to change ESLint rule severity and/or options around certain portions of code.\nAs a project's ESLint configuration file changes, it's possible for these directives to no longer be different from what was already set.\nYou can enable reporting of these unused inline config comments by setting the `reportUnusedInlineConfigs` option to a severity string, as in this example:\n\n",
+        "line_start": 507,
+        "line_end": 510
+      },
+      {
+        "stable_chunk_id": "child-c1fe08c9518a57cc3b167a099c1ab1bd7d522225",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tlinterOptions: {\n\t\t\treportUnusedInlineConfigs: \"error\",\n\t\t},\n\t},\n]);\n```\n\nYou can override this setting using the [`--report-unused-inline-configs`](../command-line-interface#--report-unused-inline-configs) command line option.\n\n",
+        "line_start": 511,
+        "line_end": 526
+      },
+      {
+        "stable_chunk_id": "child-0352af76f7bc5d33b8aec6190d6abc1c9e58351b",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Configure Rules\n\nYou can configure any number of rules in a configuration object by adding a `rules` property containing an object with your rule configurations. The names in this object are the names of the rules and the values are the configurations for each of those rules. Here's an example:\n\n",
+        "line_start": 527,
+        "line_end": 530
+      },
+      {
+        "stable_chunk_id": "child-7e408dbd557e1c199a22db150aa1e7d620bcfcd0",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 531,
+        "line_end": 543
+      },
+      {
+        "stable_chunk_id": "child-b4cb15a725bf4f516e4d3202f9242b76fd7607b5",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "This configuration object specifies that the [`semi`](../../rules/semi) rule should be enabled with a severity of `\"error\"`. You can also provide options to a rule by specifying an array where the first item is the severity and each item after that is an option for the rule. For example, you can switch the `semi` rule to disallow semicolons by passing `\"never\"` as an option:\n\n",
+        "line_start": 544,
+        "line_end": 545
+      },
+      {
+        "stable_chunk_id": "child-d6d921ee0911c433030113dc35cd8dc1505b95aa",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: [\"error\", \"never\"],\n\t\t},\n\t},\n]);\n```\n\nEach rule specifies its own options and can be any valid JSON data type. Please check the documentation for the rule you want to configure for more information about its available options.\n\nFor more information on configuring rules, see [Configure Rules](rules).\n\n",
+        "line_start": 546,
+        "line_end": 562
+      },
+      {
+        "stable_chunk_id": "child-c47a3169db635b5fcfa35018cca9ab07dd9f0f56",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Configure Shared Settings\n\n",
+        "line_start": 563,
+        "line_end": 564
+      },
+      {
+        "stable_chunk_id": "child-7c70bd0e8452155b3bc8692e580f3347012dc714",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "ESLint supports adding shared settings into configuration files. When you add a `settings` object to a configuration object, it is supplied to every rule. By convention, plugins namespace the settings they are interested in to avoid collisions with others. Plugins can use `settings` to specify the information that should be shared across all of their rules. This may be useful if you are adding custom rules and want them to have access to the same information. Here's an example:\n\n",
+        "line_start": 565,
+        "line_end": 566
+      },
+      {
+        "stable_chunk_id": "child-68c452cf4449f2d881e785dd5afb74502a37ba3d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tsettings: {\n\t\t\tsharedData: \"Hello\",\n\t\t},\n\t\tplugins: {\n\t\t\tcustomPlugin: {\n\t\t\t\trules: {\n\t\t\t\t\t\"my-rule\": {\n\t\t\t\t\t\tmeta: {\n\t\t\t\t\t\t\t// custom rule's meta information\n\t\t\t\t\t\t},\n\t\t\t\t\t\tcreate(context) {\n\t\t\t\t\t\t\tconst sharedData = context.settings.sharedData;\n\t\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\t\t// code\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t\trules: {\n\t\t\t\"customPlugin/my-rule\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 567,
+        "line_end": 599
+      },
+      {
+        "stable_chunk_id": "child-81c45cb05ca5a56d5b168dd49b8c49cb56a35d97",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Extending Configurations\n\n",
+        "line_start": 600,
+        "line_end": 601
+      },
+      {
+        "stable_chunk_id": "child-bb31d933769ddb982c986f7573ce83f24746af04",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "A configuration object uses `extends` to inherit all the traits of another configuration object or array (including rules, plugins, and language options) and can then modify all the options. The `extends` key is an array of values indicating which configurations to extend from. The elements of the `extends` array can be one of three values:\n\n- a string that specifies the name of a configuration in a plugin\n- a configuration object\n- a configuration array\n\n",
+        "line_start": 602,
+        "line_end": 607
+      },
+      {
+        "stable_chunk_id": "child-8d80e30b065d6ad474e0e323e66968f7e9392974",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Use Configurations from Plugins\n\nESLint plugins can export predefined configurations. These configurations are referenced using a string and follow the pattern `pluginName/configName`. The plugin must be specified in the `plugins` key first. Here's an example:\n\n",
+        "line_start": 608,
+        "line_end": 611
+      },
+      {
+        "stable_chunk_id": "child-4b7145637612c95c92c2cd4d6bd0463316cf0234",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport examplePlugin from \"eslint-plugin-example\";\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tplugins: {\n\t\t\texample: examplePlugin,\n\t\t},\n\t\textends: [\"example/recommended\"],\n\t},\n]);\n```\n\n",
+        "line_start": 612,
+        "line_end": 627
+      },
+      {
+        "stable_chunk_id": "child-50aa4b31baad55c8382214db81aaf046f0cfe215",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "In this example, the configuration named `recommended` from `eslint-plugin-example` is loaded. The plugin configurations can also be referenced by name inside of the configuration array.\n\nYou can also insert plugin configurations directly into the `extends` array. For example:\n\n",
+        "line_start": 628,
+        "line_end": 631
+      },
+      {
+        "stable_chunk_id": "child-aa35039e0e0637140c38b1cb189f9aa902e94493",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport pluginExample from \"eslint-plugin-example\";\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tplugins: {\n\t\t\texample: pluginExample,\n\t\t},\n\t\textends: [pluginExample.configs.recommended],\n\t},\n]);\n```\n\n",
+        "line_start": 632,
+        "line_end": 647
+      },
+      {
+        "stable_chunk_id": "child-4c12dcd295ffa05ccb132bb125e88d356b5dd9f4",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "In this case, the configuration named `recommended` from `eslint-plugin-example` is accessed directly through the plugin object's `configs` property.\n\n::: important\nIt's recommended to always use a `files` key when you use the `extends` key to ensure that your configuration applies to the correct files. By omitting the `files` key, the extended configuration may end up applied to all files.\n:::\n\n",
+        "line_start": 648,
+        "line_end": 653
+      },
+      {
+        "stable_chunk_id": "child-15f43f70da29df02905e15d1c6c39dec0e0f3645",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Use Predefined Configurations\n\nESLint has two predefined configurations for JavaScript:\n\n- `js/recommended` - enables the rules that ESLint recommends everyone use to avoid potential errors.\n- `js/all` - enables all of the rules shipped with ESLint. This configuration is **not recommended** for production use because it changes with every minor and major version of ESLint. Use at your own risk.\n\n",
+        "line_start": 654,
+        "line_end": 660
+      },
+      {
+        "stable_chunk_id": "child-f1432ed7d99bbd346bdb26728341aea85364e00a",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "To include these predefined configurations, install the `@eslint/js` package and then make any modifications to other properties in subsequent configuration objects:\n\n",
+        "line_start": 661,
+        "line_end": 662
+      },
+      {
+        "stable_chunk_id": "child-ee6c7b9c41780330d6d94938598c154bd142088b",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport js from \"@eslint/js\";\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\tplugins: {\n\t\t\tjs,\n\t\t},\n\t\textends: [\"js/recommended\"],\n\t\trules: {\n\t\t\t\"no-unused-vars\": \"warn\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 663,
+        "line_end": 681
+      },
+      {
+        "stable_chunk_id": "child-d8e1930cdd2b685f3fd45db3fa7d12cc39cf57cc",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Here, the `js/recommended` predefined configuration is applied first and then another configuration object adds the desired configuration for [`no-unused-vars`](../../rules/no-unused-vars).\n\nFor more information on how to combine predefined configs with your preferences, please see [Combine Configs](combine-configs).\n\n",
+        "line_start": 682,
+        "line_end": 685
+      },
+      {
+        "stable_chunk_id": "child-aefb52f4f61d1ee1ad19e47491ba6eb8315cca9d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "#### Use a Shareable Configuration Package\n\nA sharable configuration is an npm package that exports a configuration object or array. This package should be installed as a dependency in your project and then referenced from inside of your `eslint.config.js` file. For example, to use a shareable configuration named `eslint-config-example`, your configuration file would look like this:\n\n",
+        "line_start": 686,
+        "line_end": 689
+      },
+      {
+        "stable_chunk_id": "child-5446df75d3392556ac3c2d34850997f4523ef6ca",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\n// eslint.config.js\nimport exampleConfig from \"eslint-config-example\";\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tfiles: [\"**/*.js\"],\n\t\textends: [exampleConfig],\n\t\trules: {\n\t\t\t\"no-unused-vars\": \"warn\",\n\t\t},\n\t},\n]);\n```\n\n",
+        "line_start": 690,
+        "line_end": 705
+      },
+      {
+        "stable_chunk_id": "child-a881c44de07009ec7b0258147028512e4ec66c4f",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "In this example, `exampleConfig` can be either an object or an array, and either way it can be inserted directly into the `extends` array.\n\nFor more information on how to combine shareable configs with your preferences, please see [Combine Configs](combine-configs).\n\n",
+        "line_start": 706,
+        "line_end": 709
+      },
+      {
+        "stable_chunk_id": "child-695d54b82ed9ba43420241fe34c53d062b05077a",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### When to Use Extends vs Cascading\n\n",
+        "line_start": 710,
+        "line_end": 711
+      },
+      {
+        "stable_chunk_id": "child-d1c53a19047847bc79ab0c8288227f470b75aa89",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "When to use `Extends`:\n\n- **For reusing configurations** - When you want to inherit and build upon existing configurations from plugins, shareable packages, or predefined configs.\n- **For plugin configuration** - When applying recommended or specific configurations from ESLint plugins (e.g., `example/recommended`).\n- **For shareable configurations** - When using npm packages that export configuration objects (e.g., `eslint-config-example`).\n- **For predefined configurations** - When using ESLint's built-in configurations like `js/recommended` or `js/all`.\n- **For modular configuration** - When you want to compose multiple configuration sources into a single configuration object.\n- **For maintaining consistency** - When you want to ensure consistent base rules across multiple configuration objects.\n- **For plugin integration** - When you need to apply configurations that come bundled with plugins.\n\n",
+        "line_start": 712,
+        "line_end": 721
+      },
+      {
+        "stable_chunk_id": "child-af7def9065d3d1bb428cc04198aa184c16e6dd3a",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "When to use `Cascading`:\n\n- **For file-specific rule** - When you need different rules for different file patterns or directories.\n- **For progressive configuration** - When you want to apply base rules to all files and then add/override rules for specific subsets.\n- **For environment-specific settings** - When test files, source files, and config files need different rule sets.\n- **For directory-based configuration** - When different project directories require different linting approaches.\n- **For rule severity adjustment** - When you want to change rule severity (`error`/`warn`/`off`) for specific file patterns.\n- **For language option variations** - When different files need different ECMAScript versions or parser options.\n\n",
+        "line_start": 722,
+        "line_end": 730
+      },
+      {
+        "stable_chunk_id": "child-465c0e3e2f3430fd5f10868d7c9750637eef99cd",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Configuration Naming Conventions\n\nThe `name` property is optional, but it is recommended to provide a name for each configuration object, especially when you are creating shared configurations. The name is used in error messages and the config inspector to help identify which configuration object is being used.\n\n",
+        "line_start": 731,
+        "line_end": 734
+      },
+      {
+        "stable_chunk_id": "child-bf016c55a8d214c9e249b4d29ebb08cbf24f3935",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "The name should be descriptive of the configuration object's purpose and scoped with the configuration name or plugin name using `/` as a separator. ESLint does not enforce the names to be unique at runtime, but it is recommended that unique names be set to avoid confusion.\n\n",
+        "line_start": 735,
+        "line_end": 736
+      },
+      {
+        "stable_chunk_id": "child-e13041934bc7a4cb0a95a11cd1c9c00613e74a24",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "For example, if you are creating a configuration object for a plugin named `eslint-plugin-example`, you might add `name` to the configuration objects with the `example/` prefix:\n\n```js\nexport default {\n\tconfigs: {\n\t\trecommended: {\n\t\t\tname: \"example/recommended\",\n\t\t\trules: {\n\t\t\t\t\"no-unused-vars\": \"warn\",\n\t\t\t},\n\t\t},\n\t\tstrict: {\n\t\t\tname: \"example/strict\",\n\t\t\trules: {\n\t\t\t\t\"no-unused-vars\": \"error\",\n\t\t\t},\n\t\t},\n\t},\n};\n```\n\n",
+        "line_start": 737,
+        "line_end": 757
+      },
+      {
+        "stable_chunk_id": "child-5d62a9ed110f9ec474373f20c7f584eb9962677b",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "When exposing arrays of configuration objects, the `name` may have extra scoping levels to help identify the configuration object. For example:\n\n",
+        "line_start": 758,
+        "line_end": 759
+      },
+      {
+        "stable_chunk_id": "child-20f62080859c91f70b0891965d0b36c1522ce47b",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "```js\nexport default {\n\tconfigs: {\n\t\tstrict: [\n\t\t\t{\n\t\t\t\tname: \"example/strict/language-setup\",\n\t\t\t\tlanguageOptions: {\n\t\t\t\t\tecmaVersion: 2024,\n\t\t\t\t},\n\t\t\t},\n\t\t\t{\n\t\t\t\tname: \"example/strict/sub-config\",\n\t\t\t\tfiles: [\"src/**/*.js\"],\n\t\t\t\trules: {\n\t\t\t\t\t\"no-unused-vars\": \"error\",\n\t\t\t\t},\n\t\t\t},\n\t\t],\n\t},\n};\n```\n\n",
+        "line_start": 760,
+        "line_end": 781
+      },
+      {
+        "stable_chunk_id": "child-ba4e0c09e4c36eaf765c9249565d77eba85f0d1c",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "## Configuration File Resolution\n\nWhen ESLint is run on the command line, it determines configuration for each target file by first looking in the directory that contains the file and then searching up ancestor directories until it finds an `eslint.config.*` file. This behavior improves support for monorepos, where subdirectories can have their own configuration files.\n\n",
+        "line_start": 782,
+        "line_end": 785
+      },
+      {
+        "stable_chunk_id": "child-1edd89ac1f90e158d79623548ab091507219f418",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "You can prevent this search by using the `-c` or `--config` option on the command line to specify an alternate configuration file, such as:\n\n{{ npx_tabs({\n    package: \"eslint\",\n    args: [\"--config\", \"some-other-file.js\", \"**/*.js\"]\n}) }}\n\nIn this case, ESLint does not search for configuration files and instead uses `some-other-file.js`.\n\n",
+        "line_start": 786,
+        "line_end": 794
+      },
+      {
+        "stable_chunk_id": "child-1c79dcb7ee093f2e7b52d7e66afb50d99276cc51",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "## TypeScript Configuration Files\n\nFor Deno and Bun, TypeScript configuration files are natively supported; for Node.js, you must install the optional dev dependency [`jiti`](https://github.com/unjs/jiti) in version 2.2.0 or later in your project (this dependency is not automatically installed by ESLint):\n\n{{ npm_tabs({\n    command: \"install\",\n    packages: [\"jiti\"],\n    args: [\"--save-dev\"]\n}) }}\n\n",
+        "line_start": 795,
+        "line_end": 804
+      },
+      {
+        "stable_chunk_id": "child-48f802d147b9b0d34d90d6fd37af4763f44b4db2",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "You can then create a configuration file with a `.ts`, `.mts`, or `.cts` extension, and export an array of [configuration objects](#configuration-objects).\n\n::: important\nESLint does not perform type checking on your configuration file and does not apply any settings from `tsconfig.json`.\n:::\n\n",
+        "line_start": 805,
+        "line_end": 810
+      },
+      {
+        "stable_chunk_id": "child-7267e3a7dd836cdeca0bf8418f3b74533e67012d",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Native TypeScript Support\n\nIf you're using **Node.js >= 22.13.0**, you can load TypeScript configuration files natively without requiring [`jiti`](https://github.com/unjs/jiti). This is possible thanks to the [**`--experimental-strip-types`**](https://nodejs.org/docs/latest-v22.x/api/cli.html#--experimental-strip-types) flag.\n\n",
+        "line_start": 811,
+        "line_end": 814
+      },
+      {
+        "stable_chunk_id": "child-7bb2315e2bf5ce92b6f55b6b0cefce773ef96d17",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "Since this feature is still experimental, you must also enable the `unstable_native_nodejs_ts_config` flag.\n\n```bash\nnpx --node-options='--experimental-strip-types' eslint --flag unstable_native_nodejs_ts_config\n```\n\n",
+        "line_start": 815,
+        "line_end": 820
+      },
+      {
+        "stable_chunk_id": "child-1b242d227621856e06f26374345904cf8e252432",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "### Configuration File Precedence\n\nIf you have multiple ESLint configuration files, ESLint prioritizes JavaScript files over TypeScript files. The order of precedence is as follows:\n\n1. `eslint.config.js`\n2. `eslint.config.mjs`\n3. `eslint.config.cjs`\n4. `eslint.config.ts`\n5. `eslint.config.mts`\n6. `eslint.config.cts`\n\n",
+        "line_start": 821,
+        "line_end": 831
+      },
+      {
+        "stable_chunk_id": "child-90fe6926f35bfa709bf82fa1863aaeae98ac960e",
+        "source_path": "docs/src/use/configure/configuration-files.md",
+        "display_text": "To override this behavior, use the `--config` or `-c` command line option to specify a different configuration file:\n\n{{ npx_tabs({\n    package: \"eslint\",\n    args: [\"--config\", \"eslint.config.ts\"]\n}) }}\n",
+        "line_start": 832,
+        "line_end": 837
+      },
+      {
+        "stable_chunk_id": "child-bd7bdc0e9acd4e5387f6dab32a1c33abeb79d896",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "---\ntitle: Ignore Files\neleventyNavigation:\n    key: ignore files\n    parent: configure\n    title: Ignore Files\n    order: 7\n---\n\n{%- from 'components/npx_tabs.macro.html' import npx_tabs %}\n\n::: tip\nThis page explains how to ignore files using the flat config format.\n:::\n\n",
+        "line_start": 1,
+        "line_end": 15
+      },
+      {
+        "stable_chunk_id": "child-244a69a7d7a66e113ed2a832a4a96e90d789cb03",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "::: tip\nThis page explains how to use the `globalIgnores()` function to completely ignore files and directories. For more information on non-global ignores, see [Specify files and ignores](configuration-files#specify-files-and-ignores). For more information on the differences between global and non-global ignores, see [Globally ignore files with `ignores`](configuration-files#globally-ignore-files-with-ignores).\n:::\nYou can configure ESLint to ignore certain files and directories while linting by specifying one or more glob patterns in the following ways:\n\n- Inside of your `eslint.config.js` file.\n- On the command line using `--ignore-pattern`.\n\n",
+        "line_start": 16,
+        "line_end": 23
+      },
+      {
+        "stable_chunk_id": "child-4a9c93d6cde6145d11cd7317cdb1521fd4df2603",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Ignore Files\n\nIn your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([globalIgnores([\".config/*\"])]);\n```\n\n",
+        "line_start": 24,
+        "line_end": 34
+      },
+      {
+        "stable_chunk_id": "child-0b5bdca6161111bec479e841184eb0f546ec0352",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "This configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.\n\nBy default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:\n\n",
+        "line_start": 35,
+        "line_end": 38
+      },
+      {
+        "stable_chunk_id": "child-f12497dbafc82f2c1d20901b38c3e063d75ee928",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),\n]);\n```\n\nWhen non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:\n\n",
+        "line_start": 39,
+        "line_end": 49
+      },
+      {
+        "stable_chunk_id": "child-b822a2aa9beaf0fc9d75a08ebd18919c5812d1f3",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),\n\t{\n\t\tfiles: [\"**/*.ts\"],\n\t\tignores: [\".config/**\"],\n\t\trules: {/* ... */},\n\t},\n]);\n```\n\nYou can also ignore files on the command line using [`--ignore-pattern`](../command-line-interface#--ignore-pattern), such as:\n\n{{ npx_tabs({\n    package: \"eslint\",\n    args: [\".\", \"--ignore-pattern\", \"\\'.config/*\\'\"]\n}) }}\n\n",
+        "line_start": 50,
+        "line_end": 70
+      },
+      {
+        "stable_chunk_id": "child-d88615d720f23d302c17ee6e0241ff9cdd702cec",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Ignore Directories\n\nIgnoring directories works the same way as ignoring files, by passing a pattern to the `globalIgnores()` helper function. For example, the following ignores the `.config` directory as a whole (meaning file search will not traverse into it at all):\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([globalIgnores([\".config/\"])]);\n```\n\n",
+        "line_start": 71,
+        "line_end": 81
+      },
+      {
+        "stable_chunk_id": "child-dfb3a74c0d3b531bd8ea13100d36488fec967813",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "Unlike `.gitignore`, an ignore pattern like `.config` will only ignore the `.config` directory in the same directory as the configuration file. If you want to recursively ignore all directories named `.config`, you need to use `**/.config/`, as in this example:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([globalIgnores([\"**/.config/\"])]);\n```\n\n",
+        "line_start": 82,
+        "line_end": 90
+      },
+      {
+        "stable_chunk_id": "child-a6532d89d09c7d25ce95ca3f12d208e2c07f81bd",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Unignore Files and Directories\n\nYou can also unignore files and directories that are ignored by previous patterns, including the default patterns. For example, this config unignores `node_modules/mylibrary`:\n\n",
+        "line_start": 91,
+        "line_end": 94
+      },
+      {
+        "stable_chunk_id": "child-c5c5c2d776920eebc4c7b9f8fbb8c8b2e59272f3",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\n\t\t\"!node_modules/\", // unignore `node_modules/` directory\n\t\t\"node_modules/*\", // ignore its content\n\t\t\"!node_modules/mylibrary/\", // unignore `node_modules/mylibrary` directory\n\t]),\n]);\n```\n\n",
+        "line_start": 95,
+        "line_end": 107
+      },
+      {
+        "stable_chunk_id": "child-0ae87b57423ef9e8f343ff998802a5d5d6219d4a",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "If you'd like to ignore a directory except for specific files or subdirectories, then the ignore pattern `directory/**/*` must be used instead of `directory/**`. The pattern `directory/**` ignores the entire directory and its contents, so traversal will skip over the directory completely and you cannot unignore anything inside.\n\n",
+        "line_start": 108,
+        "line_end": 109
+      },
+      {
+        "stable_chunk_id": "child-f4d97fc5797094f01f5ae58ac08c2adf54910e04",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "For example, `build/**` ignores directory `build` and its contents, whereas `build/**/*` ignores only its contents. If you'd like to ignore everything in the `build` directory except for `build/test.js`, you'd need to create a config like this:\n\n",
+        "line_start": 110,
+        "line_end": 111
+      },
+      {
+        "stable_chunk_id": "child-f975960fe7beaf44fa956c839467cd0c461799fe",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\n\t\t\"build/**/*\", // ignore all contents in and under `build/` directory but not the `build/` directory itself\n\t\t\"!build/test.js\", // unignore `!build/test.js`\n\t]),\n]);\n```\n\n",
+        "line_start": 112,
+        "line_end": 123
+      },
+      {
+        "stable_chunk_id": "child-e89417938261fed552b44b649baca4abdec7aece",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "If you'd like to ignore a directory except for specific files at any level under the directory, you should also ensure that subdirectories are not ignored. Note that while patterns that end with `/` only match directories, patterns that don't end with `/` match both files and directories so it isn't possible to write a single pattern that only ignores files, but you can achieve this with two patterns: one to ignore all contents and another to unignore subdirectories.\n\n",
+        "line_start": 124,
+        "line_end": 125
+      },
+      {
+        "stable_chunk_id": "child-5c25b12e9502cadaf7a3ab9e957576fd58155a47",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "For example, this config ignores all files in and under `build` directory except for files named `test.js` at any level:\n\n",
+        "line_start": 126,
+        "line_end": 127
+      },
+      {
+        "stable_chunk_id": "child-631e9624a36dee5d23932ab78d3a901a2823ddd1",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\n\t\t\"build/**/*\", // ignore all contents in and under `build/` directory but not the `build/` directory itself\n\t\t\"!build/**/*/\", // unignore all subdirectories\n\t\t\"!build/**/test.js\", // unignore `test.js` files\n\t]),\n]);\n```\n\n",
+        "line_start": 128,
+        "line_end": 140
+      },
+      {
+        "stable_chunk_id": "child-3689e51d6b2087024531bf26302fb1c7af31d6cc",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "If you want to ignore ESLint's default file patterns (`**/*.js`, `**/*.cjs`, and `**/*.mjs`) while still linting specific files or directories, you can use negative patterns to unignore them:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\", \"!**/src/**/*.js\"]),\n]);\n```\n\n",
+        "line_start": 141,
+        "line_end": 151
+      },
+      {
+        "stable_chunk_id": "child-2045c96c32ab17261bfa228edd87ac7b3e80c31c",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "This configuration ignores all files matching the default patterns except for JavaScript files located within `src` directories.\n\n::: important\nNote that only global `ignores` patterns can match directories.\n`ignores` patterns that are specific to a configuration will only match file names.\n:::\n\nYou can also unignore files on the command line using [`--ignore-pattern`](../command-line-interface#--ignore-pattern), such as:\n\n",
+        "line_start": 152,
+        "line_end": 160
+      },
+      {
+        "stable_chunk_id": "child-e8db6ff59e46b4a262975def8a09f2f4edc7544b",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "{{ npx_tabs({\n    package: \"eslint\",\n    args: [\".\", \"--ignore-pattern\", \"\\'!node_modules/\\'\"]\n}) }}\n\n",
+        "line_start": 161,
+        "line_end": 165
+      },
+      {
+        "stable_chunk_id": "child-16c5e78052ba6e94825a68f1f4b5a9eba465c54a",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Glob Pattern Resolution\n\n",
+        "line_start": 166,
+        "line_end": 167
+      },
+      {
+        "stable_chunk_id": "child-bde49bf5133d6d8700e3d0585d0b432dd4c6991d",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "How glob patterns are evaluated depends on where they are located and how they are used:\n\n1. When using `globalIgnores()` in an `eslint.config.js` file, glob patterns are evaluated relative to the `eslint.config.js` file.\n1. When using `globalIgnores()` in an alternate configuration file specified using the [`--config`](../command-line-interface#-c---config) command line option, glob patterns are evaluated relative to the current working directory.\n1. When using [`--ignore-pattern`](../command-line-interface#--ignore-pattern), glob patterns are evaluated relative to the current working directory.\n\n",
+        "line_start": 168,
+        "line_end": 173
+      },
+      {
+        "stable_chunk_id": "child-47a757f37e81a5a9f2c96a8f28f7788b1f76be2f",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Name the Global Ignores Config\n\nBy default, `globalIgnores()` will assign a name to the config that represents your ignores. You can override this name by providing a second argument to `globalIgnores()`, which is the name you'd like to use instead of the default:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"build/**/*\"], \"Ignore Build Directory\"),\n]);\n```\n\n",
+        "line_start": 174,
+        "line_end": 186
+      },
+      {
+        "stable_chunk_id": "child-15a342b9a1fe68b815567e417040bf608c30721e",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "The `\"Ignore Build Directory\"` string in this example is the name of the config created for the global ignores. This is useful for debugging purposes.\n\n",
+        "line_start": 187,
+        "line_end": 188
+      },
+      {
+        "stable_chunk_id": "child-28f682806a6098c0e16306d245cdb2e0fbc97697",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Ignored File Warnings\n\nWhen you pass directories to the ESLint CLI, files and directories are silently ignored. If you pass a specific file to ESLint, then ESLint creates a warning that the file was skipped. For example, suppose you have an `eslint.config.js` file that looks like this:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([globalIgnores([\"foo.js\"])]);\n```\n\nAnd then you run:\n\n",
+        "line_start": 189,
+        "line_end": 201
+      },
+      {
+        "stable_chunk_id": "child-be52d0b250e091147faf3adcf46b17b946e4de74",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "{{ npx_tabs({\n    package: \"eslint\",\n    args: [\"foo.js\"]\n}) }}\n\nYou'll see this warning:\n\n```text\nfoo.js\n  0:0  warning  File ignored because of a matching ignore pattern. Use \"--no-ignore\" to disable file ignore settings or use \"--no-warn-ignored\" to suppress this warning.\n\n✖ 1 problem (0 errors, 1 warning)\n```\n\n",
+        "line_start": 202,
+        "line_end": 215
+      },
+      {
+        "stable_chunk_id": "child-2989aa82a4b8d1580da42683ad0fbc9210b593f0",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "This message occurs because ESLint is unsure if you wanted to actually lint the file or not. As the message indicates, you can use `--no-ignore` to omit using the ignore rules.\n\n",
+        "line_start": 216,
+        "line_end": 217
+      },
+      {
+        "stable_chunk_id": "child-a6eb4f75cacfbbdd7274c5fc975fb92824485b04",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "## Include `.gitignore` Files\n\nIf you want to include patterns from a [`.gitignore`](https://git-scm.com/docs/gitignore) file or any other file with gitignore-style patterns, you can use the `includeIgnoreFile` utility.\n\n",
+        "line_start": 218,
+        "line_end": 221
+      },
+      {
+        "stable_chunk_id": "child-352a2289011164a9668652ba67348fc6484f97d3",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\n\nimport { defineConfig, includeIgnoreFile } from \"eslint/config\";\nimport { fileURLToPath } from \"node:url\";\n\nconst gitignorePath = fileURLToPath(new URL(\".gitignore\", import.meta.url));\n\nexport default defineConfig([\n\tincludeIgnoreFile(gitignorePath, { gitignoreResolution: true }),\n\t{\n\t\t// your overrides\n\t},\n]);\n```\n\n",
+        "line_start": 222,
+        "line_end": 237
+      },
+      {
+        "stable_chunk_id": "child-8b2df107dbe35a12a081f416c0464f26d2fc2584",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "This automatically loads the specified file and translates gitignore-style patterns into a config object containing `ignores` glob patterns. The `{ gitignoreResolution: true }` option ensures that patterns will be interpreted relative to the location of the specified file.\n\nAn array of ignore file paths can also be provided:\n\n",
+        "line_start": 238,
+        "line_end": 241
+      },
+      {
+        "stable_chunk_id": "child-87bbbe9ddde126f93931fd9d3bde55ff657e7935",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\n\nimport { defineConfig, includeIgnoreFile } from \"eslint/config\";\nimport { fileURLToPath } from \"node:url\";\n\nconst rootGitignorePath = fileURLToPath(new URL(\".gitignore\", import.meta.url));\nconst nestedGitignorePath = fileURLToPath(\n\tnew URL(\"some/other/folder/.gitignore\", import.meta.url),\n);\n\nexport default defineConfig([\n\tincludeIgnoreFile([rootGitignorePath, nestedGitignorePath], {\n\t\tgitignoreResolution: true,\n\t}),\n\t{\n\t\t// your overrides\n\t},\n]);\n```\n\n",
+        "line_start": 242,
+        "line_end": 262
+      },
+      {
+        "stable_chunk_id": "child-973249938ff20e5f50b4685caffe46b899fb092b",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "In this case, an array of config objects will be returned.\n\n",
+        "line_start": 263,
+        "line_end": 264
+      },
+      {
+        "stable_chunk_id": "child-3ae3494293aabb3dbf40e12eadfb93afbaeb28f9",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "### Include other ignore files\n\nIf `{ gitignoreResolution: true }` is omitted, or if `{ gitignoreResolution: false\" }` is specified, `includeIgnoreFile()` will interpret the ignore patterns relative to the location of the ESLint config file.\n\n",
+        "line_start": 265,
+        "line_end": 268
+      },
+      {
+        "stable_chunk_id": "child-64ff043d9cab6b9bb0a9482920f9e1b1793c2ca7",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\n\nimport { defineConfig, includeIgnoreFile } from \"eslint/config\";\nimport { fileURLToPath } from \"node:url\";\n\nconst eslintIgnorePath = fileURLToPath(\n\tnew URL(\"eslint-ignore-patterns\", import.meta.url),\n);\n\nexport default defineConfig([\n\tincludeIgnoreFile(eslintIgnorePath),\n\t{\n\t\t// your overrides\n\t},\n]);\n```\n\n",
+        "line_start": 269,
+        "line_end": 286
+      },
+      {
+        "stable_chunk_id": "child-e78385fc8bf48519c62fb73ffa9cecc98ee9d442",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "By contrast, `.gitignore` files are specified such that the ignore patterns should be interpreted relative to the location of the `.gitignore` file itself. Therefore, `{ gitignoreResolution: true }`, which tells `includeIgnoreFile()` to match this behavior, should always be used when including ignore patterns from `.gitignore` files.\n\n",
+        "line_start": 287,
+        "line_end": 288
+      },
+      {
+        "stable_chunk_id": "child-68b4b631af6f8182a481601707d91b71bf8f33c4",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "### Customize name of output configs\n\nBy default, `includeIgnoreFile()` will assign a name to the config that represents your ignores. You can override this name by providing it in the second argument to `includeIgnoreFile()`:\n\n",
+        "line_start": 289,
+        "line_end": 292
+      },
+      {
+        "stable_chunk_id": "child-06a3f5800a73ca6c8a637a7d397a028dacfd29a8",
+        "source_path": "docs/src/use/configure/ignore.md",
+        "display_text": "```js\n// eslint.config.js\n\nimport { defineConfig, includeIgnoreFile } from \"eslint/config\";\nimport { fileURLToPath } from \"node:url\";\n\nconst gitignorePath = fileURLToPath(new URL(\".gitignore\", import.meta.url));\n\nexport default defineConfig([\n\tincludeIgnoreFile(gitignorePath, {\n\t\tgitignoreResolution: true,\n\t\tname: \"Imported .gitignore patterns\",\n\t}),\n\t{\n\t\t// your overrides\n\t},\n]);\n```\n",
+        "line_start": 293,
+        "line_end": 310
+      }
+    ],
+    "sqlite_version": "3.50.4",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "36e03cfc059a90acbd34a57c5f990347192f05a524864aa16aaf6eaa14f8cc04",
+    "storage_path": "/tmp/docatlas-evidence-32x7ft7g/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-089d60ada10d41e1ad0877eb5f0ba9fd",
+    "catalog_sha256": "1ec6a80fb90d7be3e73ade8eb87963397f65354bb313927a63c4374811653081",
+    "documents": [
+      {
+        "path": "docs/src/use/command-line-interface.md",
+        "content_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+        "catalog_entry_hash": "sha256:1328bcdc92ef37911c54ea022dab3c8802e32e9b7558ebd24eab57e84a8fedcc"
+      },
+      {
+        "path": "docs/src/use/configure/configuration-files.md",
+        "content_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+        "catalog_entry_hash": "sha256:8942eaa0368b4071617abd15cd1285714412736c00dfd54e214bd70ed93ddb3a"
+      },
+      {
+        "path": "docs/src/use/configure/ignore.md",
+        "content_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+        "catalog_entry_hash": "sha256:b90abd1a6dea3b1eed85b04b3361ab9f8e76e49d2b40c870cb5ca5cd1043505b"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-089d60ada10d41e1ad0877eb5f0ba9fd",
+      "members": 3,
+      "new_count": 3,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 148,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 148
+    }
+  },
+  "snapshot_sources": [
+    {
+      "path": "docs/src/use/command-line-interface.md",
+      "content_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2"
+    },
+    {
+      "path": "docs/src/use/configure/configuration-files.md",
+      "content_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d"
+    },
+    {
+      "path": "docs/src/use/configure/ignore.md",
+      "content_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "status": "completed",
+  "boundary": "installed wheel stdio MCP, isolated docs-only corpus",
+  "origin": "/tmp/opencode/removal-default-checks/installed-final/lib/python3.12/site-packages/docmancer/__init__.py",
+  "python": "/tmp/opencode/removal-default-checks/installed-final/bin/python",
+  "arm": "V0",
+  "counts": {
+    "prepare": 1,
+    "context": 2,
+    "resource": 1,
+    "model": 0
+  },
+  "source_integrity": "PASS",
+  "client_session": "NOT RUN",
+  "production_smoke": "NOT RUN",
+  "answer_quality": "NOT MEASURED"
+}

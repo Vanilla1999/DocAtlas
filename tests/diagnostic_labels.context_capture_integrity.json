@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/docs/test_context_capture_integrity.py": "cefa23d52a4a72d2a6169d34c85380547ca42be6d2274189017d36d253e63a12"
+    "tests/docs/test_context_capture_integrity.py": "0367a723c9f10182fb0de0ceb9d4160dd059e21da141c81bd20ecde3d5734bba"
   }
 }

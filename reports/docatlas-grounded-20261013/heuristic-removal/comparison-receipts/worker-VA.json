@@ -1,0 +1,22 @@
+{
+  "python": "/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python",
+  "datasets": [
+    {
+      "path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+      "count": 40,
+      "arms": [
+        "VA"
+      ],
+      "index": 0
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+      "count": 20,
+      "arms": [
+        "VA"
+      ],
+      "index": 1
+    }
+  ],
+  "wall_seconds": 875
+}

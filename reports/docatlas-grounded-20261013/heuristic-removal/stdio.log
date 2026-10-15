@@ -1,0 +1,45 @@
+  + Exception Group Traceback (most recent call last):
+  |   File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_stdio.py", line 166, in <module>
+  |     main()
+  |   File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_stdio.py", line 158, in main
+  |     asyncio.run(asyncio.wait_for(smoke(args), timeout=240))
+  |   File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+  |     return runner.run(main)
+  |            ^^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+  |     return future.result()
+  |            ^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+  |     return await fut
+  |            ^^^^^^^^^
+  |   File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_stdio.py", line 107, in smoke
+  |     async with stdio_client(parameters, errlog=stderr) as streams:
+  |   File "/usr/lib/python3.12/contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(value)
+  |   File "/tmp/opencode/docatlas-ablation-venv/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 182, in stdio_client
+  |     async with (
+  |   File "/tmp/opencode/docatlas-ablation-venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "/tmp/opencode/docatlas-ablation-venv/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 189, in stdio_client
+    |     yield read_stream, write_stream
+    |   File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_stdio.py", line 108, in smoke
+    |     async with ClientSession(*streams) as session:
+    |   File "/tmp/opencode/docatlas-ablation-venv/lib/python3.12/site-packages/mcp/shared/session.py", line 238, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/tmp/opencode/docatlas-ablation-venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Traceback (most recent call last):
+      |   File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_stdio.py", line 142, in smoke
+      |     assert not version.get("sources") and version.get("answer_available") is not True
+      |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      | AssertionError
+      +------------------------------------

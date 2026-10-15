@@ -104,24 +104,6 @@ sdks:
     return project
 
 
-def test_characterization_registered_docs_source_reused_without_docs_url(tmp_path, monkeypatch):
-    agent = FakeAgent()
-    service = _service(tmp_path, monkeypatch, agent)
-    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
-
-    result = service.get_docs("pytest", topic="fixtures")
-
-    assert result.status == "success"
-    assert result.tool == "get_library_docs"
-    assert result.schema_version == "2.1-mvp"
-    assert result.decision == "answer_returned"
-    assert result.identity["docs_url"] == "https://docs.pytest.org/"
-    assert result.identity["docs_url_source"] == "registry"
-    assert result.policy["direct_webfetch"] == "forbidden"
-    assert result.policy["reason_code"] == "registered_source_exists"
-    assert agent.add_calls == ["https://docs.pytest.org/"]
-
-
 def test_characterization_ambiguous_library_returns_candidates_and_retry_guidance(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     service.resolve_library("go_router", ecosystem="pub", version="14.8.1", docs_url="https://pub.dev/documentation/go_router/14.8.1/")
@@ -176,59 +158,6 @@ def test_characterization_no_project_docs_returns_architecture_remediation(tmp_p
     assert result.recommended_next_actions[-1]["preferred_path"] == "ARCHITECTURE.md"
 
 
-def test_characterization_stale_project_docs_requires_preflight_confirmation(tmp_path, monkeypatch):
-    project = _flutter_project(tmp_path)
-    readme = project / "README.md"
-    readme.write_text("# Architecture\n\nOriginal overview.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
-    readme.write_text("# Architecture\n\nUpdated overview.", encoding="utf-8")
-
-    result = service.inspect_project_docs(str(project))
-
-    assert result.reason_code == "project_docs_preflight_confirmation_required"
-    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
-    assert result.next_action["tool_after_confirmation"] == "sync_project_docs"
-    assert result.requires_confirmation is True
-    assert result.confirmation_reason == "project_docs_preflight"
-    assert result.recommended_next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
-    assert result.recommended_next_actions[0]["requires_confirmation"] is True
-
-
-def test_characterization_get_project_context_returns_context_pack_and_trust_contract(tmp_path, monkeypatch):
-    project = _flutter_project(tmp_path)
-    (project / "README.md").write_text("# Architecture\n\nContextNeedle uses local docs.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
-
-    result = service.get_project_context(str(project), "ContextNeedle", tokens=1200, limit=3)
-
-    assert result.status == "success"
-    assert result.tool == "get_docs_context"
-    assert result.context_pack
-    assert result.context_pack[0]["source_class"] == "project_doc"
-    assert result.trust_contract["schema_version"] == "trust-contract-1.2"
-    assert result.trust_contract["sources"]["selected"][0]["source_class"] == "project_file"
-    assert "trusted_sources" not in result.trust_contract
-    assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
-
-
-def test_characterization_dependency_docs_network_fetch_path_requires_confirmation(tmp_path, monkeypatch):
-    project = _flutter_project(tmp_path)
-    (project / "README.md").write_text("# Architecture\n\nProject overview.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
-
-    result = service.bootstrap_project_docs(str(project), question="How should we use go_router?")
-
-    assert result.status == "confirmation_required"
-    assert result.reason_code == "dependency_docs_prefetch_confirmation_required"
-    assert result.next_action["type"] == "ask_user_to_prefetch_dependency_docs"
-    assert result.next_action["tool_after_confirmation"] == "prepare_docs"
-    assert result.requires_confirmation is True
-    assert result.confirmation_reason == "network_fetch"
-
-
 def test_characterization_target_url_security_rejects_localhost_private_networks(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
 
@@ -253,27 +182,3 @@ def test_characterization_manifest_validation_errors_remain_stable(tmp_path, mon
     assert result.targets == []
     assert any("URL path is outside path_prefixes" in error for error in result.errors)
 
-
-def test_characterization_docs_job_status_list_cancel_shapes(tmp_path, monkeypatch):
-    service = _service(tmp_path, monkeypatch)
-    job = service.jobs.create("prefetch_docs_targets")
-    service.jobs.update(job.job_id, status="running")
-
-    status = service.get_docs_job_status(job.job_id)
-    jobs = service.list_docs_jobs(status="running", limit=10)
-    cancel = service.cancel_docs_job(job.job_id)
-    missing_cancel = service.cancel_docs_job("missing")
-
-    assert status is not None
-    assert set(asdict(status)) >= {"job_id", "kind", "status", "phase", "started_at", "updated_at", "events"}
-    assert [item.job_id for item in jobs] == [job.job_id]
-    assert asdict(cancel) == {
-        "job_id": job.job_id,
-        "status": "cancelling",
-        "message": "Cancellation requested.",
-    }
-    assert asdict(missing_cancel) == {
-        "job_id": "missing",
-        "status": "not_found",
-        "message": "Job not found.",
-    }

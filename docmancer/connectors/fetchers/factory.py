@@ -40,6 +40,8 @@ def build_fetcher(
     deadline_at: float | None = None,
     source_manifest: dict | None = None,
     query: str | None = None,
+    exact_urls: list[str] | None = None,
+    robots_urls: list[str] | None = None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
     concrete = detect_fetcher_provider(url, provider)
@@ -72,4 +74,6 @@ def build_fetcher(
         deadline_at=deadline_at,
         source_manifest=source_manifest,
         query=query,
+        exact_urls=exact_urls,
+        robots_urls=robots_urls,
     )

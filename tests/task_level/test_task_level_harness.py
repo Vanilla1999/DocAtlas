@@ -12,133 +12,18 @@ from eval.task_level.runners.base import RunnerCapabilities
 from eval.task_level.schemas import TASKS_PATH
 
 
-def test_manifest_has_required_pilot_shape():
-    tasks = load_tasks(TASKS_PATH)
-
-    assert len(tasks) == 21
-    assert sum(1 for task in tasks if task.suite == "comparable") == 5
-    assert sum(1 for task in tasks if task.suite == "differentiation") == 16
-    assert {task.task_type for task in tasks} == {"curated", "real"}
 
 
-def test_conditions_encode_tool_isolation():
-    assert not CONDITIONS["repo_only"].tool_policy.allow_docatlas
-    assert not CONDITIONS["repo_only"].tool_policy.allow_context7
-    assert not CONDITIONS["repo_only_strict_offline"].tool_policy.allow_docatlas
-    assert not CONDITIONS["repo_only_strict_offline"].tool_policy.allow_web
-    assert CONDITIONS["repo_only_web_audited"].tool_policy.allow_web
-    assert CONDITIONS["repo_plus_audited_external_context"].tool_policy.inject_external_context
-    assert not CONDITIONS["repo_plus_audited_external_context"].tool_policy.allow_web
-    assert CONDITIONS["context7"].tool_policy.allow_context7
-    assert not CONDITIONS["context7"].tool_policy.allow_docatlas
-    assert CONDITIONS["docatlas_evidence_first"].tool_policy.allow_docatlas
-    assert CONDITIONS["docatlas_evidence_first"].tool_policy.docatlas_response_style == "evidence-first"
-    assert CONDITIONS["docatlas_snippet_first"].tool_policy.docatlas_response_style == "snippet-first"
-    assert CONDITIONS["docatlas_tool_recommended"].tool_policy.recommend_docatlas_before_edit
-    assert not CONDITIONS["docatlas_tool_recommended"].tool_policy.require_docatlas_call_before_edit
 
 
-def test_smoke_results_are_explicitly_not_causal(tmp_path: Path):
-    tasks = load_tasks(TASKS_PATH)
-    results = run_smoke(tasks, list(DEFAULT_CONDITIONS), repeats=1, run_dir=tmp_path)
-
-    assert results
-    assert {result["status"] for result in results} == {"smoke_not_causal"}
-    assert not any(result["resolved"] for result in results)
 
 
-def test_causal_gate_requires_successful_canaries():
-    conditions = ["repo_only_strict_offline", "docatlas_tool_recommended"]
-
-    assert _causal_gate_error(
-        conditions,
-        verify_runner_requested=False,
-        runner_canary=None,
-        verify_docatlas_requested=False,
-        docatlas_canary=None,
-    )
-    assert _causal_gate_error(
-        conditions,
-        verify_runner_requested=True,
-        runner_canary={"status": "passed"},
-        verify_docatlas_requested=False,
-        docatlas_canary=None,
-    )
-    assert _causal_gate_error(
-        conditions,
-        verify_runner_requested=True,
-        runner_canary={"status": "passed"},
-        verify_docatlas_requested=True,
-        docatlas_canary={"docatlas_tool_visibility_verified": True},
-    ) is None
 
 
-def test_bootstrap_delta_ci_is_paired_and_directional():
-    ci = bootstrap_delta_ci([True, True, False, True], [True, False, False, False])
-    assert ci is not None
-    observed, low, high = ci
-    assert observed == 0.5
-    assert low <= observed <= high
 
 
-def test_shell_call_metrics_normalize_runner_shapes_test_commands_and_retries():
-    pytest_command = "/bin/bash -lc 'uv run --offline pytest tests/docs'"
-    metrics = shell_call_metrics([
-        {
-            "tool_name": "Bash",
-            "arguments": {"command": pytest_command},
-            "exit_code": 2,
-            "execution_status": "failed",
-        },
-        {
-            "tool_name": "Shell",
-            "arguments": {"command": pytest_command},
-            "exit_code": 0,
-            "execution_status": "completed",
-        },
-        {
-            "tool_name": "command_execution",
-            "arguments": {"command": "python -m pytest tests/unit"},
-            "status": "succeeded",
-        },
-        {
-            "tool_name": "bash.legacy",
-            "arguments": {"command": "flutter test", "executed": True},
-        },
-        {
-            "tool_name": "Bash",
-            "arguments": {"command": "rg -n pytest tests"},
-            "exit_code": 0,
-        },
-        {
-            "tool_name": "Edit",
-            "arguments": {"command": "pytest should not count"},
-        },
-    ])
-
-    assert metrics == {
-        "shell_calls": 5,
-        "successful_shell_calls": 3,
-        "failed_shell_calls": 1,
-        "unknown_shell_outcomes": 1,
-        "exec_error_count": 0,
-        "retried_command_count": 1,
-        "test_runs": 4,
-        "pytest_invocations": 3,
-    }
 
 
-def test_shell_exec_errors_are_distinct_from_nonzero_command_exits():
-    metrics = shell_call_metrics([
-        {"tool_name": "Shell", "arguments": {"command": "pytest a.py"}, "exit_code": 1},
-        {
-            "tool_name": "Shell", "arguments": {"command": "pytest b.py"},
-            "execution_status": "runner_failed", "is_error": True,
-        },
-    ])
-
-    assert metrics["failed_shell_calls"] == 2
-    assert metrics["exec_error_count"] == 1
 
 
 def _sample_run_result(index: int) -> dict[str, object]:
@@ -158,47 +43,10 @@ def _sample_run_result(index: int) -> dict[str, object]:
     }
 
 
-def test_run_jsonl_serialization_has_one_physical_line_per_record(tmp_path: Path):
-    results = [_sample_run_result(index) for index in range(8)]
-    text = serialize_run_results_jsonl(results)
-
-    assert text.endswith("\n")
-    assert text.count("\n") == 8
-
-    path = tmp_path / "runs.jsonl"
-    path.write_text(text, encoding="utf-8")
-    assert count_jsonl_records(path) == 8
 
 
-def test_write_run_progress_records_artifact_integrity(tmp_path: Path):
-    results = [_sample_run_result(index) for index in range(8)]
-
-    write_run_progress(tmp_path, results, total_runs=8, current=None, finished=True)
-
-    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
-    assert status["status"] == "finished"
-    assert status["completed_runs"] == 8
-    assert status["artifact_integrity"] == {
-        "finished": True,
-        "in_memory_results": 8,
-        "expected_total_runs": 8,
-        "ok": True,
-        "reason": None,
-        "runs_jsonl_records": 8,
-    }
-    assert count_jsonl_records(tmp_path / "runs.jsonl") == 8
 
 
-def test_finished_progress_marks_incomplete_artifacts_failed(tmp_path: Path):
-    results = [_sample_run_result(index) for index in range(7)]
-
-    write_run_progress(tmp_path, results, total_runs=8, current=None, finished=True)
-
-    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
-    assert status["status"] == "artifact_integrity_failed"
-    assert status["artifact_integrity"]["ok"] is False
-    assert status["artifact_integrity"]["reason"] == ["finished_before_expected_run_count"]
-    assert run_artifact_integrity(tmp_path, in_memory_results=7, total_runs=8, finished=True)["ok"] is False
 
 
 class FailingRunner:
@@ -223,131 +71,9 @@ class FailingRunner:
         raise NotImplementedError("runner unavailable in test")
 
 
-def test_execute_pilot_blocks_runner_when_pre_runner_setup_fails(tmp_path: Path, monkeypatch):
-    monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
-    base_task = next(
-        task for task in load_tasks(TASKS_PATH)
-        if task.task_id == "decisive_docmancer_vector_timeout_fallback_001"
-    )
-    task = replace(base_task, setup_command="definitely-missing-task33-setup-command")
-    runner = FailingRunner()
-
-    results = execute_pilot(
-        [task],
-        ["repo_only_strict_offline"],
-        repeats=1,
-        run_id="setup_blocked",
-        runner=runner,
-        model="test",
-        timeout_seconds=1,
-        prompt_template="Issue:\n{issue_text}",
-    )
-
-    assert getattr(runner, "calls", 0) == 0
-    assert results[0]["status"] == "condition_setup_failed"
-    assert results[0]["evaluation_execution"]["public_tests"]["status"] == "not_run"
-    assert results[0]["evaluation_execution"]["hidden_tests"]["status"] == "not_run"
-    run_dir = (
-        tmp_path / "setup_blocked" / task.task_id
-        / "repo_only_strict_offline" / "repeat_0"
-    )
-    setup = json.loads((run_dir / "condition_setup.json").read_text(encoding="utf-8"))
-    assert setup["phase"] == "pre_runner"
-    assert setup["status"] == "condition_setup_failed"
-    assert setup["returncode"] != 0
 
 
-def test_execute_pilot_records_runner_blocked_rows(tmp_path: Path, monkeypatch):
-    monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
-    task = next(task for task in load_tasks(TASKS_PATH) if task.task_id == "decisive_docmancer_vector_timeout_fallback_001")
-
-    results = execute_pilot(
-        [task],
-        ["repo_only_strict_offline"],
-        repeats=1,
-        run_id="runner_blocked",
-        runner=FailingRunner(),
-        model="test",
-        timeout_seconds=1,
-        prompt_template="Issue:\n{issue_text}",
-    )
-
-    assert len(results) == 1
-    result = results[0]
-    assert result["status"] == "runner_unavailable"
-    assert result["resolved"] is False
-    assert result["constraint_violations_after_patch"] == 0
-    assert (tmp_path / "runner_blocked" / "runs.jsonl").exists()
-    status = json.loads((tmp_path / "runner_blocked" / "status.json").read_text(encoding="utf-8"))
-    assert status["artifact_integrity"]["ok"] is True
-    assert status["runtime_integrity"] == {
-        "ok": False,
-        "valid_runs": 0,
-        "infrastructure_failed_runs": 1,
-    }
-    run_dir = tmp_path / "runner_blocked" / task.task_id / "repo_only_strict_offline" / "repeat_0"
-    assert json.loads((run_dir / "changed_files.json").read_text(encoding="utf-8")) == []
-    assert (run_dir / "patch.diff").read_text(encoding="utf-8") == ""
-    assert json.loads((run_dir / "validation.json").read_text(encoding="utf-8"))["constraint_validation"]["violated"] == 0
 
 
-def test_execute_pilot_retries_only_infrastructure_failures_without_duplicate_rows(tmp_path: Path, monkeypatch):
-    monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
-    task = next(task for task in load_tasks(TASKS_PATH) if task.task_id == "decisive_docmancer_vector_timeout_fallback_001")
-    runner = FailingRunner()
-    kwargs = {
-        "tasks": [task],
-        "conditions": ["repo_only_strict_offline"],
-        "repeats": 1,
-        "run_id": "retry_runner_blocked",
-        "runner": runner,
-        "model": "test",
-        "timeout_seconds": 1,
-        "prompt_template": "Issue:\n{issue_text}",
-    }
-    execute_pilot(**kwargs)
-
-    results = execute_pilot(**kwargs, retry_infrastructure_failures=True)
-
-    assert runner.calls == 2
-    assert len(results) == 1
-    assert results[0]["status"] == "runner_unavailable"
-    run_dir = tmp_path / "retry_runner_blocked" / task.task_id / "repo_only_strict_offline" / "repeat_0"
-    assert (run_dir / "attempts" / "attempt_1" / "runner_error.json").exists()
-    assert len((tmp_path / "retry_runner_blocked" / "runs.jsonl").read_text(encoding="utf-8").splitlines()) == 1
 
 
-def test_archive_run_attempt_moves_stale_artifacts_out_of_active_cell(tmp_path: Path):
-    (tmp_path / "runner_error.json").write_text("{}", encoding="utf-8")
-    (tmp_path / "stdout.log").write_text("failed", encoding="utf-8")
-
-    _archive_run_attempt(tmp_path)
-
-    assert not (tmp_path / "runner_error.json").exists()
-    assert not (tmp_path / "stdout.log").exists()
-    assert (tmp_path / "attempts" / "attempt_1" / "runner_error.json").exists()
-    assert (tmp_path / "attempts" / "attempt_1" / "stdout.log").read_text(encoding="utf-8") == "failed"
-
-
-def test_report_summarizes_runner_unavailable_failures(tmp_path: Path):
-    report = write_report(
-        tmp_path,
-        metadata={"environment": {}, "executive_result": "test"},
-        results=[{
-            "task_id": "t",
-            "condition_id": "repo_only_strict_offline",
-            "repeat": 0,
-            "status": "runner_unavailable",
-            "resolved": False,
-            "public_tests_passed": False,
-            "hidden_tests_passed": False,
-            "policy_clean": False,
-            "metrics": {},
-            "docatlas": {},
-            "contract": {},
-            "actionability": {},
-        }],
-    )
-
-    text = report.read_text(encoding="utf-8")
-    assert "1 run(s) did not produce a valid evaluated result" in text

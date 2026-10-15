@@ -1,0 +1,33 @@
+{
+  "attempt": "attempt-02-native-restore",
+  "base_commit": "62e36f8052f528ddf3033dbf546ece686ac48a65",
+  "started_at_utc": "2026-10-12T20:17:35.311072+00:00",
+  "command": [
+    "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-s",
+    "-ra",
+    "tests/test_native_context_preservation_integration.py",
+    "--basetemp",
+    "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/late-attempt-02-native-restore",
+    "--junitxml",
+    "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/late-context-diagnostics-20261012/attempt-02-native-restore/junit.xml",
+    "-o",
+    "junit_family=legacy"
+  ],
+  "status": "completed",
+  "automatic_retries": 0,
+  "timeout_seconds": 180,
+  "environment": {
+    "DOCATLAS_AUTO_VECTORS": "0",
+    "PYTEST_DOCATLAS_ARTIFACT_DIR": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/late-context-diagnostics-20261012/attempt-02-native-restore/artifacts",
+    "PYTHONHASHSEED": "0",
+    "TMPDIR": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 2.972783232002257,
+  "finished_at_utc": "2026-10-12T20:17:38.284130+00:00",
+  "runtime_inputs_unchanged": true
+}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.496" timestamp="2026-10-13T14:18:36.221387+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" time="0.006"><failure message="PermissionError: storage ancestors must not permit foreign namespace replacement">tmp_path = PosixPath('/tmp/opencode/removal-default-checks/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8ff0dc66c0&gt;
+state_root = PosixPath('/tmp/opencode/removal-default-checks/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7f8ff0dd5e40&gt;
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), &lt;=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+&gt;       with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+
+tests/test_heuristic_removal_public_integration.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+eval/evidence_quality_v2/runtime.py:93: in isolated_service
+    cold = create_local_mcp_service()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/mcp/_docs_server_part01.py:63: in create_local_mcp_service
+    return LocalMemberService(resolve_mcp_config(explicit_path=config_path))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/core/config_resolution.py:92: in resolve_mcp_config
+    policy.validate()
+docmancer/core/member_storage_policy.py:93: in validate
+    self._directories()
+docmancer/core/member_storage_policy.py:50: in _directories
+    self._directory(directory, private=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MemberStoragePolicy(app_home=PosixPath('/tmp/opencode/removal-default-checks/docatlas-evidence-v1va2469/docatlas_home'...mp/opencode/removal-default-checks/docatlas-evidence-v1va2469/docatlas_home/mcp-members/members.db'), config_path=None)
+path = PosixPath('/tmp/opencode'), private = False
+
+    def _directory(self, path: Path, *, private: bool) -&gt; None:
+        try:
+            info = path.lstat()
+        except FileNotFoundError:
+            return
+        if not stat.S_ISDIR(info.st_mode):
+            raise PermissionError("storage ancestors must be plain directories")
+        # A sticky system temporary directory is permitted, but an ordinary
+        # writable ancestor would let another principal replace private state.
+        if (info.st_uid not in {0, os.getuid()}
+                or info.st_mode &amp; 0o022 and not info.st_mode &amp; stat.S_ISVTX):
+&gt;           raise PermissionError("storage ancestors must not permit foreign namespace replacement")
+E           PermissionError: storage ancestors must not permit foreign namespace replacement
+
+docmancer/core/member_storage_policy.py:64: PermissionError</failure></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" time="0.005"><failure message="PermissionError: storage ancestors must not permit foreign namespace replacement">tmp_path = PosixPath('/tmp/opencode/removal-default-checks/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8ff0e26ab0&gt;
+state_root = PosixPath('/tmp/opencode/removal-default-checks/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/member-state')
+
+    def test_public_removal_explicit_scope_version_and_foreign_locator(
+        tmp_path, monkeypatch, state_root,
+    ):
+        """2 prepare, 6 contexts; foreign project also indexed, so locator isolation is real."""
+        root, foreign = (tmp_path / "project").resolve(), (tmp_path / "foreign").resolve()
+        runtime.write_project(root, SCOPE_DOCUMENTS)
+        catalog = root / "docatlas.project-docs.yaml"
+        data = yaml.safe_load(catalog.read_bytes())
+        for entry in data["documents"]:
+            if entry["path"] == "modules/imaging/guide.md":
+                entry.update(scope="module", module_path="modules/imaging")
+        catalog.write_text(yaml.safe_dump(data, sort_keys=False))
+        foreign_documents = {"docs/foreign.md": "# Foreign vault\n\n`FOREIGN_VAULT_PIN` unlocks the foreign vault.\n"}
+        runtime.write_project(foreign, foreign_documents)
+&gt;       with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+
+tests/test_heuristic_removal_public_integration.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+eval/evidence_quality_v2/runtime.py:93: in isolated_service
+    cold = create_local_mcp_service()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/mcp/_docs_server_part01.py:63: in create_local_mcp_service
+    return LocalMemberService(resolve_mcp_config(explicit_path=config_path))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/core/config_resolution.py:92: in resolve_mcp_config
+    policy.validate()
+docmancer/core/member_storage_policy.py:93: in validate
+    self._directories()
+docmancer/core/member_storage_policy.py:50: in _directories
+    self._directory(directory, private=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MemberStoragePolicy(app_home=PosixPath('/tmp/opencode/removal-default-checks/docatlas-evidence-haq2vc0n/docatlas_home'...mp/opencode/removal-default-checks/docatlas-evidence-haq2vc0n/docatlas_home/mcp-members/members.db'), config_path=None)
+path = PosixPath('/tmp/opencode'), private = False
+
+    def _directory(self, path: Path, *, private: bool) -&gt; None:
+        try:
+            info = path.lstat()
+        except FileNotFoundError:
+            return
+        if not stat.S_ISDIR(info.st_mode):
+            raise PermissionError("storage ancestors must be plain directories")
+        # A sticky system temporary directory is permitted, but an ordinary
+        # writable ancestor would let another principal replace private state.
+        if (info.st_uid not in {0, os.getuid()}
+                or info.st_mode &amp; 0o022 and not info.st_mode &amp; stat.S_ISVTX):
+&gt;           raise PermissionError("storage ancestors must not permit foreign namespace replacement")
+E           PermissionError: storage ancestors must not permit foreign namespace replacement
+
+docmancer/core/member_storage_policy.py:64: PermissionError</failure></testcase></testsuite></testsuites>

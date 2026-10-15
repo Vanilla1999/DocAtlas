@@ -107,94 +107,7 @@ def _bound_module_recovery_projection(
     if not candidates:
         return
 
-    limit = min(256, INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
-    for key in SUPPORT_ENVELOPE_KEYS:
-        if key not in _MODULE_RECOVERY_SUPPORT_SUMMARY_KEYS:
-            payload.pop(key, None)
-    payload.pop("support_envelope", None)
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-
-    missing = payload.get("missing")
-    if isinstance(missing, list):
-        payload["missing"] = missing[:1] or [_MODULE_RECOVERY_MISSING]
-    action = payload.get("recommended_next_action")
-    if isinstance(action, dict):
-        for key in (
-            "type", "reason", "message", "confirmation_reason", "agent_question",
-            "observations", "security_scope", "decision_options",
-        ):
-            action.pop(key, None)
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-
-    for row in candidates:
-        row.pop("module_name", None)
-        row.pop("module_type", None)
     payload["module_candidates"] = candidates
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-
-    # Preserve the complete ambiguity set whenever the requested budget allows it.
-    # Compact surrounding diagnostics before sacrificing candidate coverage.
-    for key in (
-        "operational_status", "context_available", "disposition", "edit_ready",
-        "source_search_status", "requires_confirmation", "decision_hash", "reason_code",
-        "documentation_supported", "investigation_allowed", "hard_stop",
-        "recovery_origin", "recovery_reason_code", "recovery_disposition",
-    ):
-        payload.pop(key, None)
-    payload["missing"] = [_MODULE_RECOVERY_MISSING]
-    payload["module_candidates"] = candidates
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-
-    # A tight budget keeps one complete exact locator. Never truncate a path.
-    candidates.sort(
-        key=lambda row: (len(str(row["module_path"])), str(row["module_path"]))
-    )
-    payload["module_candidates"] = [candidates[0]]
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-
-    minimal_action = payload.get("recommended_next_action")
-    if isinstance(minimal_action, dict):
-        minimal_action = {
-            key: deepcopy(minimal_action[key])
-            for key in ("tool", "arguments_patch", "requires_confirmation", "auto_execute")
-            if key in minimal_action
-        }
-    kind = payload.get("kind")
-    payload.clear()
-    payload.update({
-        "status": "insufficient_evidence",
-        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
-        "missing": [_MODULE_RECOVERY_MISSING],
-        "answer_supported": False,
-        "answer_available": False,
-        "support_status": "insufficient_evidence",
-        "operational_reason_code": reason,
-        "module_candidates": [candidates[0]],
-        "estimated_tokens": 0,
-    })
-    if minimal_action:
-        payload["recommended_next_action"] = minimal_action
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-
-    # An exact locator is useful only when it survives intact. Drop the row
-    # rather than returning a misleading truncated path or failing the handler.
-    payload.pop("module_candidates", None)
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-    payload.pop("recommended_next_action", None)
     _refresh_estimate(payload)
 
 
@@ -275,6 +188,11 @@ def _attach_recovery_diagnosis(
     # A concrete lifecycle/status/user-confirmation action describes a known
     # operational state and is more precise than changing the wording. Preserve
     # it unless canonical evidence reports an authoritative hard stop.
+    if bool(diagnosis.get("hard_stop")):
+        updated["next_action"] = None
+        updated["next_actions"] = []
+        updated.pop("recommended_next_action", None)
+        return updated
     operational = _first_operational_action(updated)
     if operational is not None and not bool(diagnosis.get("hard_stop")):
         updated.update({

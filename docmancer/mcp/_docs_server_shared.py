@@ -3,30 +3,6 @@ from __future__ import annotations
 from ._docs_server_schema import *  # noqa: F401,F403
 from ._docs_server_tool_data import *  # noqa: F401,F403
 
-_ORIGINAL_REQUEST_GUIDANCE = (
-    "Pass the user's original request unchanged as question; never substitute a "
-    "documentation-governance meta-question. "
-)
-_CONCRETE_QUESTION_GUIDANCE = (
-    "One call = one concrete question; pass it as the original request unchanged, never a "
-    "benchmark/evaluation or documentation-governance meta-question. "
-)
-_GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
-    "One concrete question; independent questions use separate calls."
-)
-_GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
-    "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."
-)
-_GET_DOCS_CONTEXT_SCOPE_GUIDANCE = (
-    'For onboarding/cross-module use scope=all without module filters (scope="all"); use scope="project" for repo policy and '
-    'scope="module" with exact module_path. module_path always implies module scope. Preserve explicit scope; never widen it.'
-)
-_GET_DOCS_CONTEXT_SCOPE_DESCRIPTION = (
-    "project=repo-level docs only; module=one module; all=repo-level plus modules in the same repository; "
-    "module_path limits to module."
-)
-
-
 def _handler_for_tool(name: str) -> ToolHandler:
     if name in {tool["name"] for tool in context_tools(RAW_TOOLS)}:
         return handle_context_tool
@@ -40,9 +16,14 @@ def _handler_for_tool(name: str) -> ToolHandler:
 
 
 def _strip_null_enum_values(value: Any) -> Any:
+    """Strip legacy null enum members only when the declared type excludes null."""
     if isinstance(value, dict):
         cleaned = {key: _strip_null_enum_values(child) for key, child in value.items()}
-        if "enum" in cleaned and isinstance(cleaned["enum"], list):
+        declared_type = cleaned.get("type")
+        nullable = declared_type == "null" or (
+            isinstance(declared_type, list) and "null" in declared_type
+        )
+        if "enum" in cleaned and isinstance(cleaned["enum"], list) and not nullable:
             cleaned["enum"] = [item for item in cleaned["enum"] if item is not None]
         return cleaned
     if isinstance(value, list):
@@ -50,55 +31,26 @@ def _strip_null_enum_values(value: Any) -> Any:
     return value
 
 
-def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
+def _tool_spec(raw: dict[str, Any], *, config: DocsServerConfig) -> ToolSpec:
     name = str(raw["name"])
-    validation_schema = _strip_null_enum_values(copy.deepcopy(raw["inputSchema"]))
     advertised_schema = _strip_null_enum_values(copy.deepcopy(
         PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, raw["inputSchema"])
     ))
     description = PUBLIC_ADVERTISED_DESCRIPTIONS.get(name, str(raw["description"]))
-    if name == "get_docs_context":
-        description = description.replace(
-            _ORIGINAL_REQUEST_GUIDANCE,
-            _CONCRETE_QUESTION_GUIDANCE,
+    output_schema = copy.deepcopy(PUBLIC_ADVERTISED_OUTPUT_SCHEMAS.get(name, raw.get("outputSchema")))
+    if name == "get_docs_context" and config.expose_advanced:
+        advertised_schema["properties"]["context_format"] = copy.deepcopy(
+            raw["inputSchema"]["properties"]["context_format"]
         )
-        description = description.replace(
-            "For cross-module use scope=all without module filters; module_path always implies module scope.",
-            _GET_DOCS_CONTEXT_SCOPE_GUIDANCE,
-        )
-        properties = advertised_schema.get("properties", {})
-        question_schema = properties.get("question")
-        if isinstance(question_schema, dict):
-            question_schema["description"] = _GET_DOCS_CONTEXT_QUESTION_DESCRIPTION
-        lookup_schema = properties.get("lookup_queries")
-        if isinstance(lookup_schema, dict):
-            lookup_schema["description"] = _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION
-        scope_schema = properties.get("scope")
-        if isinstance(scope_schema, dict):
-            scope_schema["description"] = _GET_DOCS_CONTEXT_SCOPE_DESCRIPTION
-        validation_schema = copy.deepcopy(advertised_schema)
-    elif name == "docs_status":
-        description = description.replace(
-            "a returned prepare_docs job_id",
-            "a returned job_id from prepare_docs",
-        )
+        description += " Optional context_format=patch_context selects read-only evidence, never edit permission; omitted/null returns docs."
+        output_schema = {"oneOf": [output_schema, copy.deepcopy(_PATCH_CONTEXT_OUTPUT_SCHEMA)]}
     return ToolSpec(
         name=name,
         description=description,
         input_schema=advertised_schema,
         handler=_handler_for_tool(name),
-        output_schema=(
-            None
-            if text_fallback
-            else copy.deepcopy(PUBLIC_ADVERTISED_OUTPUT_SCHEMAS.get(name, raw.get("outputSchema")))
-        ),
-        validation_schema=(
-            validation_schema
-            if name == "get_docs_context"
-            else _strip_null_enum_values(copy.deepcopy(
-                PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
-            ))
-        ),
+        output_schema=None if config.text_fallback else output_schema,
+        validation_schema=copy.deepcopy(advertised_schema),
     )
 
 
@@ -112,7 +64,7 @@ def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
             continue
         if name in ADVANCED_TOOL_NAMES and not config.expose_advanced:
             continue
-        specs.append(_tool_spec(raw, text_fallback=config.text_fallback))
+        specs.append(_tool_spec(raw, config=config))
     return DocsMcpSurface(
         tools=tuple(specs),
         handlers={spec.name: spec.handler for spec in specs},

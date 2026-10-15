@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T04",
+  "question": "What arguments does a Textual watch method receive when it declares one positional argument versus two?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "785396266062c2f52d25fd83490b2ae342e4f2f19fa02c6846b29ec78b0d4482",
+      "mini_sha256": "785396266062c2f52d25fd83490b2ae342e4f2f19fa02c6846b29ec78b0d4482"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "770511d495cc7644b94d7ec63240b141e10caf1f570b0208c8120fa9816bae20",
+      "mini_sha256": "770511d495cc7644b94d7ec63240b141e10caf1f570b0208c8120fa9816bae20"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "39f0d80b74e5542becbebdabb2c35d243568e533ccb2f218f6ebbbc9a1b84049",
+      "mini_sha256": "39f0d80b74e5542becbebdabb2c35d243568e533ccb2f218f6ebbbc9a1b84049"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

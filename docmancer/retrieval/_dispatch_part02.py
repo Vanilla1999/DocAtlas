@@ -156,10 +156,9 @@ class _RetrievalDispatcherPart02:
     def _candidate_limit_for_diversity(self, limit: int, expand: str | None) -> int:
         if (expand or "").lower() in {"adjacent", "page"}:
             return limit
-        max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
-        if not max_per_source:
-            return limit
-        return max(limit * 3, limit + int(max_per_source) * 3)
+        # Bounded reserve for policy exclusions after backend search, independent
+        # of document identity or the retired per-source diversity setting.
+        return max(limit * 3, limit + 6)
 
     def _limit_sections_per_source(
         self,
@@ -170,50 +169,20 @@ class _RetrievalDispatcherPart02:
     ) -> list[Any]:
         if (expand or "").lower() in {"adjacent", "page"}:
             return chunks
-        max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
-        if not max_per_source:
+        # An explicitly configured resource quota is not a relevance score.
+        # The default remains unset: no implicit diversity or authority policy.
+        quota = self.config.retrieval.max_sections_per_source
+        if quota is None:
             return chunks[:limit] if limit is not None else chunks
-
-        # The per-source quota remains the diversity floor. One additional
-        # candidate may backfill unused global capacity only when its indexed
-        # parent is already represented by a preferred chunk from that source.
-        # Parent identity proves source-local structure, not semantic support;
-        # the normal evidence qualification/projection gates still decide
-        # whether the added candidate may become visible evidence.
         counts: dict[str, int] = {}
-        preferred: list[Any] = []
-        preferred_parents: dict[str, set[str]] = {}
-        structural_overflow: list[Any] = []
-        overflow_sources: set[str] = set()
+        selected = []
         for chunk in chunks:
-            metadata = getattr(chunk, "metadata", {}) or {}
-            source = str(
-                metadata.get("canonical_url")
-                or getattr(chunk, "source", "")
-                or ""
-            )
-            parent = str(metadata.get("parent_logical_id") or "")
-            count = counts.get(source, 0)
-            if count < int(max_per_source):
-                counts[source] = count + 1
-                preferred.append(chunk)
-                if parent:
-                    preferred_parents.setdefault(source, set()).add(parent)
+            source = str(chunk.source)
+            if counts.get(source, 0) >= quota:
                 continue
-            if (
-                source not in overflow_sources
-                and parent
-                and parent in preferred_parents.get(source, set())
-            ):
-                structural_overflow.append(chunk)
-                overflow_sources.add(source)
-
-        if limit is None:
-            return [*preferred, *structural_overflow]
-        selected = preferred[:limit]
-        if len(selected) < limit:
-            selected.extend(structural_overflow[:limit - len(selected)])
-        return selected
+            counts[source] = counts.get(source, 0) + 1
+            selected.append(chunk)
+        return selected[:limit] if limit is not None else selected
 
     @staticmethod
     def _filter_chunks(chunks: list[Any], filters: dict | None) -> list[Any]:
@@ -228,76 +197,6 @@ class _RetrievalDispatcherPart02:
             )
         ]
 
-    @staticmethod
-    def _rank_project_bodies_within_source(query: str, chunks: list[Any]) -> list[Any]:
-        """Spend each source's quota on body matches before heading mentions.
-
-        Keep the inter-source ordering and global capacity unchanged. This is
-        a candidate preference only; source policy and visible qualification
-        still govern admission. Stable ties retain the original retrieval rank.
-        """
-        from docmancer.docs.domain.evidence_qualification import _visible_term_present
-        from docmancer.docs.domain.query_terms import documentation_query_terms, documentation_exact_terms
-
-        terms = documentation_query_terms(query)
-        exact = {term.normalized_value for term in documentation_exact_terms(query)}
-        def key(chunk: Any) -> tuple[int, int]:
-            body = str(chunk.text).casefold()
-            return (sum(_visible_term_present(term, body, exact=True) for term in exact),
-                    sum(_visible_term_present(term, body, exact=term in exact) for term in terms))
-        groups: dict[str, list[Any]] = {}
-        for chunk in chunks:
-            source = str((chunk.metadata or {}).get('canonical_url') or chunk.source)
-            groups.setdefault(source, []).append(chunk)
-        queues = {source: iter(sorted(group, key=key, reverse=True)) for source, group in groups.items()}
-        return [next(queues[str((chunk.metadata or {}).get('canonical_url') or chunk.source)]) for chunk in chunks]
-
-    def _rerank_intent_matches(self, query: str, chunks: list[Any], *, expand: str | None = None) -> list[Any]:
-        if not query or len(chunks) < 2:
-            return chunks
-        # Project lanes already carry SQLite ranking; library snippet boosts
-        # must not displace repository prose requirements with code examples.
-        if all((getattr(chunk, "metadata", {}) or {}).get("source_class") == "project_file" for chunk in chunks):
-            return self._rank_project_bodies_within_source(query, chunks)
-        query_lower = query.lower()
-        query_terms = _query_api_terms(query)
-        intent_terms = _query_intent_terms(query_lower)
-        if not query_terms and not intent_terms:
-            return chunks
-
-        scored: list[tuple[float, int, Any]] = []
-        for index, chunk in enumerate(chunks):
-            metadata = getattr(chunk, "metadata", {}) or {}
-            source = str(metadata.get("canonical_url") or getattr(chunk, "source", "") or "")
-            title = str(metadata.get("title") or metadata.get("section_title") or "")
-            document_title = str(metadata.get("document_title") or "")
-            anchor = str(metadata.get("anchor") or "")
-            haystack = "\n".join([source, title, document_title, anchor]).lower()
-            text = str(getattr(chunk, "text", "") or "").lower()
-
-            boost = 0.0
-            for term in query_terms:
-                term_lower = term.lower()
-                compact = term_lower.replace(".", "")
-                if term_lower in haystack or compact in haystack:
-                    boost += 3.0
-                elif term_lower in text[:1200] or compact in text[:1200]:
-                    boost += 1.0
-
-            if boost and any(part in source for part in ("/docs/", "/guide/", "/tutorial/", "/reference/", "/concepts/", "/concepts2/")):
-                boost += 1.0
-            boost += _intent_source_score(query_lower, intent_terms, source, haystack, text)
-            boost += _snippet_intent_score(query_lower, intent_terms, query_terms, metadata, text)
-            if isinstance(metadata, dict):
-                metadata["_pre_post_rank"] = index + 1
-                metadata["_intent_boost"] = boost
-            scored.append((boost, index, chunk))
-
-        if not any(boost for boost, _index, _chunk in scored):
-            return chunks
-        scored.sort(key=lambda item: (-item[0], item[1]))
-        return [chunk for _boost, _index, chunk in scored]
-
     def _append_api_term_matches(
         self,
         query: str,
@@ -308,33 +207,8 @@ class _RetrievalDispatcherPart02:
         backend_filters: dict | None = None,
         verification_filters: dict | None = None,
     ) -> list[Any]:
-        query_terms = _query_api_terms(query)
-        if not query_terms:
-            return chunks
-        supplemental: list[Any] = []
-        for term in sorted(query_terms)[:8]:
-            try:
-                supplemental.extend(self.store.query(
-                    term, limit=4, budget=budget,
-                    expand=expand, filters=backend_filters,
-                ))
-            except Exception:
-                continue
-        supplemental = self._filter_chunks(supplemental, verification_filters)
-        for rank, chunk in enumerate(supplemental, start=1):
-            metadata = getattr(chunk, "metadata", None)
-            if isinstance(metadata, dict):
-                metadata["_supplemental_rank"] = rank
-        seen: set[Any] = set()
-        out: list[Any] = []
-        for chunk in [*chunks, *supplemental]:
-            metadata = getattr(chunk, "metadata", {}) or {}
-            key = metadata.get("section_id") or (getattr(chunk, "source", ""), getattr(chunk, "chunk_index", None))
-            if key in seen:
-                continue
-            seen.add(key)
-            out.append(chunk)
-        return out
+        # Literal anchors remain constraints, not extra executable searches.
+        return self._filter_chunks(chunks, verification_filters)
 
     def _degraded_mode_name(self, mode: str, candidate_lists: dict[str, list[Any]], failures: dict[str, str]) -> str:
         if not failures:

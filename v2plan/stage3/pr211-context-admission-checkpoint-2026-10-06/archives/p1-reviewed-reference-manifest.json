@@ -1,0 +1,56 @@
+{
+  "schema": "p1-reviewed-reference-manifest-v1",
+  "status": "REVIEWED_REFERENCE_NOT_OWNER_APPROVED",
+  "approved_freeze": false,
+  "p1_done": false,
+  "p2_authorized": false,
+  "review": {
+    "path": "archives/p1-independent-review-v2.json",
+    "sha256": "bec8804277f7b276c1ad2d31c1d68e3fc3848b8f844923b80fd238d7a8acf4ed"
+  },
+  "reviewed_inputs": {
+    "P1_CONTRACT_RU.md": "e999802fbf420f3db66b6e03f4f7bfcde1242a803c5a4bb139793cd7da902fc1",
+    "p1_contract_corpus.py": "4486f54c81e736e9179f738b2630befd61730fbf70a3953742597db36f50c891",
+    "p1_fixture_draft.py": "aedef1f8133830d98ad4fcb2862de57ca48e678158e3ebc869224005c5eaa496",
+    "archives/p1-contract-corpus-review.json": "fb704db29324346c6e94df5a30ecd89670f66a79e44a7a6c51cc51a3d7cd1f38",
+    "DICTIONARY_EXIT_PLAN_RU.md": "b4264e4221f1077ffc3ecbfb5551954be89fa6f8518bc95f48a0fc2697b70c92",
+    "P1_ACCEPTANCE_DRAFT_RU.md": "28d0d3701f20ef3e975c49d9ed63c7c10b3e5cc5a6794c2fd06319db967ff8f5",
+    "archives/p0-transition-manifest.json": "375cdda976a6e07cea6ae6c95521ee762424c1bc5dd9626a98b37d9ec6a0f91f"
+  },
+  "files": [
+    {
+      "path": "archives/p1-development-reference-v1.json",
+      "sha256": "1f44e0a0efebbc51b4af8c6ea3c202f146f7aa22677ffe0825d9bd661767ad7f",
+      "cases": 88
+    },
+    {
+      "path": "archives/p1-holdout-reference-v1.json",
+      "sha256": "65ca8335fcbf46fbf9607cf5f4a39cbaad7cd797bd0b92ccf2e75afb1f76b4b6",
+      "cases": 136
+    }
+  ],
+  "ledger": {
+    "path": "archives/p1-test-migration-ledger.json",
+    "sha256": "308cfecd68ee55e2f9dac91375b62929e0f980d0cd7b9b42edb7a13c04dc8c50",
+    "assertions": 159
+  },
+  "checks": {
+    "cases": 224,
+    "families": 28,
+    "span_checks": 176
+  },
+  "generation_environment": {
+    "python": "3.14.3"
+  },
+  "pending": [
+    "owner TD/TM/behavior decisions",
+    "formal P0 archival waiver or closure before approved freeze",
+    "numeric backend latency/cost/storage ceilings before model choice/download/run",
+    "actual product config/serializer/tokenizer/environment binding before execution"
+  ],
+  "limitations": [
+    "family-disjoint, not blind or source-disjoint holdout",
+    "quantum control intentionally reuses development Pebble document",
+    "offline validation is not product retrieval acceptance"
+  ]
+}

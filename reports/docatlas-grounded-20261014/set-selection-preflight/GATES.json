@@ -1,0 +1,41 @@
+{
+  "checked_on": "2026-10-14",
+  "repository": "Vanilla1999/DocAtlas",
+  "pr": 211,
+  "branch": "integration/stage3-v2-identity-pr1",
+  "head": "a011c7298f0731455799de2b19b4b7bb304876e8",
+  "pr_base": "main",
+  "pr_open": true,
+  "pr_merged": false,
+  "evidence_audit": "PASS",
+  "archive_files_verified": 47,
+  "oracle_separation_audited_diagnostic": "PASS",
+  "artifact_gate": "BLOCKED",
+  "trained_bundle": null,
+  "blockers": [
+    "No confirmed official trained SetR/ParaSet/SetCE weights with compatible complete inference bundle",
+    "Trained weights license not established",
+    "Full-pool 167-256 input capacity and exact tokenizer limits not established",
+    "Hardware requirements and reproducible offline inference not established"
+  ],
+  "arm_a": {
+    "kind": "audited historical installed public in-process MCP receipts, not a new paired run",
+    "P03": {"coverage": "FAIL", "covered_characters": 442, "required_characters": 515, "dto_cost": 11884, "selected": 41, "omitted": 126},
+    "E01": {"coverage": "FAIL", "covered_characters": 0, "required_characters": 557, "dto_cost": 11819, "selected": 39, "omitted": 217},
+    "integrity_scope_version_read_only": "PASS per preserved receipts",
+    "all_omitted_ids_have_over_cap_trial": true
+  },
+  "arm_b": {"P03": "NOT RUN", "E01": "NOT RUN", "latency_seconds": null, "peak_rss_bytes": null, "peak_vram_bytes": null},
+  "whitespace_only_control": {"boundary": "offline fixed final A JSON; no repacking", "P03_cost": 10868, "E01_cost": 10850, "coverage_changed": false},
+  "feasibility_packets": {"P03_cost": 743, "E01_cost": 811, "gold_informed": true, "is_arm_b": false},
+  "new_full_v40": "NOT RUN: B development gate not passed",
+  "historical_v40": {"positives": "22/24", "documented_partial": "8/8", "strict_empty_separate": "0/8"},
+  "semantic_refusal": "NOT TESTED / NOT IMPLEMENTED",
+  "new_product_calls": 0,
+  "model_inference_calls": 0,
+  "training_runs": 0,
+  "production_changes": false,
+  "unit_tests_added": 0,
+  "committed": false,
+  "pushed": false
+}

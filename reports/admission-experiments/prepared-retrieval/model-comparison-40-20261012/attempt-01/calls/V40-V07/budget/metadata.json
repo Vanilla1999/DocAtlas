@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-V07",
+  "mode": "budget",
+  "question": "What guaranteed 99th-percentile HMR propagation latency does Vite provide?",
+  "public_request": {
+    "question": "What guaranteed 99th-percentile HMR propagation latency does Vite provide?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/vite.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:46.321989+00:00",
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_before": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5714277520019095,
+  "process_cpu_seconds": 0.5691931739999916,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 973408,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_after": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "wire_sha256": "f8becf9c697038d373a6e9dbb1c3d072115032d64dd04f9b386bbcfa136774ef",
+  "wire_utf8_bytes": 4206,
+  "utf8_quarter_proxy": 1052,
+  "codec_o200k_base": 1215,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

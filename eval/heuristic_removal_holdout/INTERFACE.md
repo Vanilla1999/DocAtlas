@@ -1,0 +1,16 @@
+# NEW20 pre-freeze interface (no question/oracle content)
+
+Owner D. Runner E/coordinator may read this file, `source-manifest.json`, `FREEZE_MANIFEST.json`, `rubric.json`, and `corpus/**`. Do **not** read `sealed/**` until the coordinator records code/config/prompt/tokenizer freeze. This is procedural blinding, not a filesystem security boundary against same-user processes.
+
+Four isolated project roots: `eval/heuristic_removal_holdout/corpus/{click,requests,pytest,tox}`. Prepare these through the public local-project-docs prepare operation. `.rst` is a supported catalog extension; preserve original path, UTF-8 bytes, symbols, case and line endings. Do not prepare the enclosing holdout directory (it contains research and evaluator artifacts). Root is the named family, not its `docs` child. The acquisition record pins upstream release and source SHA; local snapshot bytes define evaluation version, not current upstream/latest. No product calls have been made by D.
+
+`source-manifest.json`: `{schema_version, dataset_id, sources:[{family,project_group,project_root,path,sha256,bytes,repository,revision,url}]}`. `path` is relative to this holdout directory; source locator within project is the suffix after `corpus/<family>/`.
+
+After freeze only:
+- `sealed/questions.json`: `{schema_version,dataset_id,cases:[{id,project_group,family,question,answerability,split,source_kind}]}`. `answerability` = `positive|partial|negative`, `split` = `NEW20`, `source_kind` = `project`. IDs are opaque consecutive NEW01–NEW20, not product rules. Questions pass unchanged, without lookup expansion/rewrite. Same project roots for both arms.
+- `sealed/oracle.json`: `{schema_version,dataset_id,offset_unit,cases:[{id,required_facts:[{id,statement,witness_sets:[[{path,sha256,text,start_byte,end_byte,start_line,end_line}]]}],unavailable_obligations,forbidden_claims,negative_empty_sources}]}`. For each fact, OR across witness sets; AND across witnesses inside a set. Byte spans are half-open into original raw UTF-8 bytes. Exact-match comparator tests literal `text` presence in delivered source text without deleting punctuation/Markdown/RST symbols or lowercasing. All required facts must pass for exact coverage; semantic sufficiency is separately judged. Partial has required supported facts and explicitly unavailable obligation(s); never score missing unavailable facts as required coverage, or call a full answer supported.
+- `sealed/witness-audit.json`: data-only literal/span audit, not product evidence.
+
+NEW20 distribution: 8 positive, 6 partial, 6 negative across four previously unused document families. Questions/gold deliberately absent here. The generic `rubric.json` is new and independent of the historical oracle. Blind reviewers initially receive question + delivered text + anonymized packet identifier, without arm names, expected class, gold or scores. Gold/source reconciliation is a second stage. Retain all output/failure receipts; do not tune from NEW20.
+
+Do not execute `acquire.py` to refresh a frozen corpus. It is provenance, not a runtime setup step. Hash-verify local corpus and sealed artifacts before opening; preserve the pre-output manifest separately from runtime manifests. No unit/product/model/benchmark execution is authorized by this interface.

@@ -1,0 +1,39 @@
+[
+  {
+    "file": "run-01-packets/context-139c136fa3e44b349f74c78db902a2d0.json",
+    "test": "test_final_budget_preserves_stale_source_denial_and_confirmation",
+    "project": "project",
+    "wire_bytes": 618,
+    "proxy": 155,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "no_docs_context_available"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-01-packets/context-e446a35db9114d349d1f9e7e0a666258.json",
+    "test": "test_final_budget_preserves_stale_source_denial_and_confirmation",
+    "project": "project",
+    "wire_bytes": 517,
+    "proxy": 130,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": null,
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "budget_limited"
+      ]
+    }
+  }
+]

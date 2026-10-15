@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "packet": "/tmp/opencode/pr211-delete-green-docs.json",
+  "sha256": "170389a103c8e598185c02e75663e0d09125ce869206dca94b3583592fca6080",
+  "removed": 1195, "added": 0,
+  "BASE_status": {"PASS": 1195}, "saved_CI_status": {"PASS": 1195},
+  "exact_ids_binding": "Manifest green-docs-units::retired-green1195 equals packet new_removed_pass_base_ids exactly;1195 unique, no overlap with prior1695. Packet classifies actual boundaries as units; no independent runtime validation claimed.",
+  "prior_manifest_sha256": "8ebc221ba8e2098057fb98e4a322d6d4f45589a222bf42900c3bdce04b1f3da3",
+  "integrated_manifest_sha256": "6d9290e2457cdf3ba11af320462423b1b7c7395824c8d9cea4e6277554834bbc",
+  "policy": "New confirmed AGENTS.md2026-10-10 PASS-unit exception, including unique/protective checks without successor/review; accepted coverage loss. Green integration/SKIP excluded. Historical red policy and historical findings are not rewritten; separate green policy appended.",
+  "source_bindings": {
+    "deleted_module_count": 119,
+    "deleted_module_binding": "Exact paths and author prior SHA in packet deleted_modules; all119 physically absent at metadata integration. No prior bytes reconstructed or independently hashed after deletion.",
+    "modified_module_count": 10,
+    "modified_final_sha256": {
+      "tests/docs/test_admission_meaning.py": "028e69f3ac5b9bc7714a0baf934c86c58b4d47f9dc5c8f40f6170247f38d7a16",
+      "tests/docs/test_admission_local_binding.py": "b9b907be3ce1795589f67cb58655ee2c6ba924e28e1a2578000dabde8064f272",
+      "tests/docs/test_library_docs_service.py": "acbc466288d39e44abda05bb771dac1057b561aed4ea5c097a53d4d2aa3d41be",
+      "tests/docs/test_question_plan_v4.py": "af8f665ea82e2fc9b4810b47d4888e9155bcb3bb6485110d3b32eb32fad82bba",
+      "tests/docs/test_patch_request_plan.py": "fa89a2d64474fe5a5bebce864e7e8f3b8c4dd565f9e6cc9a11d601cfed199447",
+      "tests/docs/test_mcp_boundary.py": "813cd22a9eb8e6f17ccfdcc9c74dfdb50929ca71eadd61a156d76dd072c07e76",
+      "tests/docs/test_project_context_service.py": "58fd715869c7c58b549bf05fd6860134e76358f41fdb926b7d32633bc76a1d7b",
+      "tests/docs/test_project_doc_ranking.py": "b1030bdbb24e44a8b9dbe19258a376a6065a8dbd52f7f2b3eee2b33704c30d45",
+      "tests/docs/test_docs_lossless_context_projection.py": "93f9360a22816c353a0170a39db365057b3d4c62bfe9a503aaf58164f9569fc0",
+      "tests/docs/test_evidence_set_disposition.py": "e7592e3de5a3498c1be81adcd41453bcaecb5bffa1013a93735321bc25f9034d"
+    },
+    "all129_paths_to_final_SHA_or_null_compact_sorted_JSON_sha256": "fe79e299e1494607a05e7ac34f3fd777ab1eebe5b9d7e2ce3e5b5b9b52304259",
+    "limits": "All10 current final SHA match packet. First four helper modification before hashes unavailable; author also notes unavailable prior evidence_selection deletion hash. Such missing before proof remains explicit."
+  },
+  "registry_actions": {"files": 60, "survivor_hashes": 10, "absent_module_metadata_entries": 238, "retired_node_overrides": 5, "total": 253},
+  "registry_binding": {
+    "paths": "Exact60 diagnostic_label_proposals paths in original hash-bound packet",
+    "compact_sorted_JSON_path_to_final_file_SHA256_sha256": "07f192b023f4b105c7cf21e9c27e4f886c53950116aebaa6cb962030a95e6034",
+    "canonicalization": "UTF-8 JSON sorted keys with comma/colon separators; SHA256 values hash exact registry bytes.",
+    "method": "Normalized unique BASE identities minus all2890 integrated removals, sorted newline-joined SHA256.119 absent modules lose module_labels/hash.10 physically surviving helper-only modules retain labels and receive empty-survivor hash e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855. No surviving helper/consumer label removed solely because it has zero scenarios. ROOT module labels/hash/overrides unchanged."
+  },
+  "remaining_docs_candidates": {
+    "modules": 81, "PASS_identities": 865,
+    "classification": "integration_or_ambiguous; packet does not provide separate exhaustive integration/ambiguous counts",
+    "sorted_unique_newline_joined_PASS_ids_sha256": "77d4f5cad944f6a2a5fcea7fe03b92f8a4393eaffa6222f44f7e5f78d63bb5c7",
+    "remaining_confirmed_unit_candidates_in_packet": 0,
+    "limit": "Remaining mixed/unclassified docs modules may contain units; no all-docs-unit completion claim. Exact remaining candidate IDs and source SHA are hash-bound in author packet."
+  },
+  "deferred_scope": "All ROOT tests outside tests/docs are active-writer scope; no current root source hash read/applied and no root registry entry changed. Root green deletions receive no credit until completed packet.",
+  "deferred_docs_paths": [],
+  "proof": {
+    "run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core3.11_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "advanced3.12_junit_sha256": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+    "boundary": "Exact saved PASS plus frozen BASE status; no current runtime/collection or product-quality proof. Source textual definitions confirm normalized survivor sets only."
+  },
+  "validation": {"partition": 8291, "overlap_previous": 0, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "removed": 2890, "added": 1, "net": 2889, "projected_after": 5402, "target_gap": 428, "classified": 3249, "unclassified": 5042},
+  "limits": "Only metadata/registries owned. No test/production/fixtures edits by integrator; no runtime/AST/project imports/pytest/install/CI/commit/push. Historical reviews/retention findings remain history. Coverage loss accepted, not product fix/PASS/green; final collection/CI pending."
+}

@@ -22,12 +22,15 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - [Context7 comparison](./context7-docmancer-comparison.md) — comparison with Context7-style hosted documentation lookup.
 - [Product brief](./DOCMANCER_PRODUCT_BRIEF.md) — product positioning and scope.
 - [Architecture](../wiki/Architecture.md) — architecture narrative for indexing, retrieval, Docs MCP, Packs runtime, registry, and version provenance.
-- [Question planning](./modules/question-planning.md) — fail-closed documentation-question and proof-obligation boundary.
+- [Project context retrieval](./modules/project-context-retrieval.md) — application, gateway, explicit query lineage, and source qualification.
+- [Evidence selection](./modules/evidence-selection.md) — current evidence eligibility, visible fidelity, and retrieval-only decisions.
+- [Question planning](./modules/question-planning.md) — original request identity and compatibility planning boundaries.
 - [Patch request planning](./modules/patch-request-planning.md) — reviewed imperative grammar, patch requirements, target resolution, mutation readiness, and edit authorization.
 
 ## User-facing reference
 
 - [Commands](../wiki/Commands.md) — CLI command reference.
+- [Index cleanup](./index-cleanup.md) — preview and confirmed cleanup of derived state while retaining sources and configuration.
 - [Configuration](../wiki/Configuration.md) — configuration options.
 - [Supported Sources](../wiki/Supported-Sources.md) — supported source types and fetch behavior.
 - [Install Targets](../wiki/Install-Targets.md) — agent installation targets.
@@ -53,4 +56,5 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - Prefer links to repository-owned docs over generated hidden summaries.
 - Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.
 - After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action="sync_project_docs")` action and retry the original question unchanged.
-- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.
+- Project reads return retrieval-only `docs_context`; `insufficient_evidence` is a status, not a fourth result kind. Compatibility `docs_answer` and advanced `patch_context` do not grant an answer-proof or edit permission. Check the advertised runtime schema.
+- The read catalog is a finite, explicit membership list. A link in this index does not by itself permit DocAtlas to read or index its target.

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._commands_shared import *  # noqa: F401,F403
+from docmancer.docs.application.query_trace import record_request_status, traced_request
 
 from ._commands_part01 import _collect_doctor_report, _create_agent_or_raise_lock_error, _effective_config, _effective_retrieval_mode, _emit_doctor_report, _get_agent_class, _load_config, _operational_source_card, _run_dispatch_query, _source_rows
 
@@ -165,6 +166,7 @@ def doctor_cmd(config_path: str | None, profile: str, json_output: bool, list_ch
     help="In non-lexical modes, fall back to remaining signals if a retriever fails instead of erroring.",
 )
 @click.pass_context
+@traced_request("cli", "query")
 def query_cmd(
     ctx: click.Context,
     text: str,
@@ -441,6 +443,7 @@ def patch_review_cmd(
 @click.option("--mode", default="auto", type=click.Choice(["auto", "project-only", "deps-only", "public-docs"], case_sensitive=False), show_default=True)
 @click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
 @click.option("--explain", is_flag=True, help="Print selected, rejected, and risky source decisions.")
+@traced_request("cli", "context")
 def context_cmd(
     project_path: str,
     question: str,
@@ -475,6 +478,7 @@ def context_cmd(
     result = LibraryDocsService(
         config=topology.config,
         library_index_root=topology.library_index_root,
+        read_only_metadata=True,
     ).get_project_context(
         project_path,
         question,
@@ -488,6 +492,7 @@ def context_cmd(
         mode=mode,
     )
     payload = asdict(result)
+    record_request_status(payload.get("status"))
     if output_format == "json":
         click.echo(json.dumps(
             payload,

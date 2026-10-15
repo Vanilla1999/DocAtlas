@@ -1,0 +1,63 @@
+{
+  "contract": "citation-coordinates-v3-2",
+  "adapter_id": "citation-adaptation-v3-2-envelope-authority-empty",
+  "raw_answer_sha256": "6dfc60c1e0f7a717be497a8d185b57d3c631a1068e0f858d8e3dee0ce81e1c92",
+  "prepared_sha256": "5104fb2f87f7266cec8b1445dd0fa67b9e64d47c9abfc9166cb451eaa2517665",
+  "semantic_entailment": "INDEPENDENT_REVIEW_REQUIRED",
+  "status": "EXTRACTED",
+  "generator_output": {
+    "status": "complete",
+    "claims": [
+      {
+        "claim": "Путь от ворот к упаковке через весы расходует 10 единиц заряда (4 + 6) и укладывается в бюджет 12 единиц, поскольку суммарный расход не превышает бюджет.",
+        "citations": [
+          {
+            "source_id": "ev-fc27ab709d57a0cd",
+            "start": 43,
+            "end": 401
+          }
+        ]
+      }
+    ],
+    "missing": []
+  },
+  "claims": [
+    {
+      "claim": "Путь от ворот к упаковке через весы расходует 10 единиц заряда (4 + 6) и укладывается в бюджет 12 единиц, поскольку суммарный расход не превышает бюджет.",
+      "citations": [
+        {
+          "source_id": "ev-fc27ab709d57a0cd",
+          "start": 43,
+          "end": 401,
+          "quote": "Разрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n",
+          "quote_sha256": "14afa63d3a08c191d06cd0b8c15bb07df537d582f1151b28266e83932c0f5b5d",
+          "document_char_range": [
+            43,
+            401
+          ],
+          "document_utf8_byte_range": [
+            79,
+            734
+          ],
+          "document_lf_line_range": [
+            3,
+            3
+          ],
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "provenance": {
+            "path_or_url": "docs/routes.md",
+            "scope": "project",
+            "version_binding": "unversioned",
+            "line_start": 1,
+            "line_end": 5,
+            "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+            "authority": "source_of_truth",
+            "source_uri": "docatlas://source/987a250698e507d05260a108"
+          },
+          "resolvable": true,
+          "verbatim": true
+        }
+      ]
+    }
+  ]
+}

@@ -8,13 +8,6 @@ from .context_blocks import source_block_alternatives
 from .technical_tokens import technical_term_pattern
 
 
-_QUERY_STOP_WORDS = frozenset({
-    "about", "after", "does", "from", "have", "into", "project", "that",
-    "their", "then", "these", "this", "what", "when", "where", "which",
-    "with", "работает", "какие", "когда", "проект", "этот",
-})
-
-
 _BASE_WINDOW_LIMITS = (160, 320, 520)
 _SHORT_COMPLETE_SOURCE_MAX_CHARS = 704
 
@@ -41,8 +34,7 @@ def _query_terms(queries: tuple[str, ...]) -> set[str]:
     return {
         token.casefold()
         for query in queries
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.-]{4,}", query)
-        if token.casefold() not in _QUERY_STOP_WORDS
+        for token in re.findall(r"[\w.-]+", query)
     }
 
 
@@ -336,7 +328,6 @@ def _include_complete_code_fence(
     for fence_start, fence_end, closed in blocks:
         if (
             closed and end <= fence_start and not text[end:fence_start].strip()
-            and re.search(r"\b(?:following|command|example)\b", text[start:end], re.I)
             and fence_end - start <= limit
         ):
             end = fence_end

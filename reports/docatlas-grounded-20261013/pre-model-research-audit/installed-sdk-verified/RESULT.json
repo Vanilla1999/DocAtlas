@@ -1,0 +1,915 @@
+{
+  "status": "PASS",
+  "boundary": "installed SDK, source-tree prepared SQLite",
+  "origin": "/tmp/opencode/docatlas-sdk-delivery-installed-20261013/lib/python3.12/site-packages/docmancer/__init__.py",
+  "calls": 10,
+  "model_calls": 0,
+  "seconds": 0.057734218000405235,
+  "small_count": 1,
+  "tight_text": "### Observatory storage\n\n# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/storage.md*",
+  "wide_text": "### Observatory storage\n\n# Observatory storage\n\nObservatory storage keeps the cases dry and locked. The technician records the shelf number and return date. Each lens must be inspected before storage. Any damaged lens is placed in a separate case with an inspection note attached.\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/storage.md*\n\n---\n\n### Observatory transport\n\n# Observatory transport\n\nObservatory transport begins after the operator signs the issue record. The driver keeps cases upright throughout the journey. On arrival, the operator inspects the seals and records any damage. A broken seal requires inspection before equipment is used.\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/transport.md*\n\n---\n\n### Observatory packing\n\n# Observatory packing\n\nObservatory lenses must be packed in rigid cases. Foam dividers separate every pair of lenses. The issue record must contain the case number and the serial number of each lens. The receiving technician checks this record before any case is opened.\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/packing.md*",
+  "expanded_text": "### Optical case dispatch checklist\n\n- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md*\n\n---\n\n### Optical case dispatch checklist\n\n# Optical case dispatch checklist\n\nComplete every dispatch checklist step before handing over an optical case.\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md*\n\n---\n\n### Filing after arrival\n\n## Filing after arrival\n\nFile the signed dispatch sheet in the room labelled «réception».\n\n\n*Source: /tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md*",
+  "adjacent": [
+    {
+      "source": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md",
+      "chunk_index": 1,
+      "text": "- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+      "score": 0.7463635157977063,
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project",
+        "project_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "repository_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791901357555341849,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "265634e27df6dd85c2d92286b4c9cb3aba0f5e63ca288849ee1d7078c3c54990",
+        "retrieval_content_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "stable_chunk_id": "child-7fb69e6725e215dccf7200c23272b642c88b2398",
+        "vector_id": "439bdaa6-871b-5d4a-be5b-4529959b9c3d",
+        "parent_logical_id": "parent-e297f3b1fce8c8daae373ce3bf4d6af9",
+        "atom_type": "list",
+        "atom_id": "atom-867aa6de50c16fafd35d81c4560c9120",
+        "source_identity": "project_file:local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          111,
+          1845
+        ],
+        "byte_span": [
+          111,
+          1845
+        ],
+        "line_span": [
+          4,
+          20
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 434,
+        "retrieval_token_estimate": 497,
+        "generation_id": "gen-e1c6f1554ff14ce79949f220fd50f795",
+        "title": "Optical case dispatch checklist",
+        "section_id": 4120858114707828412,
+        "token_estimate": 434,
+        "docmancer_tokens": 486,
+        "raw_tokens": 484,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 486,
+          "admitted_text_bytes": 1938,
+          "resource_skipped_rows": 0,
+          "expansion": "adjacent"
+        },
+        "ranking": {
+          "stable_id": "child-7fb69e6725e215dccf7200c23272b642c88b2398",
+          "section_id": 4120858114707828412,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -0.7463635157977063
+          },
+          "base_utility": 0.7463635157977063,
+          "feature_contributions": {},
+          "final_utility": 0.7463635157977063,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 3,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "photograph"
+          ],
+          "matched_terms": [
+            "photograph"
+          ],
+          "exact_terms": [
+            "photograph"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -0.7463635157977063,
+          "lexical_score": 0.7463635157977063,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "photograph"
+            ],
+            "retrieval_text": [
+              "photograph"
+            ]
+          }
+        },
+        "delivery": {
+          "limit": 20,
+          "budget": 12000,
+          "estimated_tokens": 486,
+          "measure": "stored_display_token_estimate"
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md",
+      "chunk_index": 0,
+      "text": "# Optical case dispatch checklist\n\nComplete every dispatch checklist step before handing over an optical case.\n",
+      "score": -0.0,
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project",
+        "project_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "repository_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791901357555341849,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "f63bbb5659f0522b47f532fe93c7930ff7f3a020729b260283ba6b41561f9b6e",
+        "retrieval_content_hash": "fb14ef6b0757eefab091c47f011f7d93336179bec9c885fbf21446736f2588f3",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "fb14ef6b0757eefab091c47f011f7d93336179bec9c885fbf21446736f2588f3",
+        "stable_chunk_id": "child-b211bda8ce3652e2c42c3eb9e5ed2196d5b8280f",
+        "vector_id": "13500af3-2b79-54b3-b472-0bb9fbba9c4e",
+        "parent_logical_id": "parent-e297f3b1fce8c8daae373ce3bf4d6af9",
+        "atom_type": "mixed",
+        "atom_id": "atom-0630cd0abfeb4a731ccc78adf7ff60dc",
+        "source_identity": "project_file:local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          111
+        ],
+        "byte_span": [
+          0,
+          111
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 28,
+        "retrieval_token_estimate": 91,
+        "generation_id": "gen-e1c6f1554ff14ce79949f220fd50f795",
+        "expansion": {
+          "mode": "adjacent",
+          "anchor_section_id": 4120858114707828412,
+          "anchor_rank": 1
+        },
+        "title": "Optical case dispatch checklist",
+        "section_id": 3222199577967358205,
+        "token_estimate": 28,
+        "docmancer_tokens": 486,
+        "raw_tokens": 484,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 486,
+          "admitted_text_bytes": 1938,
+          "resource_skipped_rows": 0,
+          "expansion": "adjacent"
+        },
+        "ranking": {
+          "method": "source_expansion",
+          "final_rank": 2,
+          "anchor_section_id": 4120858114707828412
+        },
+        "delivery": {
+          "limit": 20,
+          "budget": 12000,
+          "estimated_tokens": 486,
+          "measure": "stored_display_token_estimate"
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md",
+      "chunk_index": 2,
+      "text": "## Filing after arrival\n\nFile the signed dispatch sheet in the room labelled «réception».\n",
+      "score": -0.0,
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project",
+        "project_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "repository_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791901357555341849,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Filing after arrival",
+        "section_level": 2,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist > Filing after arrival",
+        "content_hash": "7b2cc197da540557337dccaa17d26c1cdb2d23b56cacc1c470f08f0f777b80ee",
+        "retrieval_content_hash": "c5d44e12423cc382410569a1564b2bb2cdf570fd946e8728f5190d6900e29454",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "f22b64a17f1654bfee4fc8951ecf33bee3778ea4443f8940c750d97257114f7d",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "f22b64a17f1654bfee4fc8951ecf33bee3778ea4443f8940c750d97257114f7d",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist > Filing after arrival",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "c5d44e12423cc382410569a1564b2bb2cdf570fd946e8728f5190d6900e29454",
+        "stable_chunk_id": "child-d30d007077b63b51ac06075a024640e180d89b6c",
+        "vector_id": "0a4f273d-953e-58f7-8ff9-34a2f3047cf3",
+        "parent_logical_id": "parent-e4a61668c21aec67c6c6a59fd02aff19",
+        "atom_type": "mixed",
+        "atom_id": "atom-9eb6f79fa545fafc1778028eb31d9d86",
+        "source_identity": "project_file:local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist",
+          "Filing after arrival"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          1845,
+          1935
+        ],
+        "byte_span": [
+          1845,
+          1938
+        ],
+        "line_span": [
+          21,
+          23
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 24,
+        "retrieval_token_estimate": 93,
+        "generation_id": "gen-e1c6f1554ff14ce79949f220fd50f795",
+        "expansion": {
+          "mode": "adjacent",
+          "anchor_section_id": 4120858114707828412,
+          "anchor_rank": 1
+        },
+        "title": "Filing after arrival",
+        "section_id": 6220106247755021231,
+        "token_estimate": 24,
+        "docmancer_tokens": 486,
+        "raw_tokens": 484,
+        "savings_percent": 0.0,
+        "runway_multiplier": 1.0,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 3,
+          "admitted_estimated_tokens": 486,
+          "admitted_text_bytes": 1938,
+          "resource_skipped_rows": 0,
+          "expansion": "adjacent"
+        },
+        "ranking": {
+          "method": "source_expansion",
+          "final_rank": 3,
+          "anchor_section_id": 4120858114707828412
+        },
+        "delivery": {
+          "limit": 20,
+          "budget": 12000,
+          "estimated_tokens": 486,
+          "measure": "stored_display_token_estimate"
+        }
+      }
+    }
+  ],
+  "page": [
+    {
+      "source": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md",
+      "chunk_index": 1,
+      "text": "- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+      "score": 0.7463635157977063,
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project",
+        "project_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "repository_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791901357555341849,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "265634e27df6dd85c2d92286b4c9cb3aba0f5e63ca288849ee1d7078c3c54990",
+        "retrieval_content_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "08199d5adf96a17d93b87fdcf70b21473c572c82c02c1f3e76681a3c520baccf",
+        "stable_chunk_id": "child-7fb69e6725e215dccf7200c23272b642c88b2398",
+        "vector_id": "439bdaa6-871b-5d4a-be5b-4529959b9c3d",
+        "parent_logical_id": "parent-e297f3b1fce8c8daae373ce3bf4d6af9",
+        "atom_type": "list",
+        "atom_id": "atom-867aa6de50c16fafd35d81c4560c9120",
+        "source_identity": "project_file:local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          111,
+          1845
+        ],
+        "byte_span": [
+          111,
+          1845
+        ],
+        "line_span": [
+          4,
+          20
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 434,
+        "retrieval_token_estimate": 497,
+        "generation_id": "gen-e1c6f1554ff14ce79949f220fd50f795",
+        "title": "Optical case dispatch checklist",
+        "section_id": 4120858114707828412,
+        "token_estimate": 434,
+        "docmancer_tokens": 462,
+        "raw_tokens": 484,
+        "savings_percent": 4.5,
+        "runway_multiplier": 1.05,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 2,
+          "admitted_estimated_tokens": 462,
+          "admitted_text_bytes": 1845,
+          "resource_skipped_rows": 0,
+          "expansion": "page"
+        },
+        "ranking": {
+          "stable_id": "child-7fb69e6725e215dccf7200c23272b642c88b2398",
+          "section_id": 4120858114707828412,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "fts5_bm25_cost": -0.7463635157977063
+          },
+          "base_utility": 0.7463635157977063,
+          "feature_contributions": {},
+          "final_utility": 0.7463635157977063,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 2,
+          "method": "fts5_bm25_equal_fields_or_v1"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "photograph"
+          ],
+          "matched_terms": [
+            "photograph"
+          ],
+          "exact_terms": [
+            "photograph"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 1,
+          "match_ratio": 1.0,
+          "bm25_cost": -0.7463635157977063,
+          "lexical_score": 0.7463635157977063,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "photograph"
+            ],
+            "retrieval_text": [
+              "photograph"
+            ]
+          }
+        },
+        "delivery": {
+          "limit": 20,
+          "budget": 12000,
+          "estimated_tokens": 462,
+          "measure": "stored_display_token_estimate"
+        }
+      }
+    },
+    {
+      "source": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project/docs/dispatch.md",
+      "chunk_index": 0,
+      "text": "# Optical case dispatch checklist\n\nComplete every dispatch checklist step before handing over an optical case.\n",
+      "score": -0.0,
+      "metadata": {
+        "project_path": "/tmp/opencode/sdk-installed-fixture-fvltt4xg/project",
+        "project_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "repository_identity": "local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/dispatch.md",
+        "source_path": "docs/dispatch.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "project_doc_catalog_entry_hash": "sha256:923a160f6f0345d115bcd447017a40352aeb3437151d3c5fd27b74f2e1d95389",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": "",
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791901357555341849,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "resolved_version": "",
+        "version_family": "",
+        "authority": "source_of_truth",
+        "temporal_relevance": "current",
+        "docs_snapshot_exact": null,
+        "section_title": "Optical case dispatch checklist",
+        "section_level": 1,
+        "document_title": "dispatch",
+        "document_title_hash": "05b145cfb6fbc24d",
+        "anchor": "Optical case dispatch checklist",
+        "content_hash": "f63bbb5659f0522b47f532fe93c7930ff7f3a020729b260283ba6b41561f9b6e",
+        "retrieval_content_hash": "fb14ef6b0757eefab091c47f011f7d93336179bec9c885fbf21446736f2588f3",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "67c6c70526eaa54a68d30f892e0023aa8f8d5f172b8b36ede8ca1b33eccdc66a",
+          "token_estimate": 56,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "dispatch",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "docs/dispatch.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Optical case dispatch checklist",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "authority",
+              "value": "source_of_truth",
+              "provenance": "source.metadata.authority",
+              "priority": 100
+            },
+            {
+              "name": "catalog_description",
+              "value": "Pinned documentation source",
+              "provenance": "project.catalog.description",
+              "priority": 120
+            }
+          ]
+        },
+        "embedding_input_hash": "fb14ef6b0757eefab091c47f011f7d93336179bec9c885fbf21446736f2588f3",
+        "stable_chunk_id": "child-b211bda8ce3652e2c42c3eb9e5ed2196d5b8280f",
+        "vector_id": "13500af3-2b79-54b3-b472-0bb9fbba9c4e",
+        "parent_logical_id": "parent-e297f3b1fce8c8daae373ce3bf4d6af9",
+        "atom_type": "mixed",
+        "atom_id": "atom-0630cd0abfeb4a731ccc78adf7ff60dc",
+        "source_identity": "project_file:local:ddfb86788bb8929aebdf842f38a0e18a8f483898667fe3c480f4e045a5de8a57:docs/dispatch.md",
+        "source_content_hash": "fb159801bc3fdcbfa0fd87014dc088572270683d84c133f721b8627df9908633",
+        "heading_path": [
+          "Optical case dispatch checklist"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          111
+        ],
+        "byte_span": [
+          0,
+          111
+        ],
+        "line_span": [
+          1,
+          3
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 28,
+        "retrieval_token_estimate": 91,
+        "generation_id": "gen-e1c6f1554ff14ce79949f220fd50f795",
+        "expansion": {
+          "mode": "page",
+          "anchor_section_id": 4120858114707828412,
+          "anchor_rank": 1
+        },
+        "title": "Optical case dispatch checklist",
+        "section_id": 3222199577967358205,
+        "token_estimate": 28,
+        "docmancer_tokens": 462,
+        "raw_tokens": 484,
+        "savings_percent": 4.5,
+        "runway_multiplier": 1.05,
+        "acquisition": {
+          "method": "fts5_bm25_equal_fields_or_v1",
+          "sql_rows": 1,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 2,
+          "admitted_estimated_tokens": 462,
+          "admitted_text_bytes": 1845,
+          "resource_skipped_rows": 0,
+          "expansion": "page"
+        },
+        "ranking": {
+          "method": "source_expansion",
+          "final_rank": 2,
+          "anchor_section_id": 4120858114707828412
+        },
+        "delivery": {
+          "limit": 20,
+          "budget": 12000,
+          "estimated_tokens": 462,
+          "measure": "stored_display_token_estimate"
+        }
+      }
+    }
+  ],
+  "state_unchanged": true
+}

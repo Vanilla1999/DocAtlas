@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-E07",
+  "mode": "mini",
+  "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+  "public_request": {
+    "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/eslint.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:14:01.204894+00:00",
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_before": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "same_initial_state": true,
+  "elapsed_seconds": 1.475965448000352,
+  "process_cpu_seconds": 6.724719126999986,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 981112,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_after": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "wire_sha256": "d292c9444da893de1b71ee79d7b233ca3231ff7e32fa9bc8e78aa664b6ea9598",
+  "wire_utf8_bytes": 3488,
+  "utf8_quarter_proxy": 872,
+  "codec_o200k_base": 1014,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

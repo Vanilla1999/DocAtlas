@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/evidence_quality_v2/test_git_stdio_isolation.py": "31a9c961cc3bb13d8ac75bc8a169dbf4deae4029a7dc052da67156a37d28d2ae"
+    "tests/evidence_quality_v2/test_git_stdio_isolation.py": "176a00fdf64db04c6bb71b4a65eed9e05d57c9426675aa97872b04b638713054"
   }
 }

@@ -421,8 +421,6 @@ def build_bounded_direct_packet(
         question=task.issue_text,
         context_pack=packet_evidence,
         trust_contract=evidence.trust_contract,
-        # Leave headroom, then enforce the authoritative serialized limit below.
-        max_tokens=1_960,
         project_path=str(workspace),
         retrieval_issues=evidence.retrieval_issues,
         required_evidence_paths=(
@@ -435,50 +433,50 @@ def build_bounded_direct_packet(
     errors = validate_action_packet(
         packet,
         evidence_items=packet_evidence,
-        max_tokens=2_000,
         project_path=str(workspace),
     )
     if errors:
         raise IsolatedDeliveryError("invalid_bounded_direct_packet:" + ";".join(errors))
+    if packet["estimated_tokens"] > 2_000:
+        # Historical evaluation policy only; never trim the runtime packet.
+        raise IsolatedDeliveryError("historical_evaluation_packet_token_ceiling_exceeded")
     missing_categories = missing_packet_evidence_categories(
         packet,
         evidence.evidence_items,
         TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
     )
-    if packet.get("status") != "insufficient_evidence" and missing_categories:
+    if packet.get("result") == "data" and missing_categories:
         raise IsolatedDeliveryError(
             "bounded_direct_missing_required_evidence_categories:" + ",".join(missing_categories)
         )
     missing_paths = missing_packet_evidence_paths(
         packet, evidence.evidence_items, TASK33C_REQUIRED_EVIDENCE_PATHS
     )
-    if packet.get("status") != "insufficient_evidence" and missing_paths:
+    if packet.get("result") == "data" and missing_paths:
         raise IsolatedDeliveryError(
             "bounded_direct_missing_required_evidence_paths:" + ",".join(missing_paths)
         )
     contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
-    target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
     packet_targets = {
         str(row.get("path") or "").strip().replace("\\", "/")
-        for row in target_surface.get("likely_files", [])
-        if isinstance(row, dict)
+        for row in packet.get("assignments", [])
+        if isinstance(row, dict) and row.get("proof_role") == "target_identity"
     }
     missing_targets = sorted(set(contract.allowed_paths if contract else ()) - packet_targets)
-    if packet.get("status") != "insufficient_evidence" and missing_targets:
+    if packet.get("result") == "data" and missing_targets:
         raise IsolatedDeliveryError(
             "bounded_direct_missing_required_target_modules:" + ",".join(missing_targets)
         )
     projection, projection_snapshot = project_patch_context(
         packet=packet,
         evidence_items=packet_evidence,
-        max_tokens=2_000,
+        project_path=str(workspace),
     )
     projection_errors = _bounded_direct_projection_errors(
         projection,
         validate_model_visible_projection(
             projection,
             snapshot=projection_snapshot,
-            max_tokens=2_000,
         ),
     )
     if projection_errors:
@@ -492,7 +490,8 @@ def build_bounded_direct_packet(
     _write_json_atomic(output_dir / "bounded_direct_metrics.json", {
         "schema_version": 2,
         "strategy": "bounded_direct",
-        "status": packet["status"],
+        "result": packet["result"],
+        "completeness": packet["completeness"],
         "attempts": 1,
         "retrieval_calls": evidence.retrieval_calls,
         "parent_visible_raw_retrieval": False,

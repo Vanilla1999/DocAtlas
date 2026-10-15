@@ -1,0 +1,61 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_final_budget_preserves_stale_source_denial_and_confirmation _______
+
+tmp_path = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-review-run01/test_final_budget_preserves_st0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbca1964650>
+state_root = PosixPath('/workspace/scratch/7ccc1a9e2e54/docatlas-review-run01/test_final_budget_preserves_st0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x7fbc9f579760>
+
+    def test_final_budget_preserves_stale_source_denial_and_confirmation(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """1 prepare, 2 contexts, 0 source reads, 0 model calls."""
+        project = tmp_path / "project"
+        runtime.write_project(project, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.setenv(PARENTS_ENV, "1")
+            inventory = runtime.index_project(service, config, project)
+            before = _database_state(inventory)
+            (project / "docs/issue.md").write_text(UPDATED_ISSUE, encoding="utf-8")
+            edited_files = _file_state(project)
+            env.setenv(ADMISSION_ENV, "source_valid_candidates_v1")
+            env.setenv(CAP_ENV, str(WIDE_CAP))
+            wide = _context(service, project, OPTICS_QUESTION)
+            assert wide.get("kind") == "docs_context", wide
+            assert not wide.get("sources"), wide
+            assert wide.get("requires_confirmation") is True, wide
+            assert (wide.get("delivery_decision") or {}).get("deliverable") is False, wide
+            assert wide.get("confirmation_reason"), wide
+            assert REFUSAL_CAP < _packet_proxy(wide) <= WIDE_CAP
+            env.setenv(CAP_ENV, str(REFUSAL_CAP))
+            bounded = _context(service, project, OPTICS_QUESTION)
+            record_property("wide_refusal_utf8_quarter_proxy", _packet_proxy(wide))
+            record_property("bounded_refusal_utf8_quarter_proxy", _packet_proxy(bounded))
+            assert bounded.get("kind") == "docs_context", bounded
+            assert _packet_proxy(bounded) <= REFUSAL_CAP, bounded
+            assert not bounded.get("sources") and not bounded.get("read_next"), bounded
+            for key in ("context_available", "answer_supported", "answer_available", "edit_ready"):
+                assert wide.get(key) is False and bounded.get(key) is False, (key, bounded)
+            for key in (
+                "status", "reason_code", "support_status", "requires_confirmation",
+                "confirmation_reason", "delivery_decision", "operational_status", "context_quality",
+            ):
+>               assert bounded.get(key) == wide.get(key), (key, wide, bounded)
+E               AssertionError: ('confirmation_reason', {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['no_docs_context_avail...nd': 'docs_context', 'missing': ['Source context did not fit the experimental budget.'], 'estimated_tokens': 122, ...})
+E               assert None == 'project_docs_preflight'
+E                +  where None = <built-in method get of dict object at 0x7fbc9efa0b40>('confirmation_reason')
+E                +    where <built-in method get of dict object at 0x7fbc9efa0b40> = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['Source context did not fit the experimental budget.'], 'estimated_tokens': 122, ...}.get
+E                +  and   'project_docs_preflight' = <built-in method get of dict object at 0x7fbca19415c0>('confirmation_reason')
+E                +    where <built-in method get of dict object at 0x7fbca19415c0> = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['no_docs_context_available'], 'estimated_tokens': 146, ...}.get
+
+tests/test_context_budget_refusal_integration.py:56: AssertionError
+=============================== warnings summary ===============================
+tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation
+  tests/test_context_budget_refusal_integration.py:22: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_final_budget_preserves_stale_source_denial_and_confirmation(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation
+1 failed, 1 warning in 1.08s

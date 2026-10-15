@@ -1,0 +1,515 @@
+{
+  "schema_version": 1,
+  "projection109": {
+    "packet": "/tmp/opencode/pr211-fail-projection.json",
+    "sha256": "a0e0afaad00d25d993531f2c1dd5401a31cc22349a4a7ad5b0646ed6c642e1a1",
+    "removed": 109,
+    "added": 0,
+    "BASE_status": {
+      "FAIL": 108,
+      "PASS": 1
+    },
+    "saved_CI_status": {
+      "FAIL": 109
+    },
+    "module_counts": {
+      "tests/docs/test_model_visible_projection.py": 30,
+      "tests/docs/test_compact_context_blocks.py": 10,
+      "tests/docs/test_context_span_growth.py": 2,
+      "tests/docs/test_relation_preserving_projection.py": 9,
+      "tests/docs/test_review_assignment_identity.py": 6,
+      "tests/docs/test_review_boundary_semantics.py": 14,
+      "tests/docs/test_review_query_lineage.py": 4,
+      "tests/docs/test_review_span_lineage.py": 8,
+      "tests/docs/test_structural_behavior_matrix.py": 5,
+      "tests/docs/test_structural_item_integrity.py": 1,
+      "tests/docs/test_projection_decision_trace.py": 3,
+      "tests/docs/test_v2_acceptance_gaps.py": 3,
+      "tests/docs/test_action_packet_semantic_density.py": 9,
+      "tests/docs/test_normative_language.py": 3,
+      "tests/docs/test_request_flow_lineage.py": 2
+    },
+    "retained_integrated_failures": [
+      "tests/docs/test_v2_acceptance_gaps.py::test_v2_natural_chunking_keeps_parent_and_child_witnesses",
+      "tests/docs/test_v2_acceptance_gaps.py::test_v2_review_ready_keeps_reading_and_test_witnesses",
+      "tests/docs/test_v2_acceptance_gaps.py::test_v2_search_trust_keeps_selection_proof_and_context_witnesses"
+    ],
+    "unresolved": [],
+    "author_validation": "stdlib tokenize only; no project imports, runtime, pytest, installs or CI",
+    "BASE_PASS_saved_FAIL": [
+      "tests/docs/test_structural_item_integrity.py::test_projection_owner_remains_within_repository_module_budget"
+    ]
+  },
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "boundary": "Saved core3.11 pre-retirement; not final collection/runtime. Metadata and registries only; no runtime/AST/project imports/CI. Owner FAIL retirement accepts coverage loss, not product fix/PASS."
+  },
+  "registry_updates": [
+    {
+      "registry": "tests/diagnostic_labels.admission_contract.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_admission_role_boundaries.py",
+          "action": "survivor_hash",
+          "old": "c9e8b53c258a82f5e785b1b300c5aa01889795c52ef0e1480b21fd24a39318c7",
+          "new": "d77545346893d82abb8caeb93223f3dde0d46d3add35378a0d9f9b405d0bf278"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.bound_table_qualification.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_bound_table_qualification.py",
+          "action": "survivor_hash",
+          "old": "25c44558969d8754955af6957b6d4bbfe06be2f4e4a0e2164219c22a09350294",
+          "new": "fbaf8b75b673b89d20685ca6383bf1d555439261b61308ff35d656a90070bea6"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.comparison_relation_query_planning.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_comparison_relation_query_planning.py",
+          "action": "remove_absent_module_module_labels"
+        },
+        {
+          "module": "tests/docs/test_comparison_relation_query_planning.py",
+          "action": "remove_absent_module_module_node_hashes"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.component_coverage.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_component_completeness.py",
+          "action": "survivor_hash",
+          "old": "b7d6d44879da6030363cbc0907b9176d05d773b6fa1df4c29a2e9d7aa7131810",
+          "new": "babd18367d38362f157df796c6cb5c395a07f928e5412fd5ae8912061f3a9851"
+        },
+        {
+          "module": "tests/docs/test_component_coverage.py",
+          "action": "survivor_hash",
+          "old": "7ae241ab13b5e65a010056a0ad8d7a21528a8a67d318a16028fd1e6d3abd7037",
+          "new": "6107f32be79947746361b9209e5520a401c33f4fccbe4f0d41f71812a93ead90"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.compound_context.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_context_ranking_regressions.py",
+          "action": "survivor_hash",
+          "old": "f05ec79354e745e77ee80077c371bb4b70db64274be92acd8892dd669d25e38a",
+          "new": "125af85ae958d0f6e3e497596d1ca1dab795e85d349cf0aee2a9b3ff84e70ca2"
+        },
+        {
+          "module": "tests/docs/test_evidence_qualification.py",
+          "action": "survivor_hash",
+          "old": "d5ad49d23372d870bea1904944cac69adfc3451820af7f7c8d7f3cc2b00f4812",
+          "new": "7934e4ca1894ac5d04fcbf317275cd6e061fa9641c62dcc67766314d5bd093b7"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.curated_merge.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_cli_literal_query_binding.py",
+          "action": "survivor_hash",
+          "old": "8113c546c99ba7e4af43c9e0c70cd06516e5b14a0801049e13e1bbd5cb1eb3e2",
+          "new": "b17117c51678baad6e0e7e6d1fd5796c5b9b439e96908262eb346695c1a89318"
+        },
+        {
+          "module": "tests/docs/test_projection_decision_trace.py",
+          "action": "survivor_hash",
+          "old": "887dd4df7b709289683ff608ac1c5b3837011cfcae5c1abcdfa9bd0edb21d7df",
+          "new": "4f6d0cff280be48a78a91a33ee2fbbd941876dae9c5bb5cbf1ad5c256e9a5503"
+        },
+        {
+          "module": "tests/docs/test_russian_inquiry_intent.py",
+          "action": "survivor_hash",
+          "old": "3f0c0133b98278097c14b3623f3cceab62007f1eaf9db970e7db417029582260",
+          "new": "c9ecbf39351aa8ea258854f84fc40542cc552f29f17f7cb66b014273575d0f42"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.docs_lossless_facade.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_docs_lossless_facade.py",
+          "action": "survivor_hash",
+          "old": "caa03b71bd7e77482cfd9bf2a20ee775152f526967a2987c63e058a0a47064d6",
+          "new": "4557f7726a7c1b6e71d9620944875102c8ab37818599a15f0e550ed7ed22ac0a"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.enumeration_terms.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_enumeration_request_terms.py",
+          "action": "survivor_hash",
+          "old": "bdb432c21374030c58d15723bec0b20740fac5be857004d7e0d449f2071635da",
+          "new": "8bc3ac19aa37e1687cc6a4da1fbcc429d567db50e0a36493d158de9fc91865c3"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.evidence_admission_sufficiency.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_evidence_admission_sufficiency.py",
+          "action": "survivor_hash",
+          "old": "62b68add0402544f11c39e0f55350391cdf4b13a6b3b2ce78526402be89b0386",
+          "new": "de67f86361b5d6a986daef4e02235ef4c32a5c807055eb4c47f7616218b11e0c"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.evidence_sets.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_evidence_set_compositional_frames.py",
+          "action": "survivor_hash",
+          "old": "fc91341eddb385ee51644a992201283f6b8a9040b4d468476830653299f53a1e",
+          "new": "89025f3668b50e9a2d7429a856583bf637a740739dee91f67cf7f2b382b6822c"
+        },
+        {
+          "module": "tests/docs/test_evidence_set_dependencies.py",
+          "action": "survivor_hash",
+          "old": "8e28249e508e91337c9d528f3f0955cbc43cf6fb54f6fd5ac02e599be062ee80",
+          "new": "be530d73e59cd22efa138e879b06ddda57817dd2b95dc0c0273324689d9a3262"
+        },
+        {
+          "module": "tests/docs/test_evidence_set_disposition.py",
+          "action": "survivor_hash",
+          "old": "00144fda388c5f3d7084cfb1011a82205b7f75845784e55e166cfe6c1f3d88c5",
+          "new": "bbaae3e12532f56d111390278ca1e528c33c2ef1d96a854b8d7891def6779058"
+        },
+        {
+          "module": "tests/docs/test_evidence_set_parse_cache.py",
+          "action": "survivor_hash",
+          "old": "4894b6918112f919dd841f8fe70929890c77b195c783843a2e7e6713f0be3a6a",
+          "new": "0f12210dc2c914c5fd6769f5c700009de52098b4ca017213435e2bb4d19c3c71"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.gap_directed_candidate_ranking.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_gap_directed_candidate_ranking.py",
+          "action": "survivor_hash",
+          "old": "239591935d041dd6aa1252ca1cce18ba7e5c08b0625b575104c74ebd1917a0ab",
+          "new": "8ba2b8acbbb6b074d3c356228fcb0bc9510631e065f40eb22e5c6ecd5f4de381"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.global_evidence.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_context_constraint_roles.py",
+          "action": "survivor_hash",
+          "old": "768e6ae1c73bb7d33905fac7a1d5450610978580e0506b2c845bd3896bd00b93",
+          "new": "c4f0adb1fbb4605762f12d08f768dfe1054af68276d37461e8649d7a094597ac"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.hyphenated_identity.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_hyphenated_query_identity.py",
+          "action": "survivor_hash",
+          "old": "503fd72ba010cecd9b90463ae70a5e43b834f258827d28f0dda92d0e20bd0467",
+          "new": "bd0c2bee8170d4902dd75d07e9b5aaa9a58126bb64c5e7ae1c3f2d6190f2ed84"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.independent_query_probes.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_independent_query_probes.py",
+          "action": "survivor_hash",
+          "old": "d0fbb456d7d76872a6bfdb6d47ebd5438b6956d059437de32d06834833622b20",
+          "new": "7f1b2fdc4b0d5a8c0e8589134f64e6370f28683e0343c64fc2f5f77c1cbb00c0"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_answer_units_v2.py",
+          "action": "survivor_hash",
+          "old": "4d21c00a8efe098febff7be8e3b355593655a891cf77a1c19a9a0282ce4c688f",
+          "new": "52d8bc902d1b4d06286d1ca21d2e90c102cd8b80881b5d7ec9b8d81b74bdb975"
+        },
+        {
+          "module": "tests/docs/test_answer_units_v3.py",
+          "action": "survivor_hash",
+          "old": "c7538c5646ed60e0e626f46d5be0a7a48700e8e7e320e48a8db01621b38c6215",
+          "new": "d3b3de57ea4cb64e9124ab616e2ed1b82189f5706024e8cc12eca695dda132af"
+        },
+        {
+          "module": "tests/docs/test_evidence_selection.py",
+          "action": "survivor_hash",
+          "old": "8d6071d496ae1728097d2369bcd61b39c1bbf751159773b82ea6784c007ca7bd",
+          "new": "8a993ce838b8adb9e9f0700d8bd0562bc35764338e03d404f1f0d3d8455df285"
+        },
+        {
+          "module": "tests/docs/test_evidence_selection_part02.py",
+          "action": "survivor_hash",
+          "old": "49a9a1d17f9107ce44dfb616be86e6c5dcb6200a6ad42c48096fd04cd39bd566",
+          "new": "4e82f5fd2b7b598c1591077bf8c3e07b1153750e829d2ef10a3c4c8728362e8f"
+        },
+        {
+          "module": "tests/docs/test_evidence_selection_v2.py",
+          "action": "survivor_hash",
+          "old": "58e5f3f455a78db99b9b0b4462f45c73f55463d685f454e98306155c6bceb733",
+          "new": "8f9c54a4acf6f4cc51f26756558a87bb791e3722397e9df63c3e46b686446f16"
+        },
+        {
+          "module": "tests/docs/test_model_visible_projection.py",
+          "action": "survivor_hash",
+          "old": "ab27fd8b9a1cc9ae801b5b5f6a4c54148504a1b8632b03726f85fa6e1fbb8618",
+          "new": "6f8521389ef090c0621693448569b2a5f9062c199ae75fb5a7a0a4d43c701739"
+        },
+        {
+          "module": "tests/docs/test_normative_language.py",
+          "action": "survivor_hash",
+          "old": "5b25646db89c8cb2e5d1db290f4b1878628366cf87ed455d8cbd76f6b934bba8",
+          "new": "1b7e381f64bf7a4d03ed050aa8b5cd4192b3d3842a9136dffa5d034d63301cae"
+        },
+        {
+          "module": "tests/docs/test_project_answer_outline.py",
+          "action": "remove_absent_module_module_labels"
+        },
+        {
+          "module": "tests/docs/test_project_answer_outline.py",
+          "action": "remove_absent_module_module_node_hashes"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.query_planning.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_query_planning_budget_regressions.py",
+          "action": "survivor_hash",
+          "old": "16a26d08912b819b76d5ecd6276be87de1a139b37dc922e2e2915dbbc40750e8",
+          "new": "63e094a473a494169a06ea3ffbb29645a0a667b19f968b967f9f6124f7b924d5"
+        },
+        {
+          "module": "tests/docs/test_query_planning_temporal_regressions.py",
+          "action": "survivor_hash",
+          "old": "e5db8178237b12cb19992f67aa4cbf630594d393cf607b586da280d030e006d2",
+          "new": "d172dd590f1c2243bb21d844c300481b45b0ff6f7729bf6f1b12e2796a1cb779"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.query_planning_p5.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_relation_preserving_projection.py",
+          "action": "survivor_hash",
+          "old": "1b54a5fbf2dfc57abd65e54015b3339ca79ae8a1a394bbc1d9f39aa1b41377cb",
+          "new": "79c795f4697eca05fbab03c90cf7a7aa8668f39a1a1744db02e4464df236e826"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.reference_binding.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_query_reference_roles.py",
+          "action": "survivor_hash",
+          "old": "59da9b8eb7e1094d8f3ff14e97f548b4c79da4a5d5e658b95af94257d72138aa",
+          "new": "99dc089947aa6c5c6b85115d78e101fa88cd148733a2c3944c9af3c16fbb001d"
+        },
+        {
+          "module": "tests/docs/test_source_locator_resolution.py",
+          "action": "survivor_hash",
+          "old": "5304c9c1ab89da22d4729cfcbfaccd0123fc592eabbc3f6d3c668758c835fc7c",
+          "new": "2f37e00723edd0a743dcfdf0f3ff8a122b47f88dc821760d41223c0b1dda30cc"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.request_flow_lineage.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_request_flow_lineage.py",
+          "action": "survivor_hash",
+          "old": "d024a537ba7ae02dd7de1dcab7e1fff6048bc788ccfd338881262d3e110bd03d",
+          "new": "5ec9633e475a9956a6ba4456564daa505e83deda5948dd89bd64d0e9470025a1"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.residual_paraphrase_query_planning.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_residual_paraphrase_query_planning.py",
+          "action": "survivor_hash",
+          "old": "b35d444e6503e7a22c98ae04fc50e1a7d0e7c2fa1e839fab67583099a5f0d726",
+          "new": "2a067e023466858cafa7d5a83adecea814912f1ea85f36b48d9e4c895d6ef1f6"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.review_assignment_identity.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_review_assignment_identity.py",
+          "action": "survivor_hash",
+          "old": "74e237066991b04cb38038aff90056b5179337f5d8c399ca51316ce083ea96f4",
+          "new": "dfb9b7144f755c0fa36e5c9ea547dead391d78a4066123a2d0670dd29491b454"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.review_boundary_semantics.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_review_boundary_semantics.py",
+          "action": "survivor_hash",
+          "old": "5e6034743f90c63770b604d5f8d0a9c9e53d4ebae467a4ccc8d38e07e96c3435",
+          "new": "6983e191154e17cefac7d365b145f32395781652398ae27b61e203b3cba6b618"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.review_query_lineage.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_review_query_lineage.py",
+          "action": "survivor_hash",
+          "old": "66c16dc5afebac13440b5ab11f8d4275c3d9123b73f576ba2adb49d509de0a9a",
+          "new": "d57739942cbcfa58f1ec9eb304ee1705edcde8d577a48b1ed3221fbe3b91702c"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.review_span_lineage.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_review_span_lineage.py",
+          "action": "survivor_hash",
+          "old": "f1a0ca944e34a6e3de103fc021ab794b8a5b7c97a14d67262e7137fd10775988",
+          "new": "6dbda159d5b7195b1462160c80784925d2ffa48a7d0aa7ff3f324c1b9b4caadb"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.scope_span.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_context_span_growth.py",
+          "action": "survivor_hash",
+          "old": "27dce25fc9cabca0029a0de84455222890ee0bfa4507a4890f7afba98233907e",
+          "new": "3bbc3886b56fd8563f3d8fb8d09fcbf9989dfe7105fcf2373e4064fd8ef95d78"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.semantic_density.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_action_packet_semantic_density.py",
+          "action": "survivor_hash",
+          "old": "e73e5c2acb6be697456ad3c00a8bc12f404eeafb81782ba87be2d84e21235ede",
+          "new": "feee0ed61a49d11bc77a7c9f2f7b045b8912a7425ea77425829b008fb6eef910"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.source_item_integrity.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_structural_item_integrity.py",
+          "action": "survivor_hash",
+          "old": "02a53aaa11f3adb872418f47353639ea32cf9a95ed302f62b93f26ad1a03d2f3",
+          "new": "69da70d36d1e34cd883a129c9091d28c31f24ed4018b1f098145be803faa8a50"
+        },
+        {
+          "id": "tests/docs/test_structural_item_integrity.py::test_projection_owner_remains_within_repository_module_budget",
+          "action": "remove_retired_normalized_override"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.structural_behavior.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_structural_behavior_matrix.py",
+          "action": "survivor_hash",
+          "old": "d0606fa5ce8669c59d577f58209448b22391b6b9083af43a0a50dddd4437d702",
+          "new": "91d491a595c9657864d120276b0cb64320eee6c516ff28db577a2ced536aed67"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.v13_v15.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_comparison_treat_frame.py",
+          "action": "survivor_hash",
+          "old": "5ec9ddd96b8c6caf25cd17f890c34069e5bee621dc5c716251155905455ca20b",
+          "new": "327f57127265ab4f0370703e970f40787d73660db33226caf6fccb90b23ad1c3"
+        },
+        {
+          "module": "tests/docs/test_reporting_relation_selection.py",
+          "action": "survivor_hash",
+          "old": "57845b11fcc623dbc5ba0c53715dfd9a983fc449f1fe796aadaa8c890b9c73c0",
+          "new": "aca93f6741c5621ee54db15096e7ddb8510cca9904fbf086aa0a9aac250fee2f"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.v2_acceptance_gaps.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_v2_acceptance_gaps.py",
+          "action": "survivor_hash",
+          "old": "752e3731bd646754af7adf6dbe8db9e886b4ec42280e81e2b63fee635fc44e4a",
+          "new": "e1f2f1367d827da41d08210d4b1a051c3b1f32c1d954b7b3c47a171f40654ba0"
+        }
+      ]
+    }
+  ],
+  "deferred_paths": [
+    "tests/docs/test_compact_context_blocks.py",
+    "tests/docs/test_evidence_set_query_schedule.py",
+    "tests/docs/test_query_planning_alias_regressions.py",
+    "tests/docs/test_query_planning_completion_safety.py"
+  ],
+  "registry_method": "Normalized frozen BASE node IDs minus all integrated removals; deduplicate/sort/newline-join/SHA256. Source textual test-definition names independently equal surviving normalized sets for settled modules. Only empty surviving module labels/hashes and retired overrides removed; helper consumers untouched. Expanded parameter renumbering changes no normalized hash and is not addition credit.",
+  "validation": {
+    "partition": 8291,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0,
+    "overlap_previous": 0,
+    "removed": 615,
+    "added": 1,
+    "net": 614,
+    "projected_after": 7677,
+    "target_gap": 2703,
+    "classified": 1308,
+    "unclassified": 6983
+  },
+  "prior_manifest_sha256": "343352b93ee7484a9b7f88f849f59a4f97ff010ac28139d640e035544f656a5f",
+  "pending": "New admission/ranking packets excluded; deferred registry modules untouched; final collection/CI pending."
+}

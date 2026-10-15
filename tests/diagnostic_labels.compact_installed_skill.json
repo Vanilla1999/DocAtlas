@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_compact_installed_skill.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_compact_installed_skill.py": "5c791f3f3779c12145ab148b50f4159a657eba1507c8264db3ee3821102e0d6b"
+  }
+}

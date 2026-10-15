@@ -5,6 +5,8 @@ import hashlib
 import json
 import os
 import shutil
+import stat
+from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -45,6 +47,78 @@ from eval.agent_developer_v1.model_benchmark import (
     score_task,
 )
 import scripts.run_agent_developer_gate as oracle_gate
+from docmancer.docs.application.project_docs_member_transaction import catalog_entry_hash
+from docmancer.docs.project_docs_catalog import CATALOG_FILENAME, read_project_docs_catalog
+
+
+@contextmanager
+def _fixture_workspace(task_id: str):
+    # Do not inherit TMPDIR aliases or group-writable harness directories.
+    parent = Path.home()
+    if not parent.is_absolute() or parent.resolve() != parent:
+        raise PermissionError("fixture workspace requires a canonical home")
+    for directory in (parent, *parent.parents):
+        info = directory.lstat()
+        if (not stat.S_ISDIR(info.st_mode) or info.st_uid not in {0, os.getuid()}
+                or info.st_mode & 0o022 and not info.st_mode & stat.S_ISVTX):
+            raise PermissionError("unsafe fixture workspace ancestor")
+    with TemporaryDirectory(prefix=f"docatlas-installed-{task_id}-", dir=parent) as raw:
+        yield Path(raw)
+
+
+def _fixture_bootstrap(project: Path, home: Path, *, fixture_author_confirm: bool) -> dict[str, Any]:
+    """Finite fixture-author consent, not permission inferred from document data."""
+    if fixture_author_confirm is not True:
+        raise PermissionError("fixture author confirmation required")
+    catalog = read_project_docs_catalog(project)
+    if not catalog.present or not catalog.valid or not catalog.entries:
+        raise ValueError("fixture requires a valid finite documentation catalog")
+    return {
+        "action": "sync_project_docs",
+        "project_path": str(project),
+        "mutation": {
+            "operation": "sync_project_docs",
+            "confirm": True,
+            "storage_path": str(home / "mcp-members" / "members.db"),
+            "catalog_sha256": hashlib.sha256((project / CATALOG_FILENAME).read_bytes()).hexdigest(),
+            "expected_generation_id": None,
+            "documents": [
+                {"path": entry.path,
+                 "content_sha256": hashlib.sha256((project / entry.path).read_bytes()).hexdigest(),
+                 "catalog_entry_hash": catalog_entry_hash(entry)}
+                for entry in catalog.entries
+            ],
+        },
+    }
+
+
+def _exception_diagnostic(exc: BaseException) -> dict[str, Any]:
+    # Arbitrary exception text may contain credentials or absolute paths. Keep
+    # fingerprints, bounded cause structure and source locations, never raw text.
+    rows: list[dict[str, Any]] = []
+    seen: set[int] = set()
+    pending = [(exc, None)]
+    while pending and len(rows) < 16:
+        current, parent = pending.pop(0)
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        index = len(rows)
+        frames = []
+        tb = current.__traceback__
+        while tb is not None:
+            frames.append({"file": Path(tb.tb_frame.f_code.co_filename).name,
+                           "function": tb.tb_frame.f_code.co_name[:100], "line": tb.tb_lineno})
+            tb = tb.tb_next
+        rows.append({"parent": parent, "error_type": type(current).__name__[:100],
+                     "message_sha256": hashlib.sha256(str(current).encode("utf-8")).hexdigest(),
+                     "frames": frames[-8:]})
+        children = list(current.exceptions) if isinstance(current, BaseExceptionGroup) else []
+        cause = current.__cause__ or current.__context__
+        if cause is not None:
+            children.append(cause)
+        pending.extend((child, index) for child in children[:16])
+    return {"exceptions": rows, "truncated": bool(pending)}
 
 
 async def _call_tool(
@@ -64,6 +138,7 @@ async def _run_task(
     server_command: str,
     artifact: ArtifactIdentity,
     max_schema_repairs: int,
+    diagnostics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     events = EventLog()
     records: list[dict[str, Any]] = []
@@ -72,17 +147,16 @@ async def _run_task(
     schema_repairs = 0
     failure_stages: list[str] = []
 
-    with TemporaryDirectory(
-        prefix=f"docatlas-installed-{public_task['id']}-"
-    ) as raw:
-        root = Path(raw)
+    if diagnostics is not None:
+        diagnostics["events"] = events
+    with _fixture_workspace(str(public_task["id"])) as root:
         project = root / "project"
         fixture = oracle_gate.PROJECTS_ROOT / str(public_task["fixture"])
         shutil.copytree(fixture, project)
         home = root / "docatlas-home"
         user_home = root / "user-home"
-        home.mkdir()
-        user_home.mkdir()
+        home.mkdir(mode=0o700)
+        user_home.mkdir(mode=0o700)
 
         env = {
             key: value
@@ -134,6 +208,8 @@ async def _run_task(
                         f"installed public tool inventory mismatch: {names!r}"
                     )
                 schema_sha = schema_digest(catalog)
+                if diagnostics is not None:
+                    diagnostics["mcp_schema_sha256"] = schema_sha
                 events.add(
                     "mcp_tools_list",
                     {
@@ -143,11 +219,9 @@ async def _run_task(
                     },
                 )
 
-                bootstrap_args = {
-                    "action": "sync_project_docs",
-                    "project_path": str(project),
-                    "with_vectors": False,
-                }
+                bootstrap_args = _fixture_bootstrap(project, home, fixture_author_confirm=True)
+                # Validate the producer against the exact installed public schema.
+                validate_tool_arguments("prepare_docs", bootstrap_args, catalog)
                 bootstrap_result, bootstrap_payload = await _call_tool(
                     session,
                     "prepare_docs",
@@ -157,14 +231,14 @@ async def _run_task(
                     "host_bootstrap",
                     {
                         "tool_name": "prepare_docs",
-                        "arguments": redact(bootstrap_args, project),
+                        "arguments": redact(redact(bootstrap_args, project), root),
                         "is_error": bool(
                             getattr(bootstrap_result, "isError", False)
                         ),
                         "result_sha256": sha256_json(
-                            redact(bootstrap_payload, project)
+                            redact(redact(bootstrap_payload, project), root)
                         ),
-                        "summary": result_summary(bootstrap_payload, project),
+                        "summary": redact(result_summary(bootstrap_payload, project), root),
                     },
                 )
                 if bool(getattr(bootstrap_result, "isError", False)):
@@ -609,6 +683,7 @@ def _aggregate(
     task_results: list[dict[str, Any]],
     infrastructure_errors: list[str],
     max_schema_repairs: int,
+    infrastructure_diagnostics: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     passed = sum(bool(row["passed"]) for row in task_results)
     false_supported = sum(
@@ -669,6 +744,7 @@ def _aggregate(
         "false_supported": false_supported,
         "forbidden_source_contamination": contamination,
         "infrastructure_errors": infrastructure_errors,
+        "infrastructure_diagnostics": infrastructure_diagnostics or [],
         "tasks": task_results,
         "privacy": {
             "raw_prompts_persisted": False,
@@ -707,8 +783,10 @@ async def run_benchmark_async(
     }
     results: list[dict[str, Any]] = []
     infrastructure_errors: list[str] = []
+    infrastructure_diagnostics: list[dict[str, Any]] = []
     for task in selected:
         task_id = str(task["id"])
+        diagnostic: dict[str, Any] = {}
         try:
             results.append(
                 await _run_task(
@@ -718,12 +796,20 @@ async def run_benchmark_async(
                     server_command=server_command,
                     artifact=artifact,
                     max_schema_repairs=max_schema_repairs,
+                    diagnostics=diagnostic,
                 )
             )
         except Exception as exc:
             infrastructure_errors.append(
                 f"{task_id}: {exc.__class__.__name__}"
             )
+            events = diagnostic.get("events")
+            infrastructure_diagnostics.append({
+                "task_id": task_id,
+                **_exception_diagnostic(exc),
+                "events": events.rows() if events is not None else [],
+                "mcp_schema_sha256": diagnostic.get("mcp_schema_sha256"),
+            })
             break
     return _aggregate(
         artifact=artifact,
@@ -732,6 +818,7 @@ async def run_benchmark_async(
         task_results=results,
         infrastructure_errors=infrastructure_errors,
         max_schema_repairs=max_schema_repairs,
+        infrastructure_diagnostics=infrastructure_diagnostics,
     )
 
 

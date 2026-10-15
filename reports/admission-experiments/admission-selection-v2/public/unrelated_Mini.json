@@ -1,0 +1,3659 @@
+{
+  "case_id": "unrelated",
+  "split": "diagnostic",
+  "arm": "Mini",
+  "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+  "request": {
+    "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+    "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-8bb1ead30abe1f26",
+        "path_or_url": "docs/fixture.md",
+        "section": "Fixture store",
+        "snippet": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "dcbd9b791ab62b1e35d9c86620e42d834407165bd45e6d2556d360999941a76a",
+        "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/9c3b52c8c54f4f5141f64285"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 282,
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "mandatory_component_ids": [],
+        "covered_component_ids": [],
+        "missing_component_ids": [],
+        "evidence_ids": [],
+        "unresolved_residue": [
+          "unverified_original_component_scope"
+        ],
+        "status": "unavailable",
+        "recognized_component_status": "unavailable"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "observed",
+        "projection": "observed",
+        "coverage": "observed",
+        "delivery": "projected"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+          "document_id": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+          "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-fdf311bea093fcf39f95a07198e0e82ec249810b"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+          "document_id": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+          "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "window_characters": 71,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "как",
+                "docatlas",
+                "отправляет",
+                "сообщения",
+                "через",
+                "квантовый",
+                "канал"
+              ],
+              "matched_terms": [
+                "docatlas"
+              ],
+              "exact_terms": [
+                "как",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "как"
+              ],
+              "query_term_count": 7,
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "bm25_cost": -1.4864864864864864e-06,
+              "lexical_score": 1.4864864864864864e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "docatlas"
+                ],
+                "retrieval_text": [
+                  "docatlas"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "canonical_path": "docs/fixture.md",
+                "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+              },
+              "char_start": 0,
+              "char_end": 71
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 1,
+            "root_references": [
+              {
+                "role": "unresolved",
+                "state": "unresolved",
+                "reason": "unresolved_reference_role",
+                "mention": {
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false,
+                  "start": 4,
+                  "end": 12
+                }
+              }
+            ]
+          },
+          "observed_qualification": {
+            "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "query_terms": [
+              "как",
+              "docatlas",
+              "отправляет",
+              "сообщения",
+              "через",
+              "квантовый",
+              "канал"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "matched_terms": [
+              "docatlas"
+            ],
+            "body_matched_terms": [
+              "docatlas"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.1429,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              70
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": {
+            "reason": "policy_valid_original_candidate_v1",
+            "query_id": "query-original",
+            "qualification_reason": "insufficient_visible_match",
+            "coverage_credit": false,
+            "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+            "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "path": "docs/fixture.md",
+            "body_witnesses": [
+              {
+                "kind": "policy_valid_original_candidate_v1",
+                "relevance_unassessed": true,
+                "text": "DocAtlas stores fixture records for local inspection.",
+                "char_start": 17,
+                "char_end": 70,
+                "block_char_start": 17,
+                "block_char_end": 70,
+                "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+              }
+            ],
+            "body_window": {
+              "char_start": 0,
+              "char_end": 71,
+              "byte_start": 0,
+              "byte_end": 71,
+              "line_start": 1,
+              "line_end": 3
+            }
+          }
+        }
+      ],
+      "qualification_rejections": [
+        "child-fdf311bea093fcf39f95a07198e0e82ec249810b"
+      ],
+      "pre_projection_qualified_ids": [],
+      "ranked_candidate_ids": [
+        "child-fdf311bea093fcf39f95a07198e0e82ec249810b"
+      ],
+      "selected_candidate_ids": [],
+      "considered_variants": [],
+      "projection_rejections": [],
+      "final_visible_evidence_ids": [
+        "ev-8bb1ead30abe1f26"
+      ],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": false,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "ok",
+          "context_available": true,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "evidence_id": "ev-8bb1ead30abe1f26"
+              }
+            ]
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                "document_id": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                "document_id": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "attempt_kind": "primary",
+          "qualified_variants": 0,
+          "ranked_candidates": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "child-fdf311bea093fcf39f95a07198e0e82ec249810b"
+            ]
+          },
+          "prepared_qualified_variants": {
+            "observation": "recorded",
+            "recorded_count": 0,
+            "producer_count": 0,
+            "producer_omitted": 0,
+            "preview_count": 0,
+            "preview_omitted": 0,
+            "items": []
+          },
+          "literal_context_admissions": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "reason": "policy_valid_original_candidate_v1",
+                "query_id": "query-original",
+                "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "coverage_credit": false,
+                "qualification_reason": "insufficient_visible_match"
+              }
+            ]
+          },
+          "core_payload_sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "ev-8bb1ead30abe1f26"
+            ]
+          },
+          "decision_trace": {
+            "schema_version": 1,
+            "variant_attempts": 0,
+            "omitted_events": 0,
+            "selection_events_omitted": 0,
+            "branch_counts": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "branch": "candidate:policy_valid_original_candidate_v1",
+                  "count": 1
+                },
+                {
+                  "branch": "selection:policy_valid_original_candidate_v1",
+                  "count": 1
+                }
+              ]
+            },
+            "events": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "candidate",
+                  "decision": "prepared",
+                  "reason": "policy_valid_original_candidate_v1",
+                  "candidate_key": "3a04ec8d007a50d4ff81d852",
+                  "variant_key": "ac936d27262357c6066f38ca"
+                },
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "policy_valid_original_candidate_v1",
+                  "candidate_key": "3a04ec8d007a50d4ff81d852",
+                  "variant_key": "ac936d27262357c6066f38ca"
+                }
+              ]
+            },
+            "selection_events": {
+              "observation": "recorded",
+              "recorded_count": 1,
+              "producer_count": 1,
+              "producer_omitted": 0,
+              "preview_count": 1,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "policy_valid_original_candidate_v1",
+                  "candidate_key": "3a04ec8d007a50d4ff81d852",
+                  "variant_key": "ac936d27262357c6066f38ca"
+                }
+              ]
+            }
+          }
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+                    "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                    "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+                    "path": "docs/fixture.md",
+                    "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 71,
+                    "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                    "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                    "project_doc_catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+                    "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+                "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "partial_navigational_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                    "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+                    "path": "docs/fixture.md",
+                    "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 71,
+                    "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                    "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 1,
+                "items": [
+                  {
+                    "requirement_id": "query_symbol:0:docatlas",
+                    "kind": "exact_term",
+                    "value": "DocAtlas",
+                    "mandatory": false,
+                    "public_provenance": "query_exact_term",
+                    "proof_role": "generic_fact"
+                  }
+                ],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "query_symbol:0:docatlas"
+                  ],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+                    "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                    "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+                    "path": "docs/fixture.md",
+                    "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 71,
+                    "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                    "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                    "project_doc_catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+                    "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+                "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 250,
+                "observed_budget_projection_bytes": 250,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": true,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                    "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+                    "path": "docs/fixture.md",
+                    "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 71,
+                    "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                    "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 1,
+                "items": [
+                  {
+                    "requirement_id": "query_symbol:0:docatlas",
+                    "kind": "exact_term",
+                    "value": "DocAtlas",
+                    "mandatory": false,
+                    "public_provenance": "query_exact_term",
+                    "proof_role": "generic_fact"
+                  }
+                ],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "query_symbol:0:docatlas"
+                  ],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "success",
+                "reason_code": "partial_navigational_context",
+                "source_count": 1
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 250,
+                "observed_budget_projection_bytes": 250,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {
+    "ev-8bb1ead30abe1f26": {
+      "source": {
+        "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+        "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+        "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+        "_source_snapshot_sha256": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "canonical_path": "docs/fixture.md",
+            "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+          },
+          "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "member_binding": {
+            "doc_scope": "project",
+            "module_path": "",
+            "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+          },
+          "char_start": 0,
+          "char_end": 71,
+          "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "owner": {
+            "text": "# Fixture store\n",
+            "char_start": 0,
+            "char_end": 16,
+            "scope_start": 0,
+            "scope_end": 71,
+            "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                "start": 4,
+                "end": 12,
+                "text": "DocAtlas",
+                "syntax_role": "unresolved",
+                "explicit": false
+              },
+              "role": "unresolved",
+              "state": "unresolved",
+              "source_ids": [],
+              "reason": "unresolved_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "version": "",
+            "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "Как DocAtlas отправляет сообщения через квантовый канал?": {
+            "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                  "start": 4,
+                  "end": 12,
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+            "member_spans": [
+              [
+                0,
+                15,
+                "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+              ],
+              [
+                17,
+                70,
+                "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+        "resolved_version": "",
+        "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+        "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+        "byte_start": 0,
+        "byte_end": 71,
+        "_source_catalog_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+        "char_start": 0,
+        "char_end": 71,
+        "line_start": 1,
+        "line_end": 3,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "как",
+              "docatlas",
+              "отправляет",
+              "сообщения",
+              "через",
+              "квантовый",
+              "канал"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "bound_subject_context": "# Fixture store\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              70
+            ],
+            "matched_terms": [
+              "docatlas"
+            ],
+            "body_matched_terms": [
+              "docatlas"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 1,
+            "match_ratio": 0.1429,
+            "qualified": false,
+            "qualification_reason": "insufficient_visible_match",
+            "context_only": true,
+            "coverage_kinds": []
+          }
+        },
+        "project_ranking": {
+          "query_intent": "general",
+          "base_score": 1.0,
+          "final_score": 1.0,
+          "original_rank": 0,
+          "selected_rank": 1,
+          "source_weight_reason": "base retrieval score; no topic-derived source weight",
+          "requirement_reason": null,
+          "selected_by": "ranking",
+          "diversity_relaxed": false,
+          "reasons": [
+            "independent qualified query coverage and base retrieval score"
+          ]
+        },
+        "path": "docs/fixture.md",
+        "url": null,
+        "title": "Fixture store",
+        "heading_path": "Fixture store",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+        "content": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "display_text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "token_estimate": 17,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+          "path": "docs/fixture.md",
+          "url": null,
+          "title": "Fixture store"
+        },
+        "section": {
+          "title": "Fixture store",
+          "heading_path": "Fixture store",
+          "freshness": "current"
+        },
+        "source_provenance": {
+          "owner": "configured_repository",
+          "origin_lane": "project"
+        },
+        "version_exactness": "not_applicable",
+        "repository_authority": "ordinary_repository_document",
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1",
+          "executable_policy": false
+        },
+        "document_data": {
+          "schema": "docmancer-document-data-v1",
+          "instruction_trust": "untrusted_data",
+          "content": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n"
+        },
+        "authority_root": null,
+        "policy_scope": null,
+        "scope_verified": false,
+        "origin_lane": "project",
+        "canonical_id": null,
+        "library_id": null,
+        "version": null,
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+          "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+          "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "_source_snapshot_sha256": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "canonical_path": "docs/fixture.md",
+              "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+            },
+            "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+            },
+            "char_start": 0,
+            "char_end": 71,
+            "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+            "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+            "owner": {
+              "text": "# Fixture store\n",
+              "char_start": 0,
+              "char_end": 16,
+              "scope_start": 0,
+              "scope_end": 71,
+              "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                  "start": 4,
+                  "end": 12,
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "Как DocAtlas отправляет сообщения через квантовый канал?": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                    "start": 4,
+                    "end": 12,
+                    "text": "DocAtlas",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+              "member_spans": [
+                [
+                  0,
+                  15,
+                  "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+                ],
+                [
+                  17,
+                  70,
+                  "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+          "resolved_version": "",
+          "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+          "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "byte_start": 0,
+          "byte_end": 71,
+          "_source_catalog_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+          "char_start": 0,
+          "char_end": 71,
+          "line_start": 1,
+          "line_end": 3,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+          "retrieval_query_ids": [],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "как",
+                "docatlas",
+                "отправляет",
+                "сообщения",
+                "через",
+                "квантовый",
+                "канал"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [
+                "DocAtlas"
+              ],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "bound_subject_context": "# Fixture store\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                0,
+                70
+              ],
+              "matched_terms": [
+                "docatlas"
+              ],
+              "body_matched_terms": [
+                "docatlas"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "context_only": true,
+              "literal_context_admission": {
+                "reason": "policy_valid_original_candidate_v1",
+                "query_id": "query-original",
+                "qualification_reason": "insufficient_visible_match",
+                "coverage_credit": false,
+                "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "path": "docs/fixture.md",
+                "body_witnesses": [
+                  {
+                    "kind": "policy_valid_original_candidate_v1",
+                    "relevance_unassessed": true,
+                    "text": "DocAtlas stores fixture records for local inspection.",
+                    "char_start": 17,
+                    "char_end": 70,
+                    "block_char_start": 17,
+                    "block_char_end": 70,
+                    "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+                  }
+                ],
+                "body_window": {
+                  "char_start": 0,
+                  "char_end": 71,
+                  "byte_start": 0,
+                  "byte_end": 71,
+                  "line_start": 1,
+                  "line_end": 3
+                }
+              }
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/fixture.md",
+          "url": null,
+          "title": "Fixture store",
+          "heading_path": "Fixture store",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "display_text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "token_estimate": 17,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "path": "docs/fixture.md",
+            "url": null,
+            "title": "Fixture store"
+          },
+          "section": {
+            "title": "Fixture store",
+            "heading_path": "Fixture store",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_expected_project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+        "_lifecycle_intent": "current",
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_assigned_requirement_ids": []
+      },
+      "projected_source": {
+        "evidence_id": "ev-8bb1ead30abe1f26",
+        "path_or_url": "docs/fixture.md",
+        "section": "Fixture store",
+        "snippet": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "dcbd9b791ab62b1e35d9c86620e42d834407165bd45e6d2556d360999941a76a",
+        "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/9c3b52c8c54f4f5141f64285"
+      },
+      "evidence_id": "ev-8bb1ead30abe1f26",
+      "path_or_url": "docs/fixture.md",
+      "section": "Fixture store",
+      "snippet": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "dcbd9b791ab62b1e35d9c86620e42d834407165bd45e6d2556d360999941a76a",
+      "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+      "line_start": 1,
+      "line_end": 3,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/9c3b52c8c54f4f5141f64285",
+      "qualification": {
+        "evidence_id": "ev-8bb1ead30abe1f26",
+        "path_or_url": "docs/fixture.md",
+        "section": "Fixture store",
+        "snippet": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "dcbd9b791ab62b1e35d9c86620e42d834407165bd45e6d2556d360999941a76a",
+        "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "catalog_role": "other",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "как",
+              "docatlas",
+              "отправляет",
+              "сообщения",
+              "через",
+              "квантовый",
+              "канал"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "DocAtlas"
+            ],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "bound_subject_context": "# Fixture store\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              70
+            ],
+            "matched_terms": [
+              "docatlas"
+            ],
+            "body_matched_terms": [
+              "docatlas"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 1,
+            "match_ratio": 0.1429,
+            "qualified": false,
+            "qualification_reason": "insufficient_visible_match",
+            "context_only": true,
+            "coverage_kinds": []
+          }
+        },
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+          "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+          "display_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "_source_snapshot_sha256": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "canonical_path": "docs/fixture.md",
+              "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+            },
+            "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+            },
+            "char_start": 0,
+            "char_end": 71,
+            "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+            "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+            "owner": {
+              "text": "# Fixture store\n",
+              "char_start": 0,
+              "char_end": 16,
+              "scope_start": 0,
+              "scope_end": 71,
+              "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                  "start": 4,
+                  "end": 12,
+                  "text": "DocAtlas",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "Как DocAtlas отправляет сообщения через квантовый канал?": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                    "start": 4,
+                    "end": 12,
+                    "text": "DocAtlas",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+              "member_spans": [
+                [
+                  0,
+                  15,
+                  "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+                ],
+                [
+                  17,
+                  70,
+                  "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+          "resolved_version": "",
+          "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+          "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "byte_start": 0,
+          "byte_end": 71,
+          "_source_catalog_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+          "char_start": 0,
+          "char_end": 71,
+          "line_start": 1,
+          "line_end": 3,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+          "retrieval_query_ids": [],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "как",
+                "docatlas",
+                "отправляет",
+                "сообщения",
+                "через",
+                "квантовый",
+                "канал"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [
+                "DocAtlas"
+              ],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "bound_subject_context": "# Fixture store\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                0,
+                70
+              ],
+              "matched_terms": [
+                "docatlas"
+              ],
+              "body_matched_terms": [
+                "docatlas"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "context_only": true,
+              "literal_context_admission": {
+                "reason": "policy_valid_original_candidate_v1",
+                "query_id": "query-original",
+                "qualification_reason": "insufficient_visible_match",
+                "coverage_credit": false,
+                "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "path": "docs/fixture.md",
+                "body_witnesses": [
+                  {
+                    "kind": "policy_valid_original_candidate_v1",
+                    "relevance_unassessed": true,
+                    "text": "DocAtlas stores fixture records for local inspection.",
+                    "char_start": 17,
+                    "char_end": 70,
+                    "block_char_start": 17,
+                    "block_char_end": 70,
+                    "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+                  }
+                ],
+                "body_window": {
+                  "char_start": 0,
+                  "char_end": 71,
+                  "byte_start": 0,
+                  "byte_end": 71,
+                  "line_start": 1,
+                  "line_end": 3
+                }
+              }
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/fixture.md",
+          "url": null,
+          "title": "Fixture store",
+          "heading_path": "Fixture store",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "display_text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "token_estimate": 17,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "path": "docs/fixture.md",
+            "url": null,
+            "title": "Fixture store"
+          },
+          "section": {
+            "title": "Fixture store",
+            "heading_path": "Fixture store",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_expected_project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+        "_lifecycle_intent": "current",
+        "_visible_assignment_hashes": [],
+        "_assigned_requirement_ids": []
+      }
+    }
+  },
+  "pools": [
+    {
+      "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+      "pool": [
+        {
+          "id": "aea8b54d7dd486e945d428ee1c10a2797f61c5798999b9ab003b8d230e2141ac",
+          "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "text_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "source": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+          "chunk_index": 0,
+          "score": 1.0,
+          "path": "docs/fixture.md",
+          "span": [
+            0,
+            71
+          ],
+          "binding": {
+            "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "canonical_path": "docs/fixture.md",
+            "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+            "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "repository_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/fixture.md",
+            "source_path": "docs/fixture.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "project_doc_catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809090007693415,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Fixture store",
+            "section_level": 1,
+            "document_title": "fixture",
+            "document_title_hash": "51cff3c1f0bc59f6",
+            "anchor": "Fixture store",
+            "content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "retrieval_content_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+              "token_estimate": 51,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "fixture",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/fixture.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Fixture store",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+            "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+            "vector_id": "79bce4d2-6068-58c9-abef-4d6d7cb84365",
+            "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+            "atom_type": "mixed",
+            "atom_id": "atom-25f837d54fc6d292d13596085249ad3b",
+            "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "heading_path": [
+              "Fixture store"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              71
+            ],
+            "byte_span": [
+              0,
+              71
+            ],
+            "line_span": [
+              1,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 18,
+            "retrieval_token_estimate": 76,
+            "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+            "title": "Fixture store",
+            "section_id": 2507549070149329057,
+            "token_estimate": 18,
+            "docmancer_tokens": 18,
+            "raw_tokens": 18,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+              "section_id": 2507549070149329057,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -1.486486e-06
+              },
+              "base_utility": 1.486486e-06,
+              "feature_contributions": {},
+              "final_utility": 1.486486e-06,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 1
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "как",
+                "docatlas",
+                "отправляет",
+                "сообщения",
+                "через",
+                "квантовый",
+                "канал"
+              ],
+              "matched_terms": [
+                "docatlas"
+              ],
+              "exact_terms": [
+                "как",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "как"
+              ],
+              "query_term_count": 7,
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "bm25_cost": -1.4864864864864864e-06,
+              "lexical_score": 1.4864864864864864e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "docatlas"
+                ],
+                "retrieval_text": [
+                  "docatlas"
+                ]
+              }
+            },
+            "query_plan_hash": "2b528a8eb380c184b164ebfd17a1df50c7209baf37dd62d8bb0de5792e72721a",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                    "start": 4,
+                    "end": 12,
+                    "text": "DocAtlas",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Как DocAtlas отправляет сообщения через квантовый канал?": {
+                "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                      "start": 4,
+                      "end": 12,
+                      "text": "DocAtlas",
+                      "syntax_role": "unresolved",
+                      "explicit": false
+                    },
+                    "role": "unresolved",
+                    "state": "unresolved",
+                    "source_ids": [],
+                    "reason": "unresolved_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "canonical_path": "docs/fixture.md",
+                "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+              },
+              "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+              },
+              "char_start": 0,
+              "char_end": 71,
+              "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+              "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+              "owner": {
+                "text": "# Fixture store\n",
+                "char_start": 0,
+                "char_end": 16,
+                "scope_start": 0,
+                "scope_end": 71,
+                "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+                "member_spans": [
+                  [
+                    0,
+                    15,
+                    "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+                  ],
+                  [
+                    17,
+                    70,
+                    "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "как",
+                  "docatlas",
+                  "отправляет",
+                  "сообщения",
+                  "через",
+                  "квантовый",
+                  "канал"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [
+                  "DocAtlas"
+                ],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "bound_subject_context": "# Fixture store\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  70
+                ],
+                "matched_terms": [
+                  "docatlas"
+                ],
+                "body_matched_terms": [
+                  "docatlas"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 1,
+                "match_ratio": 0.1429,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true,
+                "literal_context_admission": {
+                  "reason": "policy_valid_original_candidate_v1",
+                  "query_id": "query-original",
+                  "qualification_reason": "insufficient_visible_match",
+                  "coverage_credit": false,
+                  "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                  "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                  "path": "docs/fixture.md",
+                  "body_witnesses": [
+                    {
+                      "kind": "policy_valid_original_candidate_v1",
+                      "relevance_unassessed": true,
+                      "text": "DocAtlas stores fixture records for local inspection.",
+                      "char_start": 17,
+                      "char_end": 70,
+                      "block_char_start": 17,
+                      "block_char_end": 70,
+                      "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+                    }
+                  ],
+                  "body_window": {
+                    "char_start": 0,
+                    "char_end": 71,
+                    "byte_start": 0,
+                    "byte_end": 71,
+                    "line_start": 1,
+                    "line_end": 3
+                  }
+                }
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        }
+      ],
+      "pool_sha256": "41792a086cac5a02f3fa618bd19e6fa4ec8734fab98baaca4adbd88a3983f1fc",
+      "complete_candidates": [
+        {
+          "id": "aea8b54d7dd486e945d428ee1c10a2797f61c5798999b9ab003b8d230e2141ac",
+          "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "text_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "source": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+          "chunk_index": 0,
+          "score": 1.0,
+          "path": "docs/fixture.md",
+          "span": [
+            0,
+            71
+          ],
+          "binding": {
+            "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "canonical_path": "docs/fixture.md",
+            "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+            "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "repository_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/fixture.md",
+            "source_path": "docs/fixture.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "project_doc_catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809090007693415,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Fixture store",
+            "section_level": 1,
+            "document_title": "fixture",
+            "document_title_hash": "51cff3c1f0bc59f6",
+            "anchor": "Fixture store",
+            "content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "retrieval_content_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+              "token_estimate": 51,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "fixture",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/fixture.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Fixture store",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+            "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+            "vector_id": "79bce4d2-6068-58c9-abef-4d6d7cb84365",
+            "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+            "atom_type": "mixed",
+            "atom_id": "atom-25f837d54fc6d292d13596085249ad3b",
+            "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "heading_path": [
+              "Fixture store"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              71
+            ],
+            "byte_span": [
+              0,
+              71
+            ],
+            "line_span": [
+              1,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 18,
+            "retrieval_token_estimate": 76,
+            "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+            "title": "Fixture store",
+            "section_id": 2507549070149329057,
+            "token_estimate": 18,
+            "docmancer_tokens": 18,
+            "raw_tokens": 18,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+              "section_id": 2507549070149329057,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -1.486486e-06
+              },
+              "base_utility": 1.486486e-06,
+              "feature_contributions": {},
+              "final_utility": 1.486486e-06,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 1
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "как",
+                "docatlas",
+                "отправляет",
+                "сообщения",
+                "через",
+                "квантовый",
+                "канал"
+              ],
+              "matched_terms": [
+                "docatlas"
+              ],
+              "exact_terms": [
+                "как",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "как"
+              ],
+              "query_term_count": 7,
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "bm25_cost": -1.4864864864864864e-06,
+              "lexical_score": 1.4864864864864864e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "docatlas"
+                ],
+                "retrieval_text": [
+                  "docatlas"
+                ]
+              }
+            },
+            "query_plan_hash": "2b528a8eb380c184b164ebfd17a1df50c7209baf37dd62d8bb0de5792e72721a",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                    "start": 4,
+                    "end": 12,
+                    "text": "DocAtlas",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Как DocAtlas отправляет сообщения через квантовый канал?": {
+                "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                      "start": 4,
+                      "end": 12,
+                      "text": "DocAtlas",
+                      "syntax_role": "unresolved",
+                      "explicit": false
+                    },
+                    "role": "unresolved",
+                    "state": "unresolved",
+                    "source_ids": [],
+                    "reason": "unresolved_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "canonical_path": "docs/fixture.md",
+                "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+              },
+              "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+              },
+              "char_start": 0,
+              "char_end": 71,
+              "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+              "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+              "owner": {
+                "text": "# Fixture store\n",
+                "char_start": 0,
+                "char_end": 16,
+                "scope_start": 0,
+                "scope_end": 71,
+                "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+                "member_spans": [
+                  [
+                    0,
+                    15,
+                    "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+                  ],
+                  [
+                    17,
+                    70,
+                    "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "как",
+                  "docatlas",
+                  "отправляет",
+                  "сообщения",
+                  "через",
+                  "квантовый",
+                  "канал"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [
+                  "DocAtlas"
+                ],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "bound_subject_context": "# Fixture store\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  70
+                ],
+                "matched_terms": [
+                  "docatlas"
+                ],
+                "body_matched_terms": [
+                  "docatlas"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 1,
+                "match_ratio": 0.1429,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true,
+                "literal_context_admission": {
+                  "reason": "policy_valid_original_candidate_v1",
+                  "query_id": "query-original",
+                  "qualification_reason": "insufficient_visible_match",
+                  "coverage_credit": false,
+                  "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                  "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                  "path": "docs/fixture.md",
+                  "body_witnesses": [
+                    {
+                      "kind": "policy_valid_original_candidate_v1",
+                      "relevance_unassessed": true,
+                      "text": "DocAtlas stores fixture records for local inspection.",
+                      "char_start": 17,
+                      "char_end": 70,
+                      "block_char_start": 17,
+                      "block_char_end": 70,
+                      "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+                    }
+                  ],
+                  "body_window": {
+                    "char_start": 0,
+                    "char_end": 71,
+                    "byte_start": 0,
+                    "byte_end": 71,
+                    "line_start": 1,
+                    "line_end": 3
+                  }
+                }
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "aea8b54d7dd486e945d428ee1c10a2797f61c5798999b9ab003b8d230e2141ac",
+          "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+          "text_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+          "source": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+          "chunk_index": 0,
+          "score": 1.0,
+          "path": "docs/fixture.md",
+          "span": [
+            0,
+            71
+          ],
+          "binding": {
+            "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "scope": {
+              "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "version": "",
+              "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+            },
+            "canonical_path": "docs/fixture.md",
+            "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+            "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "repository_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/fixture.md",
+            "source_path": "docs/fixture.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "project_doc_catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809090007693415,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Fixture store",
+            "section_level": 1,
+            "document_title": "fixture",
+            "document_title_hash": "51cff3c1f0bc59f6",
+            "anchor": "Fixture store",
+            "content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "retrieval_content_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+              "token_estimate": 51,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "fixture",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/fixture.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Fixture store",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+            "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+            "vector_id": "79bce4d2-6068-58c9-abef-4d6d7cb84365",
+            "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+            "atom_type": "mixed",
+            "atom_id": "atom-25f837d54fc6d292d13596085249ad3b",
+            "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+            "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "heading_path": [
+              "Fixture store"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              71
+            ],
+            "byte_span": [
+              0,
+              71
+            ],
+            "line_span": [
+              1,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 18,
+            "retrieval_token_estimate": 76,
+            "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+            "title": "Fixture store",
+            "section_id": 2507549070149329057,
+            "token_estimate": 18,
+            "docmancer_tokens": 18,
+            "raw_tokens": 18,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+              "section_id": 2507549070149329057,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -1.486486e-06
+              },
+              "base_utility": 1.486486e-06,
+              "feature_contributions": {},
+              "final_utility": 1.486486e-06,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 1
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "как",
+                "docatlas",
+                "отправляет",
+                "сообщения",
+                "через",
+                "квантовый",
+                "канал"
+              ],
+              "matched_terms": [
+                "docatlas"
+              ],
+              "exact_terms": [
+                "как",
+                "docatlas"
+              ],
+              "missing_exact_terms": [
+                "как"
+              ],
+              "query_term_count": 7,
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "bm25_cost": -1.4864864864864864e-06,
+              "lexical_score": 1.4864864864864864e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "docatlas"
+                ],
+                "retrieval_text": [
+                  "docatlas"
+                ]
+              }
+            },
+            "query_plan_hash": "a250062995c5238a596689044b0a4fa4290233f39da641d72b22bcc48bb3adde",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                    "start": 4,
+                    "end": 12,
+                    "text": "DocAtlas",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Как DocAtlas отправляет сообщения через квантовый канал?": {
+                "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                      "start": 4,
+                      "end": 12,
+                      "text": "DocAtlas",
+                      "syntax_role": "unresolved",
+                      "explicit": false
+                    },
+                    "role": "unresolved",
+                    "state": "unresolved",
+                    "source_ids": [],
+                    "reason": "unresolved_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "canonical_path": "docs/fixture.md",
+                "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+              },
+              "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+              },
+              "char_start": 0,
+              "char_end": 71,
+              "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+              "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+              "owner": {
+                "text": "# Fixture store\n",
+                "char_start": 0,
+                "char_end": 16,
+                "scope_start": 0,
+                "scope_end": 71,
+                "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+                "member_spans": [
+                  [
+                    0,
+                    15,
+                    "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+                  ],
+                  [
+                    17,
+                    70,
+                    "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "как",
+                  "docatlas",
+                  "отправляет",
+                  "сообщения",
+                  "через",
+                  "квантовый",
+                  "канал"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [
+                  "DocAtlas"
+                ],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "bound_subject_context": "# Fixture store\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  70
+                ],
+                "matched_terms": [
+                  "docatlas"
+                ],
+                "body_matched_terms": [
+                  "docatlas"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 1,
+                "match_ratio": 0.1429,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true,
+                "literal_context_admission": {
+                  "reason": "policy_valid_original_candidate_v1",
+                  "query_id": "query-original",
+                  "qualification_reason": "insufficient_visible_match",
+                  "coverage_credit": false,
+                  "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                  "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                  "path": "docs/fixture.md",
+                  "body_witnesses": [
+                    {
+                      "kind": "policy_valid_original_candidate_v1",
+                      "relevance_unassessed": true,
+                      "text": "DocAtlas stores fixture records for local inspection.",
+                      "char_start": 17,
+                      "char_end": 70,
+                      "block_char_start": 17,
+                      "block_char_end": 70,
+                      "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+                    }
+                  ],
+                  "body_window": {
+                    "char_start": 0,
+                    "char_end": 71,
+                    "byte_start": 0,
+                    "byte_end": 71,
+                    "line_start": 1,
+                    "line_end": 3
+                  }
+                }
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        }
+      ],
+      "complete_sha256": "7515326ddf48cd01588106553c023b41f06fa2e6e897c63dbdda1039ed621e6f",
+      "excluded": [
+        {
+          "candidate": {
+            "id": "aea8b54d7dd486e945d428ee1c10a2797f61c5798999b9ab003b8d230e2141ac",
+            "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+            "text_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+            "source": "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+            "chunk_index": 0,
+            "score": 1.0,
+            "path": "docs/fixture.md",
+            "span": [
+              0,
+              71
+            ],
+            "binding": {
+              "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+              "scope": {
+                "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                "version": "",
+                "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+              },
+              "canonical_path": "docs/fixture.md",
+              "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-selection-v2-awsnykhu/project",
+              "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "repository_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "docs/fixture.md",
+              "source_path": "docs/fixture.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+              "project_doc_catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791809090007693415,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Fixture store",
+              "section_level": 1,
+              "document_title": "fixture",
+              "document_title_hash": "51cff3c1f0bc59f6",
+              "anchor": "Fixture store",
+              "content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+              "retrieval_content_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "98ace31a92094acdf1afe5b8e8f05350137d77e14de8f03adb65c25dc71b101d",
+                "token_estimate": 51,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "fixture",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "docs/fixture.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Fixture store",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "ef5d12d874fc6c498423f91d056c40bd2150d9f0d8ff1f6bb0924196d934406d",
+              "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+              "vector_id": "79bce4d2-6068-58c9-abef-4d6d7cb84365",
+              "parent_logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4",
+              "atom_type": "mixed",
+              "atom_id": "atom-25f837d54fc6d292d13596085249ad3b",
+              "source_identity": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+              "source_content_hash": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+              "heading_path": [
+                "Fixture store"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                0,
+                71
+              ],
+              "byte_span": [
+                0,
+                71
+              ],
+              "line_span": [
+                1,
+                3
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 18,
+              "retrieval_token_estimate": 76,
+              "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+              "title": "Fixture store",
+              "section_id": 2507549070149329057,
+              "token_estimate": 18,
+              "docmancer_tokens": 18,
+              "raw_tokens": 18,
+              "savings_percent": 0.0,
+              "runway_multiplier": 1.0,
+              "ranking": {
+                "stable_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+                "section_id": 2507549070149329057,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -1.486486e-06
+                },
+                "base_utility": 1.486486e-06,
+                "feature_contributions": {},
+                "final_utility": 1.486486e-06,
+                "raw_rank": 1,
+                "final_rank": 1,
+                "rank_delta": 0,
+                "candidate_pool_size": 1
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "как",
+                  "docatlas",
+                  "отправляет",
+                  "сообщения",
+                  "через",
+                  "квантовый",
+                  "канал"
+                ],
+                "matched_terms": [
+                  "docatlas"
+                ],
+                "exact_terms": [
+                  "как",
+                  "docatlas"
+                ],
+                "missing_exact_terms": [
+                  "как"
+                ],
+                "query_term_count": 7,
+                "matched_term_count": 1,
+                "match_ratio": 0.1429,
+                "bm25_cost": -1.4864864864864864e-06,
+                "lexical_score": 1.4864864864864864e-06,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "docatlas"
+                  ],
+                  "retrieval_text": [
+                    "docatlas"
+                  ]
+                }
+              },
+              "query_plan_hash": "a250062995c5238a596689044b0a4fa4290233f39da641d72b22bcc48bb3adde",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 1
+                },
+                "pre_post_rank": 1,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 1
+              },
+              "_reference_root_plan": {
+                "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                      "start": 4,
+                      "end": 12,
+                      "text": "DocAtlas",
+                      "syntax_role": "unresolved",
+                      "explicit": false
+                    },
+                    "role": "unresolved",
+                    "state": "unresolved",
+                    "source_ids": [],
+                    "reason": "unresolved_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                  "version": "",
+                  "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "Как DocAtlas отправляет сообщения через квантовый канал?": {
+                  "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                  "references": [
+                    {
+                      "mention": {
+                        "mention_id": "f13ca75f6d8b52d349622940553492b1bb156489bef976e3b64b250b1d75c430:4:12",
+                        "start": 4,
+                        "end": 12,
+                        "text": "DocAtlas",
+                        "syntax_role": "unresolved",
+                        "explicit": false
+                      },
+                      "role": "unresolved",
+                      "state": "unresolved",
+                      "source_ids": [],
+                      "reason": "unresolved_reference_role"
+                    }
+                  ],
+                  "scope": {
+                    "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "version": "",
+                    "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                  "scope": {
+                    "project_id": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "version": "",
+                    "snapshot_id": "gen-622560fa489b463e9a26696bb5e9d02a"
+                  },
+                  "canonical_path": "docs/fixture.md",
+                  "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+                },
+                "project_doc_content_hash": "sha256:2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+                },
+                "char_start": 0,
+                "char_end": 71,
+                "text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+                "raw_document": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+                "owner": {
+                  "text": "# Fixture store\n",
+                  "char_start": 0,
+                  "char_end": 16,
+                  "scope_start": 0,
+                  "scope_end": 71,
+                  "logical_id": "parent-8e437503825ca8a2c25c6eec3b774ff4"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:d1e29c7724bbdb5f948d6cd1afcfa133507578cb0c371e241ed1ba3d64765a7c",
+                  "member_spans": [
+                    [
+                      0,
+                      15,
+                      "515dc0aa09d9b74eccb5725d2aaf92eaaf36c21dc9ea90be86002394a5a95be1"
+                    ],
+                    [
+                      17,
+                      70,
+                      "1a8c9d4632d3bf06394c9cc15d594c7ad37a6643d0a89d1b8292cacfcfe0a8ff"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "как",
+                    "docatlas",
+                    "отправляет",
+                    "сообщения",
+                    "через",
+                    "квантовый",
+                    "канал"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [
+                    "DocAtlas"
+                  ],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 1.0,
+                  "reference_body_query": "Как DocAtlas отправляет сообщения через квантовый канал?",
+                  "bound_subject_context": "# Fixture store\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    0,
+                    70
+                  ],
+                  "matched_terms": [
+                    "docatlas"
+                  ],
+                  "body_matched_terms": [
+                    "docatlas"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 1,
+                  "match_ratio": 0.1429,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true,
+                  "literal_context_admission": {
+                    "reason": "policy_valid_original_candidate_v1",
+                    "query_id": "query-original",
+                    "qualification_reason": "insufficient_visible_match",
+                    "coverage_credit": false,
+                    "project_identity": "local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f",
+                    "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+                    "source_id": "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md",
+                    "path": "docs/fixture.md",
+                    "body_witnesses": [
+                      {
+                        "kind": "policy_valid_original_candidate_v1",
+                        "relevance_unassessed": true,
+                        "text": "DocAtlas stores fixture records for local inspection.",
+                        "char_start": 17,
+                        "char_end": 70,
+                        "block_char_start": 17,
+                        "block_char_end": 70,
+                        "native_discovery_binding_sha256": "35c764ceeb86e61601e1a98db1b8899da36e289f1d7b05eae8b5307a5646a19a"
+                      }
+                    ],
+                    "body_window": {
+                      "char_start": 0,
+                      "char_end": 71,
+                      "byte_start": 0,
+                      "byte_end": 71,
+                      "line_start": 1,
+                      "line_end": 3
+                    }
+                  }
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "duplicate_source_chunk",
+          "original_ordinal": 1
+        }
+      ],
+      "selected_indices": [
+        0
+      ]
+    }
+  ],
+  "elapsed_seconds": 0.047352380999655,
+  "state_before": {
+    "generation": "gen-622560fa489b463e9a26696bb5e9d02a",
+    "rows": [
+      [
+        "gen-622560fa489b463e9a26696bb5e9d02a",
+        "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+        "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+        "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-selection-v2-awsnykhu/project/docatlas.project-docs.yaml": "803d7348885a737d4a4b7a195b7e94fa7734676859d565dac0b079b51090273c",
+      "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+    }
+  },
+  "state_after": {
+    "generation": "gen-622560fa489b463e9a26696bb5e9d02a",
+    "rows": [
+      [
+        "gen-622560fa489b463e9a26696bb5e9d02a",
+        "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md",
+        "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+        "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+        "project_file:local:4e01921f3e9d9cc13d9df114aa30e08b340190739f8dc497712321b68236611f:docs/fixture.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-selection-v2-awsnykhu/project/docatlas.project-docs.yaml": "803d7348885a737d4a4b7a195b7e94fa7734676859d565dac0b079b51090273c",
+      "/tmp/docatlas-selection-v2-awsnykhu/project/docs/fixture.md": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+    }
+  },
+  "integrity_errors": []
+}

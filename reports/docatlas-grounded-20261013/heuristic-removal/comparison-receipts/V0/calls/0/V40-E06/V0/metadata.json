@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-E06",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-eslint",
+  "public_request": {
+    "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-eslint/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "caca8f2e17d2a9415cd3cadd43c794b87825b76bc7ebe70f06b56ccaf8976151",
+  "utf8_bytes": 6487,
+  "tokens": 1624,
+  "seconds": 0.39697205999982543,
+  "cpu_seconds": 0.39503294699999003,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

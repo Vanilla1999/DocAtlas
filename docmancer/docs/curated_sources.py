@@ -54,11 +54,8 @@ class CuratedSource:
 
 
 def _ecosystem_aliases(ecosystem: str | None) -> set[str]:
+    """Retain literal spelling only; protocol/framework IDs are not aliases."""
     value = (ecosystem or "").strip().lower()
-    if value in {"javascript", "typescript", "node", "npm"}:
-        return {"npm"}
-    if value in {"flutter", "dart", "pub"}:
-        return {"dart"}
     return {value}
 
 

@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P07",
+  "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "ea5034de8cef2b04e17373d5b2d5a7c6292136b044579c918fd6c608609ff8a7",
+      "mini_sha256": "ea5034de8cef2b04e17373d5b2d5a7c6292136b044579c918fd6c608609ff8a7"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "6c2923c88b3bbdca7f28a61bf819570dd6ec43860e1eadbd1acb89439b058983",
+      "mini_sha256": "6c2923c88b3bbdca7f28a61bf819570dd6ec43860e1eadbd1acb89439b058983"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "22f3a16874b944162d4bf48f78f486ed8cc517b700b4057b26635e4f3d08f707",
+      "mini_sha256": "22f3a16874b944162d4bf48f78f486ed8cc517b700b4057b26635e4f3d08f707"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

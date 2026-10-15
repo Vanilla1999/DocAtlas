@@ -1,0 +1,3100 @@
+{
+  "schema_version": 1,
+  "purpose": "Own CI evidence for reviewed compiler-test retirement; not whole-PR acceptance",
+  "identity": {
+    "repository": "Vanilla1999/DocAtlas",
+    "pr": 211,
+    "pr_head": "c2a6682d2438c9217c3bf26938dcd003391dbc75",
+    "checkout_commit": "642a14289fddd06408400b4ee6cc5480945e7d1a",
+    "checkout_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+    "checkout_parents": [
+      "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+      "c2a6682d2438c9217c3bf26938dcd003391dbc75"
+    ],
+    "pr_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+    "same_tree_verified": true,
+    "main_run_id": 38021212993,
+    "reader_job_id": 114124354950,
+    "advanced_job_id": 114122398660,
+    "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993/job/114124354950"
+  },
+  "console": {
+    "decoded_log_sha256": "f2a9ab819aab5498f858d85f3525d3fbd9912e2b7ef090f2f28ca92a89e6b397",
+    "decoded_log_utf8_bytes": 591931,
+    "parsed_record_count": 407,
+    "parse_errors": [],
+    "scope": "Exact selected parsed console records below; not raw report ZIPs or complete console ledger",
+    "critical_priority_omitted": 0,
+    "recovery_priority_omitted": 0,
+    "other_artifact_rows_omitted": 41
+  },
+  "critical": {
+    "baseline": {
+      "record_type": "CRITICAL_OPERANDS",
+      "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/evidence.json",
+      "sha256": "9191908ea3a417236cbcb6da83de474222280518fe3e1b6758211c83ff08f493",
+      "bytes": 16066,
+      "run": "baseline",
+      "validated": true,
+      "returncode": 0,
+      "junit": {
+        "tests": 54,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "roster_sha256": "489d07c1f0d9641cef201b4bfbbbba08ce08979c721f504cb87a3e3dce94595c"
+      },
+      "observed_case_count": 54,
+      "observed_nonpassing_count": 0,
+      "failed_cases": [],
+      "mutation": null,
+      "import_origin": {
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/import-origin.stdout.log",
+        "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+        "sha256": "3d48454cfecf4e547e4ad6b75797d0f40d7cb10ddb3ff6d0f27fdc8115b2a899",
+        "bytes": 10361,
+        "selection": "all_baseline_modules",
+        "row_count": 42,
+        "selected_row_count": 42,
+        "unselected_row_count": 0,
+        "modules": [
+          {
+            "module": "docmancer.docs.domain.normative_language",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/normative_language.py",
+            "sha256": "de87153f11fd00b874995b54b460010321ac21f2eb4ed7a1e8bad0328e757c87"
+          },
+          {
+            "module": "docmancer.docs.domain.evidence_qualification",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/evidence_qualification.py",
+            "sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554"
+          },
+          {
+            "module": "docmancer.docs.domain.content_trust",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/content_trust.py",
+            "sha256": "a8f7d738a66b55a30e0c4ab6a0694a647f1500f1cbfb15e74896daea8fbba3b5"
+          },
+          {
+            "module": "docmancer.docs.domain.project_retrieval_intent",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/project_retrieval_intent.py",
+            "sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248"
+          },
+          {
+            "module": "docmancer.docs.domain.project_query_intent",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/project_query_intent.py",
+            "sha256": "0a909dfd15fc0217930d304503928612bf8d00a256c28c9889ad41404d50871e"
+          },
+          {
+            "module": "docmancer.docs.domain.project_doc_ranking",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/project_doc_ranking.py",
+            "sha256": "6826a23587842d2b18369ab2306ded82a1652d6d35a34f414575f4c02b6df9c6"
+          },
+          {
+            "module": "docmancer.docs.domain.query_terms",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/query_terms.py",
+            "sha256": "8f50273b0edb31e028a62fa4d32cdeb67aaaffefefd89fcf6f2270127179efc6"
+          },
+          {
+            "module": "docmancer.docs.domain.admission_meaning",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/admission_meaning.py",
+            "sha256": "9eea34d0250f79d9c12147b1a89efdc8ce3a9ffaf5109f63d67cd3086e53e9ab"
+          },
+          {
+            "module": "docmancer.docs.domain.admission_local_binding",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/admission_local_binding.py",
+            "sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e"
+          },
+          {
+            "module": "docmancer.docs.application.retrieval_need_support",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/retrieval_need_support.py",
+            "sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef"
+          },
+          {
+            "module": "docmancer.docs.domain.admission_grammar",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/admission_grammar.py",
+            "sha256": "21e5e4f32ee259981898c066412d46222889ad53fd5b1aa3e4ec420149c56b6e"
+          },
+          {
+            "module": "docmancer.docs.domain.question_retrieval_needs",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/question_retrieval_needs.py",
+            "sha256": "2542795f8826982fc83510e64e30de22127dec621f500ac851301672ba4e8b70"
+          },
+          {
+            "module": "docmancer.docs.domain.query_reference_binding",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/query_reference_binding.py",
+            "sha256": "0bdf65939526fd19ecc239ce3a3ee67bdaf9d067e184798f0b8f9f9b13ef528b"
+          },
+          {
+            "module": "docmancer.docs.domain.documentation_query_plan",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/documentation_query_plan.py",
+            "sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220"
+          },
+          {
+            "module": "docmancer.docs.application.action_packet",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/action_packet.py",
+            "sha256": "92bba6db6284304386f48a7855bd59a5bc4f0ec5abe351b1a3d5faa768e3b434"
+          },
+          {
+            "module": "docmancer.docs.application._action_packet_shared",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_action_packet_shared.py",
+            "sha256": "a26fac2f44cbba06414048a0006bde129732cdc445f6fa47842ed32bafbe9063"
+          },
+          {
+            "module": "docmancer.docs.application._action_packet_part01",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_action_packet_part01.py",
+            "sha256": "2e5334e03e4954312c2cee24b28d08aadc6eb1df16c123ddb96a3d5fef548f59"
+          },
+          {
+            "module": "docmancer.docs.application._action_packet_part03",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_action_packet_part03.py",
+            "sha256": "daf8e78d2508d48127d194428910675524e92ee0029f6e95a4f85cd640b60b21"
+          },
+          {
+            "module": "docmancer.docs.application._action_packet_part04",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_action_packet_part04.py",
+            "sha256": "8dec19d2eb2437ea6201e569d7856158c78e2d72e823d31e7d5363970b1eb0d9"
+          },
+          {
+            "module": "docmancer.docs.application.evidence_selection",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/evidence_selection.py",
+            "sha256": "e3c6b2f68eb64f3072a51d022db46bbfe4956034389e191df1f3c61ddf80c459"
+          },
+          {
+            "module": "docmancer.docs.application._evidence_selection_part01",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_evidence_selection_part01.py",
+            "sha256": "3cdeb863ded666eebf04d99cb0607b4c795a72737da2ae4e421b7e916c6d97d5"
+          },
+          {
+            "module": "docmancer.docs.application._evidence_selection_part03",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_evidence_selection_part03.py",
+            "sha256": "dfba410e57597fc99d318aa87c1787418b1fee21f1cd4095485aac6fca8b6264"
+          },
+          {
+            "module": "docmancer.docs.application.evidence_candidates",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/evidence_candidates.py",
+            "sha256": "da927e4a0a47bb5f76e7b62bb4da15bcb4e44b3ca8ba67f5cd78cc895ecad6e4"
+          },
+          {
+            "module": "docmancer.docs.application.evidence_requirements",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/evidence_requirements.py",
+            "sha256": "e2baf10a57df0f5864234a1dc62264fb8687718367ad4c5c957cd52360d1d344"
+          },
+          {
+            "module": "eval.task_level.evaluators.actionability",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/eval/task_level/evaluators/actionability.py",
+            "sha256": "d0b58b9fa068f173e31f8a779ed943a7c7490966374847777452085bed85c87a"
+          },
+          {
+            "module": "eval.task_level.github_models",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/eval/task_level/github_models.py",
+            "sha256": "a618e10fb24c42b81889db151c0fafe48b10f66750f5eb02ca345c01f89b7f94"
+          },
+          {
+            "module": "eval.task_level._github_models_part02",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/eval/task_level/_github_models_part02.py",
+            "sha256": "545a70c6e0c86fc66ba34813f2c437403b8610e2b035a856560976e0c49f5fc1"
+          },
+          {
+            "module": "docmancer.docs.application.mixed_context_projection",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/mixed_context_projection.py",
+            "sha256": "8c167922629acc6f909eaafcc10c9dcd50a9a924e33d55dc59a8ff5c7272d35f"
+          },
+          {
+            "module": "docmancer.docs.application.model_visible_projection",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/model_visible_projection.py",
+            "sha256": "6e822a4db485c4ca4f36ac3d3ae03c4dbec559a8a378e5aa2d005b168f3deb64"
+          },
+          {
+            "module": "docmancer.docs.application._docs_context_projection_core",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_docs_context_projection_core.py",
+            "sha256": "bafd93e9ef1ee7548ed930903b07222795f8253b02faecf05c12253acf52047c"
+          },
+          {
+            "module": "docmancer.docs.interfaces.mcp.context_tools",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/interfaces/mcp/context_tools.py",
+            "sha256": "5643c7dd0c29ae0200be5ce0d77780d76e3d05dbfda2eb5a0b4713de939c692b"
+          },
+          {
+            "module": "docmancer.docs.application._project_docs_service_part03",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_project_docs_service_part03.py",
+            "sha256": "a5ed7652e97d0885495fc62db4f0a5ed64b92a30dc56c32da8668e1f2c05faaa"
+          },
+          {
+            "module": "docmancer.docs.application._unified_context_service_part01",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/application/_unified_context_service_part01.py",
+            "sha256": "8cbfd7b0d1408f316529f50496f0ec2d04ba0078e94757dccfff8b9e777c19ca"
+          },
+          {
+            "module": "docmancer.docs.models",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/models.py",
+            "sha256": "f132d46411911730202e42be2631ae27a39bb9f0db7dbac60ec0633093ba201d"
+          },
+          {
+            "module": "docmancer.docs.domain.literal_context_admission",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/literal_context_admission.py",
+            "sha256": "9c43fa25e59af31a4bd6118aad7b5ad744f6548afe5ccf42cad7749eb19c5a33"
+          },
+          {
+            "module": "docmancer.core.member_read_store",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/core/member_read_store.py",
+            "sha256": "b62440b322b676c8d1b69d05ab0d11a9af5750023b2bfef53e0bb07f329a3981"
+          },
+          {
+            "module": "docmancer.core.sqlite_store",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/core/sqlite_store.py",
+            "sha256": "0347c43a9eeeae64acb0235a13a0fa1a1431438285be78ef438e4e8094e48b49"
+          },
+          {
+            "module": "docmancer.mcp._docs_server_part01",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/mcp/_docs_server_part01.py",
+            "sha256": "bb9c5c596817414165120309efd55091d4498eeb697401d4617bb61a5ce9ddd6"
+          },
+          {
+            "module": "docmancer.retrieval.dispatch",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/retrieval/dispatch.py",
+            "sha256": "25211d5dada532655f31783d09dcae7d566dfa686602f07a0da78f289b2d66bf"
+          },
+          {
+            "module": "eval.agent_developer_v1.finite_http_fixture",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/eval/agent_developer_v1/finite_http_fixture.py",
+            "sha256": "c3d6448045d510ff7e2d1f51b993e8ff88a4fc05dadf54fd4259cf559847cd45"
+          },
+          {
+            "module": "eval.agent_developer_v1.current_retrieval_runtime",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/eval/agent_developer_v1/current_retrieval_runtime.py",
+            "sha256": "d2acc03409497a12b0718d4c89d49a6ce34c61d5e2a15bf8f63140f952672f12"
+          },
+          {
+            "module": "eval.evidence_quality_v2.runtime",
+            "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/eval/evidence_quality_v2/runtime.py",
+            "sha256": "2039734f7a7f056fce30c6cf2b8b9e5d5c040ff46917ebb74bcfe3831706b282"
+          }
+        ]
+      },
+      "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+    },
+    "mutants": [
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/active_task33_actionability_contract/evidence.json",
+        "sha256": "b1bbd2833188a56bb9601dbf1d2b999b4704f6b01b7273200de0e1f3cfa1f67a",
+        "bytes": 4387,
+        "run": "active_task33_actionability_contract",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "6a4890961614cc7cf459930b5b15e5ba0cda6b8e7248afa97ef01f751766104c"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.task_level.test_actionability",
+            "name": "test_active_task33_protocol_has_public_actionability_contract",
+            "outcome": "failure",
+            "message": "AssertionError: assert [] == [{'task_id': ...ct_doc', ...}]"
+          }
+        ],
+        "mutation": {
+          "name": "active_task33_actionability_contract",
+          "path": "eval/task_level/evaluators/actionability.py",
+          "anchor_count": 1,
+          "before_sha256": "d0b58b9fa068f173e31f8a779ed943a7c7490966374847777452085bed85c87a",
+          "after_sha256": "e8f99bc40c535dc415ab1a030d18d94243a2dc45996a11aff609b9185636b782",
+          "killer": "tests/task_level/test_actionability.py::test_active_task33_protocol_has_public_actionability_contract",
+          "expected_failures": 1,
+          "failure_guard": null
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/active_task33_actionability_contract/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "19a3c322a63a9bd708b01d9198674fa4822de35b26155fcc9668011f9c3cac75",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "eval.task_level.evaluators.actionability",
+              "path": "/home/runner/work/_temp/docmancer-mutation-2c8e57a1/eval/task_level/evaluators/actionability.py",
+              "sha256": "e8f99bc40c535dc415ab1a030d18d94243a2dc45996a11aff609b9185636b782"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/admission_meaning_no_inferred_equivalence/evidence.json",
+        "sha256": "fd873098b87141d32cb54e5f0d72f974780a388e3f721cdd6715395824c2c47a",
+        "bytes": 2307,
+        "run": "admission_meaning_no_inferred_equivalence",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "47cf9c22cb0a4a9a60c6d498876dd2b3d51044c1cd1cf05652c9235690042d81"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_meaning_contract",
+            "name": "test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
+            "outcome": "failure",
+            "message": "AssertionError: critical_admission_meaning_no_inferred_equivalence"
+          }
+        ],
+        "mutation": {
+          "name": "admission_meaning_no_inferred_equivalence",
+          "path": "docmancer/docs/domain/admission_meaning.py",
+          "anchor_count": 1,
+          "before_sha256": "9eea34d0250f79d9c12147b1a89efdc8ce3a9ffaf5109f63d67cd3086e53e9ab",
+          "after_sha256": "ff5083bf94616f59455fbf4149e3ff775cec0a347e79175e534528e7da3fd28a",
+          "killer": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
+          "expected_failures": 1,
+          "failure_guard": "critical_admission_meaning_no_inferred_equivalence"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/admission_meaning_no_inferred_equivalence/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "7880c1a202324654931783ad790847c7185b9060ed3f1cf4961e5d25007e36b0",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.admission_meaning",
+              "path": "/home/runner/work/_temp/docmancer-mutation-5bnixjik/docmancer/docs/domain/admission_meaning.py",
+              "sha256": "ff5083bf94616f59455fbf4149e3ff775cec0a347e79175e534528e7da3fd28a"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/context7_russian_topic_router_cannot_generate_aliases/evidence.json",
+        "sha256": "611c75bd216afe890a5eaf5c25da77b2ee85a6fdbd9e5a2e917b70e02d903d8c",
+        "bytes": 2355,
+        "run": "context7_russian_topic_router_cannot_generate_aliases",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_context7_no_topic_router_aliases"
+          }
+        ],
+        "mutation": {
+          "name": "context7_russian_topic_router_cannot_generate_aliases",
+          "path": "docmancer/docs/domain/project_retrieval_intent.py",
+          "anchor_count": 1,
+          "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+          "after_sha256": "7f9bb4c33c117987145c058a6f5860744eb5eaa3ee8ad08c19948957b7b9e25f",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_context7_no_topic_router_aliases"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/context7_russian_topic_router_cannot_generate_aliases/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "4337fb57b37c50731d210505495c6932e47b0d4947682b8f935f8ddd4affd3be",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.project_retrieval_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-f1ldhgt7/docmancer/docs/domain/project_retrieval_intent.py",
+              "sha256": "7f9bb4c33c117987145c058a6f5860744eb5eaa3ee8ad08c19948957b7b9e25f"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_nonneeds_not_erased/evidence.json",
+        "sha256": "626f58117a0e6ee9d113a3865e971d25e30820db54c4e0b2669846d1b157c9dd",
+        "bytes": 3240,
+        "run": "default_binding_nonneeds_not_erased",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_local_binding_contract",
+            "name": "test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+            "outcome": "failure",
+            "message": "AssertionError: critical_default_binding_nonneeds_preserved"
+          }
+        ],
+        "mutation": {
+          "name": "default_binding_nonneeds_not_erased",
+          "path": "docmancer/docs/application/retrieval_need_support.py",
+          "anchor_count": 1,
+          "before_sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef",
+          "after_sha256": "1a4c853e642727d4cf6af2298f24558a787a4c08b5772d060d406ff3d7698adb",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_nonneeds_preserved"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_nonneeds_not_erased/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "cc4aa330bd9c1794c5065477b2b22f4e87d5b07ab58f8adc39197e879462c6ee",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application.retrieval_need_support",
+              "path": "/home/runner/work/_temp/docmancer-mutation-47vua7zd/docmancer/docs/application/retrieval_need_support.py",
+              "sha256": "1a4c853e642727d4cf6af2298f24558a787a4c08b5772d060d406ff3d7698adb"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_unknown_cannot_qualify/evidence.json",
+        "sha256": "569c3da0014258cc446ed86ae8b7d87bf9b8a2f707c8cd180e0beaef7099eb2f",
+        "bytes": 2111,
+        "run": "default_binding_unknown_cannot_qualify",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_local_binding_contract",
+            "name": "test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+            "outcome": "failure",
+            "message": "AssertionError: critical_default_binding_unknown_veto"
+          }
+        ],
+        "mutation": {
+          "name": "default_binding_unknown_cannot_qualify",
+          "path": "docmancer/docs/application/retrieval_need_support.py",
+          "anchor_count": 1,
+          "before_sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef",
+          "after_sha256": "ba4ec7a256cfb58c5affa52e9530e8364cd54e5ab36f7a52466fd0af24c67f8f",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_unknown_veto"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_unknown_cannot_qualify/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "5bdc98fac6e029a9a6765c98fa1474c13873202f547254ac69003a63b8c7330b",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application.retrieval_need_support",
+              "path": "/home/runner/work/_temp/docmancer-mutation-6jlagtno/docmancer/docs/application/retrieval_need_support.py",
+              "sha256": "ba4ec7a256cfb58c5affa52e9530e8364cd54e5ab36f7a52466fd0af24c67f8f"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_unknown_not_false/evidence.json",
+        "sha256": "689cd9146f3705ca73fcce871a523854071cb53e7747505eefc4f69cc3f546a3",
+        "bytes": 1751,
+        "run": "default_binding_unknown_not_false",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_local_binding_contract",
+            "name": "test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+            "outcome": "failure",
+            "message": "AssertionError: critical_default_binding_unknown_abi"
+          }
+        ],
+        "mutation": {
+          "name": "default_binding_unknown_not_false",
+          "path": "docmancer/docs/domain/admission_local_binding.py",
+          "anchor_count": 1,
+          "before_sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e",
+          "after_sha256": "a650d443b0f6a2264b796f47c410dfa50c0b0132ce92b0d717406070c49397e4",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_unknown_abi"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_unknown_not_false/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "2f18b804b8aa28a6c9797fc32cd790c63feca09321ca2e286547dfb53e2f3b6a",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.admission_local_binding",
+              "path": "/home/runner/work/_temp/docmancer-mutation-3pw3s9pf/docmancer/docs/domain/admission_local_binding.py",
+              "sha256": "a650d443b0f6a2264b796f47c410dfa50c0b0132ce92b0d717406070c49397e4"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_unknown_not_true/evidence.json",
+        "sha256": "e98243526a65897965f034d37193b286b5552b67e53375e1096d92b2978f6442",
+        "bytes": 1747,
+        "run": "default_binding_unknown_not_true",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_local_binding_contract",
+            "name": "test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+            "outcome": "failure",
+            "message": "AssertionError: critical_default_binding_unknown_abi"
+          }
+        ],
+        "mutation": {
+          "name": "default_binding_unknown_not_true",
+          "path": "docmancer/docs/domain/admission_local_binding.py",
+          "anchor_count": 1,
+          "before_sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e",
+          "after_sha256": "40b8e2bc3830862461a7381e78b67675c7b6d2a1952315d182c1b9507560a598",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_unknown_abi"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/default_binding_unknown_not_true/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "982a69884500ad5cec0a562ff6d666bdd506d5eb67982befb98ffd87bd98939e",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.admission_local_binding",
+              "path": "/home/runner/work/_temp/docmancer-mutation-_or45l4x/docmancer/docs/domain/admission_local_binding.py",
+              "sha256": "40b8e2bc3830862461a7381e78b67675c7b6d2a1952315d182c1b9507560a598"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_compound_topic_does_not_generate_aliases/evidence.json",
+        "sha256": "f6cfc05dbe31100154c14fc49e3ed95043e61a37b28d54929c8ce658f9aa6011",
+        "bytes": 2381,
+        "run": "documentation_compound_topic_does_not_generate_aliases",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_compound_request_has_no_generated_aliases"
+          }
+        ],
+        "mutation": {
+          "name": "documentation_compound_topic_does_not_generate_aliases",
+          "path": "docmancer/docs/domain/project_retrieval_intent.py",
+          "anchor_count": 1,
+          "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+          "after_sha256": "3c8c7608e6ab82142ecf4f7f65a01edc0c57da79263152caa21de97a205b0c2a",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_compound_request_has_no_generated_aliases"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_compound_topic_does_not_generate_aliases/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "704ca19c00e749a6e9c9579a9bc9def3e9701d20bc11abb11c3942990e9b118f",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.project_retrieval_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ej99ke40/docmancer/docs/domain/project_retrieval_intent.py",
+              "sha256": "3c8c7608e6ab82142ecf4f7f65a01edc0c57da79263152caa21de97a205b0c2a"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_equal_lookup_does_not_inherit_original/evidence.json",
+        "sha256": "9594c6bc4e56b64e464c2395d68922949cc362af88ec571cc054a5a18d0dd2e9",
+        "bytes": 2443,
+        "run": "documentation_equal_lookup_does_not_inherit_original",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_equal_lookup_has_no_original_credit"
+          }
+        ],
+        "mutation": {
+          "name": "documentation_equal_lookup_does_not_inherit_original",
+          "path": "docmancer/docs/domain/documentation_query_plan.py",
+          "anchor_count": 1,
+          "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+          "after_sha256": "a9e9b31df66e1a7d3c56c324893853f8efea41435c4d8f61524e12ec3ada7823",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_equal_lookup_has_no_original_credit"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_equal_lookup_does_not_inherit_original/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "c0c4626d99790c44131caff168886346f5b8e1d3ce0f1570bd43071e627657cf",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-liih7ul_/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "a9e9b31df66e1a7d3c56c324893853f8efea41435c4d8f61524e12ec3ada7823"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_duplicate_lookup_slots/evidence.json",
+        "sha256": "bbd97d9c6812c30967b00926ad105a9d19e42c4d316b791b714000d3de0cfa5d",
+        "bytes": 2336,
+        "run": "documentation_plan_keeps_duplicate_lookup_slots",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_explicit_lookup_duplicate_slots"
+          }
+        ],
+        "mutation": {
+          "name": "documentation_plan_keeps_duplicate_lookup_slots",
+          "path": "docmancer/docs/domain/documentation_query_plan.py",
+          "anchor_count": 1,
+          "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+          "after_sha256": "114891dc16d8737c3e7ea551d718e1f0a71b11e58cac4490931c19601aa82c47",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_explicit_lookup_duplicate_slots"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_duplicate_lookup_slots/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "7fc96df873885942fd43f898da6de61f0502419b54ea2e315f0839b11e62f360",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-phn67aur/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "114891dc16d8737c3e7ea551d718e1f0a71b11e58cac4490931c19601aa82c47"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_fifth_lookup_slot/evidence.json",
+        "sha256": "762614a023a9056ea73b4583f61d369d4d92f174535fe573065b8e0a76bdff52",
+        "bytes": 2572,
+        "run": "documentation_plan_keeps_fifth_lookup_slot",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_explicit_lookup_fifth_slot"
+          }
+        ],
+        "mutation": {
+          "name": "documentation_plan_keeps_fifth_lookup_slot",
+          "path": "docmancer/docs/domain/documentation_query_plan.py",
+          "anchor_count": 1,
+          "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+          "after_sha256": "ac7b2e58d7db719f3163752115aed265bd4bfea56a39a4e098bbb8a9a1c8d0ef",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_explicit_lookup_fifth_slot"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_fifth_lookup_slot/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "4c8117205eaead6bdd2a4a31c132e77a6a2db236a7022dfe9b1bb10747ad9be0",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-va8ia19e/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "ac7b2e58d7db719f3163752115aed265bd4bfea56a39a4e098bbb8a9a1c8d0ef"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/github_models_host_turn_limit/evidence.json",
+        "sha256": "7dd8f1e9f3e51464696c318060ee0de3a5eecaa434872767085a7f9067e9342d",
+        "bytes": 1181,
+        "run": "github_models_host_turn_limit",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "46f6b618a6d16e21945748e3f619b1feeb09076a769a8ebaaf3ee4a56a0051da"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.task_level.test_github_models_adapter",
+            "name": "test_github_models_runner_stops_at_host_owned_turn_limit",
+            "outcome": "failure",
+            "message": "assert 3 == 2"
+          }
+        ],
+        "mutation": {
+          "name": "github_models_host_turn_limit",
+          "path": "eval/task_level/_github_models_part02.py",
+          "anchor_count": 1,
+          "before_sha256": "545a70c6e0c86fc66ba34813f2c437403b8610e2b035a856560976e0c49f5fc1",
+          "after_sha256": "d6ce0e315db92e28d658624a03bb8fe0b436776f230e0ea4a7b4aa99ba0aafdc",
+          "killer": "tests/task_level/test_github_models_adapter.py::test_github_models_runner_stops_at_host_owned_turn_limit",
+          "expected_failures": 1,
+          "failure_guard": null
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/github_models_host_turn_limit/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "e3f6ffaf04a2049411d09b88efbea2679c0d389e3dd08e82f1fb5268933fa0f1",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "eval.task_level._github_models_part02",
+              "path": "/home/runner/work/_temp/docmancer-mutation-37apnkju/eval/task_level/_github_models_part02.py",
+              "sha256": "d6ce0e315db92e28d658624a03bb8fe0b436776f230e0ea4a7b4aa99ba0aafdc"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_current_request_root/evidence.json",
+        "sha256": "9097846f6ca0f136d2d85d6978978c0c5303f28c2ef48b1f0bc833e40741f87c",
+        "bytes": 1385,
+        "run": "mixed_current_request_root",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "b3d8ccc7457ab4ea391440baea33b66ad8ff85e42358a75fd1b4b792c3320883"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_mixed_context_projection_contract",
+            "name": "test_mixed_context_preserves_current_same_call_source_bindings",
+            "outcome": "failure",
+            "message": "AssertionError: critical_mixed_request_root"
+          }
+        ],
+        "mutation": {
+          "name": "mixed_current_request_root",
+          "path": "docmancer/docs/application/mixed_context_projection.py",
+          "anchor_count": 1,
+          "before_sha256": "8c167922629acc6f909eaafcc10c9dcd50a9a924e33d55dc59a8ff5c7272d35f",
+          "after_sha256": "60a859a3d40d2a2ef3333ed7200e3c75586fee45a7806c29f4060c5bec106ba2",
+          "killer": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "expected_failures": 1,
+          "failure_guard": "critical_mixed_request_root"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_current_request_root/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "616552dd6872b2b7864d0d6a09c21f409b477f36331c07f4e6c9fa76fb0a4119",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application.mixed_context_projection",
+              "path": "/home/runner/work/_temp/docmancer-mutation-_y3x2hk1/docmancer/docs/application/mixed_context_projection.py",
+              "sha256": "60a859a3d40d2a2ef3333ed7200e3c75586fee45a7806c29f4060c5bec106ba2"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_project_context_hook/evidence.json",
+        "sha256": "0eb433af734468c2b14f7dad94cac97ca49c4cc9352c97e9f42f02ecf598dd89",
+        "bytes": 1411,
+        "run": "mixed_project_context_hook",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "b3d8ccc7457ab4ea391440baea33b66ad8ff85e42358a75fd1b4b792c3320883"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_mixed_context_projection_contract",
+            "name": "test_mixed_context_preserves_current_same_call_source_bindings",
+            "outcome": "failure",
+            "message": "AssertionError: critical_mixed_both_lanes"
+          }
+        ],
+        "mutation": {
+          "name": "mixed_project_context_hook",
+          "path": "docmancer/docs/application/model_visible_projection.py",
+          "anchor_count": 1,
+          "before_sha256": "6e822a4db485c4ca4f36ac3d3ae03c4dbec559a8a378e5aa2d005b168f3deb64",
+          "after_sha256": "6f15315a959af063ad58debc6f83fc741269c491fe0b8d86ee52d82d93cd26e8",
+          "killer": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "expected_failures": 1,
+          "failure_guard": "critical_mixed_both_lanes"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_project_context_hook/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "f66ca8f8f7d297d3fd0c7153045c34e0fe4597ed89666e08f127f5da816a7920",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application.model_visible_projection",
+              "path": "/home/runner/work/_temp/docmancer-mutation-5fojs5mx/docmancer/docs/application/model_visible_projection.py",
+              "sha256": "6f15315a959af063ad58debc6f83fc741269c491fe0b8d86ee52d82d93cd26e8"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_project_full_quote/evidence.json",
+        "sha256": "6db762bf8adec9c2b29a512077854fad74ac278ccb301ccb23562738c9f5566d",
+        "bytes": 1396,
+        "run": "mixed_project_full_quote",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "b3d8ccc7457ab4ea391440baea33b66ad8ff85e42358a75fd1b4b792c3320883"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_mixed_context_projection_contract",
+            "name": "test_mixed_context_preserves_current_same_call_source_bindings",
+            "outcome": "failure",
+            "message": "AssertionError: critical_mixed_full_fact"
+          }
+        ],
+        "mutation": {
+          "name": "mixed_project_full_quote",
+          "path": "docmancer/docs/application/mixed_context_projection.py",
+          "anchor_count": 1,
+          "before_sha256": "8c167922629acc6f909eaafcc10c9dcd50a9a924e33d55dc59a8ff5c7272d35f",
+          "after_sha256": "125ed980cd7811ae2e5b1adf7da9f415174a692ae60e2e31781aa883684b8d86",
+          "killer": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "expected_failures": 1,
+          "failure_guard": "critical_mixed_full_fact"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_project_full_quote/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "13c38dd9475c8f699a35569001239e355a255819bc0cc83ec66720ddf4d0c188",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application.mixed_context_projection",
+              "path": "/home/runner/work/_temp/docmancer-mutation-x8zru___/docmancer/docs/application/mixed_context_projection.py",
+              "sha256": "125ed980cd7811ae2e5b1adf7da9f415174a692ae60e2e31781aa883684b8d86"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_resolved_module_filter/evidence.json",
+        "sha256": "67d7e4820df53c3546f6b71936722f97884a8e1dce771c7deb3734ad14947fac",
+        "bytes": 1356,
+        "run": "mixed_resolved_module_filter",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "b3d8ccc7457ab4ea391440baea33b66ad8ff85e42358a75fd1b4b792c3320883"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_mixed_context_projection_contract",
+            "name": "test_mixed_context_preserves_current_same_call_source_bindings",
+            "outcome": "failure",
+            "message": "AssertionError: critical_mixed_resolved_module"
+          }
+        ],
+        "mutation": {
+          "name": "mixed_resolved_module_filter",
+          "path": "docmancer/docs/application/mixed_context_projection.py",
+          "anchor_count": 1,
+          "before_sha256": "8c167922629acc6f909eaafcc10c9dcd50a9a924e33d55dc59a8ff5c7272d35f",
+          "after_sha256": "23a68b6a2e5bd10f24d005eb5e6e33de64f4404d5a7aab9796d90d2d09d14376",
+          "killer": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "expected_failures": 1,
+          "failure_guard": "critical_mixed_resolved_module"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_resolved_module_filter/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "8d7e687fb6d74fdf5fdfe331024c337194956720c67571a7aa6fb2a4664a7f6f",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application.mixed_context_projection",
+              "path": "/home/runner/work/_temp/docmancer-mutation-2z41ad7c/docmancer/docs/application/mixed_context_projection.py",
+              "sha256": "23a68b6a2e5bd10f24d005eb5e6e33de64f4404d5a7aab9796d90d2d09d14376"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_scope_original_query/evidence.json",
+        "sha256": "2c6be6cbe8d8c63d80e387b805dd9da4d3541c8126b51ea47eff9644de3b9fe4",
+        "bytes": 1417,
+        "run": "mixed_scope_original_query",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "b3d8ccc7457ab4ea391440baea33b66ad8ff85e42358a75fd1b4b792c3320883"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_mixed_context_projection_contract",
+            "name": "test_mixed_context_preserves_current_same_call_source_bindings",
+            "outcome": "failure",
+            "message": "AssertionError: critical_mixed_scope_producer"
+          }
+        ],
+        "mutation": {
+          "name": "mixed_scope_original_query",
+          "path": "docmancer/docs/application/_project_docs_service_part03.py",
+          "anchor_count": 1,
+          "before_sha256": "a5ed7652e97d0885495fc62db4f0a5ed64b92a30dc56c32da8668e1f2c05faaa",
+          "after_sha256": "5f2486446c77793c394d6dcdd504169a2e3b6c21042d4491548a7fb1ef810904",
+          "killer": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "expected_failures": 1,
+          "failure_guard": "critical_mixed_scope_producer"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/mixed_scope_original_query/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "cd72ddae2f27710302f5547f8cd81335aaa930a6ced02e0c6cb649698360013f",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application._project_docs_service_part03",
+              "path": "/home/runner/work/_temp/docmancer-mutation-88rjaryx/docmancer/docs/application/_project_docs_service_part03.py",
+              "sha256": "5f2486446c77793c394d6dcdd504169a2e3b6c21042d4491548a7fb1ef810904"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_bound_source_fidelity/evidence.json",
+        "sha256": "bab8f5ea5d55fc94c73e985380f04adb3766f213dfae4686a1b64c12f6a6b663",
+        "bytes": 10750,
+        "run": "normative_bound_source_fidelity",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 26,
+          "failures": 9,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+        },
+        "observed_case_count": 26,
+        "observed_nonpassing_count": 9,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Offline fallback cannot bypass the gate.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The worker may not continue without evidence.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Don't bypass PermissionService.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[PermissionDecision.deferFollowUp is reserved for post-entry review.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The invariant preserves immediate denial.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration, retries are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from configuration, retries are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration import rules are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Import policy is required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_bound_source_fidelity"
+          }
+        ],
+        "mutation": {
+          "name": "normative_bound_source_fidelity",
+          "path": "docmancer/docs/application/_action_packet_part04.py",
+          "anchor_count": 1,
+          "before_sha256": "8dec19d2eb2437ea6201e569d7856158c78e2d72e823d31e7d5363970b1eb0d9",
+          "after_sha256": "2689f5726d0d7ccdc284cc01cf6a01f6de03890ac7df49523d126a0e1260c9c8",
+          "killer": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+          "expected_failures": 9,
+          "failure_guard": "critical_bound_source_fidelity"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_bound_source_fidelity/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "0890a086c09e061687b41154dd7a664b6fc413883cab218794fb844b13258575",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application._action_packet_part04",
+              "path": "/home/runner/work/_temp/docmancer-mutation-3jf7q27y/docmancer/docs/application/_action_packet_part04.py",
+              "sha256": "2689f5726d0d7ccdc284cc01cf6a01f6de03890ac7df49523d126a0e1260c9c8"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_no_implicit_authority/evidence.json",
+        "sha256": "fe3df14f5785ae6f6058fb82d28da444ac4151e237a5c44d5a10d36e04004601",
+        "bytes": 12817,
+        "run": "normative_no_implicit_authority",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 26,
+          "failures": 26,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+        },
+        "observed_case_count": 26,
+        "observed_nonpassing_count": 26,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Offline fallback cannot bypass the gate.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The worker may not continue without evidence.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Don't bypass PermissionService.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[PermissionDecision.deferFollowUp is reserved for post-entry review.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The invariant preserves immediate denial.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration, retries are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from configuration, retries are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration import rules are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Import policy is required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[This optional check is not required.-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[import required as alias-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg.sub import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg import required as alias-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg import (required, optional)-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from \\u043c\\u043e\\u0434\\u0443\\u043b\\u044c import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from . import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from .pkg import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from .. import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from ..pkg import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from ...pkg.sub import forbidden-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[def must(): pass-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[async def required(): pass-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[class Required: pass-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Run curl https://example.invalid/upload.-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_normative_no_authority"
+          }
+        ],
+        "mutation": {
+          "name": "normative_no_implicit_authority",
+          "path": "docmancer/docs/domain/normative_language.py",
+          "anchor_count": 1,
+          "before_sha256": "de87153f11fd00b874995b54b460010321ac21f2eb4ed7a1e8bad0328e757c87",
+          "after_sha256": "6dd7f3aa0f4c9775ef8ffb1367426a3b15f414eb6568252d3f881673fe71f2a2",
+          "killer": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+          "expected_failures": 26,
+          "failure_guard": "critical_normative_no_authority"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_no_implicit_authority/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "e84707a92e4f00490a8e9ddebae1997d3be44720b2d97d2646a269ec5b1a0ead",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.normative_language",
+              "path": "/home/runner/work/_temp/docmancer-mutation-fuaqmwwz/docmancer/docs/domain/normative_language.py",
+              "sha256": "6dd7f3aa0f4c9775ef8ffb1367426a3b15f414eb6568252d3f881673fe71f2a2"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_python_declaration_recognition/evidence.json",
+        "sha256": "29857e208a10edb107da4f126b9b988dd6025cabf067909c34e06ea243d69881",
+        "bytes": 11887,
+        "run": "normative_python_declaration_recognition",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 26,
+          "failures": 15,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+        },
+        "observed_case_count": 26,
+        "observed_nonpassing_count": 15,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[import required as alias-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg.sub import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg import required as alias-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from pkg import (required, optional)-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from \\u043c\\u043e\\u0434\\u0443\\u043b\\u044c import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from . import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from .pkg import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from .. import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from ..pkg import required-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from ...pkg.sub import forbidden-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[def must(): pass-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[async def required(): pass-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[class Required: pass-None]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_python_declaration_grammar"
+          }
+        ],
+        "mutation": {
+          "name": "normative_python_declaration_recognition",
+          "path": "docmancer/docs/domain/normative_language.py",
+          "anchor_count": 1,
+          "before_sha256": "de87153f11fd00b874995b54b460010321ac21f2eb4ed7a1e8bad0328e757c87",
+          "after_sha256": "12a4c2b6dd093f3d632ccef7d5a89fd005aea931d642ff7182832a8a50b33990",
+          "killer": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+          "expected_failures": 15,
+          "failure_guard": "critical_python_declaration_grammar"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_python_declaration_recognition/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "a3d56a57dbe16e7f93b55bd87dbe8b935ba344482aeab4b7df4a58fffd5b7bcb",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.normative_language",
+              "path": "/home/runner/work/_temp/docmancer-mutation-x79sgi6x/docmancer/docs/domain/normative_language.py",
+              "sha256": "12a4c2b6dd093f3d632ccef7d5a89fd005aea931d642ff7182832a8a50b33990"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_whole_source_delivery/evidence.json",
+        "sha256": "40e9028bbe6aa4217698dd4e3dc4ce0799ba5199eeea844d244cf508f5ba64ac",
+        "bytes": 10555,
+        "run": "normative_whole_source_delivery",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 26,
+          "failures": 9,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+        },
+        "observed_case_count": 26,
+        "observed_nonpassing_count": 9,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Offline fallback cannot bypass the gate.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The worker may not continue without evidence.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Don't bypass PermissionService.-forbidden]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[PermissionDecision.deferFollowUp is reserved for post-entry review.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The invariant preserves immediate denial.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration, retries are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from configuration, retries are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration import rules are required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          },
+          {
+            "classname": "tests.docs.test_normative_language",
+            "name": "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Import policy is required.-required]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_source_delivery_fidelity"
+          }
+        ],
+        "mutation": {
+          "name": "normative_whole_source_delivery",
+          "path": "docmancer/docs/application/_action_packet_part03.py",
+          "anchor_count": 1,
+          "before_sha256": "daf8e78d2508d48127d194428910675524e92ee0029f6e95a4f85cd640b60b21",
+          "after_sha256": "beb1ec57a163ec79eb52f47a8146577ce4bdd7b7ad4f1f248b51bf433fd4b07b",
+          "killer": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+          "expected_failures": 9,
+          "failure_guard": "critical_source_delivery_fidelity"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/normative_whole_source_delivery/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "cd65923c85e0cc36a061ab0f7254d91028e80f2c47ea857811491422a8b3b082",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.application._action_packet_part03",
+              "path": "/home/runner/work/_temp/docmancer-mutation-6xer6ea9/docmancer/docs/application/_action_packet_part03.py",
+              "sha256": "beb1ec57a163ec79eb52f47a8146577ce4bdd7b7ad4f1f248b51bf433fd4b07b"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/project_query_intent_no_inferred_roles/evidence.json",
+        "sha256": "4f0dcabca7e9efe38c08a2bdbce5aaa18436590f8158fd26622ca9cd730ef8c0",
+        "bytes": 2406,
+        "run": "project_query_intent_no_inferred_roles",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "5543c4fc19c6dad0e4853efcb14590f43d3b23eaa50c329d52e5119da8415ea4"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_query_intent_contract",
+            "name": "test_current_project_intent_preserves_literals_and_never_infers_roles",
+            "outcome": "failure",
+            "message": "AssertionError: critical_project_intent_no_inferred_roles"
+          }
+        ],
+        "mutation": {
+          "name": "project_query_intent_no_inferred_roles",
+          "path": "docmancer/docs/domain/project_query_intent.py",
+          "anchor_count": 1,
+          "before_sha256": "0a909dfd15fc0217930d304503928612bf8d00a256c28c9889ad41404d50871e",
+          "after_sha256": "69f00fbd9f8645db43feaec378e89f9aa3a227455218f5523e076c7c6fdc7a68",
+          "killer": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
+          "expected_failures": 1,
+          "failure_guard": "critical_project_intent_no_inferred_roles"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/project_query_intent_no_inferred_roles/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "612d12080c404e311c7ac25c00e205d11927e65c98daea5081182d6f2dd87a29",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.project_query_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-7k6b2kzk/docmancer/docs/domain/project_query_intent.py",
+              "sha256": "69f00fbd9f8645db43feaec378e89f9aa3a227455218f5523e076c7c6fdc7a68"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/project_retrieval_no_generated_aliases/evidence.json",
+        "sha256": "42780f768ab8c84aaa0c07b8dfa7215075bb1c76d5f34f1d6cac45e25e5116f5",
+        "bytes": 2162,
+        "run": "project_retrieval_no_generated_aliases",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_alias_no_generated_queries"
+          }
+        ],
+        "mutation": {
+          "name": "project_retrieval_no_generated_aliases",
+          "path": "docmancer/docs/domain/project_retrieval_intent.py",
+          "anchor_count": 1,
+          "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+          "after_sha256": "486399aeb7a48cf8d25c9a988963a7aa507043344b3900cc7aa07de2c98fee74",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_alias_no_generated_queries"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/project_retrieval_no_generated_aliases/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "4666735ea1561546ff34991fa68372d96810f8b4c1254cbedc2240348e12bb79",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.project_retrieval_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-r4an835e/docmancer/docs/domain/project_retrieval_intent.py",
+              "sha256": "486399aeb7a48cf8d25c9a988963a7aa507043344b3900cc7aa07de2c98fee74"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_anonymous_trace_has_no_public_credit/evidence.json",
+        "sha256": "9a823ee4b0bf5312d99c3448142e28648d4dd28a093e9a2f1d2ff8eac5df5a19",
+        "bytes": 3400,
+        "run": "relation_anonymous_trace_has_no_public_credit",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 5,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "04afea0f09c0cab7c625c1e7a3ea51f65f695da6bf7b933f9276771b6f5bc1a5"
+        },
+        "observed_case_count": 5,
+        "observed_nonpassing_count": 5,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[0]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_lookup_no_borrowed_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[1]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_lookup_no_borrowed_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[2]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_lookup_no_borrowed_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[3]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_lookup_no_borrowed_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[4]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_lookup_no_borrowed_credit"
+          }
+        ],
+        "mutation": {
+          "name": "relation_anonymous_trace_has_no_public_credit",
+          "path": "docmancer/docs/domain/evidence_qualification.py",
+          "anchor_count": 1,
+          "before_sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554",
+          "after_sha256": "2cfe7d9938e01646ae85dc969b270eed11d136fb15c61986ec2887c6999ea79b",
+          "killer": "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
+          "expected_failures": 5,
+          "failure_guard": "critical_relation_lookup_no_borrowed_credit"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_anonymous_trace_has_no_public_credit/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "1215095bcb50556e3cd5ff4353d86e9d4f59a7de44b897ecee6b2e5a0d07e7f9",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.evidence_qualification",
+              "path": "/home/runner/work/_temp/docmancer-mutation-mxzt1p5r/docmancer/docs/domain/evidence_qualification.py",
+              "sha256": "2cfe7d9938e01646ae85dc969b270eed11d136fb15c61986ec2887c6999ea79b"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_crop_clears_inherited_proof/evidence.json",
+        "sha256": "6b7d8b2e0cd1bea829fa53a7443d61bbad4a7c4a1fb45512608b6180b1efe374",
+        "bytes": 3518,
+        "run": "relation_crop_clears_inherited_proof",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 5,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "04afea0f09c0cab7c625c1e7a3ea51f65f695da6bf7b933f9276771b6f5bc1a5"
+        },
+        "observed_case_count": 5,
+        "observed_nonpassing_count": 5,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[0]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_crop_no_inherited_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[1]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_crop_no_inherited_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[2]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_crop_no_inherited_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[3]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_crop_no_inherited_credit"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_replaying_old_approval_recomputes_relation_after_crop[4]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_crop_no_inherited_credit"
+          }
+        ],
+        "mutation": {
+          "name": "relation_crop_clears_inherited_proof",
+          "path": "docmancer/docs/domain/evidence_qualification.py",
+          "anchor_count": 1,
+          "before_sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554",
+          "after_sha256": "673c68c06c17a6af3a50c3e7108ecba078cadc853488e74947bebe49ab94223b",
+          "killer": "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
+          "expected_failures": 5,
+          "failure_guard": "critical_relation_crop_no_inherited_credit"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_crop_clears_inherited_proof/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "a833011aa8d1bfdd3024d2d90b495881c53d7658aeffe69d059c2204fdf7a7a0",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.evidence_qualification",
+              "path": "/home/runner/work/_temp/docmancer-mutation-sim6expk/docmancer/docs/domain/evidence_qualification.py",
+              "sha256": "673c68c06c17a6af3a50c3e7108ecba078cadc853488e74947bebe49ab94223b"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_qualification_performs_no_source_io/evidence.json",
+        "sha256": "d8ec35b9b1c14da9613cb0101b6a8a54e305f701fc52bdce8f5d9c0ccf6afcdf",
+        "bytes": 1451,
+        "run": "relation_qualification_performs_no_source_io",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "342ccd86c99931db7bb93d828a34dc1431849fa7b92a168fea393ae72915f555"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_relation_safety",
+            "name": "test_compiled_queries_and_relations_are_pure_without_source_io",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_qualification_no_io"
+          }
+        ],
+        "mutation": {
+          "name": "relation_qualification_performs_no_source_io",
+          "path": "docmancer/docs/domain/evidence_qualification.py",
+          "anchor_count": 1,
+          "before_sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554",
+          "after_sha256": "2a99268c408d01f562a5ce3c683b9f8b67d35059ffd277de65db2c7fdf9a9e82",
+          "killer": "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io",
+          "expected_failures": 1,
+          "failure_guard": "critical_relation_qualification_no_io"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_qualification_performs_no_source_io/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "d890fdc752c4b9cf6929b73a8c4f9f3d06471cdd61a17324b81830b15f86a072",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.evidence_qualification",
+              "path": "/home/runner/work/_temp/docmancer-mutation-1ikz4tpk/docmancer/docs/domain/evidence_qualification.py",
+              "sha256": "2a99268c408d01f562a5ce3c683b9f8b67d35059ffd277de65db2c7fdf9a9e82"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_question_does_not_generate_typed_retrieval_need/evidence.json",
+        "sha256": "8ca2d26392d94eaeaa0a3f09c9abde856652517603abeb04f4f5bf9503d1a44c",
+        "bytes": 2480,
+        "run": "relation_question_does_not_generate_typed_retrieval_need",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+        },
+        "observed_case_count": 1,
+        "observed_nonpassing_count": 1,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_project_retrieval_alias_contract",
+            "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_original_does_not_generate_need_queries"
+          }
+        ],
+        "mutation": {
+          "name": "relation_question_does_not_generate_typed_retrieval_need",
+          "path": "docmancer/docs/domain/documentation_query_plan.py",
+          "anchor_count": 1,
+          "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+          "after_sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225",
+          "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+          "expected_failures": 1,
+          "failure_guard": "critical_relation_original_does_not_generate_need_queries"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_question_does_not_generate_typed_retrieval_need/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "2c7cdad24ecd7c9447851bfcf4f77fbd4a9d1ca362c040d2d1cf898d32fb9dd2",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-jjbdw1pj/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_raw_metadata_cannot_authenticate_quote/evidence.json",
+        "sha256": "a01b6e83be90509ed069e5b834f10e2837468f8cdd881c7bbfe609dead557c9d",
+        "bytes": 6987,
+        "run": "relation_raw_metadata_cannot_authenticate_quote",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 15,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e640ad58195771ee598aae792d3026cd8fe19878b4dc4351988de8f6df9ec94e"
+        },
+        "observed_case_count": 15,
+        "observed_nonpassing_count": 5,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source2-Which takes precedence: nav title or page title?-The nav title takes precedence over the page title.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_risk_metadata_inert"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source2-When do QueueTasks run relative to response delivery?-QueueTasks execute after response delivery.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_risk_metadata_inert"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source2-Can a handler for QueueHub be synchronous?-A handler for QueueHub can be synchronous.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_risk_metadata_inert"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source2-Which ways enable strict mode?-Strict mode can be enabled in these ways:\\n\\n- Use a per-call option.\\n- Set a model configuration.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_risk_metadata_inert"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source2-How do transport keys map to protocols?-| Transport key | Protocol |\\n|---|---|\\n| `ALPHA_KEY` | scheme-a |\\n| `BETA_KEY` | scheme-b |]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_risk_metadata_inert"
+          }
+        ],
+        "mutation": {
+          "name": "relation_raw_metadata_cannot_authenticate_quote",
+          "path": "docmancer/docs/domain/content_trust.py",
+          "anchor_count": 1,
+          "before_sha256": "a8f7d738a66b55a30e0c4ab6a0694a647f1500f1cbfb15e74896daea8fbba3b5",
+          "after_sha256": "fef3fbe43bdb6ac66bd7241327083c0db9c9a8c7434a1fbe9896f654211ae381",
+          "killer": "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
+          "expected_failures": 5,
+          "failure_guard": "critical_relation_risk_metadata_inert"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_raw_metadata_cannot_authenticate_quote/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "9816c59f6b5712ecc24ac6686dc883923f5fb44c07a66c453db1ee53db69df3f",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.content_trust",
+              "path": "/home/runner/work/_temp/docmancer-mutation-g5ngegvc/docmancer/docs/domain/content_trust.py",
+              "sha256": "fef3fbe43bdb6ac66bd7241327083c0db9c9a8c7434a1fbe9896f654211ae381"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_source_freshness_guard/evidence.json",
+        "sha256": "8cc1d016a0f3ef12d1551f994f469a4501958bebf15167c31488ec45b582cc58",
+        "bytes": 6739,
+        "run": "relation_source_freshness_guard",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 15,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e640ad58195771ee598aae792d3026cd8fe19878b4dc4351988de8f6df9ec94e"
+        },
+        "observed_case_count": 15,
+        "observed_nonpassing_count": 5,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source1-Which takes precedence: nav title or page title?-The nav title takes precedence over the page title.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_freshness"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source1-When do QueueTasks run relative to response delivery?-QueueTasks execute after response delivery.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_freshness"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source1-Can a handler for QueueHub be synchronous?-A handler for QueueHub can be synchronous.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_freshness"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source1-Which ways enable strict mode?-Strict mode can be enabled in these ways:\\n\\n- Use a per-call option.\\n- Set a model configuration.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_freshness"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source1-How do transport keys map to protocols?-| Transport key | Protocol |\\n|---|---|\\n| `ALPHA_KEY` | scheme-a |\\n| `BETA_KEY` | scheme-b |]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_freshness"
+          }
+        ],
+        "mutation": {
+          "name": "relation_source_freshness_guard",
+          "path": "docmancer/docs/domain/evidence_qualification.py",
+          "anchor_count": 1,
+          "before_sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554",
+          "after_sha256": "9119187e40a00d8498db5af8144d45ea9b5970b23abc820b2cffef02d5bf66d0",
+          "killer": "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
+          "expected_failures": 5,
+          "failure_guard": "critical_relation_policy_freshness"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_source_freshness_guard/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "517fcd913624b5d7d48307938f401dcb34b32dfb39b38a539c77671c2a543be7",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.evidence_qualification",
+              "path": "/home/runner/work/_temp/docmancer-mutation-w633lpsg/docmancer/docs/domain/evidence_qualification.py",
+              "sha256": "9119187e40a00d8498db5af8144d45ea9b5970b23abc820b2cffef02d5bf66d0"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      },
+      {
+        "record_type": "CRITICAL_OPERANDS",
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_source_identity_guard/evidence.json",
+        "sha256": "07c045216e20dcfa5074408b90bdc97fdd394653feaa4d762396f4a5585750b8",
+        "bytes": 6721,
+        "run": "relation_source_identity_guard",
+        "validated": true,
+        "returncode": 1,
+        "junit": {
+          "tests": 15,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "e640ad58195771ee598aae792d3026cd8fe19878b4dc4351988de8f6df9ec94e"
+        },
+        "observed_case_count": 15,
+        "observed_nonpassing_count": 5,
+        "failed_cases": [
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source0-Which takes precedence: nav title or page title?-The nav title takes precedence over the page title.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_identity"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source0-When do QueueTasks run relative to response delivery?-QueueTasks execute after response delivery.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_identity"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source0-Can a handler for QueueHub be synchronous?-A handler for QueueHub can be synchronous.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_identity"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source0-Which ways enable strict mode?-Strict mode can be enabled in these ways:\\n\\n- Use a per-call option.\\n- Set a model configuration.]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_identity"
+          },
+          {
+            "classname": "tests.docs.test_admission_relation_witnesses",
+            "name": "test_relation_does_not_override_source_policy[source0-How do transport keys map to protocols?-| Transport key | Protocol |\\n|---|---|\\n| `ALPHA_KEY` | scheme-a |\\n| `BETA_KEY` | scheme-b |]",
+            "outcome": "failure",
+            "message": "AssertionError: critical_relation_policy_identity"
+          }
+        ],
+        "mutation": {
+          "name": "relation_source_identity_guard",
+          "path": "docmancer/docs/domain/evidence_qualification.py",
+          "anchor_count": 1,
+          "before_sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554",
+          "after_sha256": "5cf3c77d433595b775936ca0e63c0a4d2b0632d7806c38b73d33f30903862403",
+          "killer": "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
+          "expected_failures": 5,
+          "failure_guard": "critical_relation_policy_identity"
+        },
+        "import_origin": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_source_identity_guard/import-origin.stdout.log",
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+          "sha256": "bf11ba0eb38e09759ddc9c59d4f99bfd09320eb3298470ba9580967263ad0d93",
+          "bytes": 10361,
+          "selection": "mutated_module",
+          "row_count": 42,
+          "selected_row_count": 1,
+          "unselected_row_count": 41,
+          "modules": [
+            {
+              "module": "docmancer.docs.domain.evidence_qualification",
+              "path": "/home/runner/work/_temp/docmancer-mutation-xxpnyel3/docmancer/docs/domain/evidence_qualification.py",
+              "sha256": "5cf3c77d433595b775936ca0e63c0a4d2b0632d7806c38b73d33f30903862403"
+            }
+          ]
+        },
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+      }
+    ],
+    "step": {
+      "name": "Run critical mutation gate",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 15
+    },
+    "claim_boundary": "Import rows are actual stored separate-process import probes, not pytest same-process observations. Producer validation and individual stored failure/source hashes are recorded without rerunning."
+  },
+  "literal_comparison": {
+    "step": {
+      "name": "Compare historical and compact literal contract tests",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 16
+    },
+    "claim_boundary": "Same-checkout producer step success. No omitted individual literal mutant rows are reconstructed."
+  },
+  "recovery": {
+    "records": [
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/authoritative-conflict-does-not-stop.json",
+        "sha256": "6e17939f3975041a3c530cd85ba2f505980934c4f6a7a4d44ec53b871cf4649b",
+        "bytes": 3751,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "authoritative_conflict",
+            "outcome": "failure",
+            "guard": "recovery_authoritative_conflict_stops"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/baseline.json",
+        "sha256": "c9872517f39c09344418d64cf2b6d087c2a8bf8cb5ba8fd2a101c72cef8def42",
+        "bytes": 29101,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 0,
+          "passed": 12
+        },
+        "observed_case_count": 12,
+        "cases": [
+          {
+            "id": "retrieval_miss",
+            "outcome": "passed"
+          },
+          {
+            "id": "original_fragments",
+            "outcome": "passed"
+          },
+          {
+            "id": "operational_precedence",
+            "outcome": "passed"
+          },
+          {
+            "id": "no_semantic_retry",
+            "outcome": "passed"
+          },
+          {
+            "id": "evidence_eligibility",
+            "outcome": "passed"
+          },
+          {
+            "id": "documentation_gap",
+            "outcome": "passed"
+          },
+          {
+            "id": "authoritative_conflict",
+            "outcome": "passed"
+          },
+          {
+            "id": "projection_states",
+            "outcome": "passed"
+          },
+          {
+            "id": "exact_document_recovery",
+            "outcome": "passed"
+          },
+          {
+            "id": "literal_anchor_context",
+            "outcome": "passed"
+          },
+          {
+            "id": "original_discovery_attribution",
+            "outcome": "passed"
+          },
+          {
+            "id": "closed_literal_context",
+            "outcome": "passed"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/closed-literal-context-disabled.json",
+        "sha256": "f0f707e7726ae5d969c3a80ba765286aef1036ba0a2c079bbb24ae4fc9acfbc6",
+        "bytes": 32016,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_closed_literal_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/closed-literal-context-ignores-extra-conditions.json",
+        "sha256": "30c8cd760fd0096b00a4ca55cd5d1ecf4f3b38ee3abc963cfd18953fc21b1bbb",
+        "bytes": 185109,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_closed_complete_syntax"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/conflict-keeps-operational-action.json",
+        "sha256": "5d13aad6a87b82c95b25ae35155c31ba4d7142593412ec6e68ba5bea7004930c",
+        "bytes": 4301,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "authoritative_conflict",
+            "outcome": "failure",
+            "guard": "recovery_conflict_suppresses_actions"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/count-context-bypasses-phrase-witness.json",
+        "sha256": "7645a7a9ca7e6af83eb71efcf2ad13d015f75023f94a1fda4323ac4ac6f41edc",
+        "bytes": 189612,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_count_phrase_body_witness"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/count-context-disabled.json",
+        "sha256": "16312569250081e201e8199ad7260779f29dab58d84f9059dac15fa98435bac1",
+        "bytes": 32707,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_count_literal_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/diagnostic-invents-domain-fact.json",
+        "sha256": "2cf6e9d64ab302b409f977d0bd34e4311bc8989c0a7a285e06f56ce06ef37aa0",
+        "bytes": 3751,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "original_fragments",
+            "outcome": "failure",
+            "guard": "recovery_original_diagnostic_fragments"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/eligibility-treated-as-retrieval.json",
+        "sha256": "7541f22e0e4bd6eceaee44c1b81eab1743349ec92283630f4de39415236bcbd8",
+        "bytes": 3820,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "evidence_eligibility",
+            "outcome": "failure",
+            "guard": "recovery_ineligible_evidence_class"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/exact-document-fallback-disabled.json",
+        "sha256": "1c0c5fa70b7399b54fb2d8cc5fcc039646a3c720f7559430922416c6b30da448",
+        "bytes": 30269,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "exact_document_recovery",
+            "outcome": "failure",
+            "guard": "recovery_exact_document_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/explain-list-borrows-label-substance.json",
+        "sha256": "55bbe26a1d11d55379193f7168aec15cfdf1415559c4d4ddbece08fdf4ca8213",
+        "bytes": 220182,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_explain_exact_body"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/explain-list-context-disabled.json",
+        "sha256": "18da80fb3bf2f994fd639e0b105e9acfdd7309f06302c07bc9a8166c8e58211d",
+        "bytes": 35754,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_explain_literal_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/explain-list-context-ignores-tail.json",
+        "sha256": "787c11f55cbdd8026ff081849a0a14324954c067fce1e240aac354cb477dd3c7",
+        "bytes": 202890,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_explain_complete_syntax"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/filename-collision-first-winner.json",
+        "sha256": "01ad81741f7954d13df86568e15144cbd5fef1f5c66a8cdde12a7b9d3eeef515",
+        "bytes": 4572,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_filename_path_selection_not_naming_scope"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/filename-nomination-disabled.json",
+        "sha256": "90e96b937f63531e66b48ffdc694c219903926d7cd811d03a0866f2a8e0ee2a8",
+        "bytes": 37909,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_filename_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/identifier-only-label-admitted.json",
+        "sha256": "68cf89c4a209d1460cf01e385f9d8c05fc9fe27fccf152ee46660ff26644d4e7",
+        "bytes": 4692,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "literal_anchor_context",
+            "outcome": "failure",
+            "guard": "recovery_literal_body_admission_safety"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/later-lookup-erases-prior-public-credit.json",
+        "sha256": "7c9d6163e84098f4689ab30e9acf8777e03b7d1eb45d023b5e8280be4df925fc",
+        "bytes": 4746,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "original_discovery_attribution",
+            "outcome": "failure",
+            "guard": "retrieval_original_coverage_survives_lookups"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/legacy-rephrase-regains-authority.json",
+        "sha256": "0858322b9a3ea496eb35e7239a93e726c9cbe4171661aad399e5f938fb294129",
+        "bytes": 3616,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "no_semantic_retry",
+            "outcome": "failure",
+            "guard": "recovery_legacy_rephrase_cannot_authorize"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/literal-context-accepts-foreign-catalog.json",
+        "sha256": "534834aff09f5da416b74614fc35f312bd21f8a519fca9ed64fe2c8c7f01d2d7",
+        "bytes": 4716,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "literal_anchor_context",
+            "outcome": "failure",
+            "guard": "recovery_literal_snapshot_binding"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/literal-context-admission-disabled.json",
+        "sha256": "a43b0a872030bd3aafcbc59f6861bd109ae7f03bc0b9fd8595bbe7896a4d6442",
+        "bytes": 47748,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "literal_anchor_context",
+            "outcome": "failure",
+            "guard": "recovery_original_question_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/literal-context-mints-original-credit.json",
+        "sha256": "1e9428f7bd516a327e61c45bbaf64bf0c68355ae2de1ad6db7ad9114b849b7e8",
+        "bytes": 4675,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "literal_anchor_context",
+            "outcome": "failure",
+            "guard": "recovery_partial_no_query_credit"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/local-handoff-auto-executes.json",
+        "sha256": "098ec20ce6c015f4f1ef3df18137a13c97df4d288bca92423bc50d7675b0f7c0",
+        "bytes": 3930,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "retrieval_miss",
+            "outcome": "failure",
+            "guard": "recovery_handoff_not_automatic"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/lookup-only-hit-mints-original-discovery.json",
+        "sha256": "467d08d526fe94932e49df2b9d8ed1d3ae307e52032940e921e817e7f1c1251d",
+        "bytes": 4745,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "original_discovery_attribution",
+            "outcome": "failure",
+            "guard": "retrieval_lookup_cannot_mint_original_discovery"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/operational-reason-masks-conflict.json",
+        "sha256": "466fc271e23e3557325131b3103af85cb597b9fe90f6205b03adfac47c91ca2e",
+        "bytes": 4303,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "authoritative_conflict",
+            "outcome": "failure",
+            "guard": "recovery_conflict_suppresses_actions"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/requirements-context-disabled.json",
+        "sha256": "377fc815382ce53d3816fb7c18a322324629fb4d9c2379814aa49b5c7abb8eaa",
+        "bytes": 32157,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_closed_literal_source_fact"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "docatlas-recovery-evidence-qdt72c_n/requirements-context-extra-modifier.json",
+        "sha256": "db66fee6ffc2c8b84f5e7482fda08ca6add077b8ed7ad615d2bd776beccb4260",
+        "bytes": 186643,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 1,
+          "passed": 0
+        },
+        "observed_case_count": 1,
+        "cases": [
+          {
+            "id": "closed_literal_context",
+            "outcome": "failure",
+            "guard": "recovery_closed_complete_syntax"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      },
+      {
+        "record_type": "RECOVERY_OPERANDS",
+        "artifact_file": "recovery-contract.json",
+        "sha256": "8221dffd940c56a330185e6e52ec41bded098d037b7a284e92badd54d5e41959",
+        "bytes": 29106,
+        "schema_version": "recovery-contract-v2",
+        "counts": {
+          "error": 0,
+          "failure": 0,
+          "passed": 12
+        },
+        "observed_case_count": 12,
+        "cases": [
+          {
+            "id": "retrieval_miss",
+            "outcome": "passed"
+          },
+          {
+            "id": "original_fragments",
+            "outcome": "passed"
+          },
+          {
+            "id": "operational_precedence",
+            "outcome": "passed"
+          },
+          {
+            "id": "no_semantic_retry",
+            "outcome": "passed"
+          },
+          {
+            "id": "evidence_eligibility",
+            "outcome": "passed"
+          },
+          {
+            "id": "documentation_gap",
+            "outcome": "passed"
+          },
+          {
+            "id": "authoritative_conflict",
+            "outcome": "passed"
+          },
+          {
+            "id": "projection_states",
+            "outcome": "passed"
+          },
+          {
+            "id": "exact_document_recovery",
+            "outcome": "passed"
+          },
+          {
+            "id": "literal_anchor_context",
+            "outcome": "passed"
+          },
+          {
+            "id": "original_discovery_attribution",
+            "outcome": "passed"
+          },
+          {
+            "id": "closed_literal_context",
+            "outcome": "passed"
+          }
+        ],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit"
+      }
+    ],
+    "step": {
+      "name": "Run recoverable documentation failure mutation gate",
+      "status": "completed",
+      "conclusion": "failure",
+      "number": 7
+    },
+    "observed_failure": {
+      "mutant": "filename-collision-first-winner",
+      "expected_guard": "recovery_filename_catalog_ambiguity",
+      "observed_guard": "recovery_filename_path_selection_not_naming_scope",
+      "basis": "Current runner strict named-guard contract and stored individual report; no complete 33-kill proof at this SHA"
+    }
+  },
+  "core": [
+    {
+      "record_type": "JUNIT_COUNTS",
+      "artifact_file": "pytest-core-3.11-38021212993-1/core-tests-3.11.xml",
+      "xml_sha256": "184cd15117d6f42b743c4c56d32ac9111bc949ac5e9560ee6fdc0b855d47d93d",
+      "counts": {
+        "PASS": 6065,
+        "FAIL": 1652,
+        "ERROR": 0,
+        "SKIP": 10
+      },
+      "integrity_issues": []
+    },
+    {
+      "record_type": "JUNIT_COUNTS",
+      "artifact_file": "pytest-core-3.12-38021212993-1/core-tests-3.12.xml",
+      "xml_sha256": "db291c4e5eecd8828995ff6a192a1e0039769eea18c0464c0a65112455237663",
+      "counts": {
+        "PASS": 6065,
+        "FAIL": 1652,
+        "ERROR": 0,
+        "SKIP": 10
+      },
+      "integrity_issues": []
+    },
+    {
+      "record_type": "JUNIT_COUNTS",
+      "artifact_file": "pytest-core-3.13-38021212993-1/core-tests-3.13.xml",
+      "xml_sha256": "4c026aee08d93073b0df18c87f76b5b60fcd1f40b93ace99e139cdf0324474bd",
+      "counts": {
+        "PASS": 6065,
+        "FAIL": 1652,
+        "ERROR": 0,
+        "SKIP": 10
+      },
+      "integrity_issues": []
+    }
+  ],
+  "artifact_provenance": {
+    "record_type": "ARTIFACT_PROVENANCE",
+    "schema_version": 1,
+    "purpose": "existing_artifacts_only_not_gate_acceptance",
+    "run_id": "38021212993",
+    "run_attempt": "1",
+    "checkout_commit": "642a14289fddd06408400b4ee6cc5480945e7d1a",
+    "issues": {
+      "items": [],
+      "report_count": 0,
+      "log_omitted": 0
+    }
+  },
+  "artifact_console": {
+    "record_type": "ARTIFACT_CONSOLE",
+    "omitted_rows": 41,
+    "record_count": 170,
+    "complete_selected_records_in_artifact": true,
+    "original_reports_preserved": true,
+    "omitted_priority_rows": {
+      "CRITICAL_OPERANDS": 0,
+      "RECOVERY_OPERANDS": 0
+    }
+  },
+  "acceptance": {
+    "required_ci": "failure",
+    "full_pr": "not_accepted",
+    "real_claude_codex_opencode_sessions": "not_run"
+  }
+}

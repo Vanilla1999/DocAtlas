@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_action_packet_v4_delivery_consumers.py": "behavioral",
+    "tests/test_action_packet_v4_projection_split.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_action_packet_v4_delivery_consumers.py": "17dc828fa9cd97a49a713095b5a3bb32ff7acd31e10e97b8b10b53d183350da7",
+    "tests/test_action_packet_v4_projection_split.py": "bf0a3ee2d5238810579f4c69bcea21c16a3a4594333938c476b601118087dab1"
+  }
+}

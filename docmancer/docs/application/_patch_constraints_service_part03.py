@@ -9,8 +9,8 @@ class _PatchConstraintsServicePart03:
     def _next_actions(constraints: list[PatchConstraint], truncated: bool) -> list[dict[str, Any]]:
         actions: list[dict[str, Any]] = [
             {
-                "type": "edit_with_constraints",
-                "description": "Apply the patch while treating high-confidence must constraints as advisory guardrails.",
+                "type": "manual_review_required",
+                "description": "Policy coverage is unresolved. Obtain separate explicit target/action authorization before editing; this packet is advisory only.",
             },
             {
                 "type": "validate_patch_against_constraints",
@@ -59,37 +59,15 @@ class _PatchConstraintsServicePart03:
 
     @staticmethod
     def _owner_from_line(line: str) -> str | None:
-        patterns = [
-            r"\b([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\s+owns\s+([^.;]+)",
-            r"\b([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\s+is\s+(?:the\s+)?(?:canonical\s+|single\s+)?source[- ]of[- ]truth\b",
-            r"\b([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\s+is\s+(?:the\s+)?source of truth\s+for\s+([^.;]+)",
-            r"\b([^.;]+?)\s+belongs\s+in\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
-            r"\bDo not implement\s+([^.;]+?)\s+in\s+([^.;]+?);?\s*(?:use|delegate to)\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
-            r"\bdelegates?\s+to\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
-            r"\bowned by\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
-        ]
-        for pattern in patterns:
-            match = re.search(pattern, line, re.I)
-            if match:
-                for group in reversed(match.groups()):
-                    if group and re.search(r"[A-Z][A-Za-z0-9_]*(Service|Manager|Repository|Controller|Policy|Layer|Adapter)$", group.strip()):
-                        return group.strip()
-        service_layer = re.search(r"\b(service layer|domain layer|application layer)\b", line, re.I)
-        if service_layer and re.search(r"source[- ]of[- ]truth|owns|belongs|policy", line, re.I):
-            return service_layer.group(1).lower()
         return None
 
     @staticmethod
     def _delegate_target(line: str) -> str | None:
-        match = re.search(r"delegates?\s+to\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))", line, re.I)
-        return match.group(1) if match else None
+        return None
 
     @staticmethod
     def _instruction_from_line(line: str) -> str:
-        cleaned = line.strip().rstrip(".")
-        if re.search(r"\b(must|should|do not)\b", cleaned, re.I):
-            return cleaned + "."
-        return f"Follow documented project convention: {cleaned}."
+        return line.strip()
 
     @staticmethod
     def _is_generated_path(path: str) -> bool:
@@ -106,17 +84,10 @@ class _PatchConstraintsServicePart03:
         haystack_tokens = set(re.findall(r"[a-z0-9_]+", haystack))
         score = 0
         package = dep.package_name.lower()
-        package_words = package.replace("_", " ").replace("-", " ")
         if (len(package) >= 3 and re.search(rf"(?<![a-z0-9_]){re.escape(package)}(?![a-z0-9_])", haystack)) or package in haystack_tokens:
             score += 10
-        elif package_words != package and package_words in haystack:
-            score += 10
-        elif any(part and len(part) >= 5 and part in haystack for part in re.split(r"[_\-]+", package)):
-            score += 6
         if any(Path(f).name in DEPENDENCY_FILES for f in self._changed_files):
             score += 4
-        if "dependency" in haystack or "version" in haystack or "upgrade" in haystack:
-            score += 3
         if dep.resolved_version:
             score += 1
         return score
@@ -179,15 +150,9 @@ class _PatchConstraintsServicePart03:
                 score += 8
             if c.type == "generated_file" and any(self._is_generated_path(f) for f in self._changed_files):
                 score += 8
-            if c.type in {"architecture", "source_of_truth"} and any(part in changed for part in ("provider", "presentation", "service", "domain", "application")):
-                score += 5
-            if c.type == "dependency_version" and any(word in lower_q for word in ("dependency", "version", "upgrade", "package")):
-                score += 5
             for token in set(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]{2,}", lower_q)):
                 if token in text:
                     score += 1
-            if c.source.lower().startswith(("docs/", "architecture", "readme", "contributing", "adr")):
-                score += 1
             return score
 
         return sorted(

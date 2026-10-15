@@ -1,0 +1,10 @@
+{"at_utc": "2026-10-13T10:24:31.480165+00:00", "operation": "initialize", "status": "returned"}
+{"at_utc": "2026-10-13T10:24:31.485732+00:00", "operation": "list_tools", "status": "returned"}
+{"at_utc": "2026-10-13T10:24:31.486873+00:00", "operation": "prepare_docs", "status": "started", "call": 1, "arguments": {"action": "sync_project_docs", "project_path": "/tmp/docatlas-removal-secure-xs_64g44/stdio-work/project", "mutation": {"operation": "sync_project_docs", "confirm": true, "storage_path": "/tmp/docatlas-removal-secure-xs_64g44/stdio-work/docatlas_home/mcp-members/members.db", "expected_generation_id": null, "catalog_sha256": "edac41036f3dbcd453b3fabee40f3d60cfacf4deb940b5bae7d0866363644f65", "documents": [{"path": "docs/auth.md", "content_sha256": "4cc9fbefea0e130483fc05979096e0b5eca60e4f5f9e33af18989ad145abb298", "catalog_entry_hash": "sha256:cd1d3007312809214640cbdcba6cba74ad893e83d2187c48fd3a0bf38d377316"}]}}}
+{"at_utc": "2026-10-13T10:24:31.623119+00:00", "operation": "prepare_docs", "status": "returned", "call": 1, "seconds": 0.1350852159994247}
+{"at_utc": "2026-10-13T10:24:31.627115+00:00", "operation": "get_docs_context", "status": "started", "call": 2, "arguments": {"question": "How do I authenticate with OAuth tokens?", "project_path": "/tmp/docatlas-removal-secure-xs_64g44/stdio-work/project", "scope": "project"}}
+{"at_utc": "2026-10-13T10:24:31.807294+00:00", "operation": "get_docs_context", "status": "returned", "call": 2, "seconds": 0.1790675900010683}
+{"at_utc": "2026-10-13T10:24:31.808649+00:00", "operation": "read_resource", "status": "started", "uri": "docatlas://source/4b28bd3a7e3223acd61dcf4c"}
+{"at_utc": "2026-10-13T10:24:31.817073+00:00", "operation": "read_resource", "status": "returned"}
+{"at_utc": "2026-10-13T10:24:31.818217+00:00", "operation": "get_docs_context", "status": "started", "call": 4, "arguments": {"question": "How do I authenticate with OAuth tokens?", "project_path": "/tmp/docatlas-removal-secure-xs_64g44/stdio-work/project", "version": "99.0.0"}}
+{"at_utc": "2026-10-13T10:24:31.863675+00:00", "operation": "get_docs_context", "status": "returned", "call": 4, "seconds": 0.04418997199900332}

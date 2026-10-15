@@ -1,0 +1,4038 @@
+{
+  "case_id": "V3CAL03",
+  "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+  "split": "calibration",
+  "arm": "V3",
+  "request": {
+    "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+    "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+    "rows": [
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+        "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+        "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md"
+      ],
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+        "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+        "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-3rggox8o/project/docatlas.project-docs.yaml": "faaf0337ca62f262ed23cb36f90a1666aef03ee98039891a41cdd3fc3d3bdb31",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+    }
+  },
+  "admission_environment": {
+    "DOCATLAS_EXPERIMENT_ADMISSION": "scalar_label_candidates_v3"
+  },
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+        },
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "window_characters": 259,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "заказ",
+                "с",
+                "кооператива"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 3,
+              "match_ratio": 0.25,
+              "bm25_cost": -3.2777526950790183,
+              "lexical_score": 3.2777526950790183,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "retrieval_text": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/disputes.md",
+                "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+              },
+              "char_start": 31,
+              "char_end": 290
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_terms": [
+              "в",
+              "какую",
+              "очередь",
+              "печати",
+              "попадает",
+              "заказ",
+              "с",
+              "приоритетом",
+              "14",
+              "по",
+              "правилу",
+              "кооператива"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "заказ",
+              "с",
+              "кооператива"
+            ],
+            "body_matched_terms": [
+              "заказ",
+              "с",
+              "кооператива"
+            ],
+            "matched_term_count": 3,
+            "match_ratio": 0.25,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              31,
+              289
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "window_characters": 247,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "в",
+                "по"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 2,
+              "match_ratio": 0.1667,
+              "bm25_cost": -2.148313900405503,
+              "lexical_score": 2.148313900405503,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в",
+                  "по"
+                ],
+                "retrieval_text": [
+                  "в",
+                  "по"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/tariff.md",
+                "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+              },
+              "char_start": 26,
+              "char_end": 273
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_terms": [
+              "в",
+              "какую",
+              "очередь",
+              "печати",
+              "попадает",
+              "заказ",
+              "с",
+              "приоритетом",
+              "14",
+              "по",
+              "правилу",
+              "кооператива"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в",
+              "по"
+            ],
+            "body_matched_terms": [
+              "в",
+              "по"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.1667,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              26,
+              272
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "window_characters": 259,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "заказ",
+                "с",
+                "кооператива"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 3,
+              "match_ratio": 0.25,
+              "bm25_cost": -3.2777526950790183,
+              "lexical_score": 3.2777526950790183,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "retrieval_text": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/disputes.md",
+                "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+              },
+              "char_start": 31,
+              "char_end": 290
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_terms": [
+              "в",
+              "какую",
+              "очередь",
+              "печати",
+              "попадает",
+              "заказ",
+              "с",
+              "приоритетом",
+              "14",
+              "по",
+              "правилу",
+              "кооператива"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "заказ",
+              "с",
+              "кооператива"
+            ],
+            "body_matched_terms": [
+              "заказ",
+              "с",
+              "кооператива"
+            ],
+            "matched_term_count": 3,
+            "match_ratio": 0.25,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              31,
+              289
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+          "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "window_characters": 247,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "в",
+                "по"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 2,
+              "match_ratio": 0.1667,
+              "bm25_cost": -2.148313900405503,
+              "lexical_score": 2.148313900405503,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в",
+                  "по"
+                ],
+                "retrieval_text": [
+                  "в",
+                  "по"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/tariff.md",
+                "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+              },
+              "char_start": 26,
+              "char_end": 273
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+            "query_terms": [
+              "в",
+              "какую",
+              "очередь",
+              "печати",
+              "попадает",
+              "заказ",
+              "с",
+              "приоритетом",
+              "14",
+              "по",
+              "правилу",
+              "кооператива"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в",
+              "по"
+            ],
+            "body_matched_terms": [
+              "в",
+              "по"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.1667,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              26,
+              272
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+        "child-6541153efb98832b5560daef3f1663d88a0de452",
+        "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd"
+      ],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 4,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 4,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md"
+              },
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 4,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 4,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "document_id": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 2,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+                    "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                    "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+                    "path": "docs/disputes.md",
+                    "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 31,
+                    "char_end": 290,
+                    "display_content_hash": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+                    "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+                    "project_doc_catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098",
+                    "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+                    "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                    "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+                    "path": "docs/tariff.md",
+                    "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 26,
+                    "char_end": 273,
+                    "display_content_hash": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+                    "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+                    "project_doc_catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3",
+                    "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+                "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+                "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "not_found",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [
+    {
+      "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+      "pool": [],
+      "complete_candidates": [
+        {
+          "id": "53e8d41fd322d9852a9ab61a2df8e066bad30f2883183d859a41647d1d546bd3",
+          "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+          "text_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+          "source": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "chunk_index": 1,
+          "score": 1.0,
+          "path": "docs/disputes.md",
+          "span": [
+            31,
+            290
+          ],
+          "binding": {
+            "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+            "scope": {
+              "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "version": "",
+              "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+            },
+            "canonical_path": "docs/disputes.md",
+            "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+            "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/disputes.md",
+            "source_path": "docs/disputes.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+            "project_doc_catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812932094126777,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Оспаривание печатного счёта",
+            "section_level": 1,
+            "document_title": "disputes",
+            "document_title_hash": "2033b7c1ff8319f7",
+            "anchor": "Оспаривание печатного счёта",
+            "content_hash": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "retrieval_content_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+              "token_estimate": 61,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "disputes",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/disputes.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Оспаривание печатного счёта",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+            "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+            "vector_id": "3f2980d6-8bb2-5ede-b6ff-897ce37b7164",
+            "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+            "atom_type": "prose",
+            "atom_id": "atom-4bfb6f27aadd6365a3871798d1aec9f5",
+            "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+            "source_content_hash": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+            "heading_path": [
+              "Оспаривание печатного счёта"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              31,
+              290
+            ],
+            "byte_span": [
+              56,
+              536
+            ],
+            "line_span": [
+              3,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 120,
+            "retrieval_token_estimate": 189,
+            "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+            "title": "Оспаривание печатного счёта",
+            "section_id": 7412231389646314102,
+            "token_estimate": 120,
+            "docmancer_tokens": 232,
+            "raw_tokens": 142,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.61,
+            "ranking": {
+              "stable_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+              "section_id": 7412231389646314102,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -3.277752695079
+              },
+              "base_utility": 3.277752695079,
+              "feature_contributions": {},
+              "final_utility": 3.277752695079,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "заказ",
+                "с",
+                "кооператива"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 3,
+              "match_ratio": 0.25,
+              "bm25_cost": -3.2777526950790183,
+              "lexical_score": 3.2777526950790183,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "retrieval_text": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ]
+              }
+            },
+            "query_plan_hash": "f19177309706384be42a8f079020c02fadbc96aea7aae9d0a01d41ebf0f0b419",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "references": [],
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/disputes.md",
+                "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+              },
+              "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+              },
+              "char_start": 31,
+              "char_end": 290,
+              "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+              "raw_document": "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+              "owner": {
+                "text": "# Оспаривание печатного счёта\n",
+                "char_start": 0,
+                "char_end": 30,
+                "scope_start": 0,
+                "scope_end": 290,
+                "logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:f8fb1ea214a8339c8c49e67c1a7a977b05a2c5662c7e6a63e2a613716d2f5178",
+                "member_spans": [
+                  [
+                    0,
+                    29,
+                    "4551cb7fccd63c216a7c2af514cfbac9c04a42da22401d6e50671e355aba06bd"
+                  ],
+                  [
+                    31,
+                    289,
+                    "1d467b9f9aaad56176162965310551e5c530d9d5fd9068d0e7be3585367e0645"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "bound_subject_context": "# Оспаривание печатного счёта\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  31,
+                  289
+                ],
+                "matched_terms": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "body_matched_terms": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 3,
+                "match_ratio": 0.25,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "24fd7a9a2605047c966575ebf1a2f4dcc135f986f96119c7b2a5076cef96ecdf",
+          "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+          "text_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+          "source": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "chunk_index": 1,
+          "score": 0.95,
+          "path": "docs/tariff.md",
+          "span": [
+            26,
+            273
+          ],
+          "binding": {
+            "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+            "scope": {
+              "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "version": "",
+              "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+            },
+            "canonical_path": "docs/tariff.md",
+            "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+            "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/tariff.md",
+            "source_path": "docs/tariff.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+            "project_doc_catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812932094185060,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Расчёт печатного счёта",
+            "section_level": 1,
+            "document_title": "tariff",
+            "document_title_hash": "551b672481fc2987",
+            "anchor": "Расчёт печатного счёта",
+            "content_hash": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "retrieval_content_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+              "token_estimate": 58,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "tariff",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/tariff.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Расчёт печатного счёта",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+            "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+            "vector_id": "136a5c7d-0632-5132-bb5b-1768aa80a9c2",
+            "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+            "atom_type": "prose",
+            "atom_id": "atom-11e740b64c25c2f179aa1110348502c9",
+            "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+            "source_content_hash": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+            "heading_path": [
+              "Расчёт печатного счёта"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              26,
+              273
+            ],
+            "byte_span": [
+              46,
+              493
+            ],
+            "line_span": [
+              3,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 112,
+            "retrieval_token_estimate": 177,
+            "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+            "title": "Расчёт печатного счёта",
+            "section_id": 343487812576613936,
+            "token_estimate": 112,
+            "docmancer_tokens": 232,
+            "raw_tokens": 142,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.61,
+            "ranking": {
+              "stable_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+              "section_id": 343487812576613936,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -2.148313900406
+              },
+              "base_utility": 2.148313900406,
+              "feature_contributions": {},
+              "final_utility": 2.148313900406,
+              "raw_rank": 2,
+              "final_rank": 2,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "в",
+                "по"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 2,
+              "match_ratio": 0.1667,
+              "bm25_cost": -2.148313900405503,
+              "lexical_score": 2.148313900405503,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в",
+                  "по"
+                ],
+                "retrieval_text": [
+                  "в",
+                  "по"
+                ]
+              }
+            },
+            "query_plan_hash": "f19177309706384be42a8f079020c02fadbc96aea7aae9d0a01d41ebf0f0b419",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 2
+              },
+              "pre_post_rank": 2,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 2
+            },
+            "_reference_root_plan": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "references": [],
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/tariff.md",
+                "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+              },
+              "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+              },
+              "char_start": 26,
+              "char_end": 273,
+              "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+              "raw_document": "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+              "owner": {
+                "text": "# Расчёт печатного счёта\n",
+                "char_start": 0,
+                "char_end": 25,
+                "scope_start": 0,
+                "scope_end": 273,
+                "logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:451f45fefb9310ff77c8fcb79a3cdc2ce6eb529bb6dee3e2c2fd634adc849c86",
+                "member_spans": [
+                  [
+                    0,
+                    24,
+                    "09573486f6f7eed7206c205b2afcdbc973e576061e7a90234cfb80d76199790f"
+                  ],
+                  [
+                    26,
+                    272,
+                    "0cab2a1b879a1f38b0310ab8da4fe0727604b1f7d43f2d0867effda204de4f74"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 0.95,
+                "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "bound_subject_context": "# Расчёт печатного счёта\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  26,
+                  272
+                ],
+                "matched_terms": [
+                  "в",
+                  "по"
+                ],
+                "body_matched_terms": [
+                  "в",
+                  "по"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 2,
+                "match_ratio": 0.1667,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "53e8d41fd322d9852a9ab61a2df8e066bad30f2883183d859a41647d1d546bd3",
+          "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+          "text_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+          "source": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+          "chunk_index": 1,
+          "score": 1.0,
+          "path": "docs/disputes.md",
+          "span": [
+            31,
+            290
+          ],
+          "binding": {
+            "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+            "scope": {
+              "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "version": "",
+              "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+            },
+            "canonical_path": "docs/disputes.md",
+            "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+            "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/disputes.md",
+            "source_path": "docs/disputes.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+            "project_doc_catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812932094126777,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Оспаривание печатного счёта",
+            "section_level": 1,
+            "document_title": "disputes",
+            "document_title_hash": "2033b7c1ff8319f7",
+            "anchor": "Оспаривание печатного счёта",
+            "content_hash": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "retrieval_content_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+              "token_estimate": 61,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "disputes",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/disputes.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Оспаривание печатного счёта",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+            "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+            "vector_id": "3f2980d6-8bb2-5ede-b6ff-897ce37b7164",
+            "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+            "atom_type": "prose",
+            "atom_id": "atom-4bfb6f27aadd6365a3871798d1aec9f5",
+            "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+            "source_content_hash": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+            "heading_path": [
+              "Оспаривание печатного счёта"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              31,
+              290
+            ],
+            "byte_span": [
+              56,
+              536
+            ],
+            "line_span": [
+              3,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 120,
+            "retrieval_token_estimate": 189,
+            "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+            "title": "Оспаривание печатного счёта",
+            "section_id": 7412231389646314102,
+            "token_estimate": 120,
+            "docmancer_tokens": 232,
+            "raw_tokens": 142,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.61,
+            "ranking": {
+              "stable_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+              "section_id": 7412231389646314102,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -3.277752695079
+              },
+              "base_utility": 3.277752695079,
+              "feature_contributions": {},
+              "final_utility": 3.277752695079,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "заказ",
+                "с",
+                "кооператива"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 3,
+              "match_ratio": 0.25,
+              "bm25_cost": -3.2777526950790183,
+              "lexical_score": 3.2777526950790183,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "retrieval_text": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ]
+              }
+            },
+            "query_plan_hash": "25a17b7796f11f3db1a74f365ae52765ad1c89e1da892f08c482226286b260ea",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "references": [],
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/disputes.md",
+                "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+              },
+              "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+              },
+              "char_start": 31,
+              "char_end": 290,
+              "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+              "raw_document": "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+              "owner": {
+                "text": "# Оспаривание печатного счёта\n",
+                "char_start": 0,
+                "char_end": 30,
+                "scope_start": 0,
+                "scope_end": 290,
+                "logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:f8fb1ea214a8339c8c49e67c1a7a977b05a2c5662c7e6a63e2a613716d2f5178",
+                "member_spans": [
+                  [
+                    0,
+                    29,
+                    "4551cb7fccd63c216a7c2af514cfbac9c04a42da22401d6e50671e355aba06bd"
+                  ],
+                  [
+                    31,
+                    289,
+                    "1d467b9f9aaad56176162965310551e5c530d9d5fd9068d0e7be3585367e0645"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "bound_subject_context": "# Оспаривание печатного счёта\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  31,
+                  289
+                ],
+                "matched_terms": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "body_matched_terms": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 3,
+                "match_ratio": 0.25,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "24fd7a9a2605047c966575ebf1a2f4dcc135f986f96119c7b2a5076cef96ecdf",
+          "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+          "text_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+          "source": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+          "chunk_index": 1,
+          "score": 0.95,
+          "path": "docs/tariff.md",
+          "span": [
+            26,
+            273
+          ],
+          "binding": {
+            "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+            "scope": {
+              "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "version": "",
+              "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+            },
+            "canonical_path": "docs/tariff.md",
+            "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+            "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "docs/tariff.md",
+            "source_path": "docs/tariff.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+            "project_doc_catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791812932094185060,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Расчёт печатного счёта",
+            "section_level": 1,
+            "document_title": "tariff",
+            "document_title_hash": "551b672481fc2987",
+            "anchor": "Расчёт печатного счёта",
+            "content_hash": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "retrieval_content_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+              "token_estimate": 58,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "tariff",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "docs/tariff.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Расчёт печатного счёта",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+            "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+            "vector_id": "136a5c7d-0632-5132-bb5b-1768aa80a9c2",
+            "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+            "atom_type": "prose",
+            "atom_id": "atom-11e740b64c25c2f179aa1110348502c9",
+            "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+            "source_content_hash": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+            "heading_path": [
+              "Расчёт печатного счёта"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              26,
+              273
+            ],
+            "byte_span": [
+              46,
+              493
+            ],
+            "line_span": [
+              3,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 112,
+            "retrieval_token_estimate": 177,
+            "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+            "title": "Расчёт печатного счёта",
+            "section_id": 343487812576613936,
+            "token_estimate": 112,
+            "docmancer_tokens": 232,
+            "raw_tokens": 142,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.61,
+            "ranking": {
+              "stable_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+              "section_id": 343487812576613936,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -2.148313900406
+              },
+              "base_utility": 2.148313900406,
+              "feature_contributions": {},
+              "final_utility": 2.148313900406,
+              "raw_rank": 2,
+              "final_rank": 2,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "в",
+                "какую",
+                "очередь",
+                "печати",
+                "попадает",
+                "заказ",
+                "с",
+                "приоритетом",
+                "14",
+                "по",
+                "правилу",
+                "кооператива"
+              ],
+              "matched_terms": [
+                "в",
+                "по"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 12,
+              "matched_term_count": 2,
+              "match_ratio": 0.1667,
+              "bm25_cost": -2.148313900405503,
+              "lexical_score": 2.148313900405503,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в",
+                  "по"
+                ],
+                "retrieval_text": [
+                  "в",
+                  "по"
+                ]
+              }
+            },
+            "query_plan_hash": "25a17b7796f11f3db1a74f365ae52765ad1c89e1da892f08c482226286b260ea",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 2
+              },
+              "pre_post_rank": 2,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 2
+            },
+            "_reference_root_plan": {
+              "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+              "references": [],
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "canonical_path": "docs/tariff.md",
+                "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+              },
+              "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+              },
+              "char_start": 26,
+              "char_end": 273,
+              "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+              "raw_document": "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+              "owner": {
+                "text": "# Расчёт печатного счёта\n",
+                "char_start": 0,
+                "char_end": 25,
+                "scope_start": 0,
+                "scope_end": 273,
+                "logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:451f45fefb9310ff77c8fcb79a3cdc2ce6eb529bb6dee3e2c2fd634adc849c86",
+                "member_spans": [
+                  [
+                    0,
+                    24,
+                    "09573486f6f7eed7206c205b2afcdbc973e576061e7a90234cfb80d76199790f"
+                  ],
+                  [
+                    26,
+                    272,
+                    "0cab2a1b879a1f38b0310ab8da4fe0727604b1f7d43f2d0867effda204de4f74"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 0.95,
+                "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "bound_subject_context": "# Расчёт печатного счёта\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  26,
+                  272
+                ],
+                "matched_terms": [
+                  "в",
+                  "по"
+                ],
+                "body_matched_terms": [
+                  "в",
+                  "по"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 2,
+                "match_ratio": 0.1667,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": {
+            "id": "53e8d41fd322d9852a9ab61a2df8e066bad30f2883183d859a41647d1d546bd3",
+            "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+            "text_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "source": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+            "chunk_index": 1,
+            "score": 1.0,
+            "path": "docs/disputes.md",
+            "span": [
+              31,
+              290
+            ],
+            "binding": {
+              "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "canonical_path": "docs/disputes.md",
+              "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "docs/disputes.md",
+              "source_path": "docs/disputes.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+              "project_doc_catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791812932094126777,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Оспаривание печатного счёта",
+              "section_level": 1,
+              "document_title": "disputes",
+              "document_title_hash": "2033b7c1ff8319f7",
+              "anchor": "Оспаривание печатного счёта",
+              "content_hash": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+              "retrieval_content_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+                "token_estimate": 61,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "disputes",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "docs/disputes.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Оспаривание печатного счёта",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+              "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+              "vector_id": "3f2980d6-8bb2-5ede-b6ff-897ce37b7164",
+              "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+              "atom_type": "prose",
+              "atom_id": "atom-4bfb6f27aadd6365a3871798d1aec9f5",
+              "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+              "source_content_hash": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+              "heading_path": [
+                "Оспаривание печатного счёта"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                31,
+                290
+              ],
+              "byte_span": [
+                56,
+                536
+              ],
+              "line_span": [
+                3,
+                3
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 120,
+              "retrieval_token_estimate": 189,
+              "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+              "title": "Оспаривание печатного счёта",
+              "section_id": 7412231389646314102,
+              "token_estimate": 120,
+              "docmancer_tokens": 232,
+              "raw_tokens": 142,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.61,
+              "ranking": {
+                "stable_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "section_id": 7412231389646314102,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -3.277752695079
+                },
+                "base_utility": 3.277752695079,
+                "feature_contributions": {},
+                "final_utility": 3.277752695079,
+                "raw_rank": 1,
+                "final_rank": 1,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "matched_terms": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "exact_terms": [],
+                "missing_exact_terms": [],
+                "query_term_count": 12,
+                "matched_term_count": 3,
+                "match_ratio": 0.25,
+                "bm25_cost": -3.2777526950790183,
+                "lexical_score": 3.2777526950790183,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ],
+                  "retrieval_text": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ]
+                }
+              },
+              "query_plan_hash": "f19177309706384be42a8f079020c02fadbc96aea7aae9d0a01d41ebf0f0b419",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 1
+                },
+                "pre_post_rank": 1,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 1
+              },
+              "_reference_root_plan": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                  "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "canonical_path": "docs/disputes.md",
+                  "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+                },
+                "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+                },
+                "char_start": 31,
+                "char_end": 290,
+                "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+                "raw_document": "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+                "owner": {
+                  "text": "# Оспаривание печатного счёта\n",
+                  "char_start": 0,
+                  "char_end": 30,
+                  "scope_start": 0,
+                  "scope_end": 290,
+                  "logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:f8fb1ea214a8339c8c49e67c1a7a977b05a2c5662c7e6a63e2a613716d2f5178",
+                  "member_spans": [
+                    [
+                      0,
+                      29,
+                      "4551cb7fccd63c216a7c2af514cfbac9c04a42da22401d6e50671e355aba06bd"
+                    ],
+                    [
+                      31,
+                      289,
+                      "1d467b9f9aaad56176162965310551e5c530d9d5fd9068d0e7be3585367e0645"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "в",
+                    "какую",
+                    "очередь",
+                    "печати",
+                    "попадает",
+                    "заказ",
+                    "с",
+                    "приоритетом",
+                    "14",
+                    "по",
+                    "правилу",
+                    "кооператива"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 1.0,
+                  "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "bound_subject_context": "# Оспаривание печатного счёта\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    31,
+                    289
+                  ],
+                  "matched_terms": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ],
+                  "body_matched_terms": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 3,
+                  "match_ratio": 0.25,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 0
+        },
+        {
+          "candidate": {
+            "id": "24fd7a9a2605047c966575ebf1a2f4dcc135f986f96119c7b2a5076cef96ecdf",
+            "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+            "text_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "source": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+            "chunk_index": 1,
+            "score": 0.95,
+            "path": "docs/tariff.md",
+            "span": [
+              26,
+              273
+            ],
+            "binding": {
+              "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "canonical_path": "docs/tariff.md",
+              "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "docs/tariff.md",
+              "source_path": "docs/tariff.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+              "project_doc_catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791812932094185060,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Расчёт печатного счёта",
+              "section_level": 1,
+              "document_title": "tariff",
+              "document_title_hash": "551b672481fc2987",
+              "anchor": "Расчёт печатного счёта",
+              "content_hash": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+              "retrieval_content_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+                "token_estimate": 58,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "tariff",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "docs/tariff.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Расчёт печатного счёта",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+              "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+              "vector_id": "136a5c7d-0632-5132-bb5b-1768aa80a9c2",
+              "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+              "atom_type": "prose",
+              "atom_id": "atom-11e740b64c25c2f179aa1110348502c9",
+              "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+              "source_content_hash": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+              "heading_path": [
+                "Расчёт печатного счёта"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                26,
+                273
+              ],
+              "byte_span": [
+                46,
+                493
+              ],
+              "line_span": [
+                3,
+                3
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 112,
+              "retrieval_token_estimate": 177,
+              "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+              "title": "Расчёт печатного счёта",
+              "section_id": 343487812576613936,
+              "token_estimate": 112,
+              "docmancer_tokens": 232,
+              "raw_tokens": 142,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.61,
+              "ranking": {
+                "stable_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "section_id": 343487812576613936,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -2.148313900406
+                },
+                "base_utility": 2.148313900406,
+                "feature_contributions": {},
+                "final_utility": 2.148313900406,
+                "raw_rank": 2,
+                "final_rank": 2,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "matched_terms": [
+                  "в",
+                  "по"
+                ],
+                "exact_terms": [],
+                "missing_exact_terms": [],
+                "query_term_count": 12,
+                "matched_term_count": 2,
+                "match_ratio": 0.1667,
+                "bm25_cost": -2.148313900405503,
+                "lexical_score": 2.148313900405503,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "в",
+                    "по"
+                  ],
+                  "retrieval_text": [
+                    "в",
+                    "по"
+                  ]
+                }
+              },
+              "query_plan_hash": "f19177309706384be42a8f079020c02fadbc96aea7aae9d0a01d41ebf0f0b419",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 2
+                },
+                "pre_post_rank": 2,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 2
+              },
+              "_reference_root_plan": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                  "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "canonical_path": "docs/tariff.md",
+                  "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+                },
+                "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+                },
+                "char_start": 26,
+                "char_end": 273,
+                "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+                "raw_document": "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+                "owner": {
+                  "text": "# Расчёт печатного счёта\n",
+                  "char_start": 0,
+                  "char_end": 25,
+                  "scope_start": 0,
+                  "scope_end": 273,
+                  "logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:451f45fefb9310ff77c8fcb79a3cdc2ce6eb529bb6dee3e2c2fd634adc849c86",
+                  "member_spans": [
+                    [
+                      0,
+                      24,
+                      "09573486f6f7eed7206c205b2afcdbc973e576061e7a90234cfb80d76199790f"
+                    ],
+                    [
+                      26,
+                      272,
+                      "0cab2a1b879a1f38b0310ab8da4fe0727604b1f7d43f2d0867effda204de4f74"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "в",
+                    "какую",
+                    "очередь",
+                    "печати",
+                    "попадает",
+                    "заказ",
+                    "с",
+                    "приоритетом",
+                    "14",
+                    "по",
+                    "правилу",
+                    "кооператива"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 0.95,
+                  "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "bound_subject_context": "# Расчёт печатного счёта\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    26,
+                    272
+                  ],
+                  "matched_terms": [
+                    "в",
+                    "по"
+                  ],
+                  "body_matched_terms": [
+                    "в",
+                    "по"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 2,
+                  "match_ratio": 0.1667,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 1
+        },
+        {
+          "candidate": {
+            "id": "53e8d41fd322d9852a9ab61a2df8e066bad30f2883183d859a41647d1d546bd3",
+            "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+            "text_sha256": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+            "source": "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+            "chunk_index": 1,
+            "score": 1.0,
+            "path": "docs/disputes.md",
+            "span": [
+              31,
+              290
+            ],
+            "binding": {
+              "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "canonical_path": "docs/disputes.md",
+              "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "docs/disputes.md",
+              "source_path": "docs/disputes.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+              "project_doc_catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791812932094126777,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Оспаривание печатного счёта",
+              "section_level": 1,
+              "document_title": "disputes",
+              "document_title_hash": "2033b7c1ff8319f7",
+              "anchor": "Оспаривание печатного счёта",
+              "content_hash": "cc2caf7320620ac17c00e94b99391a41ce96e6c8548f34b47b2527641655eabc",
+              "retrieval_content_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "57cf22a612a8a9b6fba10de843781758755409deddaf525e81e073ad5c9ff464",
+                "token_estimate": 61,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "disputes",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "docs/disputes.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Оспаривание печатного счёта",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "8312d0a6fcb088e05f35410ce26b86afed64d72b253bcc754ed74d64c402696e",
+              "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+              "vector_id": "3f2980d6-8bb2-5ede-b6ff-897ce37b7164",
+              "parent_logical_id": "parent-857731fad3fb58e7cb513924d7aa1236",
+              "atom_type": "prose",
+              "atom_id": "atom-4bfb6f27aadd6365a3871798d1aec9f5",
+              "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+              "source_content_hash": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+              "heading_path": [
+                "Оспаривание печатного счёта"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                31,
+                290
+              ],
+              "byte_span": [
+                56,
+                536
+              ],
+              "line_span": [
+                3,
+                3
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 120,
+              "retrieval_token_estimate": 189,
+              "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+              "title": "Оспаривание печатного счёта",
+              "section_id": 7412231389646314102,
+              "token_estimate": 120,
+              "docmancer_tokens": 232,
+              "raw_tokens": 142,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.61,
+              "ranking": {
+                "stable_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+                "section_id": 7412231389646314102,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -3.277752695079
+                },
+                "base_utility": 3.277752695079,
+                "feature_contributions": {},
+                "final_utility": 3.277752695079,
+                "raw_rank": 1,
+                "final_rank": 1,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "matched_terms": [
+                  "заказ",
+                  "с",
+                  "кооператива"
+                ],
+                "exact_terms": [],
+                "missing_exact_terms": [],
+                "query_term_count": 12,
+                "matched_term_count": 3,
+                "match_ratio": 0.25,
+                "bm25_cost": -3.2777526950790183,
+                "lexical_score": 3.2777526950790183,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ],
+                  "retrieval_text": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ]
+                }
+              },
+              "query_plan_hash": "25a17b7796f11f3db1a74f365ae52765ad1c89e1da892f08c482226286b260ea",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 1
+                },
+                "pre_post_rank": 1,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 1
+              },
+              "_reference_root_plan": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                  "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md",
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "canonical_path": "docs/disputes.md",
+                  "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f"
+                },
+                "project_doc_content_hash": "sha256:e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+                },
+                "char_start": 31,
+                "char_end": 290,
+                "text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+                "raw_document": "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+                "owner": {
+                  "text": "# Оспаривание печатного счёта\n",
+                  "char_start": 0,
+                  "char_end": 30,
+                  "scope_start": 0,
+                  "scope_end": 290,
+                  "logical_id": "parent-857731fad3fb58e7cb513924d7aa1236"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:f8fb1ea214a8339c8c49e67c1a7a977b05a2c5662c7e6a63e2a613716d2f5178",
+                  "member_spans": [
+                    [
+                      0,
+                      29,
+                      "4551cb7fccd63c216a7c2af514cfbac9c04a42da22401d6e50671e355aba06bd"
+                    ],
+                    [
+                      31,
+                      289,
+                      "1d467b9f9aaad56176162965310551e5c530d9d5fd9068d0e7be3585367e0645"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "в",
+                    "какую",
+                    "очередь",
+                    "печати",
+                    "попадает",
+                    "заказ",
+                    "с",
+                    "приоритетом",
+                    "14",
+                    "по",
+                    "правилу",
+                    "кооператива"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 1.0,
+                  "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "bound_subject_context": "# Оспаривание печатного счёта\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    31,
+                    289
+                  ],
+                  "matched_terms": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ],
+                  "body_matched_terms": [
+                    "заказ",
+                    "с",
+                    "кооператива"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 3,
+                  "match_ratio": 0.25,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 2
+        },
+        {
+          "candidate": {
+            "id": "24fd7a9a2605047c966575ebf1a2f4dcc135f986f96119c7b2a5076cef96ecdf",
+            "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+            "text_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+            "source": "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+            "chunk_index": 1,
+            "score": 0.95,
+            "path": "docs/tariff.md",
+            "span": [
+              26,
+              273
+            ],
+            "binding": {
+              "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+              "scope": {
+                "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                "version": "",
+                "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+              },
+              "canonical_path": "docs/tariff.md",
+              "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-v3-3rggox8o/project",
+              "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "repository_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "docs/tariff.md",
+              "source_path": "docs/tariff.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+              "project_doc_catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791812932094185060,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Расчёт печатного счёта",
+              "section_level": 1,
+              "document_title": "tariff",
+              "document_title_hash": "551b672481fc2987",
+              "anchor": "Расчёт печатного счёта",
+              "content_hash": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+              "retrieval_content_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "48fd40c50b7a454540e0b543f5196c7d08a28fdd03db802b6979730830d54fa7",
+                "token_estimate": 58,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "tariff",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "docs/tariff.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Расчёт печатного счёта",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "89aa74e4ca1b40ccd41d13b35fc9d05a6a74879f7a62fc014c9ec608c7d70585",
+              "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+              "vector_id": "136a5c7d-0632-5132-bb5b-1768aa80a9c2",
+              "parent_logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5",
+              "atom_type": "prose",
+              "atom_id": "atom-11e740b64c25c2f179aa1110348502c9",
+              "source_identity": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+              "source_content_hash": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+              "heading_path": [
+                "Расчёт печатного счёта"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                26,
+                273
+              ],
+              "byte_span": [
+                46,
+                493
+              ],
+              "line_span": [
+                3,
+                3
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 112,
+              "retrieval_token_estimate": 177,
+              "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+              "title": "Расчёт печатного счёта",
+              "section_id": 343487812576613936,
+              "token_estimate": 112,
+              "docmancer_tokens": 232,
+              "raw_tokens": 142,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.61,
+              "ranking": {
+                "stable_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+                "section_id": 343487812576613936,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -2.148313900406
+                },
+                "base_utility": 2.148313900406,
+                "feature_contributions": {},
+                "final_utility": 2.148313900406,
+                "raw_rank": 2,
+                "final_rank": 2,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "в",
+                  "какую",
+                  "очередь",
+                  "печати",
+                  "попадает",
+                  "заказ",
+                  "с",
+                  "приоритетом",
+                  "14",
+                  "по",
+                  "правилу",
+                  "кооператива"
+                ],
+                "matched_terms": [
+                  "в",
+                  "по"
+                ],
+                "exact_terms": [],
+                "missing_exact_terms": [],
+                "query_term_count": 12,
+                "matched_term_count": 2,
+                "match_ratio": 0.1667,
+                "bm25_cost": -2.148313900405503,
+                "lexical_score": 2.148313900405503,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "в",
+                    "по"
+                  ],
+                  "retrieval_text": [
+                    "в",
+                    "по"
+                  ]
+                }
+              },
+              "query_plan_hash": "25a17b7796f11f3db1a74f365ae52765ad1c89e1da892f08c482226286b260ea",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 2
+                },
+                "pre_post_rank": 2,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 2
+              },
+              "_reference_root_plan": {
+                "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                  "version": "",
+                  "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?": {
+                  "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md",
+                  "scope": {
+                    "project_id": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+                    "version": "",
+                    "snapshot_id": "gen-1a8bee8eb16a40d7be7bb18a78500804"
+                  },
+                  "canonical_path": "docs/tariff.md",
+                  "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+                },
+                "project_doc_content_hash": "sha256:441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+                },
+                "char_start": 26,
+                "char_end": 273,
+                "text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+                "raw_document": "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+                "owner": {
+                  "text": "# Расчёт печатного счёта\n",
+                  "char_start": 0,
+                  "char_end": 25,
+                  "scope_start": 0,
+                  "scope_end": 273,
+                  "logical_id": "parent-a5ad82c4071e38b4b9340f7c9015e2c5"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:451f45fefb9310ff77c8fcb79a3cdc2ce6eb529bb6dee3e2c2fd634adc849c86",
+                  "member_spans": [
+                    [
+                      0,
+                      24,
+                      "09573486f6f7eed7206c205b2afcdbc973e576061e7a90234cfb80d76199790f"
+                    ],
+                    [
+                      26,
+                      272,
+                      "0cab2a1b879a1f38b0310ab8da4fe0727604b1f7d43f2d0867effda204de4f74"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "в",
+                    "какую",
+                    "очередь",
+                    "печати",
+                    "попадает",
+                    "заказ",
+                    "с",
+                    "приоритетом",
+                    "14",
+                    "по",
+                    "правилу",
+                    "кооператива"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 0.95,
+                  "reference_body_query": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+                  "bound_subject_context": "# Расчёт печатного счёта\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    26,
+                    272
+                  ],
+                  "matched_terms": [
+                    "в",
+                    "по"
+                  ],
+                  "body_matched_terms": [
+                    "в",
+                    "по"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 2,
+                  "match_ratio": 0.1667,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 3
+        }
+      ],
+      "selected_indices": null
+    }
+  ],
+  "state_after": {
+    "generation": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+    "rows": [
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md",
+        "# Оспаривание печатного счёта\n\nСпор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+        "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/disputes.md"
+      ],
+      [
+        "gen-1a8bee8eb16a40d7be7bb18a78500804",
+        "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md",
+        "# Расчёт печатного счёта\n\nКооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+        "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+        "project_file:local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f:docs/tariff.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-3rggox8o/project/docatlas.project-docs.yaml": "faaf0337ca62f262ed23cb36f90a1666aef03ee98039891a41cdd3fc3d3bdb31",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+      "/tmp/docatlas-v3-3rggox8o/project/docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+    }
+  },
+  "elapsed_seconds": 0.04437151399906725,
+  "integrity_errors": []
+}

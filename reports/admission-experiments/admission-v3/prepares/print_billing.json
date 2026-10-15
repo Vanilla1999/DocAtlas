@@ -1,0 +1,74 @@
+{
+  "seconds": 0.1165402799997537,
+  "expected_paths": [
+    "docs/disputes.md",
+    "docs/tariff.md"
+  ],
+  "indexed_paths": [
+    "docs/disputes.md",
+    "docs/tariff.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-cec1eaf7b3e9611be4328b77bd4db14fd90c1340",
+      "source_path": "docs/disputes.md",
+      "display_text": "# Оспаривание печатного счёта\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-6541153efb98832b5560daef3f1663d88a0de452",
+      "source_path": "docs/disputes.md",
+      "display_text": "Спор о сумме печатного счёта принимает бухгалтер кооператива. Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт. Бухгалтер сверяет число страниц с заказом и оформляет исправленный счёт при ошибке расчёта.\n",
+      "line_start": 3,
+      "line_end": 3
+    },
+    {
+      "stable_chunk_id": "child-b7d7e8c08ba06d4279ca2046439e90e51b484bc7",
+      "source_path": "docs/tariff.md",
+      "display_text": "# Расчёт печатного счёта\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-bd68accd0942c52ad661a4b17fd03d8e550d19cd",
+      "source_path": "docs/tariff.md",
+      "display_text": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+      "line_start": 3,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "f56021e1127b7c56bc51e03c40f4dd1cea5cc6fad8307258a0160ed82c32e860",
+  "storage_path": "/tmp/docatlas-evidence-080h9449/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+  "catalog_sha256": "faaf0337ca62f262ed23cb36f90a1666aef03ee98039891a41cdd3fc3d3bdb31",
+  "documents": [
+    {
+      "path": "docs/disputes.md",
+      "content_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+      "catalog_entry_hash": "sha256:73e23fd5c6e34208e4c649ceb7908fdb29bb3433a183fbe510db7fb027560098"
+    },
+    {
+      "path": "docs/tariff.md",
+      "content_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+      "catalog_entry_hash": "sha256:c5f2e617f64fa835b77805e17ba96e3c98109f9a0ab1ae37e07936d6b9d3cfc3"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+    "members": 2,
+    "new_count": 2,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 2,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 2
+  },
+  "status": "EXECUTED"
+}

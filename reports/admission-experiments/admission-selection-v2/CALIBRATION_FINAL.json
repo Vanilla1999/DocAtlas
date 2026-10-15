@@ -1,0 +1,65 @@
+{
+  "k": 2,
+  "confirmation": [
+    {
+      "id": "CAL01",
+      "arm": "Budget",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL01",
+      "arm": "Mini",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL02",
+      "arm": "Budget",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL02",
+      "arm": "Mini",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL03",
+      "arm": "Budget",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL03",
+      "arm": "Mini",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL04",
+      "arm": "Budget",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL04",
+      "arm": "Mini",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL05",
+      "arm": "Budget",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL05",
+      "arm": "Mini",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL06",
+      "arm": "Budget",
+      "lost_B1_witnesses": []
+    },
+    {
+      "id": "CAL06",
+      "arm": "Mini",
+      "lost_B1_witnesses": []
+    }
+  ]
+}

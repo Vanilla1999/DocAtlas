@@ -1,0 +1,18 @@
+{
+  "status": "failed",
+  "error": {
+    "reason_code": "network_required",
+    "message": "network_required: request failed",
+    "exception_type": "TimeoutError",
+    "retryable": true,
+    "where": {
+      "tool": "get_docs_context",
+      "handler": null,
+      "phase": "execution"
+    },
+    "hints": [
+      "Retry only after explicit user approval for network access."
+    ]
+  },
+  "warnings": []
+}

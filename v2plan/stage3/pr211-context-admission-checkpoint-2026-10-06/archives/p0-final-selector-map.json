@@ -1,0 +1,2472 @@
+{
+  "schema": "p0-final-selector-map-v1",
+  "purpose": "Finite source-bounded P0 gap2 map, not implementation/release/acceptance/proof-quality claim",
+  "scope": [
+    "source_fact",
+    "facet",
+    "code_group",
+    "canonical assignment",
+    "support",
+    "project/library/patch/action/model-visible reselection"
+  ],
+  "source_pins": [
+    {
+      "path": "docmancer/docs/application/evidence_selection.py",
+      "sha256": "e3c6b2f68eb64f3072a51d022db46bbfe4956034389e191df1f3c61ddf80c459",
+      "owners": []
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_shared.py",
+      "sha256": "9e3112b8a5bdaab15907caaaebc0e781945ff9544414702d353e6cbfe8ae36d5",
+      "owners": [
+        {
+          "owner": "_source_fact_requirements",
+          "span": [
+            128,
+            171
+          ],
+          "body_sha256": "c2fdcfd656d9a8abf6080d3ce22dafac4f8b2e1cc798686533e86896c74cdd79"
+        },
+        {
+          "owner": "build_requirements",
+          "span": [
+            174,
+            195
+          ],
+          "body_sha256": "b2511450190cd0e89dd569182a98a5897979282f499608ff995bcb39366a542d"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part01.py",
+      "sha256": "bb37a3dd60b6bc6d9cfb2b65a85b5db1da8258afd9a2a710085808181f496c03",
+      "owners": [
+        {
+          "owner": "SelectionDecision.__post_init__",
+          "span": [
+            24,
+            26
+          ],
+          "body_sha256": "1755c525410f1bda52e3ab2864945b4cb3f983d90d669dea28e2ff1b197024fe"
+        },
+        {
+          "owner": "SelectionDecision.selected_items",
+          "span": [
+            29,
+            30
+          ],
+          "body_sha256": "99555e7b84d7ec9c379a48e79994ce7a6b68ab706c8d788c0b672db294547d56"
+        },
+        {
+          "owner": "SelectionDecision.audit_manifest",
+          "span": [
+            32,
+            57
+          ],
+          "body_sha256": "a6fd9bfaa5f59748fa11a85cf828049d1273d53aa256248a468ee062200e8155"
+        },
+        {
+          "owner": "resolve_assignment_unit",
+          "span": [
+            60,
+            69
+          ],
+          "body_sha256": "d5648c1f1649d3de69e6ba4c2191d637713ffb576d1ee5182589d32fb685410d"
+        },
+        {
+          "owner": "validate_assignment_binding",
+          "span": [
+            72,
+            93
+          ],
+          "body_sha256": "8eec34d62cd11e25be8727e5db80b3b88c0058b6f39cce432e53ba649c2c97e5"
+        },
+        {
+          "owner": "MixedSelectionLane.qualifier",
+          "span": [
+            103,
+            104
+          ],
+          "body_sha256": "9823f812dfb69ffb0a8f3bbdc56be19e8a1a3950b31dab9ac831cc6e75de65f0"
+        },
+        {
+          "owner": "AggregateMixedSelectionDecision.requirements",
+          "span": [
+            117,
+            118
+          ],
+          "body_sha256": "7405697218edf24c68e1829f548cdfbc4c4528ae64c6294089fa7e06d3f5a03d"
+        },
+        {
+          "owner": "AggregateMixedSelectionDecision.selected_candidates",
+          "span": [
+            121,
+            122
+          ],
+          "body_sha256": "f636a32161a3ce1867356190e184e28a85965f4788521c92aab8cba90fa92786"
+        },
+        {
+          "owner": "AggregateMixedSelectionDecision.assignments",
+          "span": [
+            125,
+            126
+          ],
+          "body_sha256": "01fbd0cc23cbedef778a497933a3cdda35e2c7e4de8234c1e879f4ff3c1f04de"
+        },
+        {
+          "owner": "AggregateMixedSelectionDecision.support_decision",
+          "span": [
+            129,
+            130
+          ],
+          "body_sha256": "05635644def77b90c3aca97d423fb2658ccd3e83de607d16de29953dc2ce2cda"
+        },
+        {
+          "owner": "AggregateMixedSelectionDecision.audit_manifest",
+          "span": [
+            132,
+            146
+          ],
+          "body_sha256": "88a039c9522051b804a484acdc5f7e031b5c107a12d973c58cd81376e6ac9849"
+        },
+        {
+          "owner": "aggregate_mixed_selection",
+          "span": [
+            149,
+            293
+          ],
+          "body_sha256": "0c7e85820902159d16e7d4462dec0196942ef6fddfbfb51db35cc93d03375b2b"
+        },
+        {
+          "owner": "docs_selection_config",
+          "span": [
+            296,
+            304
+          ],
+          "body_sha256": "2b8ed1e660145d28076bb378330a4c182e65a48189215130326d12fb21a2a582"
+        },
+        {
+          "owner": "library_docs_selection_config",
+          "span": [
+            307,
+            308
+          ],
+          "body_sha256": "6fd72f8059d94021473e85cc833383d2da575ef4625ae45feab9c2716071bfd9"
+        },
+        {
+          "owner": "project_docs_selection_config",
+          "span": [
+            311,
+            312
+          ],
+          "body_sha256": "208323a4e2f5b45f94b4dd4de5d6b61d76deaa9424fa3833acb6829cd20c7502"
+        },
+        {
+          "owner": "patch_selection_config",
+          "span": [
+            315,
+            321
+          ],
+          "body_sha256": "684308f2fb5eed42d0f95aef4318c726b199ba79784477d13c3ce80131692545"
+        },
+        {
+          "owner": "_eligible_candidates",
+          "span": [
+            324,
+            383
+          ],
+          "body_sha256": "a4537f6d62dbabbf34e8a012bdb587291ad40952d16aad390df1cf2c54942f44"
+        },
+        {
+          "owner": "_query_identifier_conflict",
+          "span": [
+            386,
+            410
+          ],
+          "body_sha256": "3b8677123e2d01c4eecf533860913c6c2dc30a36fb7150dc144ab21fb808133a"
+        },
+        {
+          "owner": "_query_identifier_values",
+          "span": [
+            413,
+            429
+          ],
+          "body_sha256": "89dae6d8f85b90e1cd5e66da6bcaf7bae125658810b15eeac3a1c70c46d676bd"
+        },
+        {
+          "owner": "_trust_source_keys",
+          "span": [
+            432,
+            451
+          ],
+          "body_sha256": "6b270017cfd62ff17918653a40d2ad25f27ae9bd218e19681a3fc3126eafbcee"
+        },
+        {
+          "owner": "_candidate_source_view",
+          "span": [
+            454,
+            480
+          ],
+          "body_sha256": "6e30213e430ad65ae00b3c36a3b0018037fc73c77fc8c54443389cd43810c55a"
+        },
+        {
+          "owner": "_candidate_preference",
+          "span": [
+            483,
+            493
+          ],
+          "body_sha256": "71f98f194bbefcd5a58f73b6ec237465e465b5679942de6a5cdca6347663eaf0"
+        },
+        {
+          "owner": "_candidate_requirement_witness",
+          "span": [
+            496,
+            503
+          ],
+          "body_sha256": "f18655103c359771935730160e523843f4b8b09f2745791d481ab7da07d8f3ea"
+        },
+        {
+          "owner": "_lifecycle_assignment_rank",
+          "span": [
+            506,
+            518
+          ],
+          "body_sha256": "b51c885b2f85f629579085a74958d57f129675672cc3856a6f7ea72aa5ef8c8b"
+        },
+        {
+          "owner": "_assignment_preference",
+          "span": [
+            521,
+            545
+          ],
+          "body_sha256": "3bc14c62cde4dbca78c998f60eb8001809f7eca89ebfc4475f0053e633523a10"
+        },
+        {
+          "owner": "_selected_identity",
+          "span": [
+            548,
+            557
+          ],
+          "body_sha256": "d2aba565e00e6ec6875565bb965a6d39131c10fdc55cd292fc94c4246cb78c06"
+        },
+        {
+          "owner": "_shingles",
+          "span": [
+            560,
+            566
+          ],
+          "body_sha256": "83135a11f2fc374e399f7ca7781dadccb761b60f82f26454593503805d59a277"
+        },
+        {
+          "owner": "_jaccard_millis",
+          "span": [
+            569,
+            572
+          ],
+          "body_sha256": "711adc8fa55c901e4ad678a13923a1f6d4c0bb12ffec9e8d1d062db74f9d40e3"
+        },
+        {
+          "owner": "_repair_mandatory_selection",
+          "span": [
+            575,
+            622
+          ],
+          "body_sha256": "dd2597afdd153c99298e4c1368cbde09d4e11655eea01c7f8d2719fa9ce3a3e0"
+        },
+        {
+          "owner": "_repair_mandatory_selection.complete",
+          "span": [
+            590,
+            592
+          ],
+          "body_sha256": "af856e592607ed79eab6a18c77210f74847ed48bfd2150902ba8fa4471fae060"
+        },
+        {
+          "owner": "_repair_mandatory_selection.quality",
+          "span": [
+            594,
+            610
+          ],
+          "body_sha256": "9c95a01d96a5217475f2139badd0370b44d287b04dd03bffa87fd3fb5f26ea24"
+        },
+        {
+          "owner": "_selection_terms",
+          "span": [
+            625,
+            631
+          ],
+          "body_sha256": "8e1fc408a6d1dc70bb4d9fd6457b837d2063c22103f1d023bf40404bbdc03e08"
+        },
+        {
+          "owner": "_marginal_utility",
+          "span": [
+            634,
+            648
+          ],
+          "body_sha256": "4ed3db11861194ecdb9c589b55a22334240f76b9cb47cb7296251fc17c781da4"
+        },
+        {
+          "owner": "_redundant_token_ratio_millis",
+          "span": [
+            651,
+            665
+          ],
+          "body_sha256": "6a844a2e36f0371e203e41e1ad860c9b8a3a6f26ed2ecd52a6d1bc230ed7a3d1"
+        },
+        {
+          "owner": "_count_reasons",
+          "span": [
+            668,
+            672
+          ],
+          "body_sha256": "35e7f7cf41254b284daed6c757a34843629a28fad5494729989ca4dc95cdd9d1"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part02.py",
+      "sha256": "db6e136903abc62f3c3f0a8fa2fee88a46a2ac1c4fd13674169f5e58b505c2c0",
+      "owners": [
+        {
+          "owner": "_scope_requirement_value",
+          "span": [
+            9,
+            15
+          ],
+          "body_sha256": "b0e2ecfb3b39e41aa72d5e0df4e7f7df223ab4b10e47a35d2e774e519cc57b07"
+        },
+        {
+          "owner": "_facet_requirement_matches",
+          "span": [
+            18,
+            113
+          ],
+          "body_sha256": "8a666b4444ba648beee109af48a48d21d31fe680738d13c4b2634cfb4e91169c"
+        },
+        {
+          "owner": "_code_group_fragments",
+          "span": [
+            116,
+            127
+          ],
+          "body_sha256": "7ebb0fbd7740687e7d0badf266938a779d7e27386b3ec6b9e3d219c70ce154a4"
+        },
+        {
+          "owner": "_candidate_code_blocks",
+          "span": [
+            130,
+            144
+          ],
+          "body_sha256": "1d70fac9fce2cdeb952ce66c524e01cb58ac119433eed66298a93378046e7368"
+        },
+        {
+          "owner": "_code_group_requirement_matches",
+          "span": [
+            147,
+            152
+          ],
+          "body_sha256": "462675518337ee271debde30340f07df3892687e9d778c6b3bd3ac229d3fc3c9"
+        },
+        {
+          "owner": "_legacy_requirement_matches_unit",
+          "span": [
+            155,
+            207
+          ],
+          "body_sha256": "da444867a7b541e3c35333575b3ab9ded777b5428318893b5f841d00d5efe300"
+        },
+        {
+          "owner": "_witness_for_requirement",
+          "span": [
+            210,
+            264
+          ],
+          "body_sha256": "ed03e8b67551bb203c3d14540a97eaee4e6dc97f1752f2a96a4aa81746bf3581"
+        },
+        {
+          "owner": "_with_canonical_policy_requirements",
+          "span": [
+            267,
+            294
+          ],
+          "body_sha256": "6d44ecd3976cb450d75accb402eb079ac1f469046147191089eba1014ea929b4"
+        },
+        {
+          "owner": "_deduplicate",
+          "span": [
+            297,
+            345
+          ],
+          "body_sha256": "696324612ee02fa0b0531cb49112f398a559c4ff9b1a4ba56cff2a231a7bc664"
+        },
+        {
+          "owner": "_raw_candidate_binding",
+          "span": [
+            348,
+            388
+          ],
+          "body_sha256": "f3e1d3daa570915cbee544b559765c1b63206aaa85a27280886e039449c543cd"
+        },
+        {
+          "owner": "_policy_polarity",
+          "span": [
+            391,
+            397
+          ],
+          "body_sha256": "48ef07e240e24e96e562b240b2971792772667b6e15cbdd67fe1efee8bd9c483"
+        },
+        {
+          "owner": "_overlap_millis",
+          "span": [
+            400,
+            407
+          ],
+          "body_sha256": "788950ced2ec79d2c915f8dc1bfdcb324dfba35d22eb73f8a2ebfeafce30c2ab"
+        },
+        {
+          "owner": "_reserve_and_select",
+          "span": [
+            410,
+            558
+          ],
+          "body_sha256": "c75480b70fec7cf3033ad0a6fb42a72e5c0b1633d25bc285105bd56bfd6ca618"
+        },
+        {
+          "owner": "_reserve_and_select.mandatory_choice_key",
+          "span": [
+            443,
+            466
+          ],
+          "body_sha256": "d65d856c0b6217f91906837118314938f7110d1f67a99f4a30e2cbfd5fcbb3cd"
+        },
+        {
+          "owner": "_selected_feature_trace",
+          "span": [
+            561,
+            597
+          ],
+          "body_sha256": "4a1a0d4cf3f67bcd3e47900eaa63c73fd28516d35a2c09657c2f5a64430cce8d"
+        },
+        {
+          "owner": "_authority_conflicts",
+          "span": [
+            600,
+            616
+          ],
+          "body_sha256": "3050bea9f45855df6841dca65c30040f38ece5824f34c5a4d6d8e246ded35965"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part03.py",
+      "sha256": "e058f25876be2a276f29bc153290a3ae1cf9315f73b98076bfac0fd79938ae39",
+      "owners": [
+        {
+          "owner": "_hydrate_cohesive_contract_paragraphs",
+          "span": [
+            11,
+            31
+          ],
+          "body_sha256": "e3c986b57e6e29df1519b96269af35b05dc6a2cf34a0bec711235cf6ec67616c"
+        },
+        {
+          "owner": "select_evidence",
+          "span": [
+            33,
+            465
+          ],
+          "body_sha256": "4595626a3d6c210d0b9713728f80920d0496df865685a977b074657aae813aae"
+        },
+        {
+          "owner": "select_evidence.ordering_key",
+          "span": [
+            202,
+            221
+          ],
+          "body_sha256": "e629d98e0eb8e7e02f9be009eccfa7d8f4de130adfbaa7e933867aa33787fc8d"
+        },
+        {
+          "owner": "validate_evidence_sufficiency",
+          "span": [
+            468,
+            550
+          ],
+          "body_sha256": "5faf33006a8c99bf3d34a0e9e371fdcb63f32effd60b0edd705a2a90ccc26f18"
+        },
+        {
+          "owner": "_with_coverage",
+          "span": [
+            553,
+            680
+          ],
+          "body_sha256": "98a440a308b8a175fbc43dbc079d49e0804b56ae73e2f775e72144e16b25087e"
+        },
+        {
+          "owner": "_canonical_contract_value",
+          "span": [
+            683,
+            697
+          ],
+          "body_sha256": "928906584b576860f53fff2ad744853a7ebebd6950eb59b1dacf2d52d2281856"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part04.py",
+      "sha256": "b23c6b53f072cfb9364fcb545ba4ec7ec42ad9ef505e0b4d73798ec61eafb538",
+      "owners": [
+        {
+          "owner": "requirement_probe_query",
+          "span": [
+            8,
+            40
+          ],
+          "body_sha256": "46ddce332739aa8697444c1fd4e2a46dd8b9bb7197250b28a7da188ebfadd041"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/evidence_models.py",
+      "sha256": "9d4956541e85c02ac463a2867d185a7e57c816a3f1bf100657664c3cdbdd6d3d",
+      "owners": [
+        {
+          "owner": "SelectionConfig.__post_init__",
+          "span": [
+            64,
+            78
+          ],
+          "body_sha256": "3fdd52ba6177beda1c65a5d0f49f4b3ef8a41d248ce477d0223d93dad7a9ecf4"
+        },
+        {
+          "owner": "SelectionConfig.config_hash",
+          "span": [
+            81,
+            82
+          ],
+          "body_sha256": "50d1101bb60fc1d2909a817a1fd18d997c6efe8a99e919aebf10caf4ffb7b1f7"
+        },
+        {
+          "owner": "EvidenceRequirement.__post_init__",
+          "span": [
+            118,
+            145
+          ],
+          "body_sha256": "a74072f2fce541a9b5fa8a12d31cdee705a736964ac6bf0676e8ae27309ec911"
+        },
+        {
+          "owner": "EvidenceRequirement.as_proof_obligation",
+          "span": [
+            147,
+            170
+          ],
+          "body_sha256": "6a20340e73d2c1f6fa20ea9f516a100d39f3168782248761385ccb9eeec0c7fb"
+        },
+        {
+          "owner": "EvidenceRequirementSet.__post_init__",
+          "span": [
+            194,
+            249
+          ],
+          "body_sha256": "c5110fb8a7111d70a8e6a301f15da3666cc4fc069cfd67a4b69267c93537f518"
+        },
+        {
+          "owner": "EvidenceRequirementSet.__len__",
+          "span": [
+            251,
+            252
+          ],
+          "body_sha256": "1da5328553955787c97bb001468f0e6b4ad810847093327dbba400bced7a0e92"
+        },
+        {
+          "owner": "EvidenceRequirementSet.__getitem__",
+          "span": [
+            255,
+            255
+          ],
+          "body_sha256": "f908641b9c4a1005bd405b2f2f745f4bbcb7bc2356abe5222b3e36f4df26ebda"
+        },
+        {
+          "owner": "EvidenceRequirementSet.__getitem__",
+          "span": [
+            258,
+            258
+          ],
+          "body_sha256": "bc64156312f98805a8cfcaed43251f1148cf4f0bb421c35d9e9d7ba6a385f52f"
+        },
+        {
+          "owner": "EvidenceRequirementSet.__getitem__",
+          "span": [
+            260,
+            261
+          ],
+          "body_sha256": "2a5bb68c891584e917821515bc416ec9ac8e0fe1b97d4d2f6718be18c8479d70"
+        },
+        {
+          "owner": "EvidenceRequirementSet.hash_payload",
+          "span": [
+            264,
+            294
+          ],
+          "body_sha256": "6c7d0ba495b4abd38b4bb63729d97867ee0dd1a6933fbd576db98c15f0498846"
+        },
+        {
+          "owner": "EvidenceRequirementSet.hash_payload.requirement_payload",
+          "span": [
+            265,
+            275
+          ],
+          "body_sha256": "8298a6618bfe1d90ba64ded10ec07434d5c71debcb2f647aedca6a776970da08"
+        },
+        {
+          "owner": "EvidenceRequirementSet.requirements_hash",
+          "span": [
+            297,
+            298
+          ],
+          "body_sha256": "71c4cf9ff65afd1a76700e804156abc56474191536a1b1ae2eac5b0c4a1dd409"
+        },
+        {
+          "owner": "SupportDecision.answer_available",
+          "span": [
+            407,
+            408
+          ],
+          "body_sha256": "bcde4a713820923c9a7ef5fb087cb8c7a325b2894b9de3e65ca42a3d6cf4f64b"
+        },
+        {
+          "owner": "SupportDecision.as_payload",
+          "span": [
+            410,
+            430
+          ],
+          "body_sha256": "6b049c176e04988537b22c76c179a92e59b5ca4d54817d7ae9f09b95cee9f668"
+        },
+        {
+          "owner": "SupportDecision.with_insufficient_reason_code",
+          "span": [
+            432,
+            460
+          ],
+          "body_sha256": "f11e0cc166f470be41bb2d118e14a5cc71cb0d7aaa4d83a0590c3c4bc7bb865c"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/evidence_requirements.py",
+      "sha256": "10fa03130fedb7dfbc26dc32e01060b81cebf6f03ba721fbace930f63a54afcb",
+      "owners": [
+        {
+          "owner": "build_patch_evidence_requirements",
+          "span": [
+            57,
+            83
+          ],
+          "body_sha256": "5571f05ad942d5fe90620b51f0d69a029aee460be67374fd97f934ce8a3ae8ef"
+        },
+        {
+          "owner": "_extract_requirement_entities_and_facets",
+          "span": [
+            85,
+            98
+          ],
+          "body_sha256": "30997bbb80d279b2df426a1062cb641642f8f05915cf125341b25f478c2a7d20"
+        },
+        {
+          "owner": "_project_answer_facets",
+          "span": [
+            101,
+            139
+          ],
+          "body_sha256": "341e5f4c8b47ec5bf1e79d40c20c530ea69886e8fe55573afc98b56ed4544107"
+        },
+        {
+          "owner": "_comparison_query_span",
+          "span": [
+            142,
+            148
+          ],
+          "body_sha256": "b9c7ff7fd65dae10f79baa456e6df018bbd0b74912203846cd1ff1dbfc0ec0d8"
+        },
+        {
+          "owner": "_with_query_requirement_spans",
+          "span": [
+            151,
+            190
+          ],
+          "body_sha256": "601665c7cd7b8f745fe85412f5a2d928e62521b6cfdf78bc1af690830be0106f"
+        },
+        {
+          "owner": "_semantic_requirement_key",
+          "span": [
+            193,
+            219
+          ],
+          "body_sha256": "a0e2a70a98c325e1ac8da80cccd0861f64c9281da7d5e09bf09e9f82076538e9"
+        },
+        {
+          "owner": "_requirement_from_obligation",
+          "span": [
+            222,
+            253
+          ],
+          "body_sha256": "a62935c4bd72e16265eb63b58af8afc97018f7f5bdabfc20bfd12b7d17c717d3"
+        },
+        {
+          "owner": "build_requirements",
+          "span": [
+            256,
+            560
+          ],
+          "body_sha256": "d9b7aa9a53a73b0063c99a9b1265aa1f156f4fa3578a98fe23c0955029917e9a"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/evidence_semantic_density.py",
+      "sha256": "09ea395fbaae503503b7f235291a97934500b250a33c1f850ecfb542ccca4edf",
+      "owners": [
+        {
+          "owner": "_normalized_path",
+          "span": [
+            35,
+            36
+          ],
+          "body_sha256": "ac11a252ef28cb6d16f8f37ee30a82f6640471ee5f1fc85ba9c5dae57be3c659"
+        },
+        {
+          "owner": "_scope_tokens",
+          "span": [
+            39,
+            45
+          ],
+          "body_sha256": "b70ccebd63ee1c9f8adb17f0e7cf5912c03f7b8c9d6fb727da460c5c20bed847"
+        },
+        {
+          "owner": "source_scoped_behavioral_match",
+          "span": [
+            48,
+            80
+          ],
+          "body_sha256": "5fc6fee8b282b99653268b6ecca6b2b95f710a207d6897a960780a2e6c9ec3be"
+        },
+        {
+          "owner": "source_fact_unit_semantic_score",
+          "span": [
+            83,
+            93
+          ],
+          "body_sha256": "2ce39690cfe682b33e43d57540d13d6369a36e174e3ada090e09eb1b5cff1e99"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/action_packet.py",
+      "sha256": "a40c0063c9a74795935137b2c975981639486415e2704a512f36ed1d2219818f",
+      "owners": [
+        {
+          "owner": "_path_token_sequence",
+          "span": [
+            32,
+            38
+          ],
+          "body_sha256": "240066c8537d9e29f96f2b2ddf6939583e530436a9ac1763143a013d25bca098"
+        },
+        {
+          "owner": "_path_tokens",
+          "span": [
+            41,
+            42
+          ],
+          "body_sha256": "d27ad9d1c82369572b13a5c87793bff6d692699b205b614c8da67836cbb48685"
+        },
+        {
+          "owner": "_target_scope",
+          "span": [
+            45,
+            48
+          ],
+          "body_sha256": "6f60fb0a686120f858fffd56f4ade60b2f9b50f32c47c2fbacafe9c408bbf38e"
+        },
+        {
+          "owner": "_declared_authority_by_path",
+          "span": [
+            51,
+            67
+          ],
+          "body_sha256": "2d1f0e2bef4e325e3637ead51961cf8d8f0a332108e5ab13a1633752b7eed92d"
+        },
+        {
+          "owner": "_behavioral_source_fact_contracts",
+          "span": [
+            70,
+            148
+          ],
+          "body_sha256": "66fcc2f2ad3de036f84dde38ccd23f0d8481e33464891de5289811ee1dda860f"
+        },
+        {
+          "owner": "_explicit_mutation_contract",
+          "span": [
+            151,
+            182
+          ],
+          "body_sha256": "00e4792e9f2da574ecc861600ba344c98974d106443674c5e4af664d5a01c81d"
+        },
+        {
+          "owner": "_promote_trusted_behavioral_witnesses",
+          "span": [
+            185,
+            226
+          ],
+          "body_sha256": "0c996ca3960a8d95cbc1c6952e9a79c8e7a2728e6c86e1221ac037073f6e7271"
+        },
+        {
+          "owner": "build_action_packet",
+          "span": [
+            229,
+            272
+          ],
+          "body_sha256": "016483c23e74fb2a73a5914ead5ab249daad5bf6975a1f0d554d6aea520b66e5"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part01.py",
+      "sha256": "84ba8d4d78dfc90ecd1d1eff3ee0257fbb3485f38eaca85fc79510b340ae5ac5",
+      "owners": [
+        {
+          "owner": "estimate_action_packet_tokens",
+          "span": [
+            7,
+            11
+          ],
+          "body_sha256": "c70daee77d2525f295d85e8d97b304dcfd145380603435b9e4072b229334b077"
+        },
+        {
+          "owner": "evidence_identity_for_item",
+          "span": [
+            14,
+            17
+          ],
+          "body_sha256": "e16cda9b859031ba3aaa5b578ebfe5b5b09731709365e94e023748d371108c0b"
+        },
+        {
+          "owner": "_ensure_selection_survives_packet",
+          "span": [
+            20,
+            115
+          ],
+          "body_sha256": "36bf570cdb1c469aab01520de9e454cf207973db75549fcdc17d220ed6d2eb2f"
+        },
+        {
+          "owner": "_explicit_acceptance_conditions",
+          "span": [
+            118,
+            129
+          ],
+          "body_sha256": "a903919897797d51014fc7098348ecfcec6adbcc58bf95380b00316b8647e666"
+        },
+        {
+          "owner": "_refresh_estimated_tokens",
+          "span": [
+            132,
+            138
+          ],
+          "body_sha256": "f45ea94fcad262f95991b64b501559535acf39e0a57b6e9242822826a9039ce8"
+        },
+        {
+          "owner": "_effective_authority",
+          "span": [
+            141,
+            186
+          ],
+          "body_sha256": "bac37063e82db56dfd2e97826975ef410a91f3722a6f8570b15e1f6e27f315de"
+        },
+        {
+          "owner": "_declares_canonical_authority",
+          "span": [
+            189,
+            195
+          ],
+          "body_sha256": "85b8de487454b3389f182fe657b0d28741619e6d1f2133a42480c15b7266d3c3"
+        },
+        {
+          "owner": "_critical_fact_count",
+          "span": [
+            198,
+            204
+          ],
+          "body_sha256": "2af81deba9ca6d375218f17786535d4f499555c9763d2e09bf3dc31175144653"
+        },
+        {
+          "owner": "_scope_applies",
+          "span": [
+            207,
+            218
+          ],
+          "body_sha256": "ae51b6e2481e07f504809da11e8ce810b0b53823b74a758c338959a76d826361"
+        },
+        {
+          "owner": "_absolute_scope",
+          "span": [
+            221,
+            227
+          ],
+          "body_sha256": "d711ff52441bc286ef2723503a33445923e7930f0f7583dcf02f5567175ef876"
+        },
+        {
+          "owner": "_same_path",
+          "span": [
+            230,
+            231
+          ],
+          "body_sha256": "1c85b1641a3f731a33b99c5cb89fd18d4c473dde170687b6a66f8dc3677dc0f9"
+        },
+        {
+          "owner": "_is_within",
+          "span": [
+            234,
+            240
+          ],
+          "body_sha256": "c60d621b87111bda9164d1631d5149dfee52f7238e559b9db60bde13bf4faeac"
+        },
+        {
+          "owner": "_instruction_risk_flags",
+          "span": [
+            243,
+            254
+          ],
+          "body_sha256": "c19e23865cefd75e16c8858aa4816c4a5eedaa426a299646b824a06dd539e881"
+        },
+        {
+          "owner": "_content_instruction_risk_flags",
+          "span": [
+            257,
+            262
+          ],
+          "body_sha256": "d3e5de6056afd57e8d00c8c70f7df3d6a148f0991868b89b538b7327629e99d3"
+        },
+        {
+          "owner": "_source_scope",
+          "span": [
+            265,
+            271
+          ],
+          "body_sha256": "ac1d4b26d754fe20a992e8baafe357c3f5d065f34959b1511edee023f1585959"
+        },
+        {
+          "owner": "_version_binding",
+          "span": [
+            274,
+            280
+          ],
+          "body_sha256": "638036f398d9e88a48e8d36af1d6eb068db2f1b73af3ed5b5e554b4d1eeffdfa"
+        },
+        {
+          "owner": "_relevance_score",
+          "span": [
+            283,
+            290
+          ],
+          "body_sha256": "e1aba682fd8ffbbe2284f61e92a1c75c7183af8cfddd6d2a81565865f25fdb76"
+        },
+        {
+          "owner": "_version_exactness_rank",
+          "span": [
+            293,
+            299
+          ],
+          "body_sha256": "41c8387ffbc524168a1442c8ab653af6d6b4e08e4606c444cf147d01a562b43a"
+        },
+        {
+          "owner": "_rank_and_dedupe",
+          "span": [
+            302,
+            350
+          ],
+          "body_sha256": "a2d496bc4cddfd8db75257d5e768d6bff3ef84f3b61dad754903e58990709ec0"
+        },
+        {
+          "owner": "_blocked_source_keys",
+          "span": [
+            353,
+            354
+          ],
+          "body_sha256": "5c18e05f4a47eb9f43aac13409d5685dd4ee8c8ee0bb4d17430f9b197d67da1c"
+        },
+        {
+          "owner": "_risky_source_keys",
+          "span": [
+            357,
+            358
+          ],
+          "body_sha256": "81233a7b63d257f56720c87bbc60ca0032eba655c0941626de25aa39bd509d32"
+        },
+        {
+          "owner": "_rejected_source_keys",
+          "span": [
+            361,
+            362
+          ],
+          "body_sha256": "7add63a85c3d59e0f73f3e64488d35d4ab2434665ccb7259845b66175d37b52c"
+        },
+        {
+          "owner": "_trust_source_keys",
+          "span": [
+            365,
+            382
+          ],
+          "body_sha256": "35b12dab5c28114f6bad8ccf97eceb53a75e90823c46a4ce3ffd30e81a3b1bab"
+        },
+        {
+          "owner": "_item_source_keys",
+          "span": [
+            385,
+            394
+          ],
+          "body_sha256": "e244dcdcc39535730f97da26087e213737c87e32463eac6982e53374111ec2bf"
+        },
+        {
+          "owner": "_normalized_source_key",
+          "span": [
+            397,
+            400
+          ],
+          "body_sha256": "f0c3bed763cb95657e2f9c06baa7fd8a75da5e0422228eca000b2a42dd764bbb"
+        },
+        {
+          "owner": "_authority",
+          "span": [
+            403,
+            414
+          ],
+          "body_sha256": "3d2cef0f4beaffb7be59bba132f657041d2113044ccda28ca136b6ace011f999"
+        },
+        {
+          "owner": "_source_row",
+          "span": [
+            417,
+            426
+          ],
+          "body_sha256": "b1aeaf0677dbd920a425aaf5909f7d53d4caf0516fdfc4a787f9feb310409d94"
+        },
+        {
+          "owner": "_source_path",
+          "span": [
+            429,
+            433
+          ],
+          "body_sha256": "8c703009046951127bc319771c2fc1fed27932a559664564927e3a49c2f40845"
+        },
+        {
+          "owner": "_editable_target_path",
+          "span": [
+            436,
+            447
+          ],
+          "body_sha256": "44b154168f7518d60aee01fef410222d95c3419c5ec1520f079e7711ea6b7de3"
+        },
+        {
+          "owner": "_section",
+          "span": [
+            450,
+            455
+          ],
+          "body_sha256": "aa2b4652a750f2d50c30401dc1870e6021ee8ffb5eed7722d13493950181b030"
+        },
+        {
+          "owner": "_dedupe_id",
+          "span": [
+            458,
+            476
+          ],
+          "body_sha256": "0c4f14c69cd4f07f86b1a91690102233062be393ac2924c852eb7c374025629a"
+        },
+        {
+          "owner": "_evidence_id",
+          "span": [
+            479,
+            504
+          ],
+          "body_sha256": "9c155537440420df5209857a7d52dcdc476f8ddb34ef66f6b3d82500853c9d62"
+        },
+        {
+          "owner": "_content_text",
+          "span": [
+            507,
+            510
+          ],
+          "body_sha256": "0459f1d2a7248a1ee2e181a62b1d107e5202512ff55ebe480f4fe615b4fcd06c"
+        },
+        {
+          "owner": "_add_mandatory_requirement_witnesses",
+          "span": [
+            513,
+            651
+          ],
+          "body_sha256": "862b8c7a4ca76f0fafadd90202aaa3d50c88cd8494ecb8f8599552f7ab1b05a8"
+        },
+        {
+          "owner": "_packet_visible_text",
+          "span": [
+            654,
+            676
+          ],
+          "body_sha256": "1ecec193478fae88362d75eb521094398721b6c31079ca6fe59b1685e8d891cd"
+        },
+        {
+          "owner": "_normalized_fact_text",
+          "span": [
+            679,
+            680
+          ],
+          "body_sha256": "0d50e1aa000f54aeb0656725b89b89cb206afe6a06461761a5114b1f1c3c2740"
+        },
+        {
+          "owner": "_requirement_witness",
+          "span": [
+            683,
+            706
+          ],
+          "body_sha256": "b56a4fd857dec8ca16717cb90b1e19b42ef681db662c5cbbd55aa111fb5d7e96"
+        },
+        {
+          "owner": "_extract_facts",
+          "span": [
+            709,
+            753
+          ],
+          "body_sha256": "48ec3afe570fc640bc8bc96ededdb3ac01ad40b566a52039efcaf47bf9b2d445"
+        },
+        {
+          "owner": "_validation_command",
+          "span": [
+            756,
+            760
+          ],
+          "body_sha256": "6ce0f0c8d1d1186a9639139e06e428fc1b19e505e5d420d7c7bcaa0cbab126f7"
+        },
+        {
+          "owner": "_explicit_symbols",
+          "span": [
+            763,
+            778
+          ],
+          "body_sha256": "5c320a075393ea28a841a96e12850c997794cfbac938ae13b2fa5f05153f6696"
+        },
+        {
+          "owner": "_snippet_text",
+          "span": [
+            781,
+            789
+          ],
+          "body_sha256": "4f696f18d7a5c3eeec18be3f712249aecedc40c43f0b4ecc16af61ab4ce633c0"
+        },
+        {
+          "owner": "_dedupe_cited",
+          "span": [
+            792,
+            802
+          ],
+          "body_sha256": "83525cb840ef88898f221b5e6a7bbc2ce48a166e4bd1b45ff1ca4c3a63f6ecaa"
+        },
+        {
+          "owner": "_cited_evidence_ids",
+          "span": [
+            805,
+            828
+          ],
+          "body_sha256": "85fcc258762d8c07ad59dce7ca8da79d72a51159a2dd5f63fea1bf8d0c343c14"
+        },
+        {
+          "owner": "_policy_witness_survived",
+          "span": [
+            831,
+            861
+          ],
+          "body_sha256": "a86a29a9318368b3128e1ef7afe81e12c5e00bdb9d44bcf6b2f3cfbe7b741808"
+        },
+        {
+          "owner": "_has_actionable_items",
+          "span": [
+            864,
+            877
+          ],
+          "body_sha256": "da0afa57e77d6971a01815b6cfab07e685c41c18620bb8cf5ca69a8b51f03131"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part03.py",
+      "sha256": "2191b3baff1c662ebfb22c9d2c95b647e27ea7744fdecf400710b436f7565aea",
+      "owners": [
+        {
+          "owner": "build_action_packet",
+          "span": [
+            9,
+            538
+          ],
+          "body_sha256": "1afe75238b62b56aaa88fc7a4e0082cee57644d9111e4a7340d66574a3c82982"
+        },
+        {
+          "owner": "_object_field",
+          "span": [
+            541,
+            550
+          ],
+          "body_sha256": "20681c154879b726d32df958ef5b1bc14966bf6b159924139d4c9bc34db8fc67"
+        },
+        {
+          "owner": "_validate_cited_items",
+          "span": [
+            553,
+            592
+          ],
+          "body_sha256": "b0dfa56620979a98e9ae22e5e5015d940acedd7a22425c7b2bd506caac7f7cac"
+        },
+        {
+          "owner": "_all_cited_items",
+          "span": [
+            595,
+            615
+          ],
+          "body_sha256": "e0f8a1aad942594c5d826dfdd7192d9af0c7dfc3442e018c86bf060cc8b65e5b"
+        },
+        {
+          "owner": "_cited_dict_items",
+          "span": [
+            618,
+            621
+          ],
+          "body_sha256": "0bf90e753ce34ca07b8774d8f79690520eeb5af9a990e3f2db55f83071ac3537"
+        },
+        {
+          "owner": "_string_refs",
+          "span": [
+            624,
+            628
+          ],
+          "body_sha256": "ed86e7ebde7b0234ee69a1f4b8be4c0435ca1c6d279922ada6272bff852fa421"
+        },
+        {
+          "owner": "_validate_evidence_fidelity",
+          "span": [
+            631,
+            704
+          ],
+          "body_sha256": "4a85f102d75d12906710ada2c63ed62c393feeca5ba5f20e7fac9911576f5b58"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part03.py",
+      "sha256": "3b39780e0777b3e548013e5fcad2e722dfed937ca41424efbd9768bc5878f011",
+      "owners": [
+        {
+          "owner": "_LibraryDocsApplicationServicePart03.get_docs",
+          "span": [
+            8,
+            814
+          ],
+          "body_sha256": "845e9d99b612eff675b6b7e68464ee3ecd474200aa553baef7de109f33481acd"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part04.py",
+      "sha256": "205c869c77ad6429122bfd5b7f1c53e4ad8b827e71d38a5100ff47d5b5a5550a",
+      "owners": [
+        {
+          "owner": "_LibraryDocsApplicationServicePart04._bounded_library_index_witness",
+          "span": [
+            8,
+            117
+          ],
+          "body_sha256": "c6dd54a0993e9cc9188c5cb08b41bf0b709381404cf910994a413de94d6e3102"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04._library_manifest_is_complete",
+          "span": [
+            119,
+            129
+          ],
+          "body_sha256": "3dcc988f318bccf4858bbdda9b4796ba99754453bffbe9029a60b0bb408e31b6"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04._index_size_for",
+          "span": [
+            131,
+            132
+          ],
+          "body_sha256": "3d4f148cfceecb5c1b48b8a33a18edc1a7197d0c88b4dcc8f1dbcfd97421a3ed"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04._delete_index_for",
+          "span": [
+            134,
+            135
+          ],
+          "body_sha256": "e40968e61cf9f0d69748f8b790f9c6a35194fce0a86b9e78eeafc4d6ad92fdc3"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04.inspect_library_docs",
+          "span": [
+            137,
+            138
+          ],
+          "body_sha256": "4bc8463ecce8584471b41727d4ed3e6bd58e24da41c5b46a8bdf94a6dc886d87"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04.remove_library_docs",
+          "span": [
+            140,
+            141
+          ],
+          "body_sha256": "3d1a359ecfd40bb862f837c780066ab494a68bf0f2a9e2d2c3168c80f6aae68e"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04._record_age_cutoff_value",
+          "span": [
+            143,
+            144
+          ],
+          "body_sha256": "2da50ee930dbffc96b4070b153f1a9a26be18f7ade7ddb4b22b6b48e34c657a0"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04.prune_library_docs",
+          "span": [
+            146,
+            161
+          ],
+          "body_sha256": "d8e8b99bb629d7e2423a3debb36a700ec99e28694f5016a29c2d283a42ee21a3"
+        },
+        {
+          "owner": "_LibraryDocsApplicationServicePart04.list_libraries",
+          "span": [
+            163,
+            164
+          ],
+          "body_sha256": "bc5e5e7861bad5abdda774ce93e87dcfaf7d487172add855d2144e19d9d59952"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "sha256": "76cf3854d1dda48553ecb64a166d9f38bcfb98d4743ad1872d7ff29ddcf09307",
+      "owners": [
+        {
+          "owner": "_ProjectContextServicePart01.__init__",
+          "span": [
+            14,
+            15
+          ],
+          "body_sha256": "b098f48889be7c67ea20484c59fc30efaa48c73a3451526c3b78f4f9da9aeacd"
+        },
+        {
+          "owner": "_ProjectContextServicePart01.get_project_context",
+          "span": [
+            17,
+            865
+          ],
+          "body_sha256": "a117d0b717a1d4f051f4f6b3565594760caa4523b2e9ce9a4aeb3e6c12e71b61"
+        },
+        {
+          "owner": "_ProjectContextServicePart01.dependency_mentioned_in_question",
+          "span": [
+            868,
+            897
+          ],
+          "body_sha256": "a53a381a1cc57074fff69e201a704d46d449f4ca37e1a0ffbadaf7f4099a3437"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection.py",
+      "sha256": "8cd7d45d17226245c0ec7a06ce894b0be9d811ab62c929013294ee6a9963e397",
+      "owners": [
+        {
+          "owner": "encode_support_envelope",
+          "span": [
+            96,
+            108
+          ],
+          "body_sha256": "50228931484dad8e8693f880c2db7aa6153497f45397c270f75a60858ee5e0e8"
+        },
+        {
+          "owner": "decode_support_envelope",
+          "span": [
+            111,
+            129
+          ],
+          "body_sha256": "a9767a3f85660da640f1a6de15179ed4cb22edc0042757c4b2dc415eed8e6b28"
+        },
+        {
+          "owner": "_unit_materialized_item",
+          "span": [
+            132,
+            167
+          ],
+          "body_sha256": "1be893a27f5a0183d5adabb9b560bc0c27127e15e3d60daadb8e9f3060da79a3"
+        },
+        {
+          "owner": "project_docs_answer",
+          "span": [
+            170,
+            418
+          ],
+          "body_sha256": "69d22b7980e0a413a76746b862e3ab032410684c60fd8de335870939bfd9e8ad"
+        },
+        {
+          "owner": "_requested_exact_version",
+          "span": [
+            421,
+            428
+          ],
+          "body_sha256": "919872b3aa862c4ebba50ca4e6d37fb90657a65e4a21a77912dd245a2515b31a"
+        },
+        {
+          "owner": "_docs_support_decision",
+          "span": [
+            431,
+            438
+          ],
+          "body_sha256": "26f2d703975b0eb2a4fb32d3599c05641023ba4297c76bd9e188a651b48704dc"
+        },
+        {
+          "owner": "bound_insufficient_projection",
+          "span": [
+            441,
+            502
+          ],
+          "body_sha256": "c8b8b03d02339ea9df9f11df8e9b0689d70e6c176c92e46d184850bf1b7e10e0"
+        },
+        {
+          "owner": "_compact_insufficient_support",
+          "span": [
+            505,
+            532
+          ],
+          "body_sha256": "13c108f81b2b4078dd1775c1d4e2d58450aa3521733b5a8ba177db15b7003c24"
+        },
+        {
+          "owner": "project_patch_context",
+          "span": [
+            535,
+            619
+          ],
+          "body_sha256": "dfb79f34e9747424c1f7a836f1fcd69b77966df7314f3c37189dc827eafbabe3"
+        },
+        {
+          "owner": "project_insufficient",
+          "span": [
+            622,
+            645
+          ],
+          "body_sha256": "7115ac398d11dd37001ccc921fb0547dee67390160ba388ce515b6e43e5448b0"
+        },
+        {
+          "owner": "validate_model_visible_projection",
+          "span": [
+            648,
+            837
+          ],
+          "body_sha256": "13a7001ecacdffafd0cfede026e614c4bede13d5aa50b9a1259df30ee787e9db"
+        },
+        {
+          "owner": "_docs_candidates",
+          "span": [
+            840,
+            842
+          ],
+          "body_sha256": "116de6dfac1d5d4dfc03ff75bfd76eeef24f1498846f787c84bbc28f7de0d003"
+        },
+        {
+          "owner": "_docs_source",
+          "span": [
+            845,
+            873
+          ],
+          "body_sha256": "c562365097a3950a1ce2058b2adfaf3725d014ee02abe56452fe9b0eba3d044c"
+        },
+        {
+          "owner": "_source_digest",
+          "span": [
+            876,
+            884
+          ],
+          "body_sha256": "bce2c4ff3348ee067ae5274a4c95a4cf5b2b2cf2509656e1bbfc83ca223be54b"
+        },
+        {
+          "owner": "_snapshot_entry",
+          "span": [
+            887,
+            900
+          ],
+          "body_sha256": "4c5b8a7f9e868eab3dff8f51cb62aba5335ca268df6707d7f5e2ff2d7bf70819"
+        },
+        {
+          "owner": "_answer_text",
+          "span": [
+            903,
+            934
+          ],
+          "body_sha256": "dddc0ddcdf1a8a489e92f25026d7c15b12984fd1cf58e173091aa91a61d77b35"
+        },
+        {
+          "owner": "_needs_actionable_limitation",
+          "span": [
+            937,
+            941
+          ],
+          "body_sha256": "b3fce00ddab1f87ea73e6ce7a9523212dc35bd0db4ef39f0103a170eeb32c083"
+        },
+        {
+          "owner": "_docs_retrieval_issues",
+          "span": [
+            944,
+            976
+          ],
+          "body_sha256": "d2b38cddcd859fa91d88b0e3ac9b2b4290e69c42bb89816149a49cc9045c0ea9"
+        },
+        {
+          "owner": "_find_forbidden_keys",
+          "span": [
+            979,
+            989
+          ],
+          "body_sha256": "2572011b29b9420505d8d05414638e7c2c593cc907c406a277e4f1d7bc3d3b28"
+        },
+        {
+          "owner": "_refresh_estimate",
+          "span": [
+            992,
+            998
+          ],
+          "body_sha256": "03b381ed60ab62c589cd5c065e40dfca258fa354fb887aa56f6898c8b0e0a915"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "sha256": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "owners": [
+        {
+          "owner": "observed_qualifiers",
+          "span": [
+            41,
+            46
+          ],
+          "body_sha256": "e76f5102c4cb2049715ce16b73cd83b7b2148797d5c70a5ddb042ba75ecfd877"
+        },
+        {
+          "owner": "estimated_tokens",
+          "span": [
+            49,
+            50
+          ],
+          "body_sha256": "4460f9d4b59a340fc2ab818aeea15e0b1420570e87e21048ef773bb84c87e610"
+        },
+        {
+          "owner": "docs_answer_candidate_tokens",
+          "span": [
+            53,
+            68
+          ],
+          "body_sha256": "a49c96209bf3d814dcd20368ceac0d8e15c8db0a1336b595681fd10c9e8dbd94"
+        },
+        {
+          "owner": "positive_int",
+          "span": [
+            71,
+            78
+          ],
+          "body_sha256": "d7c3c3af10a8f35db97cef87c2646ddfa96740b753e7294a844f170a2e9dfae7"
+        },
+        {
+          "owner": "normalized_source",
+          "span": [
+            81,
+            82
+          ],
+          "body_sha256": "a84c1d61e5dc686a82ca82b3db661d37a296b92d8f77b853339873bd0ca0f6a9"
+        },
+        {
+          "owner": "requirement_value_visible",
+          "span": [
+            85,
+            102
+          ],
+          "body_sha256": "f0989059deb65b16530365534b47eb67d233122c1089090ab235bde59bcf6403"
+        },
+        {
+          "owner": "source_path",
+          "span": [
+            105,
+            109
+          ],
+          "body_sha256": "29623c57d1533b5d316e602a4785d8f39ac576a2d99960fc8d6a95331f29a551"
+        },
+        {
+          "owner": "section",
+          "span": [
+            112,
+            118
+          ],
+          "body_sha256": "96b0e286770b913ea45cf800e7f179be7822b51c67c5dc3ec229fcbf9aefcb77"
+        },
+        {
+          "owner": "display_text",
+          "span": [
+            121,
+            125
+          ],
+          "body_sha256": "c8ef441ce6e0553e29a6ae48bb97af6c92c8d1218c3e2deb379a91146518851b"
+        },
+        {
+          "owner": "_text",
+          "span": [
+            128,
+            131
+          ],
+          "body_sha256": "ec839f8d3c4c818201124fe143116a283cb54b07a0b54df85ffdd3b4994a9d53"
+        },
+        {
+          "owner": "symbols",
+          "span": [
+            134,
+            142
+          ],
+          "body_sha256": "5efa62e45aa5aa3a7547d6174403a790269146227033b463a32198b64c8c7945"
+        },
+        {
+          "owner": "projected_text",
+          "span": [
+            145,
+            165
+          ],
+          "body_sha256": "77a5104826a3c66e3f03a942cdeec8b2315e0467f8f31cf22f088f69ed994a78"
+        },
+        {
+          "owner": "authority",
+          "span": [
+            168,
+            179
+          ],
+          "body_sha256": "dca0889419e30158a7653313326cf6b7da9ef1f052d25d7fc083d3a17fac7f37"
+        },
+        {
+          "owner": "version_binding",
+          "span": [
+            182,
+            189
+          ],
+          "body_sha256": "0060e64accc5693529be1b4b46f80a649b9461f5d17db68794bc5630c1d3a0b6"
+        },
+        {
+          "owner": "resolved_version",
+          "span": [
+            192,
+            193
+          ],
+          "body_sha256": "e85cf7382f6a46deac3ae396434d045e0c95dad6e7ebc3f3414f6684309b1380"
+        },
+        {
+          "owner": "version_rank",
+          "span": [
+            196,
+            205
+          ],
+          "body_sha256": "3ca119508422a7433761b0322cf31fbc8fd863edc577272adb009b21cd9daabf"
+        },
+        {
+          "owner": "risk_flags",
+          "span": [
+            208,
+            213
+          ],
+          "body_sha256": "11025cfa13451994d98b570a0b77edfba5a3decf5d61d91d6e73766c641447f4"
+        },
+        {
+          "owner": "_span",
+          "span": [
+            216,
+            224
+          ],
+          "body_sha256": "696e16682e0148dccf99932ba123fc3694656eb0c7dfb91ff047a411c35c2dba"
+        },
+        {
+          "owner": "_span_was_supplied",
+          "span": [
+            227,
+            228
+          ],
+          "body_sha256": "0202b68f5191d682594fc46f26edf8d1b3685daa52cd1656c43d0f08d61f507c"
+        },
+        {
+          "owner": "identity_aliases",
+          "span": [
+            231,
+            237
+          ],
+          "body_sha256": "589357e83229845843e9fe1b0b3b3d3218d3d689802255d3c5b05d7770ade977"
+        },
+        {
+          "owner": "normalize_candidates",
+          "span": [
+            240,
+            371
+          ],
+          "body_sha256": "9be99f9b30186a81133e19bfb10ee9f78230bc290e740a1687d5a2370f28ea7f"
+        }
+      ]
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "sha256": "3be361f9173b75fa64be341be693b7d81bdc6a8982a9d1bf611c82906737f34a",
+      "owners": [],
+      "scope": "named public call windows, file pinned"
+    }
+  ],
+  "prior_pin_comparisons": [
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part03.py",
+      "owner": "select_evidence",
+      "expected": "e058f25876be2a276f29bc153290a3ae1cf9315f73b98076bfac0fd79938ae39",
+      "actual": "e058f25876be2a276f29bc153290a3ae1cf9315f73b98076bfac0fd79938ae39",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part04.py",
+      "owner": "requirement_probe_query",
+      "expected": "b23c6b53f072cfb9364fcb545ba4ec7ec42ad9ef505e0b4d73798ec61eafb538",
+      "actual": "b23c6b53f072cfb9364fcb545ba4ec7ec42ad9ef505e0b4d73798ec61eafb538",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part03.py",
+      "owner": "_LibraryDocsApplicationServicePart03.get_docs",
+      "expected": "3b39780e0777b3e548013e5fcad2e722dfed937ca41424efbd9768bc5878f011",
+      "actual": "3b39780e0777b3e548013e5fcad2e722dfed937ca41424efbd9768bc5878f011",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "owner": "_ProjectContextServicePart01.get_project_context",
+      "expected": "76cf3854d1dda48553ecb64a166d9f38bcfb98d4743ad1872d7ff29ddcf09307",
+      "actual": "76cf3854d1dda48553ecb64a166d9f38bcfb98d4743ad1872d7ff29ddcf09307",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "owner": "normalize_candidates",
+      "expected": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "actual": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "owner": "requirement_value_visible",
+      "expected": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "actual": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "owner": "version_rank",
+      "expected": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "actual": "90226dea2366253f0b00cf47b7eb60b432d658c9255cb37fea1d651b80b56bfb",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/evidence_requirements.py",
+      "owner": "_project_answer_facets",
+      "expected": "10fa03130fedb7dfbc26dc32e01060b81cebf6f03ba721fbace930f63a54afcb",
+      "actual": "10fa03130fedb7dfbc26dc32e01060b81cebf6f03ba721fbace930f63a54afcb",
+      "matches": true
+    },
+    {
+      "path": "docmancer/docs/application/evidence_requirements.py",
+      "owner": "build_patch_evidence_requirements",
+      "expected": "10fa03130fedb7dfbc26dc32e01060b81cebf6f03ba721fbace930f63a54afcb",
+      "actual": "10fa03130fedb7dfbc26dc32e01060b81cebf6f03ba721fbace930f63a54afcb",
+      "matches": true
+    }
+  ],
+  "common_route": {
+    "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+    "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+    "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+    "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+    "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+    "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment."
+  },
+  "branches": [
+    {
+      "id": "source_fact.required",
+      "family": "source_fact",
+      "branch": "public source_fact → behavioral_contract, mandatory for required; source_path/scope required; allowed provenance; advisory is nonmandatory. as_proof_obligation returns None for this kind.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_shared.py:128–195",
+        "docmancer/docs/application/evidence_models.py:147–149"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Preserve explicit source/scope/modality/provenance IDs, invalid-input rejection and required/advisory separation; no source truth inferred by normalization.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "source_fact.scope-domain",
+      "family": "source_fact",
+      "branch": "Visible proposition required. Normalized requested/actual path equality or suffix; normative vocabulary; camel/underscore scope tokens >=3; domain tokens after generic-scope subtraction intersect unit OR symbols OR filename.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:160–174",
+        "docmancer/docs/application/evidence_semantic_density.py:14–80"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Keep declared source boundary, local span and project_rule authority guard; replace normative vocabulary, generic token exclusions and lexical scope-as-proof.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "source_fact.scope-generic",
+      "family": "source_fact",
+      "branch": "If domain token set is empty use original scope token intersection; empty scope tokens or wrong source/no normative marker reject.",
+      "source_refs": [
+        "docmancer/docs/application/evidence_semantic_density.py:55–80"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Empty/unknown must not become supported; exact paths are not behavioral entailment.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "source_fact.score",
+      "family": "source_fact",
+      "branch": "Rank matched units by descending score: normative 2 + hard-normative 2 + config-literal 4; then proposition, shorter length, start, ID. LocalProof(valid=True) supplies relation=2,value=max(1,score),completeness=3+score.",
+      "source_refs": [
+        "docmancer/docs/application/evidence_semantic_density.py:83–93",
+        "docmancer/docs/application/_evidence_selection_part02.py:231–264"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Keep deterministic unit IDs/spans/hashes; score is semantic preference, not independent authority or proof-quality result.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.comparison",
+      "family": "facet",
+      "branch": "Both anchors visible plus comparison vocabulary OR returns→runs/collects/schedules.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:20–30",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.result_access",
+      "family": "facet",
+      "branch": "Entity visible, literal result, obtain/get/retrieve/await.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:31–38",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.request_handling",
+      "family": "facet",
+      "branch": "Same sentence request/запрос + handles/process/dispatch/routes/validates/forwards + handler/router/server/tool/transport/service/registry.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:39–45",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.architecture",
+      "family": "facet",
+      "branch": "Same sentence >=2 distinct component vocabulary entries and relation vocabulary/arrow.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:46–59",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.responsiveness",
+      "family": "facet",
+      "branch": "Same sentence async/non-blocking vocabulary + worker/background/event loop/queue/thread/task.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:60–65",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.behavior",
+      "family": "facet",
+      "branch": "Detail visible; reject lexical negation; entity precedes behavior verb within <=6 intervening words.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:66–103",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.usage",
+      "family": "facet",
+      "branch": "Detail visible; reject lexical negation; usage marker and entity in either order within <=6 words.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:66–103",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.workflow",
+      "family": "facet",
+      "branch": "Detail visible; reject lexical negation; either-order relation plus >=2 workflow markers and explicit sequence marker.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:66–103",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.recall_mechanism",
+      "family": "facet",
+      "branch": "exact-term/exact match/exact query AND recall/retrieve/retrieval/match/lookup.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:104–107",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.authority_invariant",
+      "family": "facet",
+      "branch": "authority/scope AND preservation/no-widening vocabulary.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:108–112",
+        "docmancer/docs/application/evidence_requirements.py:85–139,401–422"
+      ],
+      "decision": "REMOVE",
+      "preserved_guards": "Remove semantic vocabulary admission, not mandatory coverage accounting, source role/qualifier boundaries, factual-only local proposition requirement or fail-closed loss.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "facet.unknown",
+      "family": "facet",
+      "branch": "Any other kind returns False; malformed comparison/result_access lacks separator and fails.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:18–38,113"
+      ],
+      "decision": "PRESERVE-GUARD",
+      "preserved_guards": "Unsupported family stays uncovered; no guessed fallback semantic witness.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "code_group.decode",
+      "family": "code_group",
+      "branch": "JSON list required; decode error/nonlist/empty stripped fragments produce no match.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:116–127"
+      ],
+      "decision": "PRESERVE-GUARD",
+      "preserved_guards": "Keep exact format validation; no inferred equivalent code.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "code_group.metadata",
+      "family": "code_group",
+      "branch": "Nonempty metadata.code_snippets mapping code blocks take precedence over fenced display; all casefold fragments must coexist in ONE block.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:130–152"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Preserve one-block co-location; metadata code alone is not necessarily model-visible. Casefold substring containment is lexical matching, not behavioral equivalence.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "code_group.fence",
+      "family": "code_group",
+      "branch": "If no nonempty metadata code, use fenced display blocks; each group requires all fragments in one block.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:130–152"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Keep fence/source byte bounds; lexical fragments must not stand in for semantics.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "code_group.local-unit",
+      "family": "code_group",
+      "branch": "Legacy unit matching exempts code_group from proposition gate and requires all fragments in one unit. Factual-only profiles rerun this local witness; ordinary library/generic coverage may have no witness and whole-candidate assignment.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:160–162,191–193",
+        "docmancer/docs/application/_evidence_selection_part03.py:553–680"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Preserve local unit span/hash and profile distinction; no claim metadata-only match survived visible code projection.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "witness.typed-precedence",
+      "family": "cross-family",
+      "branch": "kind proof_obligation uses best_local_proof over answer_units; no match returns None. Facet/source_fact/code_group do not become typed merely because relation/subject fields exist.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part02.py:210–230",
+        "docmancer/docs/application/evidence_models.py:147–165"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Keep typed/local binding and unknown rejection; supplied LocalProof verdict is not independent semantic authority.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    },
+    {
+      "id": "coverage.profile-and-role",
+      "family": "cross-family",
+      "branch": "project_docs_answer factual_only unless any document_statement requirement; other profiles use display+path+section+symbols+version haystack. Incomplete factual span rejected. document_statement needs explicit scoped exact path; implementation_fact source class; project_rule canonical/nonmap; dependency_fact noncode exact version; qualifier regex all; factual_only/proof_obligation requires witness.",
+      "source_refs": [
+        "docmancer/docs/application/_evidence_selection_part03.py:553–680"
+      ],
+      "decision": "SPLIT",
+      "preserved_guards": "Keep explicit scope/role/version/local span/hash obligations; replace qualifier/prose/containment interpretation, not negation/condition preservation.",
+      "route": "coverage → witness when required → mandatory canonical assignment → support",
+      "coverage": "docmancer/docs/application/_evidence_selection_part03.py:553–680",
+      "witness": "docmancer/docs/application/_evidence_selection_part02.py:155–264",
+      "canonical_assignment": "docmancer/docs/application/_evidence_selection_part03.py:315–440",
+      "support": "docmancer/docs/application/_evidence_selection_part03.py:441–475",
+      "assignment_rule": "Only mandatory covered requirements receive assignment. One selected covering candidate wins _assignment_preference: witness presence, descending supplied completeness, target identity, canonical authority, lifecycle, version, relevance, witness length, rank, stable ID. Witness spans/hash bind local unit; no-witness assignment binds whole projected candidate. Missing mandatory assignment downgrades status.",
+      "support_rule": "status ok iff selected/nonmissing/nonconflicting, with identity/bounds/factual/project requirements and project context-only authorization guards; answer_supported=status==ok. selected_evidence_ids are assigned IDs, satisfied_requirement_ids are coverage IDs (not identical sets). Advisory-only coverage does not authorize a mandatory assignment.",
+      "profile_applicability": {
+        "project_docs_answer": "Supplied canonical kind can enter; factual_only normally requires local witness; document_statement disables global factual_only but keeps its scoped-path role guard.",
+        "library_docs_answer": "Supplied matching kind can enter; facet/code_group compiler roots at evidence_requirements.py:401–446; no automatic factual_only witness for legacy kinds.",
+        "patch_context_generic": "Supplied matching kind can enter; source_fact producer optional in action_packet wrapper; plan/explicit contract merge retains role guards; no global factual_only.",
+        "model_visible_reselection": "Same matching-kind semantics for selected project/generic config; library no-canonical branch rejects instead of reselecting.",
+        "project_document_answer_SDK": "Explicit configured root; no project_docs_answer factual_only switch; compiler unsupported-content guard applies."
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "id": "project.initial",
+      "call": "docmancer/docs/application/_project_context_service_part01.py:410–416",
+      "profile": "project_docs_answer",
+      "result_kind": "docs_answer",
+      "requirements": "canonical_requirements supplied",
+      "fallback": "No compiler bypass; missing typed obligations can schedule bounded document-local probes."
+    },
+    {
+      "id": "project.rescue-qualification",
+      "call": "docmancer/docs/application/_project_context_service_part01.py:420–606",
+      "profile": "project_docs_answer",
+      "result_kind": "docs_answer",
+      "requirements": "Same canonical_requirements at 568 and 602",
+      "fallback": "At most 4 probes/2 observed docs; exact identity/hash/source/lifecycle/currentness guards; single rescue assignment qualifies component; union reselected with unchanged contract."
+    },
+    {
+      "id": "library.default",
+      "call": "docmancer/docs/application/_library_docs_service_part03.py:721–762",
+      "profile": "library_docs_answer",
+      "result_kind": "docs_answer",
+      "requirements": "supplied requirements",
+      "fallback": "Index witness can only replace insufficiency reason with retrieval_miss; selected snippet IDs use support assignment IDs."
+    },
+    {
+      "id": "library.index-witness",
+      "call": "docmancer/docs/application/_library_docs_service_part04.py:8–117",
+      "profile": "library_docs_answer",
+      "result_kind": "docs_answer",
+      "requirements": "same requirements, question empty",
+      "fallback": "Only unsupported/missing decision with complete manifest; allowed IDs/roots/rejection; diagnostic new IDs covering missing requirements; never upgrades support."
+    },
+    {
+      "id": "patch.action-packet",
+      "call": "docmancer/docs/application/_action_packet_part03.py:103–137,190–218,521",
+      "profile": "generic",
+      "result_kind": "patch_context",
+      "requirements": "Patch request plan requirements if available; merge explicit requirements; otherwise build_requirements fallback",
+      "fallback": "Wrapper action_packet.py:229–272 optionally derives source_fact from lexical doc/target path scope; no separate patch profile exists."
+    },
+    {
+      "id": "model-visible.project-or-generic-reselection",
+      "call": "docmancer/docs/application/model_visible_projection.py:180–240",
+      "profile": "project_docs_answer OR generic",
+      "result_kind": "docs_answer",
+      "requirements": "retrieval requirements or build_requirements with explicit paths/contract/version/identity",
+      "fallback": "Use supplied canonical/aggregate selection first, then retrieval selection_decision; only no-decision nonlibrary runs selector."
+    },
+    {
+      "id": "model-visible.library-no-reselection",
+      "call": "docmancer/docs/application/model_visible_projection.py:200–224",
+      "profile": "library_docs_answer",
+      "result_kind": "docs_answer",
+      "requirements": "canonical decision required",
+      "fallback": "Missing canonical decision returns insufficient immediately; no library reselection fallback."
+    },
+    {
+      "id": "SDK.explicit-profile",
+      "call": "docmancer/docs/application/evidence_models.py:45–78",
+      "profile": "project_document_answer OR explicit allowed config",
+      "result_kind": "docs_answer OR patch_context",
+      "requirements": "Explicit caller contract or compiler",
+      "fallback": "Valid SDK profile not dead code. project_document_answer does not set factual_only; without mandatory content compiler inserts unsupported document_content_requirement (evidence_requirements.py:389–400). External callbacks not runtime-audited."
+    }
+  ],
+  "defaults": {
+    "selector_schema": "budget-aware-evidence-selector-v6",
+    "default_profile": "generic",
+    "docs_hard": "min(800,max(256,max_tokens)); target min(650,hard); reserve120; 3 documents/6 spans/20 candidates",
+    "patch_hard": "min(2000,max(256,max_tokens)); target min(1200,hard); 12 sources/3 per source; reserve min(300,hard//3)",
+    "generic_single_candidate": "No mandatory+generic+docs+one fitting eligible candidate may select it; assigned IDs empty, no typed support bypass",
+    "source_lifecycle": "metadata→original lifecycle→active in candidate source view; active fallback is not observed currentness"
+  },
+  "consumer_boundaries": [
+    {
+      "source": "docmancer/docs/application/model_visible_projection.py:246–418",
+      "decision": "SPLIT",
+      "boundary": "Canonical supported result requires exact visible support ID list, assignment binding, local unit text surviving snippet; unsafe materialization/budget/retrieval issues fail closed. _docs_support_decision copies supplied canonical payload, does not independently prove it."
+    },
+    {
+      "source": "docmancer/docs/application/_action_packet_part01.py:20–115",
+      "decision": "SPLIT",
+      "boundary": "Preserve IDs/paths/version/target bindings and mandatory-loss downgrade; normalized whole-packet containment/requirement_value_visible remains lexical semantic substitute."
+    },
+    {
+      "source": "docmancer/docs/application/model_visible_projection.py:549–588",
+      "decision": "PRESERVE-GUARD",
+      "boundary": "edit_ready=packet_valid AND mutation_ready AND no mandatory assignment omission. Selector answer_supported alone is not edit permission."
+    },
+    {
+      "source": "docmancer/docs/application/action_packet.py:70–148,185–226,229–272",
+      "decision": "SPLIT",
+      "boundary": "Doc/target lexical overlap, leading token and density derive source_fact scope; declared trusted source determines project_rule; promotion uses normative modality. Keep explicit source/target provenance, replace lexical semantic assignment and normative inference."
+    },
+    {
+      "source": "docmancer/docs/application/_evidence_selection_part01.py:324–383,506–545",
+      "decision": "SPLIT",
+      "boundary": "Preserve forbidden/stale/risk/project/module/exact version/identity guards; legal wordlist query intent and authority/lifecycle/default producers not exempt; lifecycle ranking active default not evidence."
+    }
+  ],
+  "pending": [],
+  "limitations": [
+    "No runtime branch execution claim, no proof-quality or acceptance claim, no dictionary removal implemented.",
+    "Gap1 original/lookup attribution handled separately; this map does not reconcile attribution.",
+    "Finite branches identified by source; external dynamic receiver bindings are not claimed resolved.",
+    "Semantic REMOVE/SPLIT are migration dispositions, not deletion of guards or implemented changes."
+  ],
+  "validation": {
+    "facet_named_branches": [
+      "architecture",
+      "authority_invariant",
+      "behavior",
+      "comparison",
+      "recall_mechanism",
+      "request_handling",
+      "responsiveness",
+      "result_access",
+      "usage",
+      "workflow"
+    ],
+    "facet_missing": [],
+    "branch_rows": 21,
+    "unique_branch_ids": true,
+    "profile_rows": 8,
+    "current_source_pins_rechecked": true,
+    "prior_pinned_rows_checked": 9,
+    "prior_pin_mismatches": 0,
+    "pending_count": 0,
+    "meaning": "Named finite family/source routes enumerated; not public proposition certification",
+    "source_files_checked": 18,
+    "qualified_owner_names": true
+  },
+  "public_roots": [
+    {
+      "source": "docmancer/docs/interfaces/mcp/context_tools.py:309–331,411–477,485–504",
+      "route": "get_docs_context → application result → supplied canonical docs projection (or no-canonical reselection rules) / rebuilt mutation action packet; final projection validation. Network/bootstrap disabled by public route; raw DTO edit_ready is not permission."
+    },
+    {
+      "source": "docmancer/docs/application/evidence_selection.py:9–19",
+      "route": "Public exports from actual shards and proofability; exported select_evidence is part03 implementation."
+    }
+  ],
+  "classification_origins": [
+    "P0_APPLICATION_RESOLVED_2_RU.md:45–68,85–88",
+    "P0_AGENT_APPLICATION_RU.md:selector eligibility D15 SPLIT",
+    "P0_PARALLEL_CLOSURE_ASSESSMENT_RU.md:48–55,84–109",
+    "Current source_fact/code_group rows refine concrete mixed components; do not imply implemented removal."
+  ]
+}

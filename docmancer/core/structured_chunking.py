@@ -17,6 +17,10 @@ from dataclasses import dataclass
 SCHEMA_VERSION = "parent-child-v1"
 TOKEN_ESTIMATOR_VERSION = "utf8-bytes-div4-v1"
 _ATOMIZATION_REVISION = "introduced-list-v2"
+# Compatibility for optional prepared-parent certificates only.  This does not
+# participate in chunk IDs or generation configuration.  Change it whenever
+# parse_markdown_parents changes its output, including coordinates or ancestry.
+PARENT_PARSER_REVISION = "markdown-parent-sections-v1"
 _HEADING = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*\r?\n?$")
 _FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 _LIST = re.compile(r"^[ \t]*(?:[-+*]|\d+[.)])[ \t]+")
@@ -93,6 +97,32 @@ class ParentSection:
     line_start: int
     line_end: int
     display_text: str
+
+
+def parent_sections_digest(parents: list[ParentSection]) -> str:
+    """Fingerprint ordered canonical parents without storing their text again.
+
+    Every ParentSection field participates; display_text is represented by its
+    UTF-8 SHA-256.  The certificate format and parser revision version the tuple
+    layout.  This fingerprint proves integrity only after canonical comparison
+    at prepare time; hashing arbitrary persisted rows is not certification.
+    """
+    rows = [
+        (
+            parent.logical_id, parent.revision_id, parent.source_identity,
+            parent.source_content_hash, parent.title, parent.level,
+            parent.heading_path, parent.heading_levels, parent.occurrence,
+            parent.char_start, parent.char_end, parent.byte_start, parent.byte_end,
+            parent.line_start, parent.line_end,
+            hashlib.sha256(parent.display_text.encode("utf-8")).hexdigest(),
+        )
+        for parent in parents
+    ]
+    payload = json.dumps(
+        (PARENT_PARSER_REVISION, rows), ensure_ascii=False,
+        separators=(",", ":"), allow_nan=False,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_prepared_retrieval_integration.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_prepared_retrieval_integration.py": "87ef36e44c725193f4c5b291eecbc47b2d5b4c92ab2648f845301d5ee1ca5c82"
+  },
+  "node_overrides": {}
+}

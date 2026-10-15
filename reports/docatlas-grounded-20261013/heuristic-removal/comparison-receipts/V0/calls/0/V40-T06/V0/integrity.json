@@ -1,0 +1,17 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/guide/workers.md",
+      "raw_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/guide/workers.md",
+      "raw_sha256": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "errors": []
+    }
+  ]
+}

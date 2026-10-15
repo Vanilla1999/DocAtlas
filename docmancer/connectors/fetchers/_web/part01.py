@@ -32,6 +32,8 @@ class _WebFetcherPart01:
         source_manifest: dict | None = None,
         max_fetched_document_bytes: int = 64 * 1024 * 1024,
         query: str | None = None,
+        exact_urls: list[str] | None = None,
+        robots_urls: list[str] | None = None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -50,6 +52,7 @@ class _WebFetcherPart01:
             path_prefixes=tuple(path_prefixes or ()),
         )
         self._max_response_bytes = max_response_bytes
+        self._transport_policy = self._fetch_policy
         self._max_decoded_text_bytes = max_decoded_text_bytes
         self._max_redirects = max_redirects
         self._connect_timeout = connect_timeout
@@ -61,6 +64,9 @@ class _WebFetcherPart01:
         )
         self._max_fetched_document_bytes = max_fetched_document_bytes
         self._query = query
+        selected = exact_urls if exact_urls is not None else seed_urls
+        self._exact_urls = tuple(selected) if isinstance(selected, (list, tuple)) else selected
+        self._robots_urls = list(robots_urls or [])
         self.last_discovery_diagnostics: dict | None = None
         self.last_page_ledger: list[dict] = []
         self._ledger_lock = threading.Lock()
@@ -103,22 +109,22 @@ class _WebFetcherPart01:
             max_response_bytes=self._max_response_bytes,
             max_decoded_text_bytes=self._max_decoded_text_bytes,
             max_total_seconds=self._max_total_seconds,
-            deadline_at=self._deadline_at,
+            deadline_at=getattr(self, "_operation_deadline_at", self._deadline_at),
             pin_resolved_ips=not (self._proxy_url or self._use_env_proxy),
         )
 
     def _policy_for(self, url: str) -> DocsFetchPolicy:
-        if self._fetch_policy.allowed_hosts:
-            return self._fetch_policy
+        if self._transport_policy.allowed_hosts:
+            return self._transport_policy
         hosts = {
             parsed.hostname.rstrip(".").lower()
             for candidate in [url, *self._seed_urls]
             if (parsed := urlparse(candidate)).hostname
         }
-        return replace(self._fetch_policy, allowed_hosts=tuple(sorted(hosts)))
+        return replace(self._transport_policy, allowed_hosts=tuple(sorted(hosts)))
 
     def fetch(self, url: str) -> list[Document]:
-        """Fetch documentation from a URL using the generic pipeline.
+        """Fetch only selected whole documents or approved immutable file rows.
 
         Args:
             url: Root URL of the documentation site.
@@ -131,9 +137,22 @@ class _WebFetcherPart01:
         """
         self.last_fetch_failure: DocsFetchSecurityError | None = None
         self.last_page_ledger = []
+        self._operation_deadline_at = self._deadline_at
+        self._finite_total_bytes = 0
+        parsed = urlparse(url)
+        if parsed.scheme not in {"http", "https"}:
+            raise DocsFetchSecurityError("unsupported_scheme", redact_url(url))
+        if parsed.username is not None or parsed.password is not None:
+            raise DocsFetchSecurityError("userinfo_not_allowed", redact_url(url))
+        if self._source_manifest is None:
+            self._operation_deadline_at = min(
+                self._deadline_at if self._deadline_at is not None else float("inf"),
+                time.monotonic() + self._max_total_seconds,
+            )
+            self._raise_if_cancelled()
+            return self._fetch_finite(url)
         policy = self._policy_for(url)
-        base_url = url.rstrip("/")
-        public_base_url = redact_url(base_url)
+        base_url = exact_url(url)
         if self._source_manifest is not None:
             try:
                 self._raise_if_cancelled()
@@ -150,127 +169,6 @@ class _WebFetcherPart01:
                 )
                 raise
             return self._fetch_github_manifest(base_url)
-        self._raise_if_cancelled()
-        policy.validate_url(url)
-
-        with self._new_client(policy) as client:
-            if self._github_blob_raw_url(base_url):
-                page = self._fetch_page(
-                    DiscoveredUrl(url=base_url, strategy=DiscoveryStrategy.SEED_URLS),
-                    base_url,
-                    Platform.GENERIC,
-                    robots=None,
-                    rate_limiter=RateLimiter(delay=0.0),
-                    redirect_tracker=RedirectTracker(),
-                    redirect_lock=threading.Lock(),
-                )
-                if page is None:
-                    raise ValueError(f"GitHub documentation page {public_base_url!r} had no usable content.")
-                self.last_discovery_diagnostics = self._with_page_ledger({"discovery_strategy": "github-blob"})
-                return [page.document]
-            if self._is_direct_text_url(base_url):
-                document = self._fetch_direct_text_page(base_url, client)
-                self.last_discovery_diagnostics = self._with_page_ledger({"discovery_strategy": "direct-url"})
-                return [document]
-            if self._is_direct_dartdoc_url(base_url):
-                page = self._fetch_dartdoc_direct_page(base_url, base_url, client, Platform.GENERIC)
-                if page is None:
-                    raise ValueError(
-                        f"Dartdoc page {public_base_url!r} had no extractable article content. "
-                        "Try concrete class/library seed URLs or browser=true."
-                    )
-                self.last_discovery_diagnostics = self._with_page_ledger({"discovery_strategy": "dartdoc-direct"})
-                return [page.document]
-
-            # Step 1: Fetch homepage and detect platform
-            platform, root_html, root_headers = self._fetch_and_detect(base_url, client)
-            self._raise_if_cancelled()
-            logger.info("Detected platform: %s", platform.value)
-
-            # Step 2: Set up robots.txt checker
-            robots = None
-            robots_url = urljoin(f"{base_url}/", "/robots.txt")
-            if self._respect_robots and policy.allows_scope(robots_url):
-                robots = RobotsChecker(client)
-                crawl_delay = robots.get_crawl_delay(base_url)
-                if crawl_delay:
-                    self._delay = max(self._delay, crawl_delay)
-
-            # Step 3: Discover page URLs
-            self._emit_progress({"phase": "discovering", "message": f"Discovering URLs from {public_base_url}", "url": public_base_url})
-            discovery_result = discover_urls(
-                base_url=base_url,
-                client=client,
-                platform=platform,
-                robots=robots,
-                max_pages=self._max_pages,
-                force_strategy=self._strategy,
-                seed_urls=self._seed_urls,
-                root_html=root_html,
-                query=self._query,
-            )
-            discovered = discovery_result.urls
-            self._raise_if_cancelled()
-            self.last_discovery_diagnostics = discovery_result.diagnostics
-
-            if not discovered and is_dartdoc_html(root_html, url=base_url):
-                candidates = discover_dartdoc_candidate_links(root_html, base_url)
-                if candidates:
-                    discovered = [DiscoveredUrl(url=item, strategy=DiscoveryStrategy.NAV_CRAWL) for item in candidates[: self._max_pages]]
-
-            if not discovered:
-                # Check if the page might be JavaScript-rendered
-                body_words = len(root_html.split()) if root_html else 0
-                hint = ""
-                if body_words < 50:
-                    hint = (
-                        " The page appears to be JavaScript-rendered (very little content "
-                        "in the static HTML). Try: doc-atlas add <url> --browser"
-                    )
-                raise ValueError(
-                    f"Could not discover any documentation pages at {public_base_url!r}. "
-                    f"No /llms-full.txt, /llms.txt, sitemap, or navigable links found.{hint}"
-                )
-            self._emit_progress(
-                {
-                    "phase": "discovering",
-                    "message": f"Discovered {len(discovered)} URLs",
-                    "url": public_base_url,
-                    "discovered_pages": len(discovered),
-                    "total_pages": len(discovered),
-                }
-            )
-
-            # Step 4: Handle llms-full.txt (content already available)
-            if (
-                len(discovered) == 1
-                and discovered
-                and discovered[0].strategy == DiscoveryStrategy.LLMS_FULL_TXT
-                and discovered[0].content
-            ):
-                documents = self._build_llms_full_documents(discovered[0], platform)
-                content = discovered[0].content or ""
-                self._record_page(
-                    requested_url=discovered[0].url,
-                    discovered_url=discovered[0].url,
-                    canonical_url=discovered[0].url,
-                    redirect_url=None,
-                    fetch_url=discovered[0].url,
-                    fetcher="llms-full.txt",
-                    outcome="usable",
-                    reason_code="ok",
-                    bytes=len(content.encode("utf-8")),
-                    chunks=0,
-                    elapsed_ms=0,
-                )
-                self.last_discovery_diagnostics = self._with_page_ledger(self.last_discovery_diagnostics or {})
-                return documents
-
-            # Step 5: Fetch and extract each page
-            documents = self._fetch_pages(discovered, base_url, client, platform, robots)
-            self.last_discovery_diagnostics = self._with_page_ledger(self.last_discovery_diagnostics or {})
-            return documents
-
     def _fetch_github_manifest(self, base_url: str) -> list[Document]:
         manifest = self._source_manifest
         assert manifest is not None
@@ -315,6 +213,8 @@ class _WebFetcherPart01:
             self._fetch_policy,
             allowed_hosts=("raw.githubusercontent.com",),
             path_prefixes=raw_paths,
+            exact_urls=tuple(row["raw_url"] for row in rows),
+            allow_subdomains=False,
         )
         documents: list[Document] = []
         total_bytes = 0
@@ -338,6 +238,10 @@ class _WebFetcherPart01:
                     if reason != "ok":
                         raise ValueError(reason)
                     response = client.get(raw_url)
+                    response_url = getattr(response, "url", None)
+                    final_raw_url = exact_url(str(response_url)) if isinstance(response_url, (str, httpx.URL)) else raw_url
+                    if not contains(policy.exact_urls or (), final_raw_url):
+                        raise DocsFetchSecurityError("url_not_selected", redact_url(final_raw_url))
                     reason = bounded_reason() or "ok"
                     if reason != "ok":
                         raise ValueError(reason)
@@ -403,19 +307,70 @@ class _WebFetcherPart01:
                         "http_status": response.status_code,
                         "fetched_at": datetime.now(timezone.utc).isoformat(),
                         "requested_url": blob_url, "fetch_url": raw_url,
+                        "redirect_url": redact_url(final_raw_url) if final_raw_url != raw_url else None,
                         "resolved_commit_sha": manifest["discovery"]["resolved_commit_sha"],
                     },
                 )
                 documents.append(document)
                 self._record_page(
                     requested_url=blob_url, discovered_url=blob_url, canonical_url=blob_url,
-                    redirect_url=None, fetch_url=raw_url, fetcher="github-manifest",
+                    redirect_url=final_raw_url if final_raw_url != raw_url else None, fetch_url=raw_url, fetcher="github-manifest",
                     outcome="usable", reason_code="ok", bytes=len(raw), chunks=0,
                     elapsed_ms=int((time.monotonic() - started) * 1000),
                 )
         self.last_discovery_diagnostics = self._with_page_ledger(
             {"complete": True, "reason_code": "ok", "discovery_strategy": "github-manifest"}
         )
+        return documents
+
+    def _fetch_finite(self, url: str) -> list[Document]:
+        members = finite_members(self._exact_urls, self._max_pages)
+        if not contains(members, url):
+            raise ValueError("finite_member_seed_mismatch")
+        if any(urlparse(member).hostname in {"github.com", "raw.githubusercontent.com"} for member in members):
+            raise ValueError("github_source_manifest_required")
+        if any(not is_docs_url(member, member) for member in members):
+            raise ValueError("finite_member_unsupported_format_or_endpoint")
+        ceiling = self._policy_for(url)
+        controls = tuple(exact_url(control) for control in self._robots_urls)
+        if any(urlparse(control).path != "/robots.txt" or urlparse(control).query for control in controls):
+            raise ValueError("invalid_robots_control_member")
+        if any(not ceiling.allows_scope(member) for member in (*members, *controls)):
+            raise ValueError("finite_member_outside_transport_scope")
+        policy = replace(ceiling, exact_urls=members)
+        # Reject the entire invalid set before dispatch; preserve DNS/private checks.
+        for member in members:
+            policy.validate_url(member)
+        if self._respect_robots:
+            for member in members:
+                if not contains(controls, urljoin(member, "/robots.txt")):
+                    raise ValueError("explicit_robots_member_required")
+        control_policy = replace(ceiling, exact_urls=controls)
+        for control in controls:
+            control_policy.validate_url(control)
+        self._fetch_policy = policy
+        documents = []
+        tracker = RedirectTracker()
+        lock = threading.Lock()
+        limiter = RateLimiter(delay=self._delay)
+        with self._new_client(control_policy) as client:
+            robots = RobotsChecker(client) if self._respect_robots else None
+            for member in members:
+                self._raise_if_cancelled()
+                if robots:
+                    crawl_delay = robots.get_crawl_delay(member)
+                    if crawl_delay:
+                        limiter = RateLimiter(delay=max(self._delay, crawl_delay))
+                page = self._fetch_page(
+                    DiscoveredUrl(url=member, strategy=DiscoveryStrategy.SEED_URLS),
+                    member, Platform.GENERIC, robots, limiter, tracker, lock,
+                )
+                if page is not None:
+                    documents.append(page.document)
+        self.last_discovery_diagnostics = self._with_page_ledger({
+            "discovery_strategy": "finite-explicit", "selected_pages": len(members),
+            "complete": len(documents) == len(members),
+        })
         return documents
 
     def _with_page_ledger(self, diagnostics: dict) -> dict:
@@ -450,6 +405,9 @@ class _WebFetcherPart01:
     def _raise_if_cancelled(self) -> None:
         if self._cancellation_callback and self._cancellation_callback():
             raise RuntimeError("Documentation fetch cancelled.")
+        deadline = getattr(self, "_operation_deadline_at", self._deadline_at)
+        if deadline is not None and time.monotonic() >= deadline:
+            raise DocsFetchSecurityError("deadline_exceeded", "<selected-document>")
 
     @staticmethod
     def _is_direct_text_url(url: str) -> bool:
@@ -468,89 +426,8 @@ class _WebFetcherPart01:
         return self._is_dartdoc_url(url) and urlparse(url).path.lower().endswith(_DIRECT_DARTDOC_SUFFIXES)
 
     def _fetch_direct_text_page(self, url: str, client: httpx.Client) -> Document:
-        """Fetch an exact markdown/text docs URL without running site discovery."""
-        started = time.monotonic()
-        try:
-            resp = client.get(url)
-        except DocsFetchSecurityError as exc:
-            self._record_page(
-                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
-                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code=exc.category,
-                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
-            )
-            raise
-        except httpx.RequestError:
-            self._record_page(
-                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
-                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code="network_transport_error",
-                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
-            )
-            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: transport_error") from None
-
-        if resp.status_code != 200:
-            self._record_page(
-                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
-                fetch_url=url, fetcher="direct-url", outcome="failed",
-                reason_code="not_found" if resp.status_code == 404 else "http_failure",
-                bytes=len(resp.content), chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
-            )
-            raise DocsFetchSecurityError(
-                "not_found" if resp.status_code == 404 else "http_failure",
-                redact_url(url),
-                phase="fetching",
-                retryable=resp.status_code in {408, 429} or resp.status_code >= 500,
-                status_code=resp.status_code,
-            )
-        if not resp.text.strip():
-            self._record_page(
-                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
-                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code="empty_response",
-                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
-            )
-            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: empty response")
-        if looks_like_html(resp.text):
-            self._record_page(
-                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
-                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code="unexpected_html",
-                bytes=len(resp.content), chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
-            )
-            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: response appears to be HTML")
-
-        resp_url = getattr(resp, "url", None)
-        if isinstance(resp_url, (str, httpx.URL)):
-            final_url = normalize_url(str(resp_url))
-        else:
-            final_url = normalize_url(url)
-        content = resp.text
-        fetched_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        content_hash = ContentDeduplicator.content_hash(content)
-        suffix = urlparse(final_url).path.lower().rsplit(".", 1)[-1]
-        fmt = "markdown" if suffix == "md" else "text"
-        document = Document(
-            source=final_url,
-            content=content,
-            metadata={
-                "fetch_method": "direct-url",
-                "format": fmt,
-                "docset_root": infer_docset_root(final_url) or final_url,
-                "platform": Platform.GENERIC.value,
-                "title": None,
-                "description": None,
-                "lang": None,
-                "canonical_url": final_url,
-                "section_path": [],
-                "content_hash": content_hash,
-                "word_count": len(content.split()),
-                "fetched_at": fetched_at,
-            },
-        )
-        self._record_page(
-            requested_url=url, discovered_url=url, canonical_url=final_url, redirect_url=final_url if final_url != url else None,
-            fetch_url=url, fetcher="direct-url", outcome="usable", reason_code="ok",
-            bytes=len(content.encode("utf-8")), chunks=0,
-            elapsed_ms=int((time.monotonic() - started) * 1000),
-        )
-        return document
+        """Deprecated private shortcut; arbitrary supplied clients are unsafe."""
+        raise ValueError("legacy_direct_fetch_unavailable")
 
     def _fetch_dartdoc_direct_page(
         self,
@@ -572,21 +449,15 @@ class _WebFetcherPart01:
     def _fetch_and_detect(
         self, base_url: str, client: httpx.Client
     ) -> tuple[Platform, str, dict[str, str]]:
-        """Fetch the homepage and detect the platform."""
-        try:
-            resp = client.get(base_url)
-            html = resp.text
-            headers = dict(resp.headers)
-            platform = detect_platform(html, base_url, headers)
-            return platform, html, headers
-        except httpx.RequestError:
-            logger.warning("Failed to fetch homepage %s: transport_error", redact_url(base_url))
-            return Platform.GENERIC, "", {}
+        """Deprecated private shortcut; no implicit landing/platform probes."""
+        raise ValueError("legacy_landing_probe_unavailable")
 
     def _build_llms_full_documents(
         self, discovered: DiscoveredUrl, platform: Platform
     ) -> list[Document]:
         """Build Document list from llms-full.txt content."""
+        if not contains(self._fetch_policy.exact_urls or (), discovered.url):
+            raise ValueError("explicit_whole_document_member_required")
         content = discovered.content or ""
         return [
             Document(
@@ -595,7 +466,7 @@ class _WebFetcherPart01:
                 metadata={
                     "format": "markdown",
                     "fetch_method": "llms-full.txt",
-                    "docset_root": discovered.url.removesuffix("/llms-full.txt"),
+                    "docset_root": discovered.url,
                     "platform": platform.value,
                     "word_count": len(content.split()),
                     "content_hash": ContentDeduplicator.content_hash(content),

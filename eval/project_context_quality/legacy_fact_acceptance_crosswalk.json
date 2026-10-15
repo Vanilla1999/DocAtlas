@@ -1,0 +1,80 @@
+{
+  "schema_version": "legacy-original-case-fact-acceptance-crosswalk-v1",
+  "adr": {
+    "path": "docs/adr/0003-context-first-project-reads.md",
+    "blob_sha": "9ec7ca998294b171ea3e0e52972ffbdd673116dc",
+    "decision": "Frozen original questions and required facts are evaluated separately from production query-credit claims; host lookup credit never transfers to the original."
+  },
+  "frozen_inputs": [
+    {
+      "path": "eval/project_context_quality/cases.json",
+      "git_blob_sha": "43962d4d03f2bc6b0ceed498ef904730f113d2fb",
+      "sha256": "b77ae44e8fb41bc53a6aa6cf584d886ee884ba337302285e4de9af2e4a5d829a"
+    },
+    {
+      "path": "eval/project_context_quality/cases.legacy.json",
+      "git_blob_sha": "43962d4d03f2bc6b0ceed498ef904730f113d2fb",
+      "sha256": "b77ae44e8fb41bc53a6aa6cf584d886ee884ba337302285e4de9af2e4a5d829a"
+    },
+    {
+      "path": "eval/project_context_quality/protocol.lock.json",
+      "git_blob_sha": "71cc9674d2dd0d94d1fb29db7302003800043d19",
+      "sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516"
+    }
+  ],
+  "old_acceptance": {
+    "metric": "original_query_covered_count",
+    "minimum": 12,
+    "meaning": "Producer direct/audited-derived public query attribution; retained verbatim as raw telemetry, with no false original credit."
+  },
+  "current_acceptance": {
+    "schema_version": "legacy-source-fact-oracle-result-v1",
+    "metric": "verified_original_case_fact_count",
+    "minimum": 12,
+    "denominator": 15,
+    "meaning": "Versioned acceptance-metric migration: all full frozen facts for an unchanged original case occur in substantive visible body at its allowed exact source paths, with same-call source hashes, host-derived project identity, project scope, exact current source lines, safe context and honest query lineage."
+  },
+  "evidence_contract": {
+    "schema_version": "legacy-same-call-source-evidence-v1",
+    "origin": "Existing one-retrieval/one-validator observation in the same public get_docs_context call.",
+    "bindings": [
+      "raw question, project scope, explicit lookup list and host-selected absolute literal project root",
+      "exact final source equals validator projected_source; project identity independently equals local:SHA256(str(Path(captured_request.project_path)))",
+      "public source scope equals the frozen/request project scope; empty negative sources need no invented metadata",
+      "independently recomputed canonical source-material SHA256",
+      "full visible source bytes occur in the bound source material and checked-out file; strict integer public line bounds identify exactly those current source lines",
+      "all full frozen path-bound facts occur in substantive source statements, native code or table data rows; headings, standalone links/images, destinations and table headers cannot supply a fact, even beside unrelated prose",
+      "raw original credit requires its own literal direct non-admission trace; a lookup never supplies original credit"
+    ],
+    "claim_boundary": "In-process evaluator observations are not a signed remote attestation, installed-client proof, semantic answer certification, or a new production query-credit claim."
+  },
+  "retained": [
+    "All 16 original corpus records, questions, lookup strings, source expectations and required facts are byte-identical.",
+    "Frozen numeric minimum 12, positive denominator 15 and all six hard-zero metrics remain.",
+    "Historical full Legacy verdict, raw original/direct/derived/lookup telemetry and existing production guards remain.",
+    "No product changes, retrieval aliases, semantic dictionaries, embeddings, providers, new ordinary test functions or output ceilings."
+  ],
+  "prior_runtime": {
+    "pr_head_sha": "f7b9253c8e477babf276ae8dd2cb18905451cd15",
+    "checkout_commit_sha": "011e808a0dcd2ec8104611a2257d17b5f20e327a",
+    "checkout_tree_sha": "cfe816a4e295961b2b529b612bbc63c39ff99ccf",
+    "same_tree_as_pr_head": true,
+    "run_id": 38008532239,
+    "job_id": 114082885405,
+    "original_query_covered_count": 0,
+    "source_bound_full_frozen_fact_cases": 8,
+    "positive_case_count": 15,
+    "all_positive_checks_passed": 7,
+    "total_passed": 8,
+    "total_cases": 16,
+    "interpretation": "8/15 remains below the unchanged 12/15 floor. This prior report lacks the new persisted validator receipts; no new-oracle runtime PASS is claimed."
+  },
+  "controls": {
+    "module": "tests/test_project_context_quality_acceptance.py",
+    "node": "test_legacy_compatibility_floor_keeps_original_threshold_and_hard_safety",
+    "new_test_functions": 0,
+    "proof_status": "static; actual current-SHA runtime required",
+    "source_consistent_faults": "Metadata-only fact windows retain valid body/hash/line bindings and a zero metadata rollup; foreign owner/scope and shifted/expanded/malformed line ranges retain matching public/snapshot rows and unchanged content hash.",
+    "healthy_pairs": "Context-only 12/15 facts with raw original 0; a separate literal-original lane; a captured mirror root distinct from the checked-out bytes; native statement/code/table-data fact windows."
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-78c02c1ff11bdc5a",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers > Cancelling workers",
+      "snippet": "### Cancelling workers\n\nYou can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].\nThis will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "28702d31429706be1f33ce3dfa659be9443929dc31e05f4fbf151358708066f9",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 91,
+      "line_end": 95,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/64d13274f02a6bf99c3f6d41"
+    },
+    {
+      "evidence_id": "ev-a2ccea018238aed2",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers > Work decorator",
+      "snippet": "The addition of `@work(exclusive=True)` converts the `update_weather` coroutine into a regular function which when called will create and start a worker.\nNote that even though `update_weather` is an `async def` function, the decorator means that we don't need to use the `await` keyword when calling it.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0aee918bcab721ef988f5ca9d60e9e381a176468b043450e29b0d9abacc4a38e",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 75,
+      "line_end": 77,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/a9049ddf2c84fbb3e6315939"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/985fd9bf786f9fd7552b895b",
+      "path": "docs/guide/workers.md",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "snapshot_sha256": "sha256:8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+      "line_start": 78,
+      "line_end": 81,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 620
+}

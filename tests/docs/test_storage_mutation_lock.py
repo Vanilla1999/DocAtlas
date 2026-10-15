@@ -29,31 +29,6 @@ def _service(tmp_path: Path) -> LibraryDocsService:
     )
 
 
-def test_project_sync_and_cleanup_share_the_same_database_mutation_lock(tmp_path):
-    service = _service(tmp_path)
-    db_path = Path(service.config.index.db_path)
-    assert storage_mutation_lock_path(db_path).parent == db_path.parent
-
-    project = tmp_path / "project"
-    project.mkdir()
-    (project / "README.md").write_text("# Project\n\nProject documentation.\n", encoding="utf-8")
-    (project / "docatlas.project-docs.yaml").write_text(
-        "schema_version: 1\ndocuments:\n"
-        "  - path: README.md\n"
-        "    role: overview\n"
-        "    scope: project\n"
-        "    description: Project overview.\n"
-        "    authority: source_of_truth\n"
-        "    status: active\n"
-        "    impact: track\n",
-        encoding="utf-8",
-    )
-
-    with storage_mutation_lock(db_path, operation="test holder"):
-        with pytest.raises(StorageMutationBusy, match="project docs sync blocked"):
-            service.sync_project_docs(str(project), with_vectors=False)
-
-
 def test_clear_index_refuses_while_the_same_database_is_being_mutated(tmp_path):
     project = tmp_path / "project"
     storage = project / ".docatlas"

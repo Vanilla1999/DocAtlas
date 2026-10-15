@@ -162,53 +162,11 @@ def _query_intent_terms(query: str) -> set[str]:
 
 
 def _intent_source_score(query: str, terms: set[str], source: str, haystack: str, text: str) -> float:
-    score = 0.0
-    basic_or_example = terms & {"basic", "example", "examples", "tutorial", "path", "operation", "test", "testing", "pytest", "client", "assertions"}
-    exact_api = terms & {"reference", "api", "signature", "parameters", "constructor"}
-    advanced_requested = terms & {"advanced", "yield", "lifecycle", "async"}
-
-    if basic_or_example and "/tutorial/" in source:
-        score += 1.5
-    if exact_api and "/reference/" in source:
-        score += 1.5
-    if "testclient" in terms and "/tutorial/testing" in source:
-        score += 2.0
-    if "httpexception" in terms and ("/reference/exceptions" in source or "/tutorial/handling-errors" in source):
-        score += 2.0
-    if "depends" in terms and "/tutorial/dependencies" in source and "dependencies-with-yield" not in source:
-        score += 2.0
-    if "/advanced/" in source and not advanced_requested:
-        score -= 1.5
-    if "dependencies-with-yield" in source and "yield" not in terms:
-        score -= 3.0
-    if basic_or_example and "source code in `" in haystack:
-        score -= 1.0
-    if basic_or_example and any(term in text[:1200] for term in ("from fastapi.testclient", "client = testclient", "assert response")):
-        score += 1.0
-    return score
+    return 0.0
 
 
 def _snippet_intent_score(query: str, terms: set[str], api_terms: set[str], metadata: dict[str, Any], text: str) -> float:
-    code_intent = terms & {"example", "examples", "usage", "code", "import", "test", "testing", "pytest", "assert", "client", "signature"}
-    if not code_intent:
-        return 0.0
-    snippets = metadata.get("code_snippets") or []
-    has_snippet = bool(metadata.get("has_code_snippet") or snippets)
-    if not has_snippet:
-        return 0.0
-
-    snippet_text = "\n".join(str(item.get("code") or "") for item in snippets if isinstance(item, dict)).lower()
-    if not snippet_text:
-        snippet_text = text[:1200]
-
-    score = 0.75
-    for term in api_terms:
-        if term.lower() in snippet_text:
-            score += 1.5
-    for term in terms:
-        if len(term) >= 4 and term in snippet_text:
-            score += 0.25
-    return min(score, 3.0)
+    return 0.0
 
 
 def dispatch_query(

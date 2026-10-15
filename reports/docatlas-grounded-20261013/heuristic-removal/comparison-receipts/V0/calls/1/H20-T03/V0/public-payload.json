@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-c164a48852c456df",
+      "path_or_url": "docs/tutorial/parameter-types/bool.md",
+      "section": "Boolean CLI Options > Alternative names",
+      "snippet": "## Alternative names\n\nNow let's imagine we have a *CLI option* `--accept`.\n\nAnd we want to allow setting `--accept` or the contrary, but `--no-accept` looks ugly.\n\nWe might want to instead have `--accept` and `--reject`.\n\nWe can do that by passing a single `str` with the 2 names for the `bool` *CLI option* separated by `/`:\n\n{* docs_src/parameter_types/bool/tutorial002_an_py310.py hl[9] *}\n\nCheck it:\n\n<div class=\"termy\">\n\n```console\n// Check the help\n$ uv run python main.py --help\n\n// Notice the --accept / --reject\nUsage: main.py [OPTIONS]\n\nOptions:\n  --accept / --reject\n  --help                Show this message and exit.\n\n// Try it\n$ uv run python main.py\n\nI don't know what you want yet\n\n// Now pass --accept\n$ uv run python main.py --accept\n\nAccepting!\n\n// And --reject\n$ uv run python main.py --reject\n\nRejecting!\n```\n\n</div>\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "7e61b516163b3ceef2354313283f00c16a70a403fe1e64b42438a786535dd18f",
+      "project_identity": "local:150ba4cbe68bb898b14aa66236ef7710025f8dfeb1e708536da735024e0b6163",
+      "line_start": 51,
+      "line_end": 95,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/f54fa4702558ecba7472e71e"
+    },
+    {
+      "evidence_id": "ev-dce8feb642a8e219",
+      "path_or_url": "docs/tutorial/parameter-types/bool.md",
+      "section": "Boolean CLI Options",
+      "snippet": "We have seen some examples of *CLI options* with `bool`, and how **Typer** creates `--something` and `--no-something` automatically.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "928ee9fc32163a5deb6c6223877e3d1b928023f347e59f8e00857220ce66d6e9",
+      "project_identity": "local:150ba4cbe68bb898b14aa66236ef7710025f8dfeb1e708536da735024e0b6163",
+      "line_start": 3,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/0a98c2d260bed0545d3f727d"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/2714d74d97be9ec95d4ca2ed",
+      "path": "docs/tutorial/parameter-types/bool.md",
+      "project_identity": "local:150ba4cbe68bb898b14aa66236ef7710025f8dfeb1e708536da735024e0b6163",
+      "snapshot_sha256": "sha256:aab9cc628a1488d3a97ccfc0de2272825c9395c6ecb330f799c019552ae13f02",
+      "line_start": 5,
+      "line_end": 6,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 738
+}

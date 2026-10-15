@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M06",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "Which SQL database engine is the default storage backend for MkDocs' search index?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "569770e7e630d8e573461539a2f60d2f51071de8ab4393df08c324c9f9cef078",
+  "utf8_bytes": 2825,
+  "tokens": 900,
+  "seconds": 0.4424145060002047,
+  "cpu_seconds": 0.4409668330000045,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

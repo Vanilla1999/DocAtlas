@@ -16,18 +16,13 @@ from eval.evidence_quality_v2.trace import bounded_completeness, source_span
 def observe_call(service: Any, arguments: dict) -> tuple[dict, dict]:
     import scripts.run_project_docs_self_host_gate as gate
     from docmancer.docs.application import _project_docs_service_part03 as project
-    from docmancer.docs.application import docs_context_projection as projection
     from docmancer.docs.interfaces.mcp import context_tools
 
     stages: dict[str, list] = {key: [] for key in (
         "retrieved_candidates", "query_window", "rankings", "qualified_fragments", "expansions", "projector_inputs", "projector_outputs")}
-    app = getattr(service, "unified_context", service)
     projector_fn = context_tools.project_docs_context
     diagnostics_fn = project._retrieval_stage_diagnostics
     query_fn = service.project_docs.query_project_docs
-    rank_fn = projection._facet_aware_candidates
-    fragments_fn = projection._qualified_fragments
-    expand_fn = projection._expand_selected_snippets
 
     def capture_projector(*, retrieval, **kwargs):
         # This is the actual prepared projector input after MCP normalization,
@@ -55,33 +50,9 @@ def observe_call(service: Any, arguments: dict) -> tuple[dict, dict]:
                                       "transition": "lifecycle+deduplication+candidate_cap+token_budget"})
         return result
 
-    def capture_rank(candidates, **kwargs):
-        inputs = deepcopy(candidates)
-        result = rank_fn(candidates, **kwargs)
-        stages["rankings"].append({"complete": True, "before": [source_span(row) for row in inputs],
-                                  "after": [source_span(row) for row in result]})
-        return result
-
-    def capture_fragments(source, **kwargs):
-        before = deepcopy(source)
-        result = fragments_fn(source, **kwargs)
-        stages["qualified_fragments"].append({"complete": True, "before": source_span(before),
-            "after": [source_span(row) for row in result]})
-        return result
-
-    def capture_expand(sources, **kwargs):
-        before = deepcopy(sources)
-        result = expand_fn(sources, **kwargs)
-        stages["expansions"].append({"complete": True, "before": [source_span(row) for row in before],
-                                    "after": [source_span(row) for row in result]})
-        return result
-
     with (patch.object(context_tools, "project_docs_context", capture_projector),
           patch.object(project, "_retrieval_stage_diagnostics", capture_diagnostics),
-          patch.object(service.project_docs, "query_project_docs", capture_query),
-          patch.object(projection, "_facet_aware_candidates", capture_rank),
-          patch.object(projection, "_qualified_fragments", capture_fragments),
-          patch.object(projection, "_expand_selected_snippets", capture_expand)):
+          patch.object(service.project_docs, "query_project_docs", capture_query)):
         observed, snapshot = gate._call_with_snapshot(arguments, service)
     payload = dict(observed or {})
     bounded = payload.pop("diagnostics", {})
@@ -89,5 +60,12 @@ def observe_call(service: Any, arguments: dict) -> tuple[dict, dict]:
               "bounded_diagnostics": bounded, "snapshot": snapshot,
               "final": {"complete": True, "sources": deepcopy(payload.get("sources") or [])},
               "observer_counts": bounded.get("observer_counts", {}),
-              "unobserved_transitions": ["query_window: distinguish lifecycle, cap and budget only with additional evidence"]}
+              "retired_stages": ["rankings", "qualified_fragments", "expansions"],
+              "finalization_observation": deepcopy((bounded.get("projection_observation") or {}).get(
+                  "returned_core_diagnostics", {}).get("context_flow", {})),
+              "unobserved_transitions": [
+                  "Legacy semantic ranking/fragments/expansion are retired, not empty successful stages.",
+                  "query_window: distinguish lifecycle, cap and budget only with additional evidence",
+                  "finalization_observation is bounded; inspect omission/error counts before attribution",
+              ]}
     return payload, record

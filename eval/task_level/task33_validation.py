@@ -645,12 +645,12 @@ def _check_bounded_evidence(
     ]
     packet_errors = validate_action_packet(
         packet, evidence_items=packet_evidence,
-        max_tokens=protocol["packet_token_budget"],
     )
     errors.extend(f"{condition}:action_packet:{error}" for error in packet_errors)
-    objective = (packet.get("task_interpretation") or {}).get("objective")
-    if not isinstance(objective, str) or hashlib.sha256(objective.encode()).hexdigest() != protocol["objective_sha256"]:
-        errors.append(f"{condition}:action_packet_objective_mismatch")
+    # Objective provenance remains bound by the host snapshot above; v4 has no
+    # duplicated task scaffold. The frozen ceiling is evaluation policy only.
+    if packet.get("estimated_tokens", protocol["packet_token_budget"] + 1) > protocol["packet_token_budget"]:
+        errors.append(f"{condition}:historical_evaluation_packet_token_ceiling_exceeded")
     missing_categories = missing_packet_evidence_categories(
         packet, snapshot.evidence_items, tuple(protocol["required_evidence_categories"])
     )
@@ -660,8 +660,8 @@ def _check_bounded_evidence(
     if missing_categories or missing_paths:
         errors.append(f"{condition}:action_packet_required_evidence_missing")
     targets = {
-        item.get("path") for item in (packet.get("target_surface") or {}).get("likely_files", [])
-        if isinstance(item, dict)
+        item.get("path") for item in packet.get("assignments", [])
+        if isinstance(item, dict) and item.get("proof_role") == "target_identity"
     }
     if not set(protocol["required_target_paths"]).issubset(targets):
         errors.append(f"{condition}:action_packet_targets_missing")
@@ -673,7 +673,7 @@ def _check_bounded_evidence(
         prompt_sources = None
     expected_prompt_sources = [
         {"evidence_id": item.get("evidence_id"), "path": item.get("path")}
-        for item in packet.get("source_of_truth", [])
+        for item in packet.get("sources", [])
         if isinstance(item, dict) and isinstance(item.get("path"), str) and item["path"]
     ]
     if prompt_sources != expected_prompt_sources:

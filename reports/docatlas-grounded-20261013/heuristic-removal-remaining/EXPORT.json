@@ -1,0 +1,17 @@
+{
+  "destination": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/heuristic-removal-remaining",
+  "verified": {
+    "SOURCE_MANIFEST.json": "1ff7c68ec66c156d3c80ac4ccfbecb82137116b6b21d35f6fdf3e9154faab850",
+    "remaining02.xml": "28608ba189443801702920b54dbaff91606c8cb10d16e78347484c0dfa0d5fdb",
+    "remaining01.xml": "2d63b451b0881de932602c29612716976a90c8642f6bb5a434d1162f5086ec80",
+    "remaining01.log": "1706ae087920df5ccb04c9195548f698d16844a99572b5aec90b3f4b32cd2261",
+    "remaining02.log": "388ec5b45ba0f7264d31e57954eb17775e07391b070f7ee0c29e435dd3a45cb9",
+    "RESULT_RU.md": "069869f53b61b0ae32dd6aa2f6923bbc18eeaf6b90372c9364144c7c0be7b315",
+    "remaining-final.xml": "3524e07d5078bb04586ce7452e42578513b5684bbef7f79c9dfdb42d7bee67db",
+    "remaining-final.log": "fe91ffc0036a34c3f2d87f1958b9575a9e016fbac6c23df28047c5d1af68e0d0",
+    "LOG_ANALYSIS.json": "b2fce930d4d19baae5e28108daa65dbc334c783d03fae69ffe00ef0988ff84bf",
+    "remaining03.xml": "df86ab904f69dccf682d404daffbc3ae35c0306e7ffbf5aac00c0a0329223318",
+    "remaining03.log": "bcfc98a54bbcd03c8bc051ee15b13929e8262b0a28b17f95090613ad0ecee417",
+    "SOURCE.patch": "67e5beaf625fc104ad57e0bb08c5e44d5076ecdecea0b1de169e372ae1d134d8"
+  }
+}

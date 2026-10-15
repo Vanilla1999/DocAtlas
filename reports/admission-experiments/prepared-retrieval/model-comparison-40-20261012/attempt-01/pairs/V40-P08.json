@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P08",
+  "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "a23cd3e3340913735530f4b067c03951894c03e2ff1833704ead7abf0fe21958",
+      "mini_sha256": "a23cd3e3340913735530f4b067c03951894c03e2ff1833704ead7abf0fe21958"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "94f3797f3d9b2c290399996453986598b476f791404ab5ace806e40c53e25257",
+      "mini_sha256": "94f3797f3d9b2c290399996453986598b476f791404ab5ace806e40c53e25257"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "ab04eec3b70e4ec36c0025a152dd67aa507703a1b821dc5172d8e5e900d7c78a",
+      "mini_sha256": "ab04eec3b70e4ec36c0025a152dd67aa507703a1b821dc5172d8e5e900d7c78a"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

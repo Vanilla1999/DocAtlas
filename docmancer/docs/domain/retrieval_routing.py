@@ -3,12 +3,8 @@
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass, fields, is_dataclass
 from typing import Any, Iterable, Mapping
-
-from docmancer.docs.domain.request_intent import is_change_request
-
 
 RETRIEVAL_ROUTING_SCHEMA_VERSION = 2
 STAGE_ITEM_LIMITS = {
@@ -25,30 +21,6 @@ STAGE_BYTE_LIMITS = {
     "repo_map": 32 * 1024,
     "code_graph": 32 * 1024,
 }
-
-_SOURCE_NAV_RE = re.compile(
-    r"\b(where|which file|find (?:the )?(?:class|function|symbol)|where.*used|references?|imports?|"
-    r"где|какой файл|какие файлы|найди|используется|нужно менять|ссылки|импорты)\b",
-    re.IGNORECASE,
-)
-_SOURCE_CONCEPT_RE = re.compile(
-    r"(?:[A-Za-z_][A-Za-z0-9_]*(?:Service|Controller|Repository|Provider|Screen|View|Client|Manager|Module|Router|Cubit|Bloc))|"
-    r"(?:\b(?:class|function|method|symbol|module|file|service|controller|repository|provider|screen|cubit|bloc)\b)|"
-    r"(?:[A-Za-z0-9_./-]+\.(?:py|dart|js|ts|tsx|rs|go|java|kt))|(?:['\"][^'\"]{3,80}['\"])",
-    re.IGNORECASE,
-)
-_CROSS_MODULE_RE = re.compile(
-    r"\b(cross[- ]module|cross[- ]package|across modules?|call chain|dependency chain|imports?|references?|"
-    r"между модулями|цепочк\w+ вызов\w+|импорт\w+|ссылк\w+)\b",
-    re.IGNORECASE,
-)
-_PATH_HINT_RE = re.compile(r"\b(?:src|lib|app|packages?)/[A-Za-z0-9_./-]+")
-_CALL_PATH_RE = re.compile(
-    r"\b(?:call(?:s|ed|ers)?|invok\w*|used|вызыва\w*|использу\w*)\b|"
-    r"\b(?:path|flow)\b.{0,160}\bfrom\b.{1,160}\bto\b|"
-    r"\bпуть\b.{0,160}\bот\b.{1,160}\bдо\b", re.IGNORECASE,
-)
-
 
 @dataclass(frozen=True)
 class RetrievalRoute:
@@ -71,43 +43,11 @@ class GapRecoveryRoute:
 def route_initial_stages(
     *, question: str, mode: str, dependency_requested: bool, project_doc_items: Iterable[Any]
 ) -> RetrievalRoute:
-    text = str(question or "")
     project_mode = mode in {"auto", "project-only"}
-    patch = is_change_request(text)
-    source_navigation = bool(_SOURCE_NAV_RE.search(text))
-    source_concepts = bool(_SOURCE_CONCEPT_RE.search(text))
-    doc_target_hint = any(_doc_has_target_hint(item) for item in project_doc_items)
-    symbol_grounding = source_concepts and doc_target_hint and not dependency_requested
-    if source_navigation:
-        intent = "source_navigation"
-    elif patch:
-        intent = "mixed" if dependency_requested else "patch"
-    elif symbol_grounding:
-        intent = "docs"
-    elif dependency_requested:
-        intent = "api" if not project_mode or mode in {"deps-only", "public-docs"} else "mixed"
-    else:
-        intent = "docs"
-    use_source = project_mode and (
-        source_navigation or symbol_grounding or (patch and (source_concepts or doc_target_hint))
-    )
-    if not project_mode:
-        reason = "project source stages are outside the selected mode"
-    elif source_navigation:
-        reason = "the question explicitly requests source navigation"
-    elif symbol_grounding:
-        reason = "project documentation names the requested source symbol"
-    elif patch and source_concepts:
-        reason = "the patch request names a bounded source concept"
-    elif patch and doc_target_hint:
-        reason = "project documentation names an implementation target"
-    elif patch:
-        reason = "patch target is not yet source-grounded"
-    else:
-        reason = "complete documentation/API intent does not require source evidence"
+    intent = ("mixed" if project_mode else "api") if dependency_requested else "docs"
     return RetrievalRoute(
         RETRIEVAL_ROUTING_SCHEMA_VERSION, intent, project_mode,
-        dependency_requested, use_source, reason,
+        dependency_requested, False, "source stages require explicit source-bound targets; prose is not authorization",
     )
 
 
@@ -138,9 +78,7 @@ def should_run_code_graph(
     repo = list(repo_map_items)
     if not route.project_mode or route.intent in {"docs", "api"}:
         return False, "documentation/API intent does not require connectivity evidence"
-    if _CROSS_MODULE_RE.search(str(question or "")) or _CALL_PATH_RE.search(str(question or "")):
-        return True, "the question explicitly requires cross-module/reference connectivity"
-    if route.intent == "source_navigation" and not is_change_request(question):
+    if route.intent == "source_navigation":
         return False, "path discovery alone does not require connectivity evidence"
     modules = {_top_module(path) for path in _proven_source_paths([*source, *repo]) if _top_module(path)}
     if len(modules) > 1:
@@ -325,8 +263,8 @@ def _stage(status: str, reason: str) -> dict[str, Any]:
 
 
 def _doc_has_target_hint(item: Any) -> bool:
-    content = str(getattr(item, "content", None) or (item.get("content") if isinstance(item, dict) else "") or "")
-    return bool(_PATH_HINT_RE.search(content) or _SOURCE_CONCEPT_RE.search(content))
+    # Compatibility hook; source prose is not an explicit target binding.
+    return False
 
 
 def _proven_source_paths(items: Iterable[dict[str, Any]]) -> list[str]:

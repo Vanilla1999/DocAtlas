@@ -62,38 +62,6 @@ MAX_CODE_GROUPS = 6
 DOCS_SERIALIZATION_RESERVE_TOKENS = 350
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
-_COMPARISON_IDENTIFIER = r"(?<![a-z0-9_`])(`?[a-z][a-z0-9_]*`?)(?![a-z0-9_`])"
-_LOWERCASE_COMPARISON_RE = re.compile(
-    rf"{_COMPARISON_IDENTIFIER}\s+instead\s+of\s+{_COMPARISON_IDENTIFIER}",
-    re.IGNORECASE,
-)
-_COMPARE_WITH_RE = re.compile(
-    rf"\bcompare\s+{_COMPARISON_IDENTIFIER}\s+with\s+{_COMPARISON_IDENTIFIER}", re.IGNORECASE,
-)
-_COMPARING_AND_RE = re.compile(
-    rf"\bcomparing\s+{_COMPARISON_IDENTIFIER}\s+and\s+{_COMPARISON_IDENTIFIER}", re.IGNORECASE,
-)
-_RESULT_ACCESS_RE = re.compile(r"\b(?:obtain|get|retrieve)\s+(?:its|the)\s+result\b", re.IGNORECASE)
-_PASSIVE_RESULT_ACCESS_RE = re.compile(
-    r"\b(?:the\s+)?(?:scheduled\s+task\s+)?result\s+is\s+obtained\b", re.IGNORECASE,
-)
-_CODE_REQUEST_RE = re.compile(
-    r"\b(?:show|write|give|provide|need)\s+(?:an?\s+)?(?:code|example|snippet)\b"
-    r"|\b(?:code|example|snippet)\s+(?:for|that|showing)\b",
-    re.IGNORECASE,
-)
-_PATCH_FACT_RE = re.compile(
-    r"\b(?:must|shall|required|requires?|never|cannot|may\s+not|forbidden|prohibited|"
-    r"is\s+reserved\s+for|only\s+(?:after|before|when|if)|is\s+allowed\s+only|"
-    r"pytest|compileall|cargo\s+(?:test|check|build)|npm\s+(?:test|run)|"
-    r"dart\s+(?:test|analyze)|go\s+test|make\s+test)\b",
-    re.IGNORECASE,
-)
-_LEGAL_INTENT_TERMS = frozenset({
-    "agreement", "arbitration", "conditions", "copyright", "disclaimer",
-    "dmca", "eula", "governing", "indemnification", "jurisdiction", "legal",
-    "liability", "license", "privacy", "terms", "warranties", "waiver",
-})
 _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "query_exact_term",
     "public_task_contract",
@@ -105,15 +73,6 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "disclosed_authority_version_conflict",
     "patch_request_plan",
 })
-
-_QUALIFIER_PATTERNS = {
-    "proposed": re.compile(r"\bpropos(?:ed|al)\b", re.I),
-    "not_implemented": re.compile(r"\bnot\s+(?:yet\s+)?implemented\b", re.I),
-    "confirmation_required": re.compile(r"\b(?:confirmation|required approval)\s+(?:is\s+)?required\b", re.I),
-    "negated": re.compile(r"\b(?:not|never|no|cannot|must not)\b", re.I),
-    "conditional": re.compile(r"\b(?:if|when|unless|only after|only before)\b", re.I),
-    "deprecated": re.compile(r"\bdeprecated\b", re.I),
-}
 
 _GOVERNANCE_PROJECT_RULE_RELATIONS = frozenset({
     "governed_scope",
@@ -174,6 +133,8 @@ def _source_fact_requirements(
 def build_requirements(*args: Any, **kwargs: Any) -> EvidenceRequirementSet:
     """Bind typed governance and source-scoped obligations to selector policy."""
 
+    if kwargs.get("representation_bounded") is False:
+        kwargs["public_requirements"] = tuple(kwargs.get("public_requirements") or ())
     requirements = _build_requirements_impl(*args, **kwargs)
     source_facts = _source_fact_requirements(kwargs.get("public_requirements") or ())
     rebound = tuple(

@@ -19,9 +19,12 @@ from typing import Any, Callable, Protocol
 
 from docmancer.docs.application.action_packet import (
     ACTION_PACKET_SCHEMA_VERSION,
-    HARD_ACTION_PACKET_TOKENS,
     validate_action_packet,
 )
+
+# Frozen envelope validation policy used by _isolated_delivery_part01. This
+# evaluator-local historical name is not imported from/passed to the producer.
+HARD_ACTION_PACKET_TOKENS = 2_000
 from docmancer.docs.application.model_visible_projection import (
     project_patch_context,
     validate_model_visible_projection,

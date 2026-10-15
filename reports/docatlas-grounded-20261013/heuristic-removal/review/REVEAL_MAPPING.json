@@ -1,0 +1,102 @@
+{
+  "8804abe320cc6d56": {
+    "case_id": "NEW01",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW01/V0/packed.json"
+  },
+  "b80b58b00e30861e": {
+    "case_id": "NEW02",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW02/V0/packed.json"
+  },
+  "786ec43fd7d679c1": {
+    "case_id": "NEW03",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW03/V0/packed.json"
+  },
+  "a15daf493f11884c": {
+    "case_id": "NEW04",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW04/V0/packed.json"
+  },
+  "25dbba2a3cd66244": {
+    "case_id": "NEW05",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW05/V0/packed.json"
+  },
+  "f4397275aa445eae": {
+    "case_id": "NEW06",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW06/V0/packed.json"
+  },
+  "835272131847b20a": {
+    "case_id": "NEW07",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW07/V0/packed.json"
+  },
+  "c44d0576c2b45e26": {
+    "case_id": "NEW08",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW08/V0/packed.json"
+  },
+  "4d6ecfa2e5623a26": {
+    "case_id": "NEW09",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW09/V0/packed.json"
+  },
+  "ed9265704a1ddc22": {
+    "case_id": "NEW10",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW10/V0/packed.json"
+  },
+  "ac7a24ea5ecbaf50": {
+    "case_id": "NEW11",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW11/V0/packed.json"
+  },
+  "ae3eb784d0b259ca": {
+    "case_id": "NEW12",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW12/V0/packed.json"
+  },
+  "cbfd546685a0bc4e": {
+    "case_id": "NEW13",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW13/V0/packed.json"
+  },
+  "f7cb2cca977f2426": {
+    "case_id": "NEW14",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW14/V0/packed.json"
+  },
+  "4fc9986507c8d37d": {
+    "case_id": "NEW15",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW15/V0/packed.json"
+  },
+  "c9d62212d2f410a7": {
+    "case_id": "NEW16",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW16/V0/packed.json"
+  },
+  "e9841f2d46304791": {
+    "case_id": "NEW17",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW17/V0/packed.json"
+  },
+  "f27d95da62bf1ae5": {
+    "case_id": "NEW18",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW18/V0/packed.json"
+  },
+  "46ba266fb9e3ae5c": {
+    "case_id": "NEW19",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW19/V0/packed.json"
+  },
+  "a6f717a23673b22e": {
+    "case_id": "NEW20",
+    "arm": "V0",
+    "artifact": "reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/V0/calls/2/NEW20/V0/packed.json"
+  }
+}

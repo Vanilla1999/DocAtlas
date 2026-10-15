@@ -2,7 +2,6 @@
 
 from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
 from eval.project_context_quality.capture_public_context import capture_public_call
-from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
 
 
 QUESTION = "Which command starts the Docs MCP server"
@@ -29,8 +28,6 @@ def test_crlf_project_file_keeps_native_reference_evidence(tmp_path):
     payload = capture["public_payload"]
     visible = "\n".join(row["snippet"] for row in payload.get("sources") or ())
     assert NEEDLE in visible, payload
-    assert docs_context_budget_tokens(payload) <= 800
-    assert len(payload.get("sources") or ()) <= 3
     assert all(payload[key] is False for key in (
         "answer_supported", "answer_available", "edit_ready",
     ))

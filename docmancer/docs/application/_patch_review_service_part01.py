@@ -456,6 +456,8 @@ class _PatchReviewServicePart01:
             "total_constraints": int(validation.get("total_constraints") or len(constraint_items)),
             "validation_status_counts": status_counts,
             "covered_count": status_counts["satisfied"] + status_counts["violated"],
+            "policy_coverage": "unresolved",
+            "mutation_authorized": False,
             "unknown_manual_count": status_counts["unknown"] + status_counts["manual_review"],
             "categories": [category for category in [*categories.values(), uncategorized] if category["total_constraints"] > 0],
             "claims_avoided": [
@@ -479,27 +481,15 @@ class _PatchReviewServicePart01:
     @staticmethod
     def _coverage_categories_for_constraint(constraint: dict[str, Any], result: dict[str, Any] | None) -> list[str]:
         ctype = str(constraint.get("type") or "").lower()
-        text = " ".join(
-            str(value or "")
-            for value in (
-                ctype,
-                constraint.get("instruction"),
-                constraint.get("source"),
-                constraint.get("evidence"),
-                " ".join(constraint.get("files") or []),
-            )
-        ).lower()
         names: list[str] = []
-        if ctype in {"generated_file", "forbidden_edit"} or "generated" in text or "protected" in text:
+        if ctype == "generated_file":
             names.append("generated_files")
-        if ctype == "source_of_truth" or any(token in text for token in ("source-of-truth", "source of truth", "owner", "owns", "layer", "delegate")):
+        if ctype == "source_of_truth":
             names.append("source_of_truth_owner_layer")
-        if ctype == "verification" or any(token in text for token in ("test", "check", "regression", "coverage")):
+        if ctype == "verification":
             names.append("required_checks_tests")
-        if ctype == "dependency_version" or "lockfile" in text or "dependency" in text or "version" in text:
+        if ctype == "dependency_version":
             names.append("dependency_versions")
-        if "doc" in text or "readme" in text or "changelog" in text:
-            names.append("docs_update_requirements")
         if result and result.get("status") in {"unknown", "manual_review"}:
             names.append("unknown_manual")
         return list(dict.fromkeys(names))
@@ -580,13 +570,9 @@ class _PatchReviewServicePart01:
         has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
         coverage_unknown_manual = int((coverage_payload or {}).get("unknown_manual_count") or 0)
         coverage_covered = int((coverage_payload or {}).get("covered_count") or 0)
-        has_manual_review = (
-            quality_payload.get("unknown_count", 0) > 0
-            or quality_payload.get("manual_review_count", 0) > 0
-            or "manual_review_required" in signals
-            or bool(unknown_triage_codes)
-            or coverage_unknown_manual > 0
-        )
+        # Structural validation cannot resolve policy coverage, even when every
+        # supplied item is marked satisfied. This is not an authorization path.
+        has_manual_review = True
         has_actionable_items = bool(actionable_items) or quality_payload.get("actionable_items_total_count", 0) > 0
         reason_codes = []
         if has_violations:
@@ -611,6 +597,8 @@ class _PatchReviewServicePart01:
                 "unknown_manual": coverage_unknown_manual,
             },
             "semantics": "advisory_non_blocking_only",
+            "policy_coverage": "unresolved",
+            "mutation_authorized": False,
             "claims_avoided": [
                 "safe_to_merge",
                 "correctness_proof",
@@ -637,7 +625,7 @@ class _PatchReviewServicePart01:
         unknowns = [result for result in results if result.get("status") in {"unknown", "manual_review"}]
         generated_or_lock = [
             result for result in results
-            if "generated" in str(result.get("reason", "")).lower() or "lockfile" in str(result.get("reason", "")).lower()
+            if any(item.get("id") == result.get("constraint_id") and item.get("type") in {"generated_file", "dependency_version", "forbidden_edit"} for item in constraint_items)
         ]
         ranked_constraints = sorted(
             constraint_items,

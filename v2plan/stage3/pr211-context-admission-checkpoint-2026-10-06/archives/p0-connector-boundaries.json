@@ -1,0 +1,123 @@
+{
+  "schema": "p0-connector-boundaries-v1",
+  "parsers": [
+    {
+      "suffix": ".txt",
+      "configured_identity": "docmancer.connectors.parsers.text:TextLoader",
+      "actual_identity": "docmancer.connectors.parsers.text:TextLoader"
+    },
+    {
+      "suffix": ".md",
+      "configured_identity": "docmancer.connectors.parsers.markdown:MarkdownLoader",
+      "actual_identity": "docmancer.connectors.parsers.markdown:MarkdownLoader"
+    },
+    {
+      "suffix": ".markdown",
+      "configured_identity": "docmancer.connectors.parsers.markdown:MarkdownLoader",
+      "actual_identity": "docmancer.connectors.parsers.markdown:MarkdownLoader"
+    },
+    {
+      "suffix": ".pdf",
+      "configured_identity": "docmancer.connectors.parsers.pdf:PDFLoader",
+      "actual_identity": "docmancer.connectors.parsers.pdf:PDFLoader"
+    },
+    {
+      "suffix": ".docx",
+      "configured_identity": "docmancer.connectors.parsers.docx:DOCXLoader",
+      "actual_identity": "docmancer.connectors.parsers.docx:DOCXLoader"
+    },
+    {
+      "suffix": ".rtf",
+      "configured_identity": "docmancer.connectors.parsers.rtf:RTFLoader",
+      "actual_identity": "docmancer.connectors.parsers.rtf:RTFLoader"
+    },
+    {
+      "suffix": ".html",
+      "configured_identity": "docmancer.connectors.parsers.html:HTMLLoader",
+      "actual_identity": "docmancer.connectors.parsers.html:HTMLLoader"
+    },
+    {
+      "suffix": ".htm",
+      "configured_identity": "docmancer.connectors.parsers.html:HTMLLoader",
+      "actual_identity": "docmancer.connectors.parsers.html:HTMLLoader"
+    }
+  ],
+  "fetcher_factory": [
+    {
+      "provider": "web",
+      "actual_class": "docmancer.connectors.fetchers.web.WebFetcher"
+    },
+    {
+      "provider": "github",
+      "actual_class": "docmancer.connectors.fetchers.web.WebFetcher"
+    },
+    {
+      "provider": "gitbook",
+      "actual_class": "docmancer.connectors.fetchers.web.WebFetcher"
+    },
+    {
+      "provider": "mintlify",
+      "actual_class": "docmancer.connectors.fetchers.web.WebFetcher"
+    },
+    {
+      "provider": "crawl4ai",
+      "actual_class": "docmancer.connectors.fetchers.web.WebFetcher"
+    }
+  ],
+  "github_default_selection": [
+    "docs/guide.md",
+    "docs/i18n/ru/guide.md",
+    "README.md"
+  ],
+  "github_explicit_exclusion_override": [
+    "docs/CHANGELOG.md",
+    "docs/guide.md",
+    "docs/i18n/ru/guide.md",
+    "docs/legacy/guide.md",
+    "i18n/ru/guide.md",
+    "README.md"
+  ],
+  "github_selected_folders": [
+    "docs",
+    "i18n"
+  ],
+  "url_filters": [
+    {
+      "url": "https://example.test/docs/guide",
+      "seed": "https://example.test/docs",
+      "admitted": true
+    },
+    {
+      "url": "https://example.test/ru/docs/guide",
+      "seed": "https://example.test",
+      "admitted": false
+    },
+    {
+      "url": "https://example.test/ru/docs/guide",
+      "seed": "https://example.test/ru/docs",
+      "admitted": true
+    },
+    {
+      "url": "https://example.test/docs/status",
+      "seed": "https://example.test/docs",
+      "admitted": false
+    },
+    {
+      "url": "https://different.test/docs/guide",
+      "seed": "https://example.test/docs",
+      "admitted": false
+    }
+  ],
+  "root_inference": [
+    {
+      "url": "https://example.test/docs/alpha/start",
+      "inferred": "https://example.test/docs"
+    },
+    {
+      "url": "https://example.test/unknown/alpha/start",
+      "inferred": "https://example.test"
+    }
+  ],
+  "normalization": "https://example.test/docs?edition=1",
+  "limitations": "Pure helpers and constructors only; no HTTP, source freshness, network authorization, or end-to-end library ingestion claimed."
+}

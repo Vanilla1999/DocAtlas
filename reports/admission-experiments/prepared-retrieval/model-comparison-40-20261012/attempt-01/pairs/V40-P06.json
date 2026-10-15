@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P06",
+  "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+      "mini_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "1c776f161060bdd514b1185fce8260a3c8555cd2d107cef551a22e7c301605fc",
+      "mini_sha256": "1c776f161060bdd514b1185fce8260a3c8555cd2d107cef551a22e7c301605fc"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "6f9e908eab5a488b17be3f40ccf6f4424a2c0b05560fd40dd21e93754cdb6a9d",
+      "mini_sha256": "6f9e908eab5a488b17be3f40ccf6f4424a2c0b05560fd40dd21e93754cdb6a9d"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      0
+    ],
+    "mini": [
+      0
+    ]
+  },
+  "over_budget_pool": false,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

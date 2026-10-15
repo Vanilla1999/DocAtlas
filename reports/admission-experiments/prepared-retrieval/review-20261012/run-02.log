@@ -1,0 +1,24 @@
+.....                                                                    [100%]
+=============================== warnings summary ===============================
+tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation
+  tests/test_context_budget_refusal_integration.py:22: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_final_budget_preserves_stale_source_denial_and_confirmation(
+
+tests/test_prepared_retrieval_review_integration.py::test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change
+  tests/test_prepared_retrieval_review_integration.py:52: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change(
+
+tests/test_source_valid_transfer_integration.py::test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering
+  tests/test_source_valid_transfer_integration.py:99: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering(
+
+tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries
+  tests/test_prepared_retrieval_integration.py:360: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_prepared_retrieval_preserves_default_and_scope_boundaries(
+
+tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet
+  tests/test_prepared_retrieval_integration.py:510: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_final_experimental_budget_preserves_facts_and_bounds_full_packet(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 5 warnings in 4.34s

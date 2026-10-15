@@ -1,0 +1,4383 @@
+{
+  "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38552651643",
+  "artifact_id": 11887353099,
+  "artifact_name": "source-native-v40-a011c7298f0731455799de2b19b4b7bb304876e8",
+  "head": "a011c7298f0731455799de2b19b4b7bb304876e8",
+  "assessment_sha256": "88f1ed6bdead1de688c62334d3e219fed41f98897538d8d161d0eeb9701f4a92",
+  "wheel_sha256": "d58b56129f91145d29935c1524f818a2cfae6b4e76506df854261f9dd8ffbce2",
+  "all_ci_wheel_product_files_match_checkout": true,
+  "counts": {
+    "strict_positive_pass": {
+      "passed": 22,
+      "assessed": 24
+    },
+    "strict_partial_documented_pass": {
+      "passed": 8,
+      "assessed": 8
+    },
+    "strict_negative_empty_source_pass": {
+      "passed": 0,
+      "assessed": 8
+    }
+  },
+  "exposed_cases": [
+    {
+      "dataset": 0,
+      "case_id": "V40-P03",
+      "arm": "V0",
+      "status": "returned",
+      "answerability": "within_budget",
+      "seconds": 7.399326191,
+      "answer_quality": "NOT MEASURED",
+      "unsupported_generated_claims": "NOT MEASURED",
+      "semantic_sufficiency": "NOT MEASURED: independent label-hidden review required",
+      "read_only_pass": true,
+      "runtime_integrity_errors": [],
+      "native": {
+        "exact_frozen_coverage": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": false,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": false,
+                  "parts": [
+                    {
+                      "witness_id": "V40-P03/required/set-0/part-0",
+                      "path": "docs/configuration.md",
+                      "line_start": 102,
+                      "line_end": 114,
+                      "covered": false,
+                      "char_start": 2805,
+                      "char_end": 3320,
+                      "expected_characters": 515,
+                      "covered_characters": 442,
+                      "missing_char_ranges": [
+                        [
+                          3247,
+                          3320
+                        ]
+                      ],
+                      "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                      "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 0,
+          "all_documented_claims_covered": false,
+          "missing_documented_claim_ids": [
+            "required"
+          ],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [
+            "V40-P03/required/set-0/part-0"
+          ],
+          "errors": []
+        },
+        "integrity_errors": [],
+        "public_call_and_integrity_pass": true,
+        "strict_positive_pass": false,
+        "strict_partial_documented_pass": null,
+        "source_count": 42,
+        "strict_negative_empty_source_pass": null,
+        "source_receipts": [
+          {
+            "source_index": 0,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-67e1fb39c35b657c",
+            "line_start": 249,
+            "line_end": 250,
+            "projection_fingerprint": "4093e2fafca125deba8068d93b8f4d06c45be884a7b3b15e050c1b166e6aeb32",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7393,
+                7519
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7393,
+                7519
+              ]
+            ]
+          },
+          {
+            "source_index": 1,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-acb183d44f02de92",
+            "line_start": 142,
+            "line_end": 149,
+            "projection_fingerprint": "dc447beaf05eb6b04dbc44bdea2603fccf4df898f735eee6905ce996d60737ac",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4236,
+                4436
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4236,
+                4436
+              ]
+            ]
+          },
+          {
+            "source_index": 2,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-def54b7ca9e63594",
+            "line_start": 164,
+            "line_end": 171,
+            "projection_fingerprint": "65c95bd4a3ef2bd88db9e22fabda0cc0a0d9f569c0cb5902cd7d907bc0b98e30",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                5489,
+                5689
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                5489,
+                5689
+              ]
+            ]
+          },
+          {
+            "source_index": 3,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-6159ada0d7c7575d",
+            "line_start": 455,
+            "line_end": 469,
+            "projection_fingerprint": "b209f9d39ab13a2ec57a0b8f14fa8478a34e5b5e4309d54ba1eb020fac134969",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13901,
+                14306
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13901,
+                14306
+              ]
+            ]
+          },
+          {
+            "source_index": 4,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-d875d22f1f2ce662",
+            "line_start": 484,
+            "line_end": 493,
+            "projection_fingerprint": "eca10158e119f372bd7085adb19ad75685ba6208a066b7912c1ea3d27e9c8d0b",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                14577,
+                15007
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                14577,
+                15007
+              ]
+            ]
+          },
+          {
+            "source_index": 5,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-dde0078fa9ebc0bc",
+            "line_start": 371,
+            "line_end": 375,
+            "projection_fingerprint": "27bd6e169d7aeeb8063f0e046646802f65ee42c6c43694ce46644e72c711da72",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                11132,
+                11373
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                11132,
+                11373
+              ]
+            ]
+          },
+          {
+            "source_index": 6,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-53fd7d2b68871221",
+            "line_start": 567,
+            "line_end": 579,
+            "projection_fingerprint": "cf5f16977c8f6acfaeb9cf08cda4a611fdde7939d9fc219a06fcb87642cc3d61",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                17730,
+                18083
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                17730,
+                18083
+              ]
+            ]
+          },
+          {
+            "source_index": 7,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-5c8273dae92b6366",
+            "line_start": 251,
+            "line_end": 260,
+            "projection_fingerprint": "5d79b3e8b5fecb8e834bd526bc0f9781aeca0225c43dcf9b0971a28b2af3e7cd",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7519,
+                7970
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7519,
+                7970
+              ]
+            ]
+          },
+          {
+            "source_index": 8,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-355f867e8b7be3f6",
+            "line_start": 38,
+            "line_end": 46,
+            "projection_fingerprint": "4b5b3b19b2663d675c54e4966426fd71938dc0bee5d6599c9c11f91a3621a369",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1011,
+                1363
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1011,
+                1363
+              ]
+            ]
+          },
+          {
+            "source_index": 9,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-83ff9c4b6ba97cfb",
+            "line_start": 102,
+            "line_end": 111,
+            "projection_fingerprint": "c644258651501101e3a9b8db8a150a5a34b5b09e23f9dc2ea90033cd9ec2703e",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2805,
+                3247
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2805,
+                3247
+              ]
+            ]
+          },
+          {
+            "source_index": 10,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-ec1c03e9551a2c25",
+            "line_start": 522,
+            "line_end": 525,
+            "projection_fingerprint": "4e7b45a9eae80b881c1ac267ecab4dcfeba8fabb5320c3e385bb025934817c4d",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15662,
+                15974
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15662,
+                15974
+              ]
+            ]
+          },
+          {
+            "source_index": 11,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-de4b7cd18a603bcd",
+            "line_start": 171,
+            "line_end": 178,
+            "projection_fingerprint": "91526f3a4ffd558c183bc5a1d68306c975f84f27973fe3474f7a6f93a02f1640",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4994,
+                5243
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4994,
+                5243
+              ]
+            ]
+          },
+          {
+            "source_index": 12,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-4bcca794c1d7564d",
+            "line_start": 155,
+            "line_end": 162,
+            "projection_fingerprint": "78eb603878bde72aaf53571c1369343ed1cf5dbedeadfa46c43f37d9892672df",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4396,
+                4658
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4396,
+                4658
+              ]
+            ]
+          },
+          {
+            "source_index": 13,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-0fe0fbbe0790262c",
+            "line_start": 553,
+            "line_end": 558,
+            "projection_fingerprint": "7587859f968f0255bb35b201f5475c7e56ccd2e8df069c3f5e1dd6f015ef96aa",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16996,
+                17342
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16996,
+                17342
+              ]
+            ]
+          },
+          {
+            "source_index": 14,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-571b5edfbdf5d19f",
+            "line_start": 368,
+            "line_end": 380,
+            "projection_fingerprint": "88cc238d6baa11b314482a7d8566f527e9f9806b049e3e7613cb3cc2af18ecf9",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                11283,
+                11564
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                11283,
+                11564
+              ]
+            ]
+          },
+          {
+            "source_index": 15,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-2714eb9fff237ee6",
+            "line_start": 92,
+            "line_end": 101,
+            "projection_fingerprint": "139e52dafced374e36a9e66f3a9afd00b087f8ab59c6b686adb4fcd2e3001e96",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2587,
+                2805
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2587,
+                2805
+              ]
+            ]
+          },
+          {
+            "source_index": 16,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-d65ddd832521a9d1",
+            "line_start": 613,
+            "line_end": 626,
+            "projection_fingerprint": "c5a1285ec5a753366989d6353c80247c03f81a04c7e223ef8efb618430088e14",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                19180,
+                19602
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                19180,
+                19602
+              ]
+            ]
+          },
+          {
+            "source_index": 17,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-5b69fcd25939d147",
+            "line_start": 81,
+            "line_end": 91,
+            "projection_fingerprint": "476ca1d2b0e3a518bc14379ad3378e9506e4a7aca6f91bd393bbf94e02dc2aaa",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2265,
+                2587
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2265,
+                2587
+              ]
+            ]
+          },
+          {
+            "source_index": 18,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-b2d313295d18ad9e",
+            "line_start": 70,
+            "line_end": 80,
+            "projection_fingerprint": "8dfb2b232142d4ede1cc432ae30b7c230fa7f7f14176441a7454aeaafc311a54",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1986,
+                2265
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1986,
+                2265
+              ]
+            ]
+          },
+          {
+            "source_index": 19,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-56bcd79bf04c46f9",
+            "line_start": 195,
+            "line_end": 209,
+            "projection_fingerprint": "bd3cde4c32b50723e96957ed3c424ddc6a97220ad782f3eb18be99afa9c07ad0",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                5578,
+                6023
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                5578,
+                6023
+              ]
+            ]
+          },
+          {
+            "source_index": 20,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-77eb3c52a5788d92",
+            "line_start": 398,
+            "line_end": 409,
+            "projection_fingerprint": "5ac46f6b218c4a379ed682137fb1b8cedcd449c7c20a4152ed92963bd29cf535",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12049,
+                12290
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12049,
+                12290
+              ]
+            ]
+          },
+          {
+            "source_index": 21,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-6dc2d0df8539458d",
+            "line_start": 627,
+            "line_end": 639,
+            "projection_fingerprint": "0fa62a78bd6b063be0959978d1612b4755a025718287ac235b81e664e7b2f6e2",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                19602,
+                19950
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                19602,
+                19950
+              ]
+            ]
+          },
+          {
+            "source_index": 22,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-a37a551222add144",
+            "line_start": 122,
+            "line_end": 131,
+            "projection_fingerprint": "545613df4249ab23596af3f194ea00e583072329c2c07fe95950b26ebac95904",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                3446,
+                3785
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                3446,
+                3785
+              ]
+            ]
+          },
+          {
+            "source_index": 23,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-0e49be80ea695979",
+            "line_start": 393,
+            "line_end": 397,
+            "projection_fingerprint": "c98c2d7f7205612fd295271fe8bd2260aa054368303aca41eed1a948538445d7",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                11766,
+                12049
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                11766,
+                12049
+              ]
+            ]
+          },
+          {
+            "source_index": 24,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-4a4ff80da98d0102",
+            "line_start": 531,
+            "line_end": 539,
+            "projection_fingerprint": "96188cd3c2ecaf7e237161ef5835d2c11a0c46bed9692e89e9f1303b1d35072d",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16176,
+                16629
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16176,
+                16629
+              ]
+            ]
+          },
+          {
+            "source_index": 25,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-2508726a5b12af93",
+            "line_start": 420,
+            "line_end": 426,
+            "projection_fingerprint": "cf614aa231aeb312a3e9fb585fba5da99daaef4330192af9348c8dd83ce2388a",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12434,
+                12856
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12434,
+                12856
+              ]
+            ]
+          },
+          {
+            "source_index": 26,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-bcf8c900da46b8aa",
+            "line_start": 767,
+            "line_end": 778,
+            "projection_fingerprint": "f586b7ddf68036869c7079d840e5fa7d501d71c2a6c98bbd8684e4f69635393d",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                22473,
+                22802
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                22473,
+                22802
+              ]
+            ]
+          },
+          {
+            "source_index": 27,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-2205d0cecb9d7437",
+            "line_start": 559,
+            "line_end": 566,
+            "projection_fingerprint": "605e6e91a52f924d7aec8efe31919ea28d75e8287fabecf357314da1c08721a4",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                17342,
+                17730
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                17342,
+                17730
+              ]
+            ]
+          },
+          {
+            "source_index": 28,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-d168ac5d43b181da",
+            "line_start": 163,
+            "line_end": 170,
+            "projection_fingerprint": "b5de1278638d915d57b094d6c377c7f8115b130ecae220e33e03d4a908f15526",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4658,
+                4994
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4658,
+                4994
+              ]
+            ]
+          },
+          {
+            "source_index": 29,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-87b1a21513119b17",
+            "line_start": 449,
+            "line_end": 454,
+            "projection_fingerprint": "7d51169fb6116d0f78e320120fdcfa2b8c6973e9c0ce30dad366bac055658295",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13677,
+                13901
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13677,
+                13901
+              ]
+            ]
+          },
+          {
+            "source_index": 30,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-14f109d976fb355a",
+            "line_start": 441,
+            "line_end": 448,
+            "projection_fingerprint": "1c3f747c68b0dce0ab3ce67f0e20b3cbbc059da92231751df5fb6dda3b17e3cb",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13266,
+                13677
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13266,
+                13677
+              ]
+            ]
+          },
+          {
+            "source_index": 31,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-4672c6777f9ed236",
+            "line_start": 512,
+            "line_end": 521,
+            "projection_fingerprint": "c785e164038b510d168423597967fdff9af190eb0104e194ff8dfd5c58d37e1a",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15475,
+                15662
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15475,
+                15662
+              ]
+            ]
+          },
+          {
+            "source_index": 32,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-dded5534a890db22",
+            "line_start": 320,
+            "line_end": 324,
+            "projection_fingerprint": "4c1e8860fb4d630498fcdf0f67dcb0d6e978ec9b07125cf95c661535ebbbb7d6",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                9288,
+                9590
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                9288,
+                9590
+              ]
+            ]
+          },
+          {
+            "source_index": 33,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-c3bbd10d56e85d9d",
+            "line_start": 37,
+            "line_end": 40,
+            "projection_fingerprint": "9f6e9e8fae7c42bb9559e17c392e9da7262d91b3069e9bde57c9aee0c1dd9249",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                734,
+                940
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                734,
+                940
+              ]
+            ]
+          },
+          {
+            "source_index": 34,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-db7159a057cbb95f",
+            "line_start": 47,
+            "line_end": 60,
+            "projection_fingerprint": "6eed08d194250e6387b840c7989950d35801db8cdb9dc103f1dee8192cff3bf3",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1336,
+                1661
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1336,
+                1661
+              ]
+            ]
+          },
+          {
+            "source_index": 35,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-c22641d268fc666e",
+            "line_start": 354,
+            "line_end": 367,
+            "projection_fingerprint": "9de1e0335bdcc653c6dbbcfe3372cd7f7fc73715b6f32cea8d8311b78dce5a22",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                10897,
+                11283
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                10897,
+                11283
+              ]
+            ]
+          },
+          {
+            "source_index": 36,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-0c9eed813838586c",
+            "line_start": 310,
+            "line_end": 319,
+            "projection_fingerprint": "b87d53b286b29d85e41c495d893b311570113a14c3d8a7915b3d7d07acb86014",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                9123,
+                9288
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                9123,
+                9288
+              ]
+            ]
+          },
+          {
+            "source_index": 37,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-91af68a54b8915dc",
+            "line_start": 410,
+            "line_end": 419,
+            "projection_fingerprint": "00b7f84d305d0e669d1a53cf69cf58590612d3b2b4c4b647e28e4495d0052c8c",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12290,
+                12434
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12290,
+                12434
+              ]
+            ]
+          },
+          {
+            "source_index": 38,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-c99b7a5886a130d5",
+            "line_start": 87,
+            "line_end": 92,
+            "projection_fingerprint": "cb509d5bcb59d031f855240fcc107ebd4fd7201f8d7a0a26a8bfd8ab80fd5495",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2476,
+                2838
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2476,
+                2838
+              ]
+            ]
+          },
+          {
+            "source_index": 39,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-39010347e99e9b42",
+            "line_start": 172,
+            "line_end": 177,
+            "projection_fingerprint": "aa0ecf608c86a4a453648c272782cbf0323ebf180eb5e0d7dd485d2041842989",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                5689,
+                6024
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                5689,
+                6024
+              ]
+            ]
+          },
+          {
+            "source_index": 40,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-aa34a156fbeeb0c4",
+            "line_start": 261,
+            "line_end": 274,
+            "projection_fingerprint": "d90140d092af11f0e1863ae49b56c8dc299dda17e78a9966258d50269f42072a",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7970,
+                8253
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7970,
+                8253
+              ]
+            ]
+          },
+          {
+            "source_index": 41,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-4972b01dc6498b00",
+            "line_start": 430,
+            "line_end": 440,
+            "projection_fingerprint": "9675cfca1c13497627cee237b77fd364ff92574068c15b0ff4e3c890405932e4",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12915,
+                13367
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12915,
+                13367
+              ]
+            ]
+          }
+        ]
+      },
+      "packed": {
+        "exact_frozen_coverage": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": false,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": false,
+                  "parts": [
+                    {
+                      "witness_id": "V40-P03/required/set-0/part-0",
+                      "path": "docs/configuration.md",
+                      "line_start": 102,
+                      "line_end": 114,
+                      "covered": false,
+                      "char_start": 2805,
+                      "char_end": 3320,
+                      "expected_characters": 515,
+                      "covered_characters": 442,
+                      "missing_char_ranges": [
+                        [
+                          3247,
+                          3320
+                        ]
+                      ],
+                      "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                      "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 0,
+          "all_documented_claims_covered": false,
+          "missing_documented_claim_ids": [
+            "required"
+          ],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [
+            "V40-P03/required/set-0/part-0"
+          ],
+          "errors": []
+        },
+        "integrity_errors": [],
+        "public_call_and_integrity_pass": true,
+        "strict_positive_pass": false,
+        "strict_partial_documented_pass": null,
+        "source_count": 42,
+        "strict_negative_empty_source_pass": null,
+        "source_receipts": [
+          {
+            "source_index": 0,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-67e1fb39c35b657c",
+            "line_start": 249,
+            "line_end": 250,
+            "projection_fingerprint": "4093e2fafca125deba8068d93b8f4d06c45be884a7b3b15e050c1b166e6aeb32",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7393,
+                7519
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7393,
+                7519
+              ]
+            ]
+          },
+          {
+            "source_index": 1,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-acb183d44f02de92",
+            "line_start": 142,
+            "line_end": 149,
+            "projection_fingerprint": "dc447beaf05eb6b04dbc44bdea2603fccf4df898f735eee6905ce996d60737ac",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4236,
+                4436
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4236,
+                4436
+              ]
+            ]
+          },
+          {
+            "source_index": 2,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-def54b7ca9e63594",
+            "line_start": 164,
+            "line_end": 171,
+            "projection_fingerprint": "65c95bd4a3ef2bd88db9e22fabda0cc0a0d9f569c0cb5902cd7d907bc0b98e30",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                5489,
+                5689
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                5489,
+                5689
+              ]
+            ]
+          },
+          {
+            "source_index": 3,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-6159ada0d7c7575d",
+            "line_start": 455,
+            "line_end": 469,
+            "projection_fingerprint": "b209f9d39ab13a2ec57a0b8f14fa8478a34e5b5e4309d54ba1eb020fac134969",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13901,
+                14306
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13901,
+                14306
+              ]
+            ]
+          },
+          {
+            "source_index": 4,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-d875d22f1f2ce662",
+            "line_start": 484,
+            "line_end": 493,
+            "projection_fingerprint": "eca10158e119f372bd7085adb19ad75685ba6208a066b7912c1ea3d27e9c8d0b",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                14577,
+                15007
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                14577,
+                15007
+              ]
+            ]
+          },
+          {
+            "source_index": 5,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-dde0078fa9ebc0bc",
+            "line_start": 371,
+            "line_end": 375,
+            "projection_fingerprint": "27bd6e169d7aeeb8063f0e046646802f65ee42c6c43694ce46644e72c711da72",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                11132,
+                11373
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                11132,
+                11373
+              ]
+            ]
+          },
+          {
+            "source_index": 6,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-53fd7d2b68871221",
+            "line_start": 567,
+            "line_end": 579,
+            "projection_fingerprint": "cf5f16977c8f6acfaeb9cf08cda4a611fdde7939d9fc219a06fcb87642cc3d61",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                17730,
+                18083
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                17730,
+                18083
+              ]
+            ]
+          },
+          {
+            "source_index": 7,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-5c8273dae92b6366",
+            "line_start": 251,
+            "line_end": 260,
+            "projection_fingerprint": "5d79b3e8b5fecb8e834bd526bc0f9781aeca0225c43dcf9b0971a28b2af3e7cd",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7519,
+                7970
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7519,
+                7970
+              ]
+            ]
+          },
+          {
+            "source_index": 8,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-355f867e8b7be3f6",
+            "line_start": 38,
+            "line_end": 46,
+            "projection_fingerprint": "4b5b3b19b2663d675c54e4966426fd71938dc0bee5d6599c9c11f91a3621a369",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1011,
+                1363
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1011,
+                1363
+              ]
+            ]
+          },
+          {
+            "source_index": 9,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-83ff9c4b6ba97cfb",
+            "line_start": 102,
+            "line_end": 111,
+            "projection_fingerprint": "c644258651501101e3a9b8db8a150a5a34b5b09e23f9dc2ea90033cd9ec2703e",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2805,
+                3247
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2805,
+                3247
+              ]
+            ]
+          },
+          {
+            "source_index": 10,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-ec1c03e9551a2c25",
+            "line_start": 522,
+            "line_end": 525,
+            "projection_fingerprint": "4e7b45a9eae80b881c1ac267ecab4dcfeba8fabb5320c3e385bb025934817c4d",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15662,
+                15974
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15662,
+                15974
+              ]
+            ]
+          },
+          {
+            "source_index": 11,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-de4b7cd18a603bcd",
+            "line_start": 171,
+            "line_end": 178,
+            "projection_fingerprint": "91526f3a4ffd558c183bc5a1d68306c975f84f27973fe3474f7a6f93a02f1640",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4994,
+                5243
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4994,
+                5243
+              ]
+            ]
+          },
+          {
+            "source_index": 12,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-4bcca794c1d7564d",
+            "line_start": 155,
+            "line_end": 162,
+            "projection_fingerprint": "78eb603878bde72aaf53571c1369343ed1cf5dbedeadfa46c43f37d9892672df",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4396,
+                4658
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4396,
+                4658
+              ]
+            ]
+          },
+          {
+            "source_index": 13,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-0fe0fbbe0790262c",
+            "line_start": 553,
+            "line_end": 558,
+            "projection_fingerprint": "7587859f968f0255bb35b201f5475c7e56ccd2e8df069c3f5e1dd6f015ef96aa",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16996,
+                17342
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16996,
+                17342
+              ]
+            ]
+          },
+          {
+            "source_index": 14,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-571b5edfbdf5d19f",
+            "line_start": 368,
+            "line_end": 380,
+            "projection_fingerprint": "88cc238d6baa11b314482a7d8566f527e9f9806b049e3e7613cb3cc2af18ecf9",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                11283,
+                11564
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                11283,
+                11564
+              ]
+            ]
+          },
+          {
+            "source_index": 15,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-2714eb9fff237ee6",
+            "line_start": 92,
+            "line_end": 101,
+            "projection_fingerprint": "139e52dafced374e36a9e66f3a9afd00b087f8ab59c6b686adb4fcd2e3001e96",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2587,
+                2805
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2587,
+                2805
+              ]
+            ]
+          },
+          {
+            "source_index": 16,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-d65ddd832521a9d1",
+            "line_start": 613,
+            "line_end": 626,
+            "projection_fingerprint": "c5a1285ec5a753366989d6353c80247c03f81a04c7e223ef8efb618430088e14",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                19180,
+                19602
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                19180,
+                19602
+              ]
+            ]
+          },
+          {
+            "source_index": 17,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-5b69fcd25939d147",
+            "line_start": 81,
+            "line_end": 91,
+            "projection_fingerprint": "476ca1d2b0e3a518bc14379ad3378e9506e4a7aca6f91bd393bbf94e02dc2aaa",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2265,
+                2587
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2265,
+                2587
+              ]
+            ]
+          },
+          {
+            "source_index": 18,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-b2d313295d18ad9e",
+            "line_start": 70,
+            "line_end": 80,
+            "projection_fingerprint": "8dfb2b232142d4ede1cc432ae30b7c230fa7f7f14176441a7454aeaafc311a54",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1986,
+                2265
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1986,
+                2265
+              ]
+            ]
+          },
+          {
+            "source_index": 19,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-56bcd79bf04c46f9",
+            "line_start": 195,
+            "line_end": 209,
+            "projection_fingerprint": "bd3cde4c32b50723e96957ed3c424ddc6a97220ad782f3eb18be99afa9c07ad0",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                5578,
+                6023
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                5578,
+                6023
+              ]
+            ]
+          },
+          {
+            "source_index": 20,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-77eb3c52a5788d92",
+            "line_start": 398,
+            "line_end": 409,
+            "projection_fingerprint": "5ac46f6b218c4a379ed682137fb1b8cedcd449c7c20a4152ed92963bd29cf535",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12049,
+                12290
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12049,
+                12290
+              ]
+            ]
+          },
+          {
+            "source_index": 21,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-6dc2d0df8539458d",
+            "line_start": 627,
+            "line_end": 639,
+            "projection_fingerprint": "0fa62a78bd6b063be0959978d1612b4755a025718287ac235b81e664e7b2f6e2",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                19602,
+                19950
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                19602,
+                19950
+              ]
+            ]
+          },
+          {
+            "source_index": 22,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-a37a551222add144",
+            "line_start": 122,
+            "line_end": 131,
+            "projection_fingerprint": "545613df4249ab23596af3f194ea00e583072329c2c07fe95950b26ebac95904",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                3446,
+                3785
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                3446,
+                3785
+              ]
+            ]
+          },
+          {
+            "source_index": 23,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-0e49be80ea695979",
+            "line_start": 393,
+            "line_end": 397,
+            "projection_fingerprint": "c98c2d7f7205612fd295271fe8bd2260aa054368303aca41eed1a948538445d7",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                11766,
+                12049
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                11766,
+                12049
+              ]
+            ]
+          },
+          {
+            "source_index": 24,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-4a4ff80da98d0102",
+            "line_start": 531,
+            "line_end": 539,
+            "projection_fingerprint": "96188cd3c2ecaf7e237161ef5835d2c11a0c46bed9692e89e9f1303b1d35072d",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16176,
+                16629
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16176,
+                16629
+              ]
+            ]
+          },
+          {
+            "source_index": 25,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-2508726a5b12af93",
+            "line_start": 420,
+            "line_end": 426,
+            "projection_fingerprint": "cf614aa231aeb312a3e9fb585fba5da99daaef4330192af9348c8dd83ce2388a",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12434,
+                12856
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12434,
+                12856
+              ]
+            ]
+          },
+          {
+            "source_index": 26,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-bcf8c900da46b8aa",
+            "line_start": 767,
+            "line_end": 778,
+            "projection_fingerprint": "f586b7ddf68036869c7079d840e5fa7d501d71c2a6c98bbd8684e4f69635393d",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                22473,
+                22802
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                22473,
+                22802
+              ]
+            ]
+          },
+          {
+            "source_index": 27,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-2205d0cecb9d7437",
+            "line_start": 559,
+            "line_end": 566,
+            "projection_fingerprint": "605e6e91a52f924d7aec8efe31919ea28d75e8287fabecf357314da1c08721a4",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                17342,
+                17730
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                17342,
+                17730
+              ]
+            ]
+          },
+          {
+            "source_index": 28,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-d168ac5d43b181da",
+            "line_start": 163,
+            "line_end": 170,
+            "projection_fingerprint": "b5de1278638d915d57b094d6c377c7f8115b130ecae220e33e03d4a908f15526",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4658,
+                4994
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4658,
+                4994
+              ]
+            ]
+          },
+          {
+            "source_index": 29,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-87b1a21513119b17",
+            "line_start": 449,
+            "line_end": 454,
+            "projection_fingerprint": "7d51169fb6116d0f78e320120fdcfa2b8c6973e9c0ce30dad366bac055658295",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13677,
+                13901
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13677,
+                13901
+              ]
+            ]
+          },
+          {
+            "source_index": 30,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-14f109d976fb355a",
+            "line_start": 441,
+            "line_end": 448,
+            "projection_fingerprint": "1c3f747c68b0dce0ab3ce67f0e20b3cbbc059da92231751df5fb6dda3b17e3cb",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13266,
+                13677
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13266,
+                13677
+              ]
+            ]
+          },
+          {
+            "source_index": 31,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-4672c6777f9ed236",
+            "line_start": 512,
+            "line_end": 521,
+            "projection_fingerprint": "c785e164038b510d168423597967fdff9af190eb0104e194ff8dfd5c58d37e1a",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15475,
+                15662
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15475,
+                15662
+              ]
+            ]
+          },
+          {
+            "source_index": 32,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-dded5534a890db22",
+            "line_start": 320,
+            "line_end": 324,
+            "projection_fingerprint": "4c1e8860fb4d630498fcdf0f67dcb0d6e978ec9b07125cf95c661535ebbbb7d6",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                9288,
+                9590
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                9288,
+                9590
+              ]
+            ]
+          },
+          {
+            "source_index": 33,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-c3bbd10d56e85d9d",
+            "line_start": 37,
+            "line_end": 40,
+            "projection_fingerprint": "9f6e9e8fae7c42bb9559e17c392e9da7262d91b3069e9bde57c9aee0c1dd9249",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                734,
+                940
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                734,
+                940
+              ]
+            ]
+          },
+          {
+            "source_index": 34,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-db7159a057cbb95f",
+            "line_start": 47,
+            "line_end": 60,
+            "projection_fingerprint": "6eed08d194250e6387b840c7989950d35801db8cdb9dc103f1dee8192cff3bf3",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1336,
+                1661
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1336,
+                1661
+              ]
+            ]
+          },
+          {
+            "source_index": 35,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-c22641d268fc666e",
+            "line_start": 354,
+            "line_end": 367,
+            "projection_fingerprint": "9de1e0335bdcc653c6dbbcfe3372cd7f7fc73715b6f32cea8d8311b78dce5a22",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                10897,
+                11283
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                10897,
+                11283
+              ]
+            ]
+          },
+          {
+            "source_index": 36,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-0c9eed813838586c",
+            "line_start": 310,
+            "line_end": 319,
+            "projection_fingerprint": "b87d53b286b29d85e41c495d893b311570113a14c3d8a7915b3d7d07acb86014",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                9123,
+                9288
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                9123,
+                9288
+              ]
+            ]
+          },
+          {
+            "source_index": 37,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-91af68a54b8915dc",
+            "line_start": 410,
+            "line_end": 419,
+            "projection_fingerprint": "00b7f84d305d0e669d1a53cf69cf58590612d3b2b4c4b647e28e4495d0052c8c",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12290,
+                12434
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12290,
+                12434
+              ]
+            ]
+          },
+          {
+            "source_index": 38,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-c99b7a5886a130d5",
+            "line_start": 87,
+            "line_end": 92,
+            "projection_fingerprint": "cb509d5bcb59d031f855240fcc107ebd4fd7201f8d7a0a26a8bfd8ab80fd5495",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2476,
+                2838
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2476,
+                2838
+              ]
+            ]
+          },
+          {
+            "source_index": 39,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-39010347e99e9b42",
+            "line_start": 172,
+            "line_end": 177,
+            "projection_fingerprint": "aa0ecf608c86a4a453648c272782cbf0323ebf180eb5e0d7dd485d2041842989",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                5689,
+                6024
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                5689,
+                6024
+              ]
+            ]
+          },
+          {
+            "source_index": 40,
+            "path_or_url": "docs/configuration.md",
+            "relative_path": "docs/configuration.md",
+            "evidence_id": "ev-aa34a156fbeeb0c4",
+            "line_start": 261,
+            "line_end": 274,
+            "projection_fingerprint": "d90140d092af11f0e1863ae49b56c8dc299dda17e78a9966258d50269f42072a",
+            "pinned_raw_file_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7970,
+                8253
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7970,
+                8253
+              ]
+            ]
+          },
+          {
+            "source_index": 41,
+            "path_or_url": "docs/dependency-specification.md",
+            "relative_path": "docs/dependency-specification.md",
+            "evidence_id": "ev-4972b01dc6498b00",
+            "line_start": 430,
+            "line_end": 440,
+            "projection_fingerprint": "9675cfca1c13497627cee237b77fd364ff92574068c15b0ff4e3c890405932e4",
+            "pinned_raw_file_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                12915,
+                13367
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                12915,
+                13367
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "dataset": 0,
+      "case_id": "V40-E01",
+      "arm": "V0",
+      "status": "returned",
+      "answerability": "within_budget",
+      "seconds": 11.048530594999988,
+      "answer_quality": "NOT MEASURED",
+      "unsupported_generated_claims": "NOT MEASURED",
+      "semantic_sufficiency": "NOT MEASURED: independent label-hidden review required",
+      "read_only_pass": true,
+      "runtime_integrity_errors": [],
+      "native": {
+        "exact_frozen_coverage": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": false,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": false,
+                  "parts": [
+                    {
+                      "witness_id": "V40-E01/required/set-0/part-0",
+                      "path": "docs/src/use/configure/configuration-files.md",
+                      "line_start": 19,
+                      "line_end": 30,
+                      "covered": false,
+                      "char_start": 584,
+                      "char_end": 1141,
+                      "expected_characters": 557,
+                      "covered_characters": 0,
+                      "missing_char_ranges": [
+                        [
+                          584,
+                          1141
+                        ]
+                      ],
+                      "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                      "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 0,
+          "all_documented_claims_covered": false,
+          "missing_documented_claim_ids": [
+            "required"
+          ],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [
+            "V40-E01/required/set-0/part-0"
+          ],
+          "errors": []
+        },
+        "integrity_errors": [],
+        "public_call_and_integrity_pass": true,
+        "strict_positive_pass": false,
+        "strict_partial_documented_pass": null,
+        "source_count": 40,
+        "strict_negative_empty_source_pass": null,
+        "source_receipts": [
+          {
+            "source_index": 0,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-38f8e52fd84aed3d",
+            "line_start": 546,
+            "line_end": 562,
+            "projection_fingerprint": "94dc0b9bba8c6d9e87a96e1f92bf7ef4d7123643f3bc055880bbcb956b73352b",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                22478,
+                22906
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                22478,
+                22906
+              ]
+            ]
+          },
+          {
+            "source_index": 1,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-51163e76b66771ff",
+            "line_start": 110,
+            "line_end": 111,
+            "projection_fingerprint": "44c6254e0209a976cf07cd7740fabd12be2135ff3fae294bc8dfe4e722b43900",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4215,
+                4461
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4215,
+                4461
+              ]
+            ]
+          },
+          {
+            "source_index": 2,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-85c1cac5382811da",
+            "line_start": 1,
+            "line_end": 15,
+            "projection_fingerprint": "cd5f223016d5f928b7ad8fdf515d1c59128953617947f9634479488ce4f5bc09",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                0,
+                274
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                0,
+                274
+              ]
+            ]
+          },
+          {
+            "source_index": 3,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-0cf3b8c380629a1b",
+            "line_start": 179,
+            "line_end": 183,
+            "projection_fingerprint": "08f93db02f66919d5d5982bd06b9250c56a9da51349a178e43c52cbfe1c64b46",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                9476,
+                9864
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                9476,
+                9864
+              ]
+            ]
+          },
+          {
+            "source_index": 4,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-ece758f18a32fed4",
+            "line_start": 354,
+            "line_end": 357,
+            "projection_fingerprint": "85f3337c2a34ee26ce21f75ddf10f191fc59cd0ad97e7b72447b5fdc115d6ebe",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16483,
+                16639
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16483,
+                16639
+              ]
+            ]
+          },
+          {
+            "source_index": 5,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-397a2df03b63da27",
+            "line_start": 381,
+            "line_end": 382,
+            "projection_fingerprint": "ba2cafde92b64ad7b776d9c5e63d1d09ac35d7dad5ebfb7e194f6d71d1a0f192",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13565,
+                13715
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13565,
+                13715
+              ]
+            ]
+          },
+          {
+            "source_index": 6,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-fdbd52d63ebd6d2a",
+            "line_start": 95,
+            "line_end": 96,
+            "projection_fingerprint": "ad4472134ab5a34fa442e6ddbea2cca2ecedc62330ce7a0ece3318320ec63919",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                6651,
+                6803
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                6651,
+                6803
+              ]
+            ]
+          },
+          {
+            "source_index": 7,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-57c2929844b911cb",
+            "line_start": 1,
+            "line_end": 16,
+            "projection_fingerprint": "843cfec294464a24eefc108cb64205bfbb9d8b2b4d094d4fa83333fcbd03ba76",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                0,
+                349
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                0,
+                349
+              ]
+            ]
+          },
+          {
+            "source_index": 8,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-3621a40c5a4b6009",
+            "line_start": 202,
+            "line_end": 205,
+            "projection_fingerprint": "929a291af6d663c73a1e192c98fe2b42ed69f04e091ad67807ea636e79345a87",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                10522,
+                10769
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                10522,
+                10769
+              ]
+            ]
+          },
+          {
+            "source_index": 9,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-908dcac9d8221d05",
+            "line_start": 108,
+            "line_end": 109,
+            "projection_fingerprint": "f038caa805856bb34abcaa1a26e0adea49ea145318337ed8142a90f5e4c0bc6e",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                3884,
+                4215
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                3884,
+                4215
+              ]
+            ]
+          },
+          {
+            "source_index": 10,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-446840216455eec9",
+            "line_start": 393,
+            "line_end": 427,
+            "projection_fingerprint": "2de477774c5ae27d2c97866b4dae34b393128ee51a414002d7bb9b1f90825557",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                17375,
+                17955
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                17375,
+                17955
+              ]
+            ]
+          },
+          {
+            "source_index": 11,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-e19c4c30e914a763",
+            "line_start": 358,
+            "line_end": 390,
+            "projection_fingerprint": "b3de8e899b9b0474f9d80c3e19570e8bec6295dda32b366292ab46172c81e739",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16639,
+                17196
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16639,
+                17196
+              ]
+            ]
+          },
+          {
+            "source_index": 12,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-353eb2685566019b",
+            "line_start": 17,
+            "line_end": 18,
+            "projection_fingerprint": "0490047c1aad946591dc44eb6bee78481a9ca203f5615d7613ad5714a180b7a6",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                349,
+                584
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                349,
+                584
+              ]
+            ]
+          },
+          {
+            "source_index": 13,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-4f3cc04527f94c4c",
+            "line_start": 42,
+            "line_end": 48,
+            "projection_fingerprint": "6d7f473fc7d93023503cb8a1263ead9580231fc61a53d4f57159fa8afd32e330",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1080,
+                1460
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1080,
+                1460
+              ]
+            ]
+          },
+          {
+            "source_index": 14,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-c0eddfd22cbcca6a",
+            "line_start": 602,
+            "line_end": 607,
+            "projection_fingerprint": "6874c06293afcdf7fee04e30ef15b79727c7e050049d799a7e05cdafb658dfa1",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                23948,
+                24408
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                23948,
+                24408
+              ]
+            ]
+          },
+          {
+            "source_index": 15,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-d7b356a5ef1ee0b0",
+            "line_start": 211,
+            "line_end": 212,
+            "projection_fingerprint": "0a09d8a24d2afacf7642094f78281a075949c4e86d84612bf86c7b73d5581fdd",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                8347,
+                8571
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                8347,
+                8571
+              ]
+            ]
+          },
+          {
+            "source_index": 16,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-12f5fccbed65f7a9",
+            "line_start": 35,
+            "line_end": 38,
+            "projection_fingerprint": "db216761ac7edad91347fc91ee43a4ba2dd64a4728d4286c653b9d6547e0d90d",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1247,
+                1622
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1247,
+                1622
+              ]
+            ]
+          },
+          {
+            "source_index": 17,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-41e4240ded91ccf1",
+            "line_start": 69,
+            "line_end": 70,
+            "projection_fingerprint": "d0d7ad86d7090f9af541f5ef79bff6a256cae9c698d4ef0e1c0dd68feb6d7fdc",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2375,
+                2743
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2375,
+                2743
+              ]
+            ]
+          },
+          {
+            "source_index": 18,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-9c5837af950f7701",
+            "line_start": 95,
+            "line_end": 107,
+            "projection_fingerprint": "539ece7c1c34a693c0ba57cab615d38b56e30562b9a22ce5defd8fd31960b9b0",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                3558,
+                3884
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                3558,
+                3884
+              ]
+            ]
+          },
+          {
+            "source_index": 19,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-c7e173a2b62d6955",
+            "line_start": 731,
+            "line_end": 734,
+            "projection_fingerprint": "01019841054b7804fa73c67721b6caff022f603ed9d3c5711e4f0bd6f46e9b44",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                29680,
+                29998
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                29680,
+                29998
+              ]
+            ]
+          },
+          {
+            "source_index": 20,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-39b182391215b79c",
+            "line_start": 592,
+            "line_end": 601,
+            "projection_fingerprint": "d00684019b789450f64c14ad6b2d86c68a5aa9ddcea7ee65d9fa8a6765e80256",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                19527,
+                19851
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                19527,
+                19851
+              ]
+            ]
+          },
+          {
+            "source_index": 21,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-12af9e3462998530",
+            "line_start": 715,
+            "line_end": 716,
+            "projection_fingerprint": "b089d0e9f4834dac4149e146270ced2dd8b5dc6847ea54bf15344275a4b43c0f",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                24656,
+                25391
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                24656,
+                25391
+              ]
+            ]
+          },
+          {
+            "source_index": 22,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-d9b3bc0dad6ce0e6",
+            "line_start": 181,
+            "line_end": 189,
+            "projection_fingerprint": "f35d9780da93c0f5cf8e7c6060b781c3a7b0fef6782ad28b1862fb99cdff81a3",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7213,
+                7480
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7213,
+                7480
+              ]
+            ]
+          },
+          {
+            "source_index": 23,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-691542caa34246a5",
+            "line_start": 63,
+            "line_end": 75,
+            "projection_fingerprint": "bb535ce66c7ae255e8fdbb2e7ae7069a0754a4faca5dbdb0db19cecbe010fb03",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1904,
+                2307
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1904,
+                2307
+              ]
+            ]
+          },
+          {
+            "source_index": 24,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-c3aa6bd15c438f6a",
+            "line_start": 498,
+            "line_end": 504,
+            "projection_fingerprint": "5ef8d07c29b45d12e7bfcac9989ac87ab2c79bc59f6389caa61e67ed5bc1a4ee",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16918,
+                17312
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16918,
+                17312
+              ]
+            ]
+          },
+          {
+            "source_index": 25,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-25b2bce163f0464d",
+            "line_start": 643,
+            "line_end": 650,
+            "projection_fingerprint": "118e5314ac1e47750f9032e2c533c6579bdb81f9d64437412eb4abd60f98a270",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                21133,
+                21536
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                21133,
+                21536
+              ]
+            ]
+          },
+          {
+            "source_index": 26,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-229b8c568485ad25",
+            "line_start": 190,
+            "line_end": 195,
+            "projection_fingerprint": "38b3efd6f71895b1a147e5b442e70109ba616d102916fc4660343759791ae7c0",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7480,
+                7849
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7480,
+                7849
+              ]
+            ]
+          },
+          {
+            "source_index": 27,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-4ff482daec3c5bc4",
+            "line_start": 174,
+            "line_end": 186,
+            "projection_fingerprint": "93bcc6b6bee37161dfb817090d88b32975ed5bb615a32301683ab3962516e5aa",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7275,
+                7729
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7275,
+                7729
+              ]
+            ]
+          },
+          {
+            "source_index": 28,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-5be3f9b8cad56339",
+            "line_start": 295,
+            "line_end": 299,
+            "projection_fingerprint": "b0ab1f28622a28411e4b5f9e98e9a7ba9de5ef1d691be6d04db5c310eadddf4e",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                14354,
+                14700
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                14354,
+                14700
+              ]
+            ]
+          },
+          {
+            "source_index": 29,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-b740b6e87dd45842",
+            "line_start": 64,
+            "line_end": 68,
+            "projection_fingerprint": "e84039c9096631d2e246856da877ab9d6958e80b35628b26d418b83e2e7104ee",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1927,
+                2375
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1927,
+                2375
+              ]
+            ]
+          },
+          {
+            "source_index": 30,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-e0e908cec695baaf",
+            "line_start": 49,
+            "line_end": 62,
+            "projection_fingerprint": "4448ba3095b9714267a093e0fc7aaf3d12482e9281488f618402501477c2d074",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1460,
+                1904
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1460,
+                1904
+              ]
+            ]
+          },
+          {
+            "source_index": 31,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-45af42131aa18688",
+            "line_start": 46,
+            "line_end": 49,
+            "projection_fingerprint": "38e0bccaca64414c42af695fcb6a1f32ce3855efa0ecfa937ef49d49b76817c5",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1324,
+                1739
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1324,
+                1739
+              ]
+            ]
+          },
+          {
+            "source_index": 32,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-d2ff913f81a68eb3",
+            "line_start": 436,
+            "line_end": 442,
+            "projection_fingerprint": "ce4c2e405f03764dc9530548ca7c01b4eabc5cf6066249a9d29ca9e297a38123",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15185,
+                15613
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15185,
+                15613
+              ]
+            ]
+          },
+          {
+            "source_index": 33,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-9c7044c45da8f227",
+            "line_start": 717,
+            "line_end": 718,
+            "projection_fingerprint": "dc12903caafce891ca60da9b451d8d30930879de54a63d18e0df4b03d36d5879",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                25391,
+                25967
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                25391,
+                25967
+              ]
+            ]
+          },
+          {
+            "source_index": 34,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-95b361078bec9d35",
+            "line_start": 544,
+            "line_end": 545,
+            "projection_fingerprint": "2682d1ec62bc4e0bb17cd4cf61e203461add87435ee5a63ac1d9bb22479aa5a2",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                22099,
+                22478
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                22099,
+                22478
+              ]
+            ]
+          },
+          {
+            "source_index": 35,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-3d6249ba9b7f7a2c",
+            "line_start": 287,
+            "line_end": 289,
+            "projection_fingerprint": "766c0e9d559f1bf9eb71e81c5cf5315e275ba7c669f6e69e7e50621be3880f73",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13461,
+                14052
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13461,
+                14052
+              ]
+            ]
+          },
+          {
+            "source_index": 36,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-79fbcf65a5f31028",
+            "line_start": 628,
+            "line_end": 631,
+            "projection_fingerprint": "066c3b40a8f25242e5406ea742cbf26256608a442069280aaf24678ffd338440",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                24948,
+                25227
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                24948,
+                25227
+              ]
+            ]
+          },
+          {
+            "source_index": 37,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-d43639b1e166a58c",
+            "line_start": 706,
+            "line_end": 709,
+            "projection_fingerprint": "c0fdd2f5b4627539165236b73a61bb0d29ad6ef5441296d1514853878551c021",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                27725,
+                27993
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                27725,
+                27993
+              ]
+            ]
+          },
+          {
+            "source_index": 38,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-eb1e3b3a934df6db",
+            "line_start": 759,
+            "line_end": 760,
+            "projection_fingerprint": "9718d6a68e321d1df6f87e15f952b4dc1ad8f62e07554c9b9d767bdafc5880db",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                27375,
+                27662
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                27375,
+                27662
+              ]
+            ]
+          },
+          {
+            "source_index": 39,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-7dde85adaec87ebd",
+            "line_start": 450,
+            "line_end": 451,
+            "projection_fingerprint": "84fe92bc565795e80931539dfbaa32fe8339f7dc1feef5246a373794f12f9ea3",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15782,
+                15797
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15782,
+                15797
+              ]
+            ]
+          }
+        ]
+      },
+      "packed": {
+        "exact_frozen_coverage": {
+          "claims": [
+            {
+              "claim_id": "required",
+              "documented": true,
+              "covered": false,
+              "witness_sets": [
+                {
+                  "set_index": 0,
+                  "covered": false,
+                  "parts": [
+                    {
+                      "witness_id": "V40-E01/required/set-0/part-0",
+                      "path": "docs/src/use/configure/configuration-files.md",
+                      "line_start": 19,
+                      "line_end": 30,
+                      "covered": false,
+                      "char_start": 584,
+                      "char_end": 1141,
+                      "expected_characters": 557,
+                      "covered_characters": 0,
+                      "missing_char_ranges": [
+                        [
+                          584,
+                          1141
+                        ]
+                      ],
+                      "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                      "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "required_claim_count": 1,
+          "documented_claim_count": 1,
+          "covered_documented_claim_count": 0,
+          "all_documented_claims_covered": false,
+          "missing_documented_claim_ids": [
+            "required"
+          ],
+          "unavailable_requested_claim_ids": [],
+          "missing_witness_ids": [
+            "V40-E01/required/set-0/part-0"
+          ],
+          "errors": []
+        },
+        "integrity_errors": [],
+        "public_call_and_integrity_pass": true,
+        "strict_positive_pass": false,
+        "strict_partial_documented_pass": null,
+        "source_count": 40,
+        "strict_negative_empty_source_pass": null,
+        "source_receipts": [
+          {
+            "source_index": 0,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-38f8e52fd84aed3d",
+            "line_start": 546,
+            "line_end": 562,
+            "projection_fingerprint": "94dc0b9bba8c6d9e87a96e1f92bf7ef4d7123643f3bc055880bbcb956b73352b",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                22478,
+                22906
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                22478,
+                22906
+              ]
+            ]
+          },
+          {
+            "source_index": 1,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-51163e76b66771ff",
+            "line_start": 110,
+            "line_end": 111,
+            "projection_fingerprint": "44c6254e0209a976cf07cd7740fabd12be2135ff3fae294bc8dfe4e722b43900",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                4215,
+                4461
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                4215,
+                4461
+              ]
+            ]
+          },
+          {
+            "source_index": 2,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-85c1cac5382811da",
+            "line_start": 1,
+            "line_end": 15,
+            "projection_fingerprint": "cd5f223016d5f928b7ad8fdf515d1c59128953617947f9634479488ce4f5bc09",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                0,
+                274
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                0,
+                274
+              ]
+            ]
+          },
+          {
+            "source_index": 3,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-0cf3b8c380629a1b",
+            "line_start": 179,
+            "line_end": 183,
+            "projection_fingerprint": "08f93db02f66919d5d5982bd06b9250c56a9da51349a178e43c52cbfe1c64b46",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                9476,
+                9864
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                9476,
+                9864
+              ]
+            ]
+          },
+          {
+            "source_index": 4,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-ece758f18a32fed4",
+            "line_start": 354,
+            "line_end": 357,
+            "projection_fingerprint": "85f3337c2a34ee26ce21f75ddf10f191fc59cd0ad97e7b72447b5fdc115d6ebe",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16483,
+                16639
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16483,
+                16639
+              ]
+            ]
+          },
+          {
+            "source_index": 5,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-397a2df03b63da27",
+            "line_start": 381,
+            "line_end": 382,
+            "projection_fingerprint": "ba2cafde92b64ad7b776d9c5e63d1d09ac35d7dad5ebfb7e194f6d71d1a0f192",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13565,
+                13715
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13565,
+                13715
+              ]
+            ]
+          },
+          {
+            "source_index": 6,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-fdbd52d63ebd6d2a",
+            "line_start": 95,
+            "line_end": 96,
+            "projection_fingerprint": "ad4472134ab5a34fa442e6ddbea2cca2ecedc62330ce7a0ece3318320ec63919",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                6651,
+                6803
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                6651,
+                6803
+              ]
+            ]
+          },
+          {
+            "source_index": 7,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-57c2929844b911cb",
+            "line_start": 1,
+            "line_end": 16,
+            "projection_fingerprint": "843cfec294464a24eefc108cb64205bfbb9d8b2b4d094d4fa83333fcbd03ba76",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                0,
+                349
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                0,
+                349
+              ]
+            ]
+          },
+          {
+            "source_index": 8,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-3621a40c5a4b6009",
+            "line_start": 202,
+            "line_end": 205,
+            "projection_fingerprint": "929a291af6d663c73a1e192c98fe2b42ed69f04e091ad67807ea636e79345a87",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                10522,
+                10769
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                10522,
+                10769
+              ]
+            ]
+          },
+          {
+            "source_index": 9,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-908dcac9d8221d05",
+            "line_start": 108,
+            "line_end": 109,
+            "projection_fingerprint": "f038caa805856bb34abcaa1a26e0adea49ea145318337ed8142a90f5e4c0bc6e",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                3884,
+                4215
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                3884,
+                4215
+              ]
+            ]
+          },
+          {
+            "source_index": 10,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-446840216455eec9",
+            "line_start": 393,
+            "line_end": 427,
+            "projection_fingerprint": "2de477774c5ae27d2c97866b4dae34b393128ee51a414002d7bb9b1f90825557",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                17375,
+                17955
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                17375,
+                17955
+              ]
+            ]
+          },
+          {
+            "source_index": 11,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-e19c4c30e914a763",
+            "line_start": 358,
+            "line_end": 390,
+            "projection_fingerprint": "b3de8e899b9b0474f9d80c3e19570e8bec6295dda32b366292ab46172c81e739",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16639,
+                17196
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16639,
+                17196
+              ]
+            ]
+          },
+          {
+            "source_index": 12,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-353eb2685566019b",
+            "line_start": 17,
+            "line_end": 18,
+            "projection_fingerprint": "0490047c1aad946591dc44eb6bee78481a9ca203f5615d7613ad5714a180b7a6",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                349,
+                584
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                349,
+                584
+              ]
+            ]
+          },
+          {
+            "source_index": 13,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-4f3cc04527f94c4c",
+            "line_start": 42,
+            "line_end": 48,
+            "projection_fingerprint": "6d7f473fc7d93023503cb8a1263ead9580231fc61a53d4f57159fa8afd32e330",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1080,
+                1460
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1080,
+                1460
+              ]
+            ]
+          },
+          {
+            "source_index": 14,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-c0eddfd22cbcca6a",
+            "line_start": 602,
+            "line_end": 607,
+            "projection_fingerprint": "6874c06293afcdf7fee04e30ef15b79727c7e050049d799a7e05cdafb658dfa1",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                23948,
+                24408
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                23948,
+                24408
+              ]
+            ]
+          },
+          {
+            "source_index": 15,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-d7b356a5ef1ee0b0",
+            "line_start": 211,
+            "line_end": 212,
+            "projection_fingerprint": "0a09d8a24d2afacf7642094f78281a075949c4e86d84612bf86c7b73d5581fdd",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                8347,
+                8571
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                8347,
+                8571
+              ]
+            ]
+          },
+          {
+            "source_index": 16,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-12f5fccbed65f7a9",
+            "line_start": 35,
+            "line_end": 38,
+            "projection_fingerprint": "db216761ac7edad91347fc91ee43a4ba2dd64a4728d4286c653b9d6547e0d90d",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1247,
+                1622
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1247,
+                1622
+              ]
+            ]
+          },
+          {
+            "source_index": 17,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-41e4240ded91ccf1",
+            "line_start": 69,
+            "line_end": 70,
+            "projection_fingerprint": "d0d7ad86d7090f9af541f5ef79bff6a256cae9c698d4ef0e1c0dd68feb6d7fdc",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                2375,
+                2743
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                2375,
+                2743
+              ]
+            ]
+          },
+          {
+            "source_index": 18,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-9c5837af950f7701",
+            "line_start": 95,
+            "line_end": 107,
+            "projection_fingerprint": "539ece7c1c34a693c0ba57cab615d38b56e30562b9a22ce5defd8fd31960b9b0",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                3558,
+                3884
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                3558,
+                3884
+              ]
+            ]
+          },
+          {
+            "source_index": 19,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-c7e173a2b62d6955",
+            "line_start": 731,
+            "line_end": 734,
+            "projection_fingerprint": "01019841054b7804fa73c67721b6caff022f603ed9d3c5711e4f0bd6f46e9b44",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                29680,
+                29998
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                29680,
+                29998
+              ]
+            ]
+          },
+          {
+            "source_index": 20,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-39b182391215b79c",
+            "line_start": 592,
+            "line_end": 601,
+            "projection_fingerprint": "d00684019b789450f64c14ad6b2d86c68a5aa9ddcea7ee65d9fa8a6765e80256",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                19527,
+                19851
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                19527,
+                19851
+              ]
+            ]
+          },
+          {
+            "source_index": 21,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-12af9e3462998530",
+            "line_start": 715,
+            "line_end": 716,
+            "projection_fingerprint": "b089d0e9f4834dac4149e146270ced2dd8b5dc6847ea54bf15344275a4b43c0f",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                24656,
+                25391
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                24656,
+                25391
+              ]
+            ]
+          },
+          {
+            "source_index": 22,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-d9b3bc0dad6ce0e6",
+            "line_start": 181,
+            "line_end": 189,
+            "projection_fingerprint": "f35d9780da93c0f5cf8e7c6060b781c3a7b0fef6782ad28b1862fb99cdff81a3",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7213,
+                7480
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7213,
+                7480
+              ]
+            ]
+          },
+          {
+            "source_index": 23,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-691542caa34246a5",
+            "line_start": 63,
+            "line_end": 75,
+            "projection_fingerprint": "bb535ce66c7ae255e8fdbb2e7ae7069a0754a4faca5dbdb0db19cecbe010fb03",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1904,
+                2307
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1904,
+                2307
+              ]
+            ]
+          },
+          {
+            "source_index": 24,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-c3aa6bd15c438f6a",
+            "line_start": 498,
+            "line_end": 504,
+            "projection_fingerprint": "5ef8d07c29b45d12e7bfcac9989ac87ab2c79bc59f6389caa61e67ed5bc1a4ee",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                16918,
+                17312
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                16918,
+                17312
+              ]
+            ]
+          },
+          {
+            "source_index": 25,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-25b2bce163f0464d",
+            "line_start": 643,
+            "line_end": 650,
+            "projection_fingerprint": "118e5314ac1e47750f9032e2c533c6579bdb81f9d64437412eb4abd60f98a270",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                21133,
+                21536
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                21133,
+                21536
+              ]
+            ]
+          },
+          {
+            "source_index": 26,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-229b8c568485ad25",
+            "line_start": 190,
+            "line_end": 195,
+            "projection_fingerprint": "38b3efd6f71895b1a147e5b442e70109ba616d102916fc4660343759791ae7c0",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7480,
+                7849
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7480,
+                7849
+              ]
+            ]
+          },
+          {
+            "source_index": 27,
+            "path_or_url": "docs/src/use/configure/ignore.md",
+            "relative_path": "docs/src/use/configure/ignore.md",
+            "evidence_id": "ev-4ff482daec3c5bc4",
+            "line_start": 174,
+            "line_end": 186,
+            "projection_fingerprint": "93bcc6b6bee37161dfb817090d88b32975ed5bb615a32301683ab3962516e5aa",
+            "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                7275,
+                7729
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                7275,
+                7729
+              ]
+            ]
+          },
+          {
+            "source_index": 28,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-5be3f9b8cad56339",
+            "line_start": 295,
+            "line_end": 299,
+            "projection_fingerprint": "b0ab1f28622a28411e4b5f9e98e9a7ba9de5ef1d691be6d04db5c310eadddf4e",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                14354,
+                14700
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                14354,
+                14700
+              ]
+            ]
+          },
+          {
+            "source_index": 29,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-b740b6e87dd45842",
+            "line_start": 64,
+            "line_end": 68,
+            "projection_fingerprint": "e84039c9096631d2e246856da877ab9d6958e80b35628b26d418b83e2e7104ee",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1927,
+                2375
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1927,
+                2375
+              ]
+            ]
+          },
+          {
+            "source_index": 30,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-e0e908cec695baaf",
+            "line_start": 49,
+            "line_end": 62,
+            "projection_fingerprint": "4448ba3095b9714267a093e0fc7aaf3d12482e9281488f618402501477c2d074",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1460,
+                1904
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1460,
+                1904
+              ]
+            ]
+          },
+          {
+            "source_index": 31,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-45af42131aa18688",
+            "line_start": 46,
+            "line_end": 49,
+            "projection_fingerprint": "38e0bccaca64414c42af695fcb6a1f32ce3855efa0ecfa937ef49d49b76817c5",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                1324,
+                1739
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                1324,
+                1739
+              ]
+            ]
+          },
+          {
+            "source_index": 32,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-d2ff913f81a68eb3",
+            "line_start": 436,
+            "line_end": 442,
+            "projection_fingerprint": "ce4c2e405f03764dc9530548ca7c01b4eabc5cf6066249a9d29ca9e297a38123",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15185,
+                15613
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15185,
+                15613
+              ]
+            ]
+          },
+          {
+            "source_index": 33,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-9c7044c45da8f227",
+            "line_start": 717,
+            "line_end": 718,
+            "projection_fingerprint": "dc12903caafce891ca60da9b451d8d30930879de54a63d18e0df4b03d36d5879",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                25391,
+                25967
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                25391,
+                25967
+              ]
+            ]
+          },
+          {
+            "source_index": 34,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-95b361078bec9d35",
+            "line_start": 544,
+            "line_end": 545,
+            "projection_fingerprint": "2682d1ec62bc4e0bb17cd4cf61e203461add87435ee5a63ac1d9bb22479aa5a2",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                22099,
+                22478
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                22099,
+                22478
+              ]
+            ]
+          },
+          {
+            "source_index": 35,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-3d6249ba9b7f7a2c",
+            "line_start": 287,
+            "line_end": 289,
+            "projection_fingerprint": "766c0e9d559f1bf9eb71e81c5cf5315e275ba7c669f6e69e7e50621be3880f73",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                13461,
+                14052
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                13461,
+                14052
+              ]
+            ]
+          },
+          {
+            "source_index": 36,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-79fbcf65a5f31028",
+            "line_start": 628,
+            "line_end": 631,
+            "projection_fingerprint": "066c3b40a8f25242e5406ea742cbf26256608a442069280aaf24678ffd338440",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                24948,
+                25227
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                24948,
+                25227
+              ]
+            ]
+          },
+          {
+            "source_index": 37,
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "relative_path": "docs/src/use/configure/configuration-files.md",
+            "evidence_id": "ev-d43639b1e166a58c",
+            "line_start": 706,
+            "line_end": 709,
+            "projection_fingerprint": "c0fdd2f5b4627539165236b73a61bb0d29ad6ef5441296d1514853878551c021",
+            "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                27725,
+                27993
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                27725,
+                27993
+              ]
+            ]
+          },
+          {
+            "source_index": 38,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-eb1e3b3a934df6db",
+            "line_start": 759,
+            "line_end": 760,
+            "projection_fingerprint": "9718d6a68e321d1df6f87e15f952b4dc1ad8f62e07554c9b9d767bdafc5880db",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                27375,
+                27662
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                27375,
+                27662
+              ]
+            ]
+          },
+          {
+            "source_index": 39,
+            "path_or_url": "docs/src/use/command-line-interface.md",
+            "relative_path": "docs/src/use/command-line-interface.md",
+            "evidence_id": "ev-7dde85adaec87ebd",
+            "line_start": 450,
+            "line_end": 451,
+            "projection_fingerprint": "84fe92bc565795e80931539dfbaa32fe8339f7dc1feef5246a373794f12f9ea3",
+            "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+            "integrity_pass": true,
+            "errors": [],
+            "possible_occurrences": [
+              [
+                15782,
+                15797
+              ]
+            ],
+            "ambiguous_placement": false,
+            "guaranteed_coverage_intervals": [
+              [
+                15782,
+                15797
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

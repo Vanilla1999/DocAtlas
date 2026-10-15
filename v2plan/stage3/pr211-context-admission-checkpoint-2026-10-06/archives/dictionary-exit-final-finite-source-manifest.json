@@ -1,0 +1,2611 @@
+{
+  "schema": "dictionary-exit-final-finite-source-v1",
+  "base_commit": "42c72bd6d37700b6fe04890c25e8c4ac45bc9e57",
+  "created_at": "2026-10-06T22:52:11.816486+00:00",
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "1a01d766b451869ffd16426c357afe2a62b4e74a2e0ab8630cb6f546aa9818c9"
+    },
+    {
+      "path": "docmancer/__init__.py",
+      "sha256": "ea315537b1d751a0845afd3f6e79949ab3fd75cac3b6a92c47cc224cd9e916b1"
+    },
+    {
+      "path": "docmancer/__main__.py",
+      "sha256": "89f442e27353c7c18a7ec5197f2568eb965c38ca4e1a4d6d68608232d6d3844a"
+    },
+    {
+      "path": "docmancer/_internal/__init__.py",
+      "sha256": "d41f951f4f574feb7313af5640f078cd5a4e033cf0dcf95329bad1829c6869e5"
+    },
+    {
+      "path": "docmancer/_internal/shard_compat.py",
+      "sha256": "e5f71ff861bb459d7a09029324341878ce6c998a95fc515e3fbfe59a64e27285"
+    },
+    {
+      "path": "docmancer/_version.py",
+      "sha256": "1e0280dd1a99bc2eec968f0c80bc9f7c21b025b437718e88ee850c16f18b5a9b"
+    },
+    {
+      "path": "docmancer/agent.py",
+      "sha256": "abad7d7997e3cb6258cfdc02bc62af87aa3a0868f86e27be7b1dbc8a93d07d27"
+    },
+    {
+      "path": "docmancer/async_agent.py",
+      "sha256": "0bf5612d9dbbe117939fe0c7bc5ab58cab7ea86911eff502979b2885ac2b6e3e"
+    },
+    {
+      "path": "docmancer/cli/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/cli/__main__.py",
+      "sha256": "02a4ea5eac7d454e8ae36680345863c405b0432e2145bf42ad297b29b4d8bd2e"
+    },
+    {
+      "path": "docmancer/cli/_commands_part01.py",
+      "sha256": "eb1a3b57b198af853d9876cea127ca160970f97da6fcda0d9bd6aac8219dd3df"
+    },
+    {
+      "path": "docmancer/cli/_commands_part02.py",
+      "sha256": "1b20d6a8247f0b2c19f6860287545b6b2afee089ee2650876e100100a504db13"
+    },
+    {
+      "path": "docmancer/cli/_commands_part03.py",
+      "sha256": "6620b31920cf4fba5cf917b81a206918d91c62a537e6f7d770103353786cc06f"
+    },
+    {
+      "path": "docmancer/cli/_commands_part04.py",
+      "sha256": "9bf0154958009d8c059e15f8a1b1846173988ca87599fd0a14e7d55cb4f1e9a0"
+    },
+    {
+      "path": "docmancer/cli/_commands_part05.py",
+      "sha256": "b92055e75c256641dc0dbc5d80fdfe49efff7f50396d361e9d0d8b6eee5cec06"
+    },
+    {
+      "path": "docmancer/cli/_commands_shared.py",
+      "sha256": "b0b91e8d1cd73c282b220dc38e8085687a221c9f7633d9cf4624311c6b4237e5"
+    },
+    {
+      "path": "docmancer/cli/client_identity.py",
+      "sha256": "26aa356c4f40ade72058deae1e212a4bb7a5aee16e80d77c250a66a2fb69679d"
+    },
+    {
+      "path": "docmancer/cli/commands.py",
+      "sha256": "05710dacf2c9783316b28a636365467dd7b74c7fe3192dd31ef811129ae73a7c"
+    },
+    {
+      "path": "docmancer/cli/help.py",
+      "sha256": "b0de139112c2e981f266d12c32ed2cd7e5370f9b7011d23a6fd1d54f92ce3cc9"
+    },
+    {
+      "path": "docmancer/cli/mcp_commands.py",
+      "sha256": "dfa6eeaf18b73e1b49f5fb3b27b451e37a991ac1b18df659dcd81e9589c8b047"
+    },
+    {
+      "path": "docmancer/cli/qdrant_commands.py",
+      "sha256": "9d8a9d5f20e087a4ae720f7ec757a8f0d03f5c099edc84eed1746353cda68d63"
+    },
+    {
+      "path": "docmancer/cli/state_commands.py",
+      "sha256": "db88be788d3ff5d06240dcf8e3c86d453d2e150cd3e6adfb6c98318e2a5eed6d"
+    },
+    {
+      "path": "docmancer/cli/ui.py",
+      "sha256": "4190fe9830c7cda158a532659ca4a5af7081c6ec9c52f1b052b933fdbcfd6f70"
+    },
+    {
+      "path": "docmancer/client.py",
+      "sha256": "e036dd6dfe99f82155da0f94e32b5d6cb6a1dd96e783d020af7e2aa900b68fc7"
+    },
+    {
+      "path": "docmancer/connectors/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/__init__.py",
+      "sha256": "d557a2647293e6e67ca1aa06a33ab1dc41ae0a25627f05d79ecd37f49754718b"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/part01.py",
+      "sha256": "5ffda93826d131d9f5352cb22b55c9f4de7d3b236972a890a832916ebfc2e3a3"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/part02.py",
+      "sha256": "d7ac0bfd51156118af8bdb1123756b5cc0c2774e466e939e38fa592bbe896f07"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/shared.py",
+      "sha256": "0c25a5fc73ed990d216ba95174a4c64cf8f17aa39c2a39d775f59d55a317085d"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/base.py",
+      "sha256": "789eda6333ca798eaf66987856c89caacc4c86acfebb992d6a1ae4ecfd95983a"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/crawl4ai.py",
+      "sha256": "a9537ae63f52cd20a124d3f266c9e5bf3d2e12b769b59b6bf809df6e61c5df70"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/factory.py",
+      "sha256": "0b5eb211ecf897ad1a6996e635d360ff173a050a352cf6234991db4ea6ea2605"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/gitbook.py",
+      "sha256": "1a4f7fc4af0b7f747b8bf659a5efeeb4c4ee2c509770b42f1fb59494e94731f7"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/github.py",
+      "sha256": "33f1ae1ce66d82fea610aa76497e73ab8fc3d082c1f9badf999b27b2fb1b4122"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/llms_txt.py",
+      "sha256": "62efc882694fa15d6bf23114236f8bc5f9fb9d06852d9573bca564928b656628"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/mintlify.py",
+      "sha256": "5dcb0fc505dd98a87322044fd33c4df450c5743cb4a8b3a4a4f5f083531cdb70"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/__init__.py",
+      "sha256": "a6a416674276d3328dd8b2dc786058c8c29ec203883606b921c863be2476ae8f"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/browser.py",
+      "sha256": "4cda306c9e00248b7f50bdb54f3f5f75fe89938db31d82dfa213ddb08f6f1b59"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/crawl4ai_extraction.py",
+      "sha256": "7d2c385994bcb137ee36953a051f5e766277d29c2dc16a0642d3ba768764c11f"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/detection.py",
+      "sha256": "f911503f3304473de5f5e139526e012d7fb613678da9a3c42a9467c89b64c868"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/discovery.py",
+      "sha256": "ec65fed0222b723c6de2e6877504a05f0a6d51433e39c247d39c59507fc65d44"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/extraction.py",
+      "sha256": "5616de1c237be2ecf9b01e9869cd776820a639bf50afdb36f003630e199dea44"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/filtering.py",
+      "sha256": "8006aa161192aef33df01798e9b2506bf7ce0b696aa2e7f292679a80558e84a3"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/rate_limit.py",
+      "sha256": "2220333740dd09e52fff54f02305aaff7a541ccc7a438e212ab91f0171c26c57"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/redirect.py",
+      "sha256": "4d754365606d3c3443bc387b5601572bfffc59534c17b778da2050c9baadb371"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/robots.py",
+      "sha256": "67f39daadaa12ade2978bb7ae59bc17b902b5842f8fd30152ab397d1bb2615ca"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/sitemap.py",
+      "sha256": "e87074053deb51796f15e1b4bbe4469b8c3bac493ea4dc42314f6f9e2be8d785"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/__init__.py",
+      "sha256": "76a7d9debc8dda69c273b85264012f81713c95844dbb5feef7a2775fd11a6ad6"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/normalizer.py",
+      "sha256": "9d2b3eed05ca7e6e685d9b6fc1983e57b6154c602327c9e0b7ebf50e85c26642"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/parser.py",
+      "sha256": "1607b4c2465d2f39e9d8207af445adad2c99901862aefca763d022800bffe7b7"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/schema.py",
+      "sha256": "0355ca756e5a9953d26c4d81949973698b4aed1ac3766d9cf0cfedfaa9b934e0"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/web.py",
+      "sha256": "a6d5fcb348b18d77e6e90c9ace1eec64f2ac0f8dd11da42c54a5cce45bb67c18"
+    },
+    {
+      "path": "docmancer/connectors/parsers/__init__.py",
+      "sha256": "ea8729fa6f32c43bce8ce694e75a2e77939070595b474151c764b06a8500fbc2"
+    },
+    {
+      "path": "docmancer/connectors/parsers/base.py",
+      "sha256": "7997b5a578d5f461379e54b051f7aef8773eeebb68b410b16094d268cfcce4a8"
+    },
+    {
+      "path": "docmancer/connectors/parsers/docx.py",
+      "sha256": "99ae2d00876d5beefdcfd7bf3239a20ebe69a0712e397eaf32d70739e37be060"
+    },
+    {
+      "path": "docmancer/connectors/parsers/html.py",
+      "sha256": "8219f8b0eb1a1df7ae76a74d1b8108a08e96c1215d440ae78f2c4da52f8aae39"
+    },
+    {
+      "path": "docmancer/connectors/parsers/markdown.py",
+      "sha256": "a06ef067198e08a78776d668dab4737b71f8cce88fbe3226b633ce1e7da3239f"
+    },
+    {
+      "path": "docmancer/connectors/parsers/pdf.py",
+      "sha256": "f18106dfbe269c933314437f878873a56c688e31eed67a367b7641ef363d5682"
+    },
+    {
+      "path": "docmancer/connectors/parsers/rtf.py",
+      "sha256": "d7e82bd993fed51437a062e11f6f094a6748a23cc62b47a1f5bb1d64dd8d89b4"
+    },
+    {
+      "path": "docmancer/connectors/parsers/text.py",
+      "sha256": "b8e06ba653e63585b5829432433b00830c2f16943a8cddccb421720aa81d37c9"
+    },
+    {
+      "path": "docmancer/context.py",
+      "sha256": "cd04264465a9fba8541a59a5d447623ca87cf3364cfaa874cd5ccfc062cf1822"
+    },
+    {
+      "path": "docmancer/core/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_active_fts.py",
+      "sha256": "f0f58470561fe232b441b5b0b13cdf9e3c2b52e748b184992bca94aa3e09969a"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_filter_metadata.py",
+      "sha256": "113a2cd810bfd47e1a20bc594c052d2842046c27226b8fdee014c0d5e875066c"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part01.py",
+      "sha256": "0c06d1251a93268aa9d50e5d3cee3872337f197a7d5f609c1ff34583b1063791"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part02.py",
+      "sha256": "d199528234f7c83bbc20184f7fbf90ae9a8af6bb0e229bbf915090b29d60381d"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part03.py",
+      "sha256": "596514806c922ef7baff827e560bcc87f156bcb2bfc4d7619601daa86bf70447"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part04.py",
+      "sha256": "544787d703869e5cf05c5535d48df9f1a391e4663b1d4549e43b42aed7910feb"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part05.py",
+      "sha256": "1681557a71d22f61ad442fc7757958796593118e1b64927d649239ae8eb721a0"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_shared.py",
+      "sha256": "1a9c4283b9b118f34de4c46863e9b4541aaf29566d64abead5b4f41d59315bf2"
+    },
+    {
+      "path": "docmancer/core/chunking.py",
+      "sha256": "62189251b29ce189efa02aa6eb4ea71285cb64139b537ff70ec29e4c413aa305"
+    },
+    {
+      "path": "docmancer/core/config.py",
+      "sha256": "50512044998684f33734f33eeb514c8fc2304d5c55fb1b1a6356f45b239c6e75"
+    },
+    {
+      "path": "docmancer/core/config_resolution.py",
+      "sha256": "ceec473b6ad22c093f26cf2afd90751f4a90992c6e00faac0c22e5acc7e3068f"
+    },
+    {
+      "path": "docmancer/core/html_utils.py",
+      "sha256": "20486dd0dd3c7d43372334b54369104a2d2fb596a37d89d418abec86d4c2981a"
+    },
+    {
+      "path": "docmancer/core/index_meta.py",
+      "sha256": "8bb1ec7e91ba965f4d462f23a4e0b9d65cbee2291e40c082261b7c57ea0a2c21"
+    },
+    {
+      "path": "docmancer/core/models.py",
+      "sha256": "6a158f0bd4fffe1c75c9821ba2a349ad7e4c9fe50cde37ac25c6e36cd9dde4ce"
+    },
+    {
+      "path": "docmancer/core/product_identity.py",
+      "sha256": "923517aa47eee7728b45a8b2a1e390bc4e74eafc8222b3f1fe4d0da2daef8153"
+    },
+    {
+      "path": "docmancer/core/sqlite_store.py",
+      "sha256": "0347c43a9eeeae64acb0235a13a0fa1a1431438285be78ef438e4e8094e48b49"
+    },
+    {
+      "path": "docmancer/core/storage_topology.py",
+      "sha256": "2009d4904aed3d30d03cee82dd26325853e3cefaca31bab0c9cc84ffb41e714f"
+    },
+    {
+      "path": "docmancer/core/structured_chunking.py",
+      "sha256": "370b1b5573cb56ce227f9a924de12b7002797d8a75abd574106d172689932f07"
+    },
+    {
+      "path": "docmancer/docs/__init__.py",
+      "sha256": "65d7284c6538f79f992c8d4dc966c31cffdeb348764e6591ebb5c345c4b7a433"
+    },
+    {
+      "path": "docmancer/docs/_impact_part01.py",
+      "sha256": "84f80ca51dc9eb759bb1a5e024d2e63eb80dd51805055cb9aec6d4f441afa091"
+    },
+    {
+      "path": "docmancer/docs/_impact_part02.py",
+      "sha256": "b807779cf4e0a8f4fd728ebeab965b2597ca404279f8225dde3fa743ba147da8"
+    },
+    {
+      "path": "docmancer/docs/_impact_part03.py",
+      "sha256": "35965baece8a81a8322c8f0be6a69a59143ff0006051d6477e3d1a35435ac50c"
+    },
+    {
+      "path": "docmancer/docs/_impact_part04.py",
+      "sha256": "602dad329f17bc27089d44569e5b16fca63e5fcba887f9bf9a72f093cd3af47d"
+    },
+    {
+      "path": "docmancer/docs/_impact_shared.py",
+      "sha256": "5cc6e78f82ee549dca40df0a5b43efcbe5743f16a484efe8ecd40ddaeb3929ea"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_part01.py",
+      "sha256": "73084db14c349c955bc798dd4edd7259e660475d60a2d6e428295b00c7f4a287"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_part02.py",
+      "sha256": "08b9bf476ce01e362ea1252f579586603b04be9cc963af45c7a3f4bec469624a"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_shared.py",
+      "sha256": "d37be7fce59b48d00883557aefe11144084b371d1e2cf0f19f0ea7ed847a6f16"
+    },
+    {
+      "path": "docmancer/docs/agent_contract.py",
+      "sha256": "2c15e825e2e312f7619765fe6ce4b256b48311f6ea076a786a9254d99d358946"
+    },
+    {
+      "path": "docmancer/docs/agent_question_planning_eval.py",
+      "sha256": "b5545e4b5ed543743489e4089e09001c8d5a891f0ab06023ed6415791b6a8b62"
+    },
+    {
+      "path": "docmancer/docs/application/__init__.py",
+      "sha256": "7f518920c6fd354304cf786eaf62f528529cc3c0b9497f46771a75ac5498df65"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part01.py",
+      "sha256": "93e9c6db983408b850d975c7a66b81b66406dff7ee4fb0e09f9bb0fd6b7baaca"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part02.py",
+      "sha256": "0dac03f18cf31d666839a6a5328ac958e11e8a35131e2c657f89d092b8978fe7"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part03.py",
+      "sha256": "c9ef48fab56c82437f008f370d7e1654d21df70b539bafc5ae6f2523d0051805"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part04.py",
+      "sha256": "387c562ac53a346a30b6880ea94775c67d6e9e7def23c7a46baa40d07b4dccca"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_shared.py",
+      "sha256": "242f902a3cbf690c59526cb183d329998eaff7949dc5412e72844e0963f2a43f"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_payload.py",
+      "sha256": "ed9950c5f99a8dbc19e1f743987b50735a8c158cf7459462614e9dfb833e96d8"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "sha256": "fa564db7bc7cf3d0e31aa0955b33ebda1a83bb10daaf26325c4549e3358ef783"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part01.py",
+      "sha256": "269d2367691889a480e219bed40a96095148cbc34b1d57336dd5293951fed43b"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part02.py",
+      "sha256": "1e66aa2da2a2315417b7a769f93763f859222f68d1569d9c0a194218100f5173"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part03.py",
+      "sha256": "d80a5ea13faef99d1385b3176168a051e71262e3e245ab07dc940dc56becaffc"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part04.py",
+      "sha256": "b23c6b53f072cfb9364fcb545ba4ec7ec42ad9ef505e0b4d73798ec61eafb538"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_shared.py",
+      "sha256": "30122bf22ce03b3de987ee1c2dd53a52ea5bf6e6580f716f54e9882090fcc1fc"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part01.py",
+      "sha256": "bac6205b48a90fa3aa629a5d80f4d10d16ac6d784c4f130e4ed30d2b66156806"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part02.py",
+      "sha256": "5a1dcfbab2f26e228a687289bc2af646d956ad9ba955a7c89921f9bbe318fb82"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part03.py",
+      "sha256": "ee39430efb34137b30186ffbb0c1a2b9a92c17d2c983602d9184d0f187499b04"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part04.py",
+      "sha256": "205c869c77ad6429122bfd5b7f1c53e4ad8b827e71d38a5100ff47d5b5a5550a"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_shared.py",
+      "sha256": "8d1a13e3acafb512a71eb39c9fe82fb13e5e1e86a67d1a42a0461ffcdfe9a03d"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part01.py",
+      "sha256": "9c92e201da6e10a8088a5d3f4333f123be6f3eda2de8285679fa5d7df5faaee7"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part02.py",
+      "sha256": "3d0ba36ff3a72b75ef6f0a05c4372dd6aaa9edbf40758f63465b0ee2da5bc49a"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part03.py",
+      "sha256": "b96ac4eaacacba4e95ef974748730e769d2f1c0cd6ce78525517883dddd28669"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_shared.py",
+      "sha256": "93ee135066a82d235c8b5c5cf49018f0cf3dcc278316998beb95f3a9ef5ce60c"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_part01.py",
+      "sha256": "d27cdc9845eccdbe70807c1a48f59ddb731200f542a39e45cd061ce30f0bdf20"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_part02.py",
+      "sha256": "88c76c25733e3251d4565abce610a0abf20b078fca6e15e4c261ae4db6edebc4"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_shared.py",
+      "sha256": "051b06b7000c705fbd46fe78a4191860e875e3a088bf86f6d909c277d38a2c91"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "sha256": "0d28068229ec3ae949d9607085b09ac69d0b0bdeeec82e32d649e6650b3808ea"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_shared.py",
+      "sha256": "e718d38b49e7ea149b31a5ec29d41705ed94f217ac250942fdb6a4b34407cfe7"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_continuations.py",
+      "sha256": "d5724c8d5bee565727d85c1e149399289c93969bd5d177d1552f60f3549395d8"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_exact_document.py",
+      "sha256": "53dbdb497fd869c15e80b2aa3ea188fcb473ddf529da443dfb5e9bce2b83fb5f"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part01.py",
+      "sha256": "20f33e42906acfa2eea30608663d4b7162d90d99c8081429a57a34c0e62c8aa9"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part02.py",
+      "sha256": "8c43e1f017e06479d5386ebf9b06ea1dbe738e5800c6c86c29f09926782cbf30"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "sha256": "dbcda3e3db564bdaa8a7e4e1dad7a1060087e73d3979f74e852310be4abcc6c4"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_shared.py",
+      "sha256": "52f3d480c57fe4a1487ffc89be115ccd0e3d64242877aea5bdc85efade3e2e6c"
+    },
+    {
+      "path": "docmancer/docs/application/_source_continuation_core.py",
+      "sha256": "f24cb0843d0f0dbce775749bfb98f46215dceed45ea0d4665d2d5044d1bb63a1"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_part01.py",
+      "sha256": "3a87362344f131500adefbd7a1c26a126887b134ece1febb7c60972590f388bc"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_part02.py",
+      "sha256": "79d5eec8a476c7cb22d2dfd09889467613323f42d3259f9c0ca6a263f161767b"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_shared.py",
+      "sha256": "c64a9f6b30dce9e8597de9378f47e37e7664762eff3c97878a2be5fd8e7d0262"
+    },
+    {
+      "path": "docmancer/docs/application/action_packet.py",
+      "sha256": "8d69a0046b13b3bc40e6e6a592a1b0ecacd4bda182603589420c632023185700"
+    },
+    {
+      "path": "docmancer/docs/application/context_candidate_ranking.py",
+      "sha256": "5d1caa8e05a81de49754c5e0e7e88f0792b04287db5d9c33ca2bf33209730527"
+    },
+    {
+      "path": "docmancer/docs/application/context_packet_labels.py",
+      "sha256": "91f4f7d6b44a7d83c54604416239275154ec50a42131ca0ac23eea203d398787"
+    },
+    {
+      "path": "docmancer/docs/application/context_quality.py",
+      "sha256": "4a89945351c01464ecc68c9c3db06d33f05da11bde69d833b80ffac029248bbd"
+    },
+    {
+      "path": "docmancer/docs/application/context_query_probes.py",
+      "sha256": "56af78d89a4e8d6eac34c45e1a5175b726dda0ec65d98be5c32bb7cd66eaccd2"
+    },
+    {
+      "path": "docmancer/docs/application/context_selection.py",
+      "sha256": "6d79ef40829d2d26f24962c89ba35611bfadd82776c6110a8eb185c190c28c3d"
+    },
+    {
+      "path": "docmancer/docs/application/context_variant_retention.py",
+      "sha256": "aca6953e651077589a708398a2581b4e67567e92e243136a0172ecc0ede94c65"
+    },
+    {
+      "path": "docmancer/docs/application/dependency_docs_service.py",
+      "sha256": "fb710dd898e1289eb73299b71229b0da882705aeb9045fe4f925492aeefd0df1"
+    },
+    {
+      "path": "docmancer/docs/application/dependency_project_prefetch.py",
+      "sha256": "80c0b7c983c9e8b2ee381707c3541118a1bc269aaffba8d9d3773f259c9c935b"
+    },
+    {
+      "path": "docmancer/docs/application/dependency_resolution.py",
+      "sha256": "f1c09db77fb8edd4919309566006d3ab7f947f7dd5790d145292e4f29a192b66"
+    },
+    {
+      "path": "docmancer/docs/application/docs_context_projection.py",
+      "sha256": "28fb53f811ad92119f2cd25a952676975cbd87e34d14b5998337eacfe0592322"
+    },
+    {
+      "path": "docmancer/docs/application/docs_job_service.py",
+      "sha256": "dfb52f675a10a3e352f7a68fd9373855bec03a480ea24762487b492831cb943a"
+    },
+    {
+      "path": "docmancer/docs/application/docs_manifest_service.py",
+      "sha256": "b15374137c0ea86e76d711dda105825c120ccc02c48a97818cfdc4b13a0055d2"
+    },
+    {
+      "path": "docmancer/docs/application/docs_prefetch_service.py",
+      "sha256": "cfaf0b7de37059334fa569924c66e8061cccda01dde499418859fdfd294404b3"
+    },
+    {
+      "path": "docmancer/docs/application/docs_target_service.py",
+      "sha256": "6bc2ac4b3d9ca8936bb0c3d9c6242dda6d3f3060f428efdb48c56e0d0eba7ff7"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "sha256": "fd58d93041b55c8a57157f0fc118dfcfb67a93625932de4dfaf57438bd61592b"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_models.py",
+      "sha256": "9d4956541e85c02ac463a2867d185a7e57c816a3f1bf100657664c3cdbdd6d3d"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_requirements.py",
+      "sha256": "5d103d9cb956b5a0a447b297087fbbca331ee2b5c8a3f6c849f81aaad45e7edd"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_selection.py",
+      "sha256": "e3c6b2f68eb64f3072a51d022db46bbfe4956034389e191df1f3c61ddf80c459"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_semantic_density.py",
+      "sha256": "3d06bf3ed7990817d4eeab3907508a8134d4197a8df0245302e84a3059676847"
+    },
+    {
+      "path": "docmancer/docs/application/index_storage_cleanup.py",
+      "sha256": "fa7f10f8507c763290334a9f24de977bcf1f531a1c743ab75799f9791fe54982"
+    },
+    {
+      "path": "docmancer/docs/application/inspection_recovery_seeds.py",
+      "sha256": "6e61866580b358b581af7611b6f8829d26b05bdce0311d2103d28803927fb5b2"
+    },
+    {
+      "path": "docmancer/docs/application/insufficient_projection.py",
+      "sha256": "f3a2db38091db66f78acdc303e37d815a5d8499ffe75e62d37bdef62822d7681"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_candidates.py",
+      "sha256": "0e57030301c69ded7c2e59b976c6349a53f7c7e0394e1aafa081084e24acc769"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_lineage.py",
+      "sha256": "806725ca8e16547210b72af4294d72b49e50fdf243271c26ab2953a705c76c0f"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_selection.py",
+      "sha256": "fa91fc305e23e5f7983a4b658ecc6b3b56f9aabf2faa86229f7a966a594ff2e4"
+    },
+    {
+      "path": "docmancer/docs/application/joint_seed_envelopes.py",
+      "sha256": "2a5949049d0cb698d52c3b2b9d948ac0ca479ec49c911628548c2636085c1a27"
+    },
+    {
+      "path": "docmancer/docs/application/library_docs_service.py",
+      "sha256": "328d01ddc13a4c30e84c6efb7c761018bccb23734f651f8569824dd57159ae94"
+    },
+    {
+      "path": "docmancer/docs/application/library_index_publication.py",
+      "sha256": "bb7b579ac877a06ad22a3c7d7dbf401c7581f1a2b13441dabecacfec92f20c99"
+    },
+    {
+      "path": "docmancer/docs/application/library_ingest_orchestrator.py",
+      "sha256": "c3dcb7ce3ca211083e8d917ad24588893b16e9219439967322433fd56ee04f52"
+    },
+    {
+      "path": "docmancer/docs/application/library_ingest_ports.py",
+      "sha256": "9b587f3061b8dd00653258eb63650694feeb79cb5ba7fc04b63e5cd59bce90e8"
+    },
+    {
+      "path": "docmancer/docs/application/library_job_executor.py",
+      "sha256": "fbae0e5c47bdb4954b94ba99f3e58b6556ba3f260947ebff72f0281cfd2f8b11"
+    },
+    {
+      "path": "docmancer/docs/application/library_refresh_ops.py",
+      "sha256": "9d3d0eb439fdfaf2f57ff8fca6895a9150a450ab6df159a2c6654787db108fea"
+    },
+    {
+      "path": "docmancer/docs/application/library_refresh_policy.py",
+      "sha256": "a24bd4e20c51222047ed0638e44a1e8d850da4c1f66a95b934c21ea445bc47a1"
+    },
+    {
+      "path": "docmancer/docs/application/library_registry_ops.py",
+      "sha256": "5c3e4499b49fcdfbabc7f132435491e65636fe9be73e7ec93b8463a77ca461c3"
+    },
+    {
+      "path": "docmancer/docs/application/library_source_discovery.py",
+      "sha256": "cfba1656a4acfa696c401d4bc22e18690f98334a1a31979aa03d832307b33d12"
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection.py",
+      "sha256": "76fa3c0194784f6597de2052c383eec333ef8511b370f1fa685710f56c35d089"
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection_helpers.py",
+      "sha256": "fbe2530070c023d51d7aea27513c58aa469a52a48289e397651562489e8066f3"
+    },
+    {
+      "path": "docmancer/docs/application/need_context_disposition.py",
+      "sha256": "9b2902f46af1836e95e6eca6c7917118a63b6712f8db20e75cc2981e43f1ceae"
+    },
+    {
+      "path": "docmancer/docs/application/need_context_projection.py",
+      "sha256": "ac7a5a61ccb2ce6e21777a214cac74bf3e1b195b5dd9317bfd97b1bc1147bc2f"
+    },
+    {
+      "path": "docmancer/docs/application/need_query_schedule.py",
+      "sha256": "aa269e8d40d9888f699d0f7c6627c1051ca8b33d240f5c99b3acb742de40a6f1"
+    },
+    {
+      "path": "docmancer/docs/application/patch_constraint_validation_service.py",
+      "sha256": "eb18ea507e74b931d6da46be0c303842147fcdb352db86dafb79da5ea48a4f78"
+    },
+    {
+      "path": "docmancer/docs/application/patch_constraints_service.py",
+      "sha256": "23cf6c807c49658e2620f93e769aa9e3253b36c238f72a62395be6636b0d1c01"
+    },
+    {
+      "path": "docmancer/docs/application/patch_review_service.py",
+      "sha256": "e42239714f55d2c43843b36156a57d2299b236ee601a803d5d85b72930d68eb0"
+    },
+    {
+      "path": "docmancer/docs/application/project_answer_outline.py",
+      "sha256": "c90e9e1bbe154ee0a7e17519258392dc714446bcfdfcc644a8ad7f2c9a6c4ef5"
+    },
+    {
+      "path": "docmancer/docs/application/project_context_service.py",
+      "sha256": "084c10690a674ff666f2182f70810fef5e5bafeeac16fc896e8a093d17156d83"
+    },
+    {
+      "path": "docmancer/docs/application/project_docs_service.py",
+      "sha256": "77240859ffde2972090dcf7a0c9e86306a7cd5ae5ab85c6c56703965f7179eda"
+    },
+    {
+      "path": "docmancer/docs/application/project_docs_state.py",
+      "sha256": "2b896e295ab2fe47158fa64724232c7f2af0e7df3ce5304b64978faa23059570"
+    },
+    {
+      "path": "docmancer/docs/application/project_section_index.py",
+      "sha256": "e42e1038453b8a0e72cff0a76229d61f8b7e19db815407cd951714a201d16298"
+    },
+    {
+      "path": "docmancer/docs/application/projection_decision_trace.py",
+      "sha256": "46d2dd9ad132c420bb123ab843e5f3748ba7e605c0ce90860d9620f259182f88"
+    },
+    {
+      "path": "docmancer/docs/application/projection_tokenizer.py",
+      "sha256": "ee097b4d71fcc0783f2eee35cc14d0d05d262ef2ec8fcee042dd3135d09edfe6"
+    },
+    {
+      "path": "docmancer/docs/application/proofability.py",
+      "sha256": "b5146a240a64d61cdc3da83e27400279ea10ad34e470b61479b53f04ebc76376"
+    },
+    {
+      "path": "docmancer/docs/application/qualified_support_units.py",
+      "sha256": "cbfe62805d1bfadf9a82b39b0679a7c1fe3d328f3840b3bca497930bf10a4901"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_bridge.py",
+      "sha256": "baa6c813d0125f82e129fafd7bcd94e9cb1edeef978caf5513d695b22130a00e"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_context.py",
+      "sha256": "9fd295323a87bd7c6d115dd440546159f390e2e205bfc11c53654e94a7a1858d"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_recovery.py",
+      "sha256": "6d74e1cf8271cefa6737faf5ed0381be03b2f17e1539b3f1aa7d8e4de994ef8b"
+    },
+    {
+      "path": "docmancer/docs/application/recovery.py",
+      "sha256": "0b7b62ce676889206d8b902af357f89f142850f9d642c18938030809f8601e6b"
+    },
+    {
+      "path": "docmancer/docs/application/reference_query_tagging.py",
+      "sha256": "138f966942b3e9408a2d084cdef27772f49a02302223be071a587ff2939b6ea1"
+    },
+    {
+      "path": "docmancer/docs/application/retrieval_need_support.py",
+      "sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef"
+    },
+    {
+      "path": "docmancer/docs/application/source_continuation.py",
+      "sha256": "c3d9dbfd1d948232ef81d28b3f19ab18bfe6323e064614e8e4eb94941f2c6dff"
+    },
+    {
+      "path": "docmancer/docs/application/source_dependency_preparation.py",
+      "sha256": "426e32fdbf3092783c944893940649d2b133e4ee2810b424f41185038622ae20"
+    },
+    {
+      "path": "docmancer/docs/application/source_recovery_ranges.py",
+      "sha256": "c029bfb26ee859ea2f8077b40def0102c7d76197049d4fc06034bd46ea360ea6"
+    },
+    {
+      "path": "docmancer/docs/application/source_reference_evidence.py",
+      "sha256": "4134bf19b6ca815b68b8df73c492d0ac4686fd6c68f121afa9490212968bdd0e"
+    },
+    {
+      "path": "docmancer/docs/application/unified_context_service.py",
+      "sha256": "d7b473639c1baf52f839f193bf534f27776f3dd03040c9754da697608a0e97b0"
+    },
+    {
+      "path": "docmancer/docs/application/visible_evidence_retention.py",
+      "sha256": "12e7eb9793ad72190fec1e1f4334c62859d39e804c0d3e6e2fe6924a673247d6"
+    },
+    {
+      "path": "docmancer/docs/cargo_project.py",
+      "sha256": "8766917136902cb4b6e198386e84c7da6a04b942fdf5c2f2cc7dbf190aae390c"
+    },
+    {
+      "path": "docmancer/docs/code_context.py",
+      "sha256": "bae7c2c4e45e6cfb1037752dccd68a97078153d00a4cba491c167a2ad0c17ce1"
+    },
+    {
+      "path": "docmancer/docs/curated_sources.py",
+      "sha256": "b24075dd2c4d8e9c0c4cd431551c9db3351cd672d5debfc1ba7e91b4b68ae0c9"
+    },
+    {
+      "path": "docmancer/docs/dart_official_docs.py",
+      "sha256": "da2d7b8847757849b9f47aea449d84563b46316d49bf4e430373da7667d329dc"
+    },
+    {
+      "path": "docmancer/docs/dart_package_config.py",
+      "sha256": "4f11665d76a87a7b14668f963ad753b1989f7ea58051f007e17fc8a7709e5916"
+    },
+    {
+      "path": "docmancer/docs/dartdoc.py",
+      "sha256": "84dc6759a087a380737e45bfca64d59fef87ee7a7e5dba095d62006a2f7f109b"
+    },
+    {
+      "path": "docmancer/docs/discovery_candidates.py",
+      "sha256": "019a1aa39492011675143c5eba734df2984a3ce9bacf18339616a832171e7817"
+    },
+    {
+      "path": "docmancer/docs/documentation_evidence.py",
+      "sha256": "68754ef8756755ff106cb5b769cd06bb23c0eeed817013bb6e2a1147c1a34e9b"
+    },
+    {
+      "path": "docmancer/docs/domain/__init__.py",
+      "sha256": "f2493bc9d3a7d8ccc3cf7de2bec69856c673b5d0f75b161a960f063671425640"
+    },
+    {
+      "path": "docmancer/docs/domain/_answer_units_part01.py",
+      "sha256": "fe6dedce9c3afa818ffd18d605905208026f3d5111f052dcebcb83aff2b414d9"
+    },
+    {
+      "path": "docmancer/docs/domain/_answer_units_part02.py",
+      "sha256": "807987c2b165f25a4b1ee5fede241cc65ac48bf91ac7ae0eefade00369b1f8bf"
+    },
+    {
+      "path": "docmancer/docs/domain/_answer_units_shared.py",
+      "sha256": "235186478b21fc7a717db4e39f7e924548de9bad7c9d32d92ccc79c574dde443"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_part01.py",
+      "sha256": "0081448af07801a15586eb2869ccd92e71a1956a3578aff42cbf696db2c9ba99"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_part02.py",
+      "sha256": "f9d30740c3d44febc8bc88e3a8a9b3700285c2c6d9b207508c2c3a79ac0f5992"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_shared.py",
+      "sha256": "c58dc4294c642e65980985b9233caacd13f977b66a2dea2fb5d79d35354e07fa"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_part01.py",
+      "sha256": "95437dfcc68bb1b3c95a36ea4ed2be42293bcef5646fd1e98991f9b5b2d74988"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_part02.py",
+      "sha256": "8b881b07cdea5dbe6f078d0e70504b7d4aa20faa983bf46ffd5a67fc9e0e134a"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_shared.py",
+      "sha256": "b99965cb91486c06116c06c4e5e8c80a584da915d5ca3ebb7351cdc29b96780e"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_contract.py",
+      "sha256": "192e69f9043e109c63d7e13edf2afecc5d695121135c80d801cc8c833b9b91e1"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_grammar.py",
+      "sha256": "21e5e4f32ee259981898c066412d46222889ad53fd5b1aa3e4ec420149c56b6e"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_local_binding.py",
+      "sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_meaning.py",
+      "sha256": "9eea34d0250f79d9c12147b1a89efdc8ce3a9ffaf5109f63d67cd3086e53e9ab"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_relations.py",
+      "sha256": "99f77bf2c565ad4cec351a73cb1e6c4399fe30f50d4dde91824b800a0f98934f"
+    },
+    {
+      "path": "docmancer/docs/domain/answer_completeness.py",
+      "sha256": "269cd1fefe20208f5d6eeccb7e053f90edaf92efb9a154957e35af9a66f8e6d0"
+    },
+    {
+      "path": "docmancer/docs/domain/answer_units.py",
+      "sha256": "f5b08a0838be98eef19794cbb827733b82325bdad14fd8dd621928d488cdd2f9"
+    },
+    {
+      "path": "docmancer/docs/domain/canonical.py",
+      "sha256": "39dc9e061d10fd4fb7655796d3ccf33e98c0a175d474faddc4c026c4dca4f604"
+    },
+    {
+      "path": "docmancer/docs/domain/code_graph.py",
+      "sha256": "4b7c95ef9e295f7ab91410e0eea85cb26c7f63d46c4c5085c6b0099bc16dbe10"
+    },
+    {
+      "path": "docmancer/docs/domain/compositional_question_plan.py",
+      "sha256": "38544b8c9e63a5ec9342e64dd391dbdee9feeaf3c930c19a1f1bbd4d994b8c16"
+    },
+    {
+      "path": "docmancer/docs/domain/content_trust.py",
+      "sha256": "a15c7f26ff53a39dc50d3b5de1fc49c8380cbdfadd0070a53445785f85d7585e"
+    },
+    {
+      "path": "docmancer/docs/domain/context_blocks.py",
+      "sha256": "cd22acd74eaf313780cf9a33a5eb6e24c326bae6c8627f924ffe5636f1f89031"
+    },
+    {
+      "path": "docmancer/docs/domain/context_budget.py",
+      "sha256": "654e262ba4c826f22385263660a0d6f251ae795ff1d2e42dbced03e5d03a4153"
+    },
+    {
+      "path": "docmancer/docs/domain/context_hint_policy.py",
+      "sha256": "f061f74693cedaa26a92a56089e4accb32c25317e183544bf24b3c4fad276ce7"
+    },
+    {
+      "path": "docmancer/docs/domain/context_request_preferences.py",
+      "sha256": "fff8504d893bc39dfa55c912bdb173caed80a3bf678af62195906a5d8bd28068"
+    },
+    {
+      "path": "docmancer/docs/domain/context_windows.py",
+      "sha256": "3ae6bfeb79ba869ec7817998abb4d1ff34b9e0dd83a77cd4f5b09c73e8ce9e61"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "sha256": "3bfe10520df657ea16e646e5317fce6cf06b7e1c46103bfa0a7d7c36adc4ddbb"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_set_types.py",
+      "sha256": "f0a0d09d92d3a400dbb9f2634c353c66d6fab271f972e2e2013e7e40927d4594"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_set_validation.py",
+      "sha256": "b6e5e8fe2591c3256c02f8096054f0efe65a1367f9b4dc9be813d91c6d893297"
+    },
+    {
+      "path": "docmancer/docs/domain/governance_value_proof.py",
+      "sha256": "69e0e18c4d2381809c9dc93398fc4a2dd46efeedbde6a507b91d11abdd777ca8"
+    },
+    {
+      "path": "docmancer/docs/domain/legacy_question_coverage.py",
+      "sha256": "e6b3dcde6fe7779b14427139a6829acc037ba73df308f419d8664c273fd48431"
+    },
+    {
+      "path": "docmancer/docs/domain/library_source_options.py",
+      "sha256": "9cf701f0ad665f6035626102a020e63e576c97f93ef53f3bf33a324d2eb532ad"
+    },
+    {
+      "path": "docmancer/docs/domain/lifecycle_policy.py",
+      "sha256": "d8bc57dd9ce6c8747edcf534421fbaa00b939fc9f26ed9d9a723c97b80d0337c"
+    },
+    {
+      "path": "docmancer/docs/domain/mutation_intent.py",
+      "sha256": "ac4b018331453ddabe61608321e4af3f7d6725d7671dfcc3bc035a4cd7b7bab9"
+    },
+    {
+      "path": "docmancer/docs/domain/need_composition.py",
+      "sha256": "363b8e2e847aef334682855bd551adfbb8bc9df33357333511f70de67e4a7330"
+    },
+    {
+      "path": "docmancer/docs/domain/need_contracts.py",
+      "sha256": "33f319d7d0552f409bb756b6114d8b15af61ea778c949cd1dd70b5d4aeb5b183"
+    },
+    {
+      "path": "docmancer/docs/domain/normative_language.py",
+      "sha256": "de87153f11fd00b874995b54b460010321ac21f2eb4ed7a1e8bad0328e757c87"
+    },
+    {
+      "path": "docmancer/docs/domain/patch_request_plan.py",
+      "sha256": "4171dbf13ebbbbf37b2b6ca591b1734f721ca74ec6496d4fb8a15e27e048f56a"
+    },
+    {
+      "path": "docmancer/docs/domain/patch_requirements.py",
+      "sha256": "99fc15ae1eada2c80566fe4cbbca4be832b94b598ff64e2602153932518e0101"
+    },
+    {
+      "path": "docmancer/docs/domain/policies.py",
+      "sha256": "e4ae72c6bb8869b94056e939e4986bcbd8e785eb1b17c59c05fc7af4225d8846"
+    },
+    {
+      "path": "docmancer/docs/domain/project_answer_contract.py",
+      "sha256": "58667c5798abd763f1c2196829a683cc6a856b39cad1a6c5eda49e6d49fa2439"
+    },
+    {
+      "path": "docmancer/docs/domain/project_doc_ranking.py",
+      "sha256": "40ace39daa38c82b3469114ce1931dd679f0842eea8847e0298f2d7432f79650"
+    },
+    {
+      "path": "docmancer/docs/domain/project_evidence.py",
+      "sha256": "0438d2fca4a26da81e288ac185fc7e2708351081f57713c30d37165ecbd5d651"
+    },
+    {
+      "path": "docmancer/docs/domain/project_path_validation.py",
+      "sha256": "d8a4535ea1e3be6bfca0c6841f405aa27aaf9f32636b788bead4e41827bbd932"
+    },
+    {
+      "path": "docmancer/docs/domain/project_query_intent.py",
+      "sha256": "0a909dfd15fc0217930d304503928612bf8d00a256c28c9889ad41404d50871e"
+    },
+    {
+      "path": "docmancer/docs/domain/project_retrieval_intent.py",
+      "sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248"
+    },
+    {
+      "path": "docmancer/docs/domain/project_state.py",
+      "sha256": "a230b69953a27434fb3f65146c026871b487e22f2c3b54035e6de99ef984e0aa"
+    },
+    {
+      "path": "docmancer/docs/domain/quality.py",
+      "sha256": "004721d1ff3560b3cde976a87441dca7346a97e94cb3f9224b64f136003d0cce"
+    },
+    {
+      "path": "docmancer/docs/domain/query_reference_binding.py",
+      "sha256": "8d7bd198affcf5ffcffa78a93c09b98b19a7506b00ed50b65bfdff982bb6772c"
+    },
+    {
+      "path": "docmancer/docs/domain/query_script_runs.py",
+      "sha256": "1c730ba86746f05a7895d9d8a1156903dc454efc8ee6c16587bde9c4aba5ab9f"
+    },
+    {
+      "path": "docmancer/docs/domain/query_terms.py",
+      "sha256": "829bf5ab04556466a69493bfe37e876a705347c362e7d4445726f1af0bbed222"
+    },
+    {
+      "path": "docmancer/docs/domain/question_component_rewrite.py",
+      "sha256": "d87f6a092162bd6d0ff8fc1bcee19b09e383495f3f31045e0194921d49da9148"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "sha256": "bab02ded393e11cbe51bdabbd5ae3fd405d7b383400d86244232693f80a6c571"
+    },
+    {
+      "path": "docmancer/docs/domain/question_ownership.py",
+      "sha256": "045e2a2fcf5c6137ed5e15234959d372b7038aa40b2ca1e6c12f9b24a19733e2"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "sha256": "90588252e7a739061250df77f4ec79ccaa81d2342ab3f51e554f4170f1eb6831"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "sha256": "01066e1ed9897a33cea9ae563e4c619a6dfcd76bcd8103c19a978cceae68e64d"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "sha256": "71dccd291ba799149f5485fad818fb2a5008af3c79ca542053e50000a9ec5d5b"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "sha256": "985df8fa9476381f131f002c114f339e0351f27cd538f480cf7b51a907fcbc4f"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "sha256": "c3b337cd0737ca1ce0d7dd954f5d6b2ee2e9eae8da9f36dc38ed135dbf820fed"
+    },
+    {
+      "path": "docmancer/docs/domain/question_premise_proof.py",
+      "sha256": "dc9f543bef179effe022784ecd739c0ec21b19ead007d047b32a8df2a419fdbc"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "sha256": "2542795f8826982fc83510e64e30de22127dec621f500ac851301672ba4e8b70"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "sha256": "e9a82e3af5b2bcf2669166c4de08ce73096a63bee422e1ad579c2d6e4f3275de"
+    },
+    {
+      "path": "docmancer/docs/domain/question_surface_normalization.py",
+      "sha256": "5c72aceaa936558445de6ed545e7da3ee4b3b87290725bcc13056080e340b8d0"
+    },
+    {
+      "path": "docmancer/docs/domain/recovery_handoff.py",
+      "sha256": "6cb7dde7b979ecf3f929baee8a4d3cfb147d11ea3226dd6c47074f537a597e13"
+    },
+    {
+      "path": "docmancer/docs/domain/request_intent.py",
+      "sha256": "d57241db1f427614c03a09efd556f2ebd2db2fd2c09e1a3c65d4bed17869fb4e"
+    },
+    {
+      "path": "docmancer/docs/domain/retrieval_routing.py",
+      "sha256": "fb828c602331cebf41f4a39bb262dd90c4a2e78b0890316f504591c4ec3a10dc"
+    },
+    {
+      "path": "docmancer/docs/domain/snippets.py",
+      "sha256": "f32bcc02afb61ba625167489ce072f055d320601df48fd3e2d3d6e99f17bac08"
+    },
+    {
+      "path": "docmancer/docs/domain/source_boundary.py",
+      "sha256": "9fd51e61d573f6702738f2f5b229294163dac26c1fa6cde2a0e163bf1a7c224b"
+    },
+    {
+      "path": "docmancer/docs/domain/source_dependency_graph.py",
+      "sha256": "e2f64b2e5ba7b6f87387dd6cd776faba58790842dde544a2c459e13536ee3959"
+    },
+    {
+      "path": "docmancer/docs/domain/source_identity.py",
+      "sha256": "aa9f78fd5de8021158dbacb8de00b3892003a4e9e70ba44e0ea7308662f2cc52"
+    },
+    {
+      "path": "docmancer/docs/domain/source_map.py",
+      "sha256": "d3e7aaaa2681f323462f36a605da6f582a90e7be7aec2e309f56d6cad9c5b217"
+    },
+    {
+      "path": "docmancer/docs/domain/source_subject_binding.py",
+      "sha256": "cb3e0f1576de1412de839af8878eaf12ee200f996849947668cd1174ced8f105"
+    },
+    {
+      "path": "docmancer/docs/domain/target_security.py",
+      "sha256": "f89c4b5315fcc7d3c525a055cf336c2bf92b6d7bc37ac7ab57f104c701849583"
+    },
+    {
+      "path": "docmancer/docs/domain/technical_terms.py",
+      "sha256": "ebff4b6f79cdbf99e9282d37dad2b0c56830ebdaedbca5f3cace1fceccb4443d"
+    },
+    {
+      "path": "docmancer/docs/domain/technical_tokens.py",
+      "sha256": "f307750447918c3d1cc2dbafdb1ebb7a9b77726a90d1f1afec0c7b6f08cc2e48"
+    },
+    {
+      "path": "docmancer/docs/domain/tool_selection.py",
+      "sha256": "027150c6283bdb70653ce25125c95cd37d5027c1bba72f5727d0e11df23fc9f1"
+    },
+    {
+      "path": "docmancer/docs/domain/trust_contract.py",
+      "sha256": "e1677b6e3525b242e5b4d80ad5c9518682b6727a7e938c12da974d971a44d1c5"
+    },
+    {
+      "path": "docmancer/docs/ecosystem_adapters.py",
+      "sha256": "6017056b131337273d292029efa1fe2f4e7b781a4f92b46a16d8727da764b7e3"
+    },
+    {
+      "path": "docmancer/docs/exact_version.py",
+      "sha256": "5be6287ede66c6a6793593caccc515f8975a772c34645e8f2a054e547fcf4aac"
+    },
+    {
+      "path": "docmancer/docs/fetch_policy.py",
+      "sha256": "00e6e7515373dea1545b3b6fa245be9365b108673fdbd8b87e603c5841031d0f"
+    },
+    {
+      "path": "docmancer/docs/fetch_transport.py",
+      "sha256": "596e918da12ff349bf640539cca33f9e86f9c6f20fac363e72eebd5d3d71251d"
+    },
+    {
+      "path": "docmancer/docs/finite_membership.py",
+      "sha256": "40ee42f49d24d9f19312f989af672d64b4f2264721ff434983c0dc1774641bcc"
+    },
+    {
+      "path": "docmancer/docs/github_source_manifest.py",
+      "sha256": "287553110e2fe6201dd1118a4f5500467a57a92e69c27ffe53f6266e23a0cad6"
+    },
+    {
+      "path": "docmancer/docs/go_project.py",
+      "sha256": "f87ca283edce5231ea7ba50bcb8f0ed21fd63f2519d31de8711fa912e48316d7"
+    },
+    {
+      "path": "docmancer/docs/impact.py",
+      "sha256": "22609652f4f7062ffd3d222c9160404a792122188142461421a967af92bf5dc7"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/__init__.py",
+      "sha256": "c2f7012a6052298ff3709c681eee8b1f156eda907a187ee7e4b280524af73daa"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/agent_index_gateway.py",
+      "sha256": "2641806eba1ef141b7c0c7591d4327fe98204d1ce608e5e5f09bcf3f3985d694"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/filesystem_locks.py",
+      "sha256": "d399507c95981286a0cd5f8e9247f8776579ab07263ad656c2b23f2b170bb0f1"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/project_source_read_gateway.py",
+      "sha256": "ab9d58cf1c9ed39268a4cd24ddefe9b2801eb26225991b5d7168f6164130bbe1"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/storage_mutation_lock.py",
+      "sha256": "9c41199a55ac3a8735401aee588d49007d5ce5c195781d16350534a06f614d19"
+    },
+    {
+      "path": "docmancer/docs/interfaces/__init__.py",
+      "sha256": "33fdbcc1cf3a8ce3f47fb7e4a159cc340e0177ee2fbbc6f3d7e74785087139e8"
+    },
+    {
+      "path": "docmancer/docs/interfaces/grounded_mcp_session.py",
+      "sha256": "44850265335b8c12ae9618f86d038a9a92c4f5f1ef45204a06c438a89ea48a6e"
+    },
+    {
+      "path": "docmancer/docs/interfaces/host_context.py",
+      "sha256": "a57a3ed4df53e2d8a78b5f749138790ae832f92e1c832087ccb11f9e6b2edfa9"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/__init__.py",
+      "sha256": "0be9d0898d0560441c806aadec86b3d131411948e18e4fe2b33a8efa4312324c"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/_context_recovery_actions.py",
+      "sha256": "98c75c7cc42594d4219ecb6c86549c2024882b296e1d6790199f39898d1ee5d3"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "sha256": "e82d686d25aadc3be2fe8c9c45396bbf2131f3b4fa5e18a70a4917a21515fb3a"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/docs_context_routing.py",
+      "sha256": "e165bd5f000c61fc03741569f82a3a4d488e82aded1d5d036cbbcc63a4503f7d"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/docs_tools.py",
+      "sha256": "fbbf97f788a909d013f027f40293f1fbbd644638c4e0c7134496fab10d76acb4"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/error_contract.py",
+      "sha256": "cb4dd26be5b3a7ebc692f4b44f15d01cd83224f41d0a18764967ff930e1d4968"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/output_contract.py",
+      "sha256": "34b445973b4a15d094eb98e5da16e76ee3a39643b74413ef614a56442e73991d"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/prefetch_tools.py",
+      "sha256": "8aad4bac6fa5ea0234b9810e646c361578113536d240bd452327fcc7bafc202b"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/project_tools.py",
+      "sha256": "aa6ff85cef9d892bf9d051a2f46a3930a46993807ed35f0b0c3ca9efc14e8c72"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/recovery_projection.py",
+      "sha256": "61287c0f1a9688f0ec063a504fe07f6870dc8eaf04e12d368fbea82a1759dd25"
+    },
+    {
+      "path": "docmancer/docs/java_project.py",
+      "sha256": "51ec30a62f309abe0a08a9d1d784f9a43d1c4d912cb1ffc1cca1ff9a32e09262"
+    },
+    {
+      "path": "docmancer/docs/manifest_contract.py",
+      "sha256": "3e10d480fd0ae5f59efb376c6f6672b30e36d085a6693656074df14e8f63d2dd"
+    },
+    {
+      "path": "docmancer/docs/mcp_footprint.py",
+      "sha256": "8082eaf08a37f2cc56c4b030f7a41bc31230ad049a3539502171a12d1e1f3116"
+    },
+    {
+      "path": "docmancer/docs/models.py",
+      "sha256": "1070c7b10edbd1ee669e6784c8e8069dbbd19cd4cc3b8e8eed3b283c20de3330"
+    },
+    {
+      "path": "docmancer/docs/node_project.py",
+      "sha256": "e843fc1a9512ede1477ad89ac84693901e560b554559928949f522d7fc157287"
+    },
+    {
+      "path": "docmancer/docs/patch_plan_context.py",
+      "sha256": "38d0814588b684d7af90b8b921987b62f3fa0ea6ca09e2e66935062e62ce38b3"
+    },
+    {
+      "path": "docmancer/docs/project.py",
+      "sha256": "c09afe71826331731be34d52cee8db5eb4aa636837765d366cd441fba9f4da6d"
+    },
+    {
+      "path": "docmancer/docs/project_docs_catalog.py",
+      "sha256": "1f668c3f2a5224df5caadf6f4f2c3b09a26621e473ce190d43e7b941fe3a8e74"
+    },
+    {
+      "path": "docmancer/docs/pub_project.py",
+      "sha256": "b148e6b5369eb268e1a06aa1ebe1b55cf3cc3c01aa279d24a95da6909098c737"
+    },
+    {
+      "path": "docmancer/docs/python_project.py",
+      "sha256": "dc54b01469396d7f30ce969408cfa75de40050a3d7dc1ee70696efb2b5655a11"
+    },
+    {
+      "path": "docmancer/docs/registry.py",
+      "sha256": "438d05baf005e18fa2104bff91463fa9be8ea949e7926687e3e1dd32f03b88e0"
+    },
+    {
+      "path": "docmancer/docs/resolver.py",
+      "sha256": "787ac38dbbcb3eba671fc03b87d11cbb60cbd22ee7e543e609b4727492da590c"
+    },
+    {
+      "path": "docmancer/docs/section_metadata.py",
+      "sha256": "31830833561bed2b1436dda47d87073ceb1f4274cfcbcf86711c924b874fc159"
+    },
+    {
+      "path": "docmancer/docs/service.py",
+      "sha256": "23b24fc4ed61324007d35bd7f36e2c22da4546273f4546a2c7fb93fa084d2b5c"
+    },
+    {
+      "path": "docmancer/docs/tool_choice_eval.py",
+      "sha256": "ed154169f5193c2c6df5cb18fcda700c14eab6ecee89f71294d4f3c4ef9fa706"
+    },
+    {
+      "path": "docmancer/embeddings/__init__.py",
+      "sha256": "aeb3400bf70a3f0c265ebdda64079cbb38a5c9886efdda1182968f32a6c13c36"
+    },
+    {
+      "path": "docmancer/embeddings/base.py",
+      "sha256": "8a3a86452b3bd8334f277887b02fd0623d819c36e246166f30073a73fe3d3c2c"
+    },
+    {
+      "path": "docmancer/embeddings/cohere_provider.py",
+      "sha256": "a8cc130dfe0e265688c3e1b7b2645082c9f8570e32193f959ca514282977ec47"
+    },
+    {
+      "path": "docmancer/embeddings/fastembed_provider.py",
+      "sha256": "23a584a1af5fc44d0dc25ea53cb1b8f87815e8754587cfbd00e7549ccd256954"
+    },
+    {
+      "path": "docmancer/embeddings/openai_provider.py",
+      "sha256": "1c81059884d13ba7b0ebcc064d2d04fda9540e09caf8950066943b41faa088c9"
+    },
+    {
+      "path": "docmancer/embeddings/pipeline.py",
+      "sha256": "7434944b2afbdb89eb7a74e0c6295001816405ec8bf67315e483752bb2c687eb"
+    },
+    {
+      "path": "docmancer/embeddings/voyage_provider.py",
+      "sha256": "b1c275c7275eaab2a9f8bdc4a848c951c599dd89a6813e02054636c1d4c2d42c"
+    },
+    {
+      "path": "docmancer/eval/__init__.py",
+      "sha256": "4fcfe42cab91a4d5f7d5d883c8ba9d4a03f07f7a3f44ec47f69339b6b575a79c"
+    },
+    {
+      "path": "docmancer/eval/health.py",
+      "sha256": "610aa5bb296625e232cd6af082d92923873a8886fbef98b61588510797e9104a"
+    },
+    {
+      "path": "docmancer/eval/metrics.py",
+      "sha256": "e22f5c08754654b8e68bd0e87331f20953d7035cb9fc2e35834a73887d970d26"
+    },
+    {
+      "path": "docmancer/eval/runner.py",
+      "sha256": "d34388e5ae4dfce1d5e62d5e597da8babc677023e01ed05b0133418e6280d0b6"
+    },
+    {
+      "path": "docmancer/eval/schema.py",
+      "sha256": "573edeca78ea3b16f153296a539bd65f6de53fd074e20a86ac009700e8c27ad1"
+    },
+    {
+      "path": "docmancer/eval/story_corpus.py",
+      "sha256": "ce64dcd583717826c75876efc13c3a03a83c51309f6dacf826b8dcef03759036"
+    },
+    {
+      "path": "docmancer/eval/trace.py",
+      "sha256": "baa09c93dc523a8c6564051375d8d30e559c79a0fea963724a3742bf5b4d464b"
+    },
+    {
+      "path": "docmancer/mcp/__init__.py",
+      "sha256": "70461480ec40a74742648d38b26d1c01e54b518b374b8825c3cf59dc1195ae63"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_part01.py",
+      "sha256": "51e096bafc8a3a9b901c4b26764ebf85979f4aacc40f5d8b8928a2632405efec"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_resources.py",
+      "sha256": "05f8520723f90d92c7cb78aeaac07967ba5b01febbfa9bf7628afde7a70130c0"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_schema.py",
+      "sha256": "b6c3d4792322cece99dbbe2543a9986ecf853a68cdf8b4b8d549ec991300be68"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_shared.py",
+      "sha256": "d8dab26965217bb15f60bb779dece3fb8e5527b525d523c7ffff10e6b9b2d6b1"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_tool_data.py",
+      "sha256": "52f396b654ef1fe941967090ced33e2130adb454072143e8806100a28c626ca0"
+    },
+    {
+      "path": "docmancer/mcp/agent_config.py",
+      "sha256": "7aa3076e25f307a6c487f93e3136c95d2a290a08b072cfe720f86da14b0532f2"
+    },
+    {
+      "path": "docmancer/mcp/agent_workflow_contract.py",
+      "sha256": "ff92ad0ef1c526ad2cf493a88673148aecf1f42232e6ccfe9032181d6b50ee16"
+    },
+    {
+      "path": "docmancer/mcp/credentials.py",
+      "sha256": "30c8e860f3fceab480cfa21edca21c6f85e3c2b24a3624a5a0f1bebf37938cd0"
+    },
+    {
+      "path": "docmancer/mcp/dispatcher.py",
+      "sha256": "22a59947e007a968774f23ded5a8e46ca6162ac99d5f8c49075d93f8006aae1e"
+    },
+    {
+      "path": "docmancer/mcp/docs_server.py",
+      "sha256": "87856c52c07ac73a733fe92d84b2ed08265230113ba136b17b7a245562703143"
+    },
+    {
+      "path": "docmancer/mcp/doctor.py",
+      "sha256": "683ae4f34cecf1b909c98ba401961486c8d5d3a108860d48acf660671efa387c"
+    },
+    {
+      "path": "docmancer/mcp/executors/__init__.py",
+      "sha256": "965f1edfd275dbc15327c09a02b3e052321ef6532f472ba6c51c7f49b26d3364"
+    },
+    {
+      "path": "docmancer/mcp/executors/base.py",
+      "sha256": "031614a168b97036f719fe63fbaa90f8e50719cf93890df8dd9fce8a754e0af0"
+    },
+    {
+      "path": "docmancer/mcp/executors/http.py",
+      "sha256": "0f9ac73a55d9c2870053a428a2cf4c4b65d7f298f4f31f6f6d703dc74138f553"
+    },
+    {
+      "path": "docmancer/mcp/executors/noop.py",
+      "sha256": "32040a0c8bad09e5f2e85a60ebc6083614ddb3f914bef156b76272c03b1b2a83"
+    },
+    {
+      "path": "docmancer/mcp/executors/python_import.py",
+      "sha256": "80ff34d999e08e04bee917b048f75f0099937f74093d4ba8189d731ec653fc96"
+    },
+    {
+      "path": "docmancer/mcp/idempotency.py",
+      "sha256": "8ae604681e9d4dc6b29cb362d1e1682a4ea9c9601bf88392ae572f9ad2687c7d"
+    },
+    {
+      "path": "docmancer/mcp/installer.py",
+      "sha256": "fca9196bed88caccd6aa3332d8a326f2fabcd82e771aedaa4ccb03dd2df43616"
+    },
+    {
+      "path": "docmancer/mcp/logging.py",
+      "sha256": "a126a059cc8b5a1798c79a5bb9e87acc957b00f3e73d6733c1b40f692b6ed4c3"
+    },
+    {
+      "path": "docmancer/mcp/manifest.py",
+      "sha256": "71a1139ff3e7aebc9cd87bd25dbe99abf6f0e9033fa4b24ff8f42a2ddb11bcfe"
+    },
+    {
+      "path": "docmancer/mcp/network_policy.py",
+      "sha256": "d3e088ed0ae32f683788c525b8af078bcac3d0a8e616b3b209162287f76fbce0"
+    },
+    {
+      "path": "docmancer/mcp/paths.py",
+      "sha256": "0b219ec458d4b1fd3c3a51a9d94147a18b6d7c7e658cd4098038fa86443b70ba"
+    },
+    {
+      "path": "docmancer/mcp/registry.py",
+      "sha256": "93d3a13e2c52bb1a54c47d28a4517ad2c1b9493f8b940732d7b4d5d386a097b7"
+    },
+    {
+      "path": "docmancer/mcp/safety.py",
+      "sha256": "a1446d0a6777f15a32b71f7f2c899d856c8310b0a30afc3a74d7f36269e76627"
+    },
+    {
+      "path": "docmancer/mcp/search.py",
+      "sha256": "6a3b4fe5a89bd9464ad010a1dd80287237f7cf20fc0d151a4dc4ece15618a16c"
+    },
+    {
+      "path": "docmancer/mcp/search_semantic.py",
+      "sha256": "6e9b355865c5895e5c84bdf4ced85550499a649403403ea58259be0bd8d1bad1"
+    },
+    {
+      "path": "docmancer/mcp/serve.py",
+      "sha256": "ad7d491f0f42800e7f0f5ac291a261d129a13fcf242e3fe878162e222b79d192"
+    },
+    {
+      "path": "docmancer/mcp/slug.py",
+      "sha256": "c763d961cfb182c1b2d1ad7558c999fdcbf065f35edbf740949f39f68afb736a"
+    },
+    {
+      "path": "docmancer/retrieval/__init__.py",
+      "sha256": "b3147b1672dd6b5b5da7bb20a6c69400cc126143fe4bafdb219d6ea6f980044e"
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_part01.py",
+      "sha256": "fca609e4687d82ad21459bf917bd4707da0b5739e0ccd75e7824c68848055840"
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_part02.py",
+      "sha256": "b846bb22b70467d650f4904bdd0b79f3e4777cda3c6bb2569e4f6f51f815bd56"
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_shared.py",
+      "sha256": "e3c893e189859f18b1c42eaeb7967988d1f956674f1ae5b35e920bd5a40fd391"
+    },
+    {
+      "path": "docmancer/retrieval/contextual_indexing.py",
+      "sha256": "f61dc2b41d772ecd5d039d9a781aa8b8e773bcfcda019f22feee2dc63abe3ab2"
+    },
+    {
+      "path": "docmancer/retrieval/contracts.py",
+      "sha256": "b157175252d3eab24492cffe107af48122eab633b151fa0b472314db928145aa"
+    },
+    {
+      "path": "docmancer/retrieval/dense.py",
+      "sha256": "c5a868f3bc7fee2872899e7df1aebb913bb36902076f79b81310a3d5f25407c0"
+    },
+    {
+      "path": "docmancer/retrieval/dispatch.py",
+      "sha256": "25211d5dada532655f31783d09dcae7d566dfa686602f07a0da78f289b2d66bf"
+    },
+    {
+      "path": "docmancer/retrieval/fusion.py",
+      "sha256": "bd753c848cae251559c3fb5fe301848250a0f0a81ae530d42bd2fb7243d0e382"
+    },
+    {
+      "path": "docmancer/retrieval/lexical.py",
+      "sha256": "bffe5ab0019d49bd3fef6719fb07e49eb3322cf35ecd52ee976e78a1835686a3"
+    },
+    {
+      "path": "docmancer/retrieval/query_planning.py",
+      "sha256": "e706216bff0a301602e011323b79cd31501cf332559f069519de37a40c984591"
+    },
+    {
+      "path": "docmancer/retrieval/runtime.py",
+      "sha256": "e68d0244383db7466c9f44040fabcefe53606b53b11c237630002b22d95dd8f2"
+    },
+    {
+      "path": "docmancer/retrieval/sparse.py",
+      "sha256": "4cf8707890f19efc1fc4a19b6c800c2010cb6f091bddfca76e9bfc46e0c96cb4"
+    },
+    {
+      "path": "docmancer/runtime/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/runtime/qdrant_manager.py",
+      "sha256": "e21aa0ab2128cc1faf95153f04b272ed79e41f0e74e5e76fac958ab45e092060"
+    },
+    {
+      "path": "docmancer/stores/__init__.py",
+      "sha256": "fb72b6dc2b7afbfbf42be143a5d25d91345ac2026a324cbc536b3f6e2f346f7d"
+    },
+    {
+      "path": "docmancer/stores/base.py",
+      "sha256": "0142de1871bf2bfecf420cf208c743ea32688ac0eacf4c8b2293ed9ca2553b89"
+    },
+    {
+      "path": "docmancer/stores/qdrant_store.py",
+      "sha256": "50fb39d5a77ee9247878ae46ee8e15df75db60f854b8f1d9b27f01b3b7f55c30"
+    },
+    {
+      "path": "docmancer/stores/sqlite_vec_store.py",
+      "sha256": "07b0423e802bae58a53f05173f6325e884b410124b6cb18a214c572818865d9b"
+    },
+    {
+      "path": "docmancer/support_policy.py",
+      "sha256": "4ec5727b0ac5029b3a4ad812ee682c2a1b6cff5e72a065279f811b1b40c79105"
+    },
+    {
+      "path": "docmancer/templates/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/templates/agent_contract.md",
+      "sha256": "493bb4308cc049c60c7cfc7e657e6788111e5955c714a6dafac5c6df0b3ec66a"
+    },
+    {
+      "path": "docmancer/templates/claude_code_skill.md",
+      "sha256": "97570bc590418916b0c2fc5964c4b5bc29ec5938ef38d3f52bca14d2a51b7af1"
+    },
+    {
+      "path": "docmancer/templates/claude_desktop_skill.md",
+      "sha256": "f977fe7020670645cc703e30140776959e7793b4673574f5f3a4b7fe653311ba"
+    },
+    {
+      "path": "docmancer/templates/copilot_instructions.md",
+      "sha256": "1157dd9d88f725cb06e5ee7a2f647faf18a3ab03ebafd0ff986506acc578fe88"
+    },
+    {
+      "path": "docmancer/templates/cursor_agents_md.md",
+      "sha256": "58a44405094cc07e4f7050388fe1055a90aa07e667359fbc2a6f375bfd268830"
+    },
+    {
+      "path": "docmancer/templates/project_bootstrap.md",
+      "sha256": "b6b88a0459b281b0d0a485c4e040ca0b0385917fe7de0a43ff16c6492e67abfc"
+    },
+    {
+      "path": "docmancer/templates/skill.md",
+      "sha256": "f977fe7020670645cc703e30140776959e7793b4673574f5f3a4b7fe653311ba"
+    },
+    {
+      "path": "tests/diagnostic_labels.admission_contract.json",
+      "sha256": "85da3b602a04745155331997db791ad28b1ce5cf854595db3ca573c11008cd32"
+    },
+    {
+      "path": "tests/diagnostic_labels.agent_question_planning.json",
+      "sha256": "917bc0c73c24c35d05335126a8e21e82a1dfb1d993b86933d25d8fa6e97e5819"
+    },
+    {
+      "path": "tests/diagnostic_labels.bound_table_qualification.json",
+      "sha256": "c8d2d3fa5f0ee63651941c0d97d09e2b3a36ef4ef7f4ddc57231d701c039a58b"
+    },
+    {
+      "path": "tests/diagnostic_labels.compact_context.json",
+      "sha256": "4cbdfbabed72fc24d5187c4f17f540a237d8e29e07d8737058537cce4e4239b9"
+    },
+    {
+      "path": "tests/diagnostic_labels.compact_selection.json",
+      "sha256": "e57ec28712a0a64c320040f5b64a50ead4fb6d533f9ee2052ebb23270605b82d"
+    },
+    {
+      "path": "tests/diagnostic_labels.comparison_relation_query_planning.json",
+      "sha256": "13810e9e6b7cdc03f44450766df0f5c194bcd5e30050a1cfd1266b6c31d98f1a"
+    },
+    {
+      "path": "tests/diagnostic_labels.completion_guards.json",
+      "sha256": "f2e3f54ff15eac7946b8db931577eeb3f525839bf03a4bf3a968fbbb674c2a0e"
+    },
+    {
+      "path": "tests/diagnostic_labels.component_coverage.json",
+      "sha256": "6b71706fc92b10d4f67670fda63882fbf805118d57e5c1eb8df90054a74a66dc"
+    },
+    {
+      "path": "tests/diagnostic_labels.compound_context.json",
+      "sha256": "ee84dca70e4b6a68e1084dddb07647af3b8ff1f99c1ae9537cdf36d3d026cddf"
+    },
+    {
+      "path": "tests/diagnostic_labels.condition_lead.json",
+      "sha256": "e7c56cdf8c7b624e3a7b29d00b87e9c6cf8ea16be8deccce0852574a1f5767db"
+    },
+    {
+      "path": "tests/diagnostic_labels.context7_project_chat.json",
+      "sha256": "1576a6ed74741697cca0cd80573c5bb3130d9a655050a6ff36b3423187051d22"
+    },
+    {
+      "path": "tests/diagnostic_labels.context_capture_integrity.json",
+      "sha256": "a5c028944966149321e384f52c82e9c7c8505db5f04c87129d966924ea5d1d0c"
+    },
+    {
+      "path": "tests/diagnostic_labels.context_completion.json",
+      "sha256": "55b24b42ab72c1bdf5f0cece2a1d98e3d4d7dd688bff99ced48368fe080620be"
+    },
+    {
+      "path": "tests/diagnostic_labels.context_loss_boundaries.json",
+      "sha256": "28b20de640b54534fa01f7fd24e706903f6af31508a88061b70d6d69eb323685"
+    },
+    {
+      "path": "tests/diagnostic_labels.context_preservation.json",
+      "sha256": "1ab32d36120cf9db48f3e2654c2c308c40df8df62c90a05b0d3a227d48aab19d"
+    },
+    {
+      "path": "tests/diagnostic_labels.context_quality.json",
+      "sha256": "af296cdc75f4cd9179c4d532c4a2200a3e5bf26e085fa42c413094e1a716b6a4"
+    },
+    {
+      "path": "tests/diagnostic_labels.curated_merge.json",
+      "sha256": "10f7ffd782717ff60972a9ab3d5622f7a17374d42bbbabe4bfd840b345981a97"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_admission.json",
+      "sha256": "0ba2830a4382227ae7026fd231adc19d17ae19e69b81a686578e326e746d207e"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_admission_literals.json",
+      "sha256": "b5cac7d50948029c4b1939c18c6949d08b914d73555647ca463c21d4570176d2"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_callable_residuals.json",
+      "sha256": "6d63aa1d747ac347c81792d5372c390473d313bce89b769fc9140235f79118cb"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_code_context.json",
+      "sha256": "5412b7d4ddc8468ddeb5dfa2a375d40065ec3d00887a13ff85aacbcedfdcc9e5"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_completeness.json",
+      "sha256": "f6abb141bd89456602171912ffefcef5916826dfbeed19ef1a4f1e7bbd606793"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_corpus_policy.json",
+      "sha256": "d3d802e7ec031b835da747df0babbce9463026dd532ff836a58facde9224335f"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_delivered_surfaces.json",
+      "sha256": "ce91148f7faa727ac6c138dce580ba27b9bd5fa52350ca36e933c759efffbfaf"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_discovery_literals.json",
+      "sha256": "0aa760ed480e48c59343298e06967b475aaaf86b4445157bd516249424da91b0"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_dynamic_resources.json",
+      "sha256": "021a98d36f5a30642b1f539a4af6c9c3e9c55511471ea137fd51f0810ba64c5a"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_finite_callers.json",
+      "sha256": "e278bbb821d807f4055e892b80ed141acc2a06e88b013a475bca261195d4ed96"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_finite_corpus.json",
+      "sha256": "874be141fd4b8de24e9476f9d573808a3e78c1a0c7b5a89428c7be57fca27e92"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_finite_corrections.json",
+      "sha256": "5b5e1c26ec1c6e8d276b26ddb12a14b7640fa528fffd8ecb1102f987d7161ee0"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_indexed_mcp.json",
+      "sha256": "8572fd02acf697275366690856e62752e825f32311b6ecd5f3b1c8f3ba4d2cc8"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_legacy_compilers.json",
+      "sha256": "80dde22ad48f53a156c62f645d358c80fa63b3d6f8ee27d393abba2387541c3e"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_literal_needs.json",
+      "sha256": "e88ec3b1ea521f0898f78a8fbce429012051f4c7047f51db57286e83d9f30d07"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_literal_needs_mcp.json",
+      "sha256": "aea6ca01a98da0f3866525b51d317f180133b8a455007a38e8586d04b346fa21"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_local_residuals.json",
+      "sha256": "5aed64227ade3f17398f130be1207dbaa8db8f9ec4b7668ae53b67a4deaf19bc"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_ownership_telemetry.json",
+      "sha256": "3191bdf5bff454d8ac8212b109e2040634ff733e21f4ab2deabd81886b328b4d"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_packs_safety.json",
+      "sha256": "ac94df0680a7334697b3f3975a319a769612263422c8b2910ce819355375eb76"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_patch_boundary.json",
+      "sha256": "6200d8308086ba2e94f7a12144a5c317ea15292c5d99c223b9d67960ec8cb474"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_patch_literals.json",
+      "sha256": "92e9b121461bccf54ed60dfea2475fc5fdc3638fe335465d0ff9f077ae797a38"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_patch_validation.json",
+      "sha256": "85f92949f99d682630aac8e826adb3d0b383e8bb624b60d2ddbdef473f554868"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_projection.json",
+      "sha256": "94618e28cba9aaae6fa286ac5faacea0a0674bdacbba13f50062c3872ed3758d"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_public_request.json",
+      "sha256": "21193f499885b6bcf1375b9c55313d58078537f5de7a777a2652849562f0abc0"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_read_routing.json",
+      "sha256": "d04b732e8f54866d7dd648a7c797a613575c92f288bc2f43a4fdeb1a26c3777b"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_read_tails.json",
+      "sha256": "2740d80013bcf06a636ccf8269b102b7fc35728cf7ab6b7412c3a6c90df3b578"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_reference_ranking.json",
+      "sha256": "d1d18f9d6f175c06b5c66684a140a3ddae6ff736bdfc63578967b038857920b0"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_refresh_identity.json",
+      "sha256": "7594b4db1942a27d3c1a7e35766e5a2be5acd89573dc206794898d6387f4df63"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_residual_proofs.json",
+      "sha256": "601ead2de4c0df5b467d4d784518775761c46bce5f3bca7bb511e1130e74da5f"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_retrieval.json",
+      "sha256": "bbecb58247cc96833dc032b87a1721cb44e2b01347d2cdd2cc02644787af598c"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_retrieval_need_adapter.json",
+      "sha256": "4d7436f43e7787310ae6bf0f00c4ae1d16db2d1ce6985c4044d7cca6998e37fd"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_review_boundaries.json",
+      "sha256": "523d4ce1b16d7721729c32d519afda294c213c07885867c8052e21c58c1917d4"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_selector_visibility.json",
+      "sha256": "5db463c749a12d2840a9810eadd98c07050b8dce5a5c7996d0235f75267e717e"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_source_identity.json",
+      "sha256": "70d3000b294354e041bb26bcdb558d25fdef8b02a008999f579c90e97d4ae0fc"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_structural_units.json",
+      "sha256": "c9f75e9f1eebd8c60c23bdc2900d846bd462b7c405fedc161fb09964b6ee416f"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_unit_helpers.json",
+      "sha256": "3118f4a18dc8bdfd218b6a1f8385d0f12217cdffd6f51f36af89d87e8e1fbbef"
+    },
+    {
+      "path": "tests/diagnostic_labels.direct_questions.json",
+      "sha256": "46c5b26cefa8fd9f3a373b319dd2cc65cced43825742417003a5669c7891bc91"
+    },
+    {
+      "path": "tests/diagnostic_labels.docs_context_budget_reserve.json",
+      "sha256": "c2d4f9337f12c101d14eade479bd7ca9169687f4f444b013a758752cf8331768"
+    },
+    {
+      "path": "tests/diagnostic_labels.docs_context_read_next.json",
+      "sha256": "24bd0afba467bab4e919ccb8f5762f72a409f9832b24fdfb752650e3e6051f3a"
+    },
+    {
+      "path": "tests/diagnostic_labels.document_local_rescue.json",
+      "sha256": "8e839c2125ac8bc83675c6162705f46ff76f2b9a2d5bb571d94e001ba0f690d3"
+    },
+    {
+      "path": "tests/diagnostic_labels.documentation_audit.json",
+      "sha256": "87cdbad754645fd0bbd696eccdd2574209fc372b71ac6f3d7d9858020578b569"
+    },
+    {
+      "path": "tests/diagnostic_labels.enumeration_terms.json",
+      "sha256": "2cec8b2f2afb0936f6ffc4d01665f946e4c9e8ae5713b60137fff15e177249d5"
+    },
+    {
+      "path": "tests/diagnostic_labels.evidence_admission_sufficiency.json",
+      "sha256": "e9c42a672df2571a6ac2c6f50fd00bc2bf97c29b4bdd7d80ecd8226a5ec4044a"
+    },
+    {
+      "path": "tests/diagnostic_labels.evidence_quality_v2.json",
+      "sha256": "0befb4d6d16ca85c56ea94ab6c5507894285ad615891ea1a1441d957a47b4f5b"
+    },
+    {
+      "path": "tests/diagnostic_labels.evidence_sets.json",
+      "sha256": "14db854328e1698fd3417a1d558cba07981269504fe6b0b9ea71ba36997d26b0"
+    },
+    {
+      "path": "tests/diagnostic_labels.exact_document_fallback.json",
+      "sha256": "91f05c9d25e2a2d8c266887a32778a7a53a65de6fe15bce9d7d8de06999b4077"
+    },
+    {
+      "path": "tests/diagnostic_labels.frozen_fastembed_dependency.json",
+      "sha256": "48beb1ea482f1301cff0ba98ae30e51c831a6073e5630773f3048cb84def9122"
+    },
+    {
+      "path": "tests/diagnostic_labels.gap_directed_candidate_ranking.json",
+      "sha256": "beb5a4fef6359700051ab1db24fa28fd1fe100a4832396479827e617d8632eb0"
+    },
+    {
+      "path": "tests/diagnostic_labels.generic_context_workflows.json",
+      "sha256": "f0490a07bc08de401df8d50eacf1ddad4506df41968be95f10a8247c70bf25b4"
+    },
+    {
+      "path": "tests/diagnostic_labels.git_stdio.json",
+      "sha256": "6b20b9857f4f9b55a53c22a7959e8a3beb3036369415b40dd13a124a6f0410c1"
+    },
+    {
+      "path": "tests/diagnostic_labels.global_evidence.json",
+      "sha256": "e787a0555edaed5ce756f8d8fedded7110b39b01111377783e74d5e2b5e7caed"
+    },
+    {
+      "path": "tests/diagnostic_labels.grounded_mcp_session.json",
+      "sha256": "772ca8f1dcf7c9b4b13f9ea184f5a32d22c56d3fd13844487fd7db3f8841e161"
+    },
+    {
+      "path": "tests/diagnostic_labels.host_evidence_control.json",
+      "sha256": "44772c24cca66ed8aba453423b60094d859b3549a8021ccea7142cc821b307f6"
+    },
+    {
+      "path": "tests/diagnostic_labels.host_match_priority.json",
+      "sha256": "c36a597df4918dbe503fed3d0feca67699df69d2108c47efc3679c2edb23f12c"
+    },
+    {
+      "path": "tests/diagnostic_labels.host_scope_planning.json",
+      "sha256": "96809057204664b11dcf682491a05c9827cb48c46e2c333eedb412fb5ae6af2a"
+    },
+    {
+      "path": "tests/diagnostic_labels.hyphenated_identity.json",
+      "sha256": "f240477fbf2be74c6d8d894b7342d2567ba35a58a302f745a9a4d71bd1d1f4db"
+    },
+    {
+      "path": "tests/diagnostic_labels.independent_query_probes.json",
+      "sha256": "7f50327b53b14307bcdec866f89fb9e4fea4463820b24957fe3ed66ddbfafd51"
+    },
+    {
+      "path": "tests/diagnostic_labels.joint_selection.json",
+      "sha256": "c076d5fee069ae6967c113e07c6a4099c1b01c034c6dc3262cf4d251e359d445"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_aware_context.json",
+      "sha256": "d1f24fb842d9f78d1cac228dfdf0bf961970c5887fe721393c1d6ae3f64e8117"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_ci_diagnostic.json",
+      "sha256": "d83148333faf4eba4c7e2b06a8cd78b370c458af85ba1a81cc0b58fead353297"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_flow_experiment.json",
+      "sha256": "708b7bd1e83edf3e0a4e93b24f9107d325b91c1eec5a4078a7641584e707109c"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_packing_experiment.json",
+      "sha256": "e335c1a98992b382ab9ca6069fd5c12e243d0fae8e5d8b4ba0555d25c888448a"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_packing_trace.json",
+      "sha256": "20f34cb03ff37769814b18dcca949099f9cf8147a6884818ea300cafcddfa33e"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_pilot_io.json",
+      "sha256": "28f86827110b051af7f44393f151ca47a1209be9f5ceef3402a8345d57cec58b"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_pilot_review.json",
+      "sha256": "74db4c10506dc15b56496ea0d2004bff2a657664896ac8c634ff1c59ebb00f56"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_pilot_v2.json",
+      "sha256": "e347dfc0cec4771ba72f474ccc5acd95ab19f746ac88c299b9689c225b5f5dc9"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_source_profile.json",
+      "sha256": "e95fba6c8e259f3feec7870a9746d1244fe929491ef3425a77d609ea714ea3a6"
+    },
+    {
+      "path": "tests/diagnostic_labels.language_trace_serialization.json",
+      "sha256": "80e4527d322770e79d9576169ae2810e509e2398c8abe7c08f24457d15d2bc83"
+    },
+    {
+      "path": "tests/diagnostic_labels.list_introduction_atomicity.json",
+      "sha256": "ab993d993fccc0fba898b3780cbf65f543162deb2f3600ff260b67207761829c"
+    },
+    {
+      "path": "tests/diagnostic_labels.list_item_continuation_bridge.json",
+      "sha256": "5d0b7b9a3acb36e21a3a83ee0edf284326f3f5d10e69a8b7d8c902334d1d64df"
+    },
+    {
+      "path": "tests/diagnostic_labels.output_integrity.json",
+      "sha256": "a52f248a98df3c9e231bd8a8d3feaabe3ca8d6e252333c318a4b2baa762f42e2"
+    },
+    {
+      "path": "tests/diagnostic_labels.p0-governance.json",
+      "sha256": "2f864618006f779ca59a3253123c61bd4bcbcbbf77c99912c616d20f0e074071"
+    },
+    {
+      "path": "tests/diagnostic_labels.patch_context.json",
+      "sha256": "59d6125c680c12a1160026763e02702aa554f74e194f6f83db2f0d664efab09b"
+    },
+    {
+      "path": "tests/diagnostic_labels.pre_hydration_source_policy.json",
+      "sha256": "d849e97d23415673d6a2632fb6200a57369cdded81461c26ecdd3d1a3db230bb"
+    },
+    {
+      "path": "tests/diagnostic_labels.project_context_quality.json",
+      "sha256": "a1fc2725830b5585527e56e2915c7b449bedac001ab85739f80dccb294cb00d2"
+    },
+    {
+      "path": "tests/diagnostic_labels.project_context_quality_acceptance.json",
+      "sha256": "6659be09b3dd6bd23506d9d0577b822bba6876c797f9db36d1a6b7a721fa74b1"
+    },
+    {
+      "path": "tests/diagnostic_labels.project_context_quality_v2.json",
+      "sha256": "39e3ec1e7f4897c8604684a1606aeeee7f6dfdd54ce6e67c17c51a6042ce913b"
+    },
+    {
+      "path": "tests/diagnostic_labels.projection_boundaries.json",
+      "sha256": "b58af99b4a5cb3a013a87d943ea442b2108284877452b32f71a00a251ff885e5"
+    },
+    {
+      "path": "tests/diagnostic_labels.projection_facade_hooks.json",
+      "sha256": "d8ff82f30af9243e85b689ed30e75f2a8afc91a4707fe79114e20d45b2f20e6f"
+    },
+    {
+      "path": "tests/diagnostic_labels.pydantic_direct.json",
+      "sha256": "6a3ea48c85a79ecb6a09876accbedca773bc5689b1effba6bad07a73ad4c81f9"
+    },
+    {
+      "path": "tests/diagnostic_labels.quantified_attribute_scope_isolation.json",
+      "sha256": "de2a2c63ceefdeb36a7d08c26d9380e09ee1b90404435737b5d60cf704c7c22c"
+    },
+    {
+      "path": "tests/diagnostic_labels.query_blocks.json",
+      "sha256": "d3ed1f34e0b1d8cb33b6fdbea1e59f684ecbaed485a33c995a18d222f47e2a96"
+    },
+    {
+      "path": "tests/diagnostic_labels.query_planning.json",
+      "sha256": "7b04f0481090a165dce2d1fec60f8c44493f63192acdd7d82bebbfb01d2f5d00"
+    },
+    {
+      "path": "tests/diagnostic_labels.query_planning_completion.json",
+      "sha256": "b0ba7390b1cab892684eea85f24407fbe4671dddd437be2765ede8c25f14f45c"
+    },
+    {
+      "path": "tests/diagnostic_labels.query_planning_p5.json",
+      "sha256": "3377f95032bb9c17be8da143af25580bb9c6e67f57533ff5dfadb4bafef340e5"
+    },
+    {
+      "path": "tests/diagnostic_labels.read_packet_residuals.json",
+      "sha256": "52542c139c20e9bc4be825023733528f1302dfa5f0c11936320cc3bcf065f381"
+    },
+    {
+      "path": "tests/diagnostic_labels.reader_view_boundaries.json",
+      "sha256": "6fcdc1d4549b31bf6831b9a6e121a7511b36e6d7c92373c71f76e567d5de61c4"
+    },
+    {
+      "path": "tests/diagnostic_labels.reader_views.json",
+      "sha256": "eca98f4ebf7b13a8b8225fc3340dc51530c9c49bbd93dbe48f242181264e7299"
+    },
+    {
+      "path": "tests/diagnostic_labels.readme_neutral.json",
+      "sha256": "f6c79ab5a988bb7f8449a5d4d74c0c63bb8d99a0e1674d53defe2d6222086f89"
+    },
+    {
+      "path": "tests/diagnostic_labels.reference_binding.json",
+      "sha256": "6e07d3e869940a2499d096a39e3d2b8f546668bd457043a141e9f2a80c663421"
+    },
+    {
+      "path": "tests/diagnostic_labels.reference_hash_domains.json",
+      "sha256": "1abd403d3195477723399cc17844534b48d3952d010f0e16579bedfdde61490e"
+    },
+    {
+      "path": "tests/diagnostic_labels.request_flow_lineage.json",
+      "sha256": "3fe23363461bef9ab78e643c02b972c36dd178d9fd1fcf8b5399ae61a32a6e18"
+    },
+    {
+      "path": "tests/diagnostic_labels.request_source_facts.json",
+      "sha256": "928163b2d26ce79fb973fa25cda9715a87f37681a6e88e1bf2e5f6af973b0e75"
+    },
+    {
+      "path": "tests/diagnostic_labels.residual_paraphrase_query_planning.json",
+      "sha256": "3405ff841c2fc5232d1c57716111d428e7b0f9699623bbecb963bb703dbc4824"
+    },
+    {
+      "path": "tests/diagnostic_labels.retrieval_diversity.json",
+      "sha256": "5ab3d66a8977fe61b737ea2807915a63a317f8893019003926ab515ef8ca526a"
+    },
+    {
+      "path": "tests/diagnostic_labels.retrieval_only_host.json",
+      "sha256": "fe18e2ae685df38f22827b40ed80b0e87ba896f82b285805ffd0f7e87445fdaa"
+    },
+    {
+      "path": "tests/diagnostic_labels.retrieval_recheck.json",
+      "sha256": "bc667ca03d1ec0a44471b8a5c4c2437f5d7865760f098e841f489c7308f91788"
+    },
+    {
+      "path": "tests/diagnostic_labels.review_assignment_identity.json",
+      "sha256": "3f00c3f44aca55b840ef694ed3f04566f8a1b1a5b3639d68894f897e0a3cc832"
+    },
+    {
+      "path": "tests/diagnostic_labels.review_boundary_semantics.json",
+      "sha256": "0985a30f8768bbd90ada2f76f0e825905340898c482ff38ddb69ab59c68ff252"
+    },
+    {
+      "path": "tests/diagnostic_labels.review_capabilities.json",
+      "sha256": "a0904c453364f490436c8a5ab003cb011eb960caf35d24d4860d1b70509f91f6"
+    },
+    {
+      "path": "tests/diagnostic_labels.review_query_lineage.json",
+      "sha256": "9706c5487b0651122695b6a2bf5148e0bb5105aa8ea7bd0557c80ac2ab80f3d4"
+    },
+    {
+      "path": "tests/diagnostic_labels.review_span_lineage.json",
+      "sha256": "2be55be45a3f76fa21ab39f191aa77ac27f7c01c96b9c3ee3d8cd2a42583eb23"
+    },
+    {
+      "path": "tests/diagnostic_labels.scope_span.json",
+      "sha256": "9cd9eb327d146ce2b65ca19b5e0e79f374492d65e63a5a95af17b3d811139105"
+    },
+    {
+      "path": "tests/diagnostic_labels.script_recovery.json",
+      "sha256": "61710835071a2248ee603e52d3ee345f30dcf5be0a382fbf43858fad1f3d0e3c"
+    },
+    {
+      "path": "tests/diagnostic_labels.seed_envelope.json",
+      "sha256": "dffb89bf75299daa45657217c3fd250748fadc5043fe28ef421b0e7f26717734"
+    },
+    {
+      "path": "tests/diagnostic_labels.self_host_agent_contract_surface.json",
+      "sha256": "9747d15d84ced4b29f23b1998fc107d95c3cdb8cb11130f98410ed66fb5f37b1"
+    },
+    {
+      "path": "tests/diagnostic_labels.semantic_density.json",
+      "sha256": "68b762bac6f73641a374d438828984c0b962ceccb10dbec2b00a594a7b311a7c"
+    },
+    {
+      "path": "tests/diagnostic_labels.sentence_windows.json",
+      "sha256": "d1d10f0c9d5ca2840f59d5528f635d2bbacedac26236d28dc40e7cf2f5731936"
+    },
+    {
+      "path": "tests/diagnostic_labels.service_fixture_isolation.json",
+      "sha256": "bcaff0d0294961a65b258293c50d43d4d573201bd2def0820da8b6dd21606c30"
+    },
+    {
+      "path": "tests/diagnostic_labels.source_continuation.json",
+      "sha256": "59819fa258f295f7101182b0e8108d73ce97c8f0eb4fb58cab04053e476241fd"
+    },
+    {
+      "path": "tests/diagnostic_labels.source_item_integrity.json",
+      "sha256": "0c61de5ab66d6a1314bae1ab8f521bdc79427aea8109bf48ac4bafbe8f3caf9b"
+    },
+    {
+      "path": "tests/diagnostic_labels.source_recovery_targeting.json",
+      "sha256": "5c9f2a419fae79e225808b5a71b62ba53726944cdc80e4c39fc02c330ceaf614"
+    },
+    {
+      "path": "tests/diagnostic_labels.sqlite_phrase_ranking.json",
+      "sha256": "e0efad2072d1f0294b2587ce7727ca3378d61ee58da761ba64df16629be4a6a2"
+    },
+    {
+      "path": "tests/diagnostic_labels.structural_behavior.json",
+      "sha256": "6129913dde5b098530dafe5bd73647a444050f5bb93071919565fefa0dd795ac"
+    },
+    {
+      "path": "tests/diagnostic_labels.support_retention.json",
+      "sha256": "6dce9a1a2da20b4fe5f3424a406f80dcb237ec1a2ca246003cd00b6f7cfe05f8"
+    },
+    {
+      "path": "tests/diagnostic_labels.systemic_retrieval_candidate_pool.json",
+      "sha256": "cce79a40095fef9cbae9f4c3d4ea999317ae67d0f5f7be88b1825178f0b31f19"
+    },
+    {
+      "path": "tests/diagnostic_labels.unresolved_context_prefit.json",
+      "sha256": "1afa68437880c79961b3a91b18b8aa84d60e5ac569d0621b19c7e256bd29d118"
+    },
+    {
+      "path": "tests/diagnostic_labels.v13_v15.json",
+      "sha256": "ec042649fa8f10f15015f85ec808d0a9660c5b7feddc8eb8fc04b5521e48ad11"
+    },
+    {
+      "path": "tests/diagnostic_labels.v2_acceptance_gaps.json",
+      "sha256": "9a3632c8854b72b60a4f76fee8ecaacbd74638cc6e68d4b6c076662f179a1205"
+    },
+    {
+      "path": "tests/diagnostic_labels.version_evidence.json",
+      "sha256": "0e0fac68385e8fd978a89268b61664b1b44e66409c410fee525429b637224461"
+    },
+    {
+      "path": "tests/test_dictionary_exit_admission.py",
+      "sha256": "b11a4216b7085ff2c5c9733c3bff5a874e537191b7fd1b27e12802084f719973"
+    },
+    {
+      "path": "tests/test_dictionary_exit_admission_literals.py",
+      "sha256": "2e4b1fe30810e77b106ef642a1902b1022a013f6f1f84fc22efd8e9a72f13c17"
+    },
+    {
+      "path": "tests/test_dictionary_exit_callable_residuals.py",
+      "sha256": "b4aa1e18de701d3311458d0a18f76168bd9de94f7792a5f4a7da1781ca23a75b"
+    },
+    {
+      "path": "tests/test_dictionary_exit_code_context.py",
+      "sha256": "321a633825df64711f2d0be3dd8a3db213f1b6ddc2aa13746c7a0e6d1c8e8b8f"
+    },
+    {
+      "path": "tests/test_dictionary_exit_completeness.py",
+      "sha256": "d52c7ae73022a310d3cef73576a7f6885c65f9dcfda59deeb5d1cd2e67f9fea7"
+    },
+    {
+      "path": "tests/test_dictionary_exit_corpus_policy.py",
+      "sha256": "4c2a237967d87b103264d3ff02f48c956e61b929111d4659abab015352398357"
+    },
+    {
+      "path": "tests/test_dictionary_exit_delivered_surfaces.py",
+      "sha256": "7a30f27a0365c72db678bb47cd775f0cb39636efd28bcb409678154ae5169f8b"
+    },
+    {
+      "path": "tests/test_dictionary_exit_discovery_literals.py",
+      "sha256": "bab0f0700b8d49ea30e918bf19b7a1b8890ccec44baefb967cf82db7a8fb975e"
+    },
+    {
+      "path": "tests/test_dictionary_exit_dynamic_resources.py",
+      "sha256": "57f6bb681ed60ccb2d4c4e8606de0242f05dbc6ba73da6192efb36d7033e87e7"
+    },
+    {
+      "path": "tests/test_dictionary_exit_finite_callers.py",
+      "sha256": "edfa4efc11e2286d1163059f678514dc3fa392f71758d1d2983989c091db7d5d"
+    },
+    {
+      "path": "tests/test_dictionary_exit_finite_corpus.py",
+      "sha256": "f981f5f79af54dc67a203267ef713013d075f9db9a20a112c8573fd219086699"
+    },
+    {
+      "path": "tests/test_dictionary_exit_finite_corrections.py",
+      "sha256": "18fa04d624256ccd77c032df3c88723e762eb532bded01b04f874639d44b2bf0"
+    },
+    {
+      "path": "tests/test_dictionary_exit_indexed_mcp.py",
+      "sha256": "fd84551a9c6af6a5f1d02090a413623ac38d3207b9bcb8f42f59ccd873a8e0ad"
+    },
+    {
+      "path": "tests/test_dictionary_exit_legacy_compilers.py",
+      "sha256": "2868e56b2109f6bb8664fbcf5524471924e00356ffe724c111bee0ec4bd172b8"
+    },
+    {
+      "path": "tests/test_dictionary_exit_literal_needs.py",
+      "sha256": "918e9eafa18e1504a72afddfa96325c8ade3cb84ef617981423ce067072aff50"
+    },
+    {
+      "path": "tests/test_dictionary_exit_literal_needs_mcp.py",
+      "sha256": "8835cd27377d40299cd06106a9476861845b9a5ecd736eec57f348253850890b"
+    },
+    {
+      "path": "tests/test_dictionary_exit_local_residuals.py",
+      "sha256": "0c89449089df46a3c0a9b46a361412f641199a94b8120189190d7e58d1b5b831"
+    },
+    {
+      "path": "tests/test_dictionary_exit_ownership_telemetry.py",
+      "sha256": "0b7abe4f869b8b41d33e74e4b10a6e9b1449f9279072242df2ebf5c2e8681208"
+    },
+    {
+      "path": "tests/test_dictionary_exit_packs_safety.py",
+      "sha256": "3e943dae9fb050ecd975fb41333af28e1558445029bcd1ec15aa17bc614074c5"
+    },
+    {
+      "path": "tests/test_dictionary_exit_patch_boundary.py",
+      "sha256": "3d12d33749257da468966c2693633b67cb328a5f8a88561ca8b132f9b3992075"
+    },
+    {
+      "path": "tests/test_dictionary_exit_patch_literals.py",
+      "sha256": "637ae9596e4197bf0bde27dce3edf8fcfc57066ca40f3b5d2bddc7fe315ff1b7"
+    },
+    {
+      "path": "tests/test_dictionary_exit_patch_validation.py",
+      "sha256": "7b2b14855d9188d747130017391dcb68277071fcae6c8dcc0180a330357b856d"
+    },
+    {
+      "path": "tests/test_dictionary_exit_projection.py",
+      "sha256": "3894ad05f486971ea1ad8acf79d08c3d89736390e7ec8fc335ba863aefa79afa"
+    },
+    {
+      "path": "tests/test_dictionary_exit_public_request.py",
+      "sha256": "bfd1dd46eb696f5a6930e750ad0c2f3228ba54b9e90fcc436c56387fd6ec7004"
+    },
+    {
+      "path": "tests/test_dictionary_exit_read_packet_residuals.py",
+      "sha256": "0659f2f76fd6e0a37b55e73f0cb801a88672c41535405f978fe43bd086aec638"
+    },
+    {
+      "path": "tests/test_dictionary_exit_read_routing.py",
+      "sha256": "af0e687a322f09fa50350132d44fb4288c662dc5ee4d1d01d5c4f73a98412ca9"
+    },
+    {
+      "path": "tests/test_dictionary_exit_read_tails.py",
+      "sha256": "c2ef8c2cece35a9f6a06091125341f182ab53c932d715b2738c49dc9256408d6"
+    },
+    {
+      "path": "tests/test_dictionary_exit_reference_ranking.py",
+      "sha256": "bb699f7c7029ac54dae70fc0b33c31bedfb211b05e1ce742ec45193ad320d91b"
+    },
+    {
+      "path": "tests/test_dictionary_exit_refresh_identity.py",
+      "sha256": "bd24166fa480c0cdb4a765b83b4a0d22642bbe276030e0f898546d4c306fd7ac"
+    },
+    {
+      "path": "tests/test_dictionary_exit_residual_proofs.py",
+      "sha256": "8c58df46508abe1831e6b3e55b311af048b114f59c4c176e0b0d2659f90715b3"
+    },
+    {
+      "path": "tests/test_dictionary_exit_retrieval.py",
+      "sha256": "3dc3a9bfa77e1f6222ad1969ae990b952b919c396a8ee7c4280871c88ee1a80f"
+    },
+    {
+      "path": "tests/test_dictionary_exit_retrieval_need_adapter.py",
+      "sha256": "f89bc143661348084e9fd694a46b5f882e95e3fd80f1ab67b628086771e46507"
+    },
+    {
+      "path": "tests/test_dictionary_exit_review_boundaries.py",
+      "sha256": "a7244cb40c212bdcaf454d228278dd3606dd622f1951d7caf49769359c702b8d"
+    },
+    {
+      "path": "tests/test_dictionary_exit_selector_visibility.py",
+      "sha256": "cf9e72885504d31300b8f21c685796bd2375f3f5956ea77617f6aba111fedf9b"
+    },
+    {
+      "path": "tests/test_dictionary_exit_source_identity.py",
+      "sha256": "1a2badf17a6573837ba4d366882712b0192420ba6cba4d3973f289859653a30e"
+    },
+    {
+      "path": "tests/test_dictionary_exit_structural_units.py",
+      "sha256": "4b7a0013ae88b312d2e85a9575dbb3db39156bc3804e1d9aec82cf6449806ea9"
+    },
+    {
+      "path": "tests/test_dictionary_exit_unit_helpers.py",
+      "sha256": "2725785079d29f024779bc124dbf9d52b39bda980cf3a8cf18cfd2c2c09408c6"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/ADMISSION_LITERAL_DICTIONARY_EXIT_RU.md",
+      "sha256": "7efcab48219fee335785c830bf75d9b8b3e463cdd3885d833f3b0efe249f2c51"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/CALLABLE_RESIDUAL_DICTIONARY_EXIT_RU.md",
+      "sha256": "0f2f93de5cce4859eebad38e2484c6e33134789653df2950d2413aa79dfae40d"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/CONTINUE_HERE_RU.md",
+      "sha256": "3ad504ee3d54329cd3362a32f496d36bb98d5977159bda14422ca0fc27350617"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/CORPUS_CONTRACT_OPTIONS_RU.md",
+      "sha256": "7b50e1f3d963f6454ccf8ea4058dd640fb6de720eb3006a16387b671af737ce5"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/CORPUS_POLICY_DICTIONARY_EXIT_RU.md",
+      "sha256": "9bd7dfe5b3ef382764a2d73074a1d0ff854aff93f6a157706c64a10bb717e94e"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DEFAULT_READ_FOLLOWUP_RU.md",
+      "sha256": "4eccc3234f9ca15bbb6b2a8bde9ee4bee2fbcdc37ad7912557286c52f3c78ac4"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DELIVERED_SURFACES_DICTIONARY_EXIT_RU.md",
+      "sha256": "3010e77147365ad5f44db4f9daf0354b48a16ddf800600047e6e44ea0cee9c84"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DICTIONARY_EXIT_EXECUTION_RU.md",
+      "sha256": "361aadc8ac6e8878b42174903036200c973d82c24bf2f97112e1be3357d0e1ef"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DICTIONARY_EXIT_PLAN_RU.md",
+      "sha256": "b4264e4221f1077ffc3ecbfb5551954be89fa6f8518bc95f48a0fc2697b70c92"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DICTIONARY_INVENTORY_RU.md",
+      "sha256": "3fec9de57275554447db06e739168ee2c9bfb8c4878e4847dc05d619a426b2bc"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DICTIONARY_STAGE_STATUS_RU.md",
+      "sha256": "cae939ed2983951aad48e45991d678c9d1bbccb5b7557d28dde793a00ded9588"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DISCOVERY_LEGACY_EXIT_RU.md",
+      "sha256": "7ee13e504e4bfa04ddf84e36847eb7d7f5dcf3b0d330c3c07a75be1f063b4fe5"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DISCOVERY_LITERAL_DICTIONARY_EXIT_RU.md",
+      "sha256": "f2566cf92aab413830ed917a182ff893f1f15fed5cfbf7b827873c8a18dc2d3c"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/DYNAMIC_RESOURCE_DICTIONARY_EXIT_RU.md",
+      "sha256": "289b99ff572d16d4aa9a1da84d8b88b61ad4d6c40b7d5fc8391170e51be02994"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/EXECUTION_STATUS_RU.md",
+      "sha256": "8cf2a495ff4f6c8dd65ce3fd8d3c941355d97c3d59f6e7bb0e1e32af04decb77"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINAL_DICTIONARY_EXIT_INVENTORY_RU.md",
+      "sha256": "07ea44fb8076ca96f6eced88ba12d5cb1167af152f5b8b407d89ada756e1afc4"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINAL_FINITE_CORPUS_PARALLEL_RU.md",
+      "sha256": "46cad88fe4719a231ef84854d6ddc822347a43dea177f8c3ab8f00c49ed7681c"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINAL_INTEGRATED_EXIT_AUDIT_RU.md",
+      "sha256": "b5ce24b460e234376fe693300521f3cb1533ff6eb717596d9d2db7e5a2fdbd00"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINITE_CALLER_DICTIONARY_EXIT_RU.md",
+      "sha256": "7e4cc142dc33797dad5e43ed4f86dccc655090087f650526cd291d1e98635570"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINITE_CORPUS_CORRECTIONS_RU.md",
+      "sha256": "68cbb080e2722d0da01baf58f309a8690369a22f3575ce737a6d628c2cc7ae09"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINITE_CORPUS_DICTIONARY_EXIT_RU.md",
+      "sha256": "a7cdcef8e887a366c07044a2c668e9fc513cc11ce06a2bb711a1fc5705b24aee"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/FINITE_REFRESH_IDENTITY_CORRECTION_RU.md",
+      "sha256": "d8ebb86b918e437acb35bc21e322415aa713374add60514df4f2b44f3e4d275a"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/GROUNDED_COMPARISON_RU.md",
+      "sha256": "88bb49787ec7f315acafb59e01eb06c5b1894ea9524689fee5e81c354602d8c8"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/IDENTITY_ADMISSION_PARALLEL_RU.md",
+      "sha256": "aa9ea839ac04334090aa098b02af0eefa8562f628b9ed8ffc74b8cef6de60ac9"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LEGACY_COMPILER_DICTIONARY_EXIT_RU.md",
+      "sha256": "123bbb868abf723d74a43000fefa3da481a63374c209ab925e61639200e71aa9"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LITERAL_NEEDS_FOLLOWUP_RU.md",
+      "sha256": "a68b61bc69541beb0b84d268cadcca9f324a4573106d5cd9d1a1214f64d7ed8e"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LOCAL_RESIDUAL_DICTIONARY_EXIT_RU.md",
+      "sha256": "927cc14f6e3404393e36a54d1bddbb48cce113bc3fe2942009b692e49a434818"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/MERGE_PLAN_RU.md",
+      "sha256": "dcb418c3d27528728b35cfbcfc003c3c009710cbcb19f395fa770f21fe0f38b3"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/NEXT_PARALLEL_HANDOFF_RU.md",
+      "sha256": "9780ee65fd3856eb45af326c6970e8d881a8bbcb5a8bd12d3169e96ac06c1bd4"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/NON_OBLIGATION_SELECTOR_AUDIT_RU.md",
+      "sha256": "9b84bb5a726f88bcf8941b61b5fc0445a0acfe1cdd40a08231ebbfbb489dfca8"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_AGENT_APPLICATION_RU.md",
+      "sha256": "469f7cdfd9e7685459ba9d04bf2af6fb985c9dea318cca6f224016585b6a4633"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_AGENT_CLOSURE_REVIEW_RU.md",
+      "sha256": "71b32de610f2f2891594927642d58ba375ec9ae413946acbf704f2dbc1e5fb48"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_AGENT_DOMAIN_RU.md",
+      "sha256": "5806b48ff7e419a7e90db26efc511e7244b7978fc562fdeee601b736d0ef7b40"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_AGENT_INFRASTRUCTURE_RU.md",
+      "sha256": "2cac78ed0f62953f80f68df6b4320318f55ba4bce4a98fb9639044e9b0357117"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_AGENT_INTERFACES_RU.md",
+      "sha256": "6710241b9c5752d2df4582bcf596a8a46eb33c05d73f88a6ec5cbb17ccf83464"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_APPLICATION_FINAL_REVIEW_RU.md",
+      "sha256": "b688a8f7fe95e8fc65bafcf54832ee01938450f0c056e376f227ace3e00e16ff"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_APPLICATION_RESOLVED_0_RU.md",
+      "sha256": "b66ac62e20ee51b94a7fa8034c2a7f0f442f0eda770d4b24253d97cd96df2e82"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_APPLICATION_RESOLVED_1_RU.md",
+      "sha256": "dcf60b24891a3db06dfdd10f96f79aacd438b95a93a454e32e2f0d036b8eb628"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_APPLICATION_RESOLVED_2_RU.md",
+      "sha256": "81142279e946b0bd1e606d39701d87b8080909ce6d2800b001dacf2aeae194e5"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_CANDIDATE_CLOSURE_RU.md",
+      "sha256": "7fab177993c32ad8e2fb6a12507e518698dd1c5b6f7096105b6f7e76846b93f9"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_COMPLETENESS_SOURCE_MAP_RU.md",
+      "sha256": "d9a0be84eb5e10848f52352c127773031d57576020573b97d56b67c4186099ef"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_CONFIG_AND_TRACE_AUDIT_RU.md",
+      "sha256": "1e96ee746bc6a5dd68eeffcba1817d630f9f2d1f58691286d0e5445b1bc9ff7f"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_FINAL_ATTRIBUTION_MAP_RU.md",
+      "sha256": "87d9e9cdaf38133cb4d0fad3313c788305c621ad0bede654c7d408014d5b0af4"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_FINAL_BASELINE_LINKAGE_RU.md",
+      "sha256": "d61e7c0d0c72ce9de57e75b6c0a0f7956f42057a43ca00063c4cf8e0f0c97f66"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_FINAL_SELECTOR_MAP_RU.md",
+      "sha256": "2405f04ce398164675476775e03fc2c505c0e4fd80249f6ca155b4cbd2cc5380"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_NEIGHBOR_BRIDGE_AUDIT_RU.md",
+      "sha256": "6c61acc48d6eed488c2accea6ccf3a9a49084100e4450e1af867122febbb3d45"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_PARALLEL_CLOSURE_ASSESSMENT_RU.md",
+      "sha256": "189455341f13e7508eeda6cb8a72dbe1e4026eea4125089ef91b81dd84c48fe8"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_PARALLEL_RESULT_RU.md",
+      "sha256": "07890db04845eb2cfea7036842d2fbad30f666252b43ca56a4ddcdc5ae3fa098"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_RANKING_SNIPPETS_CLASSIFICATION_RU.md",
+      "sha256": "deb49f3f6240440dfcb1571c2ba5c17446824ef0775b0eeaede75cb84ca3c60e"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_READ_PATH_AUDIT_RU.md",
+      "sha256": "9cad36d7fb2c911e6545f9f4c81ee815a1d81bb7f3e8a3c756d79435ab72a551"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_STRUCTURAL_CLASSIFICATION_RU.md",
+      "sha256": "1b83b86c9c21f26971e3592d915e7eb23a8bc39a1391977c540a633f3c072bb1"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_SYMBOL_POLICY_AUDIT_RU.md",
+      "sha256": "ab772ca07fdc93551cb3741e3516e5d3d1550cfca5bbdb322851619b1b218570"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P0_TO_P1_GATE_RU.md",
+      "sha256": "a8da16291dd0681c8f3d291604db6c3a7c06cb3377d62d7a6f777852b742356b"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_ACCEPTANCE_DRAFT_RU.md",
+      "sha256": "28d0d3701f20ef3e975c49d9ed63c7c10b3e5cc5a6794c2fd06319db967ff8f5"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_APPROVAL_RU.md",
+      "sha256": "7d53b11e4f7ec529e26271b21939ba134965ac3980a697637eb6d0545ef3b824"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_CONTRACT_RU.md",
+      "sha256": "e999802fbf420f3db66b6e03f4f7bfcde1242a803c5a4bb139793cd7da902fc1"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_INDEPENDENT_REVIEW_RU.md",
+      "sha256": "b6c4e7e5eca18b226bf05565641d22e4cf7f5a6360143b65a770c673588f2c02"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_INDEPENDENT_REVIEW_V2_RU.md",
+      "sha256": "44d6e2799b48fa8dc762b3af5cfa14f5e1462a09354e62457c6fb78aee692bbd"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_SAME_LANGUAGE_AMENDMENT_RU.md",
+      "sha256": "a7a3f2cd0a2b8e87ac3bb43de2077b64b84460aed3fa018ce8665c139b34c2bb"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P1_STATUS_RU.md",
+      "sha256": "b09977768f7ffe983cf1466d4bc893209a90e56f5fb62735d6bb247169bc8c6c"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P2_REAL_MCP_ABLATION_RU.md",
+      "sha256": "4d6d22d1b6b0d283debfe47b2adbf4c3b51bd9f52fa5e13d1fe37747cdfc3fe8"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/P2_STATUS_RU.md",
+      "sha256": "1b7b625e640ad6ab163311bd1bd45ce65beb51a959d0c6a9a141c0baf392c371"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/PACKS_SAFETY_DICTIONARY_EXIT_RU.md",
+      "sha256": "7ab52a3f3aaf74145f80a2740b8210d82f046ff39fb2e0bcfd258d91bdcd6fd9"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/PARALLEL_REMAINING_EXIT_RU.md",
+      "sha256": "160106fe8a5789a3c622ccec5ca6ac94849f79fbe7ece5b1feb7e33a3879ca71"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/PATCH_VALIDATION_DICTIONARY_EXIT_RU.md",
+      "sha256": "d0c006004e34ebb7f36f52f25afdecbc1edbcde8ac2cec6e93daa75c07a96d95"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/PRECOMMIT_REVIEW_RU.md",
+      "sha256": "cbda0a33f4e44aa7bc255980cff7fce925ae737eb95f32c16808e6aa3f01bd73"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/PREFIT_PATCH_RU.md",
+      "sha256": "2295747ce357f21a95c64c2ef0b4a477610a190cbbcae82c8c84ba0eef104db7"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/README_RU.md",
+      "sha256": "ae89c8790ed967ab2d0d8aa8bfdd1b7c5eccffdb76972e917b63b5989e13c5f6"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/READ_PACKET_RESIDUAL_DICTIONARY_EXIT_RU.md",
+      "sha256": "21735f50e3b30ad6c9cf6458a7a054acd93d9618048b52bded95653e04a33ae8"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/READ_TAILS_DICTIONARY_EXIT_RU.md",
+      "sha256": "88ad76a7a831c6f257add22a252f0a43abef756d7f24f5507212be645db38610"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/REMAINING_DICTIONARY_AUDIT_RU.md",
+      "sha256": "7724d6066dc4ab4358f82681546a9d5297dc7fa748c3d6313172a16a4c723f68"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/RESIDUAL_PROOF_DICTIONARY_EXIT_RU.md",
+      "sha256": "d044892e719b96304ad22c97c9a06c524808b7d3564094ee121cfd2e0aa1043d"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/RETRIEVAL_DICTIONARY_REVIEW_RU.md",
+      "sha256": "014721dfb21d13b4efa81168a073997e1052a5cca4bbb8b5b95cd031087f5906"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/RETRIEVAL_NEED_ADAPTER_EXIT_RU.md",
+      "sha256": "74ba1df98651c983f3d3b7a4bb2f001f4e688d6bee3f493952e72b4424cb9ca7"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/SDK_PATCH_DICTIONARY_EXIT_RU.md",
+      "sha256": "602f4f6fee52fcbda8b9ac1256feab5aeea3bc5dda5236dbde349d8916b5eab9"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/SELECTOR_VISIBILITY_DICTIONARY_EXIT_RU.md",
+      "sha256": "0561ab3391d8de2c1d7bb1485d899aab5eb43f625e7806cf88e9018d3290afa7"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/SOURCE_IDENTITY_DICTIONARY_EXIT_RU.md",
+      "sha256": "0340d0d5f5c9490fb29618f17827eef09c819f11e0cd1968d0ff5d44f74bd447"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/UNIT_HELPER_DICTIONARY_EXIT_RU.md",
+      "sha256": "65b00004737d537cdcb5f298b00a57f9995d71a0f5b674dbf753549e5b8a93b4"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/archives/dictionary-exit-final-finite-self-host-v1.json",
+      "sha256": "1485715aa40661894d3eb3b85ed6125f53882cce433eae1094dc94b884cabfd0"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/archives/dictionary-exit-final-finite-test-ledger-v1.json",
+      "sha256": "5b48384a1fa1396a3f7201e0296e77451e6eef9c0d8da8ff562e9630ed7e1138"
+    }
+  ],
+  "checks": {
+    "dictionary_passed": 1970,
+    "dictionary_failed": 14,
+    "combined_passed": 2080,
+    "combined_failed": 17,
+    "old_mixed_passed": 331,
+    "old_mixed_failed": 311,
+    "independent_audit_passed": 362,
+    "effective_worker_pins": 64,
+    "frozen_pins": 13,
+    "stdio_smoke": "PASS",
+    "quality": "FAIL",
+    "bounded_publication_blocker": false,
+    "full_exit": false
+  },
+  "excluded_local_archive": "archives/p2-real-mcp-alias-ablation-v1.json.gz",
+  "excluded_volatile": [
+    "__pycache__",
+    "*.pyc"
+  ]
+}

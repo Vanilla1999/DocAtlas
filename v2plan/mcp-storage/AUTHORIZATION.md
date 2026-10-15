@@ -1,0 +1,200 @@
+# Storage continuation: approved boundaries
+
+Common base: `cb29039e901824cbd4a9dc9b6cf427a0016fe19b`.
+Prior safe-closed delivery report: `v2plan/mcp-delivery/FINAL_REPORT_RU.md`.
+
+The user approved a separate storage/VFS design and implementation phase with
+expanded ownership, isolated fixtures, no new dependencies, no live reinstall,
+and no user-index mutation. Existing mutation denial stays in place until a
+safe positive route has passed adversarial checks and independent review.
+
+The user did **not** approve identity migration or a compatibility break; they
+asked why migration is needed. The root-local identity change is ours. First
+investigate compatibility without migration, aliasing, weakened scope filters,
+unconstrained Git reads or index rebuilds. Do not treat that question as consent.
+
+## Read-only design assignments
+
+- A `/tmp/opencode/mcp-storage-a`: descriptor-bound SQLite main/sidecar storage,
+  SQL atomicity, concurrency, crashes, platform support, minimal packaging.
+- B `/tmp/opencode/mcp-storage-b`: preserve legitimate old index access without
+  unapproved migration or inferred authorization; producer/consumer bindings.
+- C `/tmp/opencode/mcp-storage-c`: real installed ready-index retrieval matrix,
+  necessary >32 KB evidence feasibility under unchanged runtime guards; no
+  mocked retrieval or fake padding. Fixture bootstrap is not preparation proof.
+- R: independent review of concrete design before production implementation,
+  then independent verification of the integrated result.
+
+Each implementation needs a reviewed interface and exact non-overlapping file
+allowlist. No nested agents. No edits to prior worktrees, historical gold,
+thresholds, reports/evaluation suites, D1 catalog or other user work.
+D1 remains exactly 10 documents, `code_files=()`; no corpus/scan expansion.
+
+Merge, release publication, version selection, current installation/config/index
+changes remain separately gated. Current stage does not imply release acceptance.
+
+## Subsequent packing approval
+
+The user approved reviewing token packing/admission for explicit
+`context_format="patch_context"` on already found windows. This does not permit
+expanding corpus, scan, candidate acquisition, source scope, network authority,
+or I/O safety limits. Omitted/null docs mode remains separate and unchanged.
+Source/hash/span bindings and partial evidence must survive. A naturally
+reachable >32 KB result remains a test obligation, not permission to pad fixtures
+or enlarge acquisition. Implementation requires the reviewed exact allowlist.
+
+## Diagnostic implementation and pending native review
+
+C's three-file ready-index diagnostic was approved and integrated as `f4db3e95`
+(original `b81e942a`). It is fixture bootstrap evidence, not preparation proof.
+Both transports delivered project/module evidence; library lineage and >32 KB
+admission remain blocked. Full smoke and ready-index diagnostic both exit 1.
+
+Neither the snapshot backend nor native persistence implementation is approved.
+The native proposal is under independent R review; object-bound versus strict
+external-alias semantics and crash recovery under hostile sidecar removal remain
+unresolved. Existing unsafe persistence denial must not be removed on this basis.
+
+## Explicitly approved isolated research spike
+
+After R's concept review, the user selected the research spike. Coordinator
+assigned A only these experimental paths, on disposable fixtures:
+
+```text
+experiments/mcp_storage_native/sqlite_fd_vfs.c
+experiments/mcp_storage_native/worker.py
+experiments/mcp_storage_native/README.md
+experiments/mcp_storage_native/include/sqlite3.h
+experiments/mcp_storage_native/include/sqlite3ext.h
+tests/test_mcp_storage_native_spike.py
+tests/diagnostic_labels.mcp_storage_native_spike.json
+```
+
+No production dispatch/store/agent/config/build/package integration is permitted
+by this allowlist. Existing compiler use and temporary experimental artifacts
+are allowed; no new dependency, runtime downloads, install or current-index use.
+Header provenance and licensing must be recorded. Coverage, locking, recovery,
+error and crash behavior must be reported with actual supported SQLite profiles.
+Unknown operations deny; no unsafe fallback. Unsupported or uncertain outcomes
+must not be mislabeled as no mutation.
+
+This does not approve object-bound authorization in place of strict alias
+guarantees, protected-namespace assumptions, or any threat-model weakening.
+Persistence remains blocked; packaging and production integration need later
+review and approval. B's found-window retention proposal is independently under
+R review and has no implementation allowlist yet.
+
+## Subsequent legacy-data decision
+
+The user explicitly stated that the old database is unused and disposable, and
+authorized clearing it if needed. Legacy-row preservation and identity migration
+are no longer requirements. Prefer a fresh empty database rather than designing
+compatibility aliases/migration. This supersedes the earlier unresolved legacy
+compatibility decision, not the source/ownership/security contract.
+
+No database has been cleared. Before any destructive operation, identify the
+exact database and related files; this statement does not identify a pathname or
+authorize broad storage-directory deletion. Live MCP/config replacement remains
+separately gated. Fresh-database initialization needs a reviewed safe route;
+discarding legacy data does not solve pathname/sidecar races or permit unsafe
+persistence fallback.
+
+## Descriptor-capture design decision
+
+R found that existing readers provide sequential observations, not coherent
+object bindings. Reusing those observations instead of later pathname checks
+changes freshness semantics. The user selected **capture design**, not that
+observation-only alternative: propose an exact interface and finite additional
+descriptor-operation list, then obtain independent review before implementation.
+
+No additional I/O implementation or freshness weakening is authorized yet.
+Per-object descriptor binding must not be advertised as an atomic multi-file
+snapshot. The proposal must explicitly account for late pathname revalidation,
+operation counts, platform gates and failure behavior; no unspecified traversal
+allowance, global cache, general capability broker or source-scope expansion.
+
+## Approved minimal retention implementation (supersedes capture plan)
+
+After R reviewed the concrete capture plan, the user approved additional
+invocations of existing catalog validation and trust/path checks for more
+already-acquired eligible windows in explicit patch context. Existing validators,
+freshness/replacement behavior, acquisition budgets/queries/filters, source-content
+reads and corpus boundaries stay unchanged. No capture/cache module or new
+descriptor/provenance interface is authorized for this implementation.
+
+B owns exactly:
+
+```text
+docmancer/docs/interfaces/mcp/context_tools.py
+docmancer/docs/application/_unified_context_service_part01.py
+docmancer/docs/application/_project_context_service_part01.py
+docmancer/docs/application/_project_docs_service_part03.py
+docmancer/docs/domain/project_doc_ranking.py
+tests/test_action_packet_v4_found_window_retention.py
+tests/diagnostic_labels.action_packet_v4_found_window_retention.json
+```
+
+Only post-acquisition packing changes are permitted. Independently qualified,
+eligible windows may be retained; unresolved admission and operational control
+views remain bounded and unchanged. Validation I/O must be measured separately;
+identical validation operation counts/targets are no longer claimed. Review and
+tests precede integration; public >32 KB delivery remains conditional.
+
+## Native spike audit corrections
+
+Independent native audit held experimental integration: real close errors could
+be ignored, exact-runtime tests conflicted with ordinary CI discovery, upstream
+header whitespace failed the gate, and write traces lacked syscall outcomes.
+A may correct these in its experimental allowlist and add exactly
+`tests/mcp_storage_native_spike_checks.py` for explicitly invoked positive research
+checks. Portable denial checks remain under ordinary discovery. No CI gate,
+workflow or pytest/conftest configuration changes; unsupported explicit positive
+runs fail closed. Header normalization must record upstream/normalized hashes.
+Production persistence and R1 closure remain unapproved.
+
+## Native research evidence-contract correction
+
+Independent reaudit resolved the reproduced close false-green and header gate,
+but the labeled, non-discovered pytest research module breaks directory inventory.
+Coordinator accepted R's exact-eight-file solution: convert
+`tests/mcp_storage_native_spike_checks.py` to a genuinely standalone finite runner
+and remove only its newly added pytest inventory labels/hash. Preserve all 27
+research scenarios and explicit unsupported-runtime failure. No hidden pytest
+tests without labels, inventory suppression, historical changes or CI gate edits.
+
+Evidence must distinguish 16 normal-gated portable pytest checks from 27
+standalone research checks. Standalone checks are not ordinary CI certification.
+Default directory inventory compatibility and the verifier wording must be fixed
+before independent review/integration. Production persistence remains blocked.
+
+## Active retention fixture migration
+
+B followup `cafcfcce6c0913ac83e5b1f493316d1eda0714d3` reports closure checks
+passing but the full focused matrix is red. Coordinator authorizes exactly two
+additional active test paths under the user's existing active-test migration
+permission:
+
+```text
+tests/test_action_packet_v4_delivery_consumers.py
+tests/test_action_packet_v4_public.py
+```
+
+Update deliberate facade support for the explicit retention contract; preserve
+security assertions, dropping-wrapper failures, docs behavior and source bindings.
+No skip/xfail/gate removal, historical modifications or broader production
+allowlist. Necessary hash-shard changes require identifying exact paths first.
+Independent closure review and a green full focused rerun precede integration.
+
+## Fresh review: explicit local-storage and installation decision
+
+The user selected automatic installation and explicitly approved a local MCP
+profile with ordinary SQLite in server-owned data storage outside the project,
+trusting the OS and same-UID processes. Malicious same-UID interference is outside
+this approved profile. This supersedes the earlier prohibition on adopting a
+trusted-storage assumption; it does not claim the experimental VFS solved R1.
+Source/grant/scope/hash/span validation and authorized source-read limits remain.
+
+Exact new implementation worktrees, ownership, initialization boundaries and
+acceptance are recorded in `FRESH_PLAN_RU.md`. Existing indexes, installation and
+configuration remain untouched. Automatic install is a delivery design choice,
+not authorization for live replacement. No production native VFS is planned.

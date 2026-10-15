@@ -1,0 +1,20 @@
+{
+  "purpose": "Required preliminary repository documentation context before coding edits; separate from synthetic evaluation",
+  "attempts": 1,
+  "tool": "docmancer.get_docs_context",
+  "arguments": {
+    "question": "Какие действующие ограничения DocAtlas разделяют source-policy validation, numeric/query-condition admission и experimental candidate selection в публичном get_docs_context?",
+    "project_path": "/tmp/opencode/docatlas-compact-review"
+  },
+  "observed_status": "insufficient_evidence",
+  "observed_reasons": ["source_unavailable"],
+  "context_available": false,
+  "documentation_supported": false,
+  "answer_supported": false,
+  "edit_ready": false,
+  "recommended_next_action": "code_search",
+  "repeat_docs_context": false,
+  "latency_seconds": "UNKNOWN",
+  "billing_backend_tokens": "UNKNOWN",
+  "record_kind": "Coordinator transcription of tool invocation/result status; not a signed backend receipt"
+}

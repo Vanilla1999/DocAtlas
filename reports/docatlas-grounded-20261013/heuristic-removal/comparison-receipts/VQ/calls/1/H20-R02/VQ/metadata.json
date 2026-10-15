@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-R02",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-ruff",
+  "public_request": {
+    "question": "How do relative paths and command-line overrides work for Ruff's closest discovered config versus a config file supplied with --config?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/1-ruff/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "84a633a6fc1eb9cac00ae8f98acd63beac0b140fb01b4f672b4e6b4d8083ed48",
+  "utf8_bytes": 47350,
+  "tokens": 12117,
+  "seconds": 16.765370762001112,
+  "cpu_seconds": 16.756982257000004,
+  "peak_rss_kib": 228656,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

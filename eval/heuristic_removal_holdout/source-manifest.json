@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "dataset_id": "NEW20-20261013",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/pallets/click/8.1.8/docs/options.rst",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "bytes": 26719,
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/pallets/click/8.1.8/docs/options.rst",
+      "family": "click",
+      "repository": "pallets/click",
+      "revision": "8.1.8",
+      "upstream_path": "docs/options.rst",
+      "project_group": "click",
+      "project_root": "corpus/click"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/psf/requests/v2.32.3/docs/user/quickstart.rst",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "bytes": 19018,
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/psf/requests/v2.32.3/docs/user/quickstart.rst",
+      "family": "requests",
+      "repository": "psf/requests",
+      "revision": "v2.32.3",
+      "upstream_path": "docs/user/quickstart.rst",
+      "project_group": "requests",
+      "project_root": "corpus/requests"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/pytest-dev/pytest/8.3.5/doc/en/how-to/skipping.rst",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "bytes": 12148,
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/pytest-dev/pytest/8.3.5/doc/en/how-to/skipping.rst",
+      "family": "pytest",
+      "repository": "pytest-dev/pytest",
+      "revision": "8.3.5",
+      "upstream_path": "doc/en/how-to/skipping.rst",
+      "project_group": "pytest",
+      "project_root": "corpus/pytest"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tox-dev/tox/4.24.1/docs/config.rst",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "bytes": 54596,
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/tox-dev/tox/4.24.1/docs/config.rst",
+      "family": "tox",
+      "repository": "tox-dev/tox",
+      "revision": "4.24.1",
+      "upstream_path": "docs/config.rst",
+      "project_group": "tox",
+      "project_root": "corpus/tox"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "base_commit": "47a636e73268f1c39495b83cda82c7a0a0c9674e",
+  "runs": [
+    {
+      "run": "run-01",
+      "started_at_utc": "2026-10-12T17:32:42.976022+00:00",
+      "command": [
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+        "-q",
+        "--basetemp=/workspace/scratch/7ccc1a9e2e54/docatlas-review-run01",
+        "--junitxml=/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/review-20261012/run-01.xml"
+      ],
+      "status": "finished",
+      "intended_workload": {
+        "purpose": "Reproduce loss of typed delivery veto before product fix",
+        "nodes": [
+          "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation"
+        ],
+        "max_public_prepare": 1,
+        "max_public_context": 2,
+        "max_public_resource": 0,
+        "max_model_calls": 0,
+        "expected_outcome": "FAIL on retained confirmation_reason/delivery_decision or context_quality"
+      },
+      "file_sha256": {
+        "tests/test_context_budget_refusal_integration.py": "8bba9d86ff4a976775d3a78ce5e6e5752f9ddaaa1eef495ed23d04255ac597df",
+        "tests/test_prepared_retrieval_review_integration.py": "31fa8b09bd18f504be95a9c719ecda19ba9a55490b895c12a653ac451bdfa353",
+        "tests/test_source_valid_transfer_integration.py": "1c898fd5910bad4f9c810cdf18ff8ce6d565c3d244728a3a940590d3bd1cb2bd",
+        "tests/test_prepared_retrieval_integration.py": "3945ebad4193795fabbe4cb737395d375cd25b641cf4c4e651704e7833a8d549",
+        "docmancer/docs/application/experimental_context_finalization.py": "8c961291388981bf8c4a91744c7b6cada646fda8dce26eca373431b6441b2254",
+        "docmancer/core/prepared_parent_sections.py": "d2edc2551f55113dfcf5233be56804380ee08bc9cc2aa2e35267928b08301632"
+      },
+      "exit_code": 1,
+      "wall_seconds": 1.469,
+      "finished_at_utc": "2026-10-12T17:32:44.445710+00:00",
+      "captured_public_contexts": 2,
+      "pytest_properties": {
+        "test_final_budget_preserves_stale_source_denial_and_confirmation": {
+          "wide_refusal_utf8_quarter_proxy": "155",
+          "bounded_refusal_utf8_quarter_proxy": "130"
+        }
+      },
+      "actual_workload": {
+        "public_prepare": 1,
+        "public_context": 2,
+        "public_resource": 0,
+        "model": 0
+      },
+      "workload_evidence": "Fixed public-call sequence in frozen tests, returned packet count, and XML bounded_source_reads; no separate raw prepare/resource response capture."
+    },
+    {
+      "run": "run-02",
+      "started_at_utc": "2026-10-12T17:33:21.084103+00:00",
+      "command": [
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+        "tests/test_prepared_retrieval_review_integration.py::test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+        "tests/test_source_valid_transfer_integration.py::test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+        "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries",
+        "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+        "-q",
+        "--basetemp=/workspace/scratch/7ccc1a9e2e54/docatlas-review-run02",
+        "--junitxml=/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/review-20261012/run-02.xml"
+      ],
+      "status": "finished",
+      "intended_workload": {
+        "purpose": "Fixed refusal + prepared hit/revision fallback + matched-cap nonnumeric transfer + strengthened existing guards",
+        "nodes": [
+          "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+          "tests/test_prepared_retrieval_review_integration.py::test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+          "tests/test_source_valid_transfer_integration.py::test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+          "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries",
+          "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet"
+        ],
+        "max_public_prepare": 6,
+        "max_public_context": 24,
+        "max_public_resource": 1,
+        "max_model_calls": 0
+      },
+      "file_sha256": {
+        "tests/test_context_budget_refusal_integration.py": "8bba9d86ff4a976775d3a78ce5e6e5752f9ddaaa1eef495ed23d04255ac597df",
+        "tests/test_prepared_retrieval_review_integration.py": "31fa8b09bd18f504be95a9c719ecda19ba9a55490b895c12a653ac451bdfa353",
+        "tests/test_source_valid_transfer_integration.py": "1c898fd5910bad4f9c810cdf18ff8ce6d565c3d244728a3a940590d3bd1cb2bd",
+        "tests/test_prepared_retrieval_integration.py": "3945ebad4193795fabbe4cb737395d375cd25b641cf4c4e651704e7833a8d549",
+        "docmancer/docs/application/experimental_context_finalization.py": "26624db4ba133edcbdaba6d2a3b30472740d1e5bf6637a7def84a45f0fe0e41f",
+        "docmancer/core/prepared_parent_sections.py": "d2edc2551f55113dfcf5233be56804380ee08bc9cc2aa2e35267928b08301632"
+      },
+      "exit_code": 0,
+      "wall_seconds": 4.734,
+      "finished_at_utc": "2026-10-12T17:33:25.818889+00:00",
+      "captured_public_contexts": 24,
+      "pytest_properties": {
+        "test_final_budget_preserves_stale_source_denial_and_confirmation": {
+          "wide_refusal_utf8_quarter_proxy": "155",
+          "bounded_refusal_utf8_quarter_proxy": "144"
+        },
+        "test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change": {
+          "valid_prepared_reader_metrics": "{\"documents\": 2, \"miss_reasons\": {\"items\": [], \"observation\": \"recorded\", \"preview_count\": 0, \"preview_omitted\": 0, \"producer_count\": 0, \"producer_omitted\": 0, \"recorded_count\": 0}, \"parent_rows\": 4, \"parent_selects\": 2, \"parser_calls\": 0, \"parser_ms\": 0.0, \"prepared_enabled\": true, \"prepared_hits\": 2, \"prepared_read_ms\": 0.06804100121371448, \"prepared_verification_ms\": 0.09975799730455037}",
+          "revision_fallback_reader_metrics": "{\"documents\": 2, \"miss_reasons\": {\"items\": [{\"count\": 2, \"reason\": \"incompatible_parent_revision\"}], \"observation\": \"recorded\", \"preview_count\": 1, \"preview_omitted\": 0, \"producer_count\": 1, \"producer_omitted\": 0, \"recorded_count\": 1}, \"parent_rows\": 0, \"parent_selects\": 0, \"parser_calls\": 2, \"parser_ms\": 0.12334199891483877, \"prepared_enabled\": true, \"prepared_hits\": 0, \"prepared_read_ms\": 0.0, \"prepared_verification_ms\": 0.0}",
+          "public_context_calls": "4",
+          "public_prepare_calls": "1",
+          "model_calls": "0"
+        },
+        "test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering": {
+          "original_baseline_facts": "4",
+          "original_broad_facts": "4",
+          "renamed_reordered_baseline_facts": "4",
+          "renamed_reordered_broad_facts": "4"
+        },
+        "test_prepared_retrieval_preserves_default_and_scope_boundaries": {
+          "negative_empty_source_current_contract": "PASS",
+          "unassessed_negative_source_count": "0",
+          "bounded_source_reads": "1"
+        },
+        "test_final_experimental_budget_preserves_facts_and_bounds_full_packet": {
+          "wide_packet_utf8_quarter_proxy": "906",
+          "small_packet_utf8_quarter_proxy": "758",
+          "small_cap_delivered_source_count": "1"
+        }
+      },
+      "actual_workload": {
+        "public_prepare": 6,
+        "public_context": 24,
+        "public_resource": 1,
+        "model": 0
+      },
+      "workload_evidence": "Fixed public-call sequence in frozen tests, returned packet count, and XML bounded_source_reads; no separate raw prepare/resource response capture."
+    }
+  ],
+  "totals": {
+    "public_prepare": 7,
+    "public_context": 26,
+    "public_resource": 1,
+    "model": 0
+  },
+  "test_inputs_unchanged_after_execution": true
+}

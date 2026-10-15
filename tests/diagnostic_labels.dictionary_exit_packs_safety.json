@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_packs_safety.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_packs_safety.py": "57c92aa0c5c930e932427c197b44d25355b80ed24b078e3e1dc1b0ffdfe18d13"
+  }
+}

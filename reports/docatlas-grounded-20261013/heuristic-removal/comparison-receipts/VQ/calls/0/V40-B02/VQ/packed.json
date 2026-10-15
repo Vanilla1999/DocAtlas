@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-f65f433ac78c3693",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Command line options > `-t`, `--target-version`",
+      "snippet": "#### `-t`, `--target-version`\n\nPython versions that should be supported by Black's output. You can run `black --help`\nand look for the `--target-version` option to see the full list of supported versions.\nYou should include all versions that your code supports. If you support Python 3.11\nthrough 3.13, you should write:\n\n```console\n$ black -t py311 -t py312 -t py313\n```\n\nIn a [configuration file](#configuration-via-a-file), you can write:\n\n```toml\ntarget-version = [\"py311\", \"py312\", \"py313\"]\n```\n\nBy default, Black will infer target versions from the project metadata in\n`pyproject.toml`, specifically the `[project.requires-python]` field. If this does not\nyield conclusive results, Black will use per-file auto-detection.\n\n_Black_ uses this option to decide what grammar to use to parse your code. In addition,\nit may use it to decide what style to use. For example, support for a trailing comma\nafter `*args` in a function call was added in Python 3.5, so _Black_ will add this comma\nonly if the target versions are all Python 3.5 or higher:\n\n```console\n$ black --line-length=10 --target-version=py35 -c 'f(a, *args)'\nf(\n    a,\n    *args,\n)\n$ black --line-length=10 --target-version=py34 -c 'f(a, *args)'\nf(\n    a,\n    *args\n)\n$ black --line-length=10 --target-version=py34 --target-version=py35 -c 'f(a, *args)'\nf(\n    a,\n    *args\n)\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ef8bd0a78352e097a9fa8e9f99ec53726021b91b8d15bbc8355a96a7c61db1a8",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 69,
+      "line_end": 112,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/674b036f004582562d157781"
+    },
+    {
+      "evidence_id": "ev-0d7e9638cdc659c4",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Command line options > `-l`, `--line-length`",
+      "snippet": "How many characters per line to allow. The default is 88.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "4133ae0cf48ec946f91fa38e5e2424ed301834dff8f6d24095726f4cdf13581d",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 65,
+      "line_end": 66,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/358acbb1bf8da1e1357f03d6"
+    }
+  ],
+  "tokens": 845,
+  "utf8_bytes": 2574,
+  "sha256": "e4851799950c6c2ca7c20ed15b82f74b3284db7568cf2f744a3d14f1f6842b2e",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

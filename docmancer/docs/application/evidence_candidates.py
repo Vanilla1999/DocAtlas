@@ -21,29 +21,11 @@ from docmancer.docs.domain.answer_units import extract_answer_units
 from docmancer.retrieval.contracts import canonical_hash
 
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
-_PATCH_FACT_RE = re.compile(
-    r"\b(?:must|shall|required|requires?|never|cannot|may\s+not|forbidden|prohibited|"
-    r"is\s+reserved\s+for|only\s+(?:after|before|when|if)|is\s+allowed\s+only|"
-    r"pytest|compileall|cargo\s+(?:test|check|build)|npm\s+(?:test|run)|"
-    r"dart\s+(?:test|analyze)|go\s+test|make\s+test)\b",
-    re.IGNORECASE,
-)
-_QUALIFIER_PATTERNS = {
-    "proposed": re.compile(r"\bpropos(?:ed|al)\b", re.I),
-    "not_implemented": re.compile(r"\bnot\s+(?:yet\s+)?implemented\b", re.I),
-    "confirmation_required": re.compile(r"\b(?:confirmation|required approval)\s+(?:is\s+)?required\b", re.I),
-    "negated": re.compile(r"\b(?:not|never|no|cannot|must not)\b", re.I),
-    "conditional": re.compile(r"\b(?:if|when|unless|only after|only before)\b", re.I),
-    "deprecated": re.compile(r"\bdeprecated\b", re.I),
-}
 
 
 def observed_qualifiers(text: str) -> tuple[EvidenceQualifier, ...]:
-    return tuple(sorted(
-        qualifier
-        for qualifier, pattern in _QUALIFIER_PATTERNS.items()
-        if pattern.search(text)
-    ))
+    """No semantic qualifiers are inferred from source wording."""
+    return ()
 
 
 def estimated_tokens(value: str) -> int:
@@ -83,7 +65,7 @@ def normalized_source(value: Any) -> str:
 
 
 def requirement_value_visible(value: str, text: str) -> bool:
-    """Match exact query terms, including a bounded CamelCase→snake_case alias."""
+    """Match literal query terms at identifier boundaries; no derived aliases."""
 
     wanted = str(value or "").strip()
     haystack = str(text or "")
@@ -91,15 +73,7 @@ def requirement_value_visible(value: str, text: str) -> bool:
         return False
     if re.search(rf"(?<![\w]){re.escape(wanted)}(?![\w])", haystack, re.I):
         return True
-    if not (
-        re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", wanted)
-        and any(char.isupper() for char in wanted[1:])
-        and any(char.islower() for char in wanted)
-    ):
-        return False
-    acronym_split = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", wanted)
-    snake_case = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", acronym_split).casefold()
-    return bool(re.search(rf"(?<![\w]){re.escape(snake_case)}(?![\w])", haystack, re.I))
+    return False
 
 
 def source_path(item: Mapping[str, Any]) -> str:
@@ -143,26 +117,9 @@ def symbols(item: Mapping[str, Any]) -> tuple[str, ...]:
 
 
 def projected_text(item: Mapping[str, Any], raw_display_text: str, result_kind: str) -> str:
-    if result_kind == "docs_answer":
-        return raw_display_text
-    snippet = _text(item.get("snippet"))
-    fact_material = str(item.get("content") or raw_display_text)
-    fact_lines = [line.strip() for line in fact_material.splitlines() if _PATCH_FACT_RE.search(line)]
-    identity_terms = list(dict.fromkeys(
-        match.group(0)
-        for line in fact_material.splitlines()
-        for match in re.finditer(
-            r"(?:[A-Za-z0-9_.-]+[\\/])+[A-Za-z0-9_.-]+"
-            r"|\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\b",
-            line,
-        )
-    ))[:32]
-    parts = [
-        part
-        for part in [snippet, *fact_lines, *identity_terms, " ".join(symbols(item)), source_path(item)]
-        if part
-    ]
-    return "\n".join(dict.fromkeys(parts)) or raw_display_text
+    # Only the visible source window participates in assignment and cost.
+    # Hidden content, paths and symbol metadata must not manufacture a quote.
+    return raw_display_text
 
 
 def authority(item: Mapping[str, Any]) -> str:
@@ -203,14 +160,6 @@ def version_rank(value: str) -> int:
     if normalized in {"", "unknown", "latest", "unversioned", "not_applicable"} or "fallback" in normalized:
         return 2
     return 1
-
-
-def risk_flags(item: Mapping[str, Any]) -> tuple[str, ...]:
-    values: list[Any] = []
-    for key in ("instruction_risk_flags", "risk_flags"):
-        value = item.get(key)
-        values.extend(value if isinstance(value, (list, tuple, set)) else [value] if value else [])
-    return tuple(sorted(str(value) for value in values if value))
 
 
 def _span(item: Mapping[str, Any], name: str) -> tuple[int | None, int | None]:
@@ -261,13 +210,8 @@ def normalize_candidates(
         stable = child_stable or str(item.get("stable_id") or "")
         identity_kind = "stable_child" if child_stable else "legacy"
         source_class = str(item.get("source_class") or "")
-        scoped_host_policy = (
-            path.startswith("host-policy://")
-            and bool(item.get("scope_verified") or metadata.get("scope_verified"))
-            and str(item.get("repository_authority") or "").strip().casefold() == "explicit_agent_policy"
-            and str(item.get("instruction_trust") or "").strip().casefold() == "scoped_agent_policy"
-        )
-        indexed_project_doc = source_class in {"project_doc", "project_file"} and bool(metadata) and not scoped_host_policy
+        # A fake host-policy URI cannot waive indexed source identity checks.
+        indexed_project_doc = source_class in {"project_doc", "project_file"} and bool(metadata)
         if indexed_project_doc and not child_stable:
             omissions.append(Omission(f"invalid:{rank}", "invalid_identity"))
             continue
@@ -285,6 +229,7 @@ def normalize_candidates(
             or (_span_was_supplied(item, "line") and (line_start is None or line_end is None))
             or (char_start is None) != (char_end is None)
             or (char_start is not None and (char_start < 0 or char_end <= char_start))
+            or (result_kind == "patch_context" and char_start is not None and char_end - char_start != len(display))
             or (line_start is None) != (line_end is None)
             or (line_start is not None and (line_start < 0 or line_end < line_start))
         )
@@ -358,14 +303,16 @@ def normalize_candidates(
             doc_scope=str(item.get("doc_scope") or ""),
             symbols=symbols(item),
             exact_terms=tuple(sorted({str(value) for value in exact_values if str(value).strip()})),
-            instruction_risk_flags=risk_flags(item),
+            instruction_risk_flags=(),
             freshness=str(item.get("freshness") or "current"),
             navigation_only=bool(item.get("navigation_only")) or str(item.get("answer_type") or "") in {"navigation_only", "partial_navigational"},
             answer_units=extract_answer_units(
                 display,
                 source_fields={"path_or_url": path, "section": heading},
                 include_soft_wrapped_prose=include_soft_wrapped_prose,
+                representation_bounded=result_kind != "patch_context",
             ),
+            answer_units_representation_bounded=result_kind != "patch_context",
             original=item,
         ))
     return candidates, omissions
@@ -375,5 +322,5 @@ __all__ = [
     "authority", "display_text", "docs_answer_candidate_tokens", "estimated_tokens",
     "identity_aliases", "normalize_candidates", "normalized_source", "observed_qualifiers",
     "positive_int", "projected_text", "requirement_value_visible", "resolved_version",
-    "risk_flags", "section", "source_path", "symbols", "version_binding", "version_rank",
+    "section", "source_path", "symbols", "version_binding", "version_rank",
 ]

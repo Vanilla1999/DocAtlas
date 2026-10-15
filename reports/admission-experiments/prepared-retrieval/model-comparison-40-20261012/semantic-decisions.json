@@ -1,0 +1,1213 @@
+[
+  {
+    "case_id": "V40-B01",
+    "mode": "budget",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "tangential",
+        "Preview styles and cross-release style guarantees do not establish the default line length."
+      ],
+      [
+        "direct_support",
+        "Explicitly states that the default permitted line length is 88."
+      ]
+    ],
+    "reason": "The requested default is present, alongside an unrelated preview-style source."
+  },
+  {
+    "case_id": "V40-B01",
+    "mode": "mini",
+    "support": "none",
+    "packet": "useful_context_only",
+    "sources": [
+      [
+        "useful_context",
+        "Shows explicit line-length=88 TOML examples and configuration syntax; an example value is not evidence of the default."
+      ]
+    ],
+    "reason": "The numeric value 88 occurs only as a configured example; the requested default relationship is missing."
+  },
+  {
+    "case_id": "V40-B02",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States inference from pyproject.toml project.requires-python and fallback to per-file auto-detection."
+      ]
+    ],
+    "reason": "Both branches of the requested default/fallback rule are explicit."
+  },
+  {
+    "case_id": "V40-B02",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States inference from pyproject.toml project.requires-python and fallback to per-file auto-detection."
+      ]
+    ],
+    "reason": "Same complete supporting source as Budget."
+  },
+  {
+    "case_id": "V40-B03",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly maps unchanged/reformatted/internal-error outcomes to 0/1/123."
+      ],
+      [
+        "direct_support",
+        "Independently repeats that --check exits 1 if a file would be reformatted; other requested outcomes remain in the first source."
+      ]
+    ],
+    "reason": "All three exit codes are supported; the second row adds a partly redundant workflow explanation."
+  },
+  {
+    "case_id": "V40-B03",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly maps unchanged/reformatted/internal-error outcomes to 0/1/123."
+      ]
+    ],
+    "reason": "All requested codes remain with the partly redundant second row removed."
+  },
+  {
+    "case_id": "V40-B04",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says --no-cache neither reads nor writes the per-user cache."
+      ],
+      [
+        "direct_support",
+        "Independently states the same no-read/no-write rule and fresh-analysis use case."
+      ]
+    ],
+    "reason": "Both cache-read and cache-write prohibitions are directly supported; rows overlap semantically."
+  },
+  {
+    "case_id": "V40-B04",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says --no-cache neither reads nor writes the per-user cache."
+      ],
+      [
+        "direct_support",
+        "Independently states the same no-read/no-write rule and fresh-analysis use case."
+      ]
+    ],
+    "reason": "Same complete evidence as Budget."
+  },
+  {
+    "case_id": "V40-B05",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Contrasts force-exclude with exclude by explicitly including command-line file/directory arguments."
+      ],
+      [
+        "useful_context",
+        "Locates configuration of the exclusion flags in pyproject.toml; it does not add the requested behavioral contrast."
+      ]
+    ],
+    "reason": "The exact explicit-argument contrast is supported in the first row; configuration placement is secondary context."
+  },
+  {
+    "case_id": "V40-B05",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Contrasts force-exclude with exclude by explicitly including command-line file/directory arguments."
+      ],
+      [
+        "useful_context",
+        "Explains --stdin-filename as a directly passed-file analogue so force-exclude applies in editors."
+      ]
+    ],
+    "reason": "The same requested contrast is retained, with a related stdin edge case."
+  },
+  {
+    "case_id": "V40-B06",
+    "mode": "budget",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Gives common base directory, parent traversal, stop conditions, stdin starting directory and global fallback; no blackd port."
+      ],
+      [
+        "useful_context",
+        "Defines the named pyproject.toml file and its role; it does not supply a search location or TCP port."
+      ]
+    ],
+    "reason": "The documented file-discovery question is answered; the requested blackd TCP port remains unsupported."
+  },
+  {
+    "case_id": "V40-B06",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Explains target Python version inference and grammar examples, not where Black searches for pyproject.toml or a blackd port."
+      ]
+    ],
+    "reason": "Shared terms pyproject.toml/Black do not supply either requested relation; the documented part delivered by Budget is lost."
+  },
+  {
+    "case_id": "V40-B07",
+    "mode": "budget",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Identifies BLACK_CACHE_DIR, its precedence over XDG_CACHE_HOME, and cache locations; no retention days."
+      ],
+      [
+        "direct_support",
+        "Names BLACK_CACHE_DIR as the cache directory environment option."
+      ]
+    ],
+    "reason": "The override variable is explicit; an exact retention duration is absent."
+  },
+  {
+    "case_id": "V40-B07",
+    "mode": "mini",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Identifies BLACK_CACHE_DIR, its precedence over XDG_CACHE_HOME, and cache locations; no retention days."
+      ],
+      [
+        "useful_context",
+        "An environment-variable-options introduction supplies structural context only."
+      ]
+    ],
+    "reason": "The requested variable remains explicit in the first row; retention days remain unsupported."
+  },
+  {
+    "case_id": "V40-B08",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Python-version support and deprecation history do not give formatting latency guarantees."
+      ],
+      [
+        "tangential",
+        "Yearly formatting-style stability is unrelated to a percentile timing guarantee."
+      ]
+    ],
+    "reason": "Neither source supports or directly refutes a guaranteed 99th-percentile formatting latency."
+  },
+  {
+    "case_id": "V40-B08",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Required-version and stable formatting guarantees concern output/version compatibility, not runtime percentile latency."
+      ],
+      [
+        "tangential",
+        "AST safety checks concern semantic preservation, not a formatting-latency SLA."
+      ]
+    ],
+    "reason": "A source being about a guarantee is insufficient when the guaranteed property differs; negative empty-source failure remains."
+  },
+  {
+    "case_id": "V40-P01",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "For a specific installer setting it explicitly recommends project poetry.toml and explains why that setting is not in pyproject.toml."
+      ],
+      [
+        "direct_support",
+        "Explicitly names poetry.toml as project-local application configuration and says it is separate from pyproject.toml."
+      ]
+    ],
+    "reason": "The requested file and distinction are directly supported; the long installer example adds substantial unnecessary detail."
+  },
+  {
+    "case_id": "V40-P01",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "For a specific installer setting it explicitly recommends project poetry.toml and explains why that setting is not in pyproject.toml."
+      ],
+      [
+        "direct_support",
+        "Explicitly names poetry.toml as project-local application configuration and says it is separate from pyproject.toml."
+      ]
+    ],
+    "reason": "Same complete source evidence as Budget."
+  },
+  {
+    "case_id": "V40-P02",
+    "mode": "budget",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Gives the full ordered precedence: environment, local poetry.toml, global config.toml, default."
+      ],
+      [
+        "tangential",
+        "Virtual-environment selection/Python compatibility is a different precedence problem from application configuration sources."
+      ]
+    ],
+    "reason": "The complete configuration order is present, plus an unrelated environment-selection source."
+  },
+  {
+    "case_id": "V40-P02",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Gives the full ordered precedence: environment, local poetry.toml, global config.toml, default."
+      ],
+      [
+        "direct_support",
+        "Independently supports local/project settings taking precedence over global settings."
+      ]
+    ],
+    "reason": "Full order remains; the extra source now supports the requested configuration precedence."
+  },
+  {
+    "case_id": "V40-P03",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly specifies POETRY_ prefix, uppercase, and dots/dashes becoming underscores."
+      ],
+      [
+        "useful_context",
+        "Shows installer.no-binary mapped to POETRY_INSTALLER_NO_BINARY, an application of the conversion with long unrelated installer details."
+      ]
+    ],
+    "reason": "The general conversion rule is complete; the extra source is a concrete but verbose example."
+  },
+  {
+    "case_id": "V40-P03",
+    "mode": "mini",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly specifies POETRY_ prefix, uppercase, and dots/dashes becoming underscores."
+      ],
+      [
+        "tangential",
+        "Configuration-source precedence does not explain the requested name transformation."
+      ]
+    ],
+    "reason": "The answerable conversion remains, but the second source concerns priority rather than naming."
+  },
+  {
+    "case_id": "V40-P04",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "useful_context",
+        "Explains the default environment/Python-selection behavior to which the reset returns."
+      ],
+      [
+        "direct_support",
+        "Explicitly prescribes poetry env use system to disable explicit environment selection and retrieve default behavior."
+      ]
+    ],
+    "reason": "The reset command and its meaning are directly present."
+  },
+  {
+    "case_id": "V40-P04",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "useful_context",
+        "Explains the default environment/Python-selection behavior to which the reset returns."
+      ],
+      [
+        "direct_support",
+        "Explicitly prescribes poetry env use system to disable explicit environment selection and retrieve default behavior."
+      ]
+    ],
+    "reason": "Same reset command and default-behavior context as Budget."
+  },
+  {
+    "case_id": "V40-P05",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "The table is for caret ^1.2.3, not compatible-release ~=1.2.3; using its <2.0.0 upper bound would answer the wrong operator."
+      ],
+      [
+        "tangential",
+        "Virtual environment/Python-selection behavior does not define the compatible-release dependency range."
+      ]
+    ],
+    "reason": "A matching version literal is present under the wrong requirement operator; the requested >=1.2.3,<1.3.0 relation is absent."
+  },
+  {
+    "case_id": "V40-P05",
+    "mode": "mini",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "tangential",
+        "Caret ^1.2.3 has a different upper bound and is not evidence for the requested ~= operator."
+      ],
+      [
+        "direct_support",
+        "The compatible-release table explicitly maps ~=1.2.3 to >=1.2.3 <1.3.0."
+      ]
+    ],
+    "reason": "The requested range is newly delivered, while a potentially confusing different-operator table remains."
+  },
+  {
+    "case_id": "V40-P06",
+    "mode": "budget",
+    "support": "none",
+    "packet": "empty",
+    "sources": [],
+    "reason": "No public source is delivered for the documented env activate output; a shell process ID is also unsupported."
+  },
+  {
+    "case_id": "V40-P06",
+    "mode": "mini",
+    "support": "none",
+    "packet": "empty",
+    "sources": [],
+    "reason": "Same source-empty packet; no evidence for the documented part is recovered."
+  },
+  {
+    "case_id": "V40-P07",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Git dependency declaration syntax, refs, subdirectories and SSH examples provide no percentile latency guarantee."
+      ]
+    ],
+    "reason": "Dependency configuration is not a dependency-resolution timing SLA."
+  },
+  {
+    "case_id": "V40-P07",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Pre-release selection constraints concern which version is eligible, not how long solving is guaranteed to take."
+      ],
+      [
+        "tangential",
+        "Minimum release age in days is an eligibility/security filter, not dependency-resolution latency."
+      ]
+    ],
+    "reason": "The time-like release-age number belongs to a different relation; no timing guarantee is supported or directly refuted."
+  },
+  {
+    "case_id": "V40-P08",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Current/new environment selection explains normal operation but gives no hard retained-environment count."
+      ]
+    ],
+    "reason": "Using or creating one current environment is not a hard maximum on all retained environments."
+  },
+  {
+    "case_id": "V40-P08",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Current/new environment selection gives no hard retained-environment count."
+      ],
+      [
+        "tangential",
+        "Manual env remove and --all deletion commands do not establish an automatic retention maximum."
+      ]
+    ],
+    "reason": "Manual cleanup instructions cannot supply or refute the requested automatic retention limit."
+  },
+  {
+    "case_id": "V40-T01",
+    "mode": "budget",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly states that the first positional argument to reactive supplies its default value."
+      ],
+      [
+        "tangential",
+        "One/two watch-method arguments belong to a different API, not reactive constructor arguments."
+      ]
+    ],
+    "reason": "The constructor default-value fact is complete; a different positional-argument contract is also emitted."
+  },
+  {
+    "case_id": "V40-T01",
+    "mode": "mini",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly states that the first positional argument to reactive supplies its default value."
+      ],
+      [
+        "tangential",
+        "Computed reactive values and compute-method caching do not establish constructor argument semantics."
+      ]
+    ],
+    "reason": "The requested fact remains; unrelated reactive-method behavior occupies the second source."
+  },
+  {
+    "case_id": "V40-T02",
+    "mode": "budget",
+    "support": "none",
+    "packet": "mixed",
+    "sources": [
+      [
+        "tangential",
+        "Reactive type hints/default types do not state refresh behavior."
+      ],
+      [
+        "useful_context",
+        "Defines the reactive attributes being asked about, but says nothing about coalescing refreshes."
+      ],
+      [
+        "useful_context",
+        "Document introduction identifies reactive attributes as the topic; it contains no refresh-count fact."
+      ]
+    ],
+    "reason": "No supplied source establishes how many refreshes result from several changes."
+  },
+  {
+    "case_id": "V40-T02",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly states that multiple reactive changes produce only a single refresh."
+      ]
+    ],
+    "reason": "The missing single-refresh relation is newly delivered; nested disabling-refresh material is additional context."
+  },
+  {
+    "case_id": "V40-T03",
+    "mode": "budget",
+    "support": "none",
+    "packet": "useful_context_only",
+    "sources": [
+      [
+        "useful_context",
+        "Distinguishes content refresh from layout resizing; layout=False is not the requested helper that suppresses both."
+      ]
+    ],
+    "reason": "The requested var helper is absent; the row only helps distinguish layout changes from refreshes."
+  },
+  {
+    "case_id": "V40-T03",
+    "mode": "mini",
+    "support": "none",
+    "packet": "empty",
+    "sources": [],
+    "reason": "The final source recheck leaves an empty packet; no var evidence survives."
+  },
+  {
+    "case_id": "V40-T04",
+    "mode": "budget",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly maps one watch argument to the new value and two to old/new."
+      ],
+      [
+        "tangential",
+        "A validate_ method's incoming-value argument belongs to a different callback contract."
+      ]
+    ],
+    "reason": "Both watch-arity rules are present; a different callback's argument behavior is unrequested."
+  },
+  {
+    "case_id": "V40-T04",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly maps one watch argument to the new value and two to old/new."
+      ],
+      [
+        "useful_context",
+        "Clarifies when the same watch methods fire and always_update; it does not change their arity contract."
+      ]
+    ],
+    "reason": "The requested argument mapping remains, with related invocation context."
+  },
+  {
+    "case_id": "V40-T05",
+    "mode": "budget",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says exclusive cancels previous workers before starting the new one, in the presented worker example."
+      ],
+      [
+        "useful_context",
+        "Shows the same exclusive=True setting on the work decorator and states it accepts run_worker arguments."
+      ],
+      [
+        "tangential",
+        "Waiting for worker return values and message-handler blocking does not establish cancellation by exclusive."
+      ]
+    ],
+    "reason": "The cancellation/start ordering is supported; a return-value waiting source is unrelated to that condition."
+  },
+  {
+    "case_id": "V40-T05",
+    "mode": "mini",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says exclusive cancels previous workers before starting the new one, in the presented worker example."
+      ],
+      [
+        "useful_context",
+        "Shows the same exclusive=True setting on the work decorator and states it accepts run_worker arguments."
+      ],
+      [
+        "tangential",
+        "Waiting for worker return values and message-handler blocking does not establish cancellation by exclusive."
+      ]
+    ],
+    "reason": "Same complete requested support and same unrequested waiting detail as Budget."
+  },
+  {
+    "case_id": "V40-T06",
+    "mode": "budget",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States that Worker.cancel raises CancelledError within the coroutine and should cause premature exit; no maximum time is given."
+      ]
+    ],
+    "reason": "The documented cancellation mechanism is present; a bounded cancellation latency remains unsupported."
+  },
+  {
+    "case_id": "V40-T06",
+    "mode": "mini",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States that Worker.cancel raises CancelledError within the coroutine and should cause premature exit; no maximum time is given."
+      ]
+    ],
+    "reason": "Same cancellation mechanism and same unsupported latency part as Budget."
+  },
+  {
+    "case_id": "V40-T07",
+    "mode": "budget",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explains call_from_thread, thread-safe post_message, and custom messages for UI updates; no OS scheduling policy."
+      ]
+    ],
+    "reason": "The UI-update instructions are supported; exact OS scheduling is absent."
+  },
+  {
+    "case_id": "V40-T07",
+    "mode": "mini",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explains call_from_thread, thread-safe post_message, and custom messages for UI updates; no OS scheduling policy."
+      ]
+    ],
+    "reason": "Same UI-update evidence as Budget, with the scheduling gap unchanged."
+  },
+  {
+    "case_id": "V40-T08",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Refresh coalescing and disabling are mechanisms, not a guaranteed keyboard-to-render percentile latency."
+      ],
+      [
+        "tangential",
+        "World-clock data binding and time zones do not support an input/render latency SLA."
+      ]
+    ],
+    "reason": "Sources use render/time-related vocabulary without the requested latency-guarantee relation."
+  },
+  {
+    "case_id": "V40-T08",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Input validation events, values and styles do not provide a percentile render-latency guarantee."
+      ],
+      [
+        "tangential",
+        "Automatic/single refresh behavior is not a keyboard-to-render latency SLA."
+      ]
+    ],
+    "reason": "Neither input validation nor smart refresh supplies or directly refutes the requested timing guarantee."
+  },
+  {
+    "case_id": "V40-V01",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States that VITE_-prefixed variables are exposed and parsed env values are strings, including numeric/boolean-looking values."
+      ]
+    ],
+    "reason": "Both the exposed-name condition and parsed type are explicit, with an appropriate secret-exposure warning."
+  },
+  {
+    "case_id": "V40-V01",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States that VITE_-prefixed variables are exposed and parsed env values are strings, including numeric/boolean-looking values."
+      ]
+    ],
+    "reason": "Same complete supporting source as Budget."
+  },
+  {
+    "case_id": "V40-V02",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says process environment present at startup has highest priority and is not overwritten by .env files."
+      ]
+    ],
+    "reason": "The requested precedence is direct; long dotenv expansion examples are unnecessary within the same source."
+  },
+  {
+    "case_id": "V40-V02",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says process environment present at startup has highest priority and is not overwritten by .env files."
+      ]
+    ],
+    "reason": "The same requested precedence is present despite a different evidence identity."
+  },
+  {
+    "case_id": "V40-V03",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Middleware mode/default false and Express integration do not state the dev server port or busy-port fallback."
+      ],
+      [
+        "tangential",
+        "Environment-file loading/expansion does not establish a listening-port default or collision behavior."
+      ]
+    ],
+    "reason": "Neither requested port fact is delivered."
+  },
+  {
+    "case_id": "V40-V03",
+    "mode": "mini",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly gives default port 5173 and automatic next-available-port behavior on collision."
+      ],
+      [
+        "tangential",
+        "Filesystem watching, WSL and polling settings do not concern port selection or port collisions."
+      ]
+    ],
+    "reason": "Both requested facts are newly delivered, with unrelated watcher detail retained."
+  },
+  {
+    "case_id": "V40-V04",
+    "mode": "budget",
+    "support": "none",
+    "packet": "useful_context_only",
+    "sources": [
+      [
+        "useful_context",
+        "Shows strictPort=true in a WebSocket/reverse-proxy workaround and links the option, but gives no behavior when the listening port is busy."
+      ]
+    ],
+    "reason": "The flag name/use case is present; the requested exit-on-busy-port condition is absent."
+  },
+  {
+    "case_id": "V40-V04",
+    "mode": "mini",
+    "support": "none",
+    "packet": "useful_context_only",
+    "sources": [
+      [
+        "useful_context",
+        "Shows strictPort=true in a WebSocket/reverse-proxy workaround and links the option, but gives no behavior when the listening port is busy."
+      ]
+    ],
+    "reason": "Same source with a flag mention but no requested conditional rule."
+  },
+  {
+    "case_id": "V40-V05",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explains serving public assets at /, copying unchanged to dist root, and referencing public/icon.png as /icon.png."
+      ]
+    ],
+    "reason": "Both the serving rule and exact source-code path are supported."
+  },
+  {
+    "case_id": "V40-V05",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explains serving public assets at /, copying unchanged to dist root, and referencing public/icon.png as /icon.png."
+      ]
+    ],
+    "reason": "Same complete public-directory evidence as Budget."
+  },
+  {
+    "case_id": "V40-V06",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "The source gives 403 for files outside fs.allow when strict is true; it does not state strict's default or a guarantee for fs.deny."
+      ]
+    ],
+    "reason": "Transferring 403 from the allow-list rule to the deny-list condition would answer the wrong relation; even the documented default part is absent."
+  },
+  {
+    "case_id": "V40-V06",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "The source gives 403 for files outside fs.allow when strict is true; it does not state strict's default or a guarantee for fs.deny."
+      ]
+    ],
+    "reason": "The same wrong-condition source remains; neither requested part is supported."
+  },
+  {
+    "case_id": "V40-V07",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Filesystem watcher/HMR triggering and polling performance notes do not provide a 99th-percentile propagation guarantee."
+      ],
+      [
+        "tangential",
+        "HMR on/off/overlay options and WebSocket option deprecation do not give a latency SLA."
+      ]
+    ],
+    "reason": "Both sources describe HMR mechanisms, not a guaranteed time percentile."
+  },
+  {
+    "case_id": "V40-V07",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Filesystem watcher/HMR triggering and polling performance notes do not provide a 99th-percentile propagation guarantee."
+      ],
+      [
+        "tangential",
+        "WebSocket connection timeout and reverse-proxy fallback concern connection settings, not HMR propagation latency guarantees."
+      ]
+    ],
+    "reason": "In particular, a WebSocket timeout value is not a guaranteed HMR propagation time."
+  },
+  {
+    "case_id": "V40-V08",
+    "mode": "budget",
+    "support": "none",
+    "packet": "empty",
+    "sources": [],
+    "reason": "No source is emitted for the unspecified guaranteed production CDN TTL; this is compatible with the frozen empty-source contract."
+  },
+  {
+    "case_id": "V40-V08",
+    "mode": "mini",
+    "support": "none",
+    "packet": "empty",
+    "sources": [],
+    "reason": "Same empty packet; no CDN TTL is asserted or sourced."
+  },
+  {
+    "case_id": "V40-E01",
+    "mode": "budget",
+    "support": "partial",
+    "packet": "useful_context_only",
+    "sources": [
+      [
+        "useful_context",
+        "Gives the eslint.config.* search pattern and an alternate --config filename, but not the supported flat-config filename/extension list."
+      ]
+    ],
+    "reason": "There is some filename/search context, but the requested complete list is missing."
+  },
+  {
+    "case_id": "V40-E01",
+    "mode": "mini",
+    "support": "none",
+    "packet": "mixed",
+    "sources": [
+      [
+        "useful_context",
+        "Identifies the document as flat-config documentation, without giving filenames."
+      ],
+      [
+        "tangential",
+        "Configuration object properties and target JavaScript source types are not configuration filename extensions."
+      ]
+    ],
+    "reason": "No accepted config filenames are enumerated; sourceType .js/.mjs/.cjs defaults concern linted files, not the asked configuration file."
+  },
+  {
+    "case_id": "V40-E02",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Starts at each target file's directory, traverses ancestors to eslint.config.*, and explains --config disabling search."
+      ]
+    ],
+    "reason": "The requested target-file-specific search workflow is explicit."
+  },
+  {
+    "case_id": "V40-E02",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Starts at each target file's directory, traverses ancestors to eslint.config.*, and explains --config disabling search."
+      ]
+    ],
+    "reason": "Same complete resolution workflow as Budget."
+  },
+  {
+    "case_id": "V40-E03",
+    "mode": "budget",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States same fixes without filesystem saves and explicitly allows stdin with --stdin."
+      ],
+      [
+        "useful_context",
+        "Shows the matching --stdin --fix-dry-run --format json command invocation."
+      ]
+    ],
+    "reason": "Both requested differences/application constraints are directly supplied."
+  },
+  {
+    "case_id": "V40-E03",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "States same fixes without filesystem saves and explicitly allows stdin with --stdin."
+      ],
+      [
+        "useful_context",
+        "Shows the matching --stdin --fix-dry-run --format json command invocation."
+      ]
+    ],
+    "reason": "Same full dry-run/stdin support as Budget."
+  },
+  {
+    "case_id": "V40-E04",
+    "mode": "budget",
+    "support": "full",
+    "packet": "mixed",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly gives default ignores **/node_modules/ and .git/."
+      ],
+      [
+        "direct_support",
+        "Explicitly gives default linted JavaScript patterns **/*.js, **/*.cjs and **/*.mjs."
+      ],
+      [
+        "tangential",
+        "Unused inline config comments and their report severity do not concern default ignored paths or linted file patterns."
+      ]
+    ],
+    "reason": "All requested facts are semantically supported by configuration-files.md, even if the strict historical oracle requires an alternative location in ignore.md."
+  },
+  {
+    "case_id": "V40-E04",
+    "mode": "mini",
+    "support": "full",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly lists both default ignored paths and the three default JavaScript patterns."
+      ],
+      [
+        "direct_support",
+        "Again names ESLint's default file patterns and shows how they can be unignored; the examples are extra detail."
+      ]
+    ],
+    "reason": "The same requested facts are supported; switching to the historical gold source is not a new semantic fact-delivery gain."
+  },
+  {
+    "case_id": "V40-E05",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "--env-info reports installed runtime/tool versions; it says nothing about TypeScript config dependencies or startup overhead."
+      ]
+    ],
+    "reason": "No support for either requested part."
+  },
+  {
+    "case_id": "V40-E05",
+    "mode": "mini",
+    "support": "partial",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Provides a conditional alternative: Node.js >=22.13.0 can avoid jiti with experimental-strip-types and the ESLint experimental flag; no timing."
+      ]
+    ],
+    "reason": "Useful version-specific support is newly delivered, but the question does not specify Node version and the general/older-Node dependency branch and exact startup overhead are absent."
+  },
+  {
+    "case_id": "V40-E06",
+    "mode": "budget",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says default off/main-thread and auto chooses an automatically determined best setting; no fixed eight-core thread count."
+      ],
+      [
+        "direct_support",
+        "CLI option reference independently repeats default off and auto-selection meaning, alongside many unrequested options."
+      ]
+    ],
+    "reason": "The documented default/auto definition is complete; a deterministic eight-core count is not given."
+  },
+  {
+    "case_id": "V40-E06",
+    "mode": "mini",
+    "support": "documented_part_only",
+    "packet": "all_relevant",
+    "sources": [
+      [
+        "direct_support",
+        "Explicitly says default off/main-thread and auto chooses an automatically determined best setting; no fixed eight-core thread count."
+      ],
+      [
+        "direct_support",
+        "CLI option reference independently repeats default off and auto-selection meaning, alongside many unrequested options."
+      ]
+    ],
+    "reason": "Same supported definition and same absent eight-core count as Budget."
+  },
+  {
+    "case_id": "V40-E07",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "Console debug output is not a per-worker memory limit."
+      ],
+      [
+        "tangential",
+        "--max-warnings limits a warning count and controls exit status, not memory usage."
+      ]
+    ],
+    "reason": "An unrelated maximum metric cannot support the requested hard memory guarantee."
+  },
+  {
+    "case_id": "V40-E07",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "--max-warnings limits a warning count, not per-worker memory."
+      ],
+      [
+        "tangential",
+        "Warnings for explicitly passed ignored files do not establish memory constraints."
+      ]
+    ],
+    "reason": "The relation remains wrong even though a maximum/worker-like operational topic is present."
+  },
+  {
+    "case_id": "V40-E08",
+    "mode": "budget",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "--env-info reports environment and installed tools and skips linting; it provides no uptime guarantee."
+      ]
+    ],
+    "reason": "Local installation/environment details are not a production uptime SLA."
+  },
+  {
+    "case_id": "V40-E08",
+    "mode": "mini",
+    "support": "none",
+    "packet": "unrelated",
+    "sources": [
+      [
+        "tangential",
+        "--env-info reports environment and installed tools and skips linting; it provides no uptime guarantee."
+      ]
+    ],
+    "reason": "Same unsupported SLA packet as Budget."
+  }
+]

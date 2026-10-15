@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "scope": "Actual full core matrix only; not complete CI or merge acceptance",
+  "head_sha": "991638f28ecff659c320b45738edfaa8b9fd375e",
+  "tree_sha": "955bac94d5ca6b847f558b0e7dbd0dcb8265e9df",
+  "merge_sha": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+  "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "run_id": 37840422988,
+  "run_attempt": 1,
+  "baseline_head_sha": "04ff1dda57efb5236d7b3577d4e2736b2820df5b",
+  "python": [
+    "3.11",
+    "3.12",
+    "3.13"
+  ],
+  "actual_total": 8513,
+  "actual_states": {
+    "failure": 1946,
+    "passed": 6496,
+    "error": 61,
+    "skipped": 10
+  },
+  "baseline_states": {
+    "failure": 1952,
+    "passed": 6484,
+    "error": 61,
+    "skipped": 10
+  },
+  "rosters_identical": true,
+  "outcomes_identical": true,
+  "node_roster_sha256": "baf2bb6e4e4e943b07365cc5bcee4ff89f08b1c6fe30d9359e43e1ac43e3be15",
+  "node_outcomes_sha256": "cdd5643f64f3998c5cc01974a14c2c92663702229e73012e7aed93ca15819703",
+  "transition_counts": {
+    "failure->passed": 7
+  },
+  "transitions": [
+    {
+      "nodeid": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_foreign_project_same_path_never_enters_owned_context",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_does_not_mark_mtime_only_change_stale",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_reports_indexed_and_stale_sources",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_docs_service_part03.py::test_get_project_docs_returns_scoped_docs_result",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_docs_service_part04.py::test_get_project_context_requires_preflight_for_stale_project_docs",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_docs_service_part04.py::test_get_project_docs_reports_stale_project_docs",
+      "before": "failure",
+      "after": "passed"
+    }
+  ],
+  "added": [
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_cold_read_does_not_create_or_authorize_storage",
+      "state": "passed"
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+      "state": "failure"
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+      "state": "passed"
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_fixture_restores_environment_and_preserves_original_repository",
+      "state": "passed"
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+      "state": "passed"
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_preserves_all_catalog_bytes_and_source_boundaries",
+      "state": "passed"
+    }
+  ],
+  "removed": [],
+  "pass_regressions": {
+    "3.11": [],
+    "3.12": [],
+    "3.13": []
+  },
+  "unexpected_transitions": {
+    "3.11": [],
+    "3.12": [],
+    "3.13": []
+  },
+  "target_count": 8,
+  "target_states": {
+    "failure": 1,
+    "passed": 7
+  },
+  "target_outcomes": [
+    {
+      "nodeid": "tests/docs/test_module_docs_manifest_e2e.py::test_two_module_docs_manifest_sync_filter_and_public_mcp",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "failure",
+      "message": "AssertionError: {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['required_evidence_missing'], 'estimated_tokens': 134, ...}\nassert 'insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence"
+    },
+    {
+      "nodeid": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_foreign_project_same_path_never_enters_owned_context",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_reports_indexed_and_stale_sources",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_does_not_mark_mtime_only_change_stale",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_docs_service_part03.py::test_get_project_docs_returns_scoped_docs_result",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_docs_service_part04.py::test_get_project_docs_reports_stale_project_docs",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_docs_service_part04.py::test_get_project_context_requires_preflight_for_stale_project_docs",
+      "group": "member_fixture_or_descriptor_mtime",
+      "before": "failure",
+      "after": "passed",
+      "message": ""
+    }
+  ],
+  "new_test_states": {
+    "passed": 5,
+    "failure": 1
+  },
+  "new_cases": [
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_cold_read_does_not_create_or_authorize_storage",
+      "state": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+      "state": "failure",
+      "message": "AssertionError: assert ('insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence)"
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+      "state": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_fixture_restores_environment_and_preserves_original_repository",
+      "state": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+      "state": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_preserves_all_catalog_bytes_and_source_boundaries",
+      "state": "passed",
+      "message": ""
+    }
+  ],
+  "security_controls": {
+    "3.11": {
+      "count": 141,
+      "states": {
+        "passed": 141
+      },
+      "nonpassing": []
+    },
+    "3.12": {
+      "count": 141,
+      "states": {
+        "passed": 141
+      },
+      "nonpassing": []
+    },
+    "3.13": {
+      "count": 141,
+      "states": {
+        "passed": 141
+      },
+      "nonpassing": []
+    }
+  },
+  "diagnostic_47": {
+    "3.11": {
+      "count": 47,
+      "states": {
+        "error": 47
+      },
+      "message_identical_to_04ff": true,
+      "first_barrier_changes": 0
+    },
+    "3.12": {
+      "count": 47,
+      "states": {
+        "error": 47
+      },
+      "message_identical_to_04ff": true,
+      "first_barrier_changes": 0
+    },
+    "3.13": {
+      "count": 47,
+      "states": {
+        "error": 47
+      },
+      "message_identical_to_04ff": true,
+      "first_barrier_changes": 0
+    }
+  },
+  "first_barrier_comparison": {
+    "3.11": {
+      "same_state_failure_error_count": 2006,
+      "stable_barrier_change_count": 10,
+      "stable_barrier_unchanged_count": 1996,
+      "no_marked_statement_count": 0,
+      "no_marked_statement_nodes": []
+    },
+    "3.12": {
+      "same_state_failure_error_count": 2006,
+      "stable_barrier_change_count": 10,
+      "stable_barrier_unchanged_count": 1996,
+      "no_marked_statement_count": 0,
+      "no_marked_statement_nodes": []
+    },
+    "3.13": {
+      "same_state_failure_error_count": 2006,
+      "stable_barrier_change_count": 10,
+      "stable_barrier_unchanged_count": 1996,
+      "no_marked_statement_count": 0,
+      "no_marked_statement_nodes": []
+    }
+  },
+  "core_jobs": [
+    {
+      "python": "3.11",
+      "job_id": 113528091279,
+      "name": "test (3.11)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37840422988/job/113528091279"
+    },
+    {
+      "python": "3.12",
+      "job_id": 113528091595,
+      "name": "test (3.12)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37840422988/job/113528091595"
+    },
+    {
+      "python": "3.13",
+      "job_id": 113528091546,
+      "name": "test (3.13)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37840422988/job/113528091546"
+    }
+  ],
+  "matrix_artifacts": [
+    {
+      "python": "3.11",
+      "job_id": 113528091279,
+      "artifact_id": 11576909680,
+      "artifact_name": "pytest-core-3.11-37840422988-1",
+      "artifact_sha256": "35d43f37f6e15bd9abe4486be8fb37fd26aeac0a014464d6cd3e24e42772ae46",
+      "artifact_bytes": 550677,
+      "xml_sha256": "e087739c1186f4153c778c02844ee40df15eb90061729660fb2896602a145a78",
+      "xml_bytes": 7612485,
+      "case_json_sha256": "de1a23fd76ab5ba88defa656f3d827f16c6a0cbc19ded0ef4fa8cf9bab4e2053",
+      "compressed_roster_sha256": "c2d5de5b805503e96903144f8b947ba6149c18f955b1aabe34bfc0082319adc8"
+    },
+    {
+      "python": "3.12",
+      "job_id": 113528091595,
+      "artifact_id": 11577836938,
+      "artifact_name": "pytest-core-3.12-37840422988-1",
+      "artifact_sha256": "1b0caf41dc0cc55e390116cd7a345be3765b00209f0bde9157187e1744aafe6d",
+      "artifact_bytes": 551277,
+      "xml_sha256": "520a77bd573da948760fbd1c535b03a8f8296685bad3e06423ee78c7a643b31d",
+      "xml_bytes": 7612698,
+      "case_json_sha256": "f7aa759fbc7f1044ee7bec07a056cf1d1bea24261125bd139b856d402e452a1c",
+      "compressed_roster_sha256": "c2d5de5b805503e96903144f8b947ba6149c18f955b1aabe34bfc0082319adc8"
+    },
+    {
+      "python": "3.13",
+      "job_id": 113528091546,
+      "artifact_id": 11577831919,
+      "artifact_name": "pytest-core-3.13-37840422988-1",
+      "artifact_sha256": "4314fa30d48192a7e61d617c2c8ed11e32625f4d9a9aa67ddb0763c20fde66e0",
+      "artifact_bytes": 550293,
+      "xml_sha256": "0bd8a14e04055eeb7c1f5f80a91edb38012c83a04cf5f3aa71cee8ff1e166679",
+      "xml_bytes": 7612698,
+      "case_json_sha256": "759b50cf43be3c6d45d64fc647d19425cf9f50551f153d7fd8c911856777a6b8",
+      "compressed_roster_sha256": "c2d5de5b805503e96903144f8b947ba6149c18f955b1aabe34bfc0082319adc8"
+    }
+  ],
+  "evidence_files": [
+    {
+      "filename": "991638f-core-critical-reasons.json",
+      "sha256": "a35c6003e9325b9c086900a262403e60b2ead6e2f196bb3259e1d8fb241acbf0",
+      "bytes": 18134
+    },
+    {
+      "filename": "991638f-core-failure-phase-audit.json",
+      "sha256": "1d53539682cfa012942fdf381cf587278a75426205038583e7addfc839e04911",
+      "bytes": 42764
+    },
+    {
+      "filename": "991638f-core-provenance.json",
+      "sha256": "ecfa6df66698b93a92bdcab0b2cae1d7b57c3e334cf7c2519fe46da4a0fcfe08",
+      "bytes": 5735
+    }
+  ],
+  "reconstruction": {
+    "baseline": {
+      "filename": "04ff1dd-core-3.12-roster.json.gz",
+      "sha256": "00d3260858aba85cbe84fa0faa8edf7c54bf4d160deb4698812dea0555e7ec64",
+      "bytes": 150121
+    },
+    "algorithm": "Load baseline node/state map, check and apply all transitions, add six new concrete node/state pairs, sort by nodeid; canonical JSON SHA256 must equal node_outcomes_sha256. Exact equality verified against all three JUnit-derived rosters.",
+    "verified_all_three": true
+  },
+  "complete_ci_acceptance": false,
+  "readiness": false,
+  "actual_clients": "NOT RUN by this core audit",
+  "message_variation_audit": {
+    "filename": "991638f-core-message-variation-audit.json",
+    "sha256": "b840605c907a4242d21c2053ecd5f59479f5af7d1e01007bdd6d882af2998be4",
+    "bytes": 10545
+  },
+  "message_variation_unexplained_changes": {
+    "3.11": [],
+    "3.12": [],
+    "3.13": []
+  },
+  "first_barrier_change_sets_identical": true
+}

@@ -1,0 +1,20 @@
+{
+  "status": "insufficient",
+  "answer": "The provided source does not establish how OtherAPI handles packet delivery during recovery. It only states that OtherAPI validates session credentials before startup, while DeliveryEngine resumes packet delivery after each request; no connection to recovery is given.",
+  "evidence": [
+    {
+      "source_id": "ev-788701f548350774",
+      "quote": "OtherAPI validates session credentials before startup.",
+      "supports": "OtherAPI's documented startup behavior"
+    },
+    {
+      "source_id": "ev-788701f548350774",
+      "quote": "Packet delivery resumes after each request.",
+      "supports": "DeliveryEngine's documented packet-delivery behavior"
+    }
+  ],
+  "missing": [
+    "A source describing OtherAPI's packet-delivery behavior specifically during recovery",
+    "Evidence connecting OtherAPI to DeliveryEngine's recovery behavior"
+  ]
+}

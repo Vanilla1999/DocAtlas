@@ -1,0 +1,42 @@
+<PARSED TEXT FOR SHEET: 1 / 1 TABS
+TAB NAME: DocAtlas_V40_Architecture_Cases.csv>index,case_id,question,category,legacy_status,prepared_status,legacy_missing,prepared_missing,legacy_sources,prepared_sources,legacy_s,prepared_s,transition,candidate_boundary
+0,V40-B01,What is Black's default line length?,положительный,PASS,PASS,,,2,2,1.0050145510000164,0.490852971999999,both_pass,
+1,V40-B02,How does Black determine target Python versions when --target-version is not set?,положительный,PASS,PASS,,,1,2,1.2929669009999998,0.4303758499999901,both_pass,
+2,V40-B03,"Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",положительный,PASS,PASS,,,2,2,0.8005829399999982,0.4866220140000052,both_pass,
+3,V40-B04,What does Black --no-cache do to cache reads and writes?,положительный,PASS,PASS,,,2,2,1.038753951999979,0.4105515900000114,both_pass,
+4,V40-B05,How does --force-exclude differ from --exclude for files passed explicitly to Black?,положительный,PASS,PASS,,,2,2,0.8391322619999926,0.4286572500000147,both_pass,
+5,V40-B06,"Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",частичный,PASS,PASS,,,2,2,0.7212829629999931,0.4936101730000075,both_pass,
+6,V40-B07,"Which environment variable overrides Black's cache directory, and for exactly how many days are cache entries retained?",частичный,PASS,PASS,,,2,2,0.9380807130000052,0.5316590609999992,both_pass,
+7,V40-B08,What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?,отрицательный,FAIL,FAIL,,,2,2,1.081497657,0.4511769230000197,both_fail,
+8,V40-P01,"Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",положительный,PASS,PASS,,,2,2,0.8122171070000093,0.5684941410000022,both_pass,
+9,V40-P02,What is Poetry's configuration precedence from highest to lowest?,положительный,PASS,PASS,,,2,2,0.7833320630000173,0.565228100000013,both_pass,
+10,V40-P03,How are Poetry configuration setting names converted into environment variable names?,положительный,PASS,PASS,,,2,2,0.8298090830000149,0.5952632670000071,both_pass,
+11,V40-P04,How do you undo an explicitly selected Poetry Python environment and return to default behavior?,положительный,PASS,PASS,,,2,2,0.8592320989999962,0.7038540820000208,both_pass,
+12,V40-P05,What version range does the compatible release requirement ~=1.2.3 allow in Poetry?,положительный,FAIL,FAIL,required,required,2,2,0.8399755169999992,0.5737280839999812,both_fail,selection
+13,V40-P06,"What does poetry env activate print, and what process ID will the activated shell have?",частичный,FAIL,FAIL,documented_part,documented_part,0,0,0.4452339720000111,0.483565872000014,both_fail,admission
+14,V40-P07,What guaranteed 99th-percentile dependency resolution latency does Poetry provide?,отрицательный,FAIL,FAIL,,,2,2,0.8028132659999869,0.6087174510000182,both_fail,
+15,V40-P08,What hard maximum number of virtual environments will Poetry retain automatically for one project?,отрицательный,FAIL,FAIL,,,1,2,0.9017161639999928,0.60377693800001,both_fail,
+16,V40-T01,What does the first positional argument to Textual reactive specify?,положительный,PASS,PASS,,,2,2,1.0715321769999946,0.5407711139999947,both_pass,
+17,V40-T02,"If several reactive attributes change together, how many refreshes does Textual perform?",положительный,FAIL,FAIL,required,required,3,2,0.8684192849999874,0.6251916669999957,both_fail,retrieval/candidate window
+18,V40-T03,Which Textual reactive helper can be used when changes should not trigger refresh or layout?,положительный,FAIL,FAIL,required,required,1,2,1.331190872999997,0.6107716160000223,both_fail,selection
+19,V40-T04,What arguments does a Textual watch method receive when it declares one positional argument versus two?,положительный,PASS,PASS,,,2,2,0.9898253869999962,0.619446857000014,both_pass,
+20,V40-T05,What does exclusive=True do when Textual starts a new worker?,положительный,PASS,PASS,,,3,2,0.8438243189999923,0.6018900489999908,both_pass,
+21,V40-T06,"What happens inside a coroutine when Worker.cancel is called, and what maximum cancellation latency does Textual guarantee?",частичный,PASS,PASS,,,1,1,0.5082167299999867,0.3994573770000045,both_pass,
+22,V40-T07,"How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",частичный,FAIL,FAIL,documented_part,documented_part,1,1,0.5692264319999936,0.4673859740000239,both_fail,admission
+23,V40-T08,What guaranteed 99th-percentile keyboard-to-render latency does Textual provide?,отрицательный,FAIL,FAIL,,,2,2,0.8266582640000024,0.5325035829999933,both_fail,
+24,V40-V01,"Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",положительный,PASS,PASS,,,2,2,1.021609825000013,0.6536177350000116,both_pass,
+25,V40-V02,What wins when the same Vite environment variable is defined by the process and by .env files?,положительный,PASS,PASS,,,1,2,1.6559567130000232,0.6163047480000046,both_pass,
+26,V40-V03,"What is Vite dev server's default port, and what happens when that port is already in use?",положительный,FAIL,FAIL,required,required,2,2,1.453191664000002,0.6359984740000186,both_fail,selection
+27,V40-V04,What does server.strictPort=true do when the configured Vite port is already in use?,положительный,PASS,PASS,,,2,2,0.8279889899999944,0.4485314410000001,both_pass,
+28,V40-V05,How are files in Vite's public directory served and how should public/icon.png be referenced from source code?,положительный,PASS,PASS,,,1,1,0.5123517099999901,0.3976433219999933,both_pass,
+29,V40-V06,"What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",частичный,FAIL,FAIL,documented_part,documented_part,1,1,0.6010525119999954,0.4354060720000063,both_fail,admission
+30,V40-V07,What guaranteed 99th-percentile HMR propagation latency does Vite provide?,отрицательный,FAIL,FAIL,,,2,2,0.7461537460000045,0.5158698580000021,both_fail,
+31,V40-V08,What exact CDN cache TTL does Vite guarantee for production build assets?,отрицательный,PASS,PASS,,,0,0,0.4038299530000131,0.4369419219999884,both_pass,
+32,V40-E01,Which filenames can ESLint use for its flat configuration file?,положительный,FAIL,FAIL,required,required,1,2,1.003269667000012,0.6231430349999982,both_fail,retrieval/candidate window
+33,V40-E02,How does ESLint search for a configuration file for each target file when run on the command line?,положительный,PASS,PASS,,,1,2,0.9605075199999932,0.6444571020000183,both_pass,
+34,V40-E03,"How does --fix-dry-run differ from --fix, and can it be used with stdin?",положительный,PASS,PASS,,,2,2,0.6624682409999991,0.5146478550000211,both_pass,
+35,V40-E04,What are ESLint's default globally ignored paths and default JavaScript file patterns?,положительный,FAIL,FAIL,required,required,3,2,0.8514298979999921,0.61941195899999,both_fail,retrieval/candidate window
+36,V40-E05,"What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",частичный,FAIL,PASS,documented_part,,2,2,0.7850534459999778,0.6142936910000003,gain,assembly improved
+37,V40-E06,"What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",частичный,PASS,PASS,,,2,2,0.6400454299999865,0.5585583859999872,both_pass,
+38,V40-E07,What hard maximum memory usage per lint worker does ESLint guarantee?,отрицательный,FAIL,FAIL,,,2,2,0.7457814889999952,0.6299991329999841,both_fail,
+39,V40-E08,What production uptime SLA does ESLint guarantee for local linting?,отрицательный,FAIL,FAIL,,,1,1,0.6081313289999741,0.5735697009999967,both_fail,

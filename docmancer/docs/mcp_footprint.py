@@ -241,20 +241,31 @@ def representative_response_fixtures() -> tuple[ResponseFixture, ...]:
         "objective": "Preserve the permission entry contract.",
         "sources": [{
             "path": "docs/permission-architecture.md", "symbol_or_section": "Gate",
-            "authority": "canonical", "instruction_trust": "scoped_agent_policy",
+            "authority": "canonical", "instruction_trust": "untrusted_data",
             "scope": "project", "version_binding": "not_applicable",
             "evidence_id": "ev-0000000000000001", "content_sha256": "0" * 64,
         }],
         "targets": {"likely_files": [{"path": "lib/permission_service.dart", "evidence_ids": ["ev-0000000000000001"]}], "symbols": []},
-        "invariants": [{"text": "Missing immediate permission blocks entry.", "evidence_ids": ["ev-0000000000000001"]}],
-        "forbidden_changes": [{"text": "Do not edit generated files.", "evidence_ids": ["ev-0000000000000001"]}],
-        "implementation_guidance": [],
-        "checks": {"compile": [], "tests": [{"text": "uv run pytest tests/test_permission_gate.py", "evidence_ids": ["ev-0000000000000001"]}], "semantic_checks": []},
+        "invariants": [], "forbidden_changes": [],
+        # Quoted examples characterize payload size, never executable checks
+        # or promoted policy. These synthetic hashes are not runtime proofs.
+        "implementation_guidance": [
+            {"text": text, "evidence_ids": ["ev-0000000000000001"]}
+            for text in (
+                "Missing immediate permission blocks entry.",
+                "Do not edit generated files.",
+                "uv run pytest tests/test_permission_gate.py",
+            )
+        ],
+        "checks": {"compile": [], "tests": [], "semantic_checks": []},
+        "edit_ready": False,
         "uncertainties": [], "omitted_counts": {}, "estimated_tokens": 0,
     }
     docs_payload = {
-        "status": "ok", "kind": "docs_answer", "answer": "Use structured concurrency.",
-        "answer_evidence_ids": ["ev-0000000000000001"],
+        "status": "ok", "kind": "docs_answer", "retrieval_only": True,
+        "answer_policy": "cite_only", "context_available": True,
+        "answer_supported": False, "answer_available": False, "edit_ready": False,
+        "support_status": "retrieval_only",
         "sources": [
             {"evidence_id": "ev-0000000000000001", "path_or_url": "kotlin/coroutines", "section": "document", "snippet": "Use structured concurrency.", "version_binding": "1.8.1", "content_sha256": "1" * 64},
             {"evidence_id": "ev-0000000000000002", "path_or_url": "kotlin/cancellation", "section": "document", "snippet": "Cancellation is cooperative.", "version_binding": "1.8.1", "content_sha256": "2" * 64},
@@ -264,6 +275,7 @@ def representative_response_fixtures() -> tuple[ResponseFixture, ...]:
     }
     insufficient_payload = {
         "status": "insufficient_evidence", "kind": "patch_context",
+        "edit_ready": False,
         "missing": ["project architecture"],
         "recommended_next_action": {"tool": "prepare_docs", "auto_execute": False},
         "estimated_tokens": 0,

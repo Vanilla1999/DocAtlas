@@ -1,0 +1,36 @@
+{
+  "main": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "research": "b97206806e899f515b437e0aea4231ee56763bf5",
+  "branch": "fix/next07-pr1-output-integrity",
+  "base_tree": "484045a93270fa705b7ef20e3a66e612cae70bdc",
+  "full_local_main_research_diff": "NOT_RUN_DNS",
+  "main_only_history": "inherited intact through exact main parent/tree",
+  "new_mcp_methods": false,
+  "output_default_policy_changed": false,
+  "model_calls": 0,
+  "source_blobs": {
+    "docmancer/docs/application/_docs_context_payload.py": "3564f5585a6d26267443bc882bff3ef3e117f743",
+    "docmancer/docs/interfaces/mcp/output_contract.py": "381325c8b8527d9a72d4509829e4bf7fa8abb2d0",
+    "eval/evidence_quality_v2/run.py": "17ce089fbc0185058e938a3bff36eca3ca961c6e",
+    "docmancer/docs/application/model_visible_projection.py": "457fb02ed358d01a5f3361eb18a9554b3133aae3"
+  },
+  "local_probe": {
+    "execution": "ISOLATED_DEFINITIONS_NOT_NATIVE",
+    "baseline_empty_status": "ok",
+    "candidate_empty_status": "insufficient_evidence",
+    "baseline_terminal_changed_snippet_with_old_claims": true,
+    "candidate_terminal_status": "failed",
+    "candidate_terminal_has_sources": false,
+    "baseline_exact_newline_positive_failures": 3,
+    "candidate_exact_newline_positive_failures": 0,
+    "newline_positives_total": 4,
+    "candidate_physical_negatives_rejected": ["shifted", "overlong_range", "forged_quote", "other_source"],
+    "limits": "Bookkeeping/token accounting and upstream validator are test doubles. Full package, SDK, stdio and corpus acceptance NOT_RUN locally."
+  },
+  "required_checks": {
+    "tracked_template": ["required-ci", "required-release"],
+    "actual_enforced_rules": "TO_VERIFY_ON_PR",
+    "independent_review": "PENDING",
+    "merge_authorized": false
+  }
+}

@@ -409,27 +409,25 @@ def _required_once_retrieval_metadata(
     result = result if isinstance(result, dict) else {}
     payload = result.get("structured_content") or result.get("structuredContent")
     payload = payload if isinstance(payload, dict) else result
-    delivery_strategy = payload.get("delivery_strategy") or call_arguments.get(
-        "delivery_strategy"
-    )
-    packet = payload.get("action_packet")
-    packet_status = packet.get("status") if isinstance(packet, dict) else None
+    context_format = call_arguments.get("context_format")
+    packet = payload if payload.get("kind") == "patch_context" else None
+    packet_result = packet.get("result") if isinstance(packet, dict) else None
     packet_errors: list[str] = ["ActionPacket missing"]
     if isinstance(packet, dict):
-        from docmancer.docs.application.action_packet import validate_action_packet
-
-        packet_errors = validate_action_packet(packet, max_tokens=2_000)
+        from docmancer.docs.interfaces.mcp.output_contract import is_v4_patch_projection
+        packet_errors = [] if is_v4_patch_projection(packet) else ["invalid v4 patch representation"]
     return {
         "question": question,
-        "delivery_strategy": delivery_strategy,
+        "context_format": context_format,
         "question_matches_task_objective": question_matches,
         "retrieval_succeeded": (
             question_matches
-            and delivery_strategy == "bounded_direct"
-            and packet_status in {"ok", "truncated"}
+            and context_format == "patch_context"
+            and packet_result == "data" and packet.get("completeness") == "complete"
             and not packet_errors
         ),
-        "action_packet_status": packet_status,
+        "action_packet_result": packet_result,
+        "action_packet_completeness": packet.get("completeness") if isinstance(packet, dict) else None,
     }
 
 

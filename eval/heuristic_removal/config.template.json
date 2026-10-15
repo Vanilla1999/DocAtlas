@@ -1,0 +1,21 @@
+{
+  "runtime_authorized": false,
+  "authorization_reference": "BLOCKED: coordinator must replace with current checkpoint decision before freeze",
+  "baseline_python": "/tmp/opencode/docatlas-heuristic-removal-baseline-runtime/bin/python",
+  "candidate_python": "/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python",
+  "baseline_wheel": "BASELINE_WHEEL_PATH",
+  "candidate_wheel": "CANDIDATE_WHEEL_PATH",
+  "code_freeze_manifest": "COORDINATOR_CODE_FREEZE_MANIFEST_PATH",
+  "code_freeze_sha256": "COORDINATOR_CODE_FREEZE_MANIFEST_SHA256",
+  "datasets": [
+    {"path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40", "count": 40, "arms": ["V0", "VQ", "VA", "VS", "VALL"]},
+    {"path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout", "count": 20, "arms": ["V0", "VQ", "VA", "VS", "VALL"]},
+    {"path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout", "count": 20, "arms": ["V0", "VALL"], "oracle_schema": "D_literal_byte_witness_sets_v1"}
+  ],
+  "limits": {"context_calls": 340, "call_seconds": 60, "prepare_seconds": 180, "wall_seconds": 1800},
+  "common": {},
+  "trace": false,
+  "packing_tokens": 12000,
+  "tokenizer_cache_dir": "COORDINATOR_PINNED_OFFLINE_TIKTOKEN_CACHE_DIRECTORY",
+  "freeze_files": ["BASELINE_WHEEL_PATH", "CANDIDATE_WHEEL_PATH", "TOKENIZER_CACHE_ASSET_PATH", "PROTOCOL_PATH", "CODE_FREEZE_MANIFEST_PATH", "D_SEALED_MANIFEST_PATH"]
+}

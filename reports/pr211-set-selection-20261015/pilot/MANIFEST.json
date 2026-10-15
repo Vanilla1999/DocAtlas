@@ -1,0 +1,69 @@
+{
+  "head": "aa48b05787a3bdc9c58f0f3d6aa965139585cd9f",
+  "product_hashes": {
+    "experimental_set_selection.py": "8e89dfb859dff88d1c59fe795a0a94f3b7d738cd01173b6620cd45e3cdf45987",
+    "experimental_context_finalization.py": "639383be651ee95ec8aa0fc46d4e36e20abeb2931eff5b14a69a19d0051a2ee5"
+  },
+  "config": {
+    "model_id": "openai/gpt-5.6-luna#medium",
+    "runtime": "OpenCode stateless /api/experimental/generate; openai provider",
+    "max_input_tokens": 100000,
+    "output_reserve": 8192,
+    "context_tokens": 400000,
+    "wrapper_token_allowance": 64
+  },
+  "corpus_hashes": {
+    "CORPUS_RU.md": "cf3481e71778ae4ad012423c276f120ffd0dd146823bea822f895203ff617d6c",
+    "run.py": "5ad3dbf8e0c38df69c26582af81624022b80df0e762e591fedf916d8f5150f99",
+    "README.md": "b18aa5dbc663e0ed8d709dd5f6a9d12fd0078fc86837b3a49af6a2f73e612138",
+    "gold_spans.json": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc",
+    "run_set_selection.py": "aef5de06e4e471c7593c01103af38cfd8d62627508807f31566c81be5deec6c2",
+    "questions.json": "67afaaa42ad71d0036d2cde4f5a7da1b4e9c9b836b53b62ef2658ffdb8af80b5",
+    "evaluate.py": "32cf91a78807d1cb5709edb140cc1ff62ad4027023cb4a382c702403188921fa",
+    "gold-span-audit.json": "a45196c1f87896d1cb3520b954b908d504b0e2573fa5de2211184380350b9f24",
+    "source_plan.json": "8ec8b19323f4bc4f7d0737aced62527b210ee4ba1c50cf77b62ccafc38594e9a",
+    "source-manifest.json": "4622d2f4ccaf6669900ee40af04272620d7641d0a5af23213e03a5ba3b76d9a8",
+    "sources/textual/docs/widgets/input.md": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+    "sources/textual/docs/guide/workers.md": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+    "sources/textual/docs/guide/reactivity.md": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+    "sources/black/docs/faq.md": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+    "sources/black/docs/usage_and_configuration/the_basics.md": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+    "sources/black/docs/usage_and_configuration/file_collection_and_discovery.md": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+    "sources/vite/docs/guide/env-and-mode.md": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31",
+    "sources/vite/docs/guide/assets.md": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+    "sources/vite/docs/config/server-options.md": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+    "sources/eslint/docs/src/use/command-line-interface.md": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+    "sources/eslint/docs/src/use/configure/configuration-files.md": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+    "sources/eslint/docs/src/use/configure/ignore.md": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+    "sources/poetry/docs/managing-environments.md": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+    "sources/poetry/docs/configuration.md": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+    "sources/poetry/docs/dependency-specification.md": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+    "licenses/poetry/LICENSE": "1786f071a510648a24695f295117f02bae0bbf0fb7c6730aafe9c93a3e4bf7ee",
+    "licenses/eslint/LICENSE": "3b6be04f862a077a4b97929dbf247299360824d9365f8603c263769303ace18c",
+    "licenses/vite/LICENSE": "692057af3d664cbb79ac38293eb50aa3c4987f8182e2a440136e59e08f1b4a54",
+    "licenses/black/LICENSE": "9c0428f0c3b4779850cf5bd96e11aaa8afc72d4a86d4a36223d7aba2e58d6e00",
+    "licenses/textual/LICENSE": "94f290a762376dfdb7768e42070618b0abfd2a2799eab1b1c097816c3a39eb57"
+  },
+  "boundary": "installed wheel, in-process public MCP, real isolated SQLite",
+  "host": {
+    "endpoint": "https://chatgpt.com/backend-api/codex",
+    "model_id": "gpt-5.6-luna",
+    "providerID": "openai",
+    "variant": "medium",
+    "context_limit_configured": 400000,
+    "input_limit_configured": 272000,
+    "output_limit_configured": 128000,
+    "sampling": "provider default/unknown",
+    "transport_output_cap": "not exposed by stateless API; 8192 is context reserve only",
+    "billing_tokens": "not exposed by stateless API",
+    "backend_retries": "not exposed; client retries 0"
+  },
+  "limits": {
+    "preparations": 2,
+    "context_calls": 4,
+    "host_attempts": 2,
+    "host_timeout_seconds": 180,
+    "automatic_retries": 0
+  },
+  "method": "prompted baseline inspired by SetR 3.2/5.3; no training or emitted CoT; full pool, JSON IDs"
+}

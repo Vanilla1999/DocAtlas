@@ -593,10 +593,7 @@ def _resolve_ref(schema: Any, schemas: dict[str, Any], depth: int = 0) -> dict[s
 
 def _derive_safety(meta: dict[str, Any]) -> dict[str, Any]:
     method = (meta.get("method") or "GET").upper()
-    path = meta.get("path") or ""
     destructive = method in {"POST", "PUT", "PATCH", "DELETE"}
-    if destructive and any(hint in path.lower() for hint in ("/search", "/query", "/list", "/find")):
-        destructive = False
     idempotent = method in {"GET", "HEAD", "PUT", "DELETE"} or meta.get("x_idempotent") is True
     return {
         "destructive": destructive,

@@ -1,0 +1,23 @@
+{
+  "runtime_authorized": true,
+  "authorization_reference": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/learned-order/PROTOCOL_RU.md",
+  "wheel": "/tmp/opencode/docatlas-learned-reranker-wheel-20261013/doc_atlas-1.3.2-py3-none-any.whl",
+  "assets": "/tmp/opencode/docatlas-learned-reranker-assets-20261013",
+  "tokenizer_cache_dir": "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/tokenizer-cache",
+  "datasets": [
+    {
+      "path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+      "count": 40,
+      "arms": [
+        "native",
+        "learned"
+      ]
+    }
+  ],
+  "context_calls": 4,
+  "wall_seconds": 600,
+  "case_ids": [
+    "V40-P03",
+    "V40-E01"
+  ]
+}

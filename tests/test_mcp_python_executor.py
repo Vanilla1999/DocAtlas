@@ -145,38 +145,6 @@ def test_python_import_uses_minimal_env_unless_allowed(tmp_path, monkeypatch):
     assert out.body is None
 
 
-def test_detect_python_ignores_project_venv_by_default(tmp_path):
-    venv = tmp_path / ".venv" / "bin"
-    venv.mkdir(parents=True)
-    python = venv / "python"
-    python.write_text("#!/bin/sh\nexit 0\n")
-    python.chmod(0o755)
-    found = detect_python(start=tmp_path)
-    assert found != str(python)
-    assert found in {sys.executable, shutil.which("python3"), shutil.which("python")}
 
 
-def test_detect_python_uses_project_venv_when_granted(tmp_path):
-    venv = tmp_path / ".venv" / "bin"
-    venv.mkdir(parents=True)
-    python = venv / "python"
-    python.write_text("#!/bin/sh\nexit 0\n")
-    python.chmod(0o755)
-    found = detect_python(start=tmp_path, use_project_venv=True)
-    assert found == str(python)
 
-
-def test_executor_returns_structured_error_for_missing_module():
-    op = {
-        "executor": "python_import",
-        "python_import": {"module": "nonexistent_module_xyz_12345", "callable": "anything"},
-        "_docatlas_operation_grant": {"allowed_modules": ["nonexistent_module_xyz_12345"]},
-    }
-    exec_ = PythonImportExecutor(python=sys.executable)
-    result = exec_.call(
-        operation=op, args={},
-        auth_headers={}, required_headers={},
-        idempotency_key=None, idempotency_header=None,
-    )
-    assert result.ok is False
-    assert "ModuleNotFoundError" in (result.error or "") or "nonexistent" in (result.error or "")

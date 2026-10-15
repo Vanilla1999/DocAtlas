@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import hashlib
+import re
 from typing import Any
 
 from docmancer.core.structured_chunking import _atom_spans, parse_markdown_parents
@@ -14,6 +15,7 @@ from .model_visible_projection import (
 
 MAX_SNAPSHOT_CHARS = 262_144
 MAX_PARENT_SECTIONS = 4096
+_LIST_ITEM = re.compile(r"^([ \t]*)([-+*]|\d+[.)])[ \t]+")
 
 
 def _verified_document(original: dict, public: dict) -> str | None:
@@ -38,15 +40,15 @@ def _verified_document(original: dict, public: dict) -> str | None:
 
 def _context_row(original: dict, public: dict, raw: str, parent: Any,
                  start: int, end: int, *, supplementary: bool) -> tuple[dict, dict] | None:
-    while end > start and raw[end - 1].isspace():
-        end -= 1
     if end <= start:
         return None
     text = raw[start:end]
     new = deepcopy(original)
     new.update(content=text, display_text=text, snippet=text, char_start=start, char_end=end,
+               byte_start=len(raw[:start].encode('utf-8')),
+               byte_end=len(raw[:end].encode('utf-8')),
                line_start=raw.count('\n', 0, start) + 1,
-               line_end=raw.count('\n', 0, end) + 1,
+               line_end=raw.count('\n', 0, end - 1) + 1,
                heading_path=' > '.join(parent.heading_path), title=parent.title)
     # Rebind exact canonical bytes; never concatenate disjoint quotes or reuse
     # the old child boundary to certify a larger span.
@@ -71,6 +73,9 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
     row = _docs_source(new, evidence_id=None if supplementary else public['evidence_id'])
     if row is None:
         return None
+    # A structural superset must retain every canonical seed byte, including
+    # outer LF/CRLF; normalized presentation would invalidate containment.
+    row['snippet'] = text
     row.update({key: new.get(key, public.get(key)) for key in
                 ('project_identity', 'line_start', 'line_end', 'authority', 'scope')})
     if supplementary:
@@ -81,11 +86,12 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
     # The seed ID is opaque and retained; its digest and snapshot are recomputed.
     return row, new
 
-def structural_spans(raw: str, start: int, end: int) -> tuple[tuple[int, int, str], ...]:
+def structural_spans(raw: str, start: int, end: int, *, split_ordered_items: bool = False) -> tuple[tuple[int, int, str], ...]:
     """Coalesce lazy list continuations without changing index chunking.
 
-    A continuation directly after a list marker belongs to that item. A prose
-    paragraph after a blank line terminates it. Consecutive items stay one run.
+    Keep lazy continuations and nested items with their item. Introduced lists
+    and fenced content stay intact. Numbered sequences remain ranking blocks;
+    callers closing one cited item may request their individual boundaries.
     """
     out: list[tuple[int, int, str]] = []
     for atom in _atom_spans(raw, start, end):
@@ -98,7 +104,25 @@ def structural_spans(raw: str, start: int, end: int) -> tuple[tuple[int, int, st
                 out[-1] = (a, atom.end, kind)
                 continue
         out.append((atom.start, atom.end, atom.atom_type))
-    return tuple(out)
+    result = []
+    for a, b, kind in out:
+        lines = raw[a:b].splitlines(keepends=True)
+        first = _LIST_ITEM.match(lines[0]) if kind == "list" and lines else None
+        ordered = first is not None and first[2][0].isdigit()
+        if first is None or ordered and not split_ordered_items or re.search(r"`{3,}|~{3,}", raw[a:b]):
+            result.append((a, b, kind))
+            continue
+        item_kind = "list" if ordered else "list_item"
+        indent = len(first[1].expandtabs(4))
+        cursor, item_start = a, a
+        for line in lines:
+            marker = _LIST_ITEM.match(line)
+            if marker and len(marker[1].expandtabs(4)) == indent and cursor > item_start:
+                result.append((item_start, cursor, item_kind))
+                item_start = cursor
+            cursor += len(line)
+        result.append((item_start, b, item_kind))
+    return tuple(result)
 
 
 def source_options(public: dict, original: dict) -> tuple[list[tuple[dict, dict, str]], tuple[dict, dict] | None]:
@@ -116,12 +140,17 @@ def source_options(public: dict, original: dict) -> tuple[list[tuple[dict, dict,
     owner = next((p for p in parents if p.char_start <= start < end <= p.char_end), None)
     if owner is None:
         return options, None
-    spans = structural_spans(raw, owner.char_start, owner.char_end)
+    spans = structural_spans(raw, owner.char_start, owner.char_end, split_ordered_items=True)
     hits = [(a, b) for a, b, kind in spans if a < end and start < b and kind != "whitespace"]
     bounds = []
     if hits:
         bounds.append((min(start, hits[0][0]), max(end, hits[-1][1]), "complete_atom"))
-    bounds.append((owner.char_start, owner.char_end, "containing_section"))
+    # A plain bullet-only section has no surrounding prose/code dependency.
+    # Other sections remain conservative: structural closure is not a semantic
+    # proof that nearby rules or examples are dispensable.
+    body = [kind for _, _, kind in spans if kind not in {"heading", "whitespace"}]
+    if not body or any(kind != "list_item" for kind in body):
+        bounds.append((owner.char_start, owner.char_end, "containing_section"))
     seen = {public["snippet"]}
     for a, b, kind in bounds:
         proposal = _context_row(original, public, raw, owner, a, b, supplementary=False)

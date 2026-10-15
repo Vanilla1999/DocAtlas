@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries",
+  "pytest_current_test": "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries (call)",
+  "arguments": {
+    "question": "Does `SHUTTER_DELAY` set shutter delay to 230 milliseconds?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-pytest-run03/test_prepared_retrieval_preser0/project",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-a5f3b5ab1aac9637",
+        "path_or_url": "docs/camera.md",
+        "section": "Camera shutter control",
+        "snippet": "# Camera shutter control\n\n`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.\nChanging `SHUTTER_DELAY` requires restarting the camera controller.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "4ba69349b105b5d2fc20e0600e817511d8a61f0d0d6a211b782b4e5565b69ebe",
+        "project_identity": "local:5fae4e2b32c4e5f1474e83a04f45735ed90fadd8eb6c3a2db81720d534f2c6c5",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/cce3746dc51460c89ced7394"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 303
+  },
+  "utf8_quarter_proxy": 320,
+  "public_source_count": 1
+}

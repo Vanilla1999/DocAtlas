@@ -26,23 +26,103 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install DocAtlas evaluator dependencies
+        id: dependencies
         run: python -m pip install -e ".[dev]"
-      - name: Verify every P1 evidence slice
+      - name: Preserve historical first-divergence guard
+        id: first_divergence
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/build_agent_developer_first_divergence.py --check
+      - name: Preserve historical contract-ablation guard
+        id: contract_ablation
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/build_agent_contract_v2_ablation.py --check
+      - name: Measure current P1.4 quality
+        id: p14_quality
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/run_paraphrase_proofability_gate.py --output "$RUNNER_TEMP/p1.4-current-retrieval.json"
+      - name: Verify P1.4 oracle controls
+        id: p14_oracle
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/paraphrase_proofability_self_test.py --report "$RUNNER_TEMP/p1.4-current-retrieval.json"
+      - name: Measure current P1.5 quality
+        id: p15_quality
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/run_mixed_evidence_provenance_gate.py --output "$RUNNER_TEMP/p1.5-current-provenance.json"
+      - name: Verify P1.5 oracle controls
+        id: p15_oracle
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/mixed_evidence_provenance_self_test.py --report "$RUNNER_TEMP/p1.5-current-provenance.json"
+      - name: Measure current P1.6 public delivery
+        id: p16_quality
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/run_evidence_is_data_gate.py --output "$RUNNER_TEMP/p1.6-current-delivery.json"
+      - name: Verify P1.6 oracle controls
+        id: p16_oracle
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/evidence_is_data_self_test.py --report "$RUNNER_TEMP/p1.6-current-delivery.json"
+      - name: Preserve Agent Developer adversarial gate
+        id: adversarial
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/run_agent_developer_adversarial_gate.py
+      - name: Preserve Agent Developer adversarial mutation gate
+        id: adversarial_mutation
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/run_agent_developer_adversarial_mutation_gate.py
+      - name: Verify source syntax and repository guards
+        id: syntax
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: |
           set -euo pipefail
-          python scripts/build_agent_developer_first_divergence.py --check
-          python scripts/build_agent_contract_v2_ablation.py --check
-          python scripts/run_paraphrase_proofability_gate.py
-          python scripts/paraphrase_proofability_self_test.py
-          python scripts/run_mixed_evidence_provenance_gate.py
-          python scripts/mixed_evidence_provenance_self_test.py
-          python scripts/run_evidence_is_data_gate.py
-          python scripts/evidence_is_data_self_test.py
-      - name: Verify the bounded P1 closure
-        run: |
-          set -euo pipefail
-          python scripts/run_p1_agent_truth_closure_gate.py
-          python scripts/p1_agent_truth_closure_self_test.py
           test -z "$(find .github/workflows -maxdepth 1 -type f -name 'temp-p1*' -print -quit)"
           python -m compileall -q eval/agent_developer_v1 scripts
           git diff --check
+      - name: Capture actual gate outcomes
+        if: ${{ always() }}
+        env:
+          P1_GATE_OUTCOMES: >-
+            {"schema_version":1,"code_commit":"${{ github.sha }}",
+             "run_id":"${{ github.run_id }}","run_attempt":"${{ github.run_attempt }}",
+             "outcomes":{"dependencies":"${{ steps.dependencies.outcome }}",
+             "first_divergence":"${{ steps.first_divergence.outcome }}",
+             "contract_ablation":"${{ steps.contract_ablation.outcome }}",
+             "p14_quality":"${{ steps.p14_quality.outcome }}",
+             "p14_oracle":"${{ steps.p14_oracle.outcome }}",
+             "p15_quality":"${{ steps.p15_quality.outcome }}",
+             "p15_oracle":"${{ steps.p15_oracle.outcome }}",
+             "p16_quality":"${{ steps.p16_quality.outcome }}",
+             "p16_oracle":"${{ steps.p16_oracle.outcome }}",
+             "adversarial":"${{ steps.adversarial.outcome }}",
+             "adversarial_mutation":"${{ steps.adversarial_mutation.outcome }}",
+             "syntax":"${{ steps.syntax.outcome }}"}}
+        run: printf '%s\n' "$P1_GATE_OUTCOMES" > "$RUNNER_TEMP/p1-gate-outcomes.json"
+      - name: Verify current closure quality
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: |
+          PYTHONPATH=. python scripts/run_p1_agent_truth_closure_gate.py \
+            --p14 "$RUNNER_TEMP/p1.4-current-retrieval.json" \
+            --p15 "$RUNNER_TEMP/p1.5-current-provenance.json" \
+            --p16 "$RUNNER_TEMP/p1.6-current-delivery.json" \
+            --gates "$RUNNER_TEMP/p1-gate-outcomes.json" \
+            --output "$RUNNER_TEMP/p1-current-closure.json"
+      - name: Verify current closure oracle controls
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: |
+          PYTHONPATH=. python scripts/p1_agent_truth_closure_self_test.py \
+            --p14 "$RUNNER_TEMP/p1.4-current-retrieval.json" \
+            --p15 "$RUNNER_TEMP/p1.5-current-provenance.json" \
+            --p16 "$RUNNER_TEMP/p1.6-current-delivery.json" \
+            --gates "$RUNNER_TEMP/p1-gate-outcomes.json" \
+            --report "$RUNNER_TEMP/p1-current-closure.json"
+      - name: Upload current closure evidence and real gate outcomes
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p1-current-closure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/p1.4-current-retrieval.json
+            ${{ runner.temp }}/p1.5-current-provenance.json
+            ${{ runner.temp }}/p1.6-current-delivery.json
+            ${{ runner.temp }}/p1-gate-outcomes.json
+            ${{ runner.temp }}/p1-current-closure.json
+          if-no-files-found: error
+          retention-days: 14

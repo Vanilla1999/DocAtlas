@@ -27,6 +27,25 @@ def is_same_origin_gain(old: VariantFootprint, new: VariantFootprint) -> bool:
     )
 
 
+def has_new_qualified_units(
+    candidate: VariantFootprint | None, selected: dict[str, VariantFootprint],
+) -> bool:
+    """Keep complete current units even when their query lane is already seen.
+
+    Footprints are rebuilt from the qualified source window by the caller.
+    Repeated body/applicability bytes inside one immutable origin add nothing;
+    another source, snapshot or query plan is not an interchangeable origin.
+    This predicate grants no query attribution or answer authority.
+    """
+    if candidate is None or not candidate.unit_keys or not candidate.query_ids:
+        return False
+    represented = frozenset(
+        key for current in selected.values() if current.origin == candidate.origin
+        for key in current.redundancy_keys
+    )
+    return bool(candidate.redundancy_keys - represented)
+
+
 def prepare_delivery_inventory(
     *, source: dict[str, Any], raw_text: str, query_plan: dict[str, Any],
     query_text: dict[str, str], eligible_query_ids: frozenset[str],
@@ -173,8 +192,7 @@ def qualified_fragments(
     preserve_required_blocks = bool(required_ids & query_ids and not obligations and not assignments)
     required_blocks: list[tuple[int, int]] = []
     for snippet_start, snippet_end in source_block_alternatives(raw_snippet).spans:
-        if ((snippet_start, snippet_end) in seen_spans
-                or (snippet_end - snippet_start > 640 and not preserve_required_blocks)):
+        if (snippet_start, snippet_end) in seen_spans:
             continue
         snippet = raw_snippet[snippet_start:snippet_end]
         candidate = dict(source)
@@ -241,7 +259,7 @@ def qualified_fragments(
             union_ids = left_ids | right_ids
             union_start = min(left_start, right_start)
             union_end = max(left_end, right_end)
-            if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
+            if (union_start, union_end) in seen_spans:
                 continue
             union_snippet = raw_snippet[union_start:union_end].strip()
             union_visible_start = raw_snippet.find(

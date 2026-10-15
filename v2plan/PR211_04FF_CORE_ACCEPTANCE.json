@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "scope": "Complete core JUnit delta only, not full acceptance",
+  "head_sha": "04ff1dda57efb5236d7b3577d4e2736b2820df5b",
+  "tree_sha": "745fc099952eacbbe1fb5fb462e02ff0b0d0eaac",
+  "merge_sha": "1d750c0f2926ccad325f4ecb1440c623022110ec",
+  "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "run_id": 37833279436,
+  "run_attempt": 1,
+  "baseline_head_sha": "03583656617336a746e9192249467017d6131f29",
+  "python": [
+    "3.11",
+    "3.12",
+    "3.13"
+  ],
+  "actual_total": 8507,
+  "actual_states": {
+    "failure": 1952,
+    "passed": 6484,
+    "error": 61,
+    "skipped": 10
+  },
+  "baseline_states": {
+    "failure": 1956,
+    "passed": 6480,
+    "error": 61,
+    "skipped": 10
+  },
+  "rosters_identical": true,
+  "outcomes_identical": true,
+  "node_roster_sha256": "e6fe4f84c1c5018c63c1f52b972a44a6951aa42e5fe2e834214ecaae389697d0",
+  "node_outcomes_sha256": "13f1a34c596699bac239dd51dffd8425830f4d665f8d71d175a1c1e60067f305",
+  "transition_counts": {
+    "failure->passed": 4
+  },
+  "transitions": [
+    {
+      "nodeid": "tests/docs/test_action_packet_semantic_density.py::test_every_safe_canonical_policy_fact_survives_packet_formatting",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/docs/test_evidence_selection_part02.py::test_evaluator_only_requirement_provenance_is_rejected",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/docs/test_evidence_selection_part02.py::test_stable_identity_collision_fails_closed_before_action_packet_rendering",
+      "before": "failure",
+      "after": "passed"
+    },
+    {
+      "nodeid": "tests/test_web_fetcher.py::TestWebFetcherDartdoc::test_direct_dartdoc_class_page_without_browser",
+      "before": "failure",
+      "after": "passed"
+    }
+  ],
+  "added": [],
+  "removed": [],
+  "pass_regressions": [],
+  "unexpected_transitions": [],
+  "target_count": 4,
+  "target_states": {
+    "passed": 4
+  },
+  "required_ci": [
+    {
+      "id": 113507696834,
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "first_barrier_comparison": {
+    "3.11": {
+      "target_errors": 47,
+      "modules": {
+        "tests/docs/test_context_completion_guards.py": 24,
+        "tests/docs/test_query_block_guards.py": 23
+      },
+      "same_state_failure_error_count": 2013,
+      "expected_diagnostic_first_barrier_changes": 47,
+      "other_first_barrier_changes": 0,
+      "unchanged_first_barrier_count": 1966,
+      "missing_traceback_anchor_count": 0
+    },
+    "3.12": {
+      "target_errors": 47,
+      "modules": {
+        "tests/docs/test_context_completion_guards.py": 24,
+        "tests/docs/test_query_block_guards.py": 23
+      },
+      "same_state_failure_error_count": 2013,
+      "expected_diagnostic_first_barrier_changes": 47,
+      "other_first_barrier_changes": 0,
+      "unchanged_first_barrier_count": 1966,
+      "missing_traceback_anchor_count": 0
+    },
+    "3.13": {
+      "target_errors": 47,
+      "modules": {
+        "tests/docs/test_context_completion_guards.py": 24,
+        "tests/docs/test_query_block_guards.py": 23
+      },
+      "same_state_failure_error_count": 2013,
+      "expected_diagnostic_first_barrier_changes": 47,
+      "other_first_barrier_changes": 0,
+      "unchanged_first_barrier_count": 1966,
+      "missing_traceback_anchor_count": 0
+    }
+  },
+  "diagnostic_result": {
+    "common_observed_response": {
+      "status": "insufficient_evidence",
+      "kind": "docs_context",
+      "reason_code": "required_evidence_missing",
+      "message": null,
+      "error": null,
+      "source_count": 0
+    },
+    "common_observed_stage_counts": {
+      "retrieved_candidates": 1,
+      "query_window": 1,
+      "rankings": 0,
+      "qualified_fragments": 0
+    },
+    "fixture_stage_assertions": {
+      "tests/docs/test_context_completion_guards.py": "projector_outputs is empty",
+      "tests/docs/test_query_block_guards.py": "projector_inputs is empty"
+    },
+    "interpretation": "Typed insufficient-evidence response returned before the observed projector stage; no nested error object. Setup remains ERROR. This does not identify why the current producer found no required evidence, and does not authorize changing qualification/retrieval or original questions.",
+    "visibility_limit": "Pytest abbreviated additional response metadata and stage counters with ellipses. operational_reason_code, requires_confirmation, hard_stop and later stage counters cannot be recovered from this JUnit diagnostic and are not inferred.",
+    "errors_fixed": 0,
+    "source_order_evidence": {
+      "head_sha": "04ff1dda57efb5236d7b3577d4e2736b2820df5b",
+      "files": [
+        {
+          "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+          "sha256": "e64f827423ba45869cc9ffd5e5a3f50039d6e83d75df61132b3a8f1f97b675e7",
+          "line_anchors": [
+            360,
+            362,
+            364,
+            369,
+            418
+          ]
+        },
+        {
+          "path": "docmancer/docs/application/model_visible_projection.py",
+          "sha256": "f78f41fb46f3ff57222b3e95837024fc36dbe82100d14fee89c56785e89a271a",
+          "line_anchors": [
+            461,
+            469,
+            471
+          ]
+        }
+      ],
+      "observation": "context_tools calls _explicit_delivery_block and returns a validated blocked DTO before the later project_docs_context call. _explicit_delivery_block allows a confirmation veto or delivery_decision.deliverable exactly False and builds project_insufficient using the operational delivery reason. This source ordering is consistent with the actual required_evidence_missing/no-projector diagnostic.",
+      "boundary": "Raw delivery_decision, confirmation value and missing_requirement_id were not exposed by the abbreviated JUnit message; no hidden values are asserted, and no admission/partial/retrieval bypass is proposed."
+    }
+  },
+  "matrix_artifacts": [
+    {
+      "python": "3.11",
+      "job_id": 113503816811,
+      "artifact_id": 11574308785,
+      "artifact_name": "pytest-core-3.11-37833279436-1",
+      "artifact_sha256": "1ead97ded9cebc8a0c8b6e543af08abe634b9e9e581cb14edd56bedbd082fe61",
+      "artifact_bytes": 555059,
+      "xml_sha256": "af129d74bb577368369cdecf5f3f6ab69520eb264912406089045bd4e2d7c3d8",
+      "xml_bytes": 7657075,
+      "case_json_sha256": "b507780bd5f0999777c0f90280d03811a34602d8dc8d581efb587ef9109f39d5",
+      "compressed_roster_sha256": "00d3260858aba85cbe84fa0faa8edf7c54bf4d160deb4698812dea0555e7ec64"
+    },
+    {
+      "python": "3.12",
+      "job_id": 113503816536,
+      "artifact_id": 11574279983,
+      "artifact_name": "pytest-core-3.12-37833279436-1",
+      "artifact_sha256": "a14df6ac5be2c720e41cd845dcb6dbe2b7487542970344c99a3830e808dae69a",
+      "artifact_bytes": 554009,
+      "xml_sha256": "138b72ee56b32b69d5c8e82ca10b4dc36cfd76199600c5ed1cd3ab25d500fe30",
+      "xml_bytes": 7657283,
+      "case_json_sha256": "f8e55ee393953b31e59e343a1fdc1d787e08f21904d29f0a959bd45ab5013be9",
+      "compressed_roster_sha256": "00d3260858aba85cbe84fa0faa8edf7c54bf4d160deb4698812dea0555e7ec64"
+    },
+    {
+      "python": "3.13",
+      "job_id": 113503816687,
+      "artifact_id": 11574418338,
+      "artifact_name": "pytest-core-3.13-37833279436-1",
+      "artifact_sha256": "2770027149d080995dbb9a76140ae75f01c8a515c9e02b14966fdd95b1ebde90",
+      "artifact_bytes": 555029,
+      "xml_sha256": "c705b36d14ce2419d81887221e80948c039078cdc9a8e2ff86475fb183d4a343",
+      "xml_bytes": 7657285,
+      "case_json_sha256": "36da56ee2e596dbc6f2f35512e792ad48ca3f3b25c004e2d37782d4e04914706",
+      "compressed_roster_sha256": "00d3260858aba85cbe84fa0faa8edf7c54bf4d160deb4698812dea0555e7ec64"
+    }
+  ],
+  "evidence_files": {
+    "04ff1dd-core-audit-summary.json": {
+      "bytes": 362026,
+      "sha256": "daedf9a0f07ae052cb67f2ebdb782fdb9e4689cde02e55912037935ab31ee9f6"
+    },
+    "04ff1dd-core-failure-phase-audit.json": {
+      "bytes": 163444,
+      "sha256": "a5fb7c6f86a35cd4beb280ef6b673628c38b543572a7d7a898aee44a60ae3b63"
+    },
+    "04ff1dd-core-critical-reasons.json": {
+      "bytes": 9790,
+      "sha256": "eb5cff8cae2a5267634c7ecfc74e4429677a9c3c6e89d1c2f241e932a88f16e1"
+    },
+    "04ff1dd-core-provenance.json": {
+      "bytes": 4945,
+      "sha256": "0337ec13b15757883007ce9bd15fe4745020a3e56f1842dbcdff53353c8576e8"
+    },
+    "04ff1dd-expected-core-targets.json": {
+      "bytes": 11174,
+      "sha256": "b5b1ca583043879f7d2c8c8900635aa4414d63a5a0419aa683bcadc4b9cb9fad"
+    },
+    "04ff1dd-core-artifacts.json": {
+      "bytes": 5895,
+      "sha256": "f71a7d17c06fc8101357648fcfe0dee275bfc08a343834306722d8926bde8d9f"
+    },
+    "04ff1dd-core-jobs-final.json": {
+      "bytes": 49870,
+      "sha256": "69810cdd760ad8276bd7f3d319ca878562de40d89120eea90b9118974171b39e"
+    },
+    "04ff1dd-core-run-final.json": {
+      "bytes": 14346,
+      "sha256": "bf5712fff7ee61d98453adf9884691316b98a60f7bacd0e888f3ff4d26249de0"
+    }
+  },
+  "reconstruction": {
+    "baseline_file": "0358365-core-3.12-roster.json.gz",
+    "baseline_sha256": "8c311d215da0fa3f636d0e019732580bf871384513de5f58a3c367b72de2b4cc",
+    "algorithm": "Decode sorted unique baseline node/state rows; assert and apply the four exact before/after transitions; no nodes added or removed. Canonical JSON UTF-8 sorted keys, compact separators. Independently compared reconstructed full roster with each of three actual current rosters.",
+    "reconstructed_outcomes_sha256": "13f1a34c596699bac239dd51dffd8425830f4d665f8d71d175a1c1e60067f305"
+  },
+  "complete_ci_acceptance": false,
+  "readiness": false,
+  "deferred_retrieval_unchanged": true,
+  "actual_clients": "NOT RUN; this is core evidence only"
+}

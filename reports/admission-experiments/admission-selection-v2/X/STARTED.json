@@ -1,0 +1,10 @@
+{
+  "cases": [
+    "Q16",
+    "Q46"
+  ],
+  "k": 2,
+  "threshold": 0.3,
+  "source": "existing unchanged live-native pool",
+  "forwards_planned": 16
+}

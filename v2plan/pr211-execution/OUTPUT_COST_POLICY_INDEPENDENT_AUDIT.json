@@ -1,0 +1,275 @@
+{
+  "runtime": "NOT RUN",
+  "changed_files": 44,
+  "assertions_reviewed": 81,
+  "files": {
+    "tests/docs/_global_evidence_fixtures.py": {
+      "assertions": 2,
+      "sha256": "414249b0a5664c2b90df292ce13bb18834196eecc037e3ecb83bac81daf3b9dc",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_compact_context_blocks.py": {
+      "assertions": 2,
+      "sha256": "be64e18273ab1f46860908120bf692d70997457161171291f3e19ec20cf3d5b6",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_component_completeness.py": {
+      "assertions": 1,
+      "sha256": "3e8d25173f04c836968d9822eb99970b92ac6919c6145e86361cc847f2dd3c02",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_component_coverage.py": {
+      "assertions": 2,
+      "sha256": "d3c4ae81aebfc1b0ce1d7ad570ffae25a76b3507209f0e0ffa8c4084575282ac",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_context_completion_followup.py": {
+      "assertions": 1,
+      "sha256": "8fd17950ed77f4273ff202d91583856e8c1a8e055d1007b2e56201f7339a52d3",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_context_projection_boundaries.py": {
+      "assertions": 3,
+      "sha256": "723e4c7e14061ebf9b385154c13eaa61d4a16c4685d713e5557d24ecd19b950e",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_contiguous_seed_envelope.py": {
+      "assertions": 3,
+      "sha256": "2f6684c1844f4b6fe0c01a13a4afe443dfcdbdebfca7ca56f96b182d743ba8eb",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_dependency_version_transition.py": {
+      "assertions": 1,
+      "sha256": "819d742bfc292f6653883b4ac48aa6e04508c279b412ccaafbedf378666ce41b",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_docs_context_compound_projection.py": {
+      "assertions": 4,
+      "sha256": "825672ced16b190636271ff365a65fcc0345fe948c9d8d3abaddc25a724dca97",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_document_local_rescue.py": {
+      "assertions": 3,
+      "sha256": "d4477df042eda1554955e25ffe7c35087fa3b472fe3a78f31e16ebe462784129",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_evidence_admission_sufficiency.py": {
+      "assertions": 1,
+      "sha256": "be0c7ddaa6aef227804f218a5ef3d384da8f9e16982c9f9a6e7937069e2ef283",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_evidence_set_delivery_acceptance.py": {
+      "assertions": 2,
+      "sha256": "83df97af1c2280c0defe3a22a1cd8c00f166382151eb3abb1e8b956582a56fab",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_exact_document_fallback_context.py": {
+      "assertions": 2,
+      "sha256": "2d0d0fc3b6851829987382f5a893f0279ae98fe8104643078bc5a0adb3edde7a",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_generic_context_workflows.py": {
+      "assertions": 7,
+      "sha256": "50b97a0281664814e4db2150c2e35a20640b7d6f887e174409a3dcde9843f58b",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_host_match_priority.py": {
+      "assertions": 2,
+      "sha256": "6a036d3be00e24d9dd35b8abc8dc2f9e626d6179d8a1b18628c6dd6a576b448e",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_host_scope_contract.py": {
+      "assertions": 2,
+      "sha256": "9959ffa2d98a549ab6fd47059e4636d1922dee93bbae15f903cf6a5cf6c5b7cc",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_joint_context_acceptance.py": {
+      "assertions": 2,
+      "sha256": "003d8a9b112a6b0df96822f143f0712beeb08837dd93e9987803eb1f9ec736c6",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_joint_context_invariants.py": {
+      "assertions": 1,
+      "sha256": "351c6b9a31fbb2238d5922c82b7bba31368e3ef9f4ccc11d92698552c1e9767f",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_language_packing_experiment.py": {
+      "assertions": 2,
+      "sha256": "1f6c8307263db46ad50b7fd9ed00a88bdb20b0b16ce40adeae94a567499eb9c4",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_mixed_script_recovery.py": {
+      "assertions": 1,
+      "sha256": "2b6d1157ba0105c99c450042d002243f4032ad0237e7c82bdf279f1d4f500804",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_model_visible_projection.py": {
+      "assertions": 1,
+      "sha256": "2e11df8b12e10d504abbb241325b6a86a56cf5b59e2aa75884b7064088f20e5f",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_pydantic_direct_context.py": {
+      "assertions": 2,
+      "sha256": "daf2f18ee7440f47d12f35c5fc85266d0d6c11940a96604d0be162741c8b9704",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_query_block_delivery.py": {
+      "assertions": 2,
+      "sha256": "0dff877ceb9235f7f312b291d07608a7e5714a9f2d6c71e987767d59934beba7",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_query_planning_scope_regressions.py": {
+      "assertions": 1,
+      "sha256": "c31ca4aefb97b6ffbc4d73f5c28cda31c7eaf03e3462e95c3b3f71372ba3cbaf",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_reference_behavior_matrix.py": {
+      "assertions": 1,
+      "sha256": "1c760ae7be2dffeab5b71a1ccdb30163fc2bb465045048bf235a6b2f227bebcf",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_reference_hash_domains.py": {
+      "assertions": 2,
+      "sha256": "a19b1cf36544be43474f14afcbc77b71ec7830668d16f941ba148d48803fe43c",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_request_flow_lineage.py": {
+      "assertions": 2,
+      "sha256": "c5446b58bcb8bfaf8537c6552fc47d0b6fced72ae09b1ae84e671e483cac9a89",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_retrieval_alias_subject_binding.py": {
+      "assertions": 4,
+      "sha256": "a4069456a80c0dac512c431867f2e4867008c756331a5b94292bc47a60acae59",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_review_assignment_identity.py": {
+      "assertions": 1,
+      "sha256": "472d1cf0bc66c275bbb5f756feee51b948e809cf1e713757c4b92d0636d612a2",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_review_span_lineage.py": {
+      "assertions": 1,
+      "sha256": "4f237e4fe5e51a56f1f0644cd579b62a05ab521e4b66f9e4ce568a2633337965",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_self_host_agent_contract_surface.py": {
+      "assertions": 1,
+      "sha256": "2154d949fde8765ebc5df1ac36a14a5e2e2932c771d315f3dd5f0f82d9a13bd2",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_source_recovery_targeting.py": {
+      "assertions": 1,
+      "sha256": "c576a9e9b79f5d97713041d1e2ab6890b9192992273b5031bcdfb700e420aade",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_structural_behavior_matrix.py": {
+      "assertions": 2,
+      "sha256": "f670e913f81bb131b01a430b960bf0613780a568f2bdf2ff8b57c9e67a44d3e5",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/docs/test_v2_acceptance_gaps.py": {
+      "assertions": 1,
+      "sha256": "db1af1b12c779ffc11ff927d397910de304348461396750207df79b28ac62d77",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_action_packet_v4_eval.py": {
+      "assertions": 1,
+      "sha256": "b8f821d61dc3f20fb99241d3f943dd9ac120160ff6d397f44481b17b3708c791",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_action_packet_v4_public.py": {
+      "assertions": 3,
+      "sha256": "aded37483c380c9f09452dea0d4ed2cbdbf32a06f50c06e4ab6e6c8d80d2076a",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_dictionary_exit_indexed_mcp.py": {
+      "assertions": 1,
+      "sha256": "030cf127dcbba98a2de1a0e4a796c962b8253c15d1b760eec78cfe1f5a161a9b",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_dictionary_exit_inert_sdk_closure.py": {
+      "assertions": 1,
+      "sha256": "272114cfc2481a7f51bb2d96026bcb929a2e1f3f95b6d2228f4d2b8cfd4ba76f",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_dictionary_exit_literal_needs_mcp.py": {
+      "assertions": 1,
+      "sha256": "dfeebf26f710ef189396cc4cf95269f3f9dc01e1ebf2528985a9db68579ef8f3",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_dictionary_exit_public_request.py": {
+      "assertions": 3,
+      "sha256": "5a6b635a3e77fac5fd8725a7f75028f3f056494246dd78d7891279a814773af0",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_list_introduction_atomicity.py": {
+      "assertions": 2,
+      "sha256": "3d4d483e937df5298c5f033ff3d7a6437f7cb8f7c833b024d386823e2a38b3ff",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_named_document_context_integration.py": {
+      "assertions": 1,
+      "sha256": "ea3ac1f6f3073f3f276fcc1b36ef643053e8a027c697c181e71ecfe916dc6a3a",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_nl_dictionary_removal_consumer_contract.py": {
+      "assertions": 1,
+      "sha256": "df496d17d3a6224bb2dce41437d9e190891923f9090a59034c61330f0d47978c",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    },
+    "tests/test_retrieval_quality_baseline.py": {
+      "assertions": 1,
+      "sha256": "590b36a8b54a1c9df6b29fb64c2dc64a2ad535dfbd1986ad206bba2f7d1419b1",
+      "all_other_AST_identical": true,
+      "removed_imports_unused": true
+    }
+  },
+  "untouched_exclusions": {
+    "tests/test_docs_service_part02.py": "explicit internal query work budget",
+    "tests/evidence_quality_v2/test_corpus.py": "frozen within_budget fixture classification"
+  }
+}

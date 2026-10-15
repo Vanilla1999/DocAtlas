@@ -41,7 +41,6 @@ _QUERY_PATH_RE = re.compile(
     r"(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp)(?![\w/])",
     re.I,
 )
-_STATUS_TOKEN_RE = re.compile(r"\b(?:active|inactive|closed|open|pending|success|error|failed|done|reopen|status|created|updated|deleted)\b", re.IGNORECASE)
 _SECRET_ASSIGNMENT_RE = re.compile(
     r"(?i)\b(api[_-]?key|auth[_-]?token|password|passwd|secret|token)(\s*[:=]\s*)(['\"]?)[^'\"\s,;)]+"
 )
@@ -164,10 +163,7 @@ def collect_project_source_facts(
         include_unmatched=include_unmatched,
         source_boundary=source_boundary,
         source_facts=source_facts,
-        include_generated=(
-            _question_requests_generated_artifacts(question)
-            if include_generated is None else include_generated
-        ),
+        include_generated=include_generated is True,
     )
 
 
@@ -185,6 +181,8 @@ def _select_project_source_facts(
     query_terms = _query_terms(question)
     candidates: list[dict[str, Any]] = []
     boundary = source_boundary or SourceBoundary.from_project(root)
+    if not boundary.enabled or not boundary.code_files:
+        return []
     def capture():
         for path in _iter_source_files(root, source_boundary=boundary, include_generated=include_generated):
             item = _map_source_file(root, path)
@@ -231,6 +229,10 @@ def build_project_source_evidence(
     root = Path(project_root).expanduser().resolve()
     if max_items <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
         return []
+    boundary = source_boundary or SourceBoundary.from_project(root)
+    if not boundary.enabled or not boundary.code_files:
+        # No scan is not evidence that a requested symbol is absent.
+        return []
 
     terms = _source_evidence_terms(question=question, requirements=requirements)
     if not terms:
@@ -238,16 +240,30 @@ def build_project_source_evidence(
 
     term_keys = {term: _normalize(term) for term in terms}
     matches: list[dict[str, Any]] = []
+    body_matches: dict[str, list[dict[str, Any]]] = {}
     match_counts: dict[str, int] = {}
-    include_generated_files = (
-        _question_requests_generated_artifacts(question)
-        if include_generated is None else include_generated
-    )
-    for path in _iter_source_files(
+
+    def match_priority(value: dict[str, Any]) -> tuple[int, int, str, int]:
+        return (
+            0 if value.get("match_type") == "exact_path" else 1,
+            0 if any(
+                str(symbol.get("name") or "").casefold()
+                == str((value.get("matched_terms") or [""])[0]).casefold()
+                for symbol in value.get("symbols") or []
+            ) else 1,
+            value.get("path") or "",
+            int(value.get("line_start") or 0),
+        )
+
+    include_generated_files = include_generated is True
+    selected_paths = list(_iter_source_files(
         root,
-        source_boundary=source_boundary,
+        source_boundary=boundary,
         include_generated=include_generated_files,
-    ):
+    ))
+    if not selected_paths:
+        return []
+    for path in selected_paths:
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -274,8 +290,6 @@ def build_project_source_evidence(
             if not normalized_line:
                 continue
             for term in terms:
-                if match_counts.get(term, 0) >= 8:
-                    continue
                 normalized_term = term_keys.get(term) or ""
                 if not normalized_term:
                     continue
@@ -284,7 +298,7 @@ def build_project_source_evidence(
                     continue
                 confidence_label = _confidence_for_line(line, match_type)
                 declarations = _extract_generic_symbols(line)
-                matches.append(_source_snippet_evidence_item(
+                item = _source_snippet_evidence_item(
                     path=relative,
                     language=language,
                     line_number=line_number,
@@ -294,8 +308,17 @@ def build_project_source_evidence(
                     confidence=confidence_label,
                     confidence_score=confidence_score,
                     symbols=declarations,
-                ))
+                )
+                # Keep eight best body witnesses per term. A later declaration
+                # can replace earlier uses without retaining every source line.
+                retained = body_matches.setdefault(term, [])
+                retained.append(item)
+                retained.sort(key=match_priority)
+                del retained[8:]
                 match_counts[term] = match_counts.get(term, 0) + 1
+
+    for retained in body_matches.values():
+        matches.extend(retained)
 
     selected: list[dict[str, Any]] = []
     spent = 0
@@ -305,14 +328,7 @@ def build_project_source_evidence(
         matches,
         key=lambda value: (
             term_order.get((value.get("matched_terms") or [""])[0], 999),
-            0 if value.get("match_type") == "exact_path" else 1,
-            0 if any(
-                str(symbol.get("name") or "").casefold()
-                == str((value.get("matched_terms") or [""])[0]).casefold()
-                for symbol in value.get("symbols") or []
-            ) else 1,
-            value.get("path") or "",
-            int(value.get("line_start") or 0),
+            *match_priority(value),
         ),
     )
 
@@ -411,15 +427,8 @@ def _source_evidence_terms(*, question: str, requirements: list[str] | None) -> 
     if requirements is None:
         raw_terms = [*_QUERY_PATH_RE.findall(question), *raw_terms]
     terms = _dedupe_normalized_terms(str(term) for term in raw_terms if str(term or "").strip())
-    # Named declarations are mutation targets, while ordinary words are recall
-    # hints. Search the bounded declaration surface first so generic snippets do
-    # not consume the source-evidence budget before requested symbols.
-    terms.sort(key=lambda value: (
-        0 if re.fullmatch(
-            r"[A-Z][A-Za-z0-9_]*(?:Gate|Service|Repository|Controller|Manager|Policy|Adapter)",
-            value,
-        ) else 1,
-    ))
+    # Preserve literal request order; a naming convention does not establish
+    # a declaration's role or give it priority within the bounded term budget.
     return terms[:16]
 
 
@@ -458,11 +467,10 @@ def _source_snippet_evidence_item(
         "why_selected": "requirement term matched a concrete project source line",
         "content": content,
         "token_estimate": max(1, len(content) // 4),
+        # The same source window has one identity across lookup terms.
         "source": {
             "source_class": "source_evidence",
             "evidence_class": "source_snippet",
-            "match_type": match_type,
-            "confidence": confidence,
             "path": path,
             "line_start": line_number,
             "line_end": line_number,
@@ -528,14 +536,6 @@ def _iter_source_files(
     ))
 
 
-def _question_requests_generated_artifacts(question: str) -> bool:
-    normalized = _normalize(question)
-    return bool(re.search(r"\.(?:g|freezed)\.dart\b|\.pb\.go\b", question, re.I)) or any(phrase in normalized for phrase in (
-        "generated artifact", "generated code", "generated file", "generated source",
-        "сгенерированн артефакт", "сгенерированн код", "сгенерированн файл",
-    ))
-
-
 def _map_source_file(root: Path, path: Path) -> dict[str, Any] | None:
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
@@ -548,7 +548,6 @@ def _map_source_file(root: Path, path: Path) -> dict[str, Any] | None:
     symbols = _extract_python_symbols(text) if language == "python" else _extract_generic_symbols(text)
     string_literals = _extract_string_literals(text)
     references = _extract_references(text, imports=imports, symbols=symbols)
-    status_like_tokens = _extract_status_like_tokens(text, string_literals)
     content = _render_source_map_content(
         path=relative,
         language=language,
@@ -556,7 +555,6 @@ def _map_source_file(root: Path, path: Path) -> dict[str, Any] | None:
         imports=imports,
         symbols=symbols,
         string_literals=string_literals,
-        status_like_tokens=status_like_tokens,
         references=references,
     )
     token_estimate = max(1, len(content) // 4)
@@ -575,7 +573,8 @@ def _map_source_file(root: Path, path: Path) -> dict[str, Any] | None:
         "references": references,
         "symbols": symbols,
         "string_literals": string_literals,
-        "status_like_tokens": status_like_tokens,
+        # Compatibility field only: source words do not establish status facts.
+        "status_like_tokens": [],
         "why_selected": "compact static source map selected by deterministic query/path/symbol ranking",
         "content": content,
         "token_estimate": token_estimate,
@@ -686,16 +685,6 @@ def _extract_references(text: str, *, imports: list[str], symbols: list[dict[str
     return references
 
 
-def _extract_status_like_tokens(text: str, string_literals: list[str]) -> list[str]:
-    tokens: list[str] = []
-    for literal in string_literals:
-        if _STATUS_TOKEN_RE.search(literal) or re.search(r"[А-Яа-яЁё]", literal):
-            _append_unique(tokens, literal)
-    for match in _STATUS_TOKEN_RE.findall(text):
-        _append_unique(tokens, match)
-    return tokens[:16]
-
-
 def _render_source_map_content(
     *,
     path: str,
@@ -704,7 +693,6 @@ def _render_source_map_content(
     imports: list[str],
     symbols: list[dict[str, Any]],
     string_literals: list[str],
-    status_like_tokens: list[str],
     references: list[str],
 ) -> str:
     symbol_bits = [f"{item['kind']} {item['name']}:{item['line_start']}" for item in symbols[:12]]
@@ -717,8 +705,6 @@ def _render_source_map_content(
         parts.append("references: " + ", ".join(references[:10]))
     if string_literals:
         parts.append("strings: " + ", ".join(f'"{value}"' for value in string_literals[:8]))
-    if status_like_tokens:
-        parts.append("status_like_tokens: " + ", ".join(status_like_tokens[:8]))
     return "\n".join(parts)
 
 
@@ -755,19 +741,13 @@ def _selection_score(item: dict[str, Any], query_terms: list[str]) -> float:
     return score
 
 
-_QUERY_STOPWORDS = {
-    "and", "are", "for", "from", "how", "the", "this", "that", "where", "with",
-    "как", "где", "для", "или", "что", "это", "этой",
-}
-
-
 def _query_terms(question: str) -> list[str]:
     terms: list[str] = []
     for quoted in re.findall(r"[\"'`“”‘’«»„]+([^\"'`“”‘’«»„]{2,120})[\"'`“”‘’«»„]+", question or ""):
         _append_unique(terms, quoted.strip())
     for word in _WORD_RE.findall(question or ""):
         normalized = _normalize(word)
-        if len(normalized) < 3 or normalized in _QUERY_STOPWORDS:
+        if len(normalized) < 3:
             continue
         _append_unique(terms, word)
     return terms[:24]

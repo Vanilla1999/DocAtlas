@@ -1,0 +1,93 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-edb9c125e877d951",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Configuration File Resolution",
+      "snippet": "## Configuration File Resolution\n\nWhen ESLint is run on the command line, it determines configuration for each target file by first looking in the directory that contains the file and then searching up ancestor directories until it finds an `eslint.config.*` file. This behavior improves support for monorepos, where subdirectories can have their own configuration files.",
+      "version_binding": "unversioned",
+      "content_sha256": "bda8a7156a6eeef98ea7bf1f63fe34bd124dd7ff8db40439f99427e257c6c082",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 782,
+      "line_end": 784,
+      "source_uri": "docatlas://source/28f3a2ca4257618b0c1e65aa"
+    },
+    {
+      "evidence_id": "ev-1a3fc45c7611eb94",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Configuration File Resolution",
+      "snippet": "## Configuration File Resolution\n\nWhen ESLint is run on the command line, it determines configuration for each target file by first looking in the directory that contains the file and then searching up ancestor directories until it finds an `eslint.config.*` file. This behavior improves support for monorepos, where subdirectories can have their own configuration files.\n\nYou can prevent this search by using the `-c` or `--config` option on the command line to specify an alternate configuration file, such as:\n\n{{ npx_tabs({\n    package: \"eslint\",\n    args: [\"--config\", \"some-other-file.js\", \"**/*.js\"]\n}) }}\n\nIn this case, ESLint does not search for configuration files and instead uses `some-other-file.js`.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f68ca282200991daaee51ce91283c80bda6fcf39c00dd2f182b8eb355d9b65d8",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 782,
+      "line_end": 794,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/8fb4cf138410d71cb41aa30c"
+    },
+    {
+      "evidence_id": "ev-42523f2a04cffbc1",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Introduction",
+      "snippet": "---\ntitle: Configuration Files\neleventyNavigation:\n    key: configuration files\n    parent: configure\n    title: Configuration Files\n    order: 1\n---\n\n{%- from 'components/npx_tabs.macro.html' import npx_tabs %}\n{%- from 'components/npm_tabs.macro.html' import npm_tabs with context %}\n\n::: tip\nThis page explains how to use flat config files.\n:::\n\nYou can put your ESLint project configuration in a configuration file. You can include built-in rules, how you want them enforced, plugins with custom rules, shareable configurations, which files you want rules to apply to, and more.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "79feb383591c6402bebeedae7e32a317523aa0ed991fb9010eba7222d8f38bd9",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 1,
+      "line_end": 18,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/1b1a48b40e9f60a422fd007d"
+    },
+    {
+      "evidence_id": "ev-21e03efc4004681a",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Run the CLI",
+      "snippet": "## Run the CLI\n\nESLint requires [Node.js](https://nodejs.org/) for installation. Follow the instructions in the [Getting Started Guide](getting-started) to install ESLint.\n\nMost users use [`npx`](https://docs.npmjs.com/cli/v8/commands/npx) to run ESLint on the command line like this:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"[options]\", \"[file|dir|glob]*\"]\n}) }}\n\nSuch as:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"file1.js\", \"file2.js\"],\n    comment: \"Run on two files\"\n}) }}\n\nor\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"lib/**\"],\n    comment: \"Run on multiple files\"\n}) }}\n\nPlease note that when passing a glob as a parameter, it is expanded by your shell. The results of the expansion can vary depending on your shell, and its configuration. If you want to use node `glob` syntax, you have to quote your parameter (using double quotes if you need it to run in Windows), as follows:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"\\\"lib/**\\\"\"]\n}) }}\n\nYou can also omit the file arguments and ESLint will use `.`. For instance, these two lines perform the same operation:\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\".\"]\n}) }}\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: []\n}) }}\n\n**Note:** You can also use alternative package managers such as [Yarn](https://yarnpkg.com/) or [pnpm](https://pnpm.io/) to run ESLint. For pnpm use `pnpm dlx eslint` and for Yarn use `yarn dlx eslint`.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "65a55f48215c27c2da354fd86d21667a7ed0a7e1895816c8570941d1620357ac",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 15,
+      "line_end": 62,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/35c86df4df738fe1e35e26ea"
+    },
+    {
+      "evidence_id": "ev-86aada9aa52a51da",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Configuration File",
+      "snippet": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\nIt should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t\t\"prefer-const\": \"error\",\n\t\t},\n\t},\n]);\n```\n\nIn this example, the `defineConfig()` helper is used to define a configuration array with just one configuration object. The configuration object enables two rules: `semi` and `prefer-const`. These rules are applied to all of the files ESLint processes using this config file.\n\nIf your project specifies `\"type\": \"commonjs\"` in its `package.json` file, then `eslint.config.js` must be in CommonJS format, such as:\n\n```js\n// eslint.config.js\nconst { defineConfig } = require(\"eslint/config\");\n\nmodule.exports = defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t\t\"prefer-const\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "a7b7a2674a0e379db80f280fc4ea88aa72856da9a1629ec1a8b4d240d0fe047d",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 19,
+      "line_end": 63,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/56440dba9e42743e3a7a6b8c"
+    },
+    {
+      "evidence_id": "ev-59e7ae8831918c52",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Configuration Objects > Configure Rules",
+      "snippet": "Each rule specifies its own options and can be any valid JSON data type. Please check the documentation for the rule you want to configure for more information about its available options.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e6bb855a565c73cd4bbdcf2b84b6e2583986e0af25ce9699ae37f116583ee4f4",
+      "project_identity": "local:87341f14b7c8b4c11f8741cd05d675460554e88154a215e92df12b3f9e124aa7",
+      "line_start": 559,
+      "line_end": 560,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/ec18c12bd532627f13a59927"
+    }
+  ],
+  "tokens": 2458,
+  "utf8_bytes": 7947,
+  "sha256": "9eebd17cf96fd613075742670c34ef4a1f1f802e25c615592b95ef323fdad24f",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

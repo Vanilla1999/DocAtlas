@@ -124,15 +124,10 @@ class FusionConfig(BaseModel):
 
 
 class HierarchicalConfig(BaseModel):
-    """Two-stage hierarchical retrieval: pick top documents, then top sections inside them.
+    """Legacy parsing DTO; document-score preselection has been retired.
 
-    By default the dispatcher decides per-index: ``auto=True`` turns the
-    two-stage pass on when the index contains at least
-    ``auto_min_documents`` distinct ``document_title_hash`` values, and
-    leaves it off on smaller / flatter corpora where the extra round-trip
-    just costs latency. Set ``enabled=True`` to force it on regardless of
-    corpus size; set ``auto=False`` to force it off unless ``enabled``
-    is also true.
+    Neither ``enabled`` nor ``auto`` filters the source-native candidate pool.
+    Fields remain accepted so existing configuration files can still be read.
     """
 
     enabled: bool = False
@@ -144,11 +139,10 @@ class HierarchicalConfig(BaseModel):
 
 
 class QueryRouter(BaseModel):
-    """A regex-matched query router.
+    """Legacy configuration DTO, retained for parsing existing configs.
 
-    When ``match`` matches the query (case-insensitive), the router's
-    ``filters`` are merged into the dispatcher filters for that call.
-    The first matching router wins; routers do not stack.
+    Query text no longer selects filters. Supply explicit dispatch filters;
+    these rows are not executed or translated into replacement routing rules.
     """
 
     match: str
@@ -164,7 +158,9 @@ class RetrievalConfig(BaseSettings):
     expand: str | None = None
     budget: int | None = None
     limit: int | None = None
-    max_sections_per_source: int | None = Field(default=2, ge=1)
+    max_sections_per_source: int | None = Field(
+        default=None, ge=1, description="Explicit source quota; unset preserves native order without a quota. Explicit expansion bypasses it.",
+    )
     model_config = SettingsConfigDict(env_prefix="DOCATLAS_RETRIEVAL_", extra="ignore")
 
 

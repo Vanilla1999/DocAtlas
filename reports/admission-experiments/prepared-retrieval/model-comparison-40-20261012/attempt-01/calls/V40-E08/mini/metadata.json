@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-E08",
+  "mode": "mini",
+  "question": "What production uptime SLA does ESLint guarantee for local linting?",
+  "public_request": {
+    "question": "What production uptime SLA does ESLint guarantee for local linting?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/eslint.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:14:02.850925+00:00",
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_before": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.4777955829995335,
+  "process_cpu_seconds": 0.4756424079999988,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 981368,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_after": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "wire_sha256": "863291b2b7fc058242e77f77dc3a0834349c2a6251203f61f9b54fdb66b731f8",
+  "wire_utf8_bytes": 1505,
+  "utf8_quarter_proxy": 377,
+  "codec_o200k_base": 449,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

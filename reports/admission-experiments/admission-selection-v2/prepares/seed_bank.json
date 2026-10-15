@@ -1,0 +1,94 @@
+{
+  "seconds": 0.11198506399887265,
+  "expected_paths": [
+    "calibration/seed_bank/intake.md",
+    "calibration/seed_bank/quarantine.md",
+    "calibration/seed_bank/storage.md"
+  ],
+  "indexed_paths": [
+    "calibration/seed_bank/intake.md",
+    "calibration/seed_bank/quarantine.md",
+    "calibration/seed_bank/storage.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-3c176a873ad387f08d2983ffbf297ee9729cd172",
+      "source_path": "calibration/seed_bank/intake.md",
+      "display_text": "# Приём партий семян\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-d953609c5483f7722185ac5b236b74137e1e8e79",
+      "source_path": "calibration/seed_bank/intake.md",
+      "display_text": "Для партии луговых трав с влажностью выше 9 процентов первичную сушку проводит техник приёмки.\nДо завершения первичной сушки партию не помещают в морозильный шкаф.\nДля партии с влажностью не выше 9 процентов первичная сушка не требуется.\nОбразцы для выставки хранят в витрине и не считают посевными партиями.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-3d267df7d8170dea08e30cc10b7061c93c6e5cb8",
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "display_text": "# Карантин посевных партий\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-ebba885f1900ee2645b22d4779bff2ab6a4669b6",
+      "source_path": "calibration/seed_bank/quarantine.md",
+      "display_text": "При обнаружении живых насекомых партию перемещают в закрытый карантинный контейнер, а не на стеллаж ожидания.\nСнять карантин может агроном банка после осмотра.\nДаже после снятия карантина для морозильного хранения нужен подписанный лист всхожести и влажность не выше 9 процентов.\nСтоимость выставочных витрин учитывается отдельно от расходов на посевные партии.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-862fe9d4eefc376e47b8fc0f821c8c9e069924a8",
+      "source_path": "calibration/seed_bank/storage.md",
+      "display_text": "# Перевод на хранение\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-fff8f50954c9857a037516d0f77ab370c6a10c9d",
+      "source_path": "calibration/seed_bank/storage.md",
+      "display_text": "После первичной сушки лаборант измеряет влажность повторно.\nПеревод партии в морозильный шкаф разрешён только при влажности не выше 9 процентов и наличии подписанного листа всхожести.\nЕсли лист всхожести отсутствует, партия остаётся на стеллаже ожидания независимо от влажности.\nПодписывать лист всхожести вправе только агроном банка.\n",
+      "line_start": 3,
+      "line_end": 6
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "45628ca29911e5fa59e80ae1ff9e92ddfe378d3866342219b9e4ee35e57af5ac",
+  "storage_path": "/tmp/docatlas-evidence-3m8zscfo/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-e572dddf09ff45d0af6d40d419ad4457",
+  "catalog_sha256": "34320aa0f48e728070565a6531f78020b43bb2c703b52629bbb9df7848f433f1",
+  "documents": [
+    {
+      "path": "calibration/seed_bank/intake.md",
+      "content_sha256": "48bdd39afbc2f42a99f3139fb228f41ef2a74f3507bc1864cfc6ed6e3a8598a9",
+      "catalog_entry_hash": "sha256:027514e057e6bd0a520064b0a8744a591b5a351eb2e147422d4753596090241a"
+    },
+    {
+      "path": "calibration/seed_bank/quarantine.md",
+      "content_sha256": "90c583e48d1893626e237a66512ad16038d2826cb80fbf01e78142584f3a8478",
+      "catalog_entry_hash": "sha256:e316671ac7f24a816980d955cb873c02eaa8881d0ad1803d660df7f94f070f2f"
+    },
+    {
+      "path": "calibration/seed_bank/storage.md",
+      "content_sha256": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+      "catalog_entry_hash": "sha256:d95425dba200d071beb7241fb730c99762b3ea49b6e48169a94dca5dfbaa46c5"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-e572dddf09ff45d0af6d40d419ad4457",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  }
+}

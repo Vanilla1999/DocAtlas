@@ -1,0 +1,15 @@
+{
+  "head": "4849b8f796d9e3e25e2c49e58562ec6859978411",
+  "status": " M docmancer/docs/application/_project_docs_service_part03.py\n M docmancer/docs/domain/literal_context_admission.py\n M docmancer/docs/domain/ordinary_body_context.py\n M docmancer/docs/domain/original_body_discovery.py\n M eval/main_flow_comparison/run_extra40.py\n?? docmancer/docs/application/experimental_candidate_selection.py\n",
+  "files": {
+    "docmancer/docs/domain/original_body_discovery.py": "b80209618be43b78bd501abde5e77a04f09e5a26cb4b0e52840ebec8f14ffc14",
+    "docmancer/docs/domain/ordinary_body_context.py": "b069de048f7ae4d3e64b87710a0c709671f0e3e47f4d5e3da12d10dd37c5eedb",
+    "docmancer/docs/domain/literal_context_admission.py": "324d4e9994d539f5938ac614543f5ebdfbdd0ce6a5b95649a3fdc94bc75e3cc9",
+    "eval/main_flow_comparison/run_extra40.py": "da6d300518a0f598fcca7a2b5bc96811871bfe27d5428342d49b76d50eccbb84",
+    "docmancer/docs/application/_project_docs_service_part03.py": "5e158284d8516796a977fddf56fb5afaf08c2d2bc8618ca3ba9178f9310e84bb",
+    "docmancer/docs/application/experimental_candidate_selection.py": "f6961f3f8df68e4fcdf0944fadbeda20e5fc118bc7081002331d68f02e89c2f6"
+  },
+  "setup_errors": [
+    "python alias unavailable (127), no runtime consumed; use python3/previous venv"
+  ]
+}

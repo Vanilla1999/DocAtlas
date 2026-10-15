@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "published_at": "2026-10-13",
+  "sources": {
+    "docatlas": {
+      "commit": "7bb61ef8b72965bdbdf42cdd7c48ec59931989d0",
+      "run": 38307961403,
+      "artifact": 11772859414,
+      "sha256": "343a81cfd4380cfb081a787684f0eb39f86b5b4ee2a9b93c8c2344a866f450e0",
+      "size_bytes": 9399403
+    },
+    "grounded": {
+      "commit": "67889012296a25ec32fea580776ccc687aab8c54",
+      "run": 38316181819,
+      "artifact": 11777480417,
+      "sha256": "e340935ca43b6c37714392e709141ed9221872d93431a4ca3516e93e737ec273",
+      "size_bytes": 435836
+    }
+  },
+  "frozen_questions": "eval/prepared_model_comparison40/questions.json",
+  "frozen_gold": "eval/prepared_model_comparison40/gold_spans.json",
+  "note": "CI artifacts expire after 14 days; numeric outputs and evaluator are committed."
+}

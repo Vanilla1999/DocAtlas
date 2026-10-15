@@ -1,0 +1,19 @@
+{
+  "command": [
+    "env",
+    "OMP_NUM_THREADS=8",
+    "MKL_NUM_THREADS=8",
+    "OPENBLAS_NUM_THREADS=8",
+    "/tmp/opencode/docatlas-review-evidence/admission-full-20261012/runtime-product/bin/python",
+    "/tmp/opencode/docatlas-review-evidence/admission-v3/run_v3.py"
+  ],
+  "cwd": "/tmp/opencode/docatlas-compact-review",
+  "shell_tool_timeout_ms": 1800000,
+  "runner_runtime_ceiling_seconds": 7200,
+  "host_timeout_seconds_per_attempt": 180,
+  "retry": false,
+  "new_install_download": false,
+  "status": "EXECUTED_ONCE_COMPLETED",
+  "runtime_seconds": 136.94634569900154,
+  "observed": {"prepares": 7, "context_attempts": 57, "host_requests": 28, "model_forwards": 0, "errors": []}
+}

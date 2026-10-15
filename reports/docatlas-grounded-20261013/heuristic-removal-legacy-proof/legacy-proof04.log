@@ -1,0 +1,53 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_public_mixed_native_context_keeps_project_and_exact_library _______
+
+tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-24/test_public_mixed_native_conte0')
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-24/test_public_mixed_native_conte0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x75a19809cf40>
+
+    def test_public_mixed_native_context_keeps_project_and_exact_library(tmp_path, state_root, record_property):
+        """One prepared project, one real library index, one mixed public request."""
+        from tests.docs.test_dependency_version_transition import _seed, PACKAGE
+        from docmancer.docs.service import LibraryDocsService
+        from docmancer.core.product_identity import ensure_owned_home
+        import os
+    
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config):
+            ensure_owned_home(Path(os.environ["DOCATLAS_HOME"]))
+>           inventory = runtime.index_project(service, config, root)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_heuristic_removal_public_integration.py:402: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+eval/evidence_quality_v2/runtime.py:112: in index_project
+    exists = policy.validate(root, config.index.db_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/core/member_storage_policy.py:93: in validate
+    self._directories()
+docmancer/core/member_storage_policy.py:50: in _directories
+    self._directory(directory, private=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MemberStoragePolicy(app_home=PosixPath('/tmp/docatlas-default-HXV8YAxA/docatlas-evidence-7l7bcw9m/docatlas_home'), db_...th('/tmp/docatlas-default-HXV8YAxA/docatlas-evidence-7l7bcw9m/docatlas_home/mcp-members/members.db'), config_path=None)
+path = PosixPath('/tmp/docatlas-default-HXV8YAxA/docatlas-evidence-7l7bcw9m/docatlas_home')
+private = False
+
+    def _directory(self, path: Path, *, private: bool) -> None:
+        try:
+            info = path.lstat()
+        except FileNotFoundError:
+            return
+        if not stat.S_ISDIR(info.st_mode):
+            raise PermissionError("storage ancestors must be plain directories")
+        # A sticky system temporary directory is permitted, but an ordinary
+        # writable ancestor would let another principal replace private state.
+        if (info.st_uid not in {0, os.getuid()}
+                or info.st_mode & 0o022 and not info.st_mode & stat.S_ISVTX):
+>           raise PermissionError("storage ancestors must not permit foreign namespace replacement")
+E           PermissionError: storage ancestors must not permit foreign namespace replacement
+
+docmancer/core/member_storage_policy.py:64: PermissionError
+1 failed in 0.42s

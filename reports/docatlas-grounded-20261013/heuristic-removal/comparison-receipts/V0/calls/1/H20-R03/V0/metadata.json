@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-R03",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-ruff",
+  "public_request": {
+    "question": "Which file patterns does Ruff discover by default (including the preview-only addition), and after exactly how many hours are its cache entries expired?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-ruff/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "2b431fb2364e9413fa41f3ec4322960a1d027c063f76c5a51ded4307195bd104",
+  "utf8_bytes": 20198,
+  "tokens": 5983,
+  "seconds": 2.585552735999954,
+  "cpu_seconds": 2.581548036999976,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

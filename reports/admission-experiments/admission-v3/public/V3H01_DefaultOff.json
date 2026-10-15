@@ -1,0 +1,3312 @@
+{
+  "case_id": "V3H01",
+  "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+  "split": "holdout",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+    "project_path": "/tmp/docatlas-v3-k4djfvvl/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-44936eec3ab9455fa0b9e8f97e582777",
+    "rows": [
+      [
+        "gen-44936eec3ab9455fa0b9e8f97e582777",
+        "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+        "# Полномочия на складе\n\nМаршрут складской тележки утверждает диспетчер движения. Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути.\n\nКонтролёр батарей подписывает ведомость запасных батарей на стеллаже 12.\n",
+        "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+        "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/roles.md"
+      ],
+      [
+        "gen-44936eec3ab9455fa0b9e8f97e582777",
+        "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+        "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+        "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+        "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-k4djfvvl/project/docatlas.project-docs.yaml": "fb954564f2de909f883946b7f9b5d018d55debb8eb1867cdab8d45f8132cb61a",
+      "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+      "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-fc27ab709d57a0cd",
+        "path_or_url": "docs/routes.md",
+        "section": "Направленные маршруты складской тележки",
+        "snippet": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "fe6a9e48c8c6abb764497999841e7387b16b3ecf83662892eb5993a57a8b5a28",
+        "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+        "line_start": 1,
+        "line_end": 5,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/987a250698e507d05260a108"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 517,
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "mandatory_component_ids": [],
+        "covered_component_ids": [],
+        "missing_component_ids": [],
+        "evidence_ids": [],
+        "unresolved_residue": [
+          "unverified_original_component_scope"
+        ],
+        "status": "unavailable",
+        "recognized_component_status": "unavailable"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "observed",
+        "projection": "observed",
+        "coverage": "observed",
+        "delivery": "projected"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+        },
+        {
+          "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+        },
+        {
+          "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+        },
+        {
+          "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+        },
+        {
+          "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107"
+        },
+        {
+          "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107"
+        },
+        {
+          "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+        },
+        {
+          "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+        },
+        {
+          "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107"
+        },
+        {
+          "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+        "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+        "child-6c6fb172f690e8e192c9132534627285087ba28c",
+        "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+        "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+        "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+        "child-6c6fb172f690e8e192c9132534627285087ba28c",
+        "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+        "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+        "child-82197fb3e15ef86a78415c17c17f6d039e566bc7"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "query_id": "query-original",
+          "outcome": "qualified",
+          "reason": "visible_fields",
+          "observed_candidate": {
+            "window_sha256": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+            "window_characters": 359,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "укладывается",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "в",
+                "бюджет",
+                "единиц",
+                "заряда",
+                "суммарный",
+                "расход",
+                "пути"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [],
+              "query_term_count": 22,
+              "matched_term_count": 15,
+              "match_ratio": 0.6818,
+              "bm25_cost": -13.974982990150265,
+              "lexical_score": 13.974982990150265,
+              "field_matches": {
+                "title": [
+                  "складской",
+                  "тележки"
+                ],
+                "body": [
+                  "укладывается",
+                  "путь",
+                  "от",
+                  "ворот",
+                  "к",
+                  "упаковке",
+                  "в",
+                  "бюджет",
+                  "единиц",
+                  "заряда",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ],
+                "retrieval_text": [
+                  "укладывается",
+                  "путь",
+                  "складской",
+                  "тележки",
+                  "от",
+                  "ворот",
+                  "к",
+                  "упаковке",
+                  "в",
+                  "бюджет",
+                  "единиц",
+                  "заряда",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/routes.md",
+                "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+              },
+              "char_start": 43,
+              "char_end": 402
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "укладывается",
+              "путь",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "в",
+              "бюджет",
+              "единиц",
+              "заряда",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "body_matched_terms": [
+              "укладывается",
+              "путь",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "в",
+              "бюджет",
+              "единиц",
+              "заряда",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "matched_term_count": 13,
+            "match_ratio": 0.5909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              43,
+              400
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "query_id": "query-original",
+          "outcome": "qualified",
+          "reason": "visible_fields",
+          "observed_candidate": {
+            "window_sha256": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+            "window_characters": 359,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "укладывается",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "в",
+                "бюджет",
+                "единиц",
+                "заряда",
+                "суммарный",
+                "расход",
+                "пути"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [],
+              "query_term_count": 22,
+              "matched_term_count": 15,
+              "match_ratio": 0.6818,
+              "bm25_cost": -13.974982990150265,
+              "lexical_score": 13.974982990150265,
+              "field_matches": {
+                "title": [
+                  "складской",
+                  "тележки"
+                ],
+                "body": [
+                  "укладывается",
+                  "путь",
+                  "от",
+                  "ворот",
+                  "к",
+                  "упаковке",
+                  "в",
+                  "бюджет",
+                  "единиц",
+                  "заряда",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ],
+                "retrieval_text": [
+                  "укладывается",
+                  "путь",
+                  "складской",
+                  "тележки",
+                  "от",
+                  "ворот",
+                  "к",
+                  "упаковке",
+                  "в",
+                  "бюджет",
+                  "единиц",
+                  "заряда",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/routes.md",
+                "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+              },
+              "char_start": 43,
+              "char_end": 402
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "укладывается",
+              "путь",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "в",
+              "бюджет",
+              "единиц",
+              "заряда",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "body_matched_terms": [
+              "укладывается",
+              "путь",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "в",
+              "бюджет",
+              "единиц",
+              "заряда",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "matched_term_count": 13,
+            "match_ratio": 0.5909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              43,
+              400
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "02358f68a8c87bb781480dbf3c1ec0017a4b0316240c20e2729d14592f343af5",
+            "window_characters": 119,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "складской",
+                "тележки",
+                "от",
+                "к",
+                "и"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 5,
+              "match_ratio": 0.2273,
+              "bm25_cost": -1.616978014440475,
+              "lexical_score": 1.616978014440475,
+              "field_matches": {
+                "title": [
+                  "складской",
+                  "тележки"
+                ],
+                "body": [
+                  "от",
+                  "к",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "складской",
+                  "тележки",
+                  "от",
+                  "к",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/routes.md",
+                "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+              },
+              "char_start": 402,
+              "char_end": 521
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "от",
+              "к",
+              "и"
+            ],
+            "body_matched_terms": [
+              "от",
+              "к",
+              "и"
+            ],
+            "matched_term_count": 3,
+            "match_ratio": 0.1364,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              402,
+              520
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "6cf4834cda71bd0f49729b2e8e650e4f0a7c43e03f222b6007f12bf80f2bd66c",
+            "window_characters": 43,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "складской",
+                "тележки"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 2,
+              "match_ratio": 0.0909,
+              "bm25_cost": -4.009111617312073e-06,
+              "lexical_score": 4.009111617312073e-06,
+              "field_matches": {
+                "title": [
+                  "складской",
+                  "тележки"
+                ],
+                "body": [
+                  "складской",
+                  "тележки"
+                ],
+                "retrieval_text": [
+                  "складской",
+                  "тележки"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/routes.md",
+                "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+              },
+              "char_start": 0,
+              "char_end": 43
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              0,
+              41
+            ],
+            "lexical_score": 0.9
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "25685132157d4e4e672f9da49d3827cd94c452793b9b19c6263bed2ef7c4e6d4",
+            "window_characters": 202,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "складской",
+                "тележки",
+                "заряда",
+                "и",
+                "суммарный",
+                "расход",
+                "пути"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 7,
+              "match_ratio": 0.3182,
+              "bm25_cost": -2.2930955397511044,
+              "lexical_score": 2.2930955397511044,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "складской",
+                  "тележки",
+                  "заряда",
+                  "и",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ],
+                "retrieval_text": [
+                  "складской",
+                  "тележки",
+                  "заряда",
+                  "и",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/roles.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/roles.md",
+                "content_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f"
+              },
+              "char_start": 0,
+              "char_end": 202
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "складской",
+              "тележки",
+              "заряда",
+              "и",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "body_matched_terms": [
+              "складской",
+              "тележки",
+              "заряда",
+              "и",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "matched_term_count": 7,
+            "match_ratio": 0.3182,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              200
+            ],
+            "lexical_score": 0.85,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "4a65ab6d80931086a18adad985430f20a3a6f8503f81cf6288eb68c2988a6cfe",
+            "window_characters": 73,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "12"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 1,
+              "match_ratio": 0.0455,
+              "bm25_cost": -1.6021192153751411,
+              "lexical_score": 1.6021192153751411,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "12"
+                ],
+                "retrieval_text": [
+                  "12"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/roles.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/roles.md",
+                "content_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f"
+              },
+              "char_start": 202,
+              "char_end": 275
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "12"
+            ],
+            "body_matched_terms": [
+              "12"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0455,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              202,
+              274
+            ],
+            "lexical_score": 0.8,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "02358f68a8c87bb781480dbf3c1ec0017a4b0316240c20e2729d14592f343af5",
+            "window_characters": 119,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "складской",
+                "тележки",
+                "от",
+                "к",
+                "и"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 5,
+              "match_ratio": 0.2273,
+              "bm25_cost": -1.616978014440475,
+              "lexical_score": 1.616978014440475,
+              "field_matches": {
+                "title": [
+                  "складской",
+                  "тележки"
+                ],
+                "body": [
+                  "от",
+                  "к",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "складской",
+                  "тележки",
+                  "от",
+                  "к",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/routes.md",
+                "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+              },
+              "char_start": 402,
+              "char_end": 521
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "от",
+              "к",
+              "и"
+            ],
+            "body_matched_terms": [
+              "от",
+              "к",
+              "и"
+            ],
+            "matched_term_count": 3,
+            "match_ratio": 0.1364,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              402,
+              520
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "6cf4834cda71bd0f49729b2e8e650e4f0a7c43e03f222b6007f12bf80f2bd66c",
+            "window_characters": 43,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "складской",
+                "тележки"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 2,
+              "match_ratio": 0.0909,
+              "bm25_cost": -4.009111617312073e-06,
+              "lexical_score": 4.009111617312073e-06,
+              "field_matches": {
+                "title": [
+                  "складской",
+                  "тележки"
+                ],
+                "body": [
+                  "складской",
+                  "тележки"
+                ],
+                "retrieval_text": [
+                  "складской",
+                  "тележки"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/routes.md",
+                "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+              },
+              "char_start": 0,
+              "char_end": 43
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              0,
+              41
+            ],
+            "lexical_score": 0.9
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "25685132157d4e4e672f9da49d3827cd94c452793b9b19c6263bed2ef7c4e6d4",
+            "window_characters": 202,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "складской",
+                "тележки",
+                "заряда",
+                "и",
+                "суммарный",
+                "расход",
+                "пути"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 7,
+              "match_ratio": 0.3182,
+              "bm25_cost": -2.2930955397511044,
+              "lexical_score": 2.2930955397511044,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "складской",
+                  "тележки",
+                  "заряда",
+                  "и",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ],
+                "retrieval_text": [
+                  "складской",
+                  "тележки",
+                  "заряда",
+                  "и",
+                  "суммарный",
+                  "расход",
+                  "пути"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/roles.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/roles.md",
+                "content_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f"
+              },
+              "char_start": 0,
+              "char_end": 202
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "складской",
+              "тележки",
+              "заряда",
+              "и",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "body_matched_terms": [
+              "складской",
+              "тележки",
+              "заряда",
+              "и",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "matched_term_count": 7,
+            "match_ratio": 0.3182,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              0,
+              200
+            ],
+            "lexical_score": 0.85,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+          "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+          "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "4a65ab6d80931086a18adad985430f20a3a6f8503f81cf6288eb68c2988a6cfe",
+            "window_characters": 73,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "matched_terms": [
+                "12"
+              ],
+              "exact_terms": [
+                "укладывается"
+              ],
+              "missing_exact_terms": [
+                "укладывается"
+              ],
+              "query_term_count": 22,
+              "matched_term_count": 1,
+              "match_ratio": 0.0455,
+              "bm25_cost": -1.6021192153751411,
+              "lexical_score": 1.6021192153751411,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "12"
+                ],
+                "retrieval_text": [
+                  "12"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/roles.md",
+                "scope": {
+                  "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                  "version": "",
+                  "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+                },
+                "canonical_path": "docs/roles.md",
+                "content_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f"
+              },
+              "char_start": 202,
+              "char_end": 275
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "12"
+            ],
+            "body_matched_terms": [
+              "12"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0455,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              202,
+              274
+            ],
+            "lexical_score": 0.8,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-6c6fb172f690e8e192c9132534627285087ba28c",
+        "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+        "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+        "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+        "child-6c6fb172f690e8e192c9132534627285087ba28c",
+        "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+        "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+        "child-82197fb3e15ef86a78415c17c17f6d039e566bc7"
+      ],
+      "pre_projection_qualified_ids": [
+        "child-5831ffefebcc6d94ef667f782c1060405f93fc32"
+      ],
+      "ranked_candidate_ids": [
+        "child-5831ffefebcc6d94ef667f782c1060405f93fc32"
+      ],
+      "selected_candidate_ids": [
+        "child-5831ffefebcc6d94ef667f782c1060405f93fc32"
+      ],
+      "considered_variants": [
+        {
+          "candidate_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "evidence_id": "ev-fc27ab709d57a0cd",
+          "qualified_query_ids": [
+            "query-original"
+          ]
+        },
+        {
+          "candidate_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "evidence_id": "ev-fc27ab709d57a0cd",
+          "qualified_query_ids": [
+            "query-original"
+          ]
+        }
+      ],
+      "projection_rejections": [],
+      "final_visible_evidence_ids": [
+        "ev-fc27ab709d57a0cd"
+      ],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": false,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "ok",
+          "context_available": true,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "evidence_id": "ev-fc27ab709d57a0cd"
+              }
+            ]
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 10,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 10,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md"
+              },
+              {
+                "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md"
+              },
+              {
+                "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md"
+              },
+              {
+                "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md"
+              },
+              {
+                "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md"
+              },
+              {
+                "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md"
+              },
+              {
+                "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md"
+              },
+              {
+                "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md"
+              },
+              {
+                "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md"
+              },
+              {
+                "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 10,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 10,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                "query_id": "query-original",
+                "outcome": "qualified",
+                "reason": "visible_fields"
+              },
+              {
+                "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                "query_id": "query-original",
+                "outcome": "qualified",
+                "reason": "visible_fields"
+              },
+              {
+                "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+                "document_id": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "attempt_kind": "primary",
+          "qualified_variants": 2,
+          "ranked_candidates": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "child-5831ffefebcc6d94ef667f782c1060405f93fc32"
+            ]
+          },
+          "prepared_qualified_variants": {
+            "observation": "recorded",
+            "recorded_count": 2,
+            "producer_count": 2,
+            "producer_omitted": 0,
+            "preview_count": 2,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "candidate_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                "evidence_id": "ev-fc27ab709d57a0cd"
+              },
+              {
+                "candidate_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                "evidence_id": "ev-fc27ab709d57a0cd"
+              }
+            ]
+          },
+          "literal_context_admissions": {
+            "observation": "missing"
+          },
+          "core_payload_sources": {
+            "observation": "recorded",
+            "recorded_count": 1,
+            "producer_count": 1,
+            "producer_omitted": 0,
+            "preview_count": 1,
+            "preview_omitted": 0,
+            "items": [
+              "ev-fc27ab709d57a0cd"
+            ]
+          },
+          "decision_trace": {
+            "schema_version": 1,
+            "variant_attempts": 2,
+            "omitted_events": 0,
+            "selection_events_omitted": 0,
+            "branch_counts": {
+              "observation": "recorded",
+              "recorded_count": 3,
+              "producer_count": 3,
+              "producer_omitted": 0,
+              "preview_count": 3,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "branch": "candidate:prepared",
+                  "count": 1
+                },
+                {
+                  "branch": "selection:accepted",
+                  "count": 1
+                },
+                {
+                  "branch": "selection:replacement_loses_mandatory",
+                  "count": 1
+                }
+              ]
+            },
+            "events": {
+              "observation": "recorded",
+              "recorded_count": 3,
+              "producer_count": 3,
+              "producer_omitted": 0,
+              "preview_count": 3,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "candidate",
+                  "decision": "prepared",
+                  "reason": "prepared",
+                  "candidate_key": "dacb1ad0c920e86adcbdac34",
+                  "variant_key": "3ff69b32c6c3c0fee9cb7e93"
+                },
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "accepted",
+                  "candidate_key": "dacb1ad0c920e86adcbdac34",
+                  "variant_key": "0468129637b5adbb3051ef6f",
+                  "budget_tokens": 426
+                },
+                {
+                  "stage": "selection",
+                  "decision": "rejected",
+                  "reason": "replacement_loses_mandatory",
+                  "candidate_key": "dacb1ad0c920e86adcbdac34",
+                  "variant_key": "aa2fb651260dc930680784b2"
+                }
+              ]
+            },
+            "selection_events": {
+              "observation": "recorded",
+              "recorded_count": 2,
+              "producer_count": 2,
+              "producer_omitted": 0,
+              "preview_count": 2,
+              "preview_omitted": 0,
+              "items": [
+                {
+                  "stage": "selection",
+                  "decision": "accepted",
+                  "reason": "accepted",
+                  "candidate_key": "dacb1ad0c920e86adcbdac34",
+                  "variant_key": "0468129637b5adbb3051ef6f",
+                  "budget_tokens": 426
+                },
+                {
+                  "stage": "selection",
+                  "decision": "rejected",
+                  "reason": "replacement_loses_mandatory",
+                  "candidate_key": "dacb1ad0c920e86adcbdac34",
+                  "variant_key": "aa2fb651260dc930680784b2"
+                }
+              ]
+            }
+          }
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "project_path": "/tmp/docatlas-v3-k4djfvvl/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 5,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                    "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                    "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+                    "path": "docs/routes.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 43,
+                    "char_end": 402,
+                    "display_content_hash": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "project_doc_catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c",
+                    "project_doc_content_hash": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+                    "qualified_query_ids": {
+                      "count": 1,
+                      "items": [
+                        "query-original"
+                      ],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                    "stable_chunk_id": "child-6c6fb172f690e8e192c9132534627285087ba28c",
+                    "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+                    "path": "docs/routes.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 402,
+                    "char_end": 521,
+                    "display_content_hash": "02358f68a8c87bb781480dbf3c1ec0017a4b0316240c20e2729d14592f343af5",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "project_doc_catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c",
+                    "project_doc_content_hash": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                    "stable_chunk_id": "child-a20ae7bdea27d34667cd702789e263c312331f1b",
+                    "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+                    "path": "docs/routes.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 43,
+                    "display_content_hash": "6cf4834cda71bd0f49729b2e8e650e4f0a7c43e03f222b6007f12bf80f2bd66c",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "project_doc_catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c",
+                    "project_doc_content_hash": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+                    "stable_chunk_id": "child-d473c6466aa0df9a5d42b609d3a97bf3f33e121d",
+                    "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107",
+                    "path": "docs/roles.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 202,
+                    "display_content_hash": "25685132157d4e4e672f9da49d3827cd94c452793b9b19c6263bed2ef7c4e6d4",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "project_doc_catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f",
+                    "project_doc_content_hash": "sha256:e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+                    "stable_chunk_id": "child-82197fb3e15ef86a78415c17c17f6d039e566bc7",
+                    "parent_logical_id": "parent-5e0a2b5a655fa52d00570ea01c5c4107",
+                    "path": "docs/roles.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 202,
+                    "char_end": 275,
+                    "display_content_hash": "4a65ab6d80931086a18adad985430f20a3a6f8503f81cf6288eb68c2988a6cfe",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "project_doc_catalog_entry_hash": "sha256:c0161aa8aad4df0d629d0e5d7bb3dbca0ad5aeed225e5b88195b2fd42769586f",
+                    "project_doc_content_hash": "sha256:e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+                "project_path": "/tmp/docatlas-v3-k4djfvvl/project",
+                "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "project_path": "/tmp/docatlas-v3-k4djfvvl/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "partial_navigational_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                    "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+                    "path": "docs/routes.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 43,
+                    "char_end": 402,
+                    "display_content_hash": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "qualified_query_ids": {
+                      "count": 1,
+                      "items": [
+                        "query-original"
+                      ],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+                    "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                    "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+                    "path": "docs/routes.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 43,
+                    "char_end": 402,
+                    "display_content_hash": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "project_doc_catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c",
+                    "project_doc_content_hash": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+                    "qualified_query_ids": {
+                      "count": 1,
+                      "items": [
+                        "query-original"
+                      ],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+                "project_path": "/tmp/docatlas-v3-k4djfvvl/project",
+                "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": true
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 896,
+                "observed_budget_projection_bytes": 896,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "project_path": "/tmp/docatlas-v3-k4djfvvl/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": true,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": true,
+                "reason_code": null
+              },
+              "context_windows": {
+                "count": 1,
+                "items": [
+                  {
+                    "source": {
+                      "type": "dict"
+                    },
+                    "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+                    "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+                    "path": "docs/routes.md",
+                    "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_doc",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 43,
+                    "char_end": 402,
+                    "display_content_hash": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+                    "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+                    "qualified_query_ids": {
+                      "count": 1,
+                      "items": [
+                        "query-original"
+                      ],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "success",
+                "reason_code": "partial_navigational_context",
+                "source_count": 1
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "answer_available": false,
+              "passed_relevance_gate": true
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 1,
+                "observed_item_count": 1,
+                "budget_projection_bytes": 896,
+                "observed_budget_projection_bytes": 896,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {
+    "ev-fc27ab709d57a0cd": {
+      "source": {
+        "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+        "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+        "display_content_hash": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+        "_source_snapshot_sha256": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+            "scope": {
+              "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+              "version": "",
+              "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+            },
+            "canonical_path": "docs/routes.md",
+            "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+          },
+          "project_doc_content_hash": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "member_binding": {
+            "doc_scope": "project",
+            "module_path": "",
+            "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+          },
+          "char_start": 0,
+          "char_end": 521,
+          "text": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+          "raw_document": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+          "owner": {
+            "text": "# Направленные маршруты складской тележки\n",
+            "char_start": 0,
+            "char_end": 42,
+            "scope_start": 0,
+            "scope_end": 521,
+            "logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+          "references": [],
+          "scope": {
+            "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+            "version": "",
+            "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?": {
+            "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "references": [],
+            "scope": {
+              "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+              "version": "",
+              "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:dd6bb29ee21640c6062415e22497bc086716d68d3a60360d2d562e3c0b0bf935",
+            "member_spans": [
+              [
+                0,
+                41,
+                "f39dac10e937371dbcb12fb878cdfc6965135ca93b83103bd07ac0e527cc06a2"
+              ],
+              [
+                43,
+                400,
+                "6e59d576897d46451108cf36fc7926ecf7441b337d6a1fe93cf1c4942413b39f"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+        "resolved_version": "",
+        "source_identity": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+        "source_content_hash": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+        "byte_start": 0,
+        "byte_end": 954,
+        "_source_catalog_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c",
+        "char_start": 0,
+        "char_end": 521,
+        "line_start": 1,
+        "line_end": 5,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+        "retrieval_query_ids": [
+          "query-original"
+        ],
+        "retrieval_query_matches": {
+          "query-original": {
+            "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "query_origin": "original",
+            "relation": "direct",
+            "query_terms": [
+              "укладывается",
+              "ли",
+              "путь",
+              "складской",
+              "тележки",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "через",
+              "весы",
+              "в",
+              "бюджет",
+              "12",
+              "единиц",
+              "заряда",
+              "и",
+              "каков",
+              "суммарный",
+              "расход",
+              "этого",
+              "пути"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "bound_subject_context": "# Направленные маршруты складской тележки\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              43,
+              400
+            ],
+            "matched_terms": [
+              "укладывается",
+              "путь",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "в",
+              "бюджет",
+              "единиц",
+              "заряда",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "body_matched_terms": [
+              "укладывается",
+              "путь",
+              "от",
+              "ворот",
+              "к",
+              "упаковке",
+              "в",
+              "бюджет",
+              "единиц",
+              "заряда",
+              "суммарный",
+              "расход",
+              "пути"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "matched_term_count": 13,
+            "match_ratio": 0.5909,
+            "qualified": true,
+            "qualification_reason": "visible_fields",
+            "context_only": true,
+            "coverage_kinds": [
+              "direct"
+            ]
+          }
+        },
+        "project_ranking": {
+          "query_intent": "general",
+          "base_score": 1.0,
+          "final_score": 1.0,
+          "original_rank": 0,
+          "selected_rank": 1,
+          "source_weight_reason": "base retrieval score; no topic-derived source weight",
+          "requirement_reason": null,
+          "selected_by": "ranking",
+          "diversity_relaxed": false,
+          "reasons": [
+            "independent qualified query coverage and base retrieval score"
+          ]
+        },
+        "path": "docs/routes.md",
+        "url": null,
+        "title": "Направленные маршруты складской тележки",
+        "heading_path": "Направленные маршруты складской тележки",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+        "content": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+        "display_text": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+        "token_estimate": 89,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+          "path": "docs/routes.md",
+          "url": null,
+          "title": "Направленные маршруты складской тележки"
+        },
+        "section": {
+          "title": "Направленные маршруты складской тележки",
+          "heading_path": "Направленные маршруты складской тележки",
+          "freshness": "current"
+        },
+        "source_provenance": {
+          "owner": "configured_repository",
+          "origin_lane": "project"
+        },
+        "version_exactness": "not_applicable",
+        "repository_authority": "ordinary_repository_document",
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1",
+          "executable_policy": false
+        },
+        "document_data": {
+          "schema": "docmancer-document-data-v1",
+          "instruction_trust": "untrusted_data",
+          "content": "Разрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\n"
+        },
+        "authority_root": null,
+        "policy_scope": null,
+        "scope_verified": false,
+        "origin_lane": "project",
+        "canonical_id": null,
+        "library_id": null,
+        "version": null,
+        "_qualification_candidate": {
+          "stable_chunk_id": "child-5831ffefebcc6d94ef667f782c1060405f93fc32",
+          "parent_logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b",
+          "display_content_hash": "e28e703e0623cf06b96e5a8c485f42a4ed216218328e6801cfa4030a87c1d1d4",
+          "_source_snapshot_sha256": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+              "scope": {
+                "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                "version": "",
+                "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+              },
+              "canonical_path": "docs/routes.md",
+              "content_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+            },
+            "project_doc_content_hash": "sha256:82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+            "member_binding": {
+              "doc_scope": "project",
+              "module_path": "",
+              "catalog_entry_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c"
+            },
+            "char_start": 0,
+            "char_end": 521,
+            "text": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+            "raw_document": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+            "owner": {
+              "text": "# Направленные маршруты складской тележки\n",
+              "char_start": 0,
+              "char_end": 42,
+              "scope_start": 0,
+              "scope_end": 521,
+              "logical_id": "parent-493de17249fcfcd843efbe5960eb7a4b"
+            }
+          },
+          "_reference_root_plan": {
+            "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+            "references": [],
+            "scope": {
+              "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+              "version": "",
+              "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?": {
+              "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "references": [],
+              "scope": {
+                "project_id": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+                "version": "",
+                "snapshot_id": "gen-44936eec3ab9455fa0b9e8f97e582777"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:dd6bb29ee21640c6062415e22497bc086716d68d3a60360d2d562e3c0b0bf935",
+              "member_spans": [
+                [
+                  0,
+                  41,
+                  "f39dac10e937371dbcb12fb878cdfc6965135ca93b83103bd07ac0e527cc06a2"
+                ],
+                [
+                  43,
+                  400,
+                  "6e59d576897d46451108cf36fc7926ecf7441b337d6a1fe93cf1c4942413b39f"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "generation_id": "gen-44936eec3ab9455fa0b9e8f97e582777",
+          "resolved_version": "",
+          "source_identity": "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md",
+          "source_content_hash": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "byte_start": 79,
+          "byte_end": 735,
+          "_source_catalog_hash": "sha256:6e632e88ccf0b5716219e403689089979f4d9f31f3e10c6dd6e2112c6eb1cb4c",
+          "char_start": 43,
+          "char_end": 402,
+          "line_start": 3,
+          "line_end": 4,
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "catalog_role": "other",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+          "retrieval_query_ids": [
+            "query-original"
+          ],
+          "retrieval_query_matches": {
+            "query-original": {
+              "query_text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "query_origin": "original",
+              "relation": "direct",
+              "query_terms": [
+                "укладывается",
+                "ли",
+                "путь",
+                "складской",
+                "тележки",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "через",
+                "весы",
+                "в",
+                "бюджет",
+                "12",
+                "единиц",
+                "заряда",
+                "и",
+                "каков",
+                "суммарный",
+                "расход",
+                "этого",
+                "пути"
+              ],
+              "exact_terms": [],
+              "bound_subjects": [],
+              "retrieval_anchors": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "lexical_score": 1.0,
+              "reference_body_query": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "bound_subject_context": "# Направленные маршруты складской тележки\n",
+              "reference_bindings": [],
+              "reference_visible_span": [
+                43,
+                400
+              ],
+              "matched_terms": [
+                "укладывается",
+                "путь",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "в",
+                "бюджет",
+                "единиц",
+                "заряда",
+                "суммарный",
+                "расход",
+                "пути"
+              ],
+              "body_matched_terms": [
+                "укладывается",
+                "путь",
+                "от",
+                "ворот",
+                "к",
+                "упаковке",
+                "в",
+                "бюджет",
+                "единиц",
+                "заряда",
+                "суммарный",
+                "расход",
+                "пути"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_exact_terms": [],
+              "missing_parent_exact_terms": [],
+              "matched_term_count": 13,
+              "match_ratio": 0.5909,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "context_only": true,
+              "coverage_kinds": [
+                "direct"
+              ]
+            }
+          },
+          "project_ranking": {
+            "query_intent": "general",
+            "base_score": 1.0,
+            "final_score": 1.0,
+            "original_rank": 0,
+            "selected_rank": 1,
+            "source_weight_reason": "base retrieval score; no topic-derived source weight",
+            "requirement_reason": null,
+            "selected_by": "ranking",
+            "diversity_relaxed": false,
+            "reasons": [
+              "independent qualified query coverage and base retrieval score"
+            ]
+          },
+          "path": "docs/routes.md",
+          "url": null,
+          "title": "Направленные маршруты складской тележки",
+          "heading_path": "Направленные маршруты складской тележки",
+          "freshness": "current",
+          "why_selected": "selected because it matched repo-owned project documentation for the question; independent qualified query coverage and base retrieval score",
+          "content": "Разрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\n",
+          "display_text": "Разрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\n",
+          "token_estimate": 89,
+          "source": {
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+            "path": "docs/routes.md",
+            "url": null,
+            "title": "Направленные маршруты складской тележки"
+          },
+          "section": {
+            "title": "Направленные маршруты складской тележки",
+            "heading_path": "Направленные маршруты складской тележки",
+            "freshness": "current"
+          },
+          "source_provenance": {
+            "owner": "configured_repository",
+            "origin_lane": "project"
+          },
+          "version_exactness": "not_applicable",
+          "repository_authority": "ordinary_repository_document",
+          "instruction_trust": "untrusted_data",
+          "content_boundary": {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": false
+          },
+          "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": "untrusted_data",
+            "content": "Разрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\n"
+          },
+          "authority_root": null,
+          "policy_scope": null,
+          "scope_verified": false,
+          "origin_lane": "project",
+          "canonical_id": null,
+          "library_id": null,
+          "version": null
+        },
+        "_expected_project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+        "_lifecycle_intent": "current",
+        "_independent_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "assigned_requirement_ids": [],
+          "missing_requirement_ids": [
+            "unsupported_answer_authorization:context_only"
+          ],
+          "broad_context_only": false
+        },
+        "_assigned_requirement_ids": [],
+        "snippet": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n"
+      },
+      "projected_source": {
+        "evidence_id": "ev-fc27ab709d57a0cd",
+        "path_or_url": "docs/routes.md",
+        "section": "Направленные маршруты складской тележки",
+        "snippet": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "fe6a9e48c8c6abb764497999841e7387b16b3ecf83662892eb5993a57a8b5a28",
+        "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+        "line_start": 1,
+        "line_end": 5,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/987a250698e507d05260a108"
+      },
+      "evidence_id": "ev-fc27ab709d57a0cd",
+      "path_or_url": "docs/routes.md",
+      "section": "Направленные маршруты складской тележки",
+      "snippet": "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "fe6a9e48c8c6abb764497999841e7387b16b3ecf83662892eb5993a57a8b5a28",
+      "project_identity": "local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913",
+      "line_start": 1,
+      "line_end": 5,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/987a250698e507d05260a108"
+    }
+  },
+  "pools": [],
+  "state_after": {
+    "generation": "gen-44936eec3ab9455fa0b9e8f97e582777",
+    "rows": [
+      [
+        "gen-44936eec3ab9455fa0b9e8f97e582777",
+        "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md",
+        "# Полномочия на складе\n\nМаршрут складской тележки утверждает диспетчер движения. Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути.\n\nКонтролёр батарей подписывает ведомость запасных батарей на стеллаже 12.\n",
+        "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+        "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/roles.md"
+      ],
+      [
+        "gen-44936eec3ab9455fa0b9e8f97e582777",
+        "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md",
+        "# Направленные маршруты складской тележки\n\nРазрешены только перечисленные направленные переходы. Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Прямой переход от ворот к упаковке расходует 15 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.\n\nОбратные переходы автоматически не разрешаются. От упаковки к весам и от упаковки к воротам разрешённых переходов нет.\n",
+        "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+        "project_file:local:e2458ba28d94660926001119625efa40c5c258a2862dbf124c7ed4c4d43d0913:docs/routes.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-k4djfvvl/project/docatlas.project-docs.yaml": "fb954564f2de909f883946b7f9b5d018d55debb8eb1867cdab8d45f8132cb61a",
+      "/tmp/docatlas-v3-k4djfvvl/project/docs/roles.md": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+      "/tmp/docatlas-v3-k4djfvvl/project/docs/routes.md": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+    }
+  },
+  "elapsed_seconds": 0.09023967599932803,
+  "integrity_errors": []
+}

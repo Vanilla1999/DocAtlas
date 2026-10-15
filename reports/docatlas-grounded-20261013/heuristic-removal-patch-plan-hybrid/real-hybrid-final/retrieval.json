@@ -1,0 +1,749 @@
+[
+  {
+    "mode": "sparse",
+    "counts": {
+      "sparse": 3
+    },
+    "failures": {},
+    "contributions": {
+      "5237351090539368904": {
+        "sparse": 1
+      },
+      "6760101366235871618": {
+        "sparse": 2
+      },
+      "5632161229096047048": {
+        "sparse": 3
+      }
+    },
+    "chunks": [
+      {
+        "source": "observatory.md",
+        "chunk_index": 0,
+        "text": "# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n",
+        "score": 0.01639344262295082,
+        "metadata": {
+          "format": "markdown",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "",
+          "project_path": "",
+          "module_id": "",
+          "doc_scope": "",
+          "source_class": "",
+          "authority": "unknown",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "docs_snapshot_exact": null,
+          "section_title": "Observatory aperture",
+          "section_level": 1,
+          "source_path": "observatory.md",
+          "document_title": "observatory",
+          "document_title_hash": "1961fb1b69f7840d",
+          "anchor": "Observatory aperture",
+          "content_hash": "406208018fbcf49ce042612c73e2a4262ea9467f475ce668bd8f343a1aa3cfb7",
+          "retrieval_content_hash": "def70730b4666a827fec495a138a6783c1c3b50678bfc484c0e7cc2714482209",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "907db4f14951219d1d9edb660a79615b66314a99b5e6ef73d64d56d3e03bf638",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "907db4f14951219d1d9edb660a79615b66314a99b5e6ef73d64d56d3e03bf638",
+            "token_estimate": 22,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "observatory",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "observatory.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Observatory aperture",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              }
+            ]
+          },
+          "embedding_input_hash": "def70730b4666a827fec495a138a6783c1c3b50678bfc484c0e7cc2714482209",
+          "stable_chunk_id": "child-2b050e67f4a195325102455dda8490591c628cda",
+          "vector_id": "920f440f-0150-5922-b9dd-5dfeae8a798f",
+          "parent_logical_id": "parent-fe5f4694481df54113fab0435c51c95a",
+          "atom_type": "mixed",
+          "atom_id": "atom-7afaf7280ee0ad61461e9fd63a49a1f4",
+          "source_identity": "observatory.md",
+          "source_content_hash": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+          "heading_path": [
+            "Observatory aperture"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            0,
+            56
+          ],
+          "byte_span": [
+            0,
+            56
+          ],
+          "line_span": [
+            1,
+            4
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 14,
+          "retrieval_token_estimate": 37,
+          "generation_id": "gen-f37821b9f33d4fe797069bdb0019167e",
+          "title": "Observatory aperture",
+          "section_id": 5237351090539368904,
+          "token_estimate": 14,
+          "docmancer_tokens": 46,
+          "raw_tokens": 45,
+          "savings_percent": 0.0,
+          "runway_multiplier": 0.98,
+          "query_plan_hash": "08e0b5fc2dcfdedfef382764bedfa26dfcd8e396aac440b758aa5b370255c3a9",
+          "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+          "retrieval_trace": {
+            "requested_mode": "sparse",
+            "mode_used": "sparse",
+            "component_ranks": {
+              "sparse": 1
+            },
+            "pre_post_rank": 1,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 1
+          }
+        }
+      },
+      {
+        "source": "observatory.md",
+        "chunk_index": 1,
+        "text": "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n",
+        "score": 0.016129032258064516,
+        "metadata": {
+          "format": "markdown",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "",
+          "project_path": "",
+          "module_id": "",
+          "doc_scope": "",
+          "source_class": "",
+          "authority": "unknown",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "docs_snapshot_exact": null,
+          "section_title": "Observatory shutter",
+          "section_level": 1,
+          "source_path": "observatory.md",
+          "document_title": "observatory",
+          "document_title_hash": "1961fb1b69f7840d",
+          "anchor": "Observatory shutter",
+          "content_hash": "081a894b217482071953929eede7b96eb97256b7704aaf3bea3a01f18384a972",
+          "retrieval_content_hash": "41eae41d98a55bc913a7eb0181d1cb04c08c087e7179139c40bfe7b049b87fee",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "1a8163e171a33b079602dfa825aa06022bde594744e6bed2dec3f8b7ac263362",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "1a8163e171a33b079602dfa825aa06022bde594744e6bed2dec3f8b7ac263362",
+            "token_estimate": 22,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "observatory",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "observatory.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Observatory shutter",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              }
+            ]
+          },
+          "embedding_input_hash": "41eae41d98a55bc913a7eb0181d1cb04c08c087e7179139c40bfe7b049b87fee",
+          "stable_chunk_id": "child-74e0c034627095852e2aef927b1295dcaeca0da4",
+          "vector_id": "32e6a8aa-aacc-5858-ba4a-c17f90dc7e7b",
+          "parent_logical_id": "parent-62624d19cfba360963e7f5c202cb3e88",
+          "atom_type": "mixed",
+          "atom_id": "atom-6f1a07ad0f0d6d216c21d81e41606493",
+          "source_identity": "observatory.md",
+          "source_content_hash": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+          "heading_path": [
+            "Observatory shutter"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            56,
+            118
+          ],
+          "byte_span": [
+            56,
+            118
+          ],
+          "line_span": [
+            5,
+            8
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 16,
+          "retrieval_token_estimate": 38,
+          "generation_id": "gen-f37821b9f33d4fe797069bdb0019167e",
+          "title": "Observatory shutter",
+          "section_id": 6760101366235871618,
+          "token_estimate": 16,
+          "docmancer_tokens": 46,
+          "raw_tokens": 45,
+          "savings_percent": 0.0,
+          "runway_multiplier": 0.98,
+          "query_plan_hash": "08e0b5fc2dcfdedfef382764bedfa26dfcd8e396aac440b758aa5b370255c3a9",
+          "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+          "retrieval_trace": {
+            "requested_mode": "sparse",
+            "mode_used": "sparse",
+            "component_ranks": {
+              "sparse": 2
+            },
+            "pre_post_rank": 2,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 2
+          }
+        }
+      },
+      {
+        "source": "observatory.md",
+        "chunk_index": 2,
+        "text": "# Observatory archive\n\nObservatory archive retains 41 nights.\n",
+        "score": 0.015873015873015872,
+        "metadata": {
+          "format": "markdown",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "",
+          "project_path": "",
+          "module_id": "",
+          "doc_scope": "",
+          "source_class": "",
+          "authority": "unknown",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "docs_snapshot_exact": null,
+          "section_title": "Observatory archive",
+          "section_level": 1,
+          "source_path": "observatory.md",
+          "document_title": "observatory",
+          "document_title_hash": "1961fb1b69f7840d",
+          "anchor": "Observatory archive",
+          "content_hash": "9d732968e766807e4db541d5c4e92fd90dd0a988f9092feafef48bbb0183f007",
+          "retrieval_content_hash": "94a7651ab4b2dec6e44555182ecc0944b688ea96ee334c20168a74834aea0fdf",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "c100865956d33d56d1ecbfbfdc574e43d17ca8129aa5a6b24dee122c3f828a78",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "c100865956d33d56d1ecbfbfdc574e43d17ca8129aa5a6b24dee122c3f828a78",
+            "token_estimate": 22,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "observatory",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "observatory.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Observatory archive",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              }
+            ]
+          },
+          "embedding_input_hash": "94a7651ab4b2dec6e44555182ecc0944b688ea96ee334c20168a74834aea0fdf",
+          "stable_chunk_id": "child-9ef689bebaeeb8282c9525b4f0f9f89aeb2eb674",
+          "vector_id": "d9bd9279-71ae-516b-b1f4-3d3fef69e650",
+          "parent_logical_id": "parent-1c5a63f0891b42b19ef6fb7ee2e308ac",
+          "atom_type": "mixed",
+          "atom_id": "atom-009244f21518d5d8f82286994bf0331d",
+          "source_identity": "observatory.md",
+          "source_content_hash": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            118,
+            180
+          ],
+          "byte_span": [
+            118,
+            180
+          ],
+          "line_span": [
+            9,
+            11
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 16,
+          "retrieval_token_estimate": 38,
+          "generation_id": "gen-f37821b9f33d4fe797069bdb0019167e",
+          "title": "Observatory archive",
+          "section_id": 5632161229096047048,
+          "token_estimate": 16,
+          "docmancer_tokens": 46,
+          "raw_tokens": 45,
+          "savings_percent": 0.0,
+          "runway_multiplier": 0.98,
+          "query_plan_hash": "08e0b5fc2dcfdedfef382764bedfa26dfcd8e396aac440b758aa5b370255c3a9",
+          "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+          "retrieval_trace": {
+            "requested_mode": "sparse",
+            "mode_used": "sparse",
+            "component_ranks": {
+              "sparse": 3
+            },
+            "pre_post_rank": 3,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "mode": "hybrid",
+    "counts": {
+      "lexical": 3,
+      "dense": 4,
+      "sparse": 3
+    },
+    "failures": {},
+    "contributions": {
+      "5237351090539368904": {
+        "lexical": 1,
+        "dense": 3,
+        "sparse": 1
+      },
+      "6760101366235871618": {
+        "lexical": 2,
+        "dense": 1,
+        "sparse": 2
+      },
+      "5632161229096047048": {
+        "lexical": 3,
+        "dense": 2,
+        "sparse": 3
+      },
+      "0": {
+        "dense": 4
+      }
+    },
+    "chunks": [
+      {
+        "source": "observatory.md",
+        "chunk_index": 0,
+        "text": "# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n",
+        "score": 0.04865990111891752,
+        "metadata": {
+          "format": "markdown",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "",
+          "project_path": "",
+          "module_id": "",
+          "doc_scope": "",
+          "source_class": "",
+          "authority": "unknown",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "docs_snapshot_exact": null,
+          "section_title": "Observatory aperture",
+          "section_level": 1,
+          "source_path": "observatory.md",
+          "document_title": "observatory",
+          "document_title_hash": "1961fb1b69f7840d",
+          "anchor": "Observatory aperture",
+          "content_hash": "406208018fbcf49ce042612c73e2a4262ea9467f475ce668bd8f343a1aa3cfb7",
+          "retrieval_content_hash": "def70730b4666a827fec495a138a6783c1c3b50678bfc484c0e7cc2714482209",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "907db4f14951219d1d9edb660a79615b66314a99b5e6ef73d64d56d3e03bf638",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "907db4f14951219d1d9edb660a79615b66314a99b5e6ef73d64d56d3e03bf638",
+            "token_estimate": 22,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "observatory",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "observatory.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Observatory aperture",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              }
+            ]
+          },
+          "embedding_input_hash": "def70730b4666a827fec495a138a6783c1c3b50678bfc484c0e7cc2714482209",
+          "stable_chunk_id": "child-2b050e67f4a195325102455dda8490591c628cda",
+          "vector_id": "920f440f-0150-5922-b9dd-5dfeae8a798f",
+          "parent_logical_id": "parent-fe5f4694481df54113fab0435c51c95a",
+          "atom_type": "mixed",
+          "atom_id": "atom-7afaf7280ee0ad61461e9fd63a49a1f4",
+          "source_identity": "observatory.md",
+          "source_content_hash": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+          "heading_path": [
+            "Observatory aperture"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            0,
+            56
+          ],
+          "byte_span": [
+            0,
+            56
+          ],
+          "line_span": [
+            1,
+            4
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 14,
+          "retrieval_token_estimate": 37,
+          "generation_id": "gen-f37821b9f33d4fe797069bdb0019167e",
+          "title": "Observatory aperture",
+          "section_id": 5237351090539368904,
+          "token_estimate": 14,
+          "docmancer_tokens": 46,
+          "raw_tokens": 45,
+          "savings_percent": 0.0,
+          "runway_multiplier": 0.98,
+          "query_plan_hash": "41c94df9903cfff536b5e233c2fa986710797801abe331015d94dec37e272b75",
+          "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+          "retrieval_trace": {
+            "requested_mode": "hybrid",
+            "mode_used": "hybrid",
+            "component_ranks": {
+              "lexical": 1,
+              "dense": 3,
+              "sparse": 1
+            },
+            "pre_post_rank": 1,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 1
+          }
+        }
+      },
+      {
+        "source": "observatory.md",
+        "chunk_index": 1,
+        "text": "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n",
+        "score": 0.048651507139079855,
+        "metadata": {
+          "format": "markdown",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "",
+          "project_path": "",
+          "module_id": "",
+          "doc_scope": "",
+          "source_class": "",
+          "authority": "unknown",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "docs_snapshot_exact": null,
+          "section_title": "Observatory shutter",
+          "section_level": 1,
+          "source_path": "observatory.md",
+          "document_title": "observatory",
+          "document_title_hash": "1961fb1b69f7840d",
+          "anchor": "Observatory shutter",
+          "content_hash": "081a894b217482071953929eede7b96eb97256b7704aaf3bea3a01f18384a972",
+          "retrieval_content_hash": "41eae41d98a55bc913a7eb0181d1cb04c08c087e7179139c40bfe7b049b87fee",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "1a8163e171a33b079602dfa825aa06022bde594744e6bed2dec3f8b7ac263362",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "1a8163e171a33b079602dfa825aa06022bde594744e6bed2dec3f8b7ac263362",
+            "token_estimate": 22,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "observatory",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "observatory.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Observatory shutter",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              }
+            ]
+          },
+          "embedding_input_hash": "41eae41d98a55bc913a7eb0181d1cb04c08c087e7179139c40bfe7b049b87fee",
+          "stable_chunk_id": "child-74e0c034627095852e2aef927b1295dcaeca0da4",
+          "vector_id": "32e6a8aa-aacc-5858-ba4a-c17f90dc7e7b",
+          "parent_logical_id": "parent-62624d19cfba360963e7f5c202cb3e88",
+          "atom_type": "mixed",
+          "atom_id": "atom-6f1a07ad0f0d6d216c21d81e41606493",
+          "source_identity": "observatory.md",
+          "source_content_hash": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+          "heading_path": [
+            "Observatory shutter"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            56,
+            118
+          ],
+          "byte_span": [
+            56,
+            118
+          ],
+          "line_span": [
+            5,
+            8
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 16,
+          "retrieval_token_estimate": 38,
+          "generation_id": "gen-f37821b9f33d4fe797069bdb0019167e",
+          "title": "Observatory shutter",
+          "section_id": 6760101366235871618,
+          "token_estimate": 16,
+          "docmancer_tokens": 46,
+          "raw_tokens": 45,
+          "savings_percent": 0.0,
+          "runway_multiplier": 0.98,
+          "query_plan_hash": "41c94df9903cfff536b5e233c2fa986710797801abe331015d94dec37e272b75",
+          "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+          "retrieval_trace": {
+            "requested_mode": "hybrid",
+            "mode_used": "hybrid",
+            "component_ranks": {
+              "lexical": 2,
+              "dense": 1,
+              "sparse": 2
+            },
+            "pre_post_rank": 2,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 2
+          }
+        }
+      },
+      {
+        "source": "observatory.md",
+        "chunk_index": 2,
+        "text": "# Observatory archive\n\nObservatory archive retains 41 nights.\n",
+        "score": 0.04787506400409626,
+        "metadata": {
+          "format": "markdown",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "",
+          "project_path": "",
+          "module_id": "",
+          "doc_scope": "",
+          "source_class": "",
+          "authority": "unknown",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "docs_snapshot_exact": null,
+          "section_title": "Observatory archive",
+          "section_level": 1,
+          "source_path": "observatory.md",
+          "document_title": "observatory",
+          "document_title_hash": "1961fb1b69f7840d",
+          "anchor": "Observatory archive",
+          "content_hash": "9d732968e766807e4db541d5c4e92fd90dd0a988f9092feafef48bbb0183f007",
+          "retrieval_content_hash": "94a7651ab4b2dec6e44555182ecc0944b688ea96ee334c20168a74834aea0fdf",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "c100865956d33d56d1ecbfbfdc574e43d17ca8129aa5a6b24dee122c3f828a78",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "c100865956d33d56d1ecbfbfdc574e43d17ca8129aa5a6b24dee122c3f828a78",
+            "token_estimate": 22,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "observatory",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "observatory.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Observatory archive",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              }
+            ]
+          },
+          "embedding_input_hash": "94a7651ab4b2dec6e44555182ecc0944b688ea96ee334c20168a74834aea0fdf",
+          "stable_chunk_id": "child-9ef689bebaeeb8282c9525b4f0f9f89aeb2eb674",
+          "vector_id": "d9bd9279-71ae-516b-b1f4-3d3fef69e650",
+          "parent_logical_id": "parent-1c5a63f0891b42b19ef6fb7ee2e308ac",
+          "atom_type": "mixed",
+          "atom_id": "atom-009244f21518d5d8f82286994bf0331d",
+          "source_identity": "observatory.md",
+          "source_content_hash": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            118,
+            180
+          ],
+          "byte_span": [
+            118,
+            180
+          ],
+          "line_span": [
+            9,
+            11
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 16,
+          "retrieval_token_estimate": 38,
+          "generation_id": "gen-f37821b9f33d4fe797069bdb0019167e",
+          "title": "Observatory archive",
+          "section_id": 5632161229096047048,
+          "token_estimate": 16,
+          "docmancer_tokens": 46,
+          "raw_tokens": 45,
+          "savings_percent": 0.0,
+          "runway_multiplier": 0.98,
+          "query_plan_hash": "41c94df9903cfff536b5e233c2fa986710797801abe331015d94dec37e272b75",
+          "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+          "retrieval_trace": {
+            "requested_mode": "hybrid",
+            "mode_used": "hybrid",
+            "component_ranks": {
+              "lexical": 3,
+              "dense": 2,
+              "sparse": 3
+            },
+            "pre_post_rank": 3,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 3
+          }
+        }
+      }
+    ]
+  }
+]

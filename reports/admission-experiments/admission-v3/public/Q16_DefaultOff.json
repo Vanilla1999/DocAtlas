@@ -1,0 +1,3728 @@
+{
+  "case_id": "Q16",
+  "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+  "split": "diagnostic",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+    "project_path": "/tmp/docatlas-v3-wgmqa0l4/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-49cab6d01db94af6b5782d2551f0a206",
+    "rows": [
+      [
+        "gen-49cab6d01db94af6b5782d2551f0a206",
+        "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+        "<!-- Source: docs/main-flow-logging.md -->\n\n# Логи основного потока\n\nПодробная диагностика по умолчанию выключена. Включение не меняет формат\nответа, источники или число продуктовых запросов.\n\n```sh\ndoc-atlas --trace query \"OAuth tokens\" --mode lexical --format json 2>trace.jsonl\ndoc-atlas --trace context --help\ndoc-atlas --trace mcp docs-serve 2>trace.jsonl\n```\n\nГлобальные `--trace` / `--no-trace` указываются **перед подкомандой**.\nОни переопределяют `DOCATLAS_TRACE` на время вызова. Без флага используется\nсуществующая настройка: только `DOCATLAS_TRACE=1` включает трассу; значение\nокружения читается при загрузке модуля, поэтому задайте его до запуска процесса.\n\n```sh\nDOCATLAS_TRACE=1 doc-atlas --no-trace query \"OAuth tokens\" --mode lexical\n```\n\nДля MCP-клиента можно задать `DOCATLAS_TRACE=1` в окружении серверного процесса.\nДиагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.\nОбычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`.\n\n## События и границы\n\n- `docatlas_request_start` и `docatlas_request_end` связываются через `request_id`.\n  Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms`\n  и `trace_incomplete`.\n- Покрыты CLI `query`, `context` и публичный диспетчер Docs MCP\n  (`operation=call_docs_tool_payload`). Ошибки разбора CLI до входа в callback\n  не имеют lifecycle-событий.\n- Существующий `docatlas_query_trace` содержит подробную диагностику проекции\n  MCP и использует тот же `request_id`. Его previews могут включать данные\n  документов; новые lifecycle-события не содержат текст вопроса или документов.\n- `success` означает завершение границы вызова, а не достаточность найденных\n  доказательств. Возвращённые статусы `error`/`failed` и исключения отмечаются\n  как `error`; результат запроса остаётся источником продуктового статуса.\n- Ошибка записи диагностики не должна менять ответ. Пропущенное начало\n  отмечается `trace_incomplete`; при сбое завершения предпринимается запись\n  `docatlas_trace_gap`. Полностью недоступный stderr не позволяет доставить\n  даже сообщение о пропуске.\n\n## Проверка\n\nИнтеграционные сценарии находятся в\n`tests/test_project_context_quality_v2_protocol.py` и\n`tests/test_main_flow_logging_integration.py`: реальные документы и SQLite,\nпубличный MCP-dispatcher и CLI subprocess, OFF/ON/OFF, независимый исходный факт,\nсохранение выдачи и корреляция событий. Это не проверка установленного MCP stdio\nили production-клиента. Выполнение новых проверок ожидает разрешённого CI.\n\nОбоснование стратегии: [результат, источники и трасса](main-flow-evaluation.md).\n\n\n<!-- Source: docs/main-flow-evaluation.md -->\n\n# Оценка основного потока: результат, источники и трасса\n\nИсследовательская записка, 11 октября 2026 года. Ниже — предложение проверки, а не отчёт о реализованных сценариях или полученном PASS.\n\n**Главный вывод:** прохождение проверки-прокси не доказывает решение исходной задачи. Для DocAtlas критерием служат независимо заданные факты документов, допустимые источники и фактическое состояние. Логи помогают объяснить результат, но не являются оракулом корректности.\n\n## Что подтверждают источники\n\n- **[Countdown-Code, arXiv:2603.07084v3](https://arxiv.org/html/2603.07084v3), §§2–4.** В эксперименте модель может менять как условие в `solution.py`, так и верификатор `test.py`. Поэтому `Rproxy=1` (проверка прошла) совместимо с `Rtrue=0` (исходная арифметическая задача не решена). Истинная оценка использует исходное условие и скрыта от модели при обучении. Около 1% загрязнённых SFT-примеров — фактически 1,2% в отфильтрованном наборе — оказалось достаточно, чтобы у ряда исследованных моделей последующее RL резко усилило reward hacking. Это результат конкретной среды, моделей и обучения, а не универсальный порог.\n- **Граница Countdown-Code.** Это исследование обхода награды при доступном для записи верификаторе, а не сравнение unit- и integration-тестов. Перенос на HumanEval/LeetCode (§5) оценивали отдельным монитором; прохождение видимых тестов при провале скрытых само по себе не объявляется reward hacking. Работа не доказывает, что интеграционный тест автоматически надёжен или что любой ошибочный ответ является намеренным обходом.\n- **[Anthropic: Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), 09.01.2026.** Разделены transcript и outcome: сообщение об успешном действии не заменяет проверку конечного состояния. Рекомендованы реальные задачи, изоляция попыток, устойчивые к обходу graders, проверка фактов, полноты и качества источников, чтение трасс для разбора сбоев. Статья прямо допускает unit-тесты для coding agents; запрета на них из неё не следует.\n- **[Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), 13.06.2025.** Оценка исследовательского результата включает фактическую точность, корректность цитат, полноту и качество источников; приложение рекомендует проверять конечное состояние. Production tracing помогал различать плохой запрос, выбор источника и отказ инструмента. Это инженерный опыт конкретной системы, не доказательство качества DocAtlas и не требование фиксировать единственную последовательность вызовов.\n- **[Anthropic: Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), 19.12.2024.** Рекомендованы простые решения, обратная связь от реальной среды, ясные интерфейсы инструментов и усложнение только при измеримом улучшении результата. Прозрачность исполнения полезна, но сама по себе не подтверждает выполнение требований.\n\n**Решение проекта:** новые проверки только интеграционного уровня и выше, согласно [AGENTS.md](../AGENTS.md). Это локальная стратегия проекта, а не экспериментальный вывод перечисленных публикаций.\n\n## Предлагаемый публичный сценарий logging off/on\n\nСначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n\n1. **Независимый эталон.** До запуска зафиксировать исходный вопрос, corpus и его версии, обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения состояния. Получить эталон из исходных документов и требований, не из выдачи проверяемого кода. Проверяемый поток не должен переписывать эталон или критерии ради PASS.\n2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов. Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n4. **Диагностический контракт.** При on трасса должна позволять связать этапы одного вопроса и локализовать причину сбоя; пропуски трассы должны быть явными. При off подробная трасса отключена. В MCP диагностический канал отделён от protocol stdout. Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.\n\nВнутренние mocks не использовать. Если для воспроизводимости подменяется внешний транспорт, явно указать эту границу: такой запуск не доказывает работоспособность живого провайдера.\n\n## Репрезентативные отрицательные проверки\n\nИспользовать небольшое число публичных сценариев с контролируемыми данными, без матриц строковых вариантов:\n\n- **Неверная версия/scope:** добавить похожий документ с конфликтующим фактом вне разрешённой области; ответ обязан опираться на допустимый оригинал.\n- **Нет достаточного основания:** убрать подтверждающий документ; ожидается предусмотренное контрактом сообщение о нехватке данных, без выдуманного факта или цитаты.\n- **Нет доступа/consent:** обратиться к недоступному источнику; проверить отсутствие утечки и неразрешённых изменений состояния в обоих режимах.\n- **Ошибка зависимости или записи логов:** создать отказ на внешней границе; проверить контракт ошибки/восстановления и фактическое состояние. Отказ диагностики не должен менять продуктовый исход относительно такого же запуска без подробных логов.\n\nДля каждого случая заранее задать ожидаемый исход и существенный дефект, который проверка должна обнаружить. Сбой разбирать по трассе исходного вопроса, сохраняя неизменными вопрос и критерии.\n\n## Границы доказательства\n\nИнтеграционный вызов публичного API подтверждает только проверенный поток и данные; installed stdio дополнительно проверяет упаковку и протокол. Реальный клиент и production smoke — отдельные уровни, их успех нельзя приписывать интеграционному запуску. Одна пара off/on не доказывает общую надёжность недетерминированного агента. В отчёте фиксировать сценарии, реальные вызовы, время, обнаруженные дефекты и непроверенные границы; количество assertions и объём логов не являются мерой качества.\n",
+        "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+        "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-wgmqa0l4/project/docatlas.project-docs.yaml": "b32229216f39ef41711f6d82e35ad3e1fadc5435ba889b4836e220be1e75249f",
+      "/tmp/docatlas-v3-wgmqa0l4/project/README.md": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb"
+        },
+        {
+          "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb"
+        },
+        {
+          "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-414354bf380ae460cad2be1fbdeb4eaf"
+        },
+        {
+          "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7"
+        },
+        {
+          "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8"
+        },
+        {
+          "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8"
+        },
+        {
+          "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-bb76d6caea5a1ad1057e63e13ee4b8eb"
+        },
+        {
+          "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8"
+        },
+        {
+          "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7"
+        },
+        {
+          "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-d4ce4e8480aec09b12e8077b482cb921"
+        },
+        {
+          "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-3ae295e87ebf488e372f132f46cb0e34"
+        },
+        {
+          "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb"
+        },
+        {
+          "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb"
+        },
+        {
+          "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-414354bf380ae460cad2be1fbdeb4eaf"
+        },
+        {
+          "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7"
+        },
+        {
+          "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8"
+        },
+        {
+          "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8"
+        },
+        {
+          "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-bb76d6caea5a1ad1057e63e13ee4b8eb"
+        },
+        {
+          "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8"
+        },
+        {
+          "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7"
+        },
+        {
+          "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-d4ce4e8480aec09b12e8077b482cb921"
+        },
+        {
+          "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-3ae295e87ebf488e372f132f46cb0e34"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-fe93b2312d805583ece001aef4850504fff96c8a",
+        "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+        "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+        "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+        "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+        "child-f1885b68de4321146ac81f71f1251511291f5e34",
+        "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+        "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+        "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+        "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+        "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+        "child-fe93b2312d805583ece001aef4850504fff96c8a",
+        "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+        "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+        "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+        "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+        "child-f1885b68de4321146ac81f71f1251511291f5e34",
+        "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+        "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+        "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+        "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+        "child-524d41891c21e3e6ce541b8ace4231be10f21dc4"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "fca78e50498ae130919876243d2bc8738e13f0f2a6ff6010f2ec5905b2d1ae33",
+            "window_characters": 1076,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "события",
+                "завершения",
+                "в",
+                "запроса"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 4,
+              "match_ratio": 0.3636,
+              "bm25_cost": -12.36727608238198,
+              "lexical_score": 12.36727608238198,
+              "field_matches": {
+                "title": [
+                  "события"
+                ],
+                "body": [
+                  "события",
+                  "завершения",
+                  "в",
+                  "запроса"
+                ],
+                "retrieval_text": [
+                  "события",
+                  "завершения",
+                  "в",
+                  "запроса"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 1024,
+              "char_end": 2100
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "события",
+              "завершения",
+              "в",
+              "запроса"
+            ],
+            "body_matched_terms": [
+              "события",
+              "завершения",
+              "в",
+              "запроса"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.3636,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              1024,
+              2098
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "57df29ab45b5b86c397c393d52c05cfaddb2a8aa6adf8700d118e582f06ced84",
+            "window_characters": 22,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "события"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -4.927721567757242,
+              "lexical_score": 4.927721567757242,
+              "field_matches": {
+                "title": [
+                  "события"
+                ],
+                "body": [
+                  "события"
+                ],
+                "retrieval_text": [
+                  "события"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 1002,
+              "char_end": 1024
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              1002,
+              1022
+            ],
+            "lexical_score": 0.95
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-414354bf380ae460cad2be1fbdeb4eaf",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "ffb01d4bbd0b03747b2400a3f2310829169cf0b8a050df9be1d4d47485feff21",
+            "window_characters": 819,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "нет",
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 2,
+              "match_ratio": 0.1818,
+              "bm25_cost": -6.354291695491527,
+              "lexical_score": 6.354291695491527,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "нет",
+                  "в"
+                ],
+                "retrieval_text": [
+                  "нет",
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 7770,
+              "char_end": 8589
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "нет",
+              "в"
+            ],
+            "body_matched_terms": [
+              "нет",
+              "в"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.1818,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              7770,
+              8587
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "740e148e136714936c622dd92bb703c27f9bc135d734739974778f51729a1ee0",
+            "window_characters": 159,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "события",
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 2,
+              "match_ratio": 0.1818,
+              "bm25_cost": -5.094348689210693,
+              "lexical_score": 5.094348689210693,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "события",
+                  "в"
+                ],
+                "retrieval_text": [
+                  "события",
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 7384,
+              "char_end": 7543
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "события",
+              "в"
+            ],
+            "body_matched_terms": [
+              "события",
+              "в"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.1818,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              7384,
+              7541
+            ],
+            "lexical_score": 0.85,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "10ba0e4b69aef4434c664404328dca861fd0b3ea741f0dbd55c7bd1640976b2d",
+            "window_characters": 170,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "у"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -4.72589399415015,
+              "lexical_score": 4.72589399415015,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "у"
+                ],
+                "retrieval_text": [
+                  "у"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 3600,
+              "char_end": 3770
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "у"
+            ],
+            "body_matched_terms": [
+              "у"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              3600,
+              3769
+            ],
+            "lexical_score": 0.8,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "3b6205d65916d0eab06e98b19089afda87c1899fe2e3329ae2a26c461b6c8926",
+            "window_characters": 251,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -2.055089600993869,
+              "lexical_score": 2.055089600993869,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 3148,
+              "char_end": 3399
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              3148,
+              3398
+            ],
+            "lexical_score": 0.75,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-bb76d6caea5a1ad1057e63e13ee4b8eb",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "302012e1c45e4204b2474cc4ecd97bd611dd5d17e66ef0549f146a05b6cb8553",
+            "window_characters": 331,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -2.0465160485180593,
+              "lexical_score": 2.0465160485180593,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 671,
+              "char_end": 1002
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              671,
+              1000
+            ],
+            "lexical_score": 0.7,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "915a60ebbf032ed0368ac20524a4e59f0bbe2ec3b2ad04402b0f16f6e520937b",
+            "window_characters": 201,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.7490301609922445,
+              "lexical_score": 1.7490301609922445,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 3399,
+              "char_end": 3600
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              3399,
+              3599
+            ],
+            "lexical_score": 0.6499999999999999,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "0bef7f982603a5f367fe29795452b925a3de92076b9dd787a1509d171b58dc00",
+            "window_characters": 196,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.7123975362288364,
+              "lexical_score": 1.7123975362288364,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 6723,
+              "char_end": 6919
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              6723,
+              6918
+            ],
+            "lexical_score": 0.6,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-d4ce4e8480aec09b12e8077b482cb921",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "c66fb248f431c98f310489c7284700f7a6efcce50cbf577b76c71fc08356dc50",
+            "window_characters": 495,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.5599283217639084,
+              "lexical_score": 1.5599283217639084,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 8810,
+              "char_end": 9305
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              8810,
+              9304
+            ],
+            "lexical_score": 0.55,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-3ae295e87ebf488e372f132f46cb0e34",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "c917fbc6df7e646d03278ac4d4af86f4d21572a1a9d16dfdca4a6ddcc9915cfd",
+            "window_characters": 405,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.4666509499966447,
+              "lexical_score": 1.4666509499966447,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 2113,
+              "char_end": 2518
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              2113,
+              2516
+            ],
+            "lexical_score": 0.5,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "fca78e50498ae130919876243d2bc8738e13f0f2a6ff6010f2ec5905b2d1ae33",
+            "window_characters": 1076,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "события",
+                "завершения",
+                "в",
+                "запроса"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 4,
+              "match_ratio": 0.3636,
+              "bm25_cost": -12.36727608238198,
+              "lexical_score": 12.36727608238198,
+              "field_matches": {
+                "title": [
+                  "события"
+                ],
+                "body": [
+                  "события",
+                  "завершения",
+                  "в",
+                  "запроса"
+                ],
+                "retrieval_text": [
+                  "события",
+                  "завершения",
+                  "в",
+                  "запроса"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 1024,
+              "char_end": 2100
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "события",
+              "завершения",
+              "в",
+              "запроса"
+            ],
+            "body_matched_terms": [
+              "события",
+              "завершения",
+              "в",
+              "запроса"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.3636,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              1024,
+              2098
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "57df29ab45b5b86c397c393d52c05cfaddb2a8aa6adf8700d118e582f06ced84",
+            "window_characters": 22,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "события"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -4.927721567757242,
+              "lexical_score": 4.927721567757242,
+              "field_matches": {
+                "title": [
+                  "события"
+                ],
+                "body": [
+                  "события"
+                ],
+                "retrieval_text": [
+                  "события"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 1002,
+              "char_end": 1024
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              1002,
+              1022
+            ],
+            "lexical_score": 0.95
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-414354bf380ae460cad2be1fbdeb4eaf",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "ffb01d4bbd0b03747b2400a3f2310829169cf0b8a050df9be1d4d47485feff21",
+            "window_characters": 819,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "нет",
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 2,
+              "match_ratio": 0.1818,
+              "bm25_cost": -6.354291695491527,
+              "lexical_score": 6.354291695491527,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "нет",
+                  "в"
+                ],
+                "retrieval_text": [
+                  "нет",
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 7770,
+              "char_end": 8589
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "нет",
+              "в"
+            ],
+            "body_matched_terms": [
+              "нет",
+              "в"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.1818,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              7770,
+              8587
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "740e148e136714936c622dd92bb703c27f9bc135d734739974778f51729a1ee0",
+            "window_characters": 159,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "события",
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 2,
+              "match_ratio": 0.1818,
+              "bm25_cost": -5.094348689210693,
+              "lexical_score": 5.094348689210693,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "события",
+                  "в"
+                ],
+                "retrieval_text": [
+                  "события",
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 7384,
+              "char_end": 7543
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "события",
+              "в"
+            ],
+            "body_matched_terms": [
+              "события",
+              "в"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.1818,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              7384,
+              7541
+            ],
+            "lexical_score": 0.85,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "10ba0e4b69aef4434c664404328dca861fd0b3ea741f0dbd55c7bd1640976b2d",
+            "window_characters": 170,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "у"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -4.72589399415015,
+              "lexical_score": 4.72589399415015,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "у"
+                ],
+                "retrieval_text": [
+                  "у"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 3600,
+              "char_end": 3770
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "у"
+            ],
+            "body_matched_terms": [
+              "у"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              3600,
+              3769
+            ],
+            "lexical_score": 0.8,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "3b6205d65916d0eab06e98b19089afda87c1899fe2e3329ae2a26c461b6c8926",
+            "window_characters": 251,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -2.055089600993869,
+              "lexical_score": 2.055089600993869,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 3148,
+              "char_end": 3399
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              3148,
+              3398
+            ],
+            "lexical_score": 0.75,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-bb76d6caea5a1ad1057e63e13ee4b8eb",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "302012e1c45e4204b2474cc4ecd97bd611dd5d17e66ef0549f146a05b6cb8553",
+            "window_characters": 331,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -2.0465160485180593,
+              "lexical_score": 2.0465160485180593,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 671,
+              "char_end": 1002
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              671,
+              1000
+            ],
+            "lexical_score": 0.7,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "915a60ebbf032ed0368ac20524a4e59f0bbe2ec3b2ad04402b0f16f6e520937b",
+            "window_characters": 201,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.7490301609922445,
+              "lexical_score": 1.7490301609922445,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 3399,
+              "char_end": 3600
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              3399,
+              3599
+            ],
+            "lexical_score": 0.6499999999999999,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "0bef7f982603a5f367fe29795452b925a3de92076b9dd787a1509d171b58dc00",
+            "window_characters": 196,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.7123975362288364,
+              "lexical_score": 1.7123975362288364,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 6723,
+              "char_end": 6919
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              6723,
+              6918
+            ],
+            "lexical_score": 0.6,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-d4ce4e8480aec09b12e8077b482cb921",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "c66fb248f431c98f310489c7284700f7a6efcce50cbf577b76c71fc08356dc50",
+            "window_characters": 495,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.5599283217639084,
+              "lexical_score": 1.5599283217639084,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 8810,
+              "char_end": 9305
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              8810,
+              9304
+            ],
+            "lexical_score": 0.55,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+          "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+          "parent_logical_id": "parent-3ae295e87ebf488e372f132f46cb0e34",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "c917fbc6df7e646d03278ac4d4af86f4d21572a1a9d16dfdca4a6ddcc9915cfd",
+            "window_characters": 405,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какая",
+                "диагностическая",
+                "информация",
+                "у",
+                "события",
+                "завершения",
+                "которой",
+                "нет",
+                "в",
+                "начале",
+                "запроса"
+              ],
+              "matched_terms": [
+                "в"
+              ],
+              "exact_terms": [
+                "какая"
+              ],
+              "missing_exact_terms": [
+                "какая"
+              ],
+              "query_term_count": 11,
+              "matched_term_count": 1,
+              "match_ratio": 0.0909,
+              "bm25_cost": -1.4666509499966447,
+              "lexical_score": 1.4666509499966447,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "в"
+                ],
+                "retrieval_text": [
+                  "в"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md",
+                "scope": {
+                  "project_id": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                  "version": "",
+                  "snapshot_id": "gen-49cab6d01db94af6b5782d2551f0a206"
+                },
+                "canonical_path": "README.md",
+                "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+              },
+              "char_start": 2113,
+              "char_end": 2518
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+            "query_terms": [
+              "какая",
+              "диагностическая",
+              "информация",
+              "у",
+              "события",
+              "завершения",
+              "которой",
+              "нет",
+              "в",
+              "начале",
+              "запроса"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "в"
+            ],
+            "body_matched_terms": [
+              "в"
+            ],
+            "matched_term_count": 1,
+            "match_ratio": 0.0909,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              2113,
+              2516
+            ],
+            "lexical_score": 0.5,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-fe93b2312d805583ece001aef4850504fff96c8a",
+        "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+        "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+        "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+        "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+        "child-f1885b68de4321146ac81f71f1251511291f5e34",
+        "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+        "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+        "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+        "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+        "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+        "child-fe93b2312d805583ece001aef4850504fff96c8a",
+        "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+        "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+        "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+        "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+        "child-f1885b68de4321146ac81f71f1251511291f5e34",
+        "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+        "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+        "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+        "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+        "child-524d41891c21e3e6ce541b8ace4231be10f21dc4"
+      ],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 22,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 22,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              },
+              {
+                "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 22,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 22,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+                "document_id": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+              "project_path": "/tmp/docatlas-v3-wgmqa0l4/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 11,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+                    "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 1024,
+                    "char_end": 2100,
+                    "display_content_hash": "fca78e50498ae130919876243d2bc8738e13f0f2a6ff6010f2ec5905b2d1ae33",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+                    "parent_logical_id": "parent-534e6739eec6736ac622e95cefcf54cb",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 1002,
+                    "char_end": 1024,
+                    "display_content_hash": "57df29ab45b5b86c397c393d52c05cfaddb2a8aa6adf8700d118e582f06ced84",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+                    "parent_logical_id": "parent-414354bf380ae460cad2be1fbdeb4eaf",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 7770,
+                    "char_end": 8589,
+                    "display_content_hash": "ffb01d4bbd0b03747b2400a3f2310829169cf0b8a050df9be1d4d47485feff21",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+                    "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 7384,
+                    "char_end": 7543,
+                    "display_content_hash": "740e148e136714936c622dd92bb703c27f9bc135d734739974778f51729a1ee0",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+                    "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 3600,
+                    "char_end": 3770,
+                    "display_content_hash": "10ba0e4b69aef4434c664404328dca861fd0b3ea741f0dbd55c7bd1640976b2d",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+                    "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 3148,
+                    "char_end": 3399,
+                    "display_content_hash": "3b6205d65916d0eab06e98b19089afda87c1899fe2e3329ae2a26c461b6c8926",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+                    "parent_logical_id": "parent-bb76d6caea5a1ad1057e63e13ee4b8eb",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 671,
+                    "char_end": 1002,
+                    "display_content_hash": "302012e1c45e4204b2474cc4ecd97bd611dd5d17e66ef0549f146a05b6cb8553",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+                    "parent_logical_id": "parent-705d36935ee23dfc65c54ae01f0180d8",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 3399,
+                    "char_end": 3600,
+                    "display_content_hash": "915a60ebbf032ed0368ac20524a4e59f0bbe2ec3b2ad04402b0f16f6e520937b",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+                    "parent_logical_id": "parent-9c973462ccb97effc6f122de7f19dbc7",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 6723,
+                    "char_end": 6919,
+                    "display_content_hash": "0bef7f982603a5f367fe29795452b925a3de92076b9dd787a1509d171b58dc00",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+                    "parent_logical_id": "parent-d4ce4e8480aec09b12e8077b482cb921",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 8810,
+                    "char_end": 9305,
+                    "display_content_hash": "c66fb248f431c98f310489c7284700f7a6efcce50cbf577b76c71fc08356dc50",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+                    "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+                    "parent_logical_id": "parent-3ae295e87ebf488e372f132f46cb0e34",
+                    "path": "README.md",
+                    "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 2113,
+                    "char_end": 2518,
+                    "display_content_hash": "c917fbc6df7e646d03278ac4d4af86f4d21572a1a9d16dfdca4a6ddcc9915cfd",
+                    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+                    "project_doc_catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04",
+                    "project_doc_content_hash": "sha256:31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+                "project_path": "/tmp/docatlas-v3-wgmqa0l4/project",
+                "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+              "project_path": "/tmp/docatlas-v3-wgmqa0l4/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+                "project_path": "/tmp/docatlas-v3-wgmqa0l4/project",
+                "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+              "project_path": "/tmp/docatlas-v3-wgmqa0l4/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "not_found",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [],
+  "state_after": {
+    "generation": "gen-49cab6d01db94af6b5782d2551f0a206",
+    "rows": [
+      [
+        "gen-49cab6d01db94af6b5782d2551f0a206",
+        "/tmp/docatlas-v3-wgmqa0l4/project/README.md",
+        "<!-- Source: docs/main-flow-logging.md -->\n\n# Логи основного потока\n\nПодробная диагностика по умолчанию выключена. Включение не меняет формат\nответа, источники или число продуктовых запросов.\n\n```sh\ndoc-atlas --trace query \"OAuth tokens\" --mode lexical --format json 2>trace.jsonl\ndoc-atlas --trace context --help\ndoc-atlas --trace mcp docs-serve 2>trace.jsonl\n```\n\nГлобальные `--trace` / `--no-trace` указываются **перед подкомандой**.\nОни переопределяют `DOCATLAS_TRACE` на время вызова. Без флага используется\nсуществующая настройка: только `DOCATLAS_TRACE=1` включает трассу; значение\nокружения читается при загрузке модуля, поэтому задайте его до запуска процесса.\n\n```sh\nDOCATLAS_TRACE=1 doc-atlas --no-trace query \"OAuth tokens\" --mode lexical\n```\n\nДля MCP-клиента можно задать `DOCATLAS_TRACE=1` в окружении серверного процесса.\nДиагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.\nОбычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`.\n\n## События и границы\n\n- `docatlas_request_start` и `docatlas_request_end` связываются через `request_id`.\n  Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms`\n  и `trace_incomplete`.\n- Покрыты CLI `query`, `context` и публичный диспетчер Docs MCP\n  (`operation=call_docs_tool_payload`). Ошибки разбора CLI до входа в callback\n  не имеют lifecycle-событий.\n- Существующий `docatlas_query_trace` содержит подробную диагностику проекции\n  MCP и использует тот же `request_id`. Его previews могут включать данные\n  документов; новые lifecycle-события не содержат текст вопроса или документов.\n- `success` означает завершение границы вызова, а не достаточность найденных\n  доказательств. Возвращённые статусы `error`/`failed` и исключения отмечаются\n  как `error`; результат запроса остаётся источником продуктового статуса.\n- Ошибка записи диагностики не должна менять ответ. Пропущенное начало\n  отмечается `trace_incomplete`; при сбое завершения предпринимается запись\n  `docatlas_trace_gap`. Полностью недоступный stderr не позволяет доставить\n  даже сообщение о пропуске.\n\n## Проверка\n\nИнтеграционные сценарии находятся в\n`tests/test_project_context_quality_v2_protocol.py` и\n`tests/test_main_flow_logging_integration.py`: реальные документы и SQLite,\nпубличный MCP-dispatcher и CLI subprocess, OFF/ON/OFF, независимый исходный факт,\nсохранение выдачи и корреляция событий. Это не проверка установленного MCP stdio\nили production-клиента. Выполнение новых проверок ожидает разрешённого CI.\n\nОбоснование стратегии: [результат, источники и трасса](main-flow-evaluation.md).\n\n\n<!-- Source: docs/main-flow-evaluation.md -->\n\n# Оценка основного потока: результат, источники и трасса\n\nИсследовательская записка, 11 октября 2026 года. Ниже — предложение проверки, а не отчёт о реализованных сценариях или полученном PASS.\n\n**Главный вывод:** прохождение проверки-прокси не доказывает решение исходной задачи. Для DocAtlas критерием служат независимо заданные факты документов, допустимые источники и фактическое состояние. Логи помогают объяснить результат, но не являются оракулом корректности.\n\n## Что подтверждают источники\n\n- **[Countdown-Code, arXiv:2603.07084v3](https://arxiv.org/html/2603.07084v3), §§2–4.** В эксперименте модель может менять как условие в `solution.py`, так и верификатор `test.py`. Поэтому `Rproxy=1` (проверка прошла) совместимо с `Rtrue=0` (исходная арифметическая задача не решена). Истинная оценка использует исходное условие и скрыта от модели при обучении. Около 1% загрязнённых SFT-примеров — фактически 1,2% в отфильтрованном наборе — оказалось достаточно, чтобы у ряда исследованных моделей последующее RL резко усилило reward hacking. Это результат конкретной среды, моделей и обучения, а не универсальный порог.\n- **Граница Countdown-Code.** Это исследование обхода награды при доступном для записи верификаторе, а не сравнение unit- и integration-тестов. Перенос на HumanEval/LeetCode (§5) оценивали отдельным монитором; прохождение видимых тестов при провале скрытых само по себе не объявляется reward hacking. Работа не доказывает, что интеграционный тест автоматически надёжен или что любой ошибочный ответ является намеренным обходом.\n- **[Anthropic: Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), 09.01.2026.** Разделены transcript и outcome: сообщение об успешном действии не заменяет проверку конечного состояния. Рекомендованы реальные задачи, изоляция попыток, устойчивые к обходу graders, проверка фактов, полноты и качества источников, чтение трасс для разбора сбоев. Статья прямо допускает unit-тесты для coding agents; запрета на них из неё не следует.\n- **[Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), 13.06.2025.** Оценка исследовательского результата включает фактическую точность, корректность цитат, полноту и качество источников; приложение рекомендует проверять конечное состояние. Production tracing помогал различать плохой запрос, выбор источника и отказ инструмента. Это инженерный опыт конкретной системы, не доказательство качества DocAtlas и не требование фиксировать единственную последовательность вызовов.\n- **[Anthropic: Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), 19.12.2024.** Рекомендованы простые решения, обратная связь от реальной среды, ясные интерфейсы инструментов и усложнение только при измеримом улучшении результата. Прозрачность исполнения полезна, но сама по себе не подтверждает выполнение требований.\n\n**Решение проекта:** новые проверки только интеграционного уровня и выше, согласно [AGENTS.md](../AGENTS.md). Это локальная стратегия проекта, а не экспериментальный вывод перечисленных публикаций.\n\n## Предлагаемый публичный сценарий logging off/on\n\nСначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n\n1. **Независимый эталон.** До запуска зафиксировать исходный вопрос, corpus и его версии, обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения состояния. Получить эталон из исходных документов и требований, не из выдачи проверяемого кода. Проверяемый поток не должен переписывать эталон или критерии ради PASS.\n2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов. Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n4. **Диагностический контракт.** При on трасса должна позволять связать этапы одного вопроса и локализовать причину сбоя; пропуски трассы должны быть явными. При off подробная трасса отключена. В MCP диагностический канал отделён от protocol stdout. Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.\n\nВнутренние mocks не использовать. Если для воспроизводимости подменяется внешний транспорт, явно указать эту границу: такой запуск не доказывает работоспособность живого провайдера.\n\n## Репрезентативные отрицательные проверки\n\nИспользовать небольшое число публичных сценариев с контролируемыми данными, без матриц строковых вариантов:\n\n- **Неверная версия/scope:** добавить похожий документ с конфликтующим фактом вне разрешённой области; ответ обязан опираться на допустимый оригинал.\n- **Нет достаточного основания:** убрать подтверждающий документ; ожидается предусмотренное контрактом сообщение о нехватке данных, без выдуманного факта или цитаты.\n- **Нет доступа/consent:** обратиться к недоступному источнику; проверить отсутствие утечки и неразрешённых изменений состояния в обоих режимах.\n- **Ошибка зависимости или записи логов:** создать отказ на внешней границе; проверить контракт ошибки/восстановления и фактическое состояние. Отказ диагностики не должен менять продуктовый исход относительно такого же запуска без подробных логов.\n\nДля каждого случая заранее задать ожидаемый исход и существенный дефект, который проверка должна обнаружить. Сбой разбирать по трассе исходного вопроса, сохраняя неизменными вопрос и критерии.\n\n## Границы доказательства\n\nИнтеграционный вызов публичного API подтверждает только проверенный поток и данные; installed stdio дополнительно проверяет упаковку и протокол. Реальный клиент и production smoke — отдельные уровни, их успех нельзя приписывать интеграционному запуску. Одна пара off/on не доказывает общую надёжность недетерминированного агента. В отчёте фиксировать сценарии, реальные вызовы, время, обнаруженные дефекты и непроверенные границы; количество assertions и объём логов не являются мерой качества.\n",
+        "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+        "project_file:local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65:README.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-wgmqa0l4/project/docatlas.project-docs.yaml": "b32229216f39ef41711f6d82e35ad3e1fadc5435ba889b4836e220be1e75249f",
+      "/tmp/docatlas-v3-wgmqa0l4/project/README.md": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    }
+  },
+  "elapsed_seconds": 0.13477630100169335,
+  "integrity_errors": []
+}

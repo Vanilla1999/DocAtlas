@@ -1,0 +1,9 @@
+{
+  "status": "baseline_build_only",
+  "base_commit": "91dd2b4e9f0615e9c6ac5c4346c13200accca550",
+  "wheel": "reports/docatlas-grounded-20261013/heuristic-removal/wheels/baseline/doc_atlas-1.3.2-py3-none-any.whl",
+  "sha256": "d62bb5f7748a2a1bbeadddebf8114a325270775974e9737fa87bbbd2668c6c97",
+  "members": 423,
+  "new_removal_helper_present": false,
+  "product_calls": 0
+}

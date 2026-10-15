@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-B06",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-black",
+  "public_request": {
+    "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-black/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "eee8caba569143b05cabe506d32553e35b16de62ffc2c76927fe971a12169817",
+  "utf8_bytes": 32185,
+  "tokens": 9531,
+  "seconds": 30.200680219000787,
+  "cpu_seconds": 30.155016160000002,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

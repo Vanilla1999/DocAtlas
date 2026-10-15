@@ -1,0 +1,5 @@
+{
+  "status": "PASS",
+  "boundary": "installed CLI, real prepared SQLite",
+  "origin": "/tmp/opencode/removal-default-checks/installed-final/lib/python3.12/site-packages/docmancer/__init__.py"
+}

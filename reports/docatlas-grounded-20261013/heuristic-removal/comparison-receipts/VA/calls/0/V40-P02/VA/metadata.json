@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-P02",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-poetry",
+  "public_request": {
+    "question": "What is Poetry's configuration precedence from highest to lowest?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-poetry/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "962e9343081da04698a79ad4fd78bfc6091fdbacb27a747375384575b3515de0",
+  "utf8_bytes": 37765,
+  "tokens": 11066,
+  "seconds": 10.285250118000477,
+  "cpu_seconds": 10.277236981999977,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

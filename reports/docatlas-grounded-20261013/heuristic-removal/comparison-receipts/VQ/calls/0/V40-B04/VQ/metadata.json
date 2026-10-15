@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-B04",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-black",
+  "public_request": {
+    "question": "What does Black --no-cache do to cache reads and writes?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-black/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "463949e8fb03c2fe14a4ae0b04f1f1917a01c6f64050cd76972286e2845e6873",
+  "utf8_bytes": 4077,
+  "tokens": 1265,
+  "seconds": 1.364519515000211,
+  "cpu_seconds": 1.3581068889999992,
+  "peak_rss_kib": 206804,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

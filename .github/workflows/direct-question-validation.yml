@@ -118,11 +118,15 @@ jobs:
                                            for group in case['fact_groups']}
                                   checks = {'tool_success': not result.isError, 'status': payload.get('status') == 'ok',
                                             'kind': payload.get('kind') == 'docs_context', 'facts': all(facts.values()),
-                                            'budget': 0 < len(sources) <= 3 and int(payload.get('estimated_tokens') or 0) <= 800,
+                                            'source_backed': bool(sources),
+                                            'cost_observation': type(payload.get('estimated_tokens')) is int and payload['estimated_tokens'] >= 0,
                                             'retrieval_only': payload.get('answer_supported') is False and payload.get('edit_ready') is False,
                                             'wire_mode': (result.structuredContent is None) if text_fallback else isinstance(result.structuredContent, dict)}
                                   row = {'id': case['id'], 'assisted': assisted, 'text_fallback': text_fallback,
-                                         'arguments': args, 'facts': facts, 'checks': checks, 'wire_result': result.model_dump(mode='json')}
+                                         'arguments': args, 'facts': facts, 'checks': checks,
+                                         'output_cost': {'source_count': len(sources), 'reported_estimated_tokens': payload.get('estimated_tokens'),
+                                                         'public_utf8_bytes': len(json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8'))},
+                                         'wire_result': result.model_dump(mode='json')}
                                   rows.append(row)
                                   # Assisted diagnostics can never substitute for mandatory direct acceptance.
                                   if not assisted and not all(checks.values()):

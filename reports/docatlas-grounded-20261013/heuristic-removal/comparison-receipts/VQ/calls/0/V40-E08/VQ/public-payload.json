@@ -1,0 +1,46 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-cb6f14bd3e2ae779",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Miscellaneous > `--env-info`",
+      "snippet": "#### `--env-info`\n\nThis option outputs information about the execution environment, including the version of Node.js, npm, and local and global installations of ESLint.\n\n- **Argument Type**: No argument.\n\nThe ESLint team may ask for this information to help solve bugs. When you use this flag, the CLI does not perform linting.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "de49ec45f1a735f6245ed8ff619d95c6a7ac12fa928d3ca0f1122b2b608a7746",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 855,
+      "line_end": 862,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/a32ebfe311f0326f6fdc45f1"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 359
+}

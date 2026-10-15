@@ -1,0 +1,2160 @@
+diff --git a/docmancer/core/_sqlite_store_part03.py b/docmancer/core/_sqlite_store_part03.py
+index 96f35c1f..5bfad286 100644
+--- a/docmancer/core/_sqlite_store_part03.py
++++ b/docmancer/core/_sqlite_store_part03.py
+@@ -191,6 +191,10 @@ class _SQLiteStorePart03:
+         expand: str | None = None,
+         filters: dict[str, Any] | None = None,
+     ) -> list[RetrievedChunk]:
++        from docmancer.retrieval.experimental_acquisition import acquisition_experiment_active
++
++        if acquisition_experiment_active():
++            return self._query_bm25_candidates(text, limit=limit, budget=budget, filters=filters)
+         expand_mode = expand or "none"
+         # The FTS scoring window is internal; the returned candidate lane is
+         # still capped by the dispatcher. Keeping the wider scoring window is
+@@ -300,6 +304,87 @@ class _SQLiteStorePart03:
+             )
+         return results
+ 
++    def _query_bm25_candidates(
++        self, text: str, *, limit: int, budget: int,
++        filters: dict[str, Any] | None,
++    ) -> list[RetrievedChunk]:
++        """Acquire bounded native children independently of the delivery budget."""
++        from docmancer.retrieval.experimental_acquisition import (
++            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
++            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
++        )
++
++        rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
++        selected: list[dict[str, Any]] = []
++        seen_ids: set[int] = set()
++        token_total = byte_total = skipped = 0
++        for raw_rank, row in enumerate(rows, start=1):
++            row_id = int(row["id"])
++            if row_id in seen_ids:
++                continue
++            seen_ids.add(row_id)
++            tokens = max(0, int(row["token_estimate"]))
++            text_bytes = len(str(row["text"]).encode("utf-8"))
++            if (
++                token_total + tokens > ACQUISITION_ESTIMATED_TOKENS
++                or byte_total + text_bytes > ACQUISITION_TEXT_BYTES
++            ):
++                skipped += 1
++                continue
++            selected.append({**row, "_bm25_rank": raw_rank})
++            token_total += tokens
++            byte_total += text_bytes
++
++        raw_tokens = self._raw_token_total([row["source"] for row in selected])
++        savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - token_total / raw_tokens))
++        runway = 1.0 if token_total <= 0 else raw_tokens / token_total
++        acquisition = {
++            "method": ACQUISITION_METHOD,
++            "sql_rows": len(rows),
++            "candidate_ceiling": ACQUISITION_CANDIDATES,
++            "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
++            "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
++            "admitted_rows": len(selected),
++            "admitted_estimated_tokens": token_total,
++            "admitted_text_bytes": byte_total,
++            "resource_skipped_rows": skipped,
++            "delivery_limit_not_applied": limit,
++            "delivery_budget_not_applied": budget,
++        }
++        results: list[RetrievedChunk] = []
++        for row in selected:
++            cost = float(row["rank"])
++            rank = int(row["_bm25_rank"])
++            metadata = json.loads(row["metadata_json"] or "{}")
++            metadata.update({
++                "title": row["title"], "section_id": int(row["id"]),
++                "token_estimate": int(row["token_estimate"]),
++                "docmancer_tokens": token_total, "raw_tokens": raw_tokens,
++                "savings_percent": round(savings, 1),
++                "runway_multiplier": round(runway, 2),
++                "acquisition": dict(acquisition),
++                "ranking": {
++                    "stable_id": self._lexical_row_identity(row),
++                    "section_id": int(row["id"]),
++                    "score_direction": "higher_is_better",
++                    "raw_component_ranks": {"fts5_bm25_cost": cost},
++                    "base_utility": -cost, "feature_contributions": {},
++                    "final_utility": -cost, "raw_rank": rank,
++                    "final_rank": rank, "rank_delta": 0,
++                    "candidate_pool_size": len(rows), "method": ACQUISITION_METHOD,
++                },
++                "lexical_match": self._lexical_match_trace(
++                    text, title=str(row["title"]), body=str(row["text"]),
++                    retrieval_text=str(row.get("retrieval_text") or ""),
++                    mode="or", bm25_cost=cost,
++                ),
++            })
++            results.append(RetrievedChunk(
++                source=row["source"], chunk_index=int(row["chunk_index"]),
++                text=row["text"], score=-cost, metadata=metadata,
++            ))
++        return results
++
+     @classmethod
+     def _lexical_match_trace(
+         cls, query: str, *, title: str, body: str, retrieval_text: str = "",
+@@ -491,10 +576,38 @@ class _SQLiteStorePart03:
+         literal_terms = [f'"{token}"' for token in terms]
+         cleaned = " ".join(literal_terms)
+         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
++        from docmancer.retrieval.experimental_acquisition import (
++            ACQUISITION_CANDIDATES, acquisition_experiment_active,
++        )
++
+         with self._connect() as conn:
+             active_generation = self._active_generation_id(conn)
+             if not active_generation:
+                 return []
++            if acquisition_experiment_active():
++                if not literal_terms:
++                    return []
++                rows = list(conn.execute(
++                    f"""
++                    SELECT sections.hydration_id AS id, sections.*,
++                           sections.display_text AS text,
++                           sections.display_token_estimate AS token_estimate,
++                           sections.display_content_hash AS content_hash,
++                           bm25(retrieval_children_fts) AS rank
++                    FROM retrieval_children_fts
++                    JOIN retrieval_children AS sections
++                      ON sections.id = retrieval_children_fts.rowid
++                    WHERE retrieval_children_fts MATCH ?
++                      AND sections.generation_id = ?
++                    {filter_sql}
++                    ORDER BY rank, sections.source, sections.chunk_index,
++                             sections.stable_chunk_id
++                    LIMIT ?
++                    """,
++                    (" OR ".join(literal_terms), active_generation, *filter_params,
++                     min(limit, ACQUISITION_CANDIDATES)),
++                ))
++                return self._mark_lexical_mode(rows, "or")
+             if active_generation:
+                 rows: list[Any] = []
+                 try:
+diff --git a/docmancer/docs/application/_docs_context_projection_core.py b/docmancer/docs/application/_docs_context_projection_core.py
+index 3ec7f063..74d27477 100644
+--- a/docmancer/docs/application/_docs_context_projection_core.py
++++ b/docmancer/docs/application/_docs_context_projection_core.py
+@@ -70,6 +70,16 @@ def project_docs_context(
+ ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+     """Project trusted retrieval as context without claiming answer support."""
+ 
++    from .experimental_candidate_selection import native_rank_selection_active
++    if native_rank_selection_active():
++        from .experimental_context_finalization import project_native_rank_context
++        return project_native_rank_context(
++            retrieval=retrieval, max_tokens=max_tokens,
++            selection_diagnostics=selection_diagnostics, _allow_context_hints=_allow_context_hints,
++        )
++    from .experimental_heuristic_removal import heuristic_removal_active
++    source_only_original = heuristic_removal_active("A")
++
+     max_tokens = PROJECT_CONTEXT_BUDGET.bounded_tokens(max_tokens)
+     blocked = _explicit_delivery_block(retrieval, kind="docs_context", max_tokens=max_tokens)
+     if blocked is not None:
+@@ -265,10 +275,10 @@ def project_docs_context(
+         qualified_ids = qualified_query_ids((original,))
+         component_ids = set(component_witnesses(qualified_original, obligations))
+         visible_query_ids = qualified_ids & eligible_query_ids
+-        if strict_single_attribute and not component_ids:
++        if strict_single_attribute and not component_ids and not source_only_original:
+             decision_trace.record('candidate', 'rejected', 'missing_attribute', original)
+             continue
+-        if not visible_query_ids and not component_ids:
++        if source_only_original or (not visible_query_ids and not component_ids):
+             raw_snippet = str(original.get("content") or original.get("display_text") or "")
+             admission = admit_original_literal_context(
+                 question=original_question, evidence_text=raw_snippet, candidate=original,
+@@ -680,12 +690,12 @@ def project_docs_context(
+     # probe, borrowed lookup credit, source read, or alternate projector is used.
+     for original, normalized, admission in literal_context_candidates:
+         evidence_id = normalized["evidence_id"]
+-        if evidence_id in seen_ids or any(
++        if evidence_id in seen_ids or (not source_only_original and any(
+             source.get("path_or_url") == normalized["path_or_url"]
+             and source.get("project_identity") == normalized["project_identity"]
+             and normalized["snippet"] in source.get("snippet", "")
+             for source in sources
+-        ):
++        )):
+             continue
+         sources.append(normalized)
+         snapshot[evidence_id] = _snapshot_entry(original, normalized)
+@@ -751,6 +761,9 @@ def project_docs_context(
+         component_scope_complete=query_plan.get("component_scope_complete", True),
+     )
+     payload = _payload(sources, decision=decision, query_plan=query_plan)
++    if source_only_original:
++        payload.update(context_unassessed=True, admission_contract="source_only_heuristic_removal_v1")
++        payload["context_quality"] = {"status": "unverified", "reasons": ["coverage_unverified"]}
+     projection_diagnostics["final_visible_evidence_ids"] = [
+         str(source.get("evidence_id") or "") for source in payload["sources"][:3]
+         if source.get("evidence_id")
+diff --git a/docmancer/docs/application/_project_context_service_part01.py b/docmancer/docs/application/_project_context_service_part01.py
+index ca3a3682..9fe61c42 100644
+--- a/docmancer/docs/application/_project_context_service_part01.py
++++ b/docmancer/docs/application/_project_context_service_part01.py
+@@ -40,6 +40,8 @@ class _ProjectContextServicePart01:
+         _retention_ack: Any = None,
+     ) -> ProjectContextResult:
+         response_style = validate_response_style(response_style)
++        from .experimental_candidate_selection import native_rank_selection_active
++        native_rank = native_rank_selection_active()
+         # This is a read boundary. Only a caller-supplied contract can request
+         # mutation guidance; unknown prose never constructs mutation authority.
+         mutation_intent = mutation_intent or MutationIntentContract("none", "unknown", ())
+@@ -116,7 +118,7 @@ class _ProjectContextServicePart01:
+                     and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash]
+             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
+                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
+-            if project_docs and project_docs.results:
++            if project_docs and project_docs.results and not native_rank:
+                 if evidence_path:
+                     evidence_path = project_docs.resolved_evidence_path or evidence_path
+                     normalized_evidence_path = normalize_doc_path(evidence_path)
+@@ -180,6 +182,12 @@ class _ProjectContextServicePart01:
+                 if budget_issue:
+                     routing_budget_issues.append(f"project_docs: {budget_issue}")
+                     routing_budget_stages.add("project_docs")
++            elif project_docs and project_docs.results:
++                # Native source windows retain acquisition order until terminal
++                # whole-row packing. Membership/hash checks above still apply;
++                # prefit relevance, reranking and intermediate delivery fitting
++                # cannot erase this independently bounded acquisition pool.
++                routing_stage_observed["project_docs"] = list(project_docs.results)
+ 
+         explicit_dependency = library or (libraries[0] if libraries else None)
+         literal_dependency = self.dependency_mentioned_in_question(metadata, question)
+diff --git a/docmancer/docs/application/_project_context_service_shared.py b/docmancer/docs/application/_project_context_service_shared.py
+index f08b6327..69b807d3 100644
+--- a/docmancer/docs/application/_project_context_service_shared.py
++++ b/docmancer/docs/application/_project_context_service_shared.py
+@@ -140,15 +140,17 @@ def _source_ground_documentation_gap(
+ 
+ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult | None, dependency_docs: DocsResult | None) -> list[dict[str, Any]]:
+     pack: list[dict[str, Any]] = []
++    from .experimental_heuristic_removal import heuristic_removal_active
++    source_native = heuristic_removal_active("A") or heuristic_removal_active("S")
+     answer_lifecycle_intent = lifecycle_intent_for_question(question)
+     if project_docs:
+         for item in project_docs.results:
+             lifecycle_metadata = {"lifecycle_status": item.lifecycle_status or "active"}
+             if item.stale or not lifecycle_allows(lifecycle_metadata, answer_lifecycle_intent):
+                 continue
+-            if _drop_placeholder_context_doc(item):
++            if not source_native and _drop_placeholder_context_doc(item):
+                 continue
+-            if _drop_low_value_context_section(item.content, item.title, item.heading_path):
++            if not source_native and _drop_low_value_context_section(item.content, item.title, item.heading_path):
+                 continue
+             token_estimate = max(1, len(item.content) // 4) if item.content else 0
+             freshness = "stale" if item.stale else "current"
+diff --git a/docmancer/docs/application/_project_docs_service_part03.py b/docmancer/docs/application/_project_docs_service_part03.py
+index 67c97072..b9400460 100644
+--- a/docmancer/docs/application/_project_docs_service_part03.py
++++ b/docmancer/docs/application/_project_docs_service_part03.py
+@@ -12,21 +12,9 @@ from docmancer.docs.domain.documentation_query_plan import (
+     DocumentationLookup,
+     DocumentationQueryPlan,
+ )
+-from docmancer.docs.domain.evidence_qualification import (
+-    derived_parent_trace,
+-    qualify_evidence,
+-)
+ from docmancer.docs.domain.project_doc_ranking import (
+     condition_lead_priority, _found_window_retention_producer, _invoke_found_window_retention,
+ )
+-from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
+-from docmancer.docs.application.retrieval_need_support import apply_retrieval_need_witness
+-from docmancer.docs.domain.query_terms import (
+-    documentation_query_terms,
+-    documentation_technical_anchors,
+-    query_constraint_roles,
+-    supplemental_query_is_useful,
+-)
+ 
+ 
+ from .reference_query_tagging import (
+@@ -153,6 +141,8 @@ class _ProjectDocsServicePart03:
+             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
+             requirements=requirements,
+         )
++        # The current planner emits the unchanged original plus explicit host
++        # lookups only. Inferred requirements never become executable queries.
+         from .need_query_schedule import scheduled_plan, requirement_search_probes
+         documentation_query_plan, scheduled_lookups = scheduled_plan(documentation_query_plan,
+             supplemental_queries=requirement_search_probes(requirements))
+@@ -255,6 +245,8 @@ class _ProjectDocsServicePart03:
+                         anchor_lookup,
+                         expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
+                     )
++        # A second filtered acquisition of identical request bytes, not a query
++        # rewrite or parent/semantic rescue. S keeps the unfiltered read first.
+         authoritative_chunks = _run(
+             query,
+             query_limit=max(effective_limit, 20),
+@@ -311,7 +303,13 @@ class _ProjectDocsServicePart03:
+             lane = supplemental_chunks_by_query.get(item.text)
+             if lane:
+                 queries_by_origin.setdefault(item.origin, []).append(lane)
+-        candidates = select_context_candidates([
++        from .experimental_candidate_selection import native_rank_selection_active
++        native_rank = native_rank_selection_active()
++        # S uses the actual original read, then the existing other reads,
++        # without score/category/lane-fairness ordering.
++        candidates = ([*chunks, *authoritative_chunks,
++                       *(chunk for lane in supplemental_chunks_by_query.values() for chunk in lane)]
++                      if native_rank else select_context_candidates([
+             [
+                 *queries_by_origin.get("exact_path", []),
+                 *queries_by_origin.get("exact_anchor", []),
+@@ -324,7 +322,7 @@ class _ProjectDocsServicePart03:
+                 *queries_by_origin.get("concept_alias", []),
+                 *queries_by_origin.get("retrieval_hint", []),
+             ],
+-        ])
++        ]))
+         # Cross-check selected candidates without extra retrieval.
+         candidates = _qualify_candidate_lookups(
+             candidates, documentation_query_plan,
+@@ -332,7 +330,8 @@ class _ProjectDocsServicePart03:
+             lifecycle_intent=answer_lifecycle_intent,
+             discovery_records=discovery_records,
+         )
+-        candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
++        if not native_rank:
++            candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
+         from .experimental_candidate_selection import select_experimental_candidates
+         candidates = select_experimental_candidates(candidates, question=query)
+         if internal_diagnostics is not None:
+@@ -340,6 +339,14 @@ class _ProjectDocsServicePart03:
+                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)
+             )
+             internal_diagnostics["prepared_parents"] = dict(reference_context.structure_diagnostics)
++        if native_rank:
++            # Acquisition already has its finite bounds. Membership is now
++            # checked native occurrences; final JSON packing owns delivery fit.
++            selected = [chunk for chunk in candidates
++                        if lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent)]
++            if _control_chunks is not None:
++                _control_chunks.extend(selected)
++            return selected
+         selected = []
+         seen: set[tuple[str, int]] = set()
+         token_total = 0
+diff --git a/docmancer/docs/application/docs_context_projection.py b/docmancer/docs/application/docs_context_projection.py
+index e4eef7a4..667281bd 100644
+--- a/docmancer/docs/application/docs_context_projection.py
++++ b/docmancer/docs/application/docs_context_projection.py
+@@ -220,6 +220,8 @@ def project_docs_context(
+     _allow_context_hints: bool = False,
+ ) -> tuple[dict[str, Any], dict[str, Any]]:
+     """Finalize visible evidence, quality and at most one registered recovery target."""
++    from .experimental_candidate_selection import native_rank_selection_active
++    native_rank = native_rank_selection_active()
+     experiment_max = experimental_context_max_tokens()
+     packet_max = (min(max_tokens, experiment_max) if max_tokens is not None and experiment_max is not None
+                   else experiment_max if experiment_max is not None else max_tokens)
+@@ -236,7 +238,7 @@ def project_docs_context(
+     root = str(retrieval.get("_source_continuation_project_root") or "")
+     target: dict[str, Any] | None = None
+     target_source: dict[str, Any] | None = None
+-    if root:
++    if root and not native_rank:
+         target, target_source = prepare_docs_context_read_next(payload, snapshot, retrieval, root=root)
+ 
+     if target is not None and target_source is not None:
+@@ -246,6 +248,10 @@ def project_docs_context(
+     if root:
+         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
+     flow.boundary("decoration.output", payload, snapshot)
++    if native_rank:
++        # No joint/query-block recovery, parent closure or semantic rescue can
++        # change the native packet after the candidate projector has selected it.
++        return recheck_experimental_context(payload, snapshot, retrieval, restore_native=False)
+     # Host-only paired structural-assembly alternative; native admission and
+     # final source/budget checks are identical to the legacy branch.
+     import os
+diff --git a/docmancer/docs/application/experimental_candidate_selection.py b/docmancer/docs/application/experimental_candidate_selection.py
+index 83f9c491..8fea7890 100644
+--- a/docmancer/docs/application/experimental_candidate_selection.py
++++ b/docmancer/docs/application/experimental_candidate_selection.py
+@@ -22,6 +22,12 @@ _SELECTOR = ContextVar("experimental_native_candidate_selector", default=None)
+ _OBSERVER = ContextVar("experimental_native_selection_observer", default=None)
+ 
+ 
++def native_rank_selection_active() -> bool:
++    """Host S arm, restricted to the existing live original project-read scope."""
++    from .experimental_heuristic_removal import heuristic_removal_active
++    return heuristic_removal_active("S") and experimental_selector_settings() is not None
++
++
+ @dataclass
+ class SelectionObservation:
+     """Diagnostics returned to a host observer; never source authorization."""
+@@ -107,6 +113,30 @@ def _observe_selection(question, pool, excluded, original, selection):
+ 
+ 
+ def select_experimental_candidates(candidates, *, question):
++    if native_rank_selection_active():
++        from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
++        if experimental_context_max_tokens() is None:
++            raise ValueError("native-rank selection requires a fixed experimental context cap")
++        pool, excluded, seen = [], [], set()
++        for ordinal, chunk in enumerate(candidates):
++            metadata = chunk.metadata or {}
++            trace = (metadata.get("retrieval_query_matches") or {}).get("query-original") or {}
++            binding = original_body_discovery_binding(
++                question=question, body=chunk.text, candidate=metadata,
++            )
++            if binding is None or not (trace.get("qualified") is True or trace.get("literal_context_admission")):
++                excluded.append((chunk, "no_checked_original_admission", ordinal))
++            elif binding in seen:
++                excluded.append((chunk, "duplicate_exact_native_occurrence", ordinal))
++            else:
++                seen.add(binding)
++                pool.append(chunk)
++        _observe_selection(question, pool, excluded, candidates, {
++            "mode": "native_acquisition_rank", "status": "final_budget_only",
++            "selected_indices": list(range(len(pool))), "top_k": None,
++            "model_forward_attempts": 0, "model_forwards": 0,
++        })
++        return pool
+     selector = _SELECTOR.get()
+     if not (policy_candidate_admission_active() or source_valid_candidate_admission_active()):
+         return candidates
+diff --git a/docmancer/docs/application/experimental_context_finalization.py b/docmancer/docs/application/experimental_context_finalization.py
+index 85100667..7102df79 100644
+--- a/docmancer/docs/application/experimental_context_finalization.py
++++ b/docmancer/docs/application/experimental_context_finalization.py
+@@ -22,11 +22,118 @@ from .context_selection import context_selection_decision
+ from .model_visible_projection import _refresh_estimate, validate_model_visible_projection
+ from .projection_decision_trace import ProjectionFlowTrace
+ from .projection_tokenizer import projection_token_count
++from .experimental_heuristic_removal import heuristic_removal_active
+ 
+ 
+ _SEED_KEY = "_experimental_native_context"
+ 
+ 
++def _mark_unassessed(payload: dict) -> None:
++    """Admission/source validity is never semantic sufficiency or query credit."""
++    if heuristic_removal_active("A"):
++        payload.update(context_unassessed=True, admission_contract="source_only_heuristic_removal_v1")
++        if payload.get("sources"):
++            payload["context_quality"] = {"status": "unverified", "reasons": ["coverage_unverified"]}
++        _refresh_estimate(payload)
++
++
++def project_native_rank_context(*, retrieval: dict, max_tokens: int | None = None,
++                                selection_diagnostics: dict | None = None,
++                                _allow_context_hints: bool = False) -> tuple[dict, dict]:
++    """Render checked whole acquired windows; no semantic ranking or variants.
++
++    The coordinator dispatches here only on S/ALL before the legacy core. The
++    ordinary recheck and terminal JSON budget still run after decoration.
++    """
++    from .experimental_candidate_selection import native_rank_selection_active
++    from .model_visible_projection import (
++        _docs_source, _snapshot_entry, _explicit_delivery_block,
++        _request_input_limit_failures, _requires_exact_snapshot, project_insufficient,
++    )
++    from .context_query_probes import authoritative_queries
++    from .docs_context_projection import _requalify_visible_source
++    from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
++    from docmancer.docs.domain.literal_context_admission import recheck_source_valid_candidate
++
++    if not native_rank_selection_active() or experimental_context_max_tokens() is None:
++        raise ValueError("native-rank projection requires the live S arm and fixed context cap")
++    blocked = _explicit_delivery_block(retrieval, kind="docs_context", max_tokens=max_tokens)
++    if blocked is not None:
++        return blocked, {}
++    plan = dict(retrieval.get("documentation_query_plan") or {})
++    question = str(plan.get("original_question") or retrieval.get("question") or "")
++    failures = _request_input_limit_failures(question, retrieval)
++    if failures:
++        payload = project_insufficient(kind="docs_context", missing=failures,
++                                       recommended_next_action=None, max_tokens=max_tokens)
++        payload["reason_code"] = "request_input_limit_exceeded"
++        _refresh_estimate(payload)
++        return payload, {}
++    queries = authoritative_queries(plan)
++    plan.update(queries=list(queries.values()), query_ids=list(queries),
++                public_query_ids=list(queries), _component_contract=[],
++                component_scope_complete=False, assigned_requirement_ids=[],
++                broad_context_only=True)
++    texts = {key: str(value.get("text") or "") for key, value in queries.items()}
++    expected = retrieval.get("project_identity")
++    requirements = retrieval.get("requirements") or {}
++    intent = (requirements.get("lifecycle_intent") if isinstance(requirements, dict) else None) or lifecycle_intent(question)
++    rows, snapshot, seen = [], {}, set()
++    for candidate in retrieval.get("context_pack") or ():
++        if not isinstance(candidate, dict) or candidate.get("source_class") != "project_doc":
++            continue
++        if _requires_exact_snapshot(retrieval) and candidate.get("docs_snapshot_exact") is not True:
++            continue
++        original = {**candidate, "_expected_project_identity": expected,
++                    "_lifecycle_intent": intent, "_independent_query_plan": plan}
++        body = original.get("content") or original.get("display_text") or ""
++        if not isinstance(body, str) or not body:
++            continue
++        receipt = recheck_source_valid_candidate(
++            question=question, evidence_text=body, candidate=original,
++            expected_project_identity=expected, lifecycle_intent=intent,
++        )
++        if receipt is None:
++            continue
++        # This identity is issued by the current source check, not a predicted
++        # owner or text-similarity key. Distinct occurrences retain distinct IDs.
++        key = receipt["native_discovery_binding_sha256"]
++        if key in seen:
++            continue
++        row = _docs_source(original, display_snippet=body,
++                           evidence_id="ev-" + hashlib.sha256(key.encode()).hexdigest()[:16])
++        if row is None:
++            continue
++        window = receipt["body_window"]
++        row.update(snippet=body, project_identity=original.get("project_identity"),
++                   line_start=window["line_start"], line_end=window["line_end"],
++                   authority=str(original.get("authority") or "supporting"),
++                   scope=str(original.get("doc_scope") or "project"),
++                   catalog_role=str(original.get("catalog_role") or ""),
++                   _assigned_requirement_ids=[])
++        # Lexical attribution stays diagnostic, not an admission/ranking gate.
++        visible = _requalify_visible_source({
++            **original, **row, "_qualification_candidate": original,
++        }, query_text=texts)
++        row.update(retrieval_query_ids=visible["retrieval_query_ids"],
++                   retrieval_query_matches=visible["retrieval_query_matches"])
++        rows.append(row)
++        snapshot[row["evidence_id"]] = _snapshot_entry(original, row)
++        seen.add(key)
++    decision = context_selection_decision(rows, tuple(queries))
++    payload = _payload(rows, decision=decision, query_plan=plan)
++    _mark_unassessed(payload)
++    snapshot = {row["evidence_id"]: _snapshot_entry(snapshot[row["evidence_id"]]["source"], row)
++                for row in payload.get("sources") or ()}
++    if rows:
++        payload["context_quality"] = {"status": "unverified", "reasons": ["coverage_unverified"]}
++    _refresh_estimate(payload)
++    errors = validate_model_visible_projection(payload, snapshot=snapshot)
++    if errors:
++        raise ValueError("native-rank projection is invalid: " + "; ".join(errors))
++    return payload, snapshot
++
++
+ def experimental_context_cost(payload: dict[str, Any]) -> int:
+     """Account for the actual non-ASCII-escaped MCP text, including whitespace.
+ 
+@@ -54,8 +161,10 @@ def capture_experimental_context(retrieval: dict, payload: dict, snapshot: dict)
+     only rows already admitted by the ordinary core projection.
+     """
+     if (experimental_context_max_tokens() is None
+-            and not source_valid_candidate_admission_active()):
++            and not source_valid_candidate_admission_active()
++            and not heuristic_removal_active("A")):
+         return
++    _mark_unassessed(payload)
+     originals = []
+     seen = set()
+     candidates = [
+@@ -95,6 +204,7 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
+         if result.get("reason_code") and result.get("missing") == [result["reason_code"]]:
+             result.pop("missing")  # The same reason remains in its typed field.
+         _refresh_estimate(result)
++        _mark_unassessed(result)
+         return result, {}
+ 
+     from .docs_context_projection import _requalify_visible_source
+@@ -148,6 +258,7 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
+         ]
+         result["context_quality"] = {"status": "unavailable", "reasons": [reason]}
+     _refresh_estimate(result)
++    _mark_unassessed(result)
+     return result, bound
+ 
+ 
+@@ -250,7 +361,10 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict,
+                                  restore_native: bool = True,
+                                  _trace_stage: str = "recheck") -> tuple[dict, dict]:
+     """Validate native/derived source lineage after the last structural rewrite."""
+-    active = source_valid_candidate_admission_active()
++    from .experimental_candidate_selection import native_rank_selection_active
++    active = (source_valid_candidate_admission_active() or heuristic_removal_active("A")
++              or native_rank_selection_active())
++    _mark_unassessed(payload)
+     flow = ProjectionFlowTrace(retrieval)
+     call_sequence = flow.boundary(_trace_stage + ".input", payload, snapshot, active=active)
+     if not active:
+@@ -258,6 +372,9 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict,
+         return payload, snapshot
+     from docmancer.docs.domain.literal_context_admission import recheck_source_valid_candidate
+     from .joint_context_lineage import _occurrence
++    native_rank = native_rank_selection_active()
++    if native_rank:
++        restore_native = False
+ 
+     state = retrieval.get(_SEED_KEY) or {}
+     originals = state.get("originals") or ()
+@@ -318,7 +435,7 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict,
+             receipt = attempt(derivation="contained_span")
+         seed_source_mismatches = seed_span_unavailable = seed_bounds_invalid = 0
+         occurrence_available = None
+-        if receipt is None:
++        if receipt is None and not native_rank:
+             # Core crops can keep the native reference envelope in their
+             # snapshot. Classify the verified visible occurrence, not that
+             # wider reference; A still independently validates the relation.
+@@ -412,6 +529,9 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+     recursive finalization, arbitrary text crop, or model call.
+     """
+     cap = experimental_context_max_tokens()
++    from .experimental_candidate_selection import native_rank_selection_active
++    native_rank = native_rank_selection_active()
++    _mark_unassessed(payload)
+     flow = ProjectionFlowTrace(retrieval)
+     active = cap is not None and payload.get("kind") == "docs_context"
+     flow.boundary("budget.input", payload, snapshot, active=active)
+@@ -420,6 +540,23 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+         return payload, snapshot
+     diagnostics = retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
+         "docs_context_projection", {})
++    if native_rank:
++        from .joint_context_lineage import _occurrence
++        unique, seen = [], set()
++        for row in payload.get("sources") or ():
++            occurrence = _occurrence(row, snapshot)
++            source = (snapshot.get(row.get("evidence_id")) or {}).get("source") or {}
++            member = (source.get("_reference_evidence") or {}).get("member_binding")
++            key = (occurrence, json.dumps(member, sort_keys=True), row.get("snippet"))
++            if occurrence is not None and key in seen:
++                continue
++            if occurrence is not None:
++                seen.add(key)
++            unique.append(row)
++        removed = len(payload.get("sources") or ()) - len(unique)
++        diagnostics["native_exact_dedupe"] = {"removed": removed}
++        if removed:
++            payload, snapshot = _rebuild(payload, snapshot, retrieval, unique, reason="exact_occurrence_dedupe")
+     before = experimental_context_cost(payload)
+     ledger = diagnostics.setdefault("experimental_budget", {})
+     ledger.update(limit=cap, input_cost=before, measure="max(o200k_base,utf8_bytes_div4)_mcp_json",
+@@ -438,7 +575,8 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+         if any(item["evidence_id"] == row["evidence_id"] for item in selected):
+             continue
+         options = [(deepcopy(row), deepcopy(snapshot[row["evidence_id"]]))]
+-        options.extend(_native_alternatives(row, snapshot, retrieval))
++        if not native_rank:
++            options.extend(_native_alternatives(row, snapshot, retrieval))
+         accepted_current = False
+         for index, (option, binding) in enumerate(options):
+             if any(item["evidence_id"] == option["evidence_id"] for item in selected):
+diff --git a/docmancer/docs/application/experimental_prepared_parent_assembler.py b/docmancer/docs/application/experimental_prepared_parent_assembler.py
+index a3cc32bb..504b1b3c 100644
+--- a/docmancer/docs/application/experimental_prepared_parent_assembler.py
++++ b/docmancer/docs/application/experimental_prepared_parent_assembler.py
+@@ -16,6 +16,9 @@ def assemble_prepared_parents(payload: dict, snapshot: dict, retrieval: dict, *,
+     All candidates originate in the core live read; no retrieval, generation,
+     source-name inference, query-rewriting, or additional answer authority.
+     """
++    from .experimental_candidate_selection import native_rank_selection_active
++    if native_rank_selection_active():
++        return payload, snapshot
+     if payload.get("kind") != "docs_context" or not payload.get("sources"):
+         return payload, snapshot
+     from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
+diff --git a/docmancer/docs/application/joint_context_selection.py b/docmancer/docs/application/joint_context_selection.py
+index cb6bcdc9..cf4c7385 100644
+--- a/docmancer/docs/application/joint_context_selection.py
++++ b/docmancer/docs/application/joint_context_selection.py
+@@ -139,6 +139,9 @@ def _draft_subsets(payload: dict, snapshot: dict, trial: dict, bindings: dict, r
+ 
+ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
+     """Yield validated candidates with bounded work, not bounded representation."""
++    from .experimental_candidate_selection import native_rank_selection_active
++    if native_rank_selection_active():
++        return
+     if (payload.get("kind") != "docs_context" or payload.get("support_status") != "retrieval_only"
+         or any(payload.get(k) is not False for k in ("answer_supported", "answer_available", "edit_ready"))
+         or (payload.get("context_quality") or {}).get("status") == "checked"
+@@ -253,6 +256,9 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
+     unnecessary. Lookup closure never imports surrounding section dependencies.
+     Canonical seed bytes, source policies and explicit budgets remain mandatory.
+     """
++    from .experimental_candidate_selection import native_rank_selection_active
++    if native_rank_selection_active():
++        return payload, snapshot
+     plan = retrieval.get("documentation_query_plan") or {}
+     lookup = any(q.get("origin") == "host_lookup" for q in plan.get("queries") or ()
+                  if isinstance(q, dict))
+diff --git a/docmancer/docs/domain/evidence_qualification.py b/docmancer/docs/domain/evidence_qualification.py
+index 498a3941..fc9fc4ed 100644
+--- a/docmancer/docs/domain/evidence_qualification.py
++++ b/docmancer/docs/domain/evidence_qualification.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ from dataclasses import dataclass
+ from functools import lru_cache
++import os
+ import re
+ from typing import Any, Literal, Mapping
+ 
+@@ -14,6 +15,15 @@ from docmancer.docs.domain.project_answer_contract import LifecycleIntent
+ CoverageKind = Literal["direct", "derived"]
+ 
+ 
++def source_only_admission_active() -> bool:
++    """Host-only candidate switch; no domain dependency on application code.
++
++    The runner must keep configuration stable through each complete public call.
++    This switch grants neither source permission nor a native discovery receipt.
++    """
++    return os.environ.get("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL") in {"A", "ALL"}
++
++
+ 
+ 
+ def _clean_relation_line(value: str) -> str:
+@@ -274,6 +284,27 @@ def qualify_evidence(
+         result["admission_only"] = True
+     if reference_reason is not None:
+         return _rejected(result, reference_reason)
++    if (source_only_admission_active() and query_id == "query-original"
++        and isinstance((candidate or {}).get("_reference_root_plan"), Mapping)):
++        # Canonical source/locator checks above do not establish query relevance.
++        # Admission separately requires the live original-discovery receipt and
++        # raw window. Never promote source validity into lexical query credit.
++        for key in (
++            "matched_terms", "body_matched_terms", "heading_context_used",
++            "table_context_used", "missing_exact_terms", "missing_parent_exact_terms",
++            "missing_bound_subjects", "matched_term_count", "match_ratio",
++            "covered_query_ids", "coverage_kind", "literal_context_admission",
++            "query_terms", "exact_terms", "parent_exact_terms", "bound_subjects",
++            "retrieval_anchors",
++        ):
++            result.pop(key, None)
++        result.update(
++            qualified=False, qualification_reason="source_valid_relevance_unassessed",
++            relevance_unassessed=True, context_only=True, coverage_credit=False,
++            admission_only=True,
++            admission_contract="source_only_heuristic_removal_v1",
++        )
++        return EvidenceQualification(False, (), None, "source_valid_relevance_unassessed", result)
+     lines = body.splitlines()
+     substantive_lines = []
+     heading_lines = []
+@@ -507,4 +538,5 @@ __all__ = [
+     "evidence_policy_rejection_reason",
+     "qualify_evidence",
+     "qualify_visible_trace",
++    "source_only_admission_active",
+ ]
+diff --git a/docmancer/docs/domain/literal_context_admission.py b/docmancer/docs/domain/literal_context_admission.py
+index b461996e..8e2ddad5 100644
+--- a/docmancer/docs/domain/literal_context_admission.py
++++ b/docmancer/docs/domain/literal_context_admission.py
+@@ -13,7 +13,7 @@ from typing import Any, Mapping
+ from docmancer.core.structured_chunking import _atom_spans, parse_markdown_parents
+ 
+ from .context_blocks import source_block_alternatives
+-from .evidence_qualification import _relation_units, qualify_evidence
++from .evidence_qualification import _relation_units, qualify_evidence, source_only_admission_active
+ from .original_body_discovery import original_body_discovery_binding
+ from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
+ from .query_terms import documentation_query_terms, query_constraint_roles
+@@ -283,14 +283,16 @@ def _checked_original_candidate(
+     ) if candidate.get(key)]
+     if not catalog_hashes or any(value != member["catalog_entry_hash"] for value in catalog_hashes):
+         return None
+-    roles = query_constraint_roles(question)
+     query = {"query_id": "query-original", "text": question,
+              "origin": "original", "relation": "direct"}
+-    qualification = qualify_evidence({
++    probe = {
+         "query_text": question, "query_origin": "original", "relation": "direct",
+-        "query_terms": list(documentation_query_terms(question)),
+-        "exact_terms": list(roles.hard_exact), "bound_subjects": list(roles.bound_subjects),
+-    }, query_id="query-original", visible_text=evidence_text, evidence_text=evidence_text,
++    }
++    if not source_only_admission_active():
++        roles = query_constraint_roles(question)
++        probe.update(query_terms=list(documentation_query_terms(question)),
++                     exact_terms=list(roles.hard_exact), bound_subjects=list(roles.bound_subjects))
++    qualification = qualify_evidence(probe, query_id="query-original", visible_text=evidence_text, evidence_text=evidence_text,
+         candidate=candidate, expected_project_identity=expected_project_identity or scope["project_id"],
+         catalog_role=str(candidate.get("catalog_role") or candidate.get("project_doc_reason") or ""),
+         lifecycle_intent=lifecycle_intent, authoritative_query=query)
+@@ -317,6 +319,27 @@ def admit_original_literal_context(
+     if checked is None:
+         return None
+     qualification, evidence, identity, scope = checked
++    if source_only_admission_active():
++        if qualification.reason != "source_valid_relevance_unassessed":
++            return None
++        body_window = _checked_raw_body_window(
++            evidence_text, candidate, evidence, qualification.trace.get("reference_visible_span"),
++        )
++        if body_window is None:
++            return None
++        witness = source_valid_original_candidate_witness(
++            question=question, evidence_text=evidence_text, candidate=candidate,
++        )
++        if witness is None:
++            return None
++        return {
++            "reason": witness["kind"], "query_id": "query-original",
++            "qualification_reason": qualification.reason, "coverage_credit": False,
++            "relevance_unassessed": True, "admission_contract": "source_only_heuristic_removal_v1",
++            "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
++            "source_id": identity.get("document_id"), "path": identity.get("canonical_path"),
++            "body_witnesses": [witness], "body_window": body_window,
++        }
+     # The canonical qualifier rechecks raw-document SHA, body/window/owner,
+     # project/generation and lifecycle. Any such rejection is not a relevance
+     # fallback. Qualified windows retain the existing qualification path.
+@@ -510,8 +533,9 @@ def recheck_source_valid_candidate(
+     result describes native/derived provenance and the surviving existing or
+     unassessed route; it grants no new qualification, coverage or edit authority.
+     Serialized results cannot replace the current native receipt or raw source.
+-    Existing qualified/literal routes keep their own request constraints: the
+-    broad route's missing-exact/unresolved-name guard must not tighten them.
++    Existing qualified/literal routes keep their own request constraints. A/ALL
++    uses only the canonical source/request/lineage checks, never the historical
++    missing-exact/unresolved-name barriers.
+     """
+     if rejection_diagnostics is not None:
+         rejection_diagnostics.clear()
+@@ -549,7 +573,8 @@ def recheck_source_valid_candidate(
+     seed_qualification = seed_checked[0]
+     seed_admission = None
+     if not seed_qualification.qualified:
+-        if seed_qualification.reason != "insufficient_visible_match":
++        if seed_qualification.reason not in ({"source_valid_relevance_unassessed"}
++                                            if source_only_admission_active() else {"insufficient_visible_match"}):
+             return reject(qualification_axis(seed_qualification.reason), seed_qualification.reason)
+         checkpoint = "native_admission"
+         seed_admission = admit_original_literal_context(
+@@ -576,7 +601,9 @@ def recheck_source_valid_candidate(
+         ))):
+         return reject("source_admissible", "derived_source_mismatch")
+     checkpoint = "visible_source_qualification"
+-    if not qualification.qualified and qualification.reason != "insufficient_visible_match":
++    if not qualification.qualified and qualification.reason not in (
++        {"source_valid_relevance_unassessed"} if source_only_admission_active() else {"insufficient_visible_match"}
++    ):
+         return reject(qualification_axis(qualification.reason), qualification.reason)
+     checkpoint = "visible_raw_window"
+     window = _checked_raw_body_window(
+@@ -601,6 +628,29 @@ def recheck_source_valid_candidate(
+         edge, native_binding = "native", own_binding
+     if edge is None:
+         return reject("source_admissible", "unverified_structural_derivation")
++    if source_only_admission_active():
++        # All canonical/lineage/structural checks above remain mandatory. Skip
++        # old semantic routes rather than admitting then resurrecting their veto.
++        visible_candidate = {**candidate, **window, "_reference_evidence": {
++            **evidence, "char_start": window["char_start"], "char_end": window["char_end"], "text": evidence_text,
++        }}
++        checkpoint = "source_only_visible_admission"
++        witness = source_valid_original_candidate_witness(
++            question=question, evidence_text=evidence_text, candidate=visible_candidate, native_candidate=seed,
++        )
++        if witness is None:
++            return reject("source_admissible", "no_verified_raw_context")
++        return {
++            "schema_version": 1, "route": "source_valid_unassessed", "derivation": edge,
++            "native_discovery_binding_sha256": native_binding,
++            "native_span": (list((evidence["char_start"], evidence["char_end"]))
++                            if own_binding is not None and native_binding == own_binding else list(seed_span)),
++            "body_window": window,
++            "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
++            "source_id": identity["document_id"], "source_sha256": identity["content_sha256"],
++            "qualification_reason": qualification.reason, "coverage_credit": False,
++            "relevance_unassessed": True, "admission_contract": "source_only_heuristic_removal_v1",
++        }
+     route = "existing_qualified" if qualification.qualified else None
+     admission = None
+     if route is None:
+diff --git a/docmancer/docs/domain/ordinary_body_context.py b/docmancer/docs/domain/ordinary_body_context.py
+index f9feb62c..ecedf480 100644
+--- a/docmancer/docs/domain/ordinary_body_context.py
++++ b/docmancer/docs/domain/ordinary_body_context.py
+@@ -15,6 +15,7 @@ from typing import Any, Mapping
+ from docmancer.core.structured_chunking import _atom_spans
+ 
+ from .context_blocks import source_block_alternatives
++from .evidence_qualification import source_only_admission_active
+ from .original_body_discovery import (
+     original_body_discovery_binding,
+     original_body_derivation_binding,
+@@ -222,6 +223,8 @@ def body_request_constraint_rejection(
+     The caller must already have checked the canonical owner. Its structural
+     scope can bind a literal name; it does not certify the actor of an action.
+     """
++    if source_only_admission_active():
++        return None  # Unresolved whole-question names are not source policy.
+     evidence = candidate["_reference_evidence"]
+     owner = evidence.get("owner")
+     subject_text = (evidence["raw_document"][owner["scope_start"]:owner["scope_end"]]
+@@ -381,6 +384,10 @@ def ordinary_body_context_witness(
+     a subject relation. A separate body witness remains mandatory. The whole
+     question and all answer/edit authority stay unverified.
+     """
++    if source_only_admission_active():
++        return source_valid_original_candidate_witness(
++            question=question, evidence_text=evidence_text, candidate=candidate,
++        )
+     for binding, source_offset, block in _policy_valid_body_blocks(
+         question=question, evidence_text=evidence_text, candidate=candidate,
+     ):
+@@ -401,6 +408,10 @@ def policy_valid_original_candidate_witness(
+     its numeric veto; V3 alone can additionally return scalar-label candidates.
+     Structural body content is not support for the question's relation.
+     """
++    if source_only_admission_active():
++        return source_valid_original_candidate_witness(
++            question=question, evidence_text=evidence_text, candidate=candidate,
++        )
+     if not policy_candidate_admission_active():
+         return None
+     for binding, source_offset, block in _policy_valid_body_blocks(
+@@ -426,12 +437,38 @@ def source_valid_original_candidate_witness(
+     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+     native_candidate: Mapping[str, Any] | None = None,
+ ) -> dict[str, Any] | None:
+-    """Opt-in substantive body delivery without ratio, numeric or label tests.
++    """Opt-in source context, with a separate source-only removal candidate.
+ 
+-    Canonical source policy and hard-exact checks belong to the admission
+-    caller. Provenance, owner and unresolved names are rechecked here. The
+-    witness is a body occurrence, never evidence of semantic contribution.
++    The historical mode retains body/name checks. A/ALL instead returns the
++    complete nonempty verified raw window, with no inferred relevance gate.
++    Canonical source policy and locator checks belong to the admission caller;
++    live provenance and the raw owner are rechecked here. Neither route proves
++    semantic contribution.
+     """
++    if source_only_admission_active():
++        # No phrase/numeric/name parser supplies admission. The complete raw
++        # occurrence is context, not a witness of semantic contribution.
++        binding = (
++            original_body_discovery_binding(question=question, body=evidence_text, candidate=candidate)
++            if native_candidate is None else original_body_derivation_binding(
++                question=question, body=evidence_text, candidate=candidate, native_candidate=native_candidate,
++            )
++        )
++        if binding is None or not evidence_text.strip():
++            return None
++        evidence = candidate["_reference_evidence"]
++        if prepared_owner_rejection(evidence) is not None:
++            return None
++        start, end = evidence["char_start"], evidence["char_end"]
++        return {
++            "kind": "source_valid_original_candidate_v1", "relevance_unassessed": True,
++            "admission_contract": "source_only_heuristic_removal_v1",
++            "coverage_credit": False,
++            "text": evidence["raw_document"][start:end],
++            "char_start": start, "char_end": end,
++            "block_char_start": start, "block_char_end": end,
++            "native_discovery_binding_sha256": binding,
++        }
+     if not source_valid_candidate_admission_active():
+         return None
+     for binding, source_offset, block in _source_valid_body_blocks(
+diff --git a/docmancer/docs/domain/query_reference_binding.py b/docmancer/docs/domain/query_reference_binding.py
+index 06215d1e..6a1f8129 100644
+--- a/docmancer/docs/domain/query_reference_binding.py
++++ b/docmancer/docs/domain/query_reference_binding.py
+@@ -434,7 +434,9 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
+             if statement is not None:
+                 binding["syntax"] = "structural_filename"
+             bindings.append(binding)
+-    if plan is not None:
++    from .evidence_qualification import source_only_admission_active
++    source_only = source_only_admission_active() and probe.get("query_origin") == "original"
++    if plan is not None and not source_only:
+         body_question = reference_body_question(plan)
+         exact_plan = plan
+         if result.get("mode") == "exact_path":
+@@ -464,6 +466,12 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
+     owner_reason = prepared_owner_rejection(evidence)
+     if owner_reason is not None:
+         return result, owner_reason
++    if source_only:
++        # Locator bindings are global request restrictions; body identities and
++        # inferred lexical roles are not obligations on every acquired window.
++        result.update(reference_bindings=bindings,
++                      reference_visible_span=[visible_start, visible_start+len(visible)])
++        return result, None
+     owner = evidence.get("owner") or {}
+     owner_text = str(owner.get("text") or "")
+     if (owner_text and type(owner.get("scope_start")) is int and type(owner.get("scope_end")) is int
+diff --git a/docmancer/retrieval/_dispatch_part01.py b/docmancer/retrieval/_dispatch_part01.py
+index e42b2779..f1c2fcfb 100644
+--- a/docmancer/retrieval/_dispatch_part01.py
++++ b/docmancer/retrieval/_dispatch_part01.py
+@@ -81,6 +81,15 @@ class _RetrievalDispatcherPart01:
+             or (configured_mode if isinstance(configured_mode, str) else None)
+             or "lexical"
+         ).lower()
++        from .experimental_acquisition import (
++            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
++            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
++            acquisition_experiment_active,
++        )
++
++        q_active = acquisition_experiment_active()
++        if q_active and effective_mode != "lexical":
++            raise ValueError("heuristic-removal Q supports lexical retrieval only")
+         limit = min(40, limit or self.config.query.default_limit)
+         budget = budget or self.config.query.default_budget
+         per_source_limit = min(40, max(limit * 3, 20))
+@@ -118,6 +127,14 @@ class _RetrievalDispatcherPart01:
+                 ),
+             },
+         })
++        if q_active:
++            fusion_config_hash = canonical_hash({
++                "schema_version": ACQUISITION_METHOD,
++                "candidate_ceiling": ACQUISITION_CANDIDATES,
++                "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
++                "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
++                "expansion": "none", "source_quota": None,
++            })
+ 
+         def finalized(result: DispatchResult) -> DispatchResult:
+             result.query_plan_hash = query_plan.plan_hash
+@@ -141,6 +158,30 @@ class _RetrievalDispatcherPart01:
+                     }
+             return result
+ 
++        if q_active:
++            chunks = self.store.query(
++                query, limit=ACQUISITION_CANDIDATES,
++                budget=ACQUISITION_ESTIMATED_TOKENS, expand="none",
++                filters=backend_filters,
++            )
++            acquired_count = len(chunks)
++            chunks = self._filter_chunks(chunks, merged_filters)
++            for chunk in chunks:
++                chunk.metadata.setdefault("acquisition", {}).update({
++                    "dispatcher_post_policy_rows": len(chunks),
++                    "delivery_limit_not_applied": limit,
++                    "delivery_budget_not_applied": budget,
++                })
++            return finalized(DispatchResult(
++                chunks=chunks,
++                contributions={
++                    c.metadata.get("section_id"): {"lexical": idx + 1}
++                    for idx, c in enumerate(chunks)
++                    if c.metadata.get("section_id") is not None
++                },
++                mode_used="lexical", candidate_counts={"lexical": acquired_count},
++            ))
++
+         missing_capabilities: dict[str, str] = {}
+         if effective_mode != "lexical":
+             if self.vector_store is None:
+diff --git a/docmancer/docs/application/experimental_heuristic_removal.py b/docmancer/docs/application/experimental_heuristic_removal.py
+new file mode 100644
+index 00000000..48e63507
+--- /dev/null
++++ b/docmancer/docs/application/experimental_heuristic_removal.py
+@@ -0,0 +1,14 @@
++"""Default-off execution arms for the frozen heuristic-removal experiment.
++
++This switch chooses an implementation, never qualifies a source or an answer.
++Q: acquisition; A: admission; S: selection/assembly; ALL: combination.
++"""
++from __future__ import annotations
++
++import os
++
++
++def heuristic_removal_active(stage: str) -> bool:
++    """Return whether the host selected this removal arm."""
++    arm = os.environ.get("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", "")
++    return stage in {"Q", "A", "S"} and arm in {stage, "ALL"}
+diff --git a/docmancer/retrieval/experimental_acquisition.py b/docmancer/retrieval/experimental_acquisition.py
+new file mode 100644
+index 00000000..64032022
+--- /dev/null
++++ b/docmancer/retrieval/experimental_acquisition.py
+@@ -0,0 +1,20 @@
++"""Fixed, non-semantic work ceilings for the default-off Q acquisition arm.
++
++Chosen before runtime; see reports/docatlas-grounded-20261013/heuristic-removal/
++A_ACQUISITION.md. These are not final context budgets or completeness guarantees.
++"""
++from __future__ import annotations
++
++ACQUISITION_CANDIDATES = 256
++ACQUISITION_ESTIMATED_TOKENS = 131_072
++ACQUISITION_TEXT_BYTES = 1_048_576
++ACQUISITION_METHOD = "fts5_bm25_equal_fields_or_v1"
++
++
++def acquisition_experiment_active() -> bool:
++    # Lazy import avoids coupling storage module initialization to docs services.
++    from docmancer.docs.application.experimental_heuristic_removal import (
++        heuristic_removal_active,
++    )
++
++    return heuristic_removal_active("Q")
+diff --git a/eval/heuristic_removal/__init__.py b/eval/heuristic_removal/__init__.py
+new file mode 100644
+index 00000000..6657bf71
+--- /dev/null
++++ b/eval/heuristic_removal/__init__.py
+@@ -0,0 +1 @@
++"""Frozen public-boundary heuristic-removal measurements; no product algorithms."""
+diff --git a/eval/heuristic_removal/assess.py b/eval/heuristic_removal/assess.py
+new file mode 100644
+index 00000000..2397b8cc
+--- /dev/null
++++ b/eval/heuristic_removal/assess.py
+@@ -0,0 +1,137 @@
++"""Offline immutable historical scoring; no product calls, no oracle rewriting.
++
++The original evaluator functions are reused verbatim for historical60. New D's
++published byte-witness schema is consumed only offline after freeze; never infer gold.
++"""
++from __future__ import annotations
++
++import argparse
++import importlib.util
++import json
++from pathlib import Path
++import sys
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++from receipts import save, sha
++
++
++def assess(manifest_path, run_dir, output):
++    if output.exists():
++        raise ValueError("fresh assessment output required")
++    manifest = json.loads(manifest_path.read_bytes())
++    for name, digest in manifest["inputs_sha256"].items():
++        if sha(Path(name).read_bytes()) != digest:
++            raise ValueError("frozen source/oracle/code changed: " + name)
++    evaluator_path = Path(__file__).resolve().parents[1] / "prepared_model_comparison40/evaluate.py"
++    spec = importlib.util.spec_from_file_location("frozen_historical_evaluation", evaluator_path)
++    historical = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(historical)
++    records = []
++    for dataset_index, dataset in enumerate(manifest["config"]["datasets"]):
++        directory = Path(dataset["path"]).resolve()
++        is_new = dataset_index == 2
++        cases = json.loads((directory / ("sealed/questions.json" if is_new else "questions.json")).read_bytes())["cases"]
++        if is_new and dataset.get("oracle_schema") != "D_literal_byte_witness_sets_v1":
++            raise ValueError("new20 schema differs from D published interface")
++        oracles = {case["id"]: case for case in json.loads((directory / (
++            "sealed/oracle.json" if is_new else "gold_spans.json")).read_bytes())["cases"]}
++        for arm in dataset["arms"]:
++            lane = run_dir / arm
++            for case in cases:
++                candidates = [run_dir / name for name in manifest.get("recovery_lanes", {}).get(arm, [arm])]
++                lane = next((candidate for candidate in candidates if (
++                    candidate / "calls" / str(dataset_index) / case["id"] / arm / "public-payload.json"
++                ).exists()), run_dir / arm)
++                destination = lane / "calls" / str(dataset_index) / case["id"] / arm
++                payload_path = destination / "public-payload.json"
++                if not payload_path.exists():
++                    records.append(dict(dataset=dataset_index, case_id=case["id"], arm=arm, status="NOT_RETURNED"))
++                    continue
++                preparation = json.loads((lane / "preparation" / f'{dataset_index}-{case["project_group"]}.json').read_bytes())
++                sources = {}
++                corpus_root = directory / ("corpus" if is_new else "sources") / case["project_group"]
++                for source in corpus_root.rglob("*"):
++                    if not source.is_file():
++                        continue
++                    raw = source.read_bytes()
++                    text = raw.decode()
++                    offsets = [0]
++                    for line in text.splitlines(keepends=True):
++                        offsets.append(offsets[-1] + len(line))
++                    sources[source.relative_to(corpus_root).as_posix()] = dict(
++                        content=text, raw=raw, line_offsets=offsets, sha256=sha(raw), errors=[])
++                prepared = dict(root=preparation["root"], sources=sources)
++                metadata = json.loads((destination / "metadata.json").read_bytes())
++                row = dict(dataset=dataset_index, case_id=case["id"], arm=arm, status="returned",
++                           answerability=case.get("answerability"), seconds=metadata["seconds"],
++                           answer_quality="NOT MEASURED", unsupported_generated_claims="NOT MEASURED",
++                           semantic_sufficiency="NOT MEASURED: independent label-hidden review required")
++                row["read_only_pass"] = metadata.get("database_unchanged") is True and metadata.get("files_unchanged") is True
++                row["runtime_integrity_errors"] = metadata.get("integrity_errors", [])
++                for name in ("native", "packed"):
++                    path = payload_path if name == "native" else destination / "packed.json"
++                    if not path.exists():
++                        row[name] = dict(status="MISSING_RECEIPT", integrity_errors=["packing_or_payload_receipt_missing"])
++                        continue
++                    payload = json.loads(path.read_bytes())
++                    verified, intervals, errors = historical._source_rows(payload, prepared)
++                    coverage = new_coverage(case, oracles[case["id"]], prepared, payload, verified) if is_new else historical._gold(
++                        case, oracles[case["id"]], prepared, intervals)
++                    negative = case.get("answerability") == ("negative" if is_new else "unanswerable")
++                    errors = list(errors) + list(coverage.get("errors", []))
++                    valid = not errors and row["read_only_pass"] and not row["runtime_integrity_errors"]
++                    documented_pass = coverage.get("all_required_facts_covered" if is_new else "all_documented_claims_covered")
++                    row[name] = dict(exact_frozen_coverage=coverage, integrity_errors=errors,
++                                     public_call_and_integrity_pass=valid,
++                                     strict_positive_pass=bool(valid and documented_pass) if case.get("answerability") == ("positive" if is_new else "within_budget") else None,
++                                     strict_partial_documented_pass=bool(valid and documented_pass) if case.get("answerability") == "partial" else None,
++                                     source_count=len(payload.get("sources") or []),
++                                     strict_negative_empty_source_pass=bool(valid and not payload.get("sources")) if negative else None,
++                                     source_receipts=verified)
++                records.append(row)
++    save(output / "CASE_RESULTS.json", dict(measure="unchanged original witness spans; not entailment/answer quality",
++         oracle_not_passed_to_runtime=True, cases=records))
++
++
++def new_coverage(case, oracle, prepared, payload, verified):
++    """D contract: literal bytes, OR alternatives / AND witnesses; no text cleanup."""
++    delivered = {}
++    for row in verified:
++        if row["integrity_pass"]:
++            delivered.setdefault(row["relative_path"], []).append(payload["sources"][row["source_index"]]["snippet"].encode())
++    facts, errors = [], []
++    for fact in oracle["required_facts"]:
++        alternatives = []
++        for witnesses in fact["witness_sets"]:
++            parts = []
++            for witness in witnesses:
++                path = Path(witness["path"])
++                prefix = Path("corpus") / case["project_group"]
++                if path.is_relative_to(prefix):
++                    path = path.relative_to(prefix)
++                relative = path.as_posix()
++                source = prepared["sources"].get(relative)
++                text = witness["text"].encode()
++                left, right = witness["start_byte"], witness["end_byte"]
++                valid = source is not None and source["sha256"] == witness["sha256"] and (
++                    type(left) is int and type(right) is int and 0 <= left < right <= len(source["raw"]))
++                valid = valid and source["raw"][left:right] == text
++                if not valid:
++                    errors.append("independent_witness_hash_or_byte_span_mismatch:" + fact["id"])
++                parts.append(dict(path=relative, start_byte=left, end_byte=right,
++                                  source_valid=valid, covered=bool(valid and any(text in snippet for snippet in delivered.get(relative, [])))))
++            alternatives.append(dict(parts=parts, covered=bool(parts) and all(part["covered"] for part in parts)))
++        facts.append(dict(id=fact["id"], alternatives=alternatives, covered=any(a["covered"] for a in alternatives)))
++    return dict(facts=facts, all_required_facts_covered=bool(facts) and not errors and all(f["covered"] for f in facts),
++                unavailable_obligations=oracle.get("unavailable_obligations", []),
++                forbidden_claims=oracle.get("forbidden_claims", []), errors=errors,
++                measure="D literal source-text presence, pinned half-open raw byte witnesses; not semantic entailment")
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--manifest", type=Path, required=True)
++    parser.add_argument("--run-dir", type=Path, required=True)
++    parser.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args()
++    assess(args.manifest, args.run_dir, args.output)
+diff --git a/eval/heuristic_removal/config.template.json b/eval/heuristic_removal/config.template.json
+new file mode 100644
+index 00000000..3417df4f
+--- /dev/null
++++ b/eval/heuristic_removal/config.template.json
+@@ -0,0 +1,21 @@
++{
++  "runtime_authorized": false,
++  "authorization_reference": "BLOCKED: coordinator must replace with current checkpoint decision before freeze",
++  "baseline_python": "/tmp/opencode/docatlas-heuristic-removal-baseline-runtime/bin/python",
++  "candidate_python": "/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python",
++  "baseline_wheel": "BASELINE_WHEEL_PATH",
++  "candidate_wheel": "CANDIDATE_WHEEL_PATH",
++  "code_freeze_manifest": "COORDINATOR_CODE_FREEZE_MANIFEST_PATH",
++  "code_freeze_sha256": "COORDINATOR_CODE_FREEZE_MANIFEST_SHA256",
++  "datasets": [
++    {"path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40", "count": 40, "arms": ["V0", "VQ", "VA", "VS", "VALL"]},
++    {"path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout", "count": 20, "arms": ["V0", "VQ", "VA", "VS", "VALL"]},
++    {"path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout", "count": 20, "arms": ["V0", "VALL"], "oracle_schema": "D_literal_byte_witness_sets_v1"}
++  ],
++  "limits": {"context_calls": 340, "call_seconds": 60, "prepare_seconds": 180, "wall_seconds": 1800},
++  "common": {},
++  "trace": false,
++  "packing_tokens": 12000,
++  "tokenizer_cache_dir": "COORDINATOR_PINNED_OFFLINE_TIKTOKEN_CACHE_DIRECTORY",
++  "freeze_files": ["BASELINE_WHEEL_PATH", "CANDIDATE_WHEEL_PATH", "TOKENIZER_CACHE_ASSET_PATH", "PROTOCOL_PATH", "CODE_FREEZE_MANIFEST_PATH", "D_SEALED_MANIFEST_PATH"]
++}
+diff --git a/eval/heuristic_removal/installed_stdio.py b/eval/heuristic_removal/installed_stdio.py
+new file mode 100644
+index 00000000..d8a758ca
+--- /dev/null
++++ b/eval/heuristic_removal/installed_stdio.py
+@@ -0,0 +1,166 @@
++"""One isolated installed-wheel MCP smoke, not a client/production benchmark.
++
++Run with the wheel venv's python -I. All product calls use real SDK stdio.
++No transport/storage/retrieval/selection/validation mocks; no live index access.
++"""
++from __future__ import annotations
++
++import argparse
++import asyncio
++import json
++import os
++from pathlib import Path
++import sys
++import time
++
++# -I intentionally excludes the checkout. Add only the harness directory, which
++# contains no docmancer package, so receipt utilities do not defeat wheel isolation.
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++from receipts import database, files, integrity, ledger, save, sha, snapshots
++
++FACT = "Authenticate with OAuth tokens."
++DOCUMENTS = {"docs/auth.md": "# Auth\n\n" + FACT + "\n"}
++QUESTION = "How do I authenticate with OAuth tokens?"
++
++
++def decode(result):
++    structured = getattr(result, "structuredContent", None)
++    if isinstance(structured, dict):
++        return structured
++    return json.loads(result.content[0].text)
++
++
++async def smoke(args):
++    manifest = json.loads(args.manifest.read_bytes())
++    if not manifest["config"].get("runtime_authorized"):
++        raise ValueError("manifest has no runtime authorization")
++    for name, digest in manifest["inputs_sha256"].items():
++        if sha(Path(name).read_bytes()) != digest:
++            raise ValueError("frozen input changed: " + name)
++    from mcp import ClientSession, StdioServerParameters
++    from mcp.client.stdio import stdio_client
++    import docmancer
++    from docmancer.docs.application.project_docs_member_transaction import catalog_entry_hash
++    from docmancer.docs.project_docs_catalog import read_project_docs_catalog
++
++    origin = Path(docmancer.__file__).resolve()
++    checkout = Path(__file__).resolve().parents[2]
++    if origin.is_relative_to(checkout) or not origin.is_relative_to(Path(sys.prefix).resolve()):
++        raise ValueError("must import installed wheel from isolated venv, never checkout")
++    if args.work.exists() or args.output.exists():
++        raise ValueError("fresh safe work/output required")
++    # Reject unsafe host ancestors before provisioning anything. No chmod of user paths.
++    parent = args.work.resolve().parent
++    for ancestor in (parent, *parent.parents):
++        if ancestor.stat().st_mode & 0o022 and not (ancestor.stat().st_mode & 0o1000):
++            raise ValueError(f"unsafe storage ancestor: {ancestor}; use explicit secure-home fixture parent")
++    args.work.mkdir(mode=0o700)
++    args.output.mkdir(parents=True)
++    root = args.work.resolve()
++    project = root / "project"
++    project.mkdir(mode=0o700)
++    entries = []
++    for name, text in DOCUMENTS.items():
++        target = project / name
++        target.parent.mkdir(parents=True, exist_ok=True)
++        target.write_bytes(text.encode())
++        entries.append(dict(path=name, role="other", scope="project", description="Pinned smoke source",
++                            authority="source_of_truth", status="active", impact="track"))
++    catalog = project / "docatlas.project-docs.yaml"
++    catalog.write_text(json.dumps(dict(schema_version=1, code_files=[], documents=entries)))
++    env = {key: os.environ[key] for key in ("PATH", "SYSTEMROOT", "WINDIR") if key in os.environ}
++    for key in ("HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_CACHE_HOME", "DOCATLAS_HOME"):
++        path = root / key.lower()
++        path.mkdir(mode=0o700)
++        env[key] = str(path)
++    env.update(PYTHONNOUSERSITE="1", DOCATLAS_OFFLINE="1", DOCATLAS_AUTO_VECTORS="0",
++               DOCATLAS_MCP_ADMIN_TOOLS="0", DOCATLAS_MCP_ADVANCED_TOOLS="0",
++               DOCATLAS_REGISTRY_API_URL="http://127.0.0.1:1", NO_PROXY="*")
++    if args.arm != "V0":
++        env["DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL"] = args.arm
++    env["DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS"] = str(manifest["config"]["packing_tokens"])
++    storage = Path(env["DOCATLAS_HOME"]) / "mcp-members/members.db"
++    mutation = dict(operation="sync_project_docs", confirm=True, storage_path=str(storage),
++                    expected_generation_id=None, catalog_sha256=sha(catalog.read_bytes()), documents=[
++        dict(path=entry.path, content_sha256=sha((project / entry.path).read_bytes()),
++             catalog_entry_hash=catalog_entry_hash(entry)) for entry in read_project_docs_catalog(project).entries])
++    receipts = args.output / "EXECUTION_LEDGER.jsonl"
++    executable = Path(sys.prefix) / "bin/doc-atlas"
++    parameters = StdioServerParameters(command=str(executable), args=["mcp", "docs-serve"], env=env, cwd=str(root))
++    counts = dict(prepare=0, context=0, resource=0, model=0)
++    async def call(session, tool, arguments):
++        counts["prepare" if tool == "prepare_docs" else "context"] += 1
++        index = sum(counts.values())
++        ledger(receipts, tool, "started", call=index, arguments=arguments)
++        start = time.perf_counter()
++        try:
++            result = await asyncio.wait_for(session.call_tool(tool, arguments), timeout=60)
++            payload = decode(result)
++            save(args.output / f"call-{index}.json", dict(tool=tool, payload=payload, is_error=result.isError,
++                 sdk_result=result.model_dump(mode="json")))
++            ledger(receipts, tool, "returned", call=index, seconds=time.perf_counter() - start)
++            return payload
++        except BaseException as exc:
++            ledger(receipts, tool, "error", call=index, error=str(exc))
++            raise
++    with (args.output / "server.stderr").open("w") as stderr:
++        async with stdio_client(parameters, errlog=stderr) as streams:
++            async with ClientSession(*streams) as session:
++                await asyncio.wait_for(session.initialize(), 60)
++                ledger(receipts, "initialize", "returned")
++                listed = await asyncio.wait_for(session.list_tools(), 60)
++                save(args.output / "tools.json", listed.model_dump(mode="json"))
++                ledger(receipts, "list_tools", "returned")
++                assert {tool.name for tool in listed.tools} == {"prepare_docs", "get_docs_context", "docs_status"}
++                prepared = await call(session, "prepare_docs", dict(action="sync_project_docs", project_path=str(project), mutation=mutation))
++                assert prepared.get("status") == "success", prepared
++                inventory = dict(storage_path=str(storage), generation_id=prepared["metrics"]["generation_id"])
++                save(args.output / "snapshots.json", snapshots(inventory, project, DOCUMENTS))
++                before, before_files = database(storage), files(project)
++                public = await call(session, "get_docs_context", dict(question=QUESTION, project_path=str(project), scope="project"))
++                checks = integrity(public, project, DOCUMENTS)
++                save(args.output / "integrity.json", checks)
++                assert not checks["errors"], checks
++                assert any(FACT in row["snippet"] for row in public.get("sources") or []), public
++                row = next(row for row in public["sources"] if row.get("source_uri"))
++                counts["resource"] += 1
++                ledger(receipts, "read_resource", "started", uri=row["source_uri"])
++                resource = await asyncio.wait_for(session.read_resource(row["source_uri"]), 60)
++                save(args.output / "resource.json", resource.model_dump(mode="json"))
++                ledger(receipts, "read_resource", "returned")
++                content = json.loads(resource.contents[0].text)
++                if content.get("status") == "complete":
++                    assert content.get("reason_code") == "end_of_source"
++                else:
++                    assert content["content_sha256"] == "sha256:" + sha(DOCUMENTS["docs/auth.md"].encode())
++                    assert content["project_identity"] == row["project_identity"]
++                    assert Path(content["path"]) == project / "docs/auth.md"
++                    start, end = content["line_start"], content["line_end"]
++                    assert 1 <= start <= end <= len(DOCUMENTS["docs/auth.md"].splitlines())
++                    assert content["snippet"] == "\n".join(DOCUMENTS["docs/auth.md"].splitlines()[start - 1:end])
++                version = await call(session, "get_docs_context", dict(question=QUESTION, project_path=str(project), version="99.0.0"))
++                assert not version.get("sources") and version.get("answer_available") is not True
++                assert database(storage) == before and files(project) == before_files
++    save(args.output / "SUMMARY.json", dict(status="completed", boundary="installed wheel stdio MCP, isolated docs-only corpus",
++         origin=str(origin), python=sys.executable, arm=args.arm, counts=counts, source_integrity="PASS",
++         client_session="NOT RUN", production_smoke="NOT RUN", answer_quality="NOT MEASURED"))
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--work", type=Path, required=True)
++    parser.add_argument("--output", type=Path, required=True)
++    parser.add_argument("--arm", choices=["V0", "Q", "A", "S", "ALL"], default="ALL")
++    parser.add_argument("--runtime-authorization", required=True)
++    parser.add_argument("--manifest", type=Path, required=True)
++    args = parser.parse_args()
++    try:
++        asyncio.run(asyncio.wait_for(smoke(args), timeout=240))
++    except BaseException as exc:
++        if args.output.exists():
++            save(args.output / "BLOCKED.json", dict(status="BLOCKED", error=str(exc), type=type(exc).__name__))
++        raise
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/eval/heuristic_removal/receipts.py b/eval/heuristic_removal/receipts.py
+new file mode 100644
+index 00000000..054403bf
+--- /dev/null
++++ b/eval/heuristic_removal/receipts.py
+@@ -0,0 +1,167 @@
++"""Independent raw-source and state receipts, reused by public scenarios."""
++from __future__ import annotations
++
++from contextlib import closing, contextmanager
++from copy import deepcopy
++from datetime import datetime, timezone
++import hashlib
++import json
++from pathlib import Path
++import signal
++import sqlite3
++
++
++def sha(raw):
++    return hashlib.sha256(raw).hexdigest()
++
++
++def save(path, value):
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
++
++
++def ledger(path, operation, status, **fields):
++    import os
++    path.parent.mkdir(parents=True, exist_ok=True)
++    with path.open("a") as handle:
++        handle.write(json.dumps(dict(at_utc=datetime.now(timezone.utc).isoformat(),
++                                    operation=operation, status=status, **fields)) + "\n")
++        handle.flush()
++        os.fsync(handle.fileno())
++
++
++@contextmanager
++def deadline(seconds):
++    """Linux/main-thread per-call ceiling; outer coordinator must also bound wall."""
++    def expired(signum, frame):
++        raise TimeoutError(f"frozen deadline {seconds}s")
++    previous = signal.signal(signal.SIGALRM, expired)
++    signal.alarm(seconds)
++    try:
++        yield
++    finally:
++        signal.alarm(0)
++        signal.signal(signal.SIGALRM, previous)
++
++
++def files(root):
++    return {p.relative_to(root).as_posix(): sha(p.read_bytes())
++            for p in sorted(root.rglob("*")) if p.is_file()}
++
++
++def database(path):
++    """Read-only logical state equality, not an expected implementation snapshot."""
++    with closing(sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)) as db:
++        names = db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
++        return {name: sha(repr(sorted(db.execute('SELECT * FROM "' + name.replace('"', '""') + '"')
++                                      .fetchall(), key=repr)).encode()) for (name,) in names}
++
++
++def snapshots(inventory, root, documents):
++    with closing(sqlite3.connect(Path(inventory["storage_path"]).resolve().as_uri() + "?mode=ro", uri=True)) as db:
++        rows = db.execute("SELECT source, content, metadata_json FROM generation_sources WHERE generation_id=?",
++                          (inventory["generation_id"],)).fetchall()
++    result = []
++    for source, content, metadata in rows:
++        relative = Path(source).relative_to(root).as_posix()
++        digest = sha(content.encode())
++        if relative not in documents or content != documents[relative]:
++            raise ValueError("committed source differs from independent pinned bytes")
++        if json.loads(metadata).get("project_doc_content_hash") != "sha256:" + digest:
++            raise ValueError("committed raw hash mismatch")
++        result.append(dict(path=relative, content_sha256=digest, matches_pinned_source=True))
++    if {row["path"] for row in result} != set(documents):
++        raise ValueError("published source membership mismatch")
++    return result
++
++
++def relative_path(value, root):
++    if not isinstance(value, str) or "://" in value or "\\" in value:
++        return None
++    path = Path(value)
++    if ".." in path.parts:
++        return None
++    try:
++        return path.relative_to(root).as_posix() if path.is_absolute() else path.as_posix()
++    except ValueError:
++        return None
++
++
++def integrity(payload, root, documents, module_paths=()):
++    """Check actual public sources against independent bytes, not product validators.
++
++    content_sha256 is a projection fingerprint: shape only, not a raw-file hash.
++    Raw source hashes are independently checked in snapshots/resources/read_next.
++    """
++    errors, rows, identities = [], [], set()
++    expected_identity = "local:" + sha(str(root).encode())
++    if not isinstance(payload, dict) or not isinstance(payload.get("sources", []), list):
++        return {"errors": ["invalid_public_payload"], "rows": []}
++    for index, row in enumerate(payload.get("sources") or []):
++        issues = []
++        relative = relative_path(row.get("path_or_url"), root)
++        text = documents.get(relative)
++        start, end, snippet = row.get("line_start"), row.get("line_end"), row.get("snippet")
++        if text is None:
++            issues.append("foreign_source")
++        elif not (type(start) is int and type(end) is int and 1 <= start <= end <= len(text.splitlines())):
++            issues.append("invalid_line_span")
++        elif not isinstance(snippet, str) or not snippet or snippet.encode() not in "".join(
++                text.splitlines(keepends=True)[start - 1:end]).encode():
++            issues.append("not_exact_raw_span")
++        expected_scope = "module" if relative in module_paths else "project"
++        if row.get("scope") != expected_scope:
++            issues.append("wrong_scope")
++        if row.get("version_binding") != "unversioned":
++            issues.append("wrong_version")
++        if row.get("authority") != "source_of_truth" or row.get("project_identity") != expected_identity:
++            issues.append("wrong_source_identity_or_authority")
++        fingerprint = row.get("content_sha256")
++        if not isinstance(fingerprint, str) or len(fingerprint) != 64 or any(c not in "0123456789abcdef" for c in fingerprint):
++            issues.append("invalid_projection_fingerprint")
++        identity = row.get("evidence_id")
++        if not isinstance(identity, str) or not identity or identity in identities:
++            issues.append("duplicate_or_missing_evidence_id")
++        identities.add(identity)
++        rows.append(dict(index=index, path=relative, raw_sha256=sha(text.encode()) if text is not None else None,
++                         errors=issues))
++        errors.extend(f"source[{index}]:{issue}" for issue in issues)
++    for target in payload.get("read_next") or []:
++        relative = relative_path(target.get("path"), root)
++        text = documents.get(relative)
++        if text is None or target.get("snapshot_sha256") != "sha256:" + sha(text.encode()):
++            errors.append("invalid_continuation_raw_hash_or_membership")
++        elif not (type(target.get("line_start")) is int and type(target.get("line_end")) is int
++                  and 1 <= target["line_start"] <= target["line_end"] <= len(text.splitlines())):
++            errors.append("invalid_continuation_span")
++        if target.get("project_identity") != expected_identity:
++            errors.append("invalid_continuation_identity")
++    for key in ("answer_supported", "answer_available", "edit_ready"):
++        if payload.get(key) is True:
++            errors.append("unexpected_authority:" + key)
++    return dict(errors=errors, rows=rows)
++
++
++def stable_packet(payload):
++    """Exclude only reissued capability bytes and their dependent estimate."""
++    result = deepcopy(payload)
++    result.pop("estimated_tokens", None)
++    for key in ("sources", "read_next"):
++        for row in result.get(key) or []:
++            row.pop("source_uri", None)
++    return result
++
++
++def pack(payload, tokenizer, cap):
++    """Whole-source ranked prefix; no crop, oracle, question or semantic score."""
++    evidence = []
++    for row in payload.get("sources") or []:
++        candidate = evidence + [row]
++        wire = json.dumps(candidate, ensure_ascii=False, sort_keys=True)
++        if len(tokenizer.encode(wire, disallowed_special=())) > cap:
++            break
++        evidence = candidate
++    wire = json.dumps(evidence, ensure_ascii=False, sort_keys=True)
++    return dict(sources=evidence, tokens=len(tokenizer.encode(wire, disallowed_special=())),
++                utf8_bytes=len(wire.encode()), sha256=sha(wire.encode()),
++                policy="whole-source input-rank prefix including full attribution", ceiling=cap)
+diff --git a/eval/heuristic_removal/run.py b/eval/heuristic_removal/run.py
+new file mode 100644
+index 00000000..f0326a1d
+--- /dev/null
++++ b/eval/heuristic_removal/run.py
+@@ -0,0 +1,340 @@
++"""Sequential public in-process comparison, never an installed-stdio claim.
++
++Selective reuse: old runner's cold prepare, source snapshots, read-only equality,
++durable receipts and bounded calls. No old RAS flags, stage helpers or oracle imports.
++"""
++from __future__ import annotations
++
++import argparse
++from contextlib import redirect_stderr
++import importlib.metadata
++import io
++import json
++import os
++from pathlib import Path
++import resource
++import importlib.util
++import subprocess
++import sys
++import time
++import traceback
++import zipfile
++
++# Script execution under -I exposes only this harness, never checkout docmancer.
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++from receipts import database, deadline, files, integrity, ledger, pack, save, sha, snapshots
++
++REPO = Path(__file__).resolve().parents[2]
++ARMS = {"V0": "", "VQ": "Q", "VA": "A", "VS": "S", "VALL": "ALL"}
++ARM_ENV = "DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL"
++
++
++def load_dataset(directory):
++    if (directory / "source_plan.json").is_file():
++        cases = json.loads((directory / "questions.json").read_bytes())["cases"]
++        families = json.loads((directory / "source_plan.json").read_bytes())["families"]
++    else:
++        # D's published INTERFACE.md. Coordinator calls this only AFTER code freeze.
++        sealed_manifest = json.loads((directory / "FREEZE_MANIFEST.json").read_bytes())
++        for item in sealed_manifest["files"]:
++            if sha((directory / item["path"]).read_bytes()) != item["sha256"]:
++                raise ValueError("D independent source/sealed digest mismatch")
++        cases = json.loads((directory / "sealed/questions.json").read_bytes())["cases"]
++        sources = json.loads((directory / "source-manifest.json").read_bytes())["sources"]
++        groups = sorted({row["project_group"] for row in sources})
++        families = [dict(id=group, paths=[Path(row["path"]).relative_to(Path("corpus") / group).as_posix()
++                    for row in sources if row["project_group"] == group]) for group in groups]
++    if len({case["id"] for case in cases}) != len(cases):
++        raise ValueError("duplicate case id")
++    known = {family["id"] for family in families}
++    if any(case["project_group"] not in known or not isinstance(case["question"], str) for case in cases):
++        raise ValueError("invalid public dataset")
++    return cases, families
++
++
++def source_directory(dataset, family):
++    return dataset / ("sources" if (dataset / "source_plan.json").is_file() else "corpus") / family
++
++
++def freeze(config_path, manifest_path):
++    if manifest_path.exists():
++        raise ValueError("freeze manifest already exists")
++    config = json.loads(config_path.read_bytes())
++    if config.get("runtime_authorized") is not True or not config.get("authorization_reference"):
++        raise ValueError("current checkpoint forbids runtime; explicit coordinator authorization required")
++    if config.get("common"):
++        raise ValueError("no legacy experiment flags: actual HEAD default is V0")
++    code_freeze = Path(config["code_freeze_manifest"])
++    if sha(code_freeze.read_bytes()) != config["code_freeze_sha256"]:
++        raise ValueError("coordinator code-freeze receipt missing or changed; do not open D sealed questions")
++    if config["limits"] != dict(context_calls=340, call_seconds=60, prepare_seconds=180, wall_seconds=1800):
++        raise ValueError("limits must match the proposed frozen ceiling; stricter checkpoints require coordinator revision")
++    paths = [config_path.resolve(), REPO / "pyproject.toml", REPO / "eval/evidence_quality_v2/runtime.py",
++             REPO / "tests/test_heuristic_removal_public_integration.py",
++             REPO / "tests/test_prepared_retrieval_integration.py",
++             REPO / "eval/prepared_model_comparison40/evaluate.py"]
++    for directory in (REPO / "docmancer", REPO / "eval/heuristic_removal"):
++        paths += [p for p in directory.rglob("*") if p.is_file() and "__pycache__" not in p.parts]
++    for specification in config["datasets"]:
++        directory = Path(specification["path"]).resolve()
++        cases, _ = load_dataset(directory)
++        if len(cases) != specification["count"]:
++            raise ValueError("exact frozen dataset count mismatch")
++        paths += [p for p in directory.rglob("*") if p.is_file() and "__pycache__" not in p.parts]
++    paths += [Path(p).resolve() for p in config["freeze_files"]]
++    paths += [code_freeze.resolve(), Path(config["baseline_wheel"]).resolve(), Path(config["candidate_wheel"]).resolve()]
++    planned = sum(spec["count"] * len(spec["arms"]) for spec in config["datasets"])
++    if planned != 340 or [spec["count"] for spec in config["datasets"]] != [40, 20, 20]:
++        raise ValueError("required historical60 x5 + new20 x2 design")
++    if any(spec["arms"] != (list(ARMS) if index < 2 else ["V0", "VALL"])
++           for index, spec in enumerate(config["datasets"])):
++        raise ValueError("invalid frozen arms")
++    manifest = dict(schema_version=1, config=config,
++                    base_commit=subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip(),
++                    inputs_sha256={str(p): sha(p.read_bytes()) for p in sorted(set(paths))},
++                    boundary="public in-process MCP dispatcher; real isolated member SQLite; NOT stdio/client/production",
++                    arm_env=ARM_ENV, arms=ARMS, planned_context_calls=planned,
++                    baseline="pinned base91dd2b4e installed wheel interpreter; no previous RAS flags",
++                    generator_status="NOT MEASURED", python=sys.version,
++                    dependencies={name: importlib.metadata.version(name) for name in ("doc-atlas", "mcp", "tiktoken")})
++    save(manifest_path, manifest)
++
++
++def verify(manifest):
++    changed = [name for name, digest in manifest["inputs_sha256"].items() if sha(Path(name).read_bytes()) != digest]
++    if changed:
++        raise ValueError("frozen files changed: " + repr(changed))
++
++
++def run(manifest_path, output, work, worker=None):
++    manifest = json.loads(manifest_path.read_bytes())
++    verify(manifest)
++    config = dict(manifest["config"])
++    if not config.get("runtime_authorized"):
++        raise ValueError("runtime not authorized")
++    if worker is None:
++        return orchestrate(manifest_path, manifest, output, work)
++    worker = json.loads(worker.read_bytes())
++    config["datasets"] = worker["datasets"]
++    call_cap = sum(spec["count"] for spec in config["datasets"])
++    if not config.get("runtime_authorized"):
++        raise ValueError("runtime not authorized")
++    if output.exists() or work.exists():
++        raise ValueError("fresh output and work required; attempts never overwritten")
++    output.mkdir(parents=True)
++    work.mkdir(parents=True, mode=0o700)
++    # Load only the established environment fixture by explicit file. Its product
++    # imports resolve exclusively to this interpreter's installed wheel.
++    runtime_spec = importlib.util.spec_from_file_location("heuristic_removal_fixture_runtime", REPO / "eval/evidence_quality_v2/runtime.py")
++    runtime = importlib.util.module_from_spec(runtime_spec)
++    runtime_spec.loader.exec_module(runtime)
++    from docmancer.mcp.docs_server import call_docs_tool_payload
++    from docmancer.docs.application.query_trace import query_trace
++    import docmancer
++    import tiktoken
++    origin = Path(docmancer.__file__).resolve()
++    if origin.is_relative_to(REPO) or not origin.is_relative_to(Path(sys.prefix).resolve()):
++        raise ValueError("comparison must use installed wheel in selected interpreter, not checkout")
++    if str(Path(sys.executable).resolve()) != str(Path(worker["python"]).resolve()):
++        raise ValueError("wrong baseline/candidate interpreter")
++    if Path(sys.prefix).resolve() != Path(worker["python"]).parent.parent.resolve():
++        raise ValueError("wrong baseline/candidate prefix")
++    arm = worker["datasets"][0]["arms"][0]
++    wheel = Path(config["baseline_wheel" if arm == "V0" else "candidate_wheel"])
++    installed_files = {}
++    with zipfile.ZipFile(wheel) as archive:
++        for name in archive.namelist():
++            if name.startswith("docmancer/") and not name.endswith("/"):
++                expected = sha(archive.read(name))
++                target = origin.parent.parent / name
++                if not target.is_file() or sha(target.read_bytes()) != expected:
++                    raise ValueError("installed artifact differs from frozen wheel: " + name)
++                installed_files[name] = expected
++    save(output / "INSTALLED_ORIGIN.json", dict(python=sys.executable, prefix=sys.prefix, origin=str(origin),
++         wheel=str(wheel), wheel_sha256=sha(wheel.read_bytes()), installed_files_sha256=installed_files))
++    if config.get("tokenizer_cache_dir"):
++        os.environ["TIKTOKEN_CACHE_DIR"] = config["tokenizer_cache_dir"]
++    tokenizer = tiktoken.get_encoding("o200k_base")
++    # Cache asset must be supplied and hashed in freeze_files before this call.
++    summary = dict(status="running", preparations=0, contexts=0, resources=0, model_calls=0,
++                   installed_origin=str(Path(docmancer.__file__).resolve()), records=[], stopped_arms=[])
++    started = time.perf_counter()
++    stopped = set()
++    ledger_path = output / "EXECUTION_LEDGER.jsonl"
++    original_env = dict(os.environ)
++    try:
++        for spec in config["datasets"]:
++            dataset_index = spec["index"]
++            dataset = Path(spec["path"]).resolve()
++            cases, families = load_dataset(dataset)
++            for family in families:
++                selected = [case for case in cases if case["project_group"] == family["id"]]
++                if "case_ids" in spec:
++                    # Recovery only: completed/started IDs are never replayed.
++                    selected = [case for case in selected if case["id"] in spec["case_ids"]]
++                if not selected:
++                    continue
++                group = f'{dataset_index}-{family["id"]}'
++                root = (work / group / "project").resolve()
++                documents = {}
++                for name in family["paths"]:
++                    source = (source_directory(dataset, family["id"]) / name).resolve()
++                    if not source.is_relative_to(source_directory(dataset, family["id"]).resolve()):
++                        raise ValueError("source escapes pinned family")
++                    documents[name] = source.read_bytes().decode("utf-8")
++                runtime.write_project(root, documents)
++                with runtime.isolated_service(work / group / "state") as (service, service_config):
++                    if time.perf_counter() - started >= worker["wall_seconds"]:
++                        raise TimeoutError("overall comparison wall ceiling")
++                    summary["preparations"] += 1
++                    ledger(ledger_path, "prepare_docs", "started", family=group)
++                    with deadline(min(180, max(1, int(worker["wall_seconds"] - (time.perf_counter() - started))))):
++                        inventory = runtime.index_project(service, service_config, root)
++                    committed = snapshots(inventory, root, documents)
++                    initial_db, initial_files = database(inventory["storage_path"]), files(root)
++                    save(output / "preparation" / f"{group}.json", dict(root=str(root), inventory=inventory,
++                         snapshot_sources=committed, dataset=str(dataset), family=family["id"]))
++                    ledger(ledger_path, "prepare_docs", "returned", family=group, seconds=inventory["seconds"])
++                    for case_index, case in enumerate(selected):
++                        arms = spec["arms"]
++                        arms = arms[case_index % len(arms):] + arms[:case_index % len(arms)]
++                        for arm in arms:
++                            if arm in stopped:
++                                continue
++                            verify(manifest)
++                            if summary["contexts"] >= call_cap or time.perf_counter() - started >= worker["wall_seconds"]:
++                                raise TimeoutError("comparison call/wall ceiling")
++                            for key in tuple(os.environ):
++                                if key.startswith("DOCATLAS_EXPERIMENT_"):
++                                    del os.environ[key]
++                            if ARMS[arm]:
++                                os.environ[ARM_ENV] = ARMS[arm]
++                            os.environ["DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS"] = str(config["packing_tokens"])
++                            arguments = dict(question=case["question"], project_path=str(root), scope="project")
++                            destination = output / "calls" / str(dataset_index) / case["id"] / arm
++                            trace = io.StringIO()
++                            metadata = dict(case_id=case["id"], variant=arm, dataset=str(dataset), family=group,
++                                            public_request=arguments, status="started", model_calls=0)
++                            save(destination / "metadata.json", metadata)
++                            summary["contexts"] += 1
++                            ledger(ledger_path, "get_docs_context", "started", case_id=case["id"], arm=arm)
++                            call_start, cpu = time.perf_counter(), time.process_time()
++                            try:
++                                remaining = max(1, int(worker["wall_seconds"] - (time.perf_counter() - started)))
++                                with redirect_stderr(trace), query_trace(config["trace"]), deadline(min(60, remaining)):
++                                    payload = call_docs_tool_payload("get_docs_context", arguments, service)
++                                # Persist native public bytes before independent assessment/packing.
++                                save(destination / "public-payload.json", payload)
++                                wire = (destination / "public-payload.json").read_bytes()
++                                checks = integrity(payload, root, documents)
++                                save(destination / "integrity.json", checks)
++                                save(destination / "packed.json", pack(payload, tokenizer, config["packing_tokens"]))
++                                metadata.update(status="returned", integrity_errors=checks["errors"],
++                                                raw_sha256=sha(wire), utf8_bytes=len(wire),
++                                                tokens=len(tokenizer.encode(wire.decode(), disallowed_special=())))
++                                if checks["errors"]:
++                                    stopped.add(arm)
++                                    ledger(ledger_path, "arm_stop", "integrity_error", arm=arm, errors=checks["errors"])
++                            except Exception as exc:
++                                metadata.update(status="error", error=str(exc), traceback=traceback.format_exc())
++                                # A failed context is never repaired/retried; prevent unknown safety from continuing.
++                                stopped.add(arm)
++                            metadata.update(seconds=time.perf_counter() - call_start,
++                                            cpu_seconds=time.process_time() - cpu,
++                                            peak_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
++                                            database_unchanged=database(inventory["storage_path"]) == initial_db,
++                                            files_unchanged=files(root) == initial_files)
++                            (destination / "trace.jsonl").write_text(trace.getvalue())
++                            save(destination / "metadata.json", metadata)
++                            summary["records"].append(metadata)
++                            ledger(ledger_path, "get_docs_context", metadata["status"], case_id=case["id"], arm=arm,
++                                   seconds=metadata["seconds"])
++                            save(output / "SUMMARY.json", summary)
++                            if not metadata["database_unchanged"] or not metadata["files_unchanged"]:
++                                raise ValueError("read-only state violation; stop whole run")
++        verify(manifest)
++        summary["status"] = "completed" if not stopped and summary["contexts"] == call_cap else "incomplete_or_integrity_failure"
++    except Exception as exc:
++        summary.update(status="error", error=str(exc), traceback=traceback.format_exc())
++        ledger(ledger_path, "workload", "error", error=str(exc))
++    finally:
++        os.environ.clear()
++        os.environ.update(original_env)
++        summary.update(seconds=time.perf_counter() - started, stopped_arms=sorted(stopped))
++        save(output / "SUMMARY.json", summary)
++    return 0 if summary["status"] == "completed" else 1
++
++
++def orchestrate(manifest_path, manifest, output, work):
++    """Installed subprocess lanes; sequential, fixed V0/Q/A/S/ALL order, no retry."""
++    if output.exists() or work.exists():
++        raise ValueError("fresh coordinator output/work required")
++    output.mkdir(parents=True)
++    work.mkdir(parents=True, mode=0o700)
++    config = manifest["config"]
++    started = time.perf_counter()
++    result = dict(status="running", contexts=0, preparations=0, model_calls=0, arms={})
++    try:
++        for arm in ARMS:
++            verify(manifest)
++            remaining = int(1800 - (time.perf_counter() - started))
++            if remaining <= 0:
++                raise TimeoutError("overall engine wall ceiling")
++            specs = [dict(spec, index=index, arms=[arm]) for index, spec in enumerate(config["datasets"])
++                     if arm in spec["arms"]]
++            interpreter = config["baseline_python" if arm == "V0" else "candidate_python"]
++            lane = dict(python=interpreter, datasets=specs, wall_seconds=remaining)
++            worker_path = output / f"worker-{arm}.json"
++            save(worker_path, lane)
++            command = [interpreter, "-I", str(Path(__file__).resolve()), "--manifest", str(manifest_path.resolve()),
++                       "--output", str((output / arm).resolve()), "--work", str((work / arm).resolve()),
++                       "--worker", str(worker_path.resolve())]
++            ledger(output / "EXECUTION_LEDGER.jsonl", "arm_process", "started", arm=arm, command=command)
++            with (output / f"{arm}.stdout").open("w") as stdout, (output / f"{arm}.stderr").open("w") as stderr:
++                child = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=remaining, cwd=work,
++                                       env={key: value for key, value in os.environ.items()
++                                            if key != "PYTHONPATH" and not key.startswith("DOCATLAS_")})
++            summary_path = output / arm / "SUMMARY.json"
++            summary = json.loads(summary_path.read_bytes()) if summary_path.exists() else dict(status="setup_failure", contexts=0, preparations=0)
++            result["arms"][arm] = summary
++            result["contexts"] += summary["contexts"]
++            result["preparations"] += summary["preparations"]
++            ledger(output / "EXECUTION_LEDGER.jsonl", "arm_process", "returned", arm=arm, exit_code=child.returncode,
++                   contexts=summary["contexts"], preparations=summary["preparations"])
++            if result["contexts"] > 340:
++                raise ValueError("global context ceiling")
++        result["status"] = "completed" if result["contexts"] == 340 and all(
++            lane["status"] == "completed" for lane in result["arms"].values()) else "incomplete_or_failed"
++    except Exception as exc:
++        result.update(status="error", error=str(exc), traceback=traceback.format_exc())
++    finally:
++        # Started receipts remain authoritative even if an outer timeout kills a
++        # worker before SUMMARY.json. Never omit a timed-out attempt from costs.
++        attempts = []
++        for path in output.glob("*/EXECUTION_LEDGER.jsonl"):
++            attempts.extend(json.loads(line) for line in path.read_text().splitlines())
++        result["contexts"] = sum(row["operation"] == "get_docs_context" and row["status"] == "started" for row in attempts)
++        result["preparations"] = sum(row["operation"] == "prepare_docs" and row["status"] == "started" for row in attempts)
++        result["raw_attempt_ledger_rows"] = len(attempts)
++        result["seconds"] = time.perf_counter() - started
++        save(output / "SUMMARY.json", result)
++    return 0 if result["status"] == "completed" else 1
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--config", type=Path)
++    parser.add_argument("--manifest", type=Path, required=True)
++    parser.add_argument("--freeze", action="store_true")
++    parser.add_argument("--output", type=Path)
++    parser.add_argument("--work", type=Path)
++    parser.add_argument("--worker", type=Path)
++    args = parser.parse_args()
++    if args.freeze:
++        freeze(args.config, args.manifest)
++        return 0
++    return run(args.manifest, args.output, args.work, args.worker)
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tests/diagnostic_labels.heuristic_removal.json b/tests/diagnostic_labels.heuristic_removal.json
+new file mode 100644
+index 00000000..5b664acd
+--- /dev/null
++++ b/tests/diagnostic_labels.heuristic_removal.json
+@@ -0,0 +1,10 @@
++{
++  "schema_version": 1,
++  "module_labels": {
++    "tests/test_heuristic_removal_public_integration.py": "behavioral"
++  },
++  "node_overrides": {},
++  "module_node_hashes": {
++    "tests/test_heuristic_removal_public_integration.py": "c9afbb1808c89a454ad1d75802b3ce5fcbfd347e8921c365cf1f296387a4378a"
++  }
++}
+diff --git a/tests/test_heuristic_removal_public_integration.py b/tests/test_heuristic_removal_public_integration.py
+new file mode 100644
+index 00000000..3322d29b
+--- /dev/null
++++ b/tests/test_heuristic_removal_public_integration.py
+@@ -0,0 +1,158 @@
++"""Public prepare/context/resource guards with real components, no mocks.
++
++Two scenarios: 4 confirmed prepare/sync calls, 13 context calls, <=2 resources,
++0 models. Existing optics/scope documents and facts reused unchanged.
++Only host environment is selected; no product helper is asserted or replaced.
++"""
++from __future__ import annotations
++
++import json
++from pathlib import Path
++
++import yaml
++import tiktoken
++
++from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
++from docmancer.docs.application.query_trace import query_trace
++from eval.evidence_quality_v2 import runtime
++from eval.heuristic_removal.receipts import database, files, integrity, pack, relative_path, sha, snapshots, stable_packet
++from tests.test_prepared_retrieval_integration import (
++    OPTICS_DOCUMENTS, OPTICS_FACTS, OPTICS_QUESTION, UPDATED_ISSUE,
++    UPDATED_OPTICS_FACTS, SCOPE_DOCUMENTS, SHUTTER_QUESTION, MODULE_QUESTION,
++    state_root,
++)
++
++
++def context(service, root, question, **extra):
++    return call_docs_tool_payload("get_docs_context", dict(
++        question=question, project_path=str(root), scope="project", **extra), service)
++
++
++def facts(payload, root, required):
++    for relative, statements in required.items():
++        delivered = [row["snippet"] for row in payload.get("sources") or []
++                     if relative_path(row["path_or_url"], root) == relative]
++        for statement in statements:
++            assert any(statement in text for text in delivered), (relative, statement, delivered)
++
++
++def read_source(service, row, root, documents):
++    """At most one resource per supplied row, no continuation loop."""
++    assert row.get("source_uri"), "public source capability missing"
++    response = read_docs_resource(row["source_uri"], service)
++    assert response is not None
++    payload = json.loads(response["text"])
++    if payload.get("status") == "complete":
++        assert payload.get("reason_code") == "end_of_source"
++        return
++    relative = Path(payload["path"]).relative_to(root).as_posix()
++    text = documents[relative]
++    assert payload["content_sha256"] == "sha256:" + sha(text.encode())
++    assert payload["project_identity"] == row["project_identity"]
++    start, end = payload["line_start"], payload["line_end"]
++    assert type(start) is int and type(end) is int and 1 <= start <= end <= len(text.splitlines())
++    assert payload["snippet"] == "\n".join(text.splitlines()[start - 1:end])
++
++
++def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
++    tmp_path, monkeypatch, state_root, record_property,
++):
++    """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), <=2 resources."""
++    root = (tmp_path / "project").resolve()
++    runtime.write_project(root, OPTICS_DOCUMENTS)
++    with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
++        env.setenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", "ALL")
++        env.setenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", "12000")
++        inventory = runtime.index_project(service, config, root)
++        snapshots(inventory, root, OPTICS_DOCUMENTS)
++        before, initial_files = database(inventory["storage_path"]), files(root)
++        packets = []
++        for trace in (False, True, False):
++            with query_trace(trace):
++                payload = context(service, root, OPTICS_QUESTION)
++            assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
++            facts(payload, root, OPTICS_FACTS)
++            packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
++            facts(packed, root, OPTICS_FACTS)
++            assert packed["tokens"] <= 12000
++            packets.append(payload)
++        assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
++        record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
++        old_row = next(row for row in packets[0]["sources"]
++                       if relative_path(row["path_or_url"], root) == "docs/issue.md")
++        read_source(service, old_row, root, OPTICS_DOCUMENTS)
++        partial = context(service, root,
++                          "How must lenses be packed for an observation trip, and what is the helicopter refuelling schedule?")
++        assert not integrity(partial, root, OPTICS_DOCUMENTS)["errors"]
++        facts(partial, root, {"docs/packing.md": OPTICS_FACTS["docs/packing.md"]})
++        assert partial.get("answer_supported") is False and partial.get("answer_available") is False
++        assert partial.get("edit_ready") is False
++        assert database(inventory["storage_path"]) == before and files(root) == initial_files
++        (root / "docs/issue.md").write_bytes(UPDATED_ISSUE.encode())
++        edited_files = files(root)
++        stale = context(service, root, OPTICS_QUESTION)
++        assert not stale.get("sources") and stale.get("context_available") is False
++        assert stale.get("requires_confirmation") is True
++        stale_resource = json.loads(read_docs_resource(old_row["source_uri"], service)["text"])
++        assert stale_resource.get("status") in {"source_changed", "source_unavailable"}
++        assert "snippet" not in stale_resource
++        assert database(inventory["storage_path"]) == before and files(root) == edited_files
++        synced = runtime.index_project(service, config, root)
++        assert synced["generation_id"] != inventory["generation_id"]
++        updated = {**OPTICS_DOCUMENTS, "docs/issue.md": UPDATED_ISSUE}
++        snapshots(synced, root, updated)
++        synced_state = database(synced["storage_path"])
++        fresh = context(service, root, OPTICS_QUESTION)
++        assert not integrity(fresh, root, updated)["errors"]
++        facts(fresh, root, UPDATED_OPTICS_FACTS)
++        assert "collection custodian" not in "\n".join(row["snippet"] for row in fresh["sources"])
++        # An unauthorized mutation field must be rejected, never treated as a grant.
++        rejected = context(service, root, OPTICS_QUESTION, mutation_intent={"operation": "delete", "confirm": True})
++        assert rejected.get("status") == "failed" and not rejected.get("sources")
++        assert rejected.get("edit_ready") is not True
++        assert database(synced["storage_path"]) == synced_state and files(root) == edited_files
++
++
++def test_public_removal_explicit_scope_version_and_foreign_locator(
++    tmp_path, monkeypatch, state_root,
++):
++    """2 prepare, 6 contexts; foreign project also indexed, so locator isolation is real."""
++    root, foreign = (tmp_path / "project").resolve(), (tmp_path / "foreign").resolve()
++    runtime.write_project(root, SCOPE_DOCUMENTS)
++    catalog = root / "docatlas.project-docs.yaml"
++    data = yaml.safe_load(catalog.read_bytes())
++    for entry in data["documents"]:
++        if entry["path"] == "modules/imaging/guide.md":
++            entry.update(scope="module", module_path="modules/imaging")
++    catalog.write_text(yaml.safe_dump(data, sort_keys=False))
++    foreign_documents = {"docs/foreign.md": "# Foreign vault\n\n`FOREIGN_VAULT_PIN` unlocks the foreign vault.\n"}
++    runtime.write_project(foreign, foreign_documents)
++    with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
++        env.setenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", "ALL")
++        env.setenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", "12000")
++        runtime.index_project(service, config, foreign)
++        inventory = runtime.index_project(service, config, root)
++        # A generation contains both explicitly prepared project roots. Check
++        # all pinned bytes here; public contexts below still enforce root scope.
++        snapshots(inventory, root.parent, {
++            **{"project/" + name: text for name, text in SCOPE_DOCUMENTS.items()},
++            **{"foreign/" + name: text for name, text in foreign_documents.items()},
++        })
++        before, root_files, foreign_files = database(inventory["storage_path"]), files(root), files(foreign)
++        project = context(service, root, SHUTTER_QUESTION)
++        assert not integrity(project, root, {"docs/camera.md": SCOPE_DOCUMENTS["docs/camera.md"]})["errors"]
++        facts(project, root, {"docs/camera.md": ("`SHUTTER_DELAY` sets shutter delay to 230 milliseconds.",)})
++        module = context(service, root, MODULE_QUESTION, scope="module", module_path="modules/imaging")
++        assert not integrity(module, root, SCOPE_DOCUMENTS, ("modules/imaging/guide.md",))["errors"]
++        assert {row["scope"] for row in module.get("sources") or []} == {"module"}
++        facts(module, root, {"modules/imaging/guide.md": ("`SENSOR_GAIN` controls sensor gain for flat-field calibration.",)})
++        project_only = context(service, root, MODULE_QUESTION)
++        assert not integrity(project_only, root, {"docs/camera.md": SCOPE_DOCUMENTS["docs/camera.md"]})["errors"]
++        missing_module = context(service, root, MODULE_QUESTION, scope="module", module_path="modules/absent")
++        exact = context(service, root, SHUTTER_QUESTION, version="99.0.0")
++        locator = context(service, root, f"In {foreign / 'docs/foreign.md'}, explain `FOREIGN_VAULT_PIN`.")
++        for payload in (missing_module, exact, locator):
++            assert not payload.get("sources"), payload
++            assert payload.get("answer_available") is not True and payload.get("edit_ready") is not True
++        assert database(inventory["storage_path"]) == before
++        assert files(root) == root_files and files(foreign) == foreign_files

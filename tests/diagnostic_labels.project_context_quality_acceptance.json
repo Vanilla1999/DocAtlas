@@ -4,7 +4,7 @@
     "tests/test_project_context_quality_acceptance.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_project_context_quality_acceptance.py": "dff098d861cc1204b6f72817df57c3ff2f4b607e5c590a9ce10cb99a99bfe9af"
+    "tests/test_project_context_quality_acceptance.py": "ce4b46f2232613713e3e6065372b5a95d155b76cc5d9c9872bcefa076ee3604e"
   },
   "node_overrides": {}
 }

@@ -1,0 +1,10 @@
+{
+  "project": "/tmp/docatlas-v3-k4djfvvl/project",
+  "generation": "gen-44936eec3ab9455fa0b9e8f97e582777",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "document_hashes": {
+    "docs/roles.md": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+    "docs/routes.md": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b"
+  }
+}

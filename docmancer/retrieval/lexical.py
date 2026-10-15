@@ -17,10 +17,8 @@ def lexical_search(
     expand: str | None = None,
     filters: dict | None = None,
 ) -> list["RetrievedChunk"]:
-    return store.query(
+    return store.acquire_candidates(
         query,
-        limit=limit,
-        budget=budget,
         expand=expand or "none",
         filters=filters,
     )

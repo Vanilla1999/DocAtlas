@@ -1,0 +1,30 @@
+{
+  "archive": "selection-receipts.tar.xz",
+  "bytes": 37300,
+  "sha256": "50e38fd1ed8b19264af463b1185987079ce6d2a085094c548301a7c14ccd8330",
+  "original_bytes": 5895524,
+  "verification": "Every decompressed entry matched the original bytes and SHA256; no product/model/test rerun.",
+  "members": [
+    {
+      "path": "attempt-01-logging-baseline/artifacts/V40-V04-budget/trace-off/selection.json",
+      "bytes": 1474037,
+      "sha256": "14b623e19f17df48c096e19c3fe490f38b5cb9c4c192d9524a6cf23dc25323fb"
+    },
+    {
+      "path": "attempt-01-logging-baseline/artifacts/V40-V04-budget/trace-on/selection.json",
+      "bytes": 1474037,
+      "sha256": "7943480d2f094dc56c2bdfecc0a3c729423cfe5c7a434ed1152aa4fe04d9c37c"
+    },
+    {
+      "path": "attempt-02-native-restore/artifacts/V40-V04-budget/trace-off/selection.json",
+      "bytes": 1473725,
+      "sha256": "0c93937295909f81ac8c32156186fa9f7a99527445808494c6cddc34804f957b"
+    },
+    {
+      "path": "attempt-02-native-restore/artifacts/V40-V04-budget/trace-on/selection.json",
+      "bytes": 1473725,
+      "sha256": "7cb23b70cf1cdbea48f6b742823f5b5fe30a0cd0d540fb080fca07709cc70310"
+    }
+  ],
+  "restore_command": "python -m tarfile -e selection-receipts.tar.xz ."
+}

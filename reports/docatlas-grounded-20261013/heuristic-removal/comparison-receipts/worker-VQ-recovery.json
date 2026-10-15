@@ -1,0 +1,40 @@
+{
+  "python": "/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python",
+  "datasets": [
+    {
+      "path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+      "count": 0,
+      "arms": [
+        "VQ"
+      ],
+      "index": 0,
+      "case_ids": []
+    },
+    {
+      "path": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+      "count": 15,
+      "arms": [
+        "VQ"
+      ],
+      "index": 1,
+      "case_ids": [
+        "H20-U01",
+        "H20-U02",
+        "H20-U03",
+        "H20-U04",
+        "H20-U05",
+        "H20-M01",
+        "H20-M02",
+        "H20-M03",
+        "H20-M04",
+        "H20-M05",
+        "H20-M06",
+        "H20-T01",
+        "H20-T02",
+        "H20-T03",
+        "H20-T04"
+      ]
+    }
+  ],
+  "wall_seconds": 969
+}

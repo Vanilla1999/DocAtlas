@@ -1,0 +1,78 @@
+{
+  "status": "completed",
+  "removed_worktrees": [
+    "/tmp/opencode/pr211-parallel-authority",
+    "/tmp/opencode/pr211-parallel-hint",
+    "/tmp/opencode/pr211-parallel-review",
+    "/tmp/opencode/pr211-parallel-strict-attribute",
+    "/tmp/opencode/pr211-simplify-controls",
+    "/tmp/opencode/pr211-simplify-decisions",
+    "/tmp/opencode/pr211-simplify-routes",
+    "/tmp/opencode/docatlas-stage3-audit",
+    "/tmp/opencode/docatlas-stage3-pebble",
+    "/tmp/opencode/docatlas-stage3-fix",
+    "/tmp/opencode/docatlas-stage3-identity",
+    "/tmp/opencode/docatlas-stage3-stack"
+  ],
+  "removed_branches": [
+    "diagnostic/pr211-authority-20261006",
+    "diagnostic/pr211-hint-20261006",
+    "diagnostic/pr211-independent-review-20261006",
+    "diagnostic/pr211-strict-attribute-20261006",
+    "diagnostic/pr211-simplify-controls-20261006",
+    "diagnostic/pr211-simplify-decisions-20261006",
+    "diagnostic/pr211-simplify-routes-20261006",
+    "audit/stage3-reproduction-20261005",
+    "experiment/stage3-pebble-counterfactual",
+    "fix/stage3-checked-context-rescue-boundary",
+    "fix/stage3-fastembed-protocol-pin",
+    "fix/stage3-v2-document-identity",
+    "integration/stage3-fastembed-pr1"
+  ],
+  "historical_refs": [
+    {
+      "branch": "audit/stage3-reproduction-20261005",
+      "sha": "47f0f645c1fef92f1edca37f3bdfa9b5f1a48c60",
+      "worktree": "/tmp/opencode/docatlas-stage3-audit",
+      "preserved_by": "archive/pre-main-20261006/research-remote"
+    },
+    {
+      "branch": "experiment/stage3-pebble-counterfactual",
+      "sha": "264694706ff3c521abaf616f366db02a014362ea",
+      "worktree": null,
+      "preserved_by": "ancestor of integration/stage3-v2-identity-pr1"
+    },
+    {
+      "branch": "fix/stage3-checked-context-rescue-boundary",
+      "sha": "37bfd0668f819935dd9e027bd9d8bf767fcd185a",
+      "worktree": "/tmp/opencode/docatlas-stage3-pebble",
+      "preserved_by": "archive/pre-main-20261006/checked-context-rescue-boundary"
+    },
+    {
+      "branch": "fix/stage3-fastembed-protocol-pin",
+      "sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+      "worktree": "/tmp/opencode/docatlas-stage3-fix",
+      "preserved_by": "archive/pre-main-20261006/pr-208"
+    },
+    {
+      "branch": "fix/stage3-v2-document-identity",
+      "sha": "aafe6a461013bb0de97c3097253c7cb81cacfca7",
+      "worktree": "/tmp/opencode/docatlas-stage3-identity",
+      "preserved_by": "archive/pre-main-20261006/pr-210"
+    },
+    {
+      "branch": "integration/stage3-fastembed-pr1",
+      "sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "worktree": "/tmp/opencode/docatlas-stage3-stack",
+      "preserved_by": "archive/pre-main-20261006/pr-209"
+    }
+  ],
+  "remote_branches_deleted": [],
+  "remote_tracking_removed": [
+    {
+      "ref": "origin/pr211-merge",
+      "sha": "dc03bf97d4a812334faabb4e5758b44ba5f460e0",
+      "preserved_by": "archive/pr211-cleanup-20261006/stale-pr211-merge"
+    }
+  ]
+}

@@ -32,37 +32,6 @@ from docmancer.retrieval.contracts import ContextConfig, canonical_hash
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
 FENCED_CODE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})([^\n]*)\n(.*?)^ {0,3}\1\s*$", re.MULTILINE | re.DOTALL)
 
-# Keywords that indicate boilerplate/legal content.  Matched against
-# normalized title words so numbered headings like "12. Miscellaneous"
-# and subsections like "Privacy Policy" are caught.
-_BOILERPLATE_KEYWORDS = frozenset({
-    "terms", "conditions", "privacy", "policy", "legal", "disclaimer",
-    "eula", "license", "agreement", "dmca", "copyright", "sla",
-    "miscellaneous", "modifications", "indemnification", "severability",
-    "arbitration", "jurisdiction", "governing", "waiver", "warranties",
-    "limitation", "liability",
-})
-
-# Query stopwords that inflate BM25 scores for legal text without
-# carrying search intent.
-_QUERY_STOPWORDS = frozenset({
-    "how", "do", "i", "a", "an", "the", "to", "is", "it", "in", "on",
-    "of", "for", "my", "can", "what", "where", "when", "why", "does",
-    "should", "would", "could", "which", "with", "this", "that", "are", "was",
-    "be", "have", "has", "will", "we", "you", "your", "me",
-    "как", "каково", "на", "для", "и", "или", "что", "это", "его",
-    "ответь", "только", "основании", "проектной", "документации", "укажи",
-    "утверждений", "модуль", "модуля", "модуле", "модулю", "модули", "модулей",
-})
-
-_GENERIC_QUERY_TERMS = frozenset({
-    "add", "build", "configure", "configuration", "create", "docs",
-    "documentation", "enable", "generate", "guide", "index", "indexing",
-    "install", "overview", "reference", "request", "setup", "start", "use",
-    "which", "workflow", "где", "какая", "какие", "какой", "когда", "может",
-    "почему",
-})
-
 INDEX_SCHEMA_VERSION = "sqlite-sections-v1"
 
 

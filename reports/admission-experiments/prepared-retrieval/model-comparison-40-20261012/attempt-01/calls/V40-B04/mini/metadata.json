@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-B04",
+  "mode": "mini",
+  "question": "What does Black --no-cache do to cache reads and writes?",
+  "public_request": {
+    "question": "What does Black --no-cache do to cache reads and writes?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/black.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:12:48.737129+00:00",
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_before": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "same_initial_state": true,
+  "elapsed_seconds": 1.003208286001609,
+  "process_cpu_seconds": 1.7557901869999988,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 894440,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_after": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "wire_sha256": "5f185375c5c7c601f1f6d9464dfe66fbf3fe8ae4cb479d07ded7e100311406e8",
+  "wire_utf8_bytes": 2632,
+  "utf8_quarter_proxy": 658,
+  "codec_o200k_base": 784,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

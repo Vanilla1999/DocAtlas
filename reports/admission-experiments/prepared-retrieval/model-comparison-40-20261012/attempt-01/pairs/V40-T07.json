@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T07",
+  "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "c3772653c3256e807507ca75cbc031f0d8894548f0544ab6efbefb83da9712aa",
+      "mini_sha256": "c3772653c3256e807507ca75cbc031f0d8894548f0544ab6efbefb83da9712aa"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "d392a4119fcb9265b6a7c4c0b4f37a37c279c1fa4ba6663867d01c9e6e45871e",
+      "mini_sha256": "d392a4119fcb9265b6a7c4c0b4f37a37c279c1fa4ba6663867d01c9e6e45871e"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "307048795ab32644db160bb97e2c536a8967f462484209b5219eb41a05757874",
+      "mini_sha256": "307048795ab32644db160bb97e2c536a8967f462484209b5219eb41a05757874"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      1
+    ],
+    "mini": [
+      1
+    ]
+  },
+  "over_budget_pool": false,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

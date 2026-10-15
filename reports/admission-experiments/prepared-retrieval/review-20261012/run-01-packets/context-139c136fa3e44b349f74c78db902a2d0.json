@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+  "pytest_current_test": "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation (call)",
+  "arguments": {
+    "question": "For an observation trip with 11 lenses, how must the lenses be packed and who receives and signs the issue record?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-review-run01/test_final_budget_preserves_st0/project",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "no_docs_context_available"
+    ],
+    "estimated_tokens": 146,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "no_docs_context_available",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": true,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "no_docs_context_available"
+    },
+    "confirmation_reason": "project_docs_preflight",
+    "operational_status": "not_found"
+  },
+  "utf8_quarter_proxy": 155,
+  "public_source_count": 0
+}

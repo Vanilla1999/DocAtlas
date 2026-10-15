@@ -1,0 +1,119 @@
+[
+  {
+    "attempt": 1,
+    "command": "pytest tests/test_prepared_retrieval_integration.py -q -x",
+    "status": "FAIL_SETUP",
+    "pytest_elapsed_seconds": 1.07,
+    "completed_prepare_sync": 0,
+    "completed_context_calls": 0,
+    "completed_resource_reads": 0,
+    "model_calls": 0,
+    "reason": "Existing fixture hardcoded /tmp, absent in this sandbox; FileNotFoundError before service creation.",
+    "fix": "Fixture uses standard TemporaryDirectory selection; TMPDIR set to a private workspace path. Product storage-policy validation unchanged.",
+    "oracle_modified": false
+  },
+  {
+    "attempt": 2,
+    "command": "pytest tests/test_prepared_retrieval_integration.py -q -x",
+    "status": "FAIL_ASSERTION_INFRASTRUCTURE",
+    "pytest_elapsed_seconds": 0.86,
+    "completed_prepare_sync": 1,
+    "completed_context_calls": 1,
+    "completed_resource_reads": 0,
+    "model_calls": 0,
+    "reason": "Raw-span assertion reconstructed lines with splitlines() and removed the final LF present in a correct original snippet. Failure occurred on unchanged default baseline.",
+    "fix_pending": false,
+    "fix": "Independent F confirmed: preserve raw LF with splitlines(keepends=True). No task facts, question, revisions or cap changes.",
+    "test_verifier_correction": {
+      "before_sha256": "6229c0a7cafda83a3bc54a538f8cc0f83b6684247c2a059f2b2db8eac28ba104",
+      "after_sha256": "be3734acb28d262a314b77b5f5121e64f6bc2545c071eb57484066d2257ee48b"
+    },
+    "pre_broad_attribution_correction": {
+      "before_sha256": "be3734acb28d262a314b77b5f5121e64f6bc2545c071eb57484066d2257ee48b",
+      "after_sha256": "ca80742b1e1ddde0b51ad1f2df6926adc275bc1988dd321fe63e98b688aad450",
+      "reason": "Independent F confirmed baseline already has retrieval-only credit; test now prohibits new IDs vs baseline and keeps false answer/edit and unverified/partial quality. Documents/questions/facts/caps unchanged. See CONTRACT_DECISION_RU.md."
+    }
+  },
+  {
+    "attempt": 3,
+    "command": "pytest tests/test_prepared_retrieval_integration.py -q -x -o junit_family=legacy",
+    "status": "TESTS_PASS_REVIEW_BLOCKED",
+    "pytest_elapsed_seconds": 4.01,
+    "scenarios_passed": 4,
+    "completed_prepare_sync": 5,
+    "completed_context_calls": 22,
+    "completed_resource_reads": 6,
+    "model_calls": 0,
+    "reason": "First complete broad-mode execution after independently reviewed verifier corrections; no product fix based on broad outputs.",
+    "testcase_properties": [
+      {
+        "test": "test_source_valid_candidates_deliver_multifacet_bound_read_only_packet",
+        "time": "0.524",
+        "properties": {
+          "bounded_source_reads": "2"
+        }
+      },
+      {
+        "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+        "time": "0.684",
+        "properties": {
+          "negative_empty_source_current_contract": "PASS",
+          "unassessed_negative_source_count": "0",
+          "bounded_source_reads": "1"
+        }
+      },
+      {
+        "test": "test_prepared_parents_parity_legacy_freshness_update_and_restart",
+        "time": "1.242",
+        "properties": {
+          "bounded_source_reads": "3"
+        }
+      },
+      {
+        "test": "test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+        "time": "1.059",
+        "properties": {
+          "wide_packet_utf8_quarter_proxy": "906",
+          "small_packet_utf8_quarter_proxy": "757",
+          "small_cap_delivered_source_count": "1"
+        }
+      }
+    ],
+    "review_found_product_defect": {
+      "packet": "run-03-packets/context-897755bc43344c85b5a5f4fc87fc7efb.json",
+      "reason": "Terminal budget rebuild promoted query-original retrieval attribution from partial to full after removing a row; reused hidden native qualifier traces.",
+      "fix": "Fresh visible-row qualification bounded by incoming public credit IDs; do not transfer old assignment IDs. Same existing checklist scenario gains monotonic-attribution assertion.",
+      "retest": "Only existing checklist integration:1 prepare,4 contexts,0 source resources,0 models."
+    }
+  },
+  {
+    "attempt": 4,
+    "command": "pytest two predeclared tests in test_named_document_context_integration.py -q -x",
+    "status": "PASS",
+    "pytest_elapsed_seconds": 0.81,
+    "scenarios_passed": 2,
+    "completed_prepare_sync": 2,
+    "prepare_boundary": "Existing confirmed member service fixture, not public prepare_docs MCP",
+    "completed_context_calls": 2,
+    "completed_resource_reads": 0,
+    "model_calls": 0,
+    "reason": "Predeclared existing public default-positive and unknown-document regression gates."
+  },
+  {
+    "attempt": 5,
+    "command": "pytest tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet -q -x",
+    "status": "PASS",
+    "pytest_elapsed_seconds": 1.85,
+    "scenarios_passed": 1,
+    "completed_prepare_sync": 1,
+    "completed_context_calls": 4,
+    "completed_resource_reads": 0,
+    "model_calls": 0,
+    "reason": "Focused retest of real terminal attribution defect, same checklist and caps; stronger regression assertion.",
+    "testcase_properties": {
+      "wide_packet_utf8_quarter_proxy": "906",
+      "small_packet_utf8_quarter_proxy": "758",
+      "small_cap_delivered_source_count": "1"
+    }
+  }
+]

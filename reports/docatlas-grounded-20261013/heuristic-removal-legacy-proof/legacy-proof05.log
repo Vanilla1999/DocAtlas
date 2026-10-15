@@ -1,0 +1,42 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_public_mixed_native_context_keeps_project_and_exact_library _______
+
+tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-25/test_public_mixed_native_conte0')
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-25/test_public_mixed_native_conte0/member-state')
+record_property = <function record_property.<locals>.append_property at 0x72ac1f588f40>
+
+    def test_public_mixed_native_context_keeps_project_and_exact_library(tmp_path, state_root, record_property):
+        """One prepared project, one real library index, one mixed public request."""
+        from tests.docs.test_dependency_version_transition import _seed, PACKAGE
+        from docmancer.docs.service import LibraryDocsService
+        from docmancer.core.product_identity import ensure_owned_home
+        import os
+    
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config):
+            home = Path(os.environ["DOCATLAS_HOME"])
+            home.mkdir(mode=0o700)
+            ensure_owned_home(home)
+            inventory = runtime.index_project(service, config, root)
+            # Explicit fixture provisioning uses the writable service, not the
+            # read-only MCP facade. Both point at this isolated host's real stores.
+            record = _seed(LibraryDocsService(config=config), "1.0.0", 'MIXED_🧭<a id="raw"></a>_ONLY')
+            library_db = service._index_config_for(record).index.db_path
+>           before = (database(inventory["storage_path"]), database(library_db), files(root))
+                                                           ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_heuristic_removal_public_integration.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/tmp/docatlas-default-HXV8YAxA/docatlas-evidence-gmd_0v81/docatlas_home/mcp-members/docs-indexes/pub-nav_kit-1-0-0-api.db'
+
+    def database(path):
+        """Read-only logical state equality, not an expected implementation snapshot."""
+>       with closing(sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)) as db:
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: unable to open database file
+
+eval/heuristic_removal/receipts.py:54: OperationalError
+1 failed in 0.66s

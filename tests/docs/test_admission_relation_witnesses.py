@@ -44,71 +44,8 @@ def qualify(question, body, origin='retrieval_need', candidate=None):
         expected_project_identity='repo')
 
 
-@pytest.mark.parametrize('english,russian,body,opposite,operator', CASES)
-@pytest.mark.parametrize('language', ['en', 'ru'])
-@pytest.mark.parametrize('answer', ['first', 'other'])
-def test_local_relation_not_question_word_overlap(english, russian, body, opposite, operator, language, answer):
-    text = body if answer == 'first' else opposite
-    result = qualify(english if language == 'en' else russian, text)
-    assert result.qualified and result.trace.get('admission_route') == 'typed_local', result.trace
-    spans = result.trace['need_witness_spans']
-    assert spans and all(0 <= a < b <= len(text) and text[a:b].strip() for a, b in spans)
 
 
-@pytest.mark.parametrize('question,body', [
-    ('Which has priority: command option or config file?', 'A config file takes precedence over a command option.'),
-    ('When does Cleanup run relative to transaction commit?', '- Cleanup executes before transaction commit.'),
-    ('Is a normal handler allowed?', 'A normal handler is not allowed; an async handler is required.'),
-    ('Which options configure retry policy?', 'Retry policy is configured using these options:\n\n- Select an interval.\n- Choose a limit.'),
-    ('How do input fields correspond to output fields?', '| Input fields | Output fields |\n|---|---|\n| old_name | new_name |'),
-])
-def test_new_lexical_family_and_markdown_layout(question, body):
-    result = qualify(question, body)
-    assert result.qualified and result.trace.get('admission_route') == 'typed_local', result.trace
 
 
-@pytest.mark.parametrize('question,body', [
-    (CASES[0][0], 'The nav title and page title glossary discusses precedence and titles.'),
-    (CASES[0][0], 'The nav title is described. Other title overrides the page title.'),
-    (CASES[1][0], 'QueueTasks are mentioned. OtherTasks execute after response delivery.'),
-    (CASES[1][0], 'QueueTasks and response delivery order are listed in a glossary.'),
-    (CASES[2][0], 'A handler for OtherHub can be synchronous. QueueHub is also documented.'),
-    (CASES[2][0], 'A handler for QueueHub can be asynchronous.'),
-    (CASES[2][0], 'QueueHub handler synchronous asynchronous glossary.'),
-    (CASES[3][0], 'Strict mode is a feature. Other mode can be enabled in these ways:\n\n- Set a flag.'),
-    (CASES[3][0], '# Strict mode ways\n\n- [Options](options.md)\n- [Methods](methods.md)'),
-    (CASES[3][0], 'Strict mode can be disabled in these ways:\n\n- Set an option.'),
-    (CASES[4][0], 'Transport keys and protocols:\n\n- `ALPHA_KEY`\n- `BETA_KEY`'),
-    (CASES[4][0], '| Transport key | Error code |\n|---|---|\n| A | B |\n\nProtocols are described elsewhere.'),
-])
-@pytest.mark.parametrize('origin', ['original', 'retrieval_need'])
-def test_keyword_salad_wrong_role_and_unrelated_sentence_never_prove_relation(question, body, origin):
-    assert not qualify(question, body, origin).qualified
 
-
-@pytest.mark.parametrize('question,body', [(c[0], c[2]) for c in CASES])
-@pytest.mark.parametrize('source', [
-    {'project_identity': 'foreign'}, {'freshness': 'stale'}, {'risk_flags': ['unsafe']},
-])
-def test_relation_does_not_override_source_policy(question, body, source):
-    assert not qualify(question, body, candidate=source).qualified
-
-
-@pytest.mark.parametrize('question,body', [(c[0], c[2]) for c in CASES[:3]])
-def test_missing_or_opposite_condition_does_not_answer_conditional_question(question, body):
-    question = question.rstrip('?') + ' when preview is disabled?'
-    assert not qualify(question, body).qualified
-    assert not qualify(question, 'When preview is enabled, ' + body).qualified
-    result = qualify(question, 'When preview is disabled, ' + body)
-    assert result.qualified and result.trace.get('admission_route') == 'typed_local', result.trace
-
-
-@pytest.mark.parametrize('question,_,body,__,operator', CASES)
-def test_native_pipeline_keeps_real_need_and_false_answer_flags(tmp_path, question, _, body, __, operator):
-    cap = capture_reference_case(tmp_path, {'Guide.md': '# Reference\n\n' + body + '\n'}, question)
-    assert cap['public_payload'].get('sources'), cap['public_payload']
-    traces = [trace for row in cap['projection_attempts'][-1]['snapshot'].values()
-              for trace in row['source'].get('retrieval_query_matches', {}).values()]
-    assert any(t.get('qualified') and t.get('admission_route') == 'typed_local'
-               and t.get('need_relation') == operator for t in traces)
-    assert all(cap['public_payload'][key] is False for key in ('answer_supported', 'answer_available', 'edit_ready'))

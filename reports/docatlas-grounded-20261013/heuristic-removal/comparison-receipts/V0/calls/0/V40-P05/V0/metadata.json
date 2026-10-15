@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-P05",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-poetry",
+  "public_request": {
+    "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-poetry/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "bd6c22c41e1d072fe748dfe5c22d3e9c9e6e6113511ab731114ff358f5b110dd",
+  "utf8_bytes": 12098,
+  "tokens": 3684,
+  "seconds": 4.8880788940005,
+  "cpu_seconds": 4.879243465000002,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

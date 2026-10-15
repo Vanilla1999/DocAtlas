@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_heuristic_removal_public_integration.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_heuristic_removal_public_integration.py": "d8c27da4987584e1218c67475bc3022e9c4b10e2b6c5146c819341496ab57dd3"
+  }
+}

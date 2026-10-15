@@ -6,13 +6,21 @@ The complete catalog is loaded once; source bytes/structure are cached per call.
 from __future__ import annotations
 
 from dataclasses import asdict
+from copy import deepcopy
 import hashlib
 import json
+from time import perf_counter
 from typing import Any, Mapping
 
+from docmancer.core.prepared_parent_sections import (
+    load_prepared_parent_manifest, prepared_parents_enabled, read_prepared_parent_sections,
+)
 from docmancer.core.structured_chunking import parse_markdown_parents
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
-from docmancer.docs.domain.query_reference_binding import CatalogSource, ScopeKey, resolve_references, normalize_reference_path
+from docmancer.docs.domain.query_reference_binding import (
+    CatalogSource, ScopeKey, resolve_references, normalize_reference_path,
+    document_statement_mentions, naming_catalog_inventory, naming_catalog_digest,
+)
 from docmancer.docs.project_docs_catalog import SUPPORTED_EXTENSIONS
 
 
@@ -22,9 +30,23 @@ class SourceReferenceContext:
         self.question = question
         self.plans: dict[str, dict[str, Any]] = {}
         self.sources: dict[str, CatalogSource] = {}
+        self.naming_sources: list[CatalogSource] = []
         self.source_file_hashes: dict[str, str] = {}
+        self.source_member_bindings: dict[str, dict[str, str]] = {}
         self.documents: dict[str, Any] = {}
+        # Capture the host setting once; neither source metadata nor query text
+        # can opt into a different reader halfway through this context.
+        self._prepared_parents_enabled = prepared_parents_enabled()
+        self._prepared_parent_manifest = None
+        self.structure_diagnostics: dict[str, Any] = {
+            "prepared_enabled": self._prepared_parents_enabled,
+            "documents": 0, "prepared_hits": 0, "parser_calls": 0,
+            "parser_ms": 0.0, "parent_rows": 0, "miss_reasons": {},
+            "parent_selects": 0, "prepared_read_ms": 0.0, "prepared_verification_ms": 0.0,
+        }
         self.complete = False
+        self.naming_catalog: dict[str, Any] | None = None
+        self.naming_catalog_sha256: str | None = None
         generation = store.active_generation_id() if hasattr(store, "active_generation_id") else None
         self.scope = ScopeKey(str(filters.get("project_identity") or ""), "", str(generation or ""))
         if generation and hasattr(store, "_connect"):
@@ -43,24 +65,34 @@ class SourceReferenceContext:
                 if any(metadata.get(key) != filters[key] for key in ("doc_scope", "module_path") if key in filters):
                     continue
                 path = str(metadata.get("project_doc_path") or metadata.get("source_path") or "")
-                if "project_doc_path" in filters and normalize_reference_path(path) != normalize_reference_path(str(filters["project_doc_path"])):
-                    continue
                 if not path or path.startswith(("/", "\\")) or ".." in path.replace("\\", "/").split("/"):
                     continue
-                if metadata.get("risk_flags") or metadata.get("index_freshness") not in (None, "", "synchronized"):
+                if metadata.get("index_freshness") not in (None, "", "synchronized"):
                     continue
-                source_key = str(row["source"])
-                self.sources[source_key] = CatalogSource(
+                identity = CatalogSource(
                     str(row["source_identity"]), self.scope, path, str(row["content_hash"])
                 )
+                # Explicit path selection narrows acquisition, never the naming
+                # universe. A colliding allowed filename outside that selection
+                # must still prevent a unique structural nomination.
+                self.naming_sources.append(identity)
+                if "project_doc_path" in filters and normalize_reference_path(path) != normalize_reference_path(str(filters["project_doc_path"])):
+                    continue
+                source_key = str(row["source"])
+                self.sources[source_key] = identity
                 self.source_file_hashes[source_key] = str(
                     metadata.get("project_doc_content_hash") or ""
                 )
+                self.source_member_bindings[source_key] = {
+                    "doc_scope": str(metadata.get("doc_scope") or "project"),
+                    "module_path": str(metadata.get("module_path") or ""),
+                    "catalog_entry_hash": str(metadata.get("project_doc_catalog_entry_hash") or ""),
+                }
             self.complete = True
         for text in dict.fromkeys((question, *(getattr(query, "text", "") for query in queries))):
             self.plan(text)
         from docmancer.docs.domain.need_contracts import compile_need_contracts
-        references = resolve_references(question, catalog=tuple(self.sources.values()),
+        references = resolve_references(question, catalog=self._catalog(question),
             scope=self.scope, catalog_complete=self.complete,
             document_suffixes=frozenset(SUPPORTED_EXTENSIONS))
         self.need_contracts = compile_need_contracts(question, references)
@@ -69,10 +101,23 @@ class SourceReferenceContext:
         self.dependency_windows = {}
         self.dependency_rejections = {}
 
+    def _catalog(self, text: str) -> tuple[CatalogSource, ...]:
+        return (tuple(self.naming_sources) if document_statement_mentions(text) is not None
+                else tuple(self.sources.values()))
+
     def plan(self, text: str) -> dict[str, Any]:
         if text not in self.plans:
-            self.plans[text] = asdict(resolve_references(text, catalog=tuple(self.sources.values()),
+            plan = asdict(resolve_references(text, catalog=self._catalog(text),
                 scope=self.scope, catalog_complete=self.complete, document_suffixes=frozenset(SUPPORTED_EXTENSIONS)))
+            if document_statement_mentions(text) is not None:
+                if self.naming_catalog is None:
+                    # Complete allowed snapshot, before and independently of
+                    # retrieval selection. Chunk-supplied names are never read.
+                    self.naming_catalog = naming_catalog_inventory(
+                        tuple(self.naming_sources), scope=self.scope, catalog_complete=self.complete)
+                    self.naming_catalog_sha256 = naming_catalog_digest(self.naming_catalog)
+                plan["naming_catalog_sha256"] = self.naming_catalog_sha256
+            self.plans[text] = plan
         return self.plans[text]
 
     def _document(self, source: str):
@@ -84,14 +129,48 @@ class SourceReferenceContext:
                     row = conn.execute("SELECT content FROM generation_sources WHERE generation_id=? AND source=?",
                         (self.scope.snapshot_id, source)).fetchone()
                     children = conn.execute(
-                        "SELECT stable_chunk_id, json_extract(metadata_json, '$.generation_id') AS embedded_generation "
+                        "SELECT stable_chunk_id, source_id, json_extract(metadata_json, '$.generation_id') AS embedded_generation "
                         "FROM retrieval_children WHERE generation_id=? AND source=?",
                         (self.scope.snapshot_id, source),
                     ).fetchall()
-                if row is not None and hashlib.sha256(row["content"].encode("utf-8")).hexdigest() == identity.content_sha256:
-                    content = row["content"]
-                    value = content, parse_markdown_parents(content, identity.document_id), {
-                        str(child["stable_chunk_id"]): child["embedded_generation"] for child in children}
+                    if row is not None and hashlib.sha256(row["content"].encode("utf-8")).hexdigest() == identity.content_sha256:
+                        content = row["content"]
+                        parents = None
+                        self.structure_diagnostics["documents"] += 1
+                        if self._prepared_parents_enabled:
+                            if self._prepared_parent_manifest is None:
+                                self._prepared_parent_manifest = load_prepared_parent_manifest(
+                                    conn, self.scope.snapshot_id)
+                                self.structure_diagnostics.update(
+                                    manifest_bytes=self._prepared_parent_manifest.bytes_read,
+                                    manifest_ms=self._prepared_parent_manifest.elapsed_ms,
+                                )
+                            source_ids = {child["source_id"] for child in children}
+                            source_id = next(iter(source_ids)) if len(source_ids) == 1 else None
+                            prepared = read_prepared_parent_sections(
+                                conn, manifest=self._prepared_parent_manifest,
+                                generation_id=self.scope.snapshot_id, source=source,
+                                source_identity=identity.document_id, content=content,
+                                content_sha256=identity.content_sha256, source_id=source_id,
+                            )
+                            parents = prepared.parents
+                            self.structure_diagnostics["parent_rows"] += prepared.diagnostics.get("parent_rows", 0)
+                            self.structure_diagnostics["parent_selects"] += prepared.diagnostics.get("parent_selects", 0)
+                            self.structure_diagnostics["prepared_read_ms"] += prepared.diagnostics.get("read_ms", 0.0)
+                            self.structure_diagnostics["prepared_verification_ms"] += prepared.diagnostics.get("verification_ms", 0.0)
+                            if parents is not None:
+                                self.structure_diagnostics["prepared_hits"] += 1
+                            else:
+                                reason = prepared.miss_reason or "prepared_unavailable"
+                                reasons = self.structure_diagnostics["miss_reasons"]
+                                reasons[reason] = reasons.get(reason, 0) + 1
+                        if parents is None:
+                            started = perf_counter()
+                            parents = parse_markdown_parents(content, identity.document_id)
+                            self.structure_diagnostics["parser_calls"] += 1
+                            self.structure_diagnostics["parser_ms"] += (perf_counter() - started) * 1000
+                        value = content, parents, {
+                            str(child["stable_chunk_id"]): child["embedded_generation"] for child in children}
 
             self.documents[source] = value
         return self.documents[source]
@@ -161,12 +240,17 @@ class SourceReferenceContext:
                             metadata["_reference_evidence"] = {
                                 "schema_version": 1, "source": asdict(identity),
                                 "project_doc_content_hash": trusted_file_hash,
+                                "member_binding": dict(self.source_member_bindings[str(chunk.source)]),
                                 "char_start": start, "char_end": end,
                                 "text": content[start:end], "raw_document": content,
                                 "owner": {"text": header, "char_start": owner.char_start,
                                     "char_end": owner.char_start+len(header), "scope_start": owner.char_start,
                                     "scope_end": owner.char_end, "logical_id": owner.logical_id} if owner else None,
                             }
+                            if self.naming_catalog is not None:
+                                # Keep the snapshot-owned inventory detached
+                                # from mutable candidate dictionaries.
+                                metadata["_reference_evidence"]["naming_catalog"] = deepcopy(self.naming_catalog)
             result.append(chunk.model_copy(update={"metadata": metadata}))
         from .source_dependency_preparation import prepare_dependency_sets, compact_dependency_record
         prepare_dependency_sets(self, result, self.need_contracts)

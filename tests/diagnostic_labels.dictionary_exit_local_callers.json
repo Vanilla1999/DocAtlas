@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_local_callers.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_local_callers.py": "5e28db3abded69d27770d1cb3868722028a02876e8cffb278077c279e5819e0e"
+  },
+  "node_overrides": {}
+}

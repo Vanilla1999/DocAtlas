@@ -1,0 +1,76 @@
+{
+  "base_commit": "10277b269ff686320cb191da93747b73e1f37f4b",
+  "inspection": "remote source and literal/hash comparison only",
+  "local_ast_run": false,
+  "local_runtime_run": false,
+  "frozen_protocol_path": "eval/agent_developer_v1/mixed_provenance_protocol.json",
+  "frozen_protocol_blob": "63a8ff66c1e1fd933af2cca1e888c19fbdf2126b",
+  "frozen_protocol_raw_sha256": "d6d9c5ab02a90a1e41f51ad19795502f33d9ea80883a1dcc0a41ccf2123dd719",
+  "frozen_protocol_canonical_sha256": "4559d02bd17977965dc8b7baf19471b3a00d56f5ee09dc37fc6de341aa757d71",
+  "historical_report_blob": "b0ab4ff3ee940689c638d7cc03fec5b8037a9207",
+  "historical_report_raw_sha256": "542ab4377d0ce5473dfffe0eced0331eff22fa2e31af1f65b4ff0f1680da7e47",
+  "case_count": 7,
+  "candidate_rows": 13,
+  "positive_cases": 5,
+  "negative_cases": 2,
+  "required_full_facts": 6,
+  "same_six_named_controls": true,
+  "files": [
+    {
+      "path": "eval/agent_developer_v1/current_retrieval_runtime.py",
+      "base_blob": "866cd50bdb4605e511f386ba5bd2c7ebe84aba76",
+      "proposed_blob": "d26bfe6affb8e2412b6a19625f975d2265ce8094",
+      "utf8_sha256": "d2acc03409497a12b0718d4c89d49a6ce34c61d5e2a15bf8f63140f952672f12",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    },
+    {
+      "path": "eval/agent_developer_v1/finite_http_fixture.py",
+      "base_blob": null,
+      "proposed_blob": "db5cafe4f456da53bb6d8c06a7352ea4a73f8b83",
+      "utf8_sha256": "c5beba9c262bc8fc7995220e7ac822ddb708a842a751f75c9e43f43185576d87",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    },
+    {
+      "path": "eval/agent_developer_v1/mixed_retrieval_runtime.py",
+      "base_blob": null,
+      "proposed_blob": "3c0236d3b9b0e46f87e6db54ebd06e16425a02a8",
+      "utf8_sha256": "9cefaab88a22ca49c5eb78a44a497eed9402a345ed7143cdadaa8a8f9b38990a",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    },
+    {
+      "path": "eval/agent_developer_v1/mixed_provenance.py",
+      "base_blob": "53f8063ffcd07f068da0e394f173151c9a4cc92e",
+      "proposed_blob": "2356484e064d834b6bb1435ee035f35998515463",
+      "utf8_sha256": "2dbc4e6edd979152dcb3ed679d5dc820f400de4974a5c1848e02907fa5893282",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    },
+    {
+      "path": "eval/agent_developer_v1/mixed_provenance_contract_migration.json",
+      "base_blob": null,
+      "proposed_blob": "d9b699efefee5e9030e00d38533da8a2c296ab7a",
+      "utf8_sha256": "c97539ad8a41dcf41c73be348e8b8648a31c6df68813eafdcda275c3a4042528",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    },
+    {
+      "path": "scripts/run_mixed_evidence_provenance_gate.py",
+      "base_blob": "641536c9cca768e7bea43ef87d2266aa89e9a422",
+      "proposed_blob": "c3124d822361e978db36d9d21a4f193ca62f532d",
+      "utf8_sha256": "91b455718cf146d14ebd56244dce30473e3a28cf3fde798abb80be4dfe17317b",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    },
+    {
+      "path": "scripts/mixed_evidence_provenance_self_test.py",
+      "base_blob": "a69f917c864529cae553d8c6d604e0ebeb7559f2",
+      "proposed_blob": "e7f3f9a8fcaf04acc03add6859ca47f8189042c1",
+      "utf8_sha256": "9d0ae0d45ad8f17e4be741fdb6ecfa879a902b95d5c143abd7d9155c22977db7",
+      "roundtrip_exact": true,
+      "no_trailing_whitespace": true
+    }
+  ]
+}

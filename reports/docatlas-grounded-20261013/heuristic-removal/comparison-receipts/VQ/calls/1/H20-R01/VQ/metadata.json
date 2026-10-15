@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-R01",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-ruff",
+  "public_request": {
+    "question": "In Ruff's configuration guide, what is the default string quote style, and does the example that sets single quotes change that default?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/1-ruff/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "6be661eae3029fb988e4969c021568c506f583025fac6c30ed1e62bdb900dbd1",
+  "utf8_bytes": 43352,
+  "tokens": 12164,
+  "seconds": 11.122625357998913,
+  "cpu_seconds": 11.11825401499999,
+  "peak_rss_kib": 228656,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

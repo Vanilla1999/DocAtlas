@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/docs/test_language_source_profile.py": "behavioral"
-  },
+  "module_labels": {},
   "node_overrides": {},
-  "module_node_hashes": {
-    "tests/docs/test_language_source_profile.py": "797babad8126b31b69d191eed7c637a2910299f7a4a383f028c2f955da4397ea"
-  }
+  "module_node_hashes": {}
 }

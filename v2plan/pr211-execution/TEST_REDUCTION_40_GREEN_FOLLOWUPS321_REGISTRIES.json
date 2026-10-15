@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "packets": {
+    "docs303": {
+      "packet": "/tmp/opencode/pr211-delete-green-docs-followup.json",
+      "sha256": "1a174f9c2cd244f38edd1c27ec65f82fe6dbe87f4400056d364f1755ed862524",
+      "removed": 303,
+      "BASE_status": {
+        "PASS": 303
+      },
+      "saved_CI_status": {
+        "PASS": 303
+      },
+      "final_source_hashes": {
+        "tests/docs/test_admission_guard_composition.py": "58b132d4263ac44ba6953e5aada67690541543cc275bbf28b8572dab31503558",
+        "tests/docs/test_admission_local_binding_contract.py": null,
+        "tests/docs/test_admission_relation_witnesses.py": "efb25190d50ae3130741cfcc17282f791dc1df59027eb923eabeef2eb63fe195",
+        "tests/docs/test_admission_subject_binding.py": "2266eaa02073a6aa46e573c388ff219ca33e633e2a8f7119219b4e1ab23f2d79",
+        "tests/docs/test_compact_docs_surface.py": null,
+        "tests/docs/test_context_capture_integrity.py": "02f33f00fb80bb2cac2ef910ea2a53798eefea53bd120c9cf4a970b10b14795e",
+        "tests/docs/test_context_completion_guards.py": "c25d44b3916678268adc96d065d4f8cbdf6e08daf24c525d4ffe8ce268004a73",
+        "tests/docs/test_context_loss_boundaries.py": null,
+        "tests/docs/test_curated_sources.py": "ed4e04f147477a140a9e62d4a8682f2dfd6fafab18e4207bd3c20f26062a3f8c",
+        "tests/docs/test_dartdoc_discovery.py": null,
+        "tests/docs/test_docs_context_compound_projection.py": "93ff325f333a28aa1aa60278bcd624b52daf3372549ec8fe6f42e321799a46f3",
+        "tests/docs/test_docs_impact.py": "a0aee2907a62d60a637689d961fa15b7a6639fc2890a5ddaf2ceffafe57e20b3",
+        "tests/docs/test_docs_lossless_remaining_caps.py": null,
+        "tests/docs/test_docs_lossless_selection.py": null,
+        "tests/docs/test_document_local_rescue.py": null,
+        "tests/docs/test_documented_cli_contract.py": null,
+        "tests/docs/test_evidence_set_context_delivery.py": null,
+        "tests/docs/test_evidence_set_delivery_acceptance.py": null,
+        "tests/docs/test_filesystem_locks.py": null,
+        "tests/docs/test_host_scope_contract.py": "9cf45083b4e405358736ca826245eb998fd4ba5127ff677200c7f94f0fed4a54",
+        "tests/docs/test_language_packing_trace.py": "7e9aeefec217f02b10653af5f1847a73529763154f45d4903f49bce285855610",
+        "tests/docs/test_library_witness_diagnostics.py": null,
+        "tests/docs/test_model_visible_projection.py": null,
+        "tests/docs/test_model_visible_projection_part02.py": null,
+        "tests/docs/test_patch_context_public.py": null,
+        "tests/docs/test_project_answer_contract_v3.py": null,
+        "tests/docs/test_query_planning_temporal_regressions.py": null,
+        "tests/docs/test_reference_projection_retention.py": "3249d307071623a1c2fe188cafff08370ff15597863760b6e75daafd6b7074a0",
+        "tests/docs/test_request_flow_lineage.py": "b17b63362430eb5706bf017524e6c6973e7f23c144af3f028752fe8aba29c470",
+        "tests/docs/test_retrieval_alias_subject_binding.py": null,
+        "tests/docs/test_section_metadata.py": null,
+        "tests/docs/test_source_continuation.py": "687844b618543a1e3eb9fb3ce367b53f6fb6e08996c34fdd4fd0de23ce35de0c",
+        "tests/docs/test_task19_project_docs_closure.py": null,
+        "tests/docs/test_v2_acceptance_gaps.py": null
+      }
+    },
+    "root12": {
+      "packet": "/tmp/opencode/pr211-delete-green-root-followup.json",
+      "sha256": "8febb4db818bc2488b4590c5445ab360689d39dd5f3294f7a88205071f3a8af5",
+      "removed": 12,
+      "BASE_status": {
+        "PASS": 12
+      },
+      "saved_CI_status": {
+        "PASS": 12
+      },
+      "final_source_hashes": {
+        "tests/test_unified_docs_context_mcp_part02.py": "5856db3453439351966b8b7f79e49cfc7b9d42f6d9ea7dddf35747d0b9cc392a",
+        "tests/test_dictionary_exit_patch_boundary.py": "6cb8ba964a51bd777f3cac2b63ced7a20913794e0797163f9d7c62cba3e2cec5",
+        "tests/test_dictionary_exit_local_entry_closure.py": "2c3192b4a69f4b3bd618fcb89efb527d2d56bf93c76a81a3692009223fd9f7be"
+      }
+    },
+    "nested6": {
+      "packet": "/tmp/opencode/pr211-green-nested.json",
+      "sha256": "ed0ef42fd8145dc03dffc21535bd2898b0eea39d658a60b0eb6667b3dd5fae6f",
+      "removed": 6,
+      "BASE_status": {
+        "PASS": 6
+      },
+      "saved_CI_status": {
+        "PASS": 6
+      },
+      "final_source_hashes": {
+        "tests/task_level/test_task_level_harness.py": "c14675d49416f9186feb7df77d5321b52a47e0bb8e22771a3080d37bff200078",
+        "tests/task_level/test_real_project_fixture.py": "a4cbf1a49257985358b420efd0af8302c067410b104bacfd2d473fd3376c1779",
+        "tests/task_level/test_real_project_suite.py": "3ed4366d32a238c9e263901983e1b4c460070cf2ce80b93a93210f442f199174",
+        "tests/task_level/test_task_evaluation.py": "1b9de0c09cbca3e279682a978b1371aa1350410f1fe5766071ebd1b2d4fe0cbe"
+      }
+    }
+  },
+  "removed": 321,
+  "added": 0,
+  "prior_manifest_sha256": "444d95897594094c346ec6d106527fe389ee7750457da9284141ef20e7c928cf",
+  "integrated_manifest_sha256": "0aecc8891e8ee5fa9d9f8f9a061dd8b7b822ace159294253470496dd1ce49dd1",
+  "deferred_source_paths": {},
+  "remaining": {
+    "docs303": {
+      "candidate_entries": 57,
+      "saved_PASS_ids": 562,
+      "sorted_identity_sha256": "ff1c8d0e6b79eb06ddc24cb39755b29b3304141848390b5bfa30ac2dcb4d0202",
+      "limit": "Remaining candidates have not been exhaustively resolved; confirmed direct-unit functions remain in language experiment and in-memory job-service modules. No complete-removal claim."
+    },
+    "root12": {
+      "candidate_entries": 850,
+      "saved_PASS_ids": 1555,
+      "sorted_identity_sha256": "b23f6b9d9099ba530e9e0d0ce0e466614934bfe460f13a82dad3a90e267e5dc8",
+      "limit": "All surviving entries are conservatively ambiguous or not yet individually reviewed in this follow-up. Zero confirmed remaining units is not an exhaustive ALL-PASS-unit completion claim. Earlier heuristic integration labels are not definitive body/dependency classifications. Counts bind only the frozen 2960 packet, not concurrent deletions by other owners."
+    },
+    "nested6": {
+      "candidate_entries": 44,
+      "saved_PASS_ids": 48,
+      "sorted_identity_sha256": "3d0548c3e87a097dc9366859a898a812e27c36e97937f7b66f6104230b918f37",
+      "limit": "Only 50 listed nested non-docs candidate functions reviewed. Three ambiguous boundaries preserved; no quota. Coverage loss accepted; removal does not establish product PASS."
+    }
+  },
+  "source_observed_at_preparation": {
+    "tests/docs/test_admission_guard_composition.py": "58b132d4263ac44ba6953e5aada67690541543cc275bbf28b8572dab31503558",
+    "tests/docs/test_admission_local_binding_contract.py": null,
+    "tests/docs/test_admission_relation_witnesses.py": "efb25190d50ae3130741cfcc17282f791dc1df59027eb923eabeef2eb63fe195",
+    "tests/docs/test_admission_subject_binding.py": "2266eaa02073a6aa46e573c388ff219ca33e633e2a8f7119219b4e1ab23f2d79",
+    "tests/docs/test_compact_docs_surface.py": null,
+    "tests/docs/test_context_capture_integrity.py": "02f33f00fb80bb2cac2ef910ea2a53798eefea53bd120c9cf4a970b10b14795e",
+    "tests/docs/test_context_completion_guards.py": "c25d44b3916678268adc96d065d4f8cbdf6e08daf24c525d4ffe8ce268004a73",
+    "tests/docs/test_context_loss_boundaries.py": null,
+    "tests/docs/test_curated_sources.py": "ed4e04f147477a140a9e62d4a8682f2dfd6fafab18e4207bd3c20f26062a3f8c",
+    "tests/docs/test_dartdoc_discovery.py": null,
+    "tests/docs/test_docs_context_compound_projection.py": "93ff325f333a28aa1aa60278bcd624b52daf3372549ec8fe6f42e321799a46f3",
+    "tests/docs/test_docs_impact.py": "a0aee2907a62d60a637689d961fa15b7a6639fc2890a5ddaf2ceffafe57e20b3",
+    "tests/docs/test_docs_lossless_remaining_caps.py": null,
+    "tests/docs/test_docs_lossless_selection.py": null,
+    "tests/docs/test_document_local_rescue.py": null,
+    "tests/docs/test_documented_cli_contract.py": null,
+    "tests/docs/test_evidence_set_context_delivery.py": null,
+    "tests/docs/test_evidence_set_delivery_acceptance.py": null,
+    "tests/docs/test_filesystem_locks.py": null,
+    "tests/docs/test_host_scope_contract.py": "9cf45083b4e405358736ca826245eb998fd4ba5127ff677200c7f94f0fed4a54",
+    "tests/docs/test_language_packing_trace.py": "7e9aeefec217f02b10653af5f1847a73529763154f45d4903f49bce285855610",
+    "tests/docs/test_library_witness_diagnostics.py": null,
+    "tests/docs/test_model_visible_projection.py": null,
+    "tests/docs/test_model_visible_projection_part02.py": null,
+    "tests/docs/test_patch_context_public.py": null,
+    "tests/docs/test_project_answer_contract_v3.py": null,
+    "tests/docs/test_query_planning_temporal_regressions.py": null,
+    "tests/docs/test_reference_projection_retention.py": "3249d307071623a1c2fe188cafff08370ff15597863760b6e75daafd6b7074a0",
+    "tests/docs/test_request_flow_lineage.py": "b17b63362430eb5706bf017524e6c6973e7f23c144af3f028752fe8aba29c470",
+    "tests/docs/test_retrieval_alias_subject_binding.py": null,
+    "tests/docs/test_section_metadata.py": null,
+    "tests/docs/test_source_continuation.py": "687844b618543a1e3eb9fb3ce367b53f6fb6e08996c34fdd4fd0de23ce35de0c",
+    "tests/docs/test_task19_project_docs_closure.py": null,
+    "tests/docs/test_v2_acceptance_gaps.py": null,
+    "tests/test_unified_docs_context_mcp_part02.py": "5856db3453439351966b8b7f79e49cfc7b9d42f6d9ea7dddf35747d0b9cc392a",
+    "tests/test_dictionary_exit_patch_boundary.py": "6cb8ba964a51bd777f3cac2b63ced7a20913794e0797163f9d7c62cba3e2cec5",
+    "tests/test_dictionary_exit_local_entry_closure.py": "2c3192b4a69f4b3bd618fcb89efb527d2d56bf93c76a81a3692009223fd9f7be",
+    "tests/task_level/test_task_level_harness.py": "c14675d49416f9186feb7df77d5321b52a47e0bb8e22771a3080d37bff200078",
+    "tests/task_level/test_real_project_fixture.py": "a4cbf1a49257985358b420efd0af8302c067410b104bacfd2d473fd3376c1779",
+    "tests/task_level/test_real_project_suite.py": "3ed4366d32a238c9e263901983e1b4c460070cf2ce80b93a93210f442f199174",
+    "tests/task_level/test_task_evaluation.py": "1b9de0c09cbca3e279682a978b1371aa1350410f1fe5766071ebd1b2d4fe0cbe"
+  },
+  "helper_labels_preserved": [
+    "tests/docs/test_admission_guard_composition.py",
+    "tests/docs/test_admission_relation_witnesses.py",
+    "tests/docs/test_docs_context_compound_projection.py",
+    "tests/task_level/test_task_level_harness.py",
+    "tests/test_unified_docs_context_mcp_part02.py"
+  ],
+  "registry_actions": {
+    "HASH": 20,
+    "REMOVE_ABSENT_MODULE": 42,
+    "REMOVE_RETIRED_OVERRIDE": 6
+  },
+  "registry_files": 24,
+  "validation": {
+    "partition": 8291,
+    "removed": 6171,
+    "added": 1,
+    "net": 6170,
+    "projected_after": 2121,
+    "target_gap": 0,
+    "reduction_percent": 74.41804366180196,
+    "classified": 6296,
+    "unclassified": 1995,
+    "overlap": 0,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0
+  },
+  "limits": "Metadata/registries only. Prior history/policies/8ROOT deferrals unchanged. Only completed321 PASS IDs credited. Active docsfinal57/directROOTA-M/N-Z excluded. Preserve helper labels/SKIP; no runtime/AST/project imports/CI/commit/push/nestedagents. Target projected, not collection/product-quality proof.",
+  "registry_final_sha256": {
+    "tests/diagnostic_labels.admission_contract.json": "d99a00747dd80cd739cecaba5a55262a556aa42d2d27c5272a2d4c7956050fa4",
+    "tests/diagnostic_labels.admission_local_binding_contract.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.compact_docs_surface.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.completion_guards.json": "7a63b6c1ada27f62f85af9f8c66292b2896a4d0790565fe7ab230b0af3d13b54",
+    "tests/diagnostic_labels.compound_context.json": "909eff5792b358717fa3f8ae43805eed3b1c4c6e4f3169655e96e8a63c7c2b57",
+    "tests/diagnostic_labels.context_capture_integrity.json": "41c6ae72baeca199a7e75e2f303b438f09204af35e85ff1b2ce0470ac984339e",
+    "tests/diagnostic_labels.context_loss_boundaries.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_local_entry_closure.json": "86805c47943437a310d416210b500011d57fdac1fc4dc494c41ba6f6ad99319f",
+    "tests/diagnostic_labels.dictionary_exit_patch_boundary.json": "a76154cf050c781e890675d609326972c7bb4fe7744bd574e5206bc0a65e9262",
+    "tests/diagnostic_labels.docs_lossless_remaining_caps.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.docs_lossless_selection.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.document_local_rescue.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.evidence_sets.json": "f56a4f1d020d9cc35f1c23ddaab9c8782f3e8f4cbe9e292987b1c1e1577da203",
+    "tests/diagnostic_labels.json": "689cfab8b0cab09297781b2374ad637eefccdb7a5129992af1d7459bc78fcf95",
+    "tests/diagnostic_labels.language_packing_trace.json": "66da09925e280e8030a11a9774e904e07f0ed3aa87a7b4bf12fa06fa8863ccc9",
+    "tests/diagnostic_labels.library_witness_diagnostics.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.patch_context.json": "2f6e7e529fb6c0efeafd7e11ace4fbc6c249522b6746f0b3f54e885764d0e619",
+    "tests/diagnostic_labels.query_planning.json": "475581d94b1737ef090705f44dbc2b5c737be4f128bcd46cdc832fd18dfd64ad",
+    "tests/diagnostic_labels.reference_binding.json": "9dce4bb74216a0db8c90ff72a00fbd19809eb9c214cc148e25eddc7f371489df",
+    "tests/diagnostic_labels.request_flow_lineage.json": "b338cddc7c50b66ccce2f5cd50ba32885d3cab2cf50a64f890c27552c61b7eab",
+    "tests/diagnostic_labels.retrieval_recheck.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.scope_span.json": "23f43c337db5af89f2315f93e00c23e83b202cd45137c01560e1f1d71be43138",
+    "tests/diagnostic_labels.source_continuation.json": "6f72834ebaafe922fce13c20f19f4f06c61eb5db8b62422268476043eb714568",
+    "tests/diagnostic_labels.v2_acceptance_gaps.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3"
+  },
+  "registry_method": "Only41 corresponding packet source bindings, including21 absent docs modules, matched current state before application. Normalized BASE minus all integrated removals plus sole ledgered addition; sorted unique newline-joined SHA256.13 physically surviving docs helper-only labels preserved,7 ROOT/nested source groups updated; all unrelated active source entries unchanged. Other pending ROOT source group from prior8 remains deferred, not new credit.",
+  "exact_ids_binding": "Each manifest green-followup::retired-docs303/root12/nested6 exactly equals packet IDs;321 new unique saved/base PASS disjoint from5850 prior.",
+  "historical_boundary": "Historical reviews and earlier owner policy/checkpoints unchanged; previous8ROOT changed deferrals are history. Seven corresponding completed file groups in root12/nested6 resolved only at current matchedSHA; remaining prior eighth belongs activeROOT AM/NZ. No repeated credit.",
+  "remaining_count_boundary": "Docs562 candidates in57modules remain unresolved, including confirmed units. Root12 frozen1555 identities are conservative ambiguous/not individually reviewed, not definitive integration labels; nested6 is a subset review, not additional candidate universe. Pending docsfinal57/directAM/NZ packets excluded.",
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core3.11_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "advanced3.12_junit_sha256": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+    "boundary": "Saved PASS and frozenBASE only; accepted unit coverage loss, not product quality/PASS/current green/final collection."
+  }
+}

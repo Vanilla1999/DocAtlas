@@ -1,29 +1,41 @@
 # Evidence selection module
 
-`EvidenceSelection` assigns retrieved answer units to mandatory requirements and authorizes certified library, dependency, or mixed answers only when every required facet is locally proven.
-
-`ProjectAnswerRequirementContract` is the input boundary emitted by question planning and consumed unchanged by evidence selection.
-
 ## Responsibility
 
-The evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.
+Evidence selection turns current eligible candidates into source-bound,
+retrieval-only context. It checks catalog membership, project and module scope,
+freshness, source identity, and visible support for each explicit query before
+returning evidence. A useful partial passage may be returned with missing
+coverage; uncertainty must not become a fabricated complete answer.
 
-Candidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.
+`ContextSelectionDecision` records selected evidence IDs and covered or missing
+query IDs. Original-query coverage and explicit lookup coverage remain separate.
+The compatibility `ProjectAnswerContract` does not compile a
+free-form documentation question into inferred proof obligations.
 
 ## Contract with question planning
 
-The module consumes the project-answer requirement contract emitted by question planning. It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation. It does not broaden subjects or replace unresolved question semantics.
+Question planning preserves the original request and explicit lookups. Selection
+consumes those requests without inventing subjects, relations, translations, or
+expected answers. A lexical match and an exact quote do not establish entailment.
 
-This relation is intentionally reciprocal in the documentation: `question-planning` owns **what must be proven**; `evidence-selection` owns **whether the available evidence proves it**.
+Project-only reads bypass answer certification. The host may use returned
+sources to explain supported facts while identifying missing information.
+Selection and `docs_context` flags cannot authorize an edit.
 
 ## Invariants
 
 - a retrieval hit is not proof;
-- complete exact proof outranks generic or partial evidence;
-- every mandatory selected witness survives final projection revalidation;
-- authority, lifecycle, source identity, and visible token cost participate in the deterministic decision;
-- a missing mandatory facet yields fail-closed `insufficient_evidence`.
+- source eligibility and visible evidence support are checked before coverage is reported;
+- original-query credit cannot be borrowed from host lookups;
+- selected text, hashes, identity, and source-local coordinates survive projection together;
+- a missing fact stays missing even when a related source is retrieved;
+- output bytes and tokens are minimized without a fixed response-size acceptance ceiling;
+- safety, source-read, candidate-work, and lifecycle bounds remain enforced.
 
-## Tests
+## Verification
 
-`tests/docs/test_evidence_selection*.py`, `tests/docs/test_model_visible_projection*.py`, and provider-free quality protocols protect the selector contract.
+Public delivery tests verify source identity, scope, stale rejection, fidelity,
+and independent query attribution. Quality evaluators compare final visible
+witnesses with reviewed facts from the original questions; their expectations
+are not generated from the production selection result.

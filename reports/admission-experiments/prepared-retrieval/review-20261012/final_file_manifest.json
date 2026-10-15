@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "base_commit": "47a636e73268f1c39495b83cda82c7a0a0c9674e",
+  "tested_product_and_tests_unchanged": true,
+  "raw_artifacts_unchanged": true,
+  "files": [
+    {
+      "path": "docmancer/docs/application/experimental_context_finalization.py",
+      "bytes": 15699,
+      "sha256": "26624db4ba133edcbdaba6d2a3b30472740d1e5bf6637a7def84a45f0fe0e41f"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/BOUNDARY_REVIEW.md",
+      "bytes": 9341,
+      "sha256": "af7f0dd6fff2a41b218fc14b6ebb3557b1011fb9630742bd1059992705c859ca"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/PREPARED_REVIEW.md",
+      "bytes": 19206,
+      "sha256": "b6d9df97b017934687e5d8145723ad244d349a3a425a65fd82777314ecdd409c"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/PROTOCOL_RU.md",
+      "bytes": 4318,
+      "sha256": "38049eb2fd01f9ba110b3f888adaf0f74fc4caa22f77825802bf1b7e15b99bfd"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/RESULTS.json",
+      "bytes": 3297,
+      "sha256": "5581cdf4b556918d2bb0d1ac64fcf8a3b69e634a810fd6fd53bbd921bb62ad5b"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/RESULT_RU.md",
+      "bytes": 15640,
+      "sha256": "6dbca8d10b29092b106f52ac53f4b160e68fbe3bbfc3ae31f8742a6fd813979e"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/TAILORING_REVIEW.md",
+      "bytes": 22054,
+      "sha256": "70371017a6e002336c48d972aa446fdfae251e3f1d56ea21af25a52d7a7a157f"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/execution_ledger.json",
+      "bytes": 8489,
+      "sha256": "0dcc3c68b2493d0272627e2a3bd7560da8e9b91235fd7c20bcc709a465c3360b"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/frozen_review_inputs.json",
+      "bytes": 2606,
+      "sha256": "09092da60fce1e09d2e5179c97846ad9cd61c7c2e6bcf05d23009a96647531c8"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-01-packet-summary.json",
+      "bytes": 1001,
+      "sha256": "79b0ee987755ea91e1a202b5c52da62d58b1f724191d066191c2981904b3d8fc"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-01-packets/context-139c136fa3e44b349f74c78db902a2d0.json",
+      "bytes": 1466,
+      "sha256": "1714f49621e9e423aa356b0489e8290ad437b314d8748547e5f7b0e4d148b7c8"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-01-packets/context-e446a35db9114d349d1f9e7e0a666258.json",
+      "bytes": 1343,
+      "sha256": "436ca17974ec99ebaed6ead4226e3fc8ff1ea2e960c481d101b1fdc1357614ec"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-01.log",
+      "bytes": 4752,
+      "sha256": "a29d590851591bf807098ed5063649b218474a39a3839e0c0aedeae8ee9f5fdd"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-01.xml",
+      "bytes": 5413,
+      "sha256": "300f06853b3e56a031c2be0e7115dc627f94c769f0a30c78d8539566045ce35c"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packet-summary.json",
+      "bytes": 11913,
+      "sha256": "a39a0b1d620d42df13b93ccd638aaba5ae0d643f5b45299ed3e630f85df8ca26"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-18a48e9adb56482d92415631a5d94a26.json",
+      "bytes": 1326,
+      "sha256": "f7edc6c80abbb1e88f78a9bb67ef5f1a8f0025927e81183924d492fd690f1fb6"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-18f53486f35b4f30ab765150249e390b.json",
+      "bytes": 1466,
+      "sha256": "5dd29b506f730f854f4c4106fdc5aa41df044ff6066f97a16def99269a88c04d"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-2931a72f45c040e9b86c31d120f70de8.json",
+      "bytes": 1326,
+      "sha256": "f7edc6c80abbb1e88f78a9bb67ef5f1a8f0025927e81183924d492fd690f1fb6"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-48849c9b6fb546c59df655422faeef7e.json",
+      "bytes": 4596,
+      "sha256": "5f359bb712e585907eb30fab71cb21b3f2bcca2d1a7c3e1641209140fcf48d93"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-4b3e8f8439bd4c08a91c656f93210ea7.json",
+      "bytes": 4596,
+      "sha256": "5f359bb712e585907eb30fab71cb21b3f2bcca2d1a7c3e1641209140fcf48d93"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-576ed15f463b4a45af0dfe454841693c.json",
+      "bytes": 4596,
+      "sha256": "5f359bb712e585907eb30fab71cb21b3f2bcca2d1a7c3e1641209140fcf48d93"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-603b2cdf4f0c491994de20628d5693cc.json",
+      "bytes": 3034,
+      "sha256": "94ed936dfc4d1344a0737b3a6352d540c0e05127a3f758ed2b6a955a85e25500"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-70686824b79942948dd65f3e31571ebc.json",
+      "bytes": 3044,
+      "sha256": "b21c17b500cec76efcae14d7ed600837628b4bc2810f0e0472147ad8a8e6bd9b"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-7435a9b173f54762a2e9cac2d6b77a2c.json",
+      "bytes": 3044,
+      "sha256": "b21c17b500cec76efcae14d7ed600837628b4bc2810f0e0472147ad8a8e6bd9b"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-7503561d75834d46939d6a0553162186.json",
+      "bytes": 1355,
+      "sha256": "544b1c8f6d17055e63799ab3dc976be5a7c4fbb305465f0620eaabfa1c8a3500"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-7e5a0b19c23a4d90babe24ef0dee029e.json",
+      "bytes": 1408,
+      "sha256": "8a4cf2456779e9048706bbd5fca0f7a626685427b64dd00eca5664f62c1b5b7b"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-8c5a8280a98c4fa1a6d1c3db4438c1d1.json",
+      "bytes": 4016,
+      "sha256": "ddf3dd0d35f544da9a94ef67fce2a84febb1432d8cea245c370913899c2a2684"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-93a4534137534d37a391223b5ec5c867.json",
+      "bytes": 4016,
+      "sha256": "ddf3dd0d35f544da9a94ef67fce2a84febb1432d8cea245c370913899c2a2684"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-9ca4a86218354317a36f8956bd18a091.json",
+      "bytes": 2149,
+      "sha256": "c799e5afd3a4377eff065399c628de9151af38fb8e23f8853177e6a7a5619a38"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-a538a6a04dd548b4a444410bfc5e5bcf.json",
+      "bytes": 1317,
+      "sha256": "cb344d5573625411a06cbaab9f2868e0aa5ba01598d16a73323f5bcc2ac1a98a"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-b3ddb1ddde2e4815a3f23036a5bd7278.json",
+      "bytes": 4596,
+      "sha256": "5f359bb712e585907eb30fab71cb21b3f2bcca2d1a7c3e1641209140fcf48d93"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-c7f6e0fd62804d90b748ed63d747134b.json",
+      "bytes": 3953,
+      "sha256": "afd6f9d2afcd3e15fa98c04075e7ba31a4d6fade91448bdd92ef6045d3efe1d5"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-ce4f1d99f742410fadb11c71c27c5e58.json",
+      "bytes": 3034,
+      "sha256": "94ed936dfc4d1344a0737b3a6352d540c0e05127a3f758ed2b6a955a85e25500"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-d9a5dd08ced7454c85f089c9f6cd19db.json",
+      "bytes": 1326,
+      "sha256": "f7edc6c80abbb1e88f78a9bb67ef5f1a8f0025927e81183924d492fd690f1fb6"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-da3ebfec75db44b4973b31d4bbb6fb6a.json",
+      "bytes": 4645,
+      "sha256": "f24cf0318d5d8949e96975d7eb533f2e4b68efbdbeda2a3a206b74986729c5be"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-de0be446a63841ddb7c9ba339d6f1509.json",
+      "bytes": 2181,
+      "sha256": "0c365043a059278213197fdcec5f3aa08f7cfadd1b699228e3ae13a0fa397caf"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-e78978dd123a4733a6fe1ac62d3eee1c.json",
+      "bytes": 1326,
+      "sha256": "62bba5d9d8e84317ac7e434ac098638e91a98f084eedcb780d1137c9b7ed7e3e"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-ef2690095e2a4c8b84a1b77d0b89e39d.json",
+      "bytes": 2190,
+      "sha256": "7af5fb13d7687bfafaf3719cda7714ef3de82a6763950d9036ddb0fcdc2bef16"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/context-f1ab438ba97946968050a8aaea9f9205.json",
+      "bytes": 2181,
+      "sha256": "0c365043a059278213197fdcec5f3aa08f7cfadd1b699228e3ae13a0fa397caf"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/prepared-trace-parser-off.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/prepared-trace-prepared-off.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/prepared-trace-prepared-on.log",
+      "bytes": 12401,
+      "sha256": "200cdcdcee590b0576aff716412f0b05c5a498ddcfeca447b6d676f8d947bb48"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02-packets/prepared-trace-revision-fallback.log",
+      "bytes": 12439,
+      "sha256": "6f567479b6f99bb24d5a363315681411dcc68de46b074dab9a3cdb97e02d0ffb"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02.log",
+      "bytes": 2039,
+      "sha256": "60acc3d2682683dcf02f4817254f857e0a0b49aeff516283eee4eb2d8be5e33e"
+    },
+    {
+      "path": "reports/admission-experiments/prepared-retrieval/review-20261012/run-02.xml",
+      "bytes": 3412,
+      "sha256": "3ba4dd960ae63911271801d42ab79243a6cf94d8d3042b748ef42418c681dcaf"
+    },
+    {
+      "path": "tests/diagnostic_labels.context_budget_refusal.json",
+      "bytes": 299,
+      "sha256": "561511a60783da6986cebce11e58dc30c7088ec9bd3d2675819321b006524250"
+    },
+    {
+      "path": "tests/diagnostic_labels.prepared_retrieval_review.json",
+      "bytes": 305,
+      "sha256": "9ada09242694ac272629c53c4ce6453502f7bf6b4d5ac68e234d1588340ca387"
+    },
+    {
+      "path": "tests/diagnostic_labels.source_valid_transfer.json",
+      "bytes": 297,
+      "sha256": "89b966d8781bd00c9068a8112782901d4d112720dd15a8376384e549ec6f09aa"
+    },
+    {
+      "path": "tests/test_context_budget_refusal_integration.py",
+      "bytes": 3029,
+      "sha256": "8bba9d86ff4a976775d3a78ce5e6e5752f9ddaaa1eef495ed23d04255ac597df"
+    },
+    {
+      "path": "tests/test_prepared_retrieval_integration.py",
+      "bytes": 29566,
+      "sha256": "3945ebad4193795fabbe4cb737395d375cd25b641cf4c4e651704e7833a8d549"
+    },
+    {
+      "path": "tests/test_prepared_retrieval_review_integration.py",
+      "bytes": 7412,
+      "sha256": "31fa8b09bd18f504be95a9c719ecda19ba9a55490b895c12a653ac451bdfa353"
+    },
+    {
+      "path": "tests/test_source_valid_transfer_integration.py",
+      "bytes": 5833,
+      "sha256": "1c898fd5910bad4f9c810cdf18ff8ce6d565c3d244728a3a940590d3bd1cb2bd"
+    }
+  ]
+}

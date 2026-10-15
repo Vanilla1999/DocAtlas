@@ -1,0 +1,95 @@
+{
+  "seconds": 0.12771783699645312,
+  "expected_paths": [
+    "holdout/ceramic_firing/cooling.md",
+    "holdout/ceramic_firing/incident.md",
+    "holdout/ceramic_firing/loading.md"
+  ],
+  "indexed_paths": [
+    "holdout/ceramic_firing/cooling.md",
+    "holdout/ceramic_firing/incident.md",
+    "holdout/ceramic_firing/loading.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+      "source_path": "holdout/ceramic_firing/cooling.md",
+      "display_text": "# Охлаждение и выгрузка\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+      "source_path": "holdout/ceramic_firing/cooling.md",
+      "display_text": "После обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже.\nДля неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже.\nПриоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже.\nПри неисправном термодатчике дверцу не открывают по расчётному времени охлаждения.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-b7d10f3e2a7ff8d3530e73186e0501bf7d36edda",
+      "source_path": "holdout/ceramic_firing/incident.md",
+      "display_text": "# Неисправность печи\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+      "source_path": "holdout/ceramic_firing/incident.md",
+      "display_text": "Если термодатчик перестал показывать температуру, печник отключает нагрев и отмечает неисправность в журнале.\nВозобновить работу печи разрешает электромеханик после замены датчика и контрольного измерения температуры.\nПосле восстановления датчика дверцу открывают по температурным правилам для соответствующего вида партии, а не по времени простоя.\nТрещины на упаковочном ящике фиксируют отдельно от неисправностей печи.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+      "source_path": "holdout/ceramic_firing/loading.md",
+      "display_text": "# Подготовка обжига\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+      "source_path": "holdout/ceramic_firing/loading.md",
+      "display_text": "Сосуд с непросохшим дном нельзя ставить в печь даже для короткого пробного обжига.\nГотовность дна проверяет мастер формовки по контрольному взвешиванию.\nЕсли два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим.\nЭтикетка с номером партии не подтверждает готовность сосуда к обжигу.\n",
+      "line_start": 3,
+      "line_end": 6
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "2b656869074e8295410ebe6c3d5517b067cbcd63b47cf8d282ffa40aeeb7023b",
+  "storage_path": "/tmp/docatlas-evidence-ng6xd_qc/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+  "catalog_sha256": "2d2f73ab57329d11c9e43d6fe974ef81a94bed7a04a2e0e50553cd75843464dd",
+  "documents": [
+    {
+      "path": "holdout/ceramic_firing/cooling.md",
+      "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337"
+    },
+    {
+      "path": "holdout/ceramic_firing/incident.md",
+      "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "catalog_entry_hash": "sha256:ea8e9945681bad9bc4faed06ddf1bee7c3c44ab0cff6d549702db83f4662e281"
+    },
+    {
+      "path": "holdout/ceramic_firing/loading.md",
+      "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+      "catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  },
+  "status": "EXECUTED"
+}
