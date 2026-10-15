@@ -8,7 +8,6 @@ and missing model assets. No external transport or scorer is mocked.
 from __future__ import annotations
 import argparse
 import asyncio
-from copy import deepcopy
 import hashlib
 import importlib.metadata
 import importlib.util
@@ -17,9 +16,9 @@ import math
 import os
 from pathlib import Path
 import resource
-import subprocess
 import sys
 import time
+from datetime import timedelta
 
 
 def load_module(name, path):
@@ -50,7 +49,8 @@ def dataset(repo):
 def wire_cost(wire):
     from docmancer.docs.application.projection_tokenizer import projection_token_count
     data = wire.encode("utf-8")
-    return max(projection_token_count(data), math.ceil(len(data) / 4)), projection_token_count(data)
+    tokens = projection_token_count(data)
+    return max(tokens, math.ceil(len(data) / 4)), tokens
 
 
 def worker(args):
@@ -72,8 +72,8 @@ def worker(args):
         inventory = runtime.index_project(service, config, root)
         before_db, before_files = helper.logical_state(inventory), helper.source_state(root)
         save(out / "preparation.json", {"root": str(root), "inventory": inventory})
-        # The existing fixture isolates HOME/DOCATLAS_*; opt-in is re-applied only
-        # after authorized preparation. No setting comes from document contents.
+        # The fixture isolates HOME/DOCATLAS_*; opt-in is re-applied only after
+        # authorized preparation. No setting comes from document contents.
         os.environ["DOCATLAS_CONTEXT_COMPRESSION"] = "off"
         with observe_section_compression() as observations:
             if not args.missing_model:
@@ -95,23 +95,35 @@ def worker(args):
             try:
                 asyncio.run(_run_async(service))
             finally:
+                memory_peak = Path("/sys/fs/cgroup/memory.peak")
                 save(out / "server.json", {
                     "observations": observations,
                     "database_unchanged": helper.logical_state(inventory) == before_db,
-                    # A source is intentionally changed only in the revocation scenario.
+                    # Source mutation is restored in the revocation scenario.
                     "files_unchanged_before_revoke": before_files,
                     "files_after": helper.source_state(root),
                     "rss_peak_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
+                    "container_memory_peak": int(memory_peak.read_text()) if memory_peak.is_file() else None,
                     "versions": {name: importlib.metadata.version(name) for name in
                                  ("onnxruntime", "tokenizers", "tiktoken", "mcp")},
                 })
+
+
+def assert_operational_error(response, expected, receipt_path):
+    """Verify the actual public error envelope, not a fabricated direct DTO."""
+    assert len(response.content) == 1 and response.content[0].type == "text"
+    payload = json.loads(response.content[0].text)
+    save(receipt_path, {"isError": response.isError, "payload": payload})
+    assert response.isError and payload.get("status") == "failed", payload
+    assert (payload.get("error") or {}).get("reason_code") == expected, payload
+    assert not payload.get("sources") and not payload.get("source_groups"), payload
 
 
 async def client(args):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
     from docmancer.docs.application.section_compression import expand_sections, FORMAT
-    corpus, cases, families = dataset(args.repo)
+    _, cases, families = dataset(args.repo)
     records, controls = [], []
     for family in families:
         group = family["id"]
@@ -123,10 +135,9 @@ async def client(args):
             "--out", str(args.out), "--model", str(args.model),
         ], env=dict(os.environ))
         root = args.work / group / "project"
-        started = time.perf_counter()
         with (out / "stderr.log").open("w") as stderr:
             async with stdio_client(params, errlog=stderr) as (read, write):
-                async with ClientSession(read, write, read_timeout_seconds=__import__("datetime").timedelta(seconds=180)) as session:
+                async with ClientSession(read, write, read_timeout_seconds=timedelta(seconds=180)) as session:
                     await session.initialize()
                     assert "get_docs_context" in {t.name for t in (await session.list_tools()).tools}
                     group_rows = []
@@ -169,36 +180,41 @@ async def client(args):
                         group_rows = expanded["sources"]
                         print(json.dumps(records[-1]), flush=True)
                     if group == "poetry":
-                        # A distinct public error scenario: no query truncation or full-pool fallback.
+                        # Distinct public error: no query truncation or full-pool fallback.
                         bad = await session.call_tool("get_docs_context", {
                             "question": "environment " * 140, "project_path": str(root), "scope": "project",
                         })
-                        payload = json.loads(bad.content[0].text)
-                        assert bad.isError and payload.get("reason_code") == "section_compression_query_limit", payload
+                        assert_operational_error(bad, "section_compression_query_limit", out / "query-overflow.json")
                         controls.append({"scenario": "query_overflow", "pass": True})
                         # Read capabilities from actual issued selected rows.
                         candidates = [r for r in group_rows if r.get("source_uri")]
                         assert len(candidates) >= 2
                         rr = await session.read_resource(candidates[0]["source_uri"])
                         value = json.loads(rr.contents[0].text)
+                        save(out / "resource-read.json", value)
                         assert value.get("status") in ("complete", "truncated"), value
                         controls.append({"scenario": "issued_resource", "pass": True})
                         stale = candidates[-1]
                         target = root / stale["path_or_url"]
                         before = target.read_bytes()
-                        target.write_bytes(before + b"\nChanged after context delivery.\n")
-                        rr = await session.read_resource(stale["source_uri"])
-                        value = json.loads(rr.contents[0].text)
-                        assert value.get("status") in ("source_changed", "source_unavailable") or value.get("reason_code") in (
-                            "source_policy_or_snapshot_changed", "snapshot_digest_mismatch"), value
-                        controls.append({"scenario": "changed_source_rejected", "pass": True})
-                        target.write_bytes(before)
+                        try:
+                            target.write_bytes(before + b"\nChanged after context delivery.\n")
+                            rr = await session.read_resource(stale["source_uri"])
+                            value = json.loads(rr.contents[0].text)
+                            save(out / "changed-source.json", value)
+                            assert value.get("status") in ("source_changed", "source_unavailable"), value
+                            assert value.get("reason_code") in (
+                                "source_policy_or_snapshot_changed", "snapshot_digest_mismatch"), value
+                            assert not value.get("snippet"), value
+                            controls.append({"scenario": "changed_source_rejected", "pass": True})
+                        finally:
+                            target.write_bytes(before)
         server = json.loads((out / "server.json").read_text())
         assert server["database_unchanged"]
         assert server["files_unchanged_before_revoke"] == server["files_after"]
         assert server["rss_peak_bytes"] <= 1_000_000_000
         assert len(server["observations"]) == len([c for c in cases if c["project_group"] == group])
-    # Separate process and bad local path: no engine cache can conceal unavailable assets.
+    # Separate process: no engine cache can conceal missing local assets.
     group = "poetry"
     badwork, badout = args.work / "missing", args.out / "missing"
     badout.mkdir()
@@ -215,9 +231,10 @@ async def client(args):
                     "question": next(c["question"] for c in cases if c["id"] == "V40-P03"),
                     "project_path": str(badwork / group / "project"), "scope": "project",
                 })
-                value = json.loads(response.content[0].text)
-                assert response.isError and value.get("reason_code") == "section_compression_model_unavailable", value
-                assert not value.get("sources")
+                assert_operational_error(response, "section_compression_model_unavailable", badout / "missing-model.json")
+    server = json.loads((badout / group / "server.json").read_text())
+    assert server["database_unchanged"] and server["files_unchanged_before_revoke"] == server["files_after"]
+    assert server["observations"] == []
     controls.append({"scenario": "missing_model_no_fallback", "pass": True})
     save(args.out / "DELIVERY.json", {"cases": records, "controls": controls,
                                      "public_calls": 82, "preparations": 6, "resource_reads": 2})
@@ -250,7 +267,9 @@ def assess(args, records, controls):
         results.append({**record, "answerability": case["answerability"],
                         "passed": passed, "integrity": valid, "coverage": coverage, "errors": errors})
     import statistics
+    server_reports = [json.loads((args.out / family / "server.json").read_text()) for family in families]
     summary = {
+        "head": os.environ.get("TESTED_SHA"),
         "cases": len(results), "positive_pass": sum(r["passed"] for r in results if r["answerability"] == "within_budget"),
         "partial_pass": sum(r["passed"] for r in results if r["answerability"] == "partial"),
         "strict_empty_pass": sum(r["passed"] for r in results if r["answerability"] == "unanswerable"),
@@ -259,11 +278,12 @@ def assess(args, records, controls):
         "tokens_max": max(r["tokens"] for r in results),
         "baseline_tokens_mean": statistics.mean(r["baseline_tokens"] for r in results),
         "seconds_median": statistics.median(r["seconds"] for r in results),
+        "server_rss_peak_bytes": max(r["rss_peak_bytes"] for r in server_reports),
+        "container_memory_peak": max((r["container_memory_peak"] or 0) for r in server_reports),
         "controls": controls, "failed": [r["case_id"] for r in results if not r["passed"]],
         "boundary": "installed wheel; real SQLite; public stdio MCP; client-received bytes",
         "semantic_refusal_implemented": False,
     }
-    # Dataset uses its original labels, not assumptions about English naming.
     summary["counts"] = {kind: {"total": sum(r["answerability"] == kind for r in results),
                                 "pass": sum(r["passed"] for r in results if r["answerability"] == kind)}
                          for kind in sorted({r["answerability"] for r in results})}
