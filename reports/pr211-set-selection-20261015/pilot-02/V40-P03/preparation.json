@@ -1,0 +1,1238 @@
+{
+  "root": "/tmp/opencode/pr211-set-selection-runtime/pilot-02-work/poetry",
+  "inventory": {
+    "seconds": 0.20983159099978366,
+    "expected_paths": [
+      "docs/configuration.md",
+      "docs/dependency-specification.md",
+      "docs/managing-environments.md"
+    ],
+    "indexed_paths": [
+      "docs/configuration.md",
+      "docs/dependency-specification.md",
+      "docs/managing-environments.md"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-8b90b43af33d690a3e1e54fc11c807bd050f60a1",
+        "source_path": "docs/configuration.md",
+        "display_text": "---\ntitle: \"Configuration\"\ndraft: false\ntype: docs\nlayout: single\n\nmenu:\n  docs:\n    weight: 40\n---\n\n",
+        "line_start": 1,
+        "line_end": 11
+      },
+      {
+        "stable_chunk_id": "child-e049e4dec8cfe707bd3e091b1b7a0ad2948b4f8a",
+        "source_path": "docs/configuration.md",
+        "display_text": "# Configuration\n\nPoetry can be configured via the `config` command ([see more about its usage here]({{< relref \"cli#config\" >}} \"config command documentation\"))\nor directly in the `config.toml` file that will be automatically created when you first run that command.\nThis file can typically be found in one of the following directories:\n\n- macOS:   `~/Library/Application Support/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n\n",
+        "line_start": 12,
+        "line_end": 20
+      },
+      {
+        "stable_chunk_id": "child-9c7251496094189b327dbed758defa4b52569c65",
+        "source_path": "docs/configuration.md",
+        "display_text": "For Unix, we follow the XDG spec and support `$XDG_CONFIG_HOME`.\nThat means, by default `~/.config/pypoetry`.\n\n",
+        "line_start": 21,
+        "line_end": 23
+      },
+      {
+        "stable_chunk_id": "child-606b01a79e6da3bd06c5383244367a13fee828bc",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Local configuration\n\nPoetry also provides the ability to have settings that are specific to a project\nby passing the `--local` option to the `config` command.\n\n```bash\npoetry config virtualenvs.create false --local\n```\n\n{{% note %}}\nYour local configuration of Poetry application is stored in the `poetry.toml` file,\nwhich is separate from `pyproject.toml`.\n{{% /note %}}\n\n",
+        "line_start": 24,
+        "line_end": 37
+      },
+      {
+        "stable_chunk_id": "child-0b539241396a979c1895fa42f9ff639b2beb5469",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nIf a setting is defined in both `poetry.toml` (local/project) and `config.toml` (global),\nthe local/project configuration takes precedence over the global configuration.\n{{% /note %}}\n\n{{% warning %}}\nBe mindful when checking in this file into your repository since it may contain user-specific or sensitive information.\n{{% /warning %}}\n\n",
+        "line_start": 38,
+        "line_end": 46
+      },
+      {
+        "stable_chunk_id": "child-922ba1cf468c470a7b505564f5c3f5d4c2b21d39",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Listing the current configuration\n\nTo list the current configuration you can use the `--list` option\nof the `config` command:\n\n```bash\npoetry config --list\n```\n\nwhich will give you something similar to this:\n\n",
+        "line_start": 47,
+        "line_end": 57
+      },
+      {
+        "stable_chunk_id": "child-3a158ea38193bf32d24fbff368e065a74b46d0f1",
+        "source_path": "docs/configuration.md",
+        "display_text": "```toml\ncache-dir = \"/path/to/cache/directory\"\nvirtualenvs.create = true\nvirtualenvs.in-project = null\nvirtualenvs.options.always-copy = true\nvirtualenvs.options.no-pip = false\nvirtualenvs.options.system-site-packages = false\nvirtualenvs.path = \"{cache-dir}/virtualenvs\"  # /path/to/cache/directory/virtualenvs\nvirtualenvs.prompt = \"{project_name}-py{python_version}\"\nvirtualenvs.use-poetry-python = false\n```\n\n",
+        "line_start": 58,
+        "line_end": 69
+      },
+      {
+        "stable_chunk_id": "child-18187d926c9dea8f3e119cf7bdadb07f2a30dc30",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Displaying a single configuration setting\n\nIf you want to see the value of a specific setting, you can\ngive its name to the `config` command\n\n```bash\npoetry config virtualenvs.path\n```\n\nFor a full list of the supported settings see [Available settings](#available-settings).\n\n",
+        "line_start": 70,
+        "line_end": 80
+      },
+      {
+        "stable_chunk_id": "child-4242f1aba083153420fa5ed97764e2551f0ba2bd",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Adding or updating a configuration setting\n\nTo change or otherwise add a new configuration setting, you can pass\na value after the setting's name:\n\n```bash\npoetry config virtualenvs.path /path/to/cache/directory/virtualenvs\n```\n\nFor a full list of the supported settings see [Available settings](#available-settings).\n\n",
+        "line_start": 81,
+        "line_end": 91
+      },
+      {
+        "stable_chunk_id": "child-e70667710ea88760dfb8c8224481b4bf7f6d92d5",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Removing a specific setting\n\nIf you want to remove a previously set setting, you can use the `--unset` option:\n\n```bash\npoetry config virtualenvs.path --unset\n```\n\nThe setting will then retrieve its default value.\n\n",
+        "line_start": 92,
+        "line_end": 101
+      },
+      {
+        "stable_chunk_id": "child-dfdc3a37307523d4096fffde52bd0be78d6eca40",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n",
+        "line_start": 102,
+        "line_end": 111
+      },
+      {
+        "stable_chunk_id": "child-0508accd66ded87b5fcd10076666aca9e3626651",
+        "source_path": "docs/configuration.md",
+        "display_text": "```bash\nexport POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory\n```\n\nThis also works for secret settings, like credentials:\n\n```bash\nexport POETRY_HTTP_BASIC_MY_REPOSITORY_PASSWORD=secret\n```\n\n",
+        "line_start": 112,
+        "line_end": 121
+      },
+      {
+        "stable_chunk_id": "child-89c87b96ed076e7640ad745386683feb7aeb78e1",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Configuration sources\n\nWhen a setting is set in multiple places, Poetry applies the following precedence\n(from highest to lowest):\n\n1. Environment variables (for example, `POETRY_VIRTUALENVS_CREATE`)\n2. The local `poetry.toml` file (created with `poetry config --local`)\n3. The global `config.toml` file\n4. The setting's default value\n\n",
+        "line_start": 122,
+        "line_end": 131
+      },
+      {
+        "stable_chunk_id": "child-d6e7f04dfa7b7edcadb2c80471acb3946927cc35",
+        "source_path": "docs/configuration.md",
+        "display_text": "For repository credentials (`http-basic.*`, `pypi-token.*`), Poetry may also read\nfrom `auth.toml` and the system keyring (for details see [Repositories]({{< relref \"repositories\" >}})).\nEnvironment variables still take precedence over file-based values.\n\n",
+        "line_start": 132,
+        "line_end": 135
+      },
+      {
+        "stable_chunk_id": "child-eef22576ecd71da135852cb4026266dac5d9ef4a",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Migrate outdated configs\n\nIf Poetry renames or remove config options it might be necessary to migrate explicit set options. This is possible\nby running:\n\n```bash\npoetry config --migrate\n```\n\nIf you need to migrate a local config run:\n\n```bash\npoetry config --migrate --local\n```\n\n",
+        "line_start": 136,
+        "line_end": 150
+      },
+      {
+        "stable_chunk_id": "child-088941559f22b29d8318bf97aa5e6201796cd192",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Default Directories\n\nPoetry uses the following default directories:\n\n",
+        "line_start": 151,
+        "line_end": 154
+      },
+      {
+        "stable_chunk_id": "child-72122218defa624b3abb287eac4563afd42987a5",
+        "source_path": "docs/configuration.md",
+        "display_text": "### Config Directory\n\n- Linux: `$XDG_CONFIG_HOME/pypoetry` or `~/.config/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n- macOS: `~/Library/Application Support/pypoetry`\n\nYou can override the config directory by setting the `POETRY_CONFIG_DIR` environment variable.\n\n",
+        "line_start": 155,
+        "line_end": 162
+      },
+      {
+        "stable_chunk_id": "child-1830af683d091194d739da93c27e8668f81f0812",
+        "source_path": "docs/configuration.md",
+        "display_text": "### Data Directory\n\n- Linux: `$XDG_DATA_HOME/pypoetry` or `~/.local/share/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n- macOS: `~/Library/Application Support/pypoetry`\n\nYou can override the data directory by setting the `POETRY_DATA_DIR` or `POETRY_HOME` environment variables. If `POETRY_HOME` is set, it will be given higher priority.\n\n",
+        "line_start": 163,
+        "line_end": 170
+      },
+      {
+        "stable_chunk_id": "child-7a109418bed4614e758c49404ad6dd7fa5150717",
+        "source_path": "docs/configuration.md",
+        "display_text": "### Cache Directory\n\n- Linux: `$XDG_CACHE_HOME/pypoetry` or `~/.cache/pypoetry`\n- Windows: `%LOCALAPPDATA%\\pypoetry`\n- macOS: `~/Library/Caches/pypoetry`\n\nYou can override the cache directory by setting the `POETRY_CACHE_DIR` environment variable.\n\n",
+        "line_start": 171,
+        "line_end": 178
+      },
+      {
+        "stable_chunk_id": "child-45ff85f1cbd4e9fd8c7675dada4414af968d36e6",
+        "source_path": "docs/configuration.md",
+        "display_text": "## Available settings\n\n",
+        "line_start": 179,
+        "line_end": 180
+      },
+      {
+        "stable_chunk_id": "child-eeed50068e3e03ee4bbabf4ad72168ef948d47b4",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `cache-dir`\n\n**Type**: `string`\n\n**Environment Variable**: `POETRY_CACHE_DIR`\n\nThe path to the cache directory used by Poetry.\n\nDefaults to one of the following directories:\n\n- macOS:   `~/Library/Caches/pypoetry`\n- Windows: `C:\\Users\\<username>\\AppData\\Local\\pypoetry\\Cache`\n- Unix:    `~/.cache/pypoetry`\n\n",
+        "line_start": 181,
+        "line_end": 194
+      },
+      {
+        "stable_chunk_id": "child-0879c88e0e21dcbe51860c557d97a31d533f5863",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `data-dir`\n\n**Type**: `string`\n\n**Environment Variable**: `POETRY_DATA_DIR`\n\nThe path to the data directory used by Poetry.\n\n- Linux: `$XDG_DATA_HOME/pypoetry` or `~/.local/share/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n- macOS: `~/Library/Application Support/pypoetry`\n\nYou can override the data directory by setting the `POETRY_DATA_DIR` or `POETRY_HOME` environment variables. If\n`POETRY_HOME` is set, it will be given higher priority.\n\n",
+        "line_start": 195,
+        "line_end": 209
+      },
+      {
+        "stable_chunk_id": "child-4cdeeb79e4ecc5bde654cb9b9d99e2cd771d9f7d",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.max-workers`\n\n**Type**: `int`\n\n**Default**: `number_of_cores + 4`\n\n**Environment Variable**: `POETRY_INSTALLER_MAX_WORKERS`\n\n*Introduced in 1.2.0*\n\nSet the maximum number of workers while using the parallel installer.\nThe `number_of_cores` is determined by `os.cpu_count()`.\nIf this raises a `NotImplementedError` exception, `number_of_cores` is assumed to be 1.\n\n",
+        "line_start": 210,
+        "line_end": 223
+      },
+      {
+        "stable_chunk_id": "child-9107ddaa3c51d2e48e7a7e9b38b78fc176b59c6d",
+        "source_path": "docs/configuration.md",
+        "display_text": "If this configuration parameter is set to a value greater than `number_of_cores + 4`,\nthe number of maximum workers is still limited at `number_of_cores + 4`.\n\n{{% note %}}\nThis configuration is ignored when `installer.parallel` is set to `false`.\n{{% /note %}}\n\n",
+        "line_start": 224,
+        "line_end": 230
+      },
+      {
+        "stable_chunk_id": "child-5d2fb394144acdb65ad71250368dbf36a932d321",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.no-binary`\n\n**Type**: `string | boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_INSTALLER_NO_BINARY`\n\n*Introduced in 1.2.0*\n\nWhen set, this configuration allows users to disallow the use of binary distribution format for all, none or specific packages.\n\n",
+        "line_start": 231,
+        "line_end": 242
+      },
+      {
+        "stable_chunk_id": "child-32e91a65b836bf071343619009a72527cee1e2bf",
+        "source_path": "docs/configuration.md",
+        "display_text": "| Configuration          | Description                                                |\n|------------------------|------------------------------------------------------------|\n| `:all:` or `true`      | Disallow binary distributions for all packages.            |\n| `:none:` or `false`    | Allow binary distributions for all packages.               |\n| `package[,package,..]` | Disallow binary distributions for specified packages only. |\n\n",
+        "line_start": 243,
+        "line_end": 248
+      },
+      {
+        "stable_chunk_id": "child-a7e510ad0f7e38a3c8b4c64ce39c6b5ffd90f56c",
+        "source_path": "docs/configuration.md",
+        "display_text": "If both `installer.no-binary` and `installer.only-binary` are set, explicit package names will take precedence over `:all:`.\n\n",
+        "line_start": 249,
+        "line_end": 250
+      },
+      {
+        "stable_chunk_id": "child-f540e0969302eb3d7b47ccde732bf3fe69f25765",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nAs with all configurations described here, this is a user specific configuration. This means that this\nis not taken into consideration when a lockfile is generated or dependencies are resolved. This is\napplied only when selecting which distribution for dependency should be installed into a Poetry managed\nenvironment.\n{{% /note %}}\n\n{{% note %}}\nFor project specific usage, it is recommended that this be configured with the `--local`.\n\n",
+        "line_start": 251,
+        "line_end": 260
+      },
+      {
+        "stable_chunk_id": "child-4d8d8550bd94ea22599f48ea42abba5c7ecb6c1f",
+        "source_path": "docs/configuration.md",
+        "display_text": "```bash\npoetry config --local installer.no-binary :all:\n```\n{{% /note %}}\n\n{{% note %}}\nFor CI or container environments using [environment variable](#using-environment-variables)\nto configure this might be useful.\n\n```bash\nexport POETRY_INSTALLER_NO_BINARY=:all:\n```\n{{% /note %}}\n\n",
+        "line_start": 261,
+        "line_end": 274
+      },
+      {
+        "stable_chunk_id": "child-133521f70c83b01740a338ef153854b7ebdb2411",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% warning %}}\nUnless this is required system-wide, if configured globally, you could encounter slower install times\nacross all your projects if incorrectly set.\n{{% /warning %}}\n\n",
+        "line_start": 275,
+        "line_end": 279
+      },
+      {
+        "stable_chunk_id": "child-71fd93febd3bc6d059bed5eb541c44f5d5d1d0bd",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.only-binary`\n\n**Type**: `string | boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_INSTALLER_ONLY_BINARY`\n\n*Introduced in 2.0.0*\n\nWhen set, this configuration allows users to enforce the use of binary distribution format for all, none or\nspecific packages.\n\n",
+        "line_start": 280,
+        "line_end": 292
+      },
+      {
+        "stable_chunk_id": "child-ae1a6128d2459b4501f6b326593dc536ac8bf1f1",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nPlease refer to [`installer.no-binary`]({{< relref \"configuration#installerno-binary\" >}}) for information on allowed\nvalues, usage instructions and warnings.\n{{% /note %}}\n\n",
+        "line_start": 293,
+        "line_end": 297
+      },
+      {
+        "stable_chunk_id": "child-5f6435bf99ca242cd510fdd326dc8ddba80a4a18",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.parallel`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_INSTALLER_PARALLEL`\n\n*Introduced in 1.1.4*\n\nUse parallel execution when using the new (`>=1.1.0`) installer.\n\n",
+        "line_start": 298,
+        "line_end": 309
+      },
+      {
+        "stable_chunk_id": "child-b8fbb0bcc9f053078aa6bf27496de6708d173b4f",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.builtin-uninstall`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_INSTALLER_BUILTIN_UNINSTALL`\n\n*Introduced in 2.5.0*\n\n",
+        "line_start": 310,
+        "line_end": 319
+      },
+      {
+        "stable_chunk_id": "child-222f79044af0cb2c267f21046d6348db31b56fbe",
+        "source_path": "docs/configuration.md",
+        "display_text": "If set to `true`, Poetry uninstalls packages using its own built-in routine instead of\ninvoking `pip uninstall` as a subprocess. This avoids the overhead of spawning pip.\nBehavior is otherwise equivalent: confirmation is automatic, and files outside the\ntarget environment's prefix are never removed.\n\n",
+        "line_start": 320,
+        "line_end": 324
+      },
+      {
+        "stable_chunk_id": "child-4da771d63717d9ef75ba4baf12aba51b8a5d8feb",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.build-config-settings.<package-name>`\n\n**Type**: `Serialised JSON with string or list of string properties`\n\n**Default**: `None`\n\n**Environment Variable**: `POETRY_INSTALLER_BUILD_CONFIG_SETTINGS_<package-name>`\n\n*Introduced in 2.1.0*\n\n{{% warning %}}\nThis is an **experimental** configuration and can be subject to changes in upcoming releases until it is considered\nstable.\n{{% /warning %}}\n\n",
+        "line_start": 325,
+        "line_end": 339
+      },
+      {
+        "stable_chunk_id": "child-4c3542e19a0dae084ddcb7c8c34456f1ee0217dd",
+        "source_path": "docs/configuration.md",
+        "display_text": "Configure [PEP 517 config settings](https://peps.python.org/pep-0517/#config-settings) to be passed to a package's\nbuild backend if it has to be built from a directory or vcs source; or a source distribution during installation.\n\n",
+        "line_start": 340,
+        "line_end": 342
+      },
+      {
+        "stable_chunk_id": "child-3f1fe137551fc413811d692600fd7214a7ad2073",
+        "source_path": "docs/configuration.md",
+        "display_text": "This is only used when a compatible binary distribution (wheel) is not available for a package. This can be used along\nwith [`installer.no-binary`]({{< relref \"configuration#installerno-binary\" >}}) option to force a build with these\nconfigurations when a dependency of your project with the specified name is being installed.\n\n",
+        "line_start": 343,
+        "line_end": 346
+      },
+      {
+        "stable_chunk_id": "child-4856e04da264a36f5cde0a8d871ce73bd2c695cc",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nPoetry does not offer a similar option in the `pyproject.toml` file as these are, in majority of cases, not universal\nand vary depending on the target installation environment.\n\nIf you want to use a project specific configuration it is recommended that this configuration be set locally, in your\nproject's `poetry.toml` file.\n\n",
+        "line_start": 347,
+        "line_end": 353
+      },
+      {
+        "stable_chunk_id": "child-7f0284ca255cb29e5d2b0faf8111715563dad867",
+        "source_path": "docs/configuration.md",
+        "display_text": "```bash\npoetry config --local installer.build-config-settings.grpcio \\\n  '{\"CC\": \"gcc\", \"--global-option\": [\"--some-global-option\"], \"--build-option\": [\"--build-option1\", \"--build-option2\"]}'\n```\n\nIf you want to modify a single key, you can do, by setting the same key again.\n\n```bash\npoetry config --local installer.build-config-settings.grpcio \\\n  '{\"CC\": \"g++\"}'\n```\n\n{{% /note %}}\n\n",
+        "line_start": 354,
+        "line_end": 367
+      },
+      {
+        "stable_chunk_id": "child-160aba0a3f7205979d23cd16c63cd92849f3db17",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `requests.max-retries`\n\n**Type**: `int`\n\n**Default**: `0`\n\n**Environment Variable**: `POETRY_REQUESTS_MAX_RETRIES`\n\n*Introduced in 2.0.0*\n\nSet the maximum number of retries in an unstable network.\nThis setting has no effect if the server does not support HTTP range requests.\n\n",
+        "line_start": 368,
+        "line_end": 380
+      },
+      {
+        "stable_chunk_id": "child-de4b4cf1679c5b6a4560d1aab361ecbfc3b2741e",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `installer.re-resolve`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_INSTALLER_RE_RESOLVE`\n\n*Changed default from `true` to `false` in 2.3.0*\n\n*Introduced in 2.0.0*\n\n",
+        "line_start": 381,
+        "line_end": 392
+      },
+      {
+        "stable_chunk_id": "child-c9c8b141d3644b0f467d4c4519d5c0183c2fefe4",
+        "source_path": "docs/configuration.md",
+        "display_text": "If the config option is _not_ set and the lock file is at least version 2.1\n(created by Poetry 2.0 or above), the installer will not re-resolve dependencies\nbut evaluate the locked markers to decide which of the locked dependencies have to\nbe installed into the target environment.\n\n",
+        "line_start": 393,
+        "line_end": 397
+      },
+      {
+        "stable_chunk_id": "child-80394a99147377636540ee35e5a062ffa113d97c",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `python.installation-dir`\n\n**Type**: `string`\n\n**Default**: `{data-dir}/python`\n\n**Environment Variable**: `POETRY_PYTHON_INSTALLATION_DIR`\n\n*Introduced in 2.1.0*\n\nThe directory in which Poetry managed Python versions are installed to.\n\n",
+        "line_start": 398,
+        "line_end": 409
+      },
+      {
+        "stable_chunk_id": "child-d8305d0381ad0872fd4674ebda4959eaa780afe4",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `solver.lazy-wheel`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_SOLVER_LAZY_WHEEL`\n\n*Introduced in 1.8.0*\n\n",
+        "line_start": 410,
+        "line_end": 419
+      },
+      {
+        "stable_chunk_id": "child-8df57a035fc9beb1e4065d30a8b507d3c6802262",
+        "source_path": "docs/configuration.md",
+        "display_text": "Do not download entire wheels to extract metadata but use\n[HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests)\nto only download the METADATA files of wheels.\nEspecially with slow network connections, this setting can speed up dependency resolution significantly.\nIf the cache has already been filled or the server does not support HTTP range requests,\nthis setting makes no difference.\n\n",
+        "line_start": 420,
+        "line_end": 426
+      },
+      {
+        "stable_chunk_id": "child-8582750b89347cc3c91c30730eb42a88229a49da",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `solver.min-release-age`\n\n**Type**: `int`\n\n**Default**: `0`\n\n**Environment Variable**: `POETRY_SOLVER_MIN_RELEASE_AGE`\n\n*Introduced in 2.4.0*\n\nMinimum age of a package release in **days** before it is considered during dependency resolution.\nWhen set, any package version where at least one distribution file was uploaded more recently\nthan the specified number of days ago will be ignored by the solver.\n\n",
+        "line_start": 427,
+        "line_end": 440
+      },
+      {
+        "stable_chunk_id": "child-cb88534c6eb13a82b36783ef6d5ed3b60629621d",
+        "source_path": "docs/configuration.md",
+        "display_text": "For example, with a value of `7`, a version is only considered\nif all known distribution files are at least seven days old.\nIf the option is not set or set to `0`, all versions are considered.\n\nThis option is useful to protect against supply chain attacks where a new release\nof a dependency is published with malicious code.\nThis is often detected within hours or days and the compromised release is removed.\n\n",
+        "line_start": 441,
+        "line_end": 448
+      },
+      {
+        "stable_chunk_id": "child-902ab9e44fa636061217ec4a3af8fbb0be323d8b",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nThis filter can only be enforced for package sources that expose file upload timestamps.\nIf a source does not provide upload times for a release,\nthat release is not filtered out by this setting.\n{{% /note %}}\n\n",
+        "line_start": 449,
+        "line_end": 454
+      },
+      {
+        "stable_chunk_id": "child-73c7dd45e9cb5757e1e5735259fcd50054b58754",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `solver.min-release-age-exclude`\n\n**Type**: `string`\n\n**Default**: *not set*\n\n**Environment Variable**: `POETRY_SOLVER_MIN_RELEASE_AGE_EXCLUDE`\n\n*Introduced in 2.4.0*\n\nA comma-separated list of package names that should be excluded from the\n[`solver.min-release-age`](#solvermin-release-age) filter.\nVersions of these packages will always be considered by the solver,\nregardless of their upload age.\n\n",
+        "line_start": 455,
+        "line_end": 469
+      },
+      {
+        "stable_chunk_id": "child-6914320bdbdaa4bada480ff44979fa4321fb845a",
+        "source_path": "docs/configuration.md",
+        "display_text": "```bash\npoetry config solver.min-release-age-exclude \"my-package,other-package\"\n```\n\n",
+        "line_start": 470,
+        "line_end": 473
+      },
+      {
+        "stable_chunk_id": "child-fda8d2f7cf1410673f32fe6afa8b90f42b7c0d70",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `solver.min-release-age-exclude-source`\n\n**Type**: `string`\n\n**Default**: *not set*\n\n**Environment Variable**: `POETRY_SOLVER_MIN_RELEASE_AGE_EXCLUDE_SOURCE`\n\n*Introduced in 2.4.0*\n\n",
+        "line_start": 474,
+        "line_end": 483
+      },
+      {
+        "stable_chunk_id": "child-3a9b8028e766362af6f6d772823bcd8b12932a23",
+        "source_path": "docs/configuration.md",
+        "display_text": "A comma-separated list of source names or URLs that should be excluded from the\n[`solver.min-release-age`](#solvermin-release-age) filter.\nAll packages from these sources will always be considered by the solver,\nregardless of their upload age.\nSources can be referenced by the name defined in `pyproject.toml` or by URL.\n\n```bash\npoetry config solver.min-release-age-exclude-source \"private-repo,https://example.com/simple/\"\n```\n\n",
+        "line_start": 484,
+        "line_end": 493
+      },
+      {
+        "stable_chunk_id": "child-5a1b154bcc3655b49053a95a23820cee410316ff",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `system-git-client`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_SYSTEM_GIT_CLIENT`\n\n*Renamed to `system-git-client` in 2.0.0*\n\n*Introduced in 1.2.0 as `experimental.system-git-client`*\n\nUse system git client backend for git related tasks.\n\nPoetry uses `dulwich` by default for git related tasks to not rely on the availability of a git client.\n\n",
+        "line_start": 494,
+        "line_end": 509
+      },
+      {
+        "stable_chunk_id": "child-2fb9e8a4d35fc6c24fea8c8990dd790325c07a4e",
+        "source_path": "docs/configuration.md",
+        "display_text": "If you encounter any problems with it, set to `true` to use the system git backend.\n\n",
+        "line_start": 510,
+        "line_end": 511
+      },
+      {
+        "stable_chunk_id": "child-adab453cfcfab396b8eeb450140e3efa45cbd9bf",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.create`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_CREATE`\n\nCreate a new virtual environment if one doesn't already exist.\n\n",
+        "line_start": 512,
+        "line_end": 521
+      },
+      {
+        "stable_chunk_id": "child-702f22351a4bdda0ec419a58abcfac677f653e75",
+        "source_path": "docs/configuration.md",
+        "display_text": "If set to `false`, Poetry will not create a new virtual environment. If it detects an already enabled virtual\nenvironment or an existing one in `{cache-dir}/virtualenvs` or `{project-dir}/.venv` it will\ninstall dependencies into them, otherwise it will install dependencies into the systems python environment.\n\n",
+        "line_start": 522,
+        "line_end": 525
+      },
+      {
+        "stable_chunk_id": "child-1f0571a1df5d3a3d0191fdb77d789466d90e1de0",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nIf Poetry detects it's running within an activated virtual environment, it will never create a new virtual environment,\nregardless of the value set for `virtualenvs.create`.\n{{% /note %}}\n\n",
+        "line_start": 526,
+        "line_end": 530
+      },
+      {
+        "stable_chunk_id": "child-074a702d2172e31d4dbddc90ab3e5a11d2d5c99d",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nBe aware that installing dependencies into the system environment likely upgrade or uninstall existing packages and thus\nbreak other applications. Installing additional Python packages after installing the project might break the Poetry\nproject in return.\n\nThis is why it is recommended to always create a virtual environment. This is also true in Docker containers, as they\nmight contain additional Python packages as well.\n{{% /note %}}\n\n",
+        "line_start": 531,
+        "line_end": 539
+      },
+      {
+        "stable_chunk_id": "child-c2961c47df5cfa78c0a2323988764ae83f4ecf13",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.in-project`\n\n**Type**: `boolean`\n\n**Default**: `None`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_IN_PROJECT`\n\nCreate the virtualenv inside the project's root directory.\n\nIf not set explicitly, `poetry` by default will create a virtual environment under\n`{cache-dir}/virtualenvs` or use the `{project-dir}/.venv` directory if one already exists.\n\n",
+        "line_start": 540,
+        "line_end": 552
+      },
+      {
+        "stable_chunk_id": "child-7ea4062f381ab155842dd584e02a90cadf8df9d2",
+        "source_path": "docs/configuration.md",
+        "display_text": "If set to `true`, the virtualenv will be created and expected in a folder named\n`.venv` within the root directory of the project.\n\n{{% note %}}\nIf a virtual environment has already been created for the project under `{cache-dir}/virtualenvs`, setting this variable to `true` will not cause `poetry` to create or use a local virtual environment.\n\n",
+        "line_start": 553,
+        "line_end": 558
+      },
+      {
+        "stable_chunk_id": "child-0fe88aec564c87dce374878d527c98a1686941c7",
+        "source_path": "docs/configuration.md",
+        "display_text": "In order for this setting to take effect for a project already in that state, you must delete the virtual environment folder located in `{cache-dir}/virtualenvs`.\n\nYou can find out where the current project's virtual environment (if there is one) is stored\nwith the command `poetry env info --path`.\n{{% /note %}}\n\nIf set to `false`, `poetry` will ignore any existing `.venv` directory.\n\n",
+        "line_start": 559,
+        "line_end": 566
+      },
+      {
+        "stable_chunk_id": "child-baa9aafc0fb175e8cdd8e452ad837a9473302cf2",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.options.always-copy`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_OPTIONS_ALWAYS_COPY`\n\n*Introduced in 1.2.0*\n\nIf set to `true` the `--always-copy` parameter is passed to `virtualenv` on creation of the virtual environment, so that\nall needed files are copied into it instead of symlinked.\n\n",
+        "line_start": 567,
+        "line_end": 579
+      },
+      {
+        "stable_chunk_id": "child-38f60a4bf9368cd9fd2c40963343fc048f536431",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.options.no-pip`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_OPTIONS_NO_PIP`\n\n*Introduced in 1.2.0*\n\nIf set to `true` the `--no-pip` parameter is passed to `virtualenv` on creation of the virtual environment. This means\nwhen a new virtual environment is created, `pip` will not be installed in the environment.\n\n",
+        "line_start": 580,
+        "line_end": 592
+      },
+      {
+        "stable_chunk_id": "child-792ef075f0bba862bf53b6827049b3de6dc98818",
+        "source_path": "docs/configuration.md",
+        "display_text": "{{% note %}}\nPoetry, for its internal operations, uses the `pip` wheel embedded in the `virtualenv` package installed as a dependency\nin Poetry's runtime environment. If a user runs `poetry run pip` when this option is set to `true`, the `pip` the\nembedded instance of `pip` is used.\n\nYou can safely set this to `true`, if you desire a virtual environment with no additional packages.\nThis is desirable for production environments.\n{{% /note %}}\n\n",
+        "line_start": 593,
+        "line_end": 601
+      },
+      {
+        "stable_chunk_id": "child-bc158258e45596e9f7bfa4f4c624deeb3de7ef37",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.options.system-site-packages`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_OPTIONS_SYSTEM_SITE_PACKAGES`\n\nGive the virtual environment access to the system site-packages directory.\nApplies on virtualenv creation.\n\n",
+        "line_start": 602,
+        "line_end": 612
+      },
+      {
+        "stable_chunk_id": "child-8341a60aaa3894a2fcb80b624e8cae59ec05a6c8",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.path`\n\n**Type**: `string`\n\n**Default**: `{cache-dir}/virtualenvs`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_PATH`\n\nDirectory where virtual environments will be created.\n\n{{% note %}}\nThis setting controls the global virtual environment storage path. It most likely will not be useful at the local level. To store virtual environments in the project root, see `virtualenvs.in-project`.\n{{% /note %}}\n\n",
+        "line_start": 613,
+        "line_end": 626
+      },
+      {
+        "stable_chunk_id": "child-96868320a53c1c99d464213b23bf09748365530d",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.prompt`\n\n**Type**: `string`\n\n**Default**: `{project_name}-py{python_version}`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_PROMPT`\n\n*Introduced in 1.2.0*\n\nFormat string defining the prompt to be displayed when the virtual environment is activated.\nThe variables `project_name` and `python_version` are available for formatting.\n\n",
+        "line_start": 627,
+        "line_end": 639
+      },
+      {
+        "stable_chunk_id": "child-143ce812134fc27505714753b901727828661fdc",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `virtualenvs.use-poetry-python`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_USE_POETRY_PYTHON`\n\n*Introduced in 2.0.0*\n\nBy default, Poetry will use the activated Python version to create a new virtual environment.\nIf set to `true`, the Python version used during Poetry installation is used.\n\n",
+        "line_start": 640,
+        "line_end": 652
+      },
+      {
+        "stable_chunk_id": "child-92048200a748f6b7895da1b684c4a0b8bdbda9c1",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `repositories.<name>.url`\n\n**Type**: `string`\n\n**Environment Variable**: `POETRY_REPOSITORIES_<NAME>_URL`\n\nSet the repository URL for `<name>`.\n\nSee [Publishable Repositories]({{< relref \"repositories#publishable-repositories\" >}}) for more information.\n\n",
+        "line_start": 653,
+        "line_end": 662
+      },
+      {
+        "stable_chunk_id": "child-7a495995319a77641687ca08b23d5c1385de653b",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `http-basic.<name>.[username|password]`\n\n**Type**: `string`\n\n**Environment Variables**: `POETRY_HTTP_BASIC_<NAME>_USERNAME`, `POETRY_HTTP_BASIC_<NAME>_PASSWORD`\n\nSet repository credentials (`username` and `password`) for `<name>`.\nSee [Repositories - Configuring credentials]({{< relref \"repositories#configuring-credentials\" >}})\nfor more information.\n\n",
+        "line_start": 663,
+        "line_end": 672
+      },
+      {
+        "stable_chunk_id": "child-f58fb96a8d0c4e6720f8503d0ab3d9fa00898d02",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `pypi-token.<name>`\n\n**Type**: `string`\n\n**Environment Variable**: `POETRY_PYPI_TOKEN_<NAME>`\n\nSet repository credentials (using an API token) for `<name>`.\nSee [Repositories - Configuring credentials]({{< relref \"repositories#configuring-credentials\" >}})\nfor more information.\n\n",
+        "line_start": 673,
+        "line_end": 682
+      },
+      {
+        "stable_chunk_id": "child-ce56ed3b46bc1655ea5d437edf611535cc6460dd",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `certificates.<name>.cert`\n\n**Type**: `string | boolean`\n\n**Environment Variable**: `POETRY_CERTIFICATES_<NAME>_CERT`\n\nSet custom certificate authority for repository `<name>`.\nSee [Repositories - Configuring credentials - Custom certificate authority]({{< relref \"repositories#custom-certificate-authority-and-mutual-tls-authentication\" >}})\nfor more information.\n\n",
+        "line_start": 683,
+        "line_end": 692
+      },
+      {
+        "stable_chunk_id": "child-81c9980312d0567f008a8876e8f8d6b84550197d",
+        "source_path": "docs/configuration.md",
+        "display_text": "This configuration can be set to `false`, if TLS certificate verification should be skipped for this\nrepository.\n\n",
+        "line_start": 693,
+        "line_end": 695
+      },
+      {
+        "stable_chunk_id": "child-18c532ebb83e7361ddc1f749035e08cf17cbca8d",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `certificates.<name>.client-cert`\n\n**Type**: `string`\n\n**Environment Variable**: `POETRY_CERTIFICATES_<NAME>_CLIENT_CERT`\n\nSet client certificate for repository `<name>`.\nSee [Repositories - Configuring credentials - Custom certificate authority]({{< relref \"repositories#custom-certificate-authority-and-mutual-tls-authentication\" >}})\nfor more information.\n\n",
+        "line_start": 696,
+        "line_end": 705
+      },
+      {
+        "stable_chunk_id": "child-dbbd95a003a3dac7daa82b6517933f929b10d596",
+        "source_path": "docs/configuration.md",
+        "display_text": "### `keyring.enabled`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_KEYRING_ENABLED`\n\nEnable the system keyring for storing credentials.\nSee [Repositories - Configuring credentials]({{< relref \"repositories#configuring-credentials\" >}})\nfor more information.\n",
+        "line_start": 706,
+        "line_end": 716
+      },
+      {
+        "stable_chunk_id": "child-6c38f6f8d72fab1ac29db37b6f0aad8b3a6af7dd",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "---\ntitle: \"Dependency specification\"\ndraft: false\ntype: docs\nlayout: single\n\nmenu:\n  docs:\n    weight: 70\n---\n\n",
+        "line_start": 1,
+        "line_end": 11
+      },
+      {
+        "stable_chunk_id": "child-88ff6f484852764c0dc82919c47cc6d1da615500",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "# Dependency specification\n\nDependencies for a project can be specified in various forms, which depend on the type\nof the dependency and on the optional constraints that might be needed for it to be installed.\n\n",
+        "line_start": 12,
+        "line_end": 16
+      },
+      {
+        "stable_chunk_id": "child-69740a884276ee2794569388a1a87e7d1387c9a6",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## `project.dependencies` and `tool.poetry.dependencies`\n\nPrior Poetry 2.0, dependencies had to be declared in the `tool.poetry.dependencies`\nsection of the `pyproject.toml` file.\n\n```toml\n[tool.poetry.dependencies]\nrequests = \"^2.13.0\"\n```\n\nWith Poetry 2.0, you should consider using the `project.dependencies` section instead.\n\n```toml\n[project]\n# ...\ndependencies = [\n    \"requests (>=2.23.0,<3.0.0)\"\n]\n```\n\n",
+        "line_start": 17,
+        "line_end": 36
+      },
+      {
+        "stable_chunk_id": "child-68337c3041e8df44c901ecf769c63c673e14f8d1",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "While dependencies in `tool.poetry.dependencies` are specified using toml tables,\ndependencies in `project.dependencies` are specified as strings according\nto [PEP 508](https://peps.python.org/pep-0508/).\n\n",
+        "line_start": 37,
+        "line_end": 40
+      },
+      {
+        "stable_chunk_id": "child-a5620addd2bf055eb6cb5b9fce258f84017b4211",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "In many cases, `tool.poetry.dependencies` can be replaced with `project.dependencies`.\nHowever, there are some cases where you might still need to use `tool.poetry.dependencies`.\nFor example, if you want to define additional information that is not required for building\nbut only for locking (for example, an explicit source), you can enrich dependency\ninformation in the `tool.poetry` section.\n\n",
+        "line_start": 41,
+        "line_end": 46
+      },
+      {
+        "stable_chunk_id": "child-1ccb209a25d9993ea5801e40600aca78629bc6e4",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[project]\n# ...\ndependencies = [\n    \"requests>=2.13.0\",\n]\n\n[tool.poetry.dependencies]\nrequests = { source = \"private-source\" }\n```\n\nWhen both are specified, `project.dependencies` are used for metadata when building the project,\n`tool.poetry.dependencies` is only used to enrich `project.dependencies` for locking.\n\n",
+        "line_start": 47,
+        "line_end": 60
+      },
+      {
+        "stable_chunk_id": "child-6bca8d4cfa47d83fbc98030876bdfbfd98c7b8a3",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "Alternatively, you can add `dependencies` to `dynamic` and define your dependencies\ncompletely in the `tool.poetry` section. Using only the `tool.poetry` section might\nmake sense in non-package mode when you will not build an sdist or a wheel.\n\n```toml\n[project]\n# ...\ndynamic = [ \"dependencies\" ]\n\n[tool.poetry.dependencies]\nrequests = { version = \">=2.13.0\", source = \"private-source\" }\n```\n\n",
+        "line_start": 61,
+        "line_end": 73
+      },
+      {
+        "stable_chunk_id": "child-a14214cf761492c07581cecf2fbda625bededa07",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{% note %}}\nAnother use case for `tool.poetry.dependencies` are relative path dependencies\nsince `project.dependencies` only support absolute paths.\n{{% /note %}}\n\n{{% note %}}\nOnly main dependencies can be specified in the `project` section.\nOther [Dependency groups]({{< relref \"managing-dependencies#dependency-groups\" >}})\nmust still be specified in the `tool.poetry` section.\n{{% /note %}}\n\n",
+        "line_start": 74,
+        "line_end": 84
+      },
+      {
+        "stable_chunk_id": "child-3a904bf006654885219aea7adc7f37201110d42b",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## Version constraints\n\n",
+        "line_start": 85,
+        "line_end": 86
+      },
+      {
+        "stable_chunk_id": "child-186eedaad587fec567a2d549d62038741f8d016f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Compatible release requirements\n\n**Compatible release requirements** specify a minimal version with the ability to update to later versions of the same level.\nFor example, if you specify a major, minor, and patch version, only patch-level changes are allowed.\nIf you only specify a major, and minor version, then minor- and patch-level changes are allowed.\n\n",
+        "line_start": 87,
+        "line_end": 92
+      },
+      {
+        "stable_chunk_id": "child-b2657a9e127a4951e40b75fc0b0aaa2d9c26e529",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "`~=1.2.3` is an example of a compatible release requirement.\n\n| Requirement | Versions allowed |\n| ----------- | ---------------- |\n| ~=1.2.3     | >=1.2.3 <1.3.0   |\n| ~=1.2       | >=1.2.0 <2.0.0   |\n\n",
+        "line_start": 93,
+        "line_end": 99
+      },
+      {
+        "stable_chunk_id": "child-91a8f2b810f1fc000250c5a228c28e7d215e061f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Wildcard requirements\n\n**Wildcard requirements** allow for the latest (dependency-dependent) version where the wildcard is positioned.\n\n`*`, `1.*` and `1.2.*` are examples of wildcard requirements.\n\n| Requirement | Versions allowed |\n| ----------- | ---------------- |\n| *           | >=0.0.0          |\n| 1.*         | >=1.0.0 <2.0.0   |\n| 1.2.*       | >=1.2.0 <1.3.0   |\n\n",
+        "line_start": 100,
+        "line_end": 111
+      },
+      {
+        "stable_chunk_id": "child-0d9e412a417154dbf6f7803683050bdcf4377e40",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Inequality requirements\n\n**Inequality requirements** allow manually specifying a version range or an exact version to depend on.\n\nHere are some examples of inequality requirements:\n\n```text\n>= 1.2.0\n> 1\n< 2\n!= 1.2.3\n```\n\n",
+        "line_start": 112,
+        "line_end": 124
+      },
+      {
+        "stable_chunk_id": "child-9c13c605ccf2a49774536a93ebac13fad0f1b64c",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "#### Multiple requirements\n\nMultiple version requirements can also be separated with a comma, e.g. `>= 1.2, < 1.5`.\n\n",
+        "line_start": 125,
+        "line_end": 128
+      },
+      {
+        "stable_chunk_id": "child-e95a40d7c1922497cc38f7ed5bf5803dbcae4341",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Exact requirements\n\nYou can specify the exact version of a package.\n\n`1.2.3` is an example of an exact version specification.\n\nThis will tell Poetry to install this version and this version only.\nIf other dependencies require a different version, the solver will ultimately fail and abort any installation or update procedures.\n\n",
+        "line_start": 129,
+        "line_end": 137
+      },
+      {
+        "stable_chunk_id": "child-86f01a031216e35805633e6538ed764a8c415349",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "Exact versions can also be specified with `==` according to [PEP 440](https://peps.python.org/pep-0440/).\n\n`==1.2.3` is an example of this.\n\n",
+        "line_start": 138,
+        "line_end": 141
+      },
+      {
+        "stable_chunk_id": "child-ebf788302c2bac2ce3dbe5e5592c95346cbaf8ee",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Caret requirements\n\n{{% warning %}}\nNot supported in `project.dependencies`.\n\nWhen using `poetry add` such constraints are automatically converted into an equivalent constraint.\n{{% /warning %}}\n\n",
+        "line_start": 142,
+        "line_end": 149
+      },
+      {
+        "stable_chunk_id": "child-f3097ea65fe677a975c3867553ca6095f776ec16",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "**Caret requirements** allow [SemVer](https://semver.org/) compatible updates to a specified version. An update is allowed if the new version number does not modify the left-most non-zero digit in the major, minor, patch grouping. For instance, if we previously ran `poetry add requests@^2.13.0` and wanted to update the library and ran `poetry update requests`, poetry would update us to version `2.14.0` if it was available, but would not update us to `3.0.0`. If instead, we had specified the version string as `^0.1.13`, poetry would update to `0.1.14` but not `0.2.0`. `0.0.x` is not considered compatible with any other version.\n\n",
+        "line_start": 150,
+        "line_end": 151
+      },
+      {
+        "stable_chunk_id": "child-5da31c9d0c107b58820bd51244249a914b0e0565",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "Here are some more examples of caret requirements and the versions that would be allowed with them:\n\n| Requirement | Versions allowed |\n| ----------- | ---------------- |\n| ^1.2.3      | >=1.2.3 <2.0.0   |\n| ^1.2        | >=1.2.0 <2.0.0   |\n| ^1          | >=1.0.0 <2.0.0   |\n| ^0.2.3      | >=0.2.3 <0.3.0   |\n| ^0.0.3      | >=0.0.3 <0.0.4   |\n| ^0.0        | >=0.0.0 <0.1.0   |\n| ^0          | >=0.0.0 <1.0.0   |\n\n",
+        "line_start": 152,
+        "line_end": 163
+      },
+      {
+        "stable_chunk_id": "child-e5ef7e0c5796710f2850a4dc374e46f9a14f146c",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Tilde requirements\n\n{{% warning %}}\nNot supported in `project.dependencies`.\n\nWhen using `poetry add` such constraints are automatically converted into an equivalent constraint.\n{{% /warning %}}\n\n",
+        "line_start": 164,
+        "line_end": 171
+      },
+      {
+        "stable_chunk_id": "child-732e51ac9e4e401ea01dd8f62ccd7c3f89d6cee5",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "**Tilde requirements** specify a minimal version with some ability to update.\nIf you specify a major, minor, and patch version or only a major and minor version, only patch-level changes are allowed.\nIf you only specify a major version, then minor- and patch-level changes are allowed.\n\n`~1.2.3` is an example of a tilde requirement.\n\n",
+        "line_start": 172,
+        "line_end": 177
+      },
+      {
+        "stable_chunk_id": "child-5dd8b63c3a7ea987bce1c883dcb1d3f8164caabc",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "| Requirement | Versions allowed |\n| ----------- | ---------------- |\n| ~1.2.3      | >=1.2.3 <1.3.0   |\n| ~1.2        | >=1.2.0 <1.3.0   |\n| ~1          | >=1.0.0 <2.0.0   |\n\n",
+        "line_start": 178,
+        "line_end": 183
+      },
+      {
+        "stable_chunk_id": "child-d55bf0d0690e900b912647e545104971a98eab2b",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Using the `@` operator\n\nWhen adding dependencies via `poetry add`, you can use the `@` operator.\nThis is understood similarly to the `==` syntax, but also allows prefixing any\nspecifiers that are valid in `pyproject.toml`. For example:\n\n```shell\npoetry add \"django@^4.0.0\"\n```\n\nThe above would translate to the following entry in `pyproject.toml`:\n\n",
+        "line_start": 184,
+        "line_end": 195
+      },
+      {
+        "stable_chunk_id": "child-25fbd9479226f68e0cdc2ace3bc32233f31db550",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< tabs tabTotal=\"2\" tabID1=\"at-project\" tabID2=\"at-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"at-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"django (>=4.0.0,<5.0.0)\",\n]\n```\n\n{{< /tab >}}\n\n{{< tab tabID=\"at-poetry\" >}}\n```toml\n[tool.poetry.dependencies]\ndjango = \"^4.0.0\"\n```\n{{< /tab >}}\n{{< /tabs >}}\n\nThe special keyword `latest` is also understood by the `@` operator:\n",
+        "line_start": 196,
+        "line_end": 217
+      },
+      {
+        "stable_chunk_id": "child-07d13690146696c267624c6276c39809a7997fe1",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```shell\npoetry add django@latest\n```\n\nThe above would translate to the following entry in `pyproject.toml`, assuming the latest release of `django` is `5.1.3`:\n\n{{< tabs tabTotal=\"2\" tabID1=\"at-latest-project\" tabID2=\"at-latest-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"at-latest-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"django (>=5.1.3,<6.0.0)\",\n]\n```\n{{< /tab >}}\n\n",
+        "line_start": 218,
+        "line_end": 235
+      },
+      {
+        "stable_chunk_id": "child-2618180906c4d82f34874d388874d39669692142",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< tab tabID=\"at-latest-poetry\" >}}\n```toml\n[tool.poetry.dependencies]\ndjango = \"^5.1.3\"\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n",
+        "line_start": 236,
+        "line_end": 243
+      },
+      {
+        "stable_chunk_id": "child-45d075e2b58de2bcdff0d9180141a833f0dfed3f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "#### Extras\n\nExtras and `@` can be combined as one might expect (`package[extra]@version`):\n\n```shell\npoetry add django[bcrypt]@^4.0.0\n```\n\n",
+        "line_start": 244,
+        "line_end": 251
+      },
+      {
+        "stable_chunk_id": "child-c0f98b22158dc640b4250ce95f15ce22b14a0b18",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## `git` dependencies\n\nTo depend on a library located in a `git` repository,\nthe minimum information you need to specify is the location of the repository:\n\n{{< tabs tabTotal=\"2\" tabID1=\"git-project\" tabID2=\"git-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"git-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"requests @ git+https://github.com/requests/requests.git\",\n]\n```\n{{< /tab >}}\n\n",
+        "line_start": 252,
+        "line_end": 268
+      },
+      {
+        "stable_chunk_id": "child-1935dc8deb091de0dc3d17d7dec553df42aa4244",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< tab tabID=\"git-poetry\" >}}\nIn the `tool.poetry` section you use the `git` key:\n\n```toml\n[tool.poetry.dependencies]\nrequests = { git = \"https://github.com/requests/requests.git\" }\n```\n\n{{< /tab >}}\n{{< /tabs >}}\n\nSince we haven’t specified any other information,\nPoetry assumes that we intend to use the latest commit on the `main` branch\nto build our project.\n\nYou can explicitly specify which branch, commit hash or tagged ref should be used:\n\n",
+        "line_start": 269,
+        "line_end": 285
+      },
+      {
+        "stable_chunk_id": "child-1db6929903f93f868342a9f9e3151fbaf03d05fd",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< tabs tabTotal=\"2\" tabID1=\"git-rev-project\" tabID2=\"git-rev-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"git-rev-project\" >}}\nAppend the information to the git url.\n\n```toml\n[project]\n# ...\ndependencies = [\n    \"requests @ git+https://github.com/requests/requests.git@next\",\n    \"flask @ git+https://github.com/pallets/flask.git@38eb5d3b\",\n    \"numpy @ git+https://github.com/numpy/numpy.git@v0.13.2\",\n]\n```\n{{< /tab >}}\n\n",
+        "line_start": 286,
+        "line_end": 301
+      },
+      {
+        "stable_chunk_id": "child-1db1bbeb665d197e4172692000268006a41027cd",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< tab tabID=\"git-rev-poetry\" >}}\nCombine the `git` key with the `branch`, `rev` or `tag` key respectively.\n\n",
+        "line_start": 302,
+        "line_end": 304
+      },
+      {
+        "stable_chunk_id": "child-09394844d9336a34038e056ca1c655d16a232dd3",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.dependencies]\n# Get the latest revision on the branch named \"next\"\nrequests = { git = \"https://github.com/kennethreitz/requests.git\", branch = \"next\" }\n# Get a revision by its commit hash\nflask = { git = \"https://github.com/pallets/flask.git\", rev = \"38eb5d3b\" }\n# Get a revision by its tag\nnumpy = { git = \"https://github.com/numpy/numpy.git\", tag = \"v0.13.2\" }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n",
+        "line_start": 305,
+        "line_end": 316
+      },
+      {
+        "stable_chunk_id": "child-b7f394fb9bdb2b142dfc6549db0241a872e7525f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "It's possible to add a package that is located in a subdirectory of the VCS repository.\n\n{{< tabs tabTotal=\"2\" tabID1=\"git-subdir-project\" tabID2=\"git-subdir-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"git-subdir-project\" >}}\nProvide the subdirectory as a URL fragment similarly to what [pip](https://pip.pypa.io/en/stable/topics/vcs-support/#url-fragments) provides.\n",
+        "line_start": 317,
+        "line_end": 322
+      },
+      {
+        "stable_chunk_id": "child-5212db8c7fae05b8e61aaaeb00fd8aaa3f5d04fe",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[project]\n# ...\ndependencies = [\n    \"subdir_package @ git+https://github.com/myorg/mypackage_with_subdirs.git#subdirectory=subdir\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"git-subdir-poetry\" >}}\nUse the `subdirectory` key in the `tool.poetry` section:\n\n",
+        "line_start": 323,
+        "line_end": 334
+      },
+      {
+        "stable_chunk_id": "child-b7616156aa810ea3813118b4e3da9b2e86ae9570",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.dependencies]\n# Install a package named `subdir_package` from a folder called `subdir` within the repository\nsubdir_package = { git = \"https://github.com/myorg/mypackage_with_subdirs.git\", subdirectory = \"subdir\" }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\nThe corresponding `add` call looks like this:\n\n```bash\npoetry add \"git+https://github.com/myorg/mypackage_with_subdirs.git#subdirectory=subdir\"\n```\n\n",
+        "line_start": 335,
+        "line_end": 348
+      },
+      {
+        "stable_chunk_id": "child-17914feddffc4754bfcb3be2a4e7ecb63e42bab0",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "To use an SSH connection, for example, in the case of private repositories, use the following example syntax:\n\n{{< tabs tabTotal=\"2\" tabID1=\"git-ssh-project\" tabID2=\"git-ssh-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"git-ssh-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"pendulum @ git+ssh://git@github.com/sdispater/pendulum.git\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"git-ssh-poetry\" >}}\n",
+        "line_start": 349,
+        "line_end": 363
+      },
+      {
+        "stable_chunk_id": "child-bd89b165dfed57793a08e476dd9f63fa8d8af69b",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.dependencies]\npendulum = { git = \"git@github.com/sdispater/pendulum.git\" }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n",
+        "line_start": 364,
+        "line_end": 370
+      },
+      {
+        "stable_chunk_id": "child-76d257fd4cc781861ff6328b973ceeace19e2077",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Credentials for git dependencies\n\nTo use HTTP basic authentication with your git repositories, you can configure credentials similar to\nhow [repository credentials]({{< relref \"repositories#configuring-credentials\" >}}) are configured.\n\n",
+        "line_start": 371,
+        "line_end": 375
+      },
+      {
+        "stable_chunk_id": "child-aa20f63add2e711142105cbe327db17eff38130d",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```bash\npoetry config repositories.git-org-project https://github.com/org/project.git\npoetry config http-basic.git-org-project username token\npoetry add git+https://github.com/org/project.git\n```\n\n{{% note %}}\nThe default git client used is [Dulwich](https://www.dulwich.io/).\n\n",
+        "line_start": 376,
+        "line_end": 384
+      },
+      {
+        "stable_chunk_id": "child-ece6012ce3ed520f5932dbe5f78c2cd8bc407579",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "We fall back to legacy system git client implementation in cases where\n[gitcredentials](https://git-scm.com/docs/gitcredentials) is used. This fallback will be removed in\na future release where `gitcredentials` helpers can be better supported natively.\n\n",
+        "line_start": 385,
+        "line_end": 388
+      },
+      {
+        "stable_chunk_id": "child-4368e29f7810d610e33377487a4c93b87fa1dec2",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "In cases where you encounter issues with the default implementation, you may wish to\nexplicitly configure the use of the system git client via a shell subprocess call.\n\n```bash\npoetry config system-git-client true\n```\n{{% /note %}}\n\n",
+        "line_start": 389,
+        "line_end": 396
+      },
+      {
+        "stable_chunk_id": "child-fe3895f08427a56655fda7d74243a36d5fa300a5",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## `path` dependencies\n\n{{< tabs tabTotal=\"2\" tabID1=\"path-project\" tabID2=\"path-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"path-project\" >}}\nIn the `project` section, you can only use absolute paths:\n\n```toml\n[project]\n# directory\ndependencies = [\n    \"my-package @ file:///absolute/path/to/my-package\"\n]\n# file\ndependencies = [\n    \"my-package @ file:///absolute/path/to/my-package/dist/my-package-0.1.0.tar.gz\"\n]\n```\n",
+        "line_start": 397,
+        "line_end": 414
+      },
+      {
+        "stable_chunk_id": "child-baa7840cc18e7bdeb7b6ddab2664bea5bf24f394",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< /tab >}}\n\n{{< tab tabID=\"path-poetry\" >}}\nTo depend on a library located in a local directory or file,\nyou can use the `path` property:\n\n```toml\n[tool.poetry.dependencies]\n# directory\nmy-package = { path = \"../my-package/\", develop = true }\n\n# file\nmy-package = { path = \"../my-package/dist/my-package-0.1.0.tar.gz\" }\n```\n\n",
+        "line_start": 415,
+        "line_end": 429
+      },
+      {
+        "stable_chunk_id": "child-b6138284f87f70f89f6abec2354d1461abd46cb9",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "To install directory path dependencies in editable mode, use the `develop` keyword and set it to `true`.\n{{< /tab >}}\n{{< /tabs >}}\n\n{{% note %}}\nPath dependencies are intended for local development.\nWhen building a wheel or sdist, Poetry records directory path dependencies as `file://` requirements,\nwhich are not portable. Before distributing your project, publish each path dependency and replace\nthe path with a version constraint.\n{{% /note %}}\n\n",
+        "line_start": 430,
+        "line_end": 440
+      },
+      {
+        "stable_chunk_id": "child-312750298f5727a96d8df16051f48b57d8a9d88f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## `url` dependencies\n\n`url` dependencies are libraries located on a remote archive.\n\n{{< tabs tabTotal=\"2\" tabID1=\"url-project\" tabID2=\"url-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"url-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"my-package @ https://example.com/my-package-0.1.0.tar.gz\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"url-poetry\" >}}\nUse the `url` property.\n\n",
+        "line_start": 441,
+        "line_end": 459
+      },
+      {
+        "stable_chunk_id": "child-9b1fa0a580ab521d019a9d42ff06d4c70ecbfb85",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.dependencies]\n# directory\nmy-package = { url = \"https://example.com/my-package-0.1.0.tar.gz\" }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\nThe corresponding `add` call is:\n\n```bash\npoetry add https://example.com/my-package-0.1.0.tar.gz\n```\n\n",
+        "line_start": 460,
+        "line_end": 473
+      },
+      {
+        "stable_chunk_id": "child-74cb7acc93d916927767df077fe0d57dd5218931",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## Dependency `extras`\n\nYou can specify [PEP-508 Extras](https://www.python.org/dev/peps/pep-0508/#extras)\nfor a dependency as shown here.\n\n{{< tabs tabTotal=\"2\" tabID1=\"extras-project\" tabID2=\"extras-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"extras-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"gunicorn[gevent] (>=20.1,<21.0)\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"extras-poetry\" >}}\n",
+        "line_start": 474,
+        "line_end": 491
+      },
+      {
+        "stable_chunk_id": "child-6d1dd327612e87d6863bb7c76c8941f7507f9c13",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.dependencies]\ngunicorn = { version = \"^20.1\", extras = [\"gevent\"] }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n{{% note %}}\nThese activate extra defined for the dependency, to configure an optional dependency\nfor extras in your project refer to [`extras`]({{< relref \"pyproject#extras\" >}}).\n{{% /note %}}\n\n",
+        "line_start": 492,
+        "line_end": 503
+      },
+      {
+        "stable_chunk_id": "child-8c4e9e45e4baf226c451f5a08e32f99aadc5d40f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## `source` dependencies\n{{% note %}}\nIt is not possible to define source dependencies in the `project` section.\n{{% /note %}}\n\nTo depend on a package from an [alternate repository]({{< relref \"repositories#installing-from-private-package-sources\" >}}),\nyou can use the `source` property:\n\n",
+        "line_start": 504,
+        "line_end": 511
+      },
+      {
+        "stable_chunk_id": "child-27665983a2833a1f101eb0c934fb0b5543778e02",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[[tool.poetry.source]]\nname = \"foo\"\nurl = \"https://foo.bar/simple/\"\npriority = \"supplemental\"\n\n[tool.poetry.dependencies]\nmy-cool-package = { version = \"*\", source = \"foo\" }\n```\n\nwith the corresponding `add` call:\n\n```sh\npoetry add my-cool-package --source foo\n```\n\n",
+        "line_start": 512,
+        "line_end": 527
+      },
+      {
+        "stable_chunk_id": "child-dce814d04e837a40fdfdc6347fef5e4ab7fff590",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{% note %}}\nIn this example, we expect `foo` to be configured correctly. See [using a private repository]({{< relref \"repositories#installing-from-private-package-sources\" >}})\nfor further information.\n{{% /note %}}\n\n",
+        "line_start": 528,
+        "line_end": 532
+      },
+      {
+        "stable_chunk_id": "child-2be123c9ca3577087c23c78043b0cc736107881d",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## Python restricted dependencies\n\nYou can also specify that a dependency should be installed only for specific Python versions:\n\n{{< tabs tabTotal=\"2\" tabID1=\"python-restriction-project\" tabID2=\"python-restriction-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"python-restriction-project\" >}}\n",
+        "line_start": 533,
+        "line_end": 539
+      },
+      {
+        "stable_chunk_id": "child-b3bd25a7e4134d5e9b194f8a0e7640b54537a7ba",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[project]\n# ...\ndependencies = [\n    \"tomli (>=2.0.1,<3.0) ; python_version < '3.11'\",\n    \"pathlib2 (>=2.2,<3.0) ; python_version >= '3.9' and python_version < '4.0'\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"python-restriction-poetry\" >}}\n\n```toml\n[tool.poetry.dependencies]\ntomli = { version = \"^2.0.1\", python = \"<3.11\" }\npathlib2 = { version = \"^2.2\", python = \"^3.9\" }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n",
+        "line_start": 540,
+        "line_end": 559
+      },
+      {
+        "stable_chunk_id": "child-4b0f3874e9464c3efc95aaa7aff789fc48297f9a",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## Using environment markers\n\nIf you need more complex install conditions for your dependencies,\nPoetry supports [environment markers](https://www.python.org/dev/peps/pep-0508/#environment-markers):\n\n{{< tabs tabTotal=\"2\" tabID1=\"markers-project\" tabID2=\"markers-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"markers-project\" >}}\n",
+        "line_start": 560,
+        "line_end": 567
+      },
+      {
+        "stable_chunk_id": "child-17c3d33c6d7a678ba58430e2c35d06a73fbae54b",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[project]\n# ...\ndependencies = [\n    \"pathlib2 (>=2.2,<3.0) ; python_version <= '3.4' or sys_platform == 'win32'\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"markers-poetry\" >}}\nUse the `markers` property:\n\n```toml\n[tool.poetry.dependencies]\npathlib2 = { version = \"^2.2\", markers = \"python_version <= '3.4' or sys_platform == 'win32'\" }\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n",
+        "line_start": 568,
+        "line_end": 586
+      },
+      {
+        "stable_chunk_id": "child-cffb8fc7d2b67a419186b01b06762d0c26cfa8f7",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### `extra` environment marker\n\nPoetry populates the `extra` marker with each of the selected extras of the root package.\nFor example, consider the following dependency:\n```toml\n[project.optional-dependencies]\npaths = [\n    \"pathlib2 (>=2.2,<3.0) ; sys_platform == 'win32'\"\n]\n```\n\n`pathlib2` will be installed when you install your package with `--extras paths` on a `win32` machine.\n\n",
+        "line_start": 587,
+        "line_end": 599
+      },
+      {
+        "stable_chunk_id": "child-9a99eab578f73d85bbe2c24b4e5653baa86db6b0",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "#### Exclusive extras\n\n{{% warning %}}\nThe first example will only work completely if you configure Poetry to not re-resolve for installation:\n\n```bash\npoetry config installer.re-resolve false\n```\n\nThis was a new feature of Poetry 2.0 and became the default behavior in Poetry 2.3.\n\n{{% /warning %}}\n\n",
+        "line_start": 600,
+        "line_end": 612
+      },
+      {
+        "stable_chunk_id": "child-444a0da3f10e5041791ebc74f7414d1f14ed0c6f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "Keep in mind that all combinations of possible extras available in your project need to be compatible with each other.\nThis means that in order to use differing or incompatible versions across different combinations, you need to make your\nextra markers *exclusive*. For example, the following installs PyTorch from one source repository with CPU versions\nwhen the `cuda` extra is *not* specified, while the other installs from another repository with a separate version set\nfor GPUs when the `cuda` extra *is* specified:\n\n",
+        "line_start": 613,
+        "line_end": 618
+      },
+      {
+        "stable_chunk_id": "child-77ff6de3ed35782d0de0703bb41f35da1a736e3f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[project]\nname = \"torch-example\"\nrequires-python = \">=3.10\"\ndependencies = [\n    \"torch (==2.3.1+cpu) ; extra != 'cuda'\",\n]\n\n[project.optional-dependencies]\ncuda = [\n    \"torch (==2.3.1+cu118)\",\n]\n\n[tool.poetry]\npackage-mode = false\n\n[tool.poetry.dependencies]\ntorch = [\n    { markers = \"extra != 'cuda'\", source = \"pytorch-cpu\"},\n    { markers = \"extra == 'cuda'\", source = \"pytorch-cuda\"},\n ]\n\n[[tool.poetry.source]]\nname = \"pytorch-cpu\"\nurl = \"https://download.pytorch.org/whl/cpu\"\npriority = \"explicit\"\n\n[[tool.poetry.source]]\nname = \"pytorch-cuda\"\nurl = \"https://download.pytorch.org/whl/cu118\"\npriority = \"explicit\"\n```\n\n",
+        "line_start": 619,
+        "line_end": 651
+      },
+      {
+        "stable_chunk_id": "child-543dee854242743a12b93cc93871657cba974397",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "For the CPU case, we have to specify `\"extra != 'cuda'\"` because the version specified is not compatible with the\nGPU (`cuda`) version.\n\nThis same logic applies when you want either-or extras:\n\n",
+        "line_start": 652,
+        "line_end": 656
+      },
+      {
+        "stable_chunk_id": "child-151c81425850c215cf4963c4ae1526f89e5b73bb",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[project]\nname = \"torch-example\"\nrequires-python = \">=3.10\"\n\n[project.optional-dependencies]\ncpu = [\n    \"torch (==2.3.1+cpu)\",\n]\ncuda = [\n    \"torch (==2.3.1+cu118)\",\n]\n\n[tool.poetry]\npackage-mode = false\n\n[tool.poetry.dependencies]\ntorch = [\n    { markers = \"extra == 'cpu' and extra != 'cuda'\", source = \"pytorch-cpu\"},\n    { markers = \"extra == 'cuda' and extra != 'cpu'\", source = \"pytorch-cuda\"},\n ]\n\n[[tool.poetry.source]]\nname = \"pytorch-cpu\"\nurl = \"https://download.pytorch.org/whl/cpu\"\npriority = \"explicit\"\n\n[[tool.poetry.source]]\nname = \"pytorch-cuda\"\nurl = \"https://download.pytorch.org/whl/cu118\"\npriority = \"explicit\"\n```\n\n",
+        "line_start": 657,
+        "line_end": 689
+      },
+      {
+        "stable_chunk_id": "child-e6ae2210d945e48edf636eb109c6044c58c6647c",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## Multiple constraints dependencies\n\nSometimes, one of your dependencies may have different version ranges depending\non the target Python versions.\n\nLet's say you have a dependency on the package `foo` which is only compatible\nwith Python 3.6–3.7 up to version 1.9, and compatible with Python 3.8+ from version 2.0:\nyou would declare it like so:\n\n",
+        "line_start": 690,
+        "line_end": 698
+      },
+      {
+        "stable_chunk_id": "child-10005c593910d2ff0e374076849cf1084aafbb9f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "{{< tabs tabTotal=\"2\" tabID1=\"multiple-constraints-project\" tabID2=\"multiple-constraints-poetry\" tabName1=\"[project]\" tabName2=\"[tool.poetry]\">}}\n\n{{< tab tabID=\"multiple-constraints-project\" >}}\n```toml\n[project]\n# ...\ndependencies = [\n    \"foo (<=1.9) ; python_version >= '3.6' and python_version < '3.8'\",\n    \"foo (>=2.0,<3.0) ; python_version >= '3.8'\"\n]\n```\n{{< /tab >}}\n\n{{< tab tabID=\"multiple-constraints-poetry\" >}}\n",
+        "line_start": 699,
+        "line_end": 712
+      },
+      {
+        "stable_chunk_id": "child-910580d8c708ffef7c309f4a88e26e31458895cf",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.dependencies]\nfoo = [\n    {version = \"<=1.9\", python = \">=3.6,<3.8\"},\n    {version = \"^2.0\", python = \">=3.8\"}\n]\n```\n{{< /tab >}}\n{{< /tabs >}}\n\n{{% note %}}\nThe constraints **must** have different requirements (like `python`)\notherwise it will cause an error when resolving dependencies.\n{{% /note %}}\n\n",
+        "line_start": 713,
+        "line_end": 727
+      },
+      {
+        "stable_chunk_id": "child-a1c6fb064d7f39261ca0d1db8f7811dd6ea3397a",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Combining git / url / path dependencies with source repositories\n\nDirect origin (`git`/ `url`/ `path`) dependencies can satisfy the requirement of a dependency that\ndoesn't explicitly specify a source, even when mutually exclusive markers are used. For instance,\nin the following example, the url package will also be a valid solution for the second requirement:\n",
+        "line_start": 728,
+        "line_end": 732
+      },
+      {
+        "stable_chunk_id": "child-3f0b7e4876b99e085307fef1cd50b85f2affe92c",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\nfoo = [\n    { platform = \"darwin\", url = \"https://example.com/example-1.0-py3-none-any.whl\" },\n    { platform = \"linux\", version = \"^1.0\" },\n]\n```\n\n",
+        "line_start": 733,
+        "line_end": 739
+      },
+      {
+        "stable_chunk_id": "child-b1b60393139de098b87bf3d40d920cc3aed3b096",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "Sometimes you may instead want to use a direct origin dependency for specific conditions\n(i.e., a compiled package that is not available on PyPI for a certain platform/architecture) while\nfalling back on source repositories in other cases. In this case you should explicitly ask for your\ndependency to be satisfied by another `source`. For example:\n",
+        "line_start": 740,
+        "line_end": 743
+      },
+      {
+        "stable_chunk_id": "child-e8672b55164f36fc8797b8b3213559319eb6d03f",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\nfoo = [\n    { platform = \"darwin\", url = \"https://example.com/foo-1.0.0-py3-none-macosx_11_0_arm64.whl\" },\n    { platform = \"linux\", version = \"^1.0\", source = \"pypi\" },\n]\n```\n\n",
+        "line_start": 744,
+        "line_end": 750
+      },
+      {
+        "stable_chunk_id": "child-0180750e8aab20f47778e690063fe5721fa2fab6",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "## Expanded dependency specification syntax\n\nIn the case of more complex dependency specifications, you may find that you\nend up with lines which are very long and difficult to read. In these cases,\nyou can shift from using \"inline table\" syntax to the \"standard table\" syntax.\n\nAn example where this might be useful is the following:\n\n",
+        "line_start": 751,
+        "line_end": 758
+      },
+      {
+        "stable_chunk_id": "child-0e9e5c3ead9404225078527fe2e11cdb2a083743",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.group.dev.dependencies]\nblack = {version = \"19.10b0\", allow-prereleases = true, python = \"^3.7\", markers = \"platform_python_implementation == 'CPython'\"}\n```\n\nAs a single line, this is a lot to digest. To make this a bit easier to\nwork with, you can do the following:\n\n",
+        "line_start": 759,
+        "line_end": 766
+      },
+      {
+        "stable_chunk_id": "child-50020a6bdfffe71885190024fd9d8de2042b0efd",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "```toml\n[tool.poetry.group.dev.dependencies.black]\nversion = \"19.10b0\"\nallow-prereleases = true\npython = \"^3.7\"\nmarkers = \"platform_python_implementation == 'CPython'\"\n```\n\nThe same information is still present, and ends up providing the exact\nsame specification. It's simply split into multiple, slightly more readable,\nlines.\n\n",
+        "line_start": 767,
+        "line_end": 778
+      },
+      {
+        "stable_chunk_id": "child-8ef19abab1d8ad7b3eb441e883387302c4990e63",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "### Handling of pre-releases\n\nPer default, Poetry will prefer stable releases and only choose a pre-release\nif no stable release satisfies a version constraint. In some cases, this may result in\na solution containing pre-releases even if another solution without pre-releases exists.\n\n",
+        "line_start": 779,
+        "line_end": 784
+      },
+      {
+        "stable_chunk_id": "child-cb3faecb57876b2b67ed192b3552532183b088d8",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "If you want to disallow pre-releases for a specific dependency,\nyou can set `allow-prereleases` to `false`. In this case, dependency resolution will\nfail if there is no solution without choosing a pre-release.\n\n",
+        "line_start": 785,
+        "line_end": 788
+      },
+      {
+        "stable_chunk_id": "child-67d68ff409c714ed542a75a777d97379ef98ac91",
+        "source_path": "docs/dependency-specification.md",
+        "display_text": "If you want to prefer the latest version of a dependency even if it is a pre-release,\nyou can set `allow-prereleases` to `true` so that Poetry makes no distinction\nbetween stable and pre-release versions during dependency resolution.\n",
+        "line_start": 789,
+        "line_end": 791
+      },
+      {
+        "stable_chunk_id": "child-9c6da9a24cfc346e4749b94c55e9f5b68aa97ac7",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "---\ntitle: \"Managing environments\"\ndraft: false\ntype: docs\nlayout: \"docs\"\n\nmenu:\n  docs:\n    weight: 60\n---\n\n",
+        "line_start": 1,
+        "line_end": 11
+      },
+      {
+        "stable_chunk_id": "child-e42b9bfb2e31a5ebee714781a8c589595f19db90",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "# Managing environments\n\nPoetry makes project environment isolation one of its core features.\n\nWhat this means is that it will always work isolated from your global Python installation.\nTo achieve this, it will first check if it's currently running inside a virtual environment.\nIf it is, it will use it directly without creating a new one. But if it's not, it will use\none that it has already created or create a brand new one for you.\n\n",
+        "line_start": 12,
+        "line_end": 20
+      },
+      {
+        "stable_chunk_id": "child-b2f47817ffe6f19ac2fe31c3e95b1ec6c22ccb2a",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "By default, Poetry will try to use the Python version used during Poetry's installation\nto create the virtual environment for the current project.\n\nHowever, for various reasons, this Python version might not be compatible\nwith the `python` range supported by the project. In this case, Poetry will try\nto find one that is and use it. If it's unable to do so then you will be prompted\nto activate one explicitly, see [Switching environments](#switching-between-environments).\n\n",
+        "line_start": 21,
+        "line_end": 28
+      },
+      {
+        "stable_chunk_id": "child-6d965be075632988b6fa9fa3710a0015f0aedd9c",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "{{% note %}}\nIf you use a tool like [pyenv](https://github.com/pyenv/pyenv) to manage different Python versions,\nyou can switch the current `python` of your shell and Poetry will use it to create\nthe new environment.\n\nFor instance, if your project requires a newer Python than is available with\nyour system, a standard workflow would be:\n\n```bash\npyenv install 3.9.8\npyenv local 3.9.8  # Activate Python 3.9 for the current project\npoetry install\n```\n\n{{% /note %}}\n\n",
+        "line_start": 29,
+        "line_end": 44
+      },
+      {
+        "stable_chunk_id": "child-cd4b51105974a5acef5a2327536742b34a7271e3",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "{{% note %}}\nSince version 1.2, Poetry no longer supports managing environments for Python 2.7.\n{{% /note %}}\n\n",
+        "line_start": 45,
+        "line_end": 48
+      },
+      {
+        "stable_chunk_id": "child-c11d2e09b238efaaee2b1cc6254353bbe6d6579c",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "## Switching between environments\n\nSometimes this might not be feasible for your system, especially Windows where `pyenv`\nis not available, or you simply prefer to have a more explicit control over your environment.\nFor this specific purpose, you can use the `env use` command to tell Poetry\nwhich Python version to use for the current project.\n\n```bash\npoetry env use /full/path/to/python\n```\n\n",
+        "line_start": 49,
+        "line_end": 59
+      },
+      {
+        "stable_chunk_id": "child-9b0573452b19fb19f1f88bb782ce33195fe407f8",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "If you have the python executable in your `PATH` you can use it:\n\n```bash\npoetry env use python3.7\n```\n\nYou can even just use the minor Python version in this case:\n\n```bash\npoetry env use 3.7\n```\n\nIf you want to disable the explicitly activated virtual environment, you can use the\nspecial `system` Python version to retrieve the default behavior:\n\n```bash\npoetry env use system\n```\n\n",
+        "line_start": 60,
+        "line_end": 78
+      },
+      {
+        "stable_chunk_id": "child-700715bf6cad83538040293f9e116d9cdafb7bb0",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "## Activating the environment\n\n{{% note %}}\nLooking for `poetry shell`? It was moved to a plugin: [`poetry-plugin-shell`](https://github.com/python-poetry/poetry-plugin-shell)\n{{% /note %}}\n\nThe `poetry env activate` command prints the activate command of the virtual environment to the console.\nYou can run the output command manually or feed it to the eval command of your shell to activate the environment.\nThis way you won't leave the current shell.\n\n",
+        "line_start": 79,
+        "line_end": 88
+      },
+      {
+        "stable_chunk_id": "child-35deb461081da960246f2fcd7bd625b978de2b74",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "{{< tabs tabTotal=\"3\" tabID1=\"bash-csh-zsh\" tabID2=\"fish\" tabID3=\"powershell\" tabName1=\"Bash/Zsh/Csh\" tabName2=\"Fish\" tabName3=\"Powershell\" >}}\n\n{{< tab tabID=\"bash-csh-zsh\" >}}\n\n```bash\n$ eval $(poetry env activate)\n(test-project-for-test) $  # Virtualenv entered\n```\n\n{{< /tab >}}\n{{< tab tabID=\"fish\" >}}\n\n```bash\n$ eval (poetry env activate)\n(test-project-for-test) $  # Virtualenv entered\n```\n\n{{< /tab >}}\n{{< tab tabID=\"powershell\" >}}\n\n",
+        "line_start": 89,
+        "line_end": 108
+      },
+      {
+        "stable_chunk_id": "child-10c9aeed8b139ccfe33fe47d970b64847037562d",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "```ps1\nPS1> Invoke-Expression (poetry env activate)\n(test-project-for-test) PS1>  # Virtualenv entered\n```\n\n{{< /tab >}}\n{{< /tabs >}}\n\n",
+        "line_start": 109,
+        "line_end": 116
+      },
+      {
+        "stable_chunk_id": "child-30659415b99ecae4c19052175a3cec95e1b492e4",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "## Displaying the environment information\n\nIf you want to get basic information about the currently activated virtual environment,\nyou can use the `env info` command:\n\n```bash\npoetry env info\n```\n\nwill output something similar to this:\n\n",
+        "line_start": 117,
+        "line_end": 127
+      },
+      {
+        "stable_chunk_id": "child-2e035495b6c28957736ef3b6dba63ddd9657aafd",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "```text\nVirtualenv\nPython:         3.7.1\nImplementation: CPython\nPath:           /path/to/poetry/cache/virtualenvs/test-O3eWbxRl-py3.7\nValid:          True\n\nBase\nPlatform: darwin\nOS:       posix\nPython:   /path/to/main/python\n```\n\nIf you only want to know the path to the virtual environment, you can pass the `--path` option\nto `env info`:\n\n```bash\npoetry env info --path\n```\n\n",
+        "line_start": 128,
+        "line_end": 147
+      },
+      {
+        "stable_chunk_id": "child-b6894e13ad1b3c80d55f5425fbf0d9ac120ce922",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "If you only want to know the path to the python executable (useful for running mypy from a global environment without installing it in the virtual environment), you can pass the `--executable` option\nto `env info`:\n\n```bash\npoetry env info --executable\n```\n\n",
+        "line_start": 148,
+        "line_end": 154
+      },
+      {
+        "stable_chunk_id": "child-3f8825831fce1fc589bf86972c2742046740e201",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "## Listing the environments associated with the project\n\nYou can also list all the virtual environments associated with the current project\nwith the `env list` command:\n\n```bash\npoetry env list\n```\n\nwill output something like the following:\n\n```text\ntest-O3eWbxRl-py3.6\ntest-O3eWbxRl-py3.7 (Activated)\n```\n\nYou can pass the option `--full-path` to display the full path to the environments:\n\n",
+        "line_start": 155,
+        "line_end": 172
+      },
+      {
+        "stable_chunk_id": "child-aaf66784a008482089e16584e1d8885e75572a39",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "```bash\npoetry env list --full-path\n```\n\n",
+        "line_start": 173,
+        "line_end": 176
+      },
+      {
+        "stable_chunk_id": "child-ca623194c3fae197d00759839e56e3dbea525751",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "## Deleting the environments\n\nFinally, you can delete existing virtual environments by using `env remove`:\n\n```bash\npoetry env remove /full/path/to/python\npoetry env remove python3.7\npoetry env remove 3.7\npoetry env remove test-O3eWbxRl-py3.7\n```\n\nYou can delete more than one environment at a time.\n\n```bash\npoetry env remove python3.6 python3.7 python3.8\n```\n\nUse the `--all` option to delete all virtual environments at once.\n\n",
+        "line_start": 177,
+        "line_end": 195
+      },
+      {
+        "stable_chunk_id": "child-f5578feb5690e09680b27fc0b1c46a78a7367ce3",
+        "source_path": "docs/managing-environments.md",
+        "display_text": "```bash\npoetry env remove --all\n```\n\nIf you remove the currently activated virtual environment, it will be automatically deactivated.\n\n{{% note %}}\nIf you use the [`virtualenvs.in-project`]({{< relref \"configuration#virtualenvsin-project\" >}}) configuration, you\ncan simply use the command as shown below.\n\n```bash\npoetry env remove\n```\n{{% /note %}}\n",
+        "line_start": 196,
+        "line_end": 209
+      }
+    ],
+    "sqlite_version": "3.50.4",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "f730ff95a66a8612d9b0567d7e72c574eee76b0db9a8a1a0f601c46f398e2c86",
+    "storage_path": "/tmp/docatlas-evidence-ad6gd1je/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-1af1d29915474e729c941d67805064d1",
+    "catalog_sha256": "2594765789b64af8e056195eec66d898441d7373dcfc7d996d0f2de866f64d3d",
+    "documents": [
+      {
+        "path": "docs/configuration.md",
+        "content_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+        "catalog_entry_hash": "sha256:cffd98bf3eb3c0a7422bcb6232ffabf6e9a40ec66089a1f72d7758204f935a2e"
+      },
+      {
+        "path": "docs/dependency-specification.md",
+        "content_sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+        "catalog_entry_hash": "sha256:4558929ddd6198444874936d1a8013a0ffe7b03f25df298a97a2c9c420f7b598"
+      },
+      {
+        "path": "docs/managing-environments.md",
+        "content_sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+        "catalog_entry_hash": "sha256:faab4068f94d50e8f8c8490107412d7bc7e57022bf5dbc7f640276aacb2ee0a3"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-1af1d29915474e729c941d67805064d1",
+      "members": 3,
+      "new_count": 3,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 102,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 102
+    }
+  },
+  "snapshots": [
+    {
+      "path": "docs/configuration.md",
+      "sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810"
+    },
+    {
+      "path": "docs/dependency-specification.md",
+      "sha256": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c"
+    },
+    {
+      "path": "docs/managing-environments.md",
+      "sha256": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d"
+    }
+  ]
+}

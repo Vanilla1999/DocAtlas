@@ -1,0 +1,4 @@
+{"operation": "prepare", "case": "V40-P03"}
+{"operation": "context_attempt", "case": "V40-P03", "arm": "A"}
+{"operation": "context_attempt", "case": "V40-P03", "arm": "D"}
+{"operation": "host_attempt", "case": "V40-P03"}

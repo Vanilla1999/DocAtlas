@@ -48,10 +48,10 @@ def _mark_unassessed(payload: dict) -> None:
 def project_native_rank_context(*, retrieval: dict, max_tokens: int | None = None,
                                 selection_diagnostics: dict | None = None,
                                 _allow_context_hints: bool = False) -> tuple[dict, dict]:
-    """Render checked whole acquired windows; no semantic ranking or variants.
+    """Render checked whole windows, with optional host-only subset selection.
 
-    The coordinator dispatches here only on S/ALL before the legacy core. The
-    ordinary recheck and terminal JSON budget still run after decoration.
+    The source check precedes selection; the ordinary builder and final
+    projection validation still run. No terminal first-fit follows selection.
     """
     from .experimental_candidate_selection import native_rank_selection_active
     from .model_visible_projection import (
@@ -131,6 +131,8 @@ def project_native_rank_context(*, retrieval: dict, max_tokens: int | None = Non
         rows.append(row)
         snapshot[row["evidence_id"]] = _snapshot_entry(original, row)
         seen.add(key)
+    from .experimental_set_selection import select_checked_windows
+    rows = select_checked_windows(question, rows)
     decision = context_selection_decision(rows, tuple(queries))
     payload = _payload(rows, decision=decision, query_plan=plan)
     _mark_unassessed(payload)
