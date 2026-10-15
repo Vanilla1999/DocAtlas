@@ -1,0 +1,6445 @@
+{
+  "boundary": "saved public DTO vs frozen raw sources and committed content hashes; full snapshot metadata audit NOT MEASURED",
+  "oracle": {
+    "claims": [
+      {
+        "claim_id": "required",
+        "documented": true,
+        "covered": true,
+        "witness_sets": [
+          {
+            "set_index": 0,
+            "covered": true,
+            "parts": [
+              {
+                "witness_id": "V40-E01/required/set-0/part-0",
+                "path": "docs/src/use/configure/configuration-files.md",
+                "line_start": 19,
+                "line_end": 30,
+                "covered": true,
+                "char_start": 584,
+                "char_end": 1141,
+                "expected_characters": 557,
+                "covered_characters": 557,
+                "missing_char_ranges": [],
+                "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "required_claim_count": 1,
+    "documented_claim_count": 1,
+    "covered_documented_claim_count": 1,
+    "all_documented_claims_covered": true,
+    "missing_documented_claim_ids": [],
+    "unavailable_requested_claim_ids": [],
+    "missing_witness_ids": [],
+    "errors": []
+  },
+  "verified_sources": [
+    {
+      "source_index": 0,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-4f030cdef1a53f71",
+      "line_start": 546,
+      "line_end": 562,
+      "projection_fingerprint": "94dc0b9bba8c6d9e87a96e1f92bf7ef4d7123643f3bc055880bbcb956b73352b",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22478,
+          22906
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22478,
+          22906
+        ]
+      ]
+    },
+    {
+      "source_index": 1,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-ed4cccea15dab433",
+      "line_start": 110,
+      "line_end": 111,
+      "projection_fingerprint": "44c6254e0209a976cf07cd7740fabd12be2135ff3fae294bc8dfe4e722b43900",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4215,
+          4461
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4215,
+          4461
+        ]
+      ]
+    },
+    {
+      "source_index": 2,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-ea6363dc65ed908f",
+      "line_start": 1,
+      "line_end": 15,
+      "projection_fingerprint": "cd5f223016d5f928b7ad8fdf515d1c59128953617947f9634479488ce4f5bc09",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          0,
+          274
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          0,
+          274
+        ]
+      ]
+    },
+    {
+      "source_index": 3,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-57cbb998a69416ea",
+      "line_start": 179,
+      "line_end": 183,
+      "projection_fingerprint": "08f93db02f66919d5d5982bd06b9250c56a9da51349a178e43c52cbfe1c64b46",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9476,
+          9864
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9476,
+          9864
+        ]
+      ]
+    },
+    {
+      "source_index": 4,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-ec36607d7c2ec0e9",
+      "line_start": 354,
+      "line_end": 357,
+      "projection_fingerprint": "85f3337c2a34ee26ce21f75ddf10f191fc59cd0ad97e7b72447b5fdc115d6ebe",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16483,
+          16639
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16483,
+          16639
+        ]
+      ]
+    },
+    {
+      "source_index": 5,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ff06532dee5ebb8a",
+      "line_start": 381,
+      "line_end": 382,
+      "projection_fingerprint": "ba2cafde92b64ad7b776d9c5e63d1d09ac35d7dad5ebfb7e194f6d71d1a0f192",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13565,
+          13715
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13565,
+          13715
+        ]
+      ]
+    },
+    {
+      "source_index": 6,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-c0336a267fac38d7",
+      "line_start": 95,
+      "line_end": 96,
+      "projection_fingerprint": "ad4472134ab5a34fa442e6ddbea2cca2ecedc62330ce7a0ece3318320ec63919",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6651,
+          6803
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6651,
+          6803
+        ]
+      ]
+    },
+    {
+      "source_index": 7,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-2bf4d6065adfbb45",
+      "line_start": 1,
+      "line_end": 16,
+      "projection_fingerprint": "843cfec294464a24eefc108cb64205bfbb9d8b2b4d094d4fa83333fcbd03ba76",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          0,
+          349
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          0,
+          349
+        ]
+      ]
+    },
+    {
+      "source_index": 8,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-0f14c591cf1bd2c5",
+      "line_start": 202,
+      "line_end": 205,
+      "projection_fingerprint": "929a291af6d663c73a1e192c98fe2b42ed69f04e091ad67807ea636e79345a87",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10522,
+          10769
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10522,
+          10769
+        ]
+      ]
+    },
+    {
+      "source_index": 9,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-75fbaa9f37dad54e",
+      "line_start": 108,
+      "line_end": 109,
+      "projection_fingerprint": "f038caa805856bb34abcaa1a26e0adea49ea145318337ed8142a90f5e4c0bc6e",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3884,
+          4215
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3884,
+          4215
+        ]
+      ]
+    },
+    {
+      "source_index": 10,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-aec8d8f74d5f4e66",
+      "line_start": 393,
+      "line_end": 427,
+      "projection_fingerprint": "2de477774c5ae27d2c97866b4dae34b393128ee51a414002d7bb9b1f90825557",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17375,
+          17955
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17375,
+          17955
+        ]
+      ]
+    },
+    {
+      "source_index": 11,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-d7c752222fef43f1",
+      "line_start": 358,
+      "line_end": 390,
+      "projection_fingerprint": "b3de8e899b9b0474f9d80c3e19570e8bec6295dda32b366292ab46172c81e739",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16639,
+          17196
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16639,
+          17196
+        ]
+      ]
+    },
+    {
+      "source_index": 12,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-9f83a9781895cf79",
+      "line_start": 17,
+      "line_end": 18,
+      "projection_fingerprint": "0490047c1aad946591dc44eb6bee78481a9ca203f5615d7613ad5714a180b7a6",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          349,
+          584
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          349,
+          584
+        ]
+      ]
+    },
+    {
+      "source_index": 13,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ede4541dbdf9f922",
+      "line_start": 42,
+      "line_end": 48,
+      "projection_fingerprint": "6d7f473fc7d93023503cb8a1263ead9580231fc61a53d4f57159fa8afd32e330",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1080,
+          1460
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1080,
+          1460
+        ]
+      ]
+    },
+    {
+      "source_index": 14,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-c08179ef85a9d701",
+      "line_start": 602,
+      "line_end": 607,
+      "projection_fingerprint": "6874c06293afcdf7fee04e30ef15b79727c7e050049d799a7e05cdafb658dfa1",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23948,
+          24408
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23948,
+          24408
+        ]
+      ]
+    },
+    {
+      "source_index": 15,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3969e2aaac64d199",
+      "line_start": 211,
+      "line_end": 212,
+      "projection_fingerprint": "0a09d8a24d2afacf7642094f78281a075949c4e86d84612bf86c7b73d5581fdd",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8347,
+          8571
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8347,
+          8571
+        ]
+      ]
+    },
+    {
+      "source_index": 16,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-688fb8a8b0d06f9b",
+      "line_start": 35,
+      "line_end": 38,
+      "projection_fingerprint": "db216761ac7edad91347fc91ee43a4ba2dd64a4728d4286c653b9d6547e0d90d",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1247,
+          1622
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1247,
+          1622
+        ]
+      ]
+    },
+    {
+      "source_index": 17,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-ef2cce4bdf4ca246",
+      "line_start": 69,
+      "line_end": 70,
+      "projection_fingerprint": "d0d7ad86d7090f9af541f5ef79bff6a256cae9c698d4ef0e1c0dd68feb6d7fdc",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2375,
+          2743
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2375,
+          2743
+        ]
+      ]
+    },
+    {
+      "source_index": 18,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-24a1dfd038ebbbe6",
+      "line_start": 95,
+      "line_end": 107,
+      "projection_fingerprint": "539ece7c1c34a693c0ba57cab615d38b56e30562b9a22ce5defd8fd31960b9b0",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3558,
+          3884
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3558,
+          3884
+        ]
+      ]
+    },
+    {
+      "source_index": 19,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-4ac7eede7cf4fb18",
+      "line_start": 731,
+      "line_end": 734,
+      "projection_fingerprint": "01019841054b7804fa73c67721b6caff022f603ed9d3c5711e4f0bd6f46e9b44",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          29680,
+          29998
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          29680,
+          29998
+        ]
+      ]
+    },
+    {
+      "source_index": 20,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e5b879882c63d6dd",
+      "line_start": 592,
+      "line_end": 601,
+      "projection_fingerprint": "d00684019b789450f64c14ad6b2d86c68a5aa9ddcea7ee65d9fa8a6765e80256",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19527,
+          19851
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19527,
+          19851
+        ]
+      ]
+    },
+    {
+      "source_index": 21,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-83fbfa119bcc18b5",
+      "line_start": 181,
+      "line_end": 189,
+      "projection_fingerprint": "f35d9780da93c0f5cf8e7c6060b781c3a7b0fef6782ad28b1862fb99cdff81a3",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7213,
+          7480
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7213,
+          7480
+        ]
+      ]
+    },
+    {
+      "source_index": 22,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-2a0f6e6792ef02eb",
+      "line_start": 715,
+      "line_end": 716,
+      "projection_fingerprint": "b089d0e9f4834dac4149e146270ced2dd8b5dc6847ea54bf15344275a4b43c0f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          24656,
+          25391
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          24656,
+          25391
+        ]
+      ]
+    },
+    {
+      "source_index": 23,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-bf8e302ea3a06cb8",
+      "line_start": 63,
+      "line_end": 75,
+      "projection_fingerprint": "bb535ce66c7ae255e8fdbb2e7ae7069a0754a4faca5dbdb0db19cecbe010fb03",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1904,
+          2307
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1904,
+          2307
+        ]
+      ]
+    },
+    {
+      "source_index": 24,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-bfd0cd75024a5518",
+      "line_start": 498,
+      "line_end": 504,
+      "projection_fingerprint": "5ef8d07c29b45d12e7bfcac9989ac87ab2c79bc59f6389caa61e67ed5bc1a4ee",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16918,
+          17312
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16918,
+          17312
+        ]
+      ]
+    },
+    {
+      "source_index": 25,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-b545c0871306fd1f",
+      "line_start": 643,
+      "line_end": 650,
+      "projection_fingerprint": "118e5314ac1e47750f9032e2c533c6579bdb81f9d64437412eb4abd60f98a270",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21133,
+          21536
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21133,
+          21536
+        ]
+      ]
+    },
+    {
+      "source_index": 26,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-25347915b781b9cc",
+      "line_start": 190,
+      "line_end": 195,
+      "projection_fingerprint": "38b3efd6f71895b1a147e5b442e70109ba616d102916fc4660343759791ae7c0",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7480,
+          7849
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7480,
+          7849
+        ]
+      ]
+    },
+    {
+      "source_index": 27,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-e40fea4976dff5fe",
+      "line_start": 174,
+      "line_end": 186,
+      "projection_fingerprint": "93bcc6b6bee37161dfb817090d88b32975ed5bb615a32301683ab3962516e5aa",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7275,
+          7729
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7275,
+          7729
+        ]
+      ]
+    },
+    {
+      "source_index": 28,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-4c9af8a4e04080d4",
+      "line_start": 295,
+      "line_end": 299,
+      "projection_fingerprint": "b0ab1f28622a28411e4b5f9e98e9a7ba9de5ef1d691be6d04db5c310eadddf4e",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14354,
+          14700
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14354,
+          14700
+        ]
+      ]
+    },
+    {
+      "source_index": 29,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-82cd964d6020d914",
+      "line_start": 64,
+      "line_end": 68,
+      "projection_fingerprint": "e84039c9096631d2e246856da877ab9d6958e80b35628b26d418b83e2e7104ee",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1927,
+          2375
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1927,
+          2375
+        ]
+      ]
+    },
+    {
+      "source_index": 30,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-c524323b103f777b",
+      "line_start": 49,
+      "line_end": 62,
+      "projection_fingerprint": "4448ba3095b9714267a093e0fc7aaf3d12482e9281488f618402501477c2d074",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1460,
+          1904
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1460,
+          1904
+        ]
+      ]
+    },
+    {
+      "source_index": 31,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e35bf1c26d51017e",
+      "line_start": 46,
+      "line_end": 49,
+      "projection_fingerprint": "38e0bccaca64414c42af695fcb6a1f32ce3855efa0ecfa937ef49d49b76817c5",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1324,
+          1739
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1324,
+          1739
+        ]
+      ]
+    },
+    {
+      "source_index": 32,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-53d5b4214438c9af",
+      "line_start": 436,
+      "line_end": 442,
+      "projection_fingerprint": "ce4c2e405f03764dc9530548ca7c01b4eabc5cf6066249a9d29ca9e297a38123",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15185,
+          15613
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15185,
+          15613
+        ]
+      ]
+    },
+    {
+      "source_index": 33,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-1d52f43e56d3fefe",
+      "line_start": 717,
+      "line_end": 718,
+      "projection_fingerprint": "dc12903caafce891ca60da9b451d8d30930879de54a63d18e0df4b03d36d5879",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          25391,
+          25967
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          25391,
+          25967
+        ]
+      ]
+    },
+    {
+      "source_index": 34,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-82192ea19def8144",
+      "line_start": 544,
+      "line_end": 545,
+      "projection_fingerprint": "2682d1ec62bc4e0bb17cd4cf61e203461add87435ee5a63ac1d9bb22479aa5a2",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22099,
+          22478
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22099,
+          22478
+        ]
+      ]
+    },
+    {
+      "source_index": 35,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-3bb9e6f4f044c1f8",
+      "line_start": 287,
+      "line_end": 289,
+      "projection_fingerprint": "766c0e9d559f1bf9eb71e81c5cf5315e275ba7c669f6e69e7e50621be3880f73",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13461,
+          14052
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13461,
+          14052
+        ]
+      ]
+    },
+    {
+      "source_index": 36,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-4e36747a6b499cc2",
+      "line_start": 628,
+      "line_end": 631,
+      "projection_fingerprint": "066c3b40a8f25242e5406ea742cbf26256608a442069280aaf24678ffd338440",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          24948,
+          25227
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          24948,
+          25227
+        ]
+      ]
+    },
+    {
+      "source_index": 37,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a7f971b2be75dbc0",
+      "line_start": 706,
+      "line_end": 709,
+      "projection_fingerprint": "c0fdd2f5b4627539165236b73a61bb0d29ad6ef5441296d1514853878551c021",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          27725,
+          27993
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          27725,
+          27993
+        ]
+      ]
+    },
+    {
+      "source_index": 38,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-cfb81af78d0b33c3",
+      "line_start": 759,
+      "line_end": 760,
+      "projection_fingerprint": "9718d6a68e321d1df6f87e15f952b4dc1ad8f62e07554c9b9d767bdafc5880db",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          27375,
+          27662
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          27375,
+          27662
+        ]
+      ]
+    },
+    {
+      "source_index": 39,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-683b261c4364c29a",
+      "line_start": 152,
+      "line_end": 160,
+      "projection_fingerprint": "7a1c921591c05360a1b8249c98211c48614d72166bd731b2e09661609cbf7311",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6113,
+          6540
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6113,
+          6540
+        ]
+      ]
+    },
+    {
+      "source_index": 40,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-358087141e9d7fc4",
+      "line_start": 782,
+      "line_end": 785,
+      "projection_fingerprint": "bda8a7156a6eeef98ea7bf1f63fe34bd124dd7ff8db40439f99427e257c6c082",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          31142,
+          31515
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          31142,
+          31515
+        ]
+      ]
+    },
+    {
+      "source_index": 41,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-a103f67df4f4e5e6",
+      "line_start": 983,
+      "line_end": 984,
+      "projection_fingerprint": "4f5f434b00d01685502215094fb5cf5a53aa53eb1bcaae0c5669efa97da94410",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          35033,
+          35170
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          35033,
+          35170
+        ]
+      ]
+    },
+    {
+      "source_index": 42,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-be690fa73b6a910f",
+      "line_start": 326,
+      "line_end": 327,
+      "projection_fingerprint": "d2ec1c1f313dec1e56ea81446658287bc989e66aaa718ca817842018c6a4060d",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15476,
+          15661
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15476,
+          15661
+        ]
+      ]
+    },
+    {
+      "source_index": 43,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-105475596d3d4f53",
+      "line_start": 91,
+      "line_end": 94,
+      "projection_fingerprint": "3394467b929cae8d4fc11341ddc7641bd42be6ffa33c0e679bdf12a01b94c252",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3346,
+          3558
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3346,
+          3558
+        ]
+      ]
+    },
+    {
+      "source_index": 44,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-7c5e1e5448d70af9",
+      "line_start": 279,
+      "line_end": 282,
+      "projection_fingerprint": "bbd214ca9501cfa80d069946d352bfac49afb3cab6f3cab8583f0095c4764d63",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13135,
+          13306
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13135,
+          13306
+        ]
+      ]
+    },
+    {
+      "source_index": 45,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-139cc96cbe0a75f6",
+      "line_start": 466,
+      "line_end": 474,
+      "projection_fingerprint": "1072d282de576310525bca142880822b65fa4e58ce8afb50d557fea9f1863c18",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16111,
+          16374
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16111,
+          16374
+        ]
+      ]
+    },
+    {
+      "source_index": 46,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3e267e00cc8276b1",
+      "line_start": 686,
+      "line_end": 692,
+      "projection_fingerprint": "74bbc5654fefa6f77eb1cbca02e785341ecdc27cf282f4a70a3dcec2710efd8e",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23244,
+          23535
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23244,
+          23535
+        ]
+      ]
+    },
+    {
+      "source_index": 47,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-dcb7f8cdff6c0644",
+      "line_start": 287,
+      "line_end": 288,
+      "projection_fingerprint": "66d368d6f1e2a6ecec36a2a546f320f46bfa2161852d260e73a583a099d8a229",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10854,
+          11191
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10854,
+          11191
+        ]
+      ]
+    },
+    {
+      "source_index": 48,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-adc66fca78fc4883",
+      "line_start": 668,
+      "line_end": 674,
+      "projection_fingerprint": "c5d514518b7d66fc00162e4fc9486b5b62e6bc50b805dd5611a5a4f0c8f8a231",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22553,
+          22849
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22553,
+          22849
+        ]
+      ]
+    },
+    {
+      "source_index": 49,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-f24944d3e7f44372",
+      "line_start": 16,
+      "line_end": 23,
+      "projection_fingerprint": "1ac1a74c8900f11541a1641547b059155f9915d089e663bc48015da5ae3f0adb",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          274,
+          928
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          274,
+          928
+        ]
+      ]
+    },
+    {
+      "source_index": 50,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-355ea6b27f85f46f",
+      "line_start": 163,
+      "line_end": 178,
+      "projection_fingerprint": "6efca963e916c31d9809aad42e9773235f2846e9438885b36cb92b9aab8a1855",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9192,
+          9476
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9192,
+          9476
+        ]
+      ]
+    },
+    {
+      "source_index": 51,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e3bb8e9a26b23e71",
+      "line_start": 527,
+      "line_end": 530,
+      "projection_fingerprint": "5350da696bc5ee6d83d5c79d0eb94601a1ea2777857df476fcac3144d1156569",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21645,
+          21946
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21645,
+          21946
+        ]
+      ]
+    },
+    {
+      "source_index": 52,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-0ce55d67d1c0c112",
+      "line_start": 786,
+      "line_end": 794,
+      "projection_fingerprint": "f4835f8f216d527855cc6a6fae16d5eb4d9b19479344312b81cffc5f71d6ebdb",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          31515,
+          31857
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          31515,
+          31857
+        ]
+      ]
+    },
+    {
+      "source_index": 53,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-760dac4a3198e96e",
+      "line_start": 534,
+      "line_end": 543,
+      "projection_fingerprint": "1248674fb1475c093584dc8bb8d6f028899cf9100a4156596dbd8bb963585299",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18093,
+          18473
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18093,
+          18473
+        ]
+      ]
+    },
+    {
+      "source_index": 54,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e951215c135f7790",
+      "line_start": 184,
+      "line_end": 199,
+      "projection_fingerprint": "b41066e9f7779e30d0a304b673698044fc62d10c86c5e6c7933c2ab483e4409f",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9864,
+          10205
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9864,
+          10205
+        ]
+      ]
+    },
+    {
+      "source_index": 55,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-90c26fff1eb4e486",
+      "line_start": 501,
+      "line_end": 504,
+      "projection_fingerprint": "b13d0e7a65fde317aece90da89dece1c892260617b28ff15624ae01c70911dd5",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20415,
+          20803
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20415,
+          20803
+        ]
+      ]
+    },
+    {
+      "source_index": 56,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-a0e6840e009aab60",
+      "line_start": 124,
+      "line_end": 125,
+      "projection_fingerprint": "d437253ccd64acda19272641f1c74cc51af0f5ed646d1ceb7ce003e95f979d76",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4768,
+          5241
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4768,
+          5241
+        ]
+      ]
+    },
+    {
+      "source_index": 57,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-63673c19dce1a4bb",
+      "line_start": 507,
+      "line_end": 510,
+      "projection_fingerprint": "6e07a6e1ee974220765c6c81ada9c4fb8c4138cf88ef03d9049996a47751eea7",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20838,
+          21286
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20838,
+          21286
+        ]
+      ]
+    },
+    {
+      "source_index": 58,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-46a293c3b6b8e019",
+      "line_start": 483,
+      "line_end": 484,
+      "projection_fingerprint": "ec0c46606b78db5a535c65657dc6e97f79023666767f15efcddea07266aa0b1e",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19677,
+          20171
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19677,
+          20171
+        ]
+      ]
+    },
+    {
+      "source_index": 59,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-8e2bb3828dd5170f",
+      "line_start": 722,
+      "line_end": 730,
+      "projection_fingerprint": "a7287c9d39ff51641231b470fa793204ce1653af9d2eb7f05c8a3bfe76c37d0f",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          28942,
+          29680
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          28942,
+          29680
+        ]
+      ]
+    },
+    {
+      "source_index": 60,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-0cab45a0107c718a",
+      "line_start": 76,
+      "line_end": 77,
+      "projection_fingerprint": "0d75169a03f7455dbc1f943ff647fa330ac4d944a872ed9a5f5780ce28528f65",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3818,
+          4209
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3818,
+          4209
+        ]
+      ]
+    },
+    {
+      "source_index": 61,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-cc9d9f5b1227732a",
+      "line_start": 712,
+      "line_end": 721,
+      "projection_fingerprint": "3b499520b47d22c7542d1a44f172f69caeb88ae213d1a82dedef180270cba6f0",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          28031,
+          28942
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          28031,
+          28942
+        ]
+      ]
+    },
+    {
+      "source_index": 62,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-054adf8461493914",
+      "line_start": 74,
+      "line_end": 75,
+      "projection_fingerprint": "65720ce7d78348ee67ebd6a358b3cc01758ea0feed4510d19cce412a17aa8997",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3473,
+          3818
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3473,
+          3818
+        ]
+      ]
+    },
+    {
+      "source_index": 63,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-c4afd2a5bbe1da99",
+      "line_start": 126,
+      "line_end": 127,
+      "projection_fingerprint": "6835e6a40abaaf332aaa52104fdfea79cd4b8259243dfd0b37b0e0df97b5caf3",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5241,
+          5363
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5241,
+          5363
+        ]
+      ]
+    },
+    {
+      "source_index": 64,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-49482f5fc2253a7a",
+      "line_start": 187,
+      "line_end": 188,
+      "projection_fingerprint": "198616e81d721f700417c05d237bb7f87abcdc2face289a7db9a92a742582a42",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7729,
+          7881
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7729,
+          7881
+        ]
+      ]
+    },
+    {
+      "source_index": 65,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-36321477403e8b86",
+      "line_start": 174,
+      "line_end": 180,
+      "projection_fingerprint": "1a912826999020a895bfce44c73a10679ef6cff3f1d0eb2d8bebcc90a5f8457e",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6991,
+          7213
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6991,
+          7213
+        ]
+      ]
+    },
+    {
+      "source_index": 66,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-9a7d0911f5bbf1ae",
+      "line_start": 749,
+      "line_end": 758,
+      "projection_fingerprint": "be5c4f824d28549b1dfb2d9735ea13d93ea032531bb1831e9011940c1fc37834",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          27135,
+          27375
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          27135,
+          27375
+        ]
+      ]
+    },
+    {
+      "source_index": 67,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-5990e08957f89cc9",
+      "line_start": 72,
+      "line_end": 73,
+      "projection_fingerprint": "ce1f837b89e6bd4b49125a86159425fa87ca08e843b60e3b3637341197d20810",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3142,
+          3473
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3142,
+          3473
+        ]
+      ]
+    },
+    {
+      "source_index": 68,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a4c7049e880cb3d2",
+      "line_start": 682,
+      "line_end": 685,
+      "projection_fingerprint": "4f8a1f95d4ea155e87e9c0549f24d3a94fa54225470e86faab41b4c92cdc4b50",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26753,
+          27073
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26753,
+          27073
+        ]
+      ]
+    },
+    {
+      "source_index": 69,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-bd33778fc607cc7f",
+      "line_start": 737,
+      "line_end": 757,
+      "projection_fingerprint": "f7d88df0afb15b28e30e70d493a9a8a990450b7b883e551baee20f05cb6d1a30",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30274,
+          30695
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30274,
+          30695
+        ]
+      ]
+    },
+    {
+      "source_index": 70,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-d9c080f919a3e4aa",
+      "line_start": 124,
+      "line_end": 126,
+      "projection_fingerprint": "020ceb66883cade703129912d58a4c4f21116109e72d94f9ac7e81e3eee0e2ae",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4251,
+          4628
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4251,
+          4628
+        ]
+      ]
+    },
+    {
+      "source_index": 71,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-f84d4e5b593d647b",
+      "line_start": 81,
+      "line_end": 84,
+      "projection_fingerprint": "9c2bb1eb391fa4ebce705903e04b639a589e65929bbed104f12394bfd789f89a",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2400,
+          2474
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2400,
+          2474
+        ]
+      ]
+    },
+    {
+      "source_index": 72,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-6efef6078531095c",
+      "line_start": 654,
+      "line_end": 660,
+      "projection_fingerprint": "7eaf52fbddb577c65b52fa8dc2e362cc8cf363a523275fe40eef25925ee4cbcf",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          25911,
+          26315
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          25911,
+          26315
+        ]
+      ]
+    },
+    {
+      "source_index": 73,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a0222e1b64a81b3f",
+      "line_start": 795,
+      "line_end": 804,
+      "projection_fingerprint": "6deab4997c385c2c9cc332d81b91493b15495492d3649cd2008246b61d1e24a9",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          31857,
+          32259
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          31857,
+          32259
+        ]
+      ]
+    },
+    {
+      "source_index": 74,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-6664eac0e6697a75",
+      "line_start": 732,
+      "line_end": 735,
+      "projection_fingerprint": "b9fe51f8577b8b8436967193691d6ed1a426fe09d1de3bb153162db604abcab8",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26284,
+          26380
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26284,
+          26380
+        ]
+      ]
+    },
+    {
+      "source_index": 75,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-288af1f7f2db3b04",
+      "line_start": 797,
+      "line_end": 800,
+      "projection_fingerprint": "5cd4a1eabd92c0499b8238354a67599ac5671a52652a31fdf86401ab36c4b013",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          28950,
+          29060
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          28950,
+          29060
+        ]
+      ]
+    },
+    {
+      "source_index": 76,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3b4bb2545e2da92d",
+      "line_start": 654,
+      "line_end": 656,
+      "projection_fingerprint": "17814ef5899c8ddfc7cf81a916c8ebdc9a3c680b3009aa4a9418410c88ae333f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21671,
+          22111
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21671,
+          22111
+        ]
+      ]
+    },
+    {
+      "source_index": 77,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-910e951560811ab1",
+      "line_start": 391,
+      "line_end": 392,
+      "projection_fingerprint": "31311d9195fe723cbf0f619b92ed2a62d29ad632f62f3549b6fafde8dcb209e5",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17196,
+          17375
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17196,
+          17375
+        ]
+      ]
+    },
+    {
+      "source_index": 78,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-dfdf5f004eae6dbd",
+      "line_start": 216,
+      "line_end": 217,
+      "projection_fingerprint": "f9a75a6d759bbef1b8d6ddc8a00ba52348e091932542544a8abccbaecd0adc32",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8658,
+          8836
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8658,
+          8836
+        ]
+      ]
+    },
+    {
+      "source_index": 79,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a7d3fddff6803879",
+      "line_start": 283,
+      "line_end": 286,
+      "projection_fingerprint": "92a42601e83ee249fbf82ba61bbaf192af6b09f56c150ecdb407dd7347654b7f",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13306,
+          13461
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13306,
+          13461
+        ]
+      ]
+    },
+    {
+      "source_index": 80,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-a3f50a8e08e273ef",
+      "line_start": 452,
+      "line_end": 457,
+      "projection_fingerprint": "97514818011805f70f1da42feab074f80917ba53e87bb1139f6b8129500529ce",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15797,
+          15978
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15797,
+          15978
+        ]
+      ]
+    },
+    {
+      "source_index": 81,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-b35056d2e615f51e",
+      "line_start": 459,
+      "line_end": 462,
+      "projection_fingerprint": "6b579cbcf6297578412b30e21538e3a98e48b3f692ce704e5c60ad6d1c44684a",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18939,
+          19164
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18939,
+          19164
+        ]
+      ]
+    },
+    {
+      "source_index": 82,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-97c06da6ec7abfbf",
+      "line_start": 218,
+      "line_end": 221,
+      "projection_fingerprint": "e2f84151c61df4960901395a5cd11a7b3be943b98e824e730dc895293d53c68b",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8836,
+          9057
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8836,
+          9057
+        ]
+      ]
+    },
+    {
+      "source_index": 83,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-43f87159192e52c9",
+      "line_start": 289,
+      "line_end": 292,
+      "projection_fingerprint": "e29e8068c32eaf092d695a613186456e78a28467b352ba6d0dce252beea51607",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11191,
+          11419
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11191,
+          11419
+        ]
+      ]
+    },
+    {
+      "source_index": 84,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-287aae4478791b84",
+      "line_start": 463,
+      "line_end": 466,
+      "projection_fingerprint": "9feba94652b126deb3f3ef172a02d15446bb453c5ed455571182f922e7e4d604",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19164,
+          19448
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19164,
+          19448
+        ]
+      ]
+    },
+    {
+      "source_index": 85,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a6e0aa5090428874",
+      "line_start": 256,
+      "line_end": 257,
+      "projection_fingerprint": "07c8e90f077ea2c2f6357d5a9dc67b5d5a7c3d908925898f36f738448ceebf3e",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12024,
+          12252
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12024,
+          12252
+        ]
+      ]
+    },
+    {
+      "source_index": 86,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-0ae1c7f79c3355bb",
+      "line_start": 238,
+      "line_end": 241,
+      "projection_fingerprint": "15c39e3b4e7a691a5023e91f7ba63353de541cd42194d220bb7c9f2ff754f398",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9402,
+          9730
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9402,
+          9730
+        ]
+      ]
+    },
+    {
+      "source_index": 87,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-9a6f0a4c79c7584f",
+      "line_start": 293,
+      "line_end": 301,
+      "projection_fingerprint": "83b6dd758c329f63a8b9c1dde42c1c764f76cc640de20a8a06e7afe2a8b0aa6a",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10670,
+          10935
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10670,
+          10935
+        ]
+      ]
+    },
+    {
+      "source_index": 88,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-887b47e20f105ba5",
+      "line_start": 693,
+      "line_end": 695,
+      "projection_fingerprint": "a169e8668de74fa7ee1f243eaba8a86603d2444e9df6c610bd248bdcd53d8515",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23535,
+          23744
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23535,
+          23744
+        ]
+      ]
+    },
+    {
+      "source_index": 89,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-a1db0f45f17c24b4",
+      "line_start": 24,
+      "line_end": 34,
+      "projection_fingerprint": "743340c32e8df354c07496f1cf17b1f235a32fa52983bc00af39e0b8a86296e6",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          928,
+          1247
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          928,
+          1247
+        ]
+      ]
+    },
+    {
+      "source_index": 90,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-399e85b4b13d3027",
+      "line_start": 805,
+      "line_end": 810,
+      "projection_fingerprint": "20c5e56eb57687ddf987674c7a2d226dab7d519346b53832196634b6bf3b45b1",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          32259,
+          32554
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          32259,
+          32554
+        ]
+      ]
+    },
+    {
+      "source_index": 91,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-34fe6005fe29274f",
+      "line_start": 608,
+      "line_end": 611,
+      "projection_fingerprint": "21ab2223688343f821bfc05386f219d5ab1493cab9bba7f6819b419ed75bb4e6",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          24408,
+          24675
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          24408,
+          24675
+        ]
+      ]
+    },
+    {
+      "source_index": 92,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-d8a7b83d1ed2203c",
+      "line_start": 237,
+      "line_end": 238,
+      "projection_fingerprint": "59cd51c08a46008ab8878d51de3bb6d152b20034c144ddee659244ad67105f25",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11431,
+          11651
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11431,
+          11651
+        ]
+      ]
+    },
+    {
+      "source_index": 93,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-bb76a414fe09a370",
+      "line_start": 870,
+      "line_end": 875,
+      "projection_fingerprint": "d2ca081f544f0af04ea275be490a8dd6366180dd64164004f6345b6f010b9959",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          31464,
+          31674
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          31464,
+          31674
+        ]
+      ]
+    },
+    {
+      "source_index": 94,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-66984d812c1d4e82",
+      "line_start": 704,
+      "line_end": 710,
+      "projection_fingerprint": "dd16006da7701cef9a34bbcb763acecc3006f75b947e67f40332abefe89384ca",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23875,
+          24184
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23875,
+          24184
+        ]
+      ]
+    },
+    {
+      "source_index": 95,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-bb6a0d984b836b19",
+      "line_start": 992,
+      "line_end": 998,
+      "projection_fingerprint": "c90b448a8e4bd0f3ccc7fd01551002f5dd35ae7ad2995653b2a15303cb4d0eb1",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          35293,
+          35449
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          35293,
+          35449
+        ]
+      ]
+    },
+    {
+      "source_index": 96,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-2fd38927b9e0d895",
+      "line_start": 758,
+      "line_end": 759,
+      "projection_fingerprint": "56f4835587f54904b6b7bb01de3ab601eccaa6a10fa310a77a370a3ca35e7c20",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30695,
+          30840
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30695,
+          30840
+        ]
+      ]
+    },
+    {
+      "source_index": 97,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-2d32d3acfcc74436",
+      "line_start": 1006,
+      "line_end": 1012,
+      "projection_fingerprint": "9b9a2901d8fd76cd5837c53f6d86ff46c9d6898cb5b4fee4165457ca4f766f24",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          35563,
+          35707
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          35563,
+          35707
+        ]
+      ]
+    },
+    {
+      "source_index": 98,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-b4610466e59b17ed",
+      "line_start": 352,
+      "line_end": 353,
+      "projection_fingerprint": "735e18789fa3d5aea9f94b8deffc5385f9075dcd400431ae9216bb28eeb69dbe",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16378,
+          16483
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16378,
+          16483
+        ]
+      ]
+    },
+    {
+      "source_index": 99,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-f3f528f180284dce",
+      "line_start": 220,
+      "line_end": 221,
+      "projection_fingerprint": "017e1f09e4221afdcf852be582c5d3d98690cafd9006cafd42d77b0b97dc9f5c",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10948,
+          11221
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10948,
+          11221
+        ]
+      ]
+    },
+    {
+      "source_index": 100,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-2e0508397496f713",
+      "line_start": 141,
+      "line_end": 151,
+      "projection_fingerprint": "a626cc09abb76981ffe0a649ec3843629034caa76933582048bd4f84ae52a8ba",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5721,
+          6113
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5721,
+          6113
+        ]
+      ]
+    },
+    {
+      "source_index": 101,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-5153a1d7d1f5ddbf",
+      "line_start": 740,
+      "line_end": 741,
+      "projection_fingerprint": "96a027f529a1bf7225acb940be81beda41fdf3a7dbd17191301b5ce0fe583f18",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26801,
+          26962
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26801,
+          26962
+        ]
+      ]
+    },
+    {
+      "source_index": 102,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-bb85d3934b86ad43",
+      "line_start": 511,
+      "line_end": 526,
+      "projection_fingerprint": "399166dcb8dec26550543866d3cd9cc9f14ea1e0dace25245cb05f422ecc4885",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21286,
+          21645
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21286,
+          21645
+        ]
+      ]
+    },
+    {
+      "source_index": 103,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-bfaa5699a2488472",
+      "line_start": 50,
+      "line_end": 70,
+      "projection_fingerprint": "ffc57e88548df59fccbb4bef6dc755e34bed4f2f2c146ee65853a2e777fe8adf",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2019,
+          2502
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2019,
+          2502
+        ]
+      ]
+    },
+    {
+      "source_index": 104,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-af299140cf6fef33",
+      "line_start": 290,
+      "line_end": 294,
+      "projection_fingerprint": "f051fba9fb30537486f4667943d56155af23418ea8f8bf7d2c36cc30bf1a7603",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14052,
+          14354
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14052,
+          14354
+        ]
+      ]
+    },
+    {
+      "source_index": 105,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-306cd6f565af22c3",
+      "line_start": 664,
+      "line_end": 667,
+      "projection_fingerprint": "1c0c66e377e5e9c6ad8dbd5b32aa10677a792d70e27fe7ccdce07c43374016f9",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22268,
+          22553
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22268,
+          22553
+        ]
+      ]
+    },
+    {
+      "source_index": 106,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-c124bc07802afae0",
+      "line_start": 143,
+      "line_end": 145,
+      "projection_fingerprint": "1b160688d9e2f194c041eaf79bd47cff07241934c1b3d21ec805cafd210b7435",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8386,
+          8597
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8386,
+          8597
+        ]
+      ]
+    },
+    {
+      "source_index": 107,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-239ca960be7027a9",
+      "line_start": 200,
+      "line_end": 201,
+      "projection_fingerprint": "6ce713a5c85243055c111985e6033512b9a4f73033af943dfeb7bd038502db21",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10205,
+          10522
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10205,
+          10522
+        ]
+      ]
+    },
+    {
+      "source_index": 108,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-0ab636f8b09beda8",
+      "line_start": 428,
+      "line_end": 431,
+      "projection_fingerprint": "a0e3a2ea1c49ced01ffbd2cc3837d698cd50e0e6bd8de48dc8c6f5b56c144f0b",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17955,
+          18183
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17955,
+          18183
+        ]
+      ]
+    },
+    {
+      "source_index": 109,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-d2321d4ce2a982ea",
+      "line_start": 81,
+      "line_end": 82,
+      "projection_fingerprint": "4d8977e8b3a43c27d1c76e37eb26e30f86d92f0d2b6299088c0bf84756b431dc",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4652,
+          5007
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4652,
+          5007
+        ]
+      ]
+    },
+    {
+      "source_index": 110,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e40ccd2dc800fbfd",
+      "line_start": 153,
+      "line_end": 158,
+      "projection_fingerprint": "19aadde3872d0e1b549a17b2021f7f02e3151e1e8b1601616ed169519230596b",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6392,
+          6736
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6392,
+          6736
+        ]
+      ]
+    },
+    {
+      "source_index": 111,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-6bf1d03f3c4bc8c4",
+      "line_start": 544,
+      "line_end": 553,
+      "projection_fingerprint": "38bfa13bdb8141f25248541742f2a6abb49de8961cee7c7ff96c7eee243a0b15",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18473,
+          18872
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18473,
+          18872
+        ]
+      ]
+    },
+    {
+      "source_index": 112,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-aea3dc94cf909aea",
+      "line_start": 325,
+      "line_end": 338,
+      "projection_fingerprint": "70eb6248ee016278fc686a44ef0d69c9b7e07e4f49b0f0ca81ed2cfaeecd8324",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11720,
+          12049
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11720,
+          12049
+        ]
+      ]
+    },
+    {
+      "source_index": 113,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-b610a73286192f9d",
+      "line_start": 811,
+      "line_end": 814,
+      "projection_fingerprint": "7423d8ea6c14a340bfa16bf772a4c3222265fb68f7f4740f926bffa1dc4def60",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          32554,
+          32887
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          32554,
+          32887
+        ]
+      ]
+    },
+    {
+      "source_index": 114,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-eea8b230b47ef8df",
+      "line_start": 565,
+      "line_end": 566,
+      "projection_fingerprint": "19359c760aceb5e163fdcf4ef4cffd1c93252a109a10c19916fd39241ec08033",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22937,
+          23421
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22937,
+          23421
+        ]
+      ]
+    },
+    {
+      "source_index": 115,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3c89b64e629e60cd",
+      "line_start": 1,
+      "line_end": 14,
+      "projection_fingerprint": "6cc12e6bfb27ce6bae12f06e67e39d0ed4c46402598a11c4e65f61d4d9609955",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          0,
+          474
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          0,
+          474
+        ]
+      ]
+    },
+    {
+      "source_index": 116,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-8010b02146b68668",
+      "line_start": 963,
+      "line_end": 969,
+      "projection_fingerprint": "a2e06880a0784e583046798c534d31ff0f9c5ba2abf82f9fac7fd5f395a035d1",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          34238,
+          34544
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          34238,
+          34544
+        ]
+      ]
+    },
+    {
+      "source_index": 117,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-1cd27fba686a7cf1",
+      "line_start": 855,
+      "line_end": 862,
+      "projection_fingerprint": "316e44524c04f7d76b46c9b2290a4acbaaf991d49ec027f524f8143144c3ad55",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          31037,
+          31366
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          31037,
+          31366
+        ]
+      ]
+    },
+    {
+      "source_index": 118,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-c3db189275c87ae9",
+      "line_start": 71,
+      "line_end": 81,
+      "projection_fingerprint": "2a57f59a0f223f08b9fe2642ef301851e71941105da9b187d36d69926fdef5cc",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2502,
+          2927
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2502,
+          2927
+        ]
+      ]
+    },
+    {
+      "source_index": 119,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-6caa04c30db0ae52",
+      "line_start": 711,
+      "line_end": 712,
+      "projection_fingerprint": "75e63143f08a0abe2d7bf8900ae6b86bd804904fcd55f9890253d4bd48289148",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          24184,
+          24530
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          24184,
+          24530
+        ]
+      ]
+    },
+    {
+      "source_index": 120,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-c5be30772f38fdc5",
+      "line_start": 121,
+      "line_end": 136,
+      "projection_fingerprint": "b21d88af2720c87f3126eb2cbb373303cdb3b6f92c0f897c9f3da53a85eaa015",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7177,
+          7562
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7177,
+          7562
+        ]
+      ]
+    },
+    {
+      "source_index": 121,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-bd7822b418549352",
+      "line_start": 239,
+      "line_end": 255,
+      "projection_fingerprint": "f0da26f33f3ab46d3115b5c7988c36210121342f0be9cdff913123cc7b292720",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11651,
+          12024
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11651,
+          12024
+        ]
+      ]
+    },
+    {
+      "source_index": 122,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-1a8336cda5f3b41a",
+      "line_start": 133,
+      "line_end": 139,
+      "projection_fingerprint": "26121aa3d055494eefc0612a467341e9e99edc22d2f266c46a1f2d36776d57d7",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5044,
+          5510
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5044,
+          5510
+        ]
+      ]
+    },
+    {
+      "source_index": 123,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3b7833eb15198516",
+      "line_start": 783,
+      "line_end": 789,
+      "projection_fingerprint": "dcfbac9468748b8587f9f3ffd8d623a008b8488e143b26649852d6fbb2adb8b8",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          28383,
+          28780
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          28383,
+          28780
+        ]
+      ]
+    },
+    {
+      "source_index": 124,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-0a478083516df3e8",
+      "line_start": 922,
+      "line_end": 929,
+      "projection_fingerprint": "69a12d7a2f9af7c246c79c6e70b6679cca18e1ae3eb836f54050b5733d7e31ee",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          33059,
+          33459
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          33059,
+          33459
+        ]
+      ]
+    },
+    {
+      "source_index": 125,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-d7668b531d1fa16b",
+      "line_start": 147,
+      "line_end": 152,
+      "projection_fingerprint": "46162ab105917f8b372b03bd64862a4a4559b45f3484c076af6bb72dcbf01889",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5956,
+          6392
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5956,
+          6392
+        ]
+      ]
+    },
+    {
+      "source_index": 126,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-f4e27d59aaae768e",
+      "line_start": 127,
+      "line_end": 132,
+      "projection_fingerprint": "81b99d3ee19fd36d9287409217e34bbcba17ebc26d075f46cb69d1319d41f1a2",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4628,
+          5044
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4628,
+          5044
+        ]
+      ]
+    },
+    {
+      "source_index": 127,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-5e0085ca370c1f89",
+      "line_start": 258,
+      "line_end": 273,
+      "projection_fingerprint": "1ccfa06a8cce7f87d4179adc52a771087b81613a395e5117bbee990532c72215",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12252,
+          12628
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12252,
+          12628
+        ]
+      ]
+    },
+    {
+      "source_index": 128,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ce6be959356d2ac2",
+      "line_start": 85,
+      "line_end": 93,
+      "projection_fingerprint": "3607646a3a66d7962dc82cce2c79ff937aee871c69d0ae7b7bbe0fa4a0b96a75",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2474,
+          2937
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2474,
+          2937
+        ]
+      ]
+    },
+    {
+      "source_index": 129,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-b9104d238dd9ca9f",
+      "line_start": 148,
+      "line_end": 150,
+      "projection_fingerprint": "2e1f2f5f4f27508055a6eeb3c5956d90a5767a87a55b3d4f5b44b4d716fbc256",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8643,
+          9007
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8643,
+          9007
+        ]
+      ]
+    },
+    {
+      "source_index": 130,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e63c4425159fd9c7",
+      "line_start": 686,
+      "line_end": 689,
+      "projection_fingerprint": "717c3118640f2a9d6a0540392f53e684316553131b664d542fcd503f61d54895",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          27073,
+          27460
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          27073,
+          27460
+        ]
+      ]
+    },
+    {
+      "source_index": 131,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-1f09647ad16b1ad2",
+      "line_start": 457,
+      "line_end": 458,
+      "projection_fingerprint": "024adeabd30b8d21cd490a65bbc57e4f9f638a9a51e87f68fe3d822ece3f59e0",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18531,
+          18939
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18531,
+          18939
+        ]
+      ]
+    },
+    {
+      "source_index": 132,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-d258e9c81744555e",
+      "line_start": 15,
+      "line_end": 27,
+      "projection_fingerprint": "43d19799a59568a5d96c198eb6dbb75f5abd5891a9b4fc5e616f0176d05ba150",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          474,
+          859
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          474,
+          859
+        ]
+      ]
+    },
+    {
+      "source_index": 133,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-9f3cec4025d6b9a2",
+      "line_start": 189,
+      "line_end": 201,
+      "projection_fingerprint": "eec83914e2b388889e6af4b4b1408f8d518533d3a884cc9e66d202f6d324c5f7",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7881,
+          8342
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7881,
+          8342
+        ]
+      ]
+    },
+    {
+      "source_index": 134,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-6da9e28dc6914f35",
+      "line_start": 137,
+      "line_end": 138,
+      "projection_fingerprint": "2cb9a580abf3b914f8de5f064c54c4fc8854d96b64268c2c031abb82272415c3",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7562,
+          8004
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7562,
+          8004
+        ]
+      ]
+    },
+    {
+      "source_index": 135,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-277c5f34e5e64701",
+      "line_start": 602,
+      "line_end": 603,
+      "projection_fingerprint": "33a24ffcb90f29f379bc26ff121b129f7d65cd8403f79fd87a70e13c0711b7db",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19851,
+          20332
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19851,
+          20332
+        ]
+      ]
+    },
+    {
+      "source_index": 136,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-c8474bb2d24c6d92",
+      "line_start": 19,
+      "line_end": 29,
+      "projection_fingerprint": "9eb7c8b9269e53ad7d7878505d045d4e4be69e3c013a6ebc9533064a76cb78b4",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          584,
+          993
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          584,
+          993
+        ]
+      ]
+    },
+    {
+      "source_index": 137,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-8d61ba70657c3a9f",
+      "line_start": 832,
+      "line_end": 837,
+      "projection_fingerprint": "45f160c10c798542c5c43bcb9f45b97306a942c48966210cbad8d4f5184e3a40",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          33424,
+          33628
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          33424,
+          33628
+        ]
+      ]
+    },
+    {
+      "source_index": 138,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-85f9f9e2a0e40d54",
+      "line_start": 821,
+      "line_end": 831,
+      "projection_fingerprint": "7ec6875f36ca129bc98cf549f7f5f4dfb3cb2b17fd868a16b593a52e35d4153d",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          33104,
+          33424
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          33104,
+          33424
+        ]
+      ]
+    },
+    {
+      "source_index": 139,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-2f3466903f587f28",
+      "line_start": 50,
+      "line_end": 63,
+      "projection_fingerprint": "600060ccfa35591b1c0a4c6d2e19bdd67669683a20a4a3f157f93a996d62fc53",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1739,
+          1927
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1739,
+          1927
+        ]
+      ]
+    },
+    {
+      "source_index": 140,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a3b8a78b213a0ed6",
+      "line_start": 30,
+      "line_end": 45,
+      "projection_fingerprint": "a5e80f6378b8b248cc2d87e3d5499ae0bda2c6bc717a435a5b5212eaac45ecad",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          993,
+          1324
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          993,
+          1324
+        ]
+      ]
+    },
+    {
+      "source_index": 141,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-ba56b78115d77408",
+      "line_start": 690,
+      "line_end": 705,
+      "projection_fingerprint": "b8f2775eb14897157ea35f7d62d03e7f2abe90d459d791e9b98aa38577137d8d",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          27460,
+          27725
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          27460,
+          27725
+        ]
+      ]
+    },
+    {
+      "source_index": 142,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-1cc596100e3f677e",
+      "line_start": 663,
+      "line_end": 681,
+      "projection_fingerprint": "ea1aead229597828aac455d8f9f94fff3dd0f8774f0d36435b4542ba16dd354e",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26482,
+          26753
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26482,
+          26753
+        ]
+      ]
+    },
+    {
+      "source_index": 143,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e79a99aa3a8eaf37",
+      "line_start": 612,
+      "line_end": 627,
+      "projection_fingerprint": "ac3f8133c4f967ff9a57ab27ea0403e99fc1a6ebaa062d1a82d0302a205a6740",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          24675,
+          24948
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          24675,
+          24948
+        ]
+      ]
+    },
+    {
+      "source_index": 144,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-b0f4b9fc9f0285bf",
+      "line_start": 661,
+      "line_end": 662,
+      "projection_fingerprint": "ca777dc4b8db8d1b41afac04289b3895930b07de7b0a9e07b6d5cbf6221c890c",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26315,
+          26482
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26315,
+          26482
+        ]
+      ]
+    },
+    {
+      "source_index": 145,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-6c593ccc15116449",
+      "line_start": 632,
+      "line_end": 647,
+      "projection_fingerprint": "dabf3959ba2e783d7f21648366866e59e07e8cdca41beb7a496dbb915f17d465",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          25227,
+          25512
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          25227,
+          25512
+        ]
+      ]
+    },
+    {
+      "source_index": 146,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a82bef4d19d23691",
+      "line_start": 467,
+      "line_end": 480,
+      "projection_fingerprint": "063ee7babac400f36071c01c7d30a219f561ba83c7d870f613983f1e8ad0ecd0",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19448,
+          19638
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19448,
+          19638
+        ]
+      ]
+    },
+    {
+      "source_index": 147,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-f657e081b6d69f13",
+      "line_start": 531,
+      "line_end": 543,
+      "projection_fingerprint": "5bb8893ecff9590a51d97fcc40e37e20b7d6b6da9d9c4b59040b786b02f482d6",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21946,
+          22099
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21946,
+          22099
+        ]
+      ]
+    },
+    {
+      "source_index": 148,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-69807a2a073ddc60",
+      "line_start": 260,
+      "line_end": 267,
+      "projection_fingerprint": "c07c0dd7b9a73f5cd9c7191e1c78da8fcaddbdc7412fc0191c28831c4362fd8b",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9798,
+          9977
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9798,
+          9977
+        ]
+      ]
+    },
+    {
+      "source_index": 149,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-c0a579289fc4a122",
+      "line_start": 203,
+      "line_end": 210,
+      "projection_fingerprint": "37824093153b37f21bb2db93a138562ce7e584968a71263db5ea240a486b5064",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7959,
+          8347
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7959,
+          8347
+        ]
+      ]
+    },
+    {
+      "source_index": 150,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-689c4dddf82123a0",
+      "line_start": 206,
+      "line_end": 219,
+      "projection_fingerprint": "796ba481c04f6011fde61a2b3cf68875c97a04ab99b9a0a49fc73903318cbdad",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10769,
+          10948
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10769,
+          10948
+        ]
+      ]
+    },
+    {
+      "source_index": 151,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-8267eeeac622c8e4",
+      "line_start": 432,
+      "line_end": 456,
+      "projection_fingerprint": "33ceda9a5de1216301446a939383d5827730351011a95dd6e0a3b6abcba79fb3",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18183,
+          18531
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18183,
+          18531
+        ]
+      ]
+    },
+    {
+      "source_index": 152,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-41275ae719fefc13",
+      "line_start": 151,
+      "line_end": 162,
+      "projection_fingerprint": "e9dcc367a7256afd8336e1716647b8c4348cb193b126a278d2f391e7e07458e5",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9007,
+          9192
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9007,
+          9192
+        ]
+      ]
+    },
+    {
+      "source_index": 153,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-7599774585d3e7e5",
+      "line_start": 91,
+      "line_end": 94,
+      "projection_fingerprint": "1460b270daeba49a495b86b193885aa117d9b26fcb749d2342c5fb8c052c9b14",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5828,
+          6651
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5828,
+          6651
+        ]
+      ]
+    },
+    {
+      "source_index": 154,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-4364d9c2d66d0382",
+      "line_start": 485,
+      "line_end": 500,
+      "projection_fingerprint": "c0736502b408fc4c2f9e62558c63ba56c681292b1bfbeac274642b4c259d8dff",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20171,
+          20415
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20171,
+          20415
+        ]
+      ]
+    },
+    {
+      "source_index": 155,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-0420ab8ef9f943c9",
+      "line_start": 710,
+      "line_end": 711,
+      "projection_fingerprint": "7a31690966e337b09bbec8d5f1af98d0dd1357d58f69e4b3b65f2ddd6e1d9690",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          27993,
+          28031
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          27993,
+          28031
+        ]
+      ]
+    },
+    {
+      "source_index": 156,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-7e4de53761e7a029",
+      "line_start": 222,
+      "line_end": 236,
+      "projection_fingerprint": "188d96ce30f8eb64955cf260703c44a4a2328472d3c5050c882588de3e798a27",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11221,
+          11431
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11221,
+          11431
+        ]
+      ]
+    },
+    {
+      "source_index": 157,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-b8dde5b05e614d8f",
+      "line_start": 600,
+      "line_end": 601,
+      "projection_fingerprint": "da1cdd2772ba9ed131f6cc7f56aab51c70d96562673fcce7713a62545ae5051f",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23918,
+          23948
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23918,
+          23948
+        ]
+      ]
+    },
+    {
+      "source_index": 158,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-41190153f9f1e8db",
+      "line_start": 648,
+      "line_end": 653,
+      "projection_fingerprint": "d2b049d2e67a80ecce0534c026e9085d6ccb3b2d12f114553b058da197d6687d",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          25512,
+          25911
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          25512,
+          25911
+        ]
+      ]
+    },
+    {
+      "source_index": 159,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-faa499c70557c0a6",
+      "line_start": 563,
+      "line_end": 564,
+      "projection_fingerprint": "73a59a57bcee219e697725a083a98f1b8bce19974dcd49b0ee10beb1d024df20",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22906,
+          22937
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22906,
+          22937
+        ]
+      ]
+    },
+    {
+      "source_index": 160,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e9885adacc8b6316",
+      "line_start": 97,
+      "line_end": 120,
+      "projection_fingerprint": "14768432c657ab66dc801dc85e9d43443a964466702fc92687a0a067ea946cbb",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6803,
+          7177
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6803,
+          7177
+        ]
+      ]
+    },
+    {
+      "source_index": 161,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-0f47061cdb87f0ad",
+      "line_start": 159,
+      "line_end": 160,
+      "projection_fingerprint": "10f0645bd012b4a805d0451ad32fd0f782d0000e2ced8d4abc76cce08f317b3f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6736,
+          6761
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6736,
+          6761
+        ]
+      ]
+    },
+    {
+      "source_index": 162,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-d134da68e6c40b53",
+      "line_start": 89,
+      "line_end": 90,
+      "projection_fingerprint": "8c0c1125626c1d451fb4f0d6ff38222d11b94e2668f1b778796c4af3ae1ef9bf",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5793,
+          5828
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5793,
+          5828
+        ]
+      ]
+    },
+    {
+      "source_index": 163,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-12ec63df5b828465",
+      "line_start": 240,
+      "line_end": 251,
+      "projection_fingerprint": "51fbd9f7630d877593bb6efb0f4ed07884f81c5a4925c7b8e7fefbfb0df89087",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9361,
+          9597
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9361,
+          9597
+        ]
+      ]
+    },
+    {
+      "source_index": 164,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-ec9a65f86cea060d",
+      "line_start": 567,
+      "line_end": 599,
+      "projection_fingerprint": "0ec36f41b6d3473637149cac61498bc1bb214b2daf750f0e0d3cd007b332d2bd",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23421,
+          23918
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23421,
+          23918
+        ]
+      ]
+    },
+    {
+      "source_index": 165,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-940d5999b596e965",
+      "line_start": 618,
+      "line_end": 619,
+      "projection_fingerprint": "7d57527feaab31dcc1756333540cc2f07135e8d228b2be0bf4059f8c78c716f7",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20550,
+          20585
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20550,
+          20585
+        ]
+      ]
+    },
+    {
+      "source_index": 166,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-c786a89e0b58cbd3",
+      "line_start": 840,
+      "line_end": 847,
+      "projection_fingerprint": "4f4c7d3cf1eefe5f126687c0b1ab1543f61529588ade375c488584e6a682fe89",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30577,
+          30947
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30577,
+          30947
+        ]
+      ]
+    },
+    {
+      "source_index": 167,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-32731197fc55f085",
+      "line_start": 481,
+      "line_end": 482,
+      "projection_fingerprint": "3ab0c0d355e2414d1a8416cd48d312b11de587c27204dcf9bb28868ff6682917",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19638,
+          19677
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19638,
+          19677
+        ]
+      ]
+    },
+    {
+      "source_index": 168,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-559753ffc45c2ebc",
+      "line_start": 505,
+      "line_end": 506,
+      "projection_fingerprint": "1cd7374bcdbea810ea881f888d401ee0573cef9cee4cfc7fbec93c9da01dea49",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20803,
+          20838
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20803,
+          20838
+        ]
+      ]
+    },
+    {
+      "source_index": 169,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-c5104a36e6204e96",
+      "line_start": 735,
+      "line_end": 736,
+      "projection_fingerprint": "47e817e56e1ed0e84801bd62ce7bccbea4d5e60bc44f6a87da447112e198e21d",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          29998,
+          30274
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          29998,
+          30274
+        ]
+      ]
+    },
+    {
+      "source_index": 170,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a56bcdb80b7085ba",
+      "line_start": 146,
+      "line_end": 147,
+      "projection_fingerprint": "7d3991dbddfd62e2a1931cd8cafdb76c1c5c6e93bd94cac599c64e6a8832fcda",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8597,
+          8643
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8597,
+          8643
+        ]
+      ]
+    },
+    {
+      "source_index": 171,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-24185489ce685c1e",
+      "line_start": 82,
+      "line_end": 90,
+      "projection_fingerprint": "ae2be1e3c4c10fabf1951f4294643269f25318f118f40026c67fcd3e685e9aa3",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2927,
+          3346
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2927,
+          3346
+        ]
+      ]
+    },
+    {
+      "source_index": 172,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-64a1df0890c62d6f",
+      "line_start": 167,
+      "line_end": 173,
+      "projection_fingerprint": "000ff125c2f099f9929748b5ee5da538325c2b7263b0b78e82fd34e632e2a110",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6866,
+          6991
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6866,
+          6991
+        ]
+      ]
+    },
+    {
+      "source_index": 173,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-02108070c4d3093f",
+      "line_start": 636,
+      "line_end": 642,
+      "projection_fingerprint": "fd91f325d353418e6d76398e0f0886bb3c68e44a9676b07f8f287ef39ff75c19",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21008,
+          21133
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21008,
+          21133
+        ]
+      ]
+    },
+    {
+      "source_index": 174,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-8cce6c386e1289bc",
+      "line_start": 815,
+      "line_end": 820,
+      "projection_fingerprint": "a335e7bc18d14181f60afa9a9cc37efac4fc9072f39318f267cac1ead7b8b433",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          32887,
+          33104
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          32887,
+          33104
+        ]
+      ]
+    },
+    {
+      "source_index": 175,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-b4c218947f0a74a8",
+      "line_start": 696,
+      "line_end": 701,
+      "projection_fingerprint": "96405463dbc92037ca1808c57b6ebf5f731c046208b2b3dd99b9ecac0026bb75",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23744,
+          23862
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23744,
+          23862
+        ]
+      ]
+    },
+    {
+      "source_index": 176,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-4ed7f0b901a96197",
+      "line_start": 78,
+      "line_end": 80,
+      "projection_fingerprint": "af747ad8656a978ac06bc60268c21072e361239b36364f54ccbfcaa5546cba3d",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4209,
+          4652
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4209,
+          4652
+        ]
+      ]
+    },
+    {
+      "source_index": 177,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-71ffdbd3a6762252",
+      "line_start": 657,
+      "line_end": 663,
+      "projection_fingerprint": "f8f8628a6ef0f7ddc943b503a84d00186df57529e5115fb8fec5821d6019bad9",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22111,
+          22268
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22111,
+          22268
+        ]
+      ]
+    },
+    {
+      "source_index": 178,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-573142e870f0e0dc",
+      "line_start": 139,
+      "line_end": 142,
+      "projection_fingerprint": "b1073b21062cac5779835bd2ed80960a6229d5f11b6ad754b167c87950c346ab",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8004,
+          8386
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8004,
+          8386
+        ]
+      ]
+    },
+    {
+      "source_index": 179,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-e3eeb48dde5a47d8",
+      "line_start": 276,
+      "line_end": 278,
+      "projection_fingerprint": "d3c7e61fac6bd234b97ad1f8f0339a235c107a2c525bcc2ceab601fcc12ac32f",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12870,
+          13135
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12870,
+          13135
+        ]
+      ]
+    },
+    {
+      "source_index": 180,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-b59b988b25fdaa2b",
+      "line_start": 161,
+      "line_end": 166,
+      "projection_fingerprint": "b2a84f7e94fd8a2334840e957b30a3b0a2701d14684c7a39b1efba63c838f28e",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6761,
+          6866
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6761,
+          6866
+        ]
+      ]
+    },
+    {
+      "source_index": 181,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-d8815ac6bf916ecc",
+      "line_start": 328,
+      "line_end": 351,
+      "projection_fingerprint": "a6a956009a768cffe808b3376e3a82150f26d895f30683e908a4adb724c34aeb",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15661,
+          16378
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15661,
+          16378
+        ]
+      ]
+    },
+    {
+      "source_index": 182,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-ac89d98fc6611f88",
+      "line_start": 760,
+      "line_end": 781,
+      "projection_fingerprint": "e56156b696d24cc2d1751739d22a193842a8a64ff11242a107cb6f937a0f4c02",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30840,
+          31142
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30840,
+          31142
+        ]
+      ]
+    },
+    {
+      "source_index": 183,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-b2ffa645342b3ab5",
+      "line_start": 675,
+      "line_end": 681,
+      "projection_fingerprint": "ee9bc373a65ecd6b6eab0d3afb5607f56251f204762d9e985c6d60ae9ec38d79",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          22849,
+          23032
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          22849,
+          23032
+        ]
+      ]
+    },
+    {
+      "source_index": 184,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-3647d4444e7b6ae3",
+      "line_start": 300,
+      "line_end": 325,
+      "projection_fingerprint": "5027a9e6c476014b74584fa3ea87e3ed1ff8f12414fe9311f2eb8340e1c97dfd",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14700,
+          15476
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14700,
+          15476
+        ]
+      ]
+    },
+    {
+      "source_index": 185,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-a5c3c7d0309ea98d",
+      "line_start": 252,
+      "line_end": 259,
+      "projection_fingerprint": "375055a907313e80d8d1158e6f5810aa4529d5acfda08729344dcb0b08a4419f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9597,
+          9798
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9597,
+          9798
+        ]
+      ]
+    },
+    {
+      "source_index": 186,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-1de2b0dcd1ae9d42",
+      "line_start": 196,
+      "line_end": 202,
+      "projection_fingerprint": "d8f65d8cfc477fdfe2b6e0fad16b7a44ffacd3c5e9f5030084ab15965d8640ae",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          7849,
+          7959
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          7849,
+          7959
+        ]
+      ]
+    },
+    {
+      "source_index": 187,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-9318aaae98288813",
+      "line_start": 168,
+      "line_end": 173,
+      "projection_fingerprint": "02782aa77f10962cb9160ef9854dc801dc27603318ff2ad6cac941e0245cba18",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6670,
+          7275
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6670,
+          7275
+        ]
+      ]
+    },
+    {
+      "source_index": 188,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-a8d12aafc4ddef46",
+      "line_start": 71,
+      "line_end": 71,
+      "projection_fingerprint": "ad523ae62cbd2cb6d5ea3ac5dfe31cc9be349a30f2fee8e074d56de2c5cca6d7",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2743,
+          3142
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2743,
+          3142
+        ]
+      ]
+    },
+    {
+      "source_index": 189,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-53607bca89e1f878",
+      "line_start": 83,
+      "line_end": 84,
+      "projection_fingerprint": "35a409585a12d013335f60eb614b63ba825bd0081a21545cbd0895903e31f412",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5007,
+          5347
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5007,
+          5347
+        ]
+      ]
+    },
+    {
+      "source_index": 190,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-2c64523d89445131",
+      "line_start": 274,
+      "line_end": 275,
+      "projection_fingerprint": "a248840855440eeb1695ec5be0d70aba9008eede254a193321bc92b95c326779",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12628,
+          12870
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12628,
+          12870
+        ]
+      ]
+    },
+    {
+      "source_index": 191,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e69ef99788e00c39",
+      "line_start": 651,
+      "line_end": 653,
+      "projection_fingerprint": "f736dda0f0052b3cdc1c5b10cd56eca2966f3787d96b04fbdcd6b70540c40191",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          21536,
+          21671
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          21536,
+          21671
+        ]
+      ]
+    },
+    {
+      "source_index": 192,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ffe116b079cd09fd",
+      "line_start": 620,
+      "line_end": 635,
+      "projection_fingerprint": "9bc8d4c39aa3024cf385304eedf62a5e97abc97f34ef9fe7cbb5b1f36a424cac",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20585,
+          21008
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20585,
+          21008
+        ]
+      ]
+    },
+    {
+      "source_index": 193,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-5e82eec97f257cf7",
+      "line_start": 115,
+      "line_end": 123,
+      "projection_fingerprint": "eaa7605ac7ab0d6c9d1c2eb8fef908f205096cf14e141e4e6cacfad51f381cdc",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          3823,
+          4251
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          3823,
+          4251
+        ]
+      ]
+    },
+    {
+      "source_index": 194,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-68248945f279f357",
+      "line_start": 554,
+      "line_end": 577,
+      "projection_fingerprint": "5f1c80e59e9f5fa9163e312ec8e3723ca2ede0d2d5b6678afd68772bc15524e6",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          18872,
+          19286
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          18872,
+          19286
+        ]
+      ]
+    },
+    {
+      "source_index": 195,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-dc936bb755a53279",
+      "line_start": 213,
+      "line_end": 232,
+      "projection_fingerprint": "11f1affe7730e8570a737416c4e696f7c364bc61fe5a1269dcd2fefc8e84241e",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8571,
+          8972
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8571,
+          8972
+        ]
+      ]
+    },
+    {
+      "source_index": 196,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-a00d0d6eca714eaf",
+      "line_start": 682,
+      "line_end": 685,
+      "projection_fingerprint": "df37c03f3f40c18c832ad9d150adfda5ff09c57f34c957762387894a00175f6b",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23032,
+          23244
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23032,
+          23244
+        ]
+      ]
+    },
+    {
+      "source_index": 197,
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "relative_path": "docs/src/use/configure/configuration-files.md",
+      "evidence_id": "ev-1db49787677ba0a4",
+      "line_start": 85,
+      "line_end": 88,
+      "projection_fingerprint": "8112e5274b4f0d8be2c5677fd9debdb7c9e6d08226b1446bc66e1abc61065297",
+      "pinned_raw_file_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5347,
+          5793
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5347,
+          5793
+        ]
+      ]
+    },
+    {
+      "source_index": 198,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-d61daa138a273e38",
+      "line_start": 726,
+      "line_end": 731,
+      "projection_fingerprint": "c00c8422a99e0b9aac6698a23bff1dfd4a9ad8620456b0aa5d5b89e7ec493b34",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26070,
+          26284
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26070,
+          26284
+        ]
+      ]
+    },
+    {
+      "source_index": 199,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-cd3301ad5480966a",
+      "line_start": 302,
+      "line_end": 313,
+      "projection_fingerprint": "36166d818c4d43ad56def0f9fb78ac4134c7159b5f09376f6a269fa8b82fa6fb",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10935,
+          11152
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10935,
+          11152
+        ]
+      ]
+    },
+    {
+      "source_index": 200,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-940f43fb266a26d4",
+      "line_start": 275,
+      "line_end": 290,
+      "projection_fingerprint": "55f44c9a4c65f90bc10c10b9360200e9cf275ede50426665c025b7ef7dd9d501",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10237,
+          10639
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10237,
+          10639
+        ]
+      ]
+    },
+    {
+      "source_index": 201,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-7d53442abccd10ee",
+      "line_start": 578,
+      "line_end": 591,
+      "projection_fingerprint": "a7f020e77ad07f1fe5c7c27bbec73aaab55002700459fb95cc0c1f139a98f58a",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          19286,
+          19527
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          19286,
+          19527
+        ]
+      ]
+    },
+    {
+      "source_index": 202,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-259a9e47110ab7af",
+      "line_start": 268,
+      "line_end": 274,
+      "projection_fingerprint": "6264e5fa83fc018a20e3f63bd837600ac2f07519ffcf95a2b4d70744607ce417",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9977,
+          10237
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9977,
+          10237
+        ]
+      ]
+    },
+    {
+      "source_index": 203,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-c331fbf2fb65f11d",
+      "line_start": 202,
+      "line_end": 215,
+      "projection_fingerprint": "4fbaf1a48c49104ed46f834fafbf4fce883952be2b8219f0c71bb6395bb92691",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8342,
+          8658
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8342,
+          8658
+        ]
+      ]
+    },
+    {
+      "source_index": 204,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-d42c38e85cff815c",
+      "line_start": 527,
+      "line_end": 533,
+      "projection_fingerprint": "95f74988c6112caf94385e95cbf2a988a8bd4fc8c7c7c0e1c9db2831f1c92853",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17974,
+          18093
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17974,
+          18093
+        ]
+      ]
+    },
+    {
+      "source_index": 205,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e6bed735f4bbdd7c",
+      "line_start": 323,
+      "line_end": 324,
+      "projection_fingerprint": "43b6cf236fef905e087ed68df6a94847f8fb35eb144c566c08a24f727551ae24",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11534,
+          11720
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11534,
+          11720
+        ]
+      ]
+    },
+    {
+      "source_index": 206,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-8582f9b8478f8b31",
+      "line_start": 606,
+      "line_end": 617,
+      "projection_fingerprint": "4855175678e3a695e2168876a50e6025a5c45b07dd8ee03994db4ae352c651c5",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          20337,
+          20550
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          20337,
+          20550
+        ]
+      ]
+    },
+    {
+      "source_index": 207,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-0b89c7147ecbbe18",
+      "line_start": 423,
+      "line_end": 428,
+      "projection_fingerprint": "4a88c0f4c931a6d22089c38234b242802ccb0cb39a3bdbba0f937d40af711e21",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14894,
+          15074
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14894,
+          15074
+        ]
+      ]
+    },
+    {
+      "source_index": 208,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ca678a0b81143113",
+      "line_start": 719,
+      "line_end": 725,
+      "projection_fingerprint": "afb1ea4957475336bf36abe3a575b359adb71fcf0d68c09921aa70def909654c",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          25967,
+          26070
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          25967,
+          26070
+        ]
+      ]
+    },
+    {
+      "source_index": 209,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-4a7425f96a7e21ca",
+      "line_start": 366,
+      "line_end": 372,
+      "projection_fingerprint": "55bccfdfc3a8a3a916864690f91a6d92529d852b8f3c78a138381f506e609ad3",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          13072,
+          13171
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          13072,
+          13171
+        ]
+      ]
+    },
+    {
+      "source_index": 210,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-513ae5dbe6436f55",
+      "line_start": 491,
+      "line_end": 497,
+      "projection_fingerprint": "e406e34689d3a41ac5e72fff00ef5d6e6600b80797fa48731d08805e610db627",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16815,
+          16918
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16815,
+          16918
+        ]
+      ]
+    },
+    {
+      "source_index": 211,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-64927c294fe34569",
+      "line_start": 999,
+      "line_end": 1005,
+      "projection_fingerprint": "c9a7f9aa65cc2552f8d52e79dac9e8395224d418a16c85754eddde1ca1251848",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          35449,
+          35563
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          35449,
+          35563
+        ]
+      ]
+    },
+    {
+      "source_index": 212,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-f9d96a24b80fb5f9",
+      "line_start": 985,
+      "line_end": 991,
+      "projection_fingerprint": "2cef023fa4b4d4d64cf68a6a0e81abbb1dc7cb7744f30887b0312cb9ddd4442f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          35170,
+          35293
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          35170,
+          35293
+        ]
+      ]
+    },
+    {
+      "source_index": 213,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-6cf9de237c6eec89",
+      "line_start": 970,
+      "line_end": 976,
+      "projection_fingerprint": "41cc446044808a58ea0725b1a24a9e6c3293566873cecb25228b463c0ac7d36f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          34544,
+          34661
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          34544,
+          34661
+        ]
+      ]
+    },
+    {
+      "source_index": 214,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-48887cdd0e020f60",
+      "line_start": 429,
+      "line_end": 435,
+      "projection_fingerprint": "eabd5bf23caf3fa9b258ace8b309613faf5c1d60c0683d1f70fff20906263c70",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15074,
+          15185
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15074,
+          15185
+        ]
+      ]
+    },
+    {
+      "source_index": 215,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-c64c4c6cc7eec365",
+      "line_start": 511,
+      "line_end": 517,
+      "projection_fingerprint": "d8e634b6416f18df43330182282b568f7c56497ced861e306bd10f0bf77ca547",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17680,
+          17803
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17680,
+          17803
+        ]
+      ]
+    },
+    {
+      "source_index": 216,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-74117bbc917e745f",
+      "line_start": 909,
+      "line_end": 914,
+      "projection_fingerprint": "e9acd5d57545b3d167aa99b2ec27c9dfb13a96c22bfad280d86e6c90075ab95c",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          32708,
+          32939
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          32708,
+          32939
+        ]
+      ]
+    },
+    {
+      "source_index": 217,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-c78f34879e148f47",
+      "line_start": 39,
+      "line_end": 49,
+      "projection_fingerprint": "26378f31df521387fac2792c7211b1c148d280a2ee398e8070060cc01e1ffc21",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          1622,
+          2019
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          1622,
+          2019
+        ]
+      ]
+    },
+    {
+      "source_index": 218,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-f1ac8d6e092292f4",
+      "line_start": 801,
+      "line_end": 804,
+      "projection_fingerprint": "9f22c2376aa04e45ff379bf2f884ef4201e21e3306a54b4de0ee6c531ebf7c3e",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          29060,
+          29505
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          29060,
+          29505
+        ]
+      ]
+    },
+    {
+      "source_index": 219,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-4ef38415a82face5",
+      "line_start": 520,
+      "line_end": 526,
+      "projection_fingerprint": "484a9d8dd48dd78f1a4e22c4710ba62be2cffd2ea764d1d855acd8dcc37553c4",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17815,
+          17974
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17815,
+          17974
+        ]
+      ]
+    },
+    {
+      "source_index": 220,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-a7825078011ebecb",
+      "line_start": 889,
+      "line_end": 895,
+      "projection_fingerprint": "749cd6cbd9e88ef6aa2fa0ae311740725fc59bd0e1b6eb0781ede4f2112d9a0f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          32080,
+          32211
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          32080,
+          32211
+        ]
+      ]
+    },
+    {
+      "source_index": 221,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-9727d6f5a50179b7",
+      "line_start": 902,
+      "line_end": 908,
+      "projection_fingerprint": "1f1b344002c58dcf3e8dd541c8dba938ca71974cdd69b8fa5691cffa0e688a67",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          32554,
+          32708
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          32554,
+          32708
+        ]
+      ]
+    },
+    {
+      "source_index": 222,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e600143624cb9610",
+      "line_start": 314,
+      "line_end": 322,
+      "projection_fingerprint": "350c2282767243aa2ce72eabbaf373dc564e901f8e8d1b8a1fa3f295b4640a0f",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11152,
+          11534
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11152,
+          11534
+        ]
+      ]
+    },
+    {
+      "source_index": 223,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-fc9ca1bf3ec887a9",
+      "line_start": 450,
+      "line_end": 451,
+      "projection_fingerprint": "84fe92bc565795e80931539dfbaa32fe8339f7dc1feef5246a373794f12f9ea3",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15782,
+          15797
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15782,
+          15797
+        ]
+      ]
+    },
+    {
+      "source_index": 224,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-15c00ae8a3667c66",
+      "line_start": 825,
+      "line_end": 830,
+      "projection_fingerprint": "e4872c1bd337f8a81c4ade326d77b7c9e462297e567c501a100d4d5be6001ae5",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30028,
+          30399
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30028,
+          30399
+        ]
+      ]
+    },
+    {
+      "source_index": 225,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-85e841d54cb1e67b",
+      "line_start": 736,
+      "line_end": 739,
+      "projection_fingerprint": "2c4f917dd03ff26123b94aea2fbaf796852824bfadcb469f429751061b4cea93",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          26380,
+          26801
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          26380,
+          26801
+        ]
+      ]
+    },
+    {
+      "source_index": 226,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-38ab99972fcda6ee",
+      "line_start": 265,
+      "line_end": 268,
+      "projection_fingerprint": "a28b8694e91850984447b9f6a6c68fc92631664c8e887b7410bd42e76184f3ec",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10275,
+          10518
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10275,
+          10518
+        ]
+      ]
+    },
+    {
+      "source_index": 227,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-b209cfa9a1df6982",
+      "line_start": 458,
+      "line_end": 465,
+      "projection_fingerprint": "0008ae2035c26619a4160ce48c5e876c8261d009f03b6fde0a74e1042d94a9ec",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          15978,
+          16111
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          15978,
+          16111
+        ]
+      ]
+    },
+    {
+      "source_index": 228,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ad3e03ad7dbe1a57",
+      "line_start": 1039,
+      "line_end": 1043,
+      "projection_fingerprint": "3b40ebec400338661a61d949cc03af669b8ba15136e5ca9265960db464707625",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          36280,
+          36780
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          36280,
+          36780
+        ]
+      ]
+    },
+    {
+      "source_index": 229,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-69637ec68741b037",
+      "line_start": 269,
+      "line_end": 286,
+      "projection_fingerprint": "3b9bda6536ce2b4c876dc1338d5a540c1a532af5af042f5a7a61f3738f08040f",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          10518,
+          10854
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          10518,
+          10854
+        ]
+      ]
+    },
+    {
+      "source_index": 230,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-37c313ac386c4508",
+      "line_start": 161,
+      "line_end": 165,
+      "projection_fingerprint": "245259555b72a2b133fcb9f972bd2d1bc54b124ed95d3c9787903f54cfaec678",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6540,
+          6642
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6540,
+          6642
+        ]
+      ]
+    },
+    {
+      "source_index": 231,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-60a293f9712e1421",
+      "line_start": 222,
+      "line_end": 237,
+      "projection_fingerprint": "4abb4ffa1df0ffc7c4db99a5912f673bc1822494418ceb4ceb080fe29ed0d1bf",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          9057,
+          9402
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          9057,
+          9402
+        ]
+      ]
+    },
+    {
+      "source_index": 232,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3cd2fea93742e9a7",
+      "line_start": 848,
+      "line_end": 854,
+      "projection_fingerprint": "46f88a4981cdf5b16574571f3425deb20ca5eed2be1cc335735df6e1664240d3",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30947,
+          31037
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30947,
+          31037
+        ]
+      ]
+    },
+    {
+      "source_index": 233,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-0a4e0bcbe1e3a571",
+      "line_start": 1013,
+      "line_end": 1019,
+      "projection_fingerprint": "c65b901d9b0aa99bee01aed56658fb6fd8dd12502d011746e08a75f3738f6bc5",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          35707,
+          35795
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          35707,
+          35795
+        ]
+      ]
+    },
+    {
+      "source_index": 234,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-a455cce844fc3a90",
+      "line_start": 1030,
+      "line_end": 1036,
+      "projection_fingerprint": "2a636f43d6196a3a3e7985e0bff8d6c0a9ccad21a2d6250cad96c3b8f460d5ba",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          36153,
+          36265
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          36153,
+          36265
+        ]
+      ]
+    },
+    {
+      "source_index": 235,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e95c686b1c6bfda7",
+      "line_start": 805,
+      "line_end": 811,
+      "projection_fingerprint": "5f28b830299945d54f4f8aa1aef0e1366cfbd1939ee8d5116ea7cff90f3be214",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          29505,
+          29689
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          29505,
+          29689
+        ]
+      ]
+    },
+    {
+      "source_index": 236,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-19ee3c3695edd93b",
+      "line_start": 112,
+      "line_end": 123,
+      "projection_fingerprint": "70383c18ac9e3efa2b7d2605879f3849d944f707b03d7ce8fb0130c06f203ea6",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          4461,
+          4768
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          4461,
+          4768
+        ]
+      ]
+    },
+    {
+      "source_index": 237,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3ef28c83407582ea",
+      "line_start": 475,
+      "line_end": 482,
+      "projection_fingerprint": "d71d785f86252095c96ce44156f16c93e9620c8a486f09c53ffc369af9e90db5",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          16374,
+          16549
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          16374,
+          16549
+        ]
+      ]
+    },
+    {
+      "source_index": 238,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-e4ce15c969158f5b",
+      "line_start": 128,
+      "line_end": 140,
+      "projection_fingerprint": "0f128b89d33139aa9fa4ef1b0cf8df47ef8bc9049d2032cbd67bea05dbe0d473",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          5363,
+          5721
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          5363,
+          5721
+        ]
+      ]
+    },
+    {
+      "source_index": 239,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-ae190ef1fd28dfff",
+      "line_start": 930,
+      "line_end": 936,
+      "projection_fingerprint": "e5229fcf900e0c0be6caa94c90ee3ccdf6c44b7077979f894572fe563813fd17",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          33459,
+          33562
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          33459,
+          33562
+        ]
+      ]
+    },
+    {
+      "source_index": 240,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-cf63dd3fdcbfb1cd",
+      "line_start": 943,
+      "line_end": 949,
+      "projection_fingerprint": "2f0c0539d89bdc06cddfc1a39334a18ff197ce15c4212315d3fb237fd97b0c13",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          33805,
+          33901
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          33805,
+          33901
+        ]
+      ]
+    },
+    {
+      "source_index": 241,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-3f608a51bba3ab40",
+      "line_start": 956,
+      "line_end": 962,
+      "projection_fingerprint": "b7f5853fc377d0f95d8b5daea1275c0d497f6e411945674f1d671eaa34c2fcab",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          34136,
+          34238
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          34136,
+          34238
+        ]
+      ]
+    },
+    {
+      "source_index": 242,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-6a122ad59b0abad3",
+      "line_start": 233,
+      "line_end": 239,
+      "projection_fingerprint": "1d3b0836389c896c7db8536802f632c45a30a7c2992107d29af54ce03d0ee577",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          8972,
+          9361
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          8972,
+          9361
+        ]
+      ]
+    },
+    {
+      "source_index": 243,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-497789dbb412f476",
+      "line_start": 28,
+      "line_end": 41,
+      "projection_fingerprint": "ef0654dd4eaabd8ef5f2b305444de41b899db2971e4be838ecad8011772d6682",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          859,
+          1080
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          859,
+          1080
+        ]
+      ]
+    },
+    {
+      "source_index": 244,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-f64e08265fa8cb7d",
+      "line_start": 76,
+      "line_end": 80,
+      "projection_fingerprint": "447c2187c521e53bf94a272c924d4eb5f4f06d7f9ce9d72790ad43ac490a7667",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          2307,
+          2400
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          2307,
+          2400
+        ]
+      ]
+    },
+    {
+      "source_index": 245,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-fe760550dae79d34",
+      "line_start": 863,
+      "line_end": 869,
+      "projection_fingerprint": "0e592df2d9d2d9755c29fc8eb6374c73b1efb0f828f67992576f7af20827f5b6",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          31366,
+          31464
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          31366,
+          31464
+        ]
+      ]
+    },
+    {
+      "source_index": 246,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-2a4f50ce7515849b",
+      "line_start": 518,
+      "line_end": 519,
+      "projection_fingerprint": "4109cf2d4c0c26563058a230d0efbe6e4b25268aff81d0834f8e0fa6a6fe8112",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          17803,
+          17815
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          17803,
+          17815
+        ]
+      ]
+    },
+    {
+      "source_index": 247,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-8dadd1fed25d952e",
+      "line_start": 702,
+      "line_end": 703,
+      "projection_fingerprint": "d2a579478965ebe4731ecf8ecf9f3de1a81202d1b6f94fe622f44f4d803365b3",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          23862,
+          23875
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          23862,
+          23875
+        ]
+      ]
+    },
+    {
+      "source_index": 248,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-11039ddf2bad2552",
+      "line_start": 838,
+      "line_end": 839,
+      "projection_fingerprint": "adf33e78553534440c133e11083803a5841e8e26593e468641a172d15c0f87d1",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          30558,
+          30577
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          30558,
+          30577
+        ]
+      ]
+    },
+    {
+      "source_index": 249,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-ec3a301f8a0945cb",
+      "line_start": 293,
+      "line_end": 310,
+      "projection_fingerprint": "190f1872b40520667e226cb40398bd77a4b98841b86c096cfada35dae56eb50a",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          11419,
+          11807
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          11419,
+          11807
+        ]
+      ]
+    },
+    {
+      "source_index": 250,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-da491b804e792b3f",
+      "line_start": 404,
+      "line_end": 420,
+      "projection_fingerprint": "69686d279ed5f754297d8b1b5ca168d1fd19101ac44ce13c2dbb664557ff0844",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          14522,
+          14876
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          14522,
+          14876
+        ]
+      ]
+    },
+    {
+      "source_index": 251,
+      "path_or_url": "docs/src/use/configure/ignore.md",
+      "relative_path": "docs/src/use/configure/ignore.md",
+      "evidence_id": "ev-01bc5b380456eeb9",
+      "line_start": 166,
+      "line_end": 167,
+      "projection_fingerprint": "a741409a5b2b81282e856ede6411272a9db223b3353f5fadcb4290db2437d7af",
+      "pinned_raw_file_sha256": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          6642,
+          6670
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          6642,
+          6670
+        ]
+      ]
+    },
+    {
+      "source_index": 252,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-1e6493525b408f08",
+      "line_start": 776,
+      "line_end": 782,
+      "projection_fingerprint": "49a1e1c4c5d61fa36534dc96c63ce5c7bdb2fea79795c129d93ead8f56914747",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          28258,
+          28383
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          28258,
+          28383
+        ]
+      ]
+    },
+    {
+      "source_index": 253,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-60a350dd3488eea4",
+      "line_start": 818,
+      "line_end": 824,
+      "projection_fingerprint": "8b1d2342e5a9188902fb03d0bf04034429231c554dfbab0ef059d5f36528f62a",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          29891,
+          30028
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          29891,
+          30028
+        ]
+      ]
+    },
+    {
+      "source_index": 254,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-bd12cafb6717f6a1",
+      "line_start": 1037,
+      "line_end": 1038,
+      "projection_fingerprint": "5f9dc1d2b8c1206469716dd83677889b415e9900c6f79f0bc70ce1f5771f1103",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          36265,
+          36280
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          36265,
+          36280
+        ]
+      ]
+    },
+    {
+      "source_index": 255,
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "relative_path": "docs/src/use/command-line-interface.md",
+      "evidence_id": "ev-e7c9bc0ae1ec8182",
+      "line_start": 351,
+      "line_end": 352,
+      "projection_fingerprint": "23bb01960436bd56a7314bfe6a53308ac393a8c4bcc2bc2ab8f8c5fcc7162fde",
+      "pinned_raw_file_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "integrity_pass": true,
+      "errors": [],
+      "possible_occurrences": [
+        [
+          12367,
+          12385
+        ]
+      ],
+      "ambiguous_placement": false,
+      "guaranteed_coverage_intervals": [
+        [
+          12367,
+          12385
+        ]
+      ]
+    }
+  ],
+  "source_errors": []
+}

@@ -12,9 +12,10 @@ from dataclasses import asdict, is_dataclass
 import json
 from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
 from docmancer.docs.domain.original_body_discovery import original_body_read_scope, experimental_context_max_tokens
-from docmancer.docs.application.experimental_context_finalization import (
-    check_experimental_context_budget, enforce_experimental_context_budget,
-)
+# Terminal budget selection is disabled: preserve the source-checked context.
+# from docmancer.docs.application.experimental_context_finalization import (
+#     check_experimental_context_budget, enforce_experimental_context_budget,
+# )
 import math
 import sys
 from uuid import uuid4
@@ -378,7 +379,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             if reason:
                 blocked["operational_reason_code"] = reason
                 _refresh_projection_estimate(blocked)
-        blocked, _ = enforce_experimental_context_budget(blocked, {}, raw)
+        # blocked, _ = enforce_experimental_context_budget(blocked, {}, raw)
         errors = validate_model_visible_projection(blocked, snapshot={})
         if errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(errors))
@@ -508,14 +509,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
             if kind == "docs_context":
-                # Recovery decoration above is part of the returned JSON too.
-                # Apply the experimental cap only after every content mutation,
-                # before issuing any references for sources that may be omitted.
-                projection, snapshot = enforce_experimental_context_budget(projection, snapshot, raw)
+                # Keep every source-checked row; terminal first-fit is disabled.
+                # projection, snapshot = enforce_experimental_context_budget(projection, snapshot, raw)
                 if experimental_context_max_tokens() is not None and reader is not None and source_root:
                     bind_project_source_continuations(reader, source_root, projection, snapshot)
                     _refresh_projection_estimate(projection)
-                check_experimental_context_budget(projection)
+                # check_experimental_context_budget(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
