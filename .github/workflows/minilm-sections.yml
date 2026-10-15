@@ -1,0 +1,53 @@
+name: MiniLM sections installed MCP
+on:
+  push:
+    branches: [feat/minilm-section-context]
+  pull_request:
+    paths:
+      - 'docmancer/**'
+      - 'eval/minilm_sections*'
+      - '.github/workflows/minilm-sections.yml'
+      - 'uv.lock'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installed-sections:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Freeze tested revision and verify syntax
+        run: |
+          mkdir -p "$RUNNER_TEMP/sections-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/sections-evidence/head.txt"
+          git diff --exit-code
+          python -m compileall -q docmancer/docs/application/section_compression.py docmancer/docs/application/section_model.py eval/minilm_sections_integration.py
+      - name: Build installed CPU runtime and explicitly provision pinned model
+        run: |
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-minilm-sections .
+          docker image inspect docatlas-minilm-sections > "$RUNNER_TEMP/sections-evidence/image.json"
+      - name: Real installed stdio MCP under 1GB, offline, all40 plus controls
+        id: acceptance
+        run: |
+          set +e
+          docker run --name docatlas-section-check --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/sections-evidence:/evidence" docatlas-minilm-sections \
+            --repo /repo --work /tmp/section-work --out /evidence/run --model /model
+          rc=$?
+          docker inspect docatlas-section-check > "$RUNNER_TEMP/sections-evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/sections-evidence/exit-code.txt"
+          exit "$rc"
+      - name: Preserve actual client outputs, independent assessments and resource receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: minilm-sections-installed-${{ github.run_id }}
+          path: ${{ runner.temp }}/sections-evidence/
+          retention-days: 30
+          if-no-files-found: error
