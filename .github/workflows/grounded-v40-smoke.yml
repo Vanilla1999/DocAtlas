@@ -1,39 +1,101 @@
-name: Grounded V40 comparison (external comparator)
+name: Whole-section compression comparison under 1GB
 on:
   push:
     branches: [fix/main-flow-compact-evidence]
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  grounded-smoke:
+  replay40:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
+          ref: 319b0e6ac55e7d454c8cb4c4c319c778c5473e7a
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: "22"
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
-        with:
-          python-version: "3.12"
-      - name: Install pinned Grounded Docs
+      - name: Retrieve frozen real MCP outputs and pinned experiment script
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/grounded-npm"
-          npm install --prefix "$RUNNER_TEMP/grounded-npm" --no-audit --no-fund --no-save @arabold/docs-mcp-server@3.2.1
-          "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" --version
-      - name: Index pinned sources and query all 40 Grounded questions
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/section-study"/{baseline,input,model,cache,out}
+          cd "$RUNNER_TEMP/section-study"
+          gh api repos/Vanilla1999/DocAtlas/actions/artifacts/11963049124/zip > baseline.zip
+          echo '7afc4d6da249cc8ff17655aacaaa13cc9f9cf5bf20341601f7c4308c08e1580f  baseline.zip' | sha256sum -c -
+          unzip -q baseline.zip -d baseline
+          curl -fLsS 'https://raw.githubusercontent.com/Vanilla1999/DocAtlas/d3daf7b15a3cff185a04465f487cade87f9ecfa3/eval/context_compression_replay_20261015.py' > study.py
+          cp study.py out/executed-study.py
+          python - <<'PY'
+          import json, pathlib, shutil, hashlib
+          p=pathlib.Path('.')
+          old=json.loads((p/'baseline/docatlas/MANIFEST.json').read_text())
+          assert old['head']=='319b0e6ac55e7d454c8cb4c4c319c778c5473e7a'
+          dest=p/'input/docatlas';dest.mkdir(parents=True)
+          cases=[{'id':c['id'],'project_group':c['project_group'],'question':c['question'],'answerability':'WITHHELD'} for c in old['cases']]
+          assert len(cases)==40
+          (dest/'MANIFEST.json').write_text(json.dumps({'head':old['head'],'cases':cases}))
+          for c in cases:shutil.copyfile(p/'baseline/docatlas'/f"{c['id']}-dto.json",dest/f"{c['id']}-dto.json")
+          shutil.copytree(p/'baseline/docatlas/preparation',dest/'preparation')
+          manifest={'code_sha':old['head'],'script_sha256':hashlib.sha256((p/'study.py').read_bytes()).hexdigest(),'artifact_id':11963049124,'profiles':[5,10],'primary_profile':5,'bm25':{'k1':1.2,'b':0.75},'grouping':'source-native section, identical membership for both rankers','model':'cross-encoder/ms-marco-MiniLM-L6-v2','model_aggregation':'MaxP, nonoverlapping token-only scoring slices, full original section delivery','memory_limit_bytes':1000000000,'network_during_scoring':False,'gold_available_to_scorer':False,'source_tree':'only sources mounted, no gold/evaluator','scope':'offline research replay, not new installed MCP run','input_sha256':{str(f.relative_to(p/'input')):hashlib.sha256(f.read_bytes()).hexdigest() for f in (p/'input').rglob('*') if f.is_file()}}
+          (p/'out/FREEZE.json').write_text(json.dumps(manifest,indent=2))
+          PY
+      - name: Build CPU-only pinned inference environment
+        shell: bash
         run: |
-          python -m eval.grounded_v40.run \
-            --cli "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" \
-            --output "$RUNNER_TEMP/grounded-v40-full"
-      - name: Preserve exact stdout/stderr of Grounded
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/section-study/Dockerfile" <<'DOCKER'
+          FROM python:3.12-slim
+          ENV PYTHONDONTWRITEBYTECODE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 HF_HUB_DISABLE_TELEMETRY=1 HF_HUB_DISABLE_XET=1 DO_NOT_TRACK=1
+          RUN pip install --no-cache-dir numpy==2.2.6 onnxruntime==1.22.1 tokenizers==0.21.4 tiktoken==0.11.0 huggingface_hub==0.34.4
+          DOCKER
+          docker build -t docatlas-section-study "$RUNNER_TEMP/section-study"
+          cp "$RUNNER_TEMP/section-study/Dockerfile" "$RUNNER_TEMP/section-study/out/Dockerfile"
+      - name: Download official model files once and freeze hashes (no inference)
+        shell: bash
+        run: |
+          set -euo pipefail
+          S="$RUNNER_TEMP/section-study"
+          docker run --rm -i -v "$S/model:/model" -v "$S/cache:/cache" -v "$S/out:/out" -e TIKTOKEN_CACHE_DIR=/cache docatlas-section-study python - <<'PY'
+          from huggingface_hub import HfApi,hf_hub_download
+          import pathlib,hashlib,json,tiktoken
+          repo='cross-encoder/ms-marco-MiniLM-L6-v2';info=HfApi().model_info(repo);rev=info.sha
+          assert rev and len(rev)==40
+          names=['config.json','tokenizer.json','tokenizer_config.json','README.md','onnx/model.onnx'];files={}
+          for name in names:
+              p=pathlib.Path(hf_hub_download(repo,name,revision=rev,local_dir='/model'))
+              files[name]={'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size}
+          cfg=json.loads(pathlib.Path('/model/config.json').read_text());assert cfg['max_position_embeddings']==512
+          pathlib.Path('/out/MODEL.json').write_text(json.dumps({'repo':repo,'revision':rev,'files':files,'config':cfg},indent=2))
+          pathlib.Path('/out/model-card.md').write_text(pathlib.Path('/model/README.md').read_text())
+          tiktoken.get_encoding('o200k_base')
+          PY
+      - name: BM25 all40 replay in 1GB network-disabled container
+        shell: bash
+        run: |
+          set -euo pipefail
+          S="$RUNNER_TEMP/section-study"
+          docker run --rm --network=none --memory=1000000000 --memory-swap=1000000000 --cpus=2 -v "$PWD/eval/prepared_model_comparison40/sources:/repo/eval/prepared_model_comparison40/sources:ro" -v "$S/input:/baseline:ro" -v "$S/out:/out" -v "$S/study.py:/study.py:ro" -v "$S/cache:/cache:ro" -e TIKTOKEN_CACHE_DIR=/cache docatlas-section-study python /study.py --repo /repo --baseline /baseline --out /out --arm bm25
+      - name: MiniLM MaxP all40 replay in 1GB network-disabled container
+        shell: bash
+        run: |
+          set -euo pipefail
+          S="$RUNNER_TEMP/section-study"
+          docker run --rm --network=none --memory=1000000000 --memory-swap=1000000000 --cpus=2 -v "$PWD/eval/prepared_model_comparison40/sources:/repo/eval/prepared_model_comparison40/sources:ro" -v "$S/input:/baseline:ro" -v "$S/out:/out" -v "$S/study.py:/study.py:ro" -v "$S/model:/model:ro" -v "$S/cache:/cache:ro" -e TIKTOKEN_CACHE_DIR=/cache -e HF_HUB_OFFLINE=1 docatlas-section-study python /study.py --repo /repo --baseline /baseline --model /model --out /out --arm minilm
+      - name: Independent unchanged oracle after both arms, verify exact source reconstruction
+        shell: bash
+        run: |
+          set -euo pipefail
+          S="$RUNNER_TEMP/section-study"
+          docker run --rm --network=none --memory=1000000000 --memory-swap=1000000000 --cpus=2 -v "$PWD:/repo:ro" -v "$S/baseline:/baseline:ro" -v "$S/out:/out" -v "$S/study.py:/study.py:ro" docatlas-section-study python /study.py --repo /repo --baseline /baseline --out /out --arm assess
+          docker image inspect docatlas-section-study --format '{{.Id}}' > "$S/out/image-id.txt"
+      - name: Preserve results even if RAM/model/quality gate fails
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: grounded-v40-full-${{ github.sha }}
-          path: ${{ runner.temp }}/grounded-v40-full/
-          retention-days: 14
-          if-no-files-found: warn
+          name: section-compression-bm25-minilm-319b0e6a
+          path: ${{ runner.temp }}/section-study/out/
+          retention-days: 30
+          if-no-files-found: error
