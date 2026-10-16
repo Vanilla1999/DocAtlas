@@ -1,0 +1,17 @@
+{
+  "tested_sha": "336d6c433e736e0d8d475f5c5ef4a4503f930d25",
+  "model_repo": "onnx-community/tinyroberta-squad2-ONNX",
+  "model_revision": "7c9f69b7e6228375169a4553bcfa6639152e3a69",
+  "run_id": 38813964649,
+  "artifact_id": 12009978017,
+  "artifact_sha256": "2d201d1d07c167313bcc62a0088f47e63e37dafa431f3bf9868827bfb66622aa",
+  "counts": {"within_budget": {"total": 24, "pass": 17}, "partial": {"total": 8, "pass": 6}, "unanswerable": {"total": 8, "pass": 8}},
+  "false_refusals": ["V40-B04", "V40-B05", "V40-B06", "V40-B07", "V40-P02", "V40-T04", "V40-V02", "V40-E03", "V40-E04"],
+  "operational_errors": 0,
+  "server_rss_peak_bytes": 722137088,
+  "container_peak_bytes": 750723072,
+  "public_calls": 80,
+  "preparations": 5,
+  "semantic_gate": "FAIL",
+  "next_profile_preregistered": "full roberta-base SQuAD2, same input/decoding/oracle, no threshold tuning"
+}

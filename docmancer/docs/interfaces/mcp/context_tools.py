@@ -508,6 +508,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
+            if kind == "docs_context":
+                from docmancer.docs.application.answerability import apply_answerability
+                projection, snapshot = apply_answerability(projection, snapshot, raw, question)
             section_compression_active = False
             if kind == "docs_context":
                 from docmancer.docs.application.section_compression import (
