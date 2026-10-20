@@ -1,0 +1,62 @@
+name: Answerability reference and QNLI pilot
+on:
+  push:
+    branches: [experiment/answerability-reference-qnli]
+    paths:
+      - 'eval/answerability_reference_qnli.py'
+      - 'eval/answerability_probe.Dockerfile*'
+      - '.github/workflows/answerability-reference-qnli.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installed-pilot:
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [reference, qnli]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Freeze code and preregistered experiment
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/probe-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/probe-evidence/head.txt"
+          git diff --exit-code
+          python -m py_compile eval/answerability_reference_qnli.py
+          cp eval/answerability_reference_qnli.py "$RUNNER_TEMP/probe-evidence/"
+          cp docs/answerability-reference-qnli.md "$RUNNER_TEMP/probe-evidence/"
+      - name: Build installed wheel and explicitly provision frozen models
+        run: |
+          docker build -f eval/answerability_probe.Dockerfile -t docatlas-answerability-probe .
+          docker image inspect docatlas-answerability-probe > "$RUNNER_TEMP/probe-evidence/image.json"
+      - name: Actual public MCP all40 with frozen reader; no network; hard 1.5GB
+        env:
+          ARM: ${{ matrix.arm }}
+        run: |
+          set +e
+          docker run --name answerability-probe --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
+            -e PROBE_ARM="$ARM" -e PROBE_ASSETS=/probe-assets -e PROBE_OUTPUT=/evidence/probe \
+            -v "$RUNNER_TEMP/probe-evidence:/evidence" docatlas-answerability-probe \
+            --repo /repo --work /tmp/probe-work --out /evidence/run --model /model --qa-model /qa-model
+          rc=$?
+          docker inspect answerability-probe > "$RUNNER_TEMP/probe-evidence/container.json"
+          docker cp answerability-probe:/probe-assets/FREEZE.json "$RUNNER_TEMP/probe-evidence/MODELS.json"
+          docker cp answerability-probe:/probe-assets/utils_qa.py "$RUNNER_TEMP/probe-evidence/official_utils_qa.py"
+          echo "$rc" > "$RUNNER_TEMP/probe-evidence/exit-code.txt"
+          exit "$rc"
+      - name: Preserve exact outputs and logits even on semantic failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: answerability-${{ matrix.arm }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/probe-evidence/
+          retention-days: 30
+          if-no-files-found: error
