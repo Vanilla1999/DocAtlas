@@ -121,7 +121,16 @@ def library_language(service: Any, canonical_id: str, inspected: dict) -> dict:
     record = service.registry.get(canonical_id)
     if record is None:
         return _unknown("language_library_unavailable", **binding)
-    manifest = (record.target_spec or {}).get("source_manifest") or {}
+    spec = record.target_spec or {}
+    # A pending refresh can carry a proposed source_manifest alongside the
+    # still-active snapshot. Never label active documents with proposal metadata.
+    manifest = spec.get("active_source_manifest")
+    if manifest is None:
+        manifest = spec.get("source_manifest") or {}
+    if not isinstance(manifest, dict):
+        return _unknown("language_declaration_invalid", **binding)
+    if manifest.get("digest") and manifest["digest"] != binding["manifest_digest"]:
+        return _unknown("language_snapshot_unverified", **binding)
     try:
         tags = language_tags(manifest.get("documentation_languages", []))
     except (ValueError, TypeError, AttributeError):

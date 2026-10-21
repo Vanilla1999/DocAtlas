@@ -1,0 +1,107 @@
+name: Documentation language installed MCP
+on:
+  pull_request:
+    paths:
+      - 'docmancer/**'
+      - 'SKILL.md'
+      - 'docs/documentation-language.md'
+      - 'eval/docs_language_integration.py'
+      - 'uv.lock'
+      - '.github/workflows/documentation-language.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: documentation-language-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
+jobs:
+  language-and-translation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Freeze exact candidate and verify syntax
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/language-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/language-evidence/head.txt"
+          git diff --exit-code
+          python -m compileall -q docmancer/docs/documentation_language.py eval/docs_language_integration.py
+      - name: Build non-editable wheel and explicitly provision pinned MiniLM
+        run: |
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-language .
+          docker image inspect docatlas-language > "$RUNNER_TEMP/language-evidence/image.json"
+      - name: Actual stdio language metadata and full translated witnesses; offline and hard 1GB
+        run: |
+          set +e
+          docker run --name docatlas-language-check --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/language-evidence:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-language -I /repo/eval/docs_language_integration.py \
+            --repo /repo --work /tmp/language-work --out /evidence/run --model /model
+          rc=$?
+          docker inspect docatlas-language-check > "$RUNNER_TEMP/language-evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/language-evidence/exit-code.txt"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: docs-language-installed-${{ github.run_id }}
+          path: ${{ runner.temp }}/language-evidence/
+          retention-days: 30
+          if-no-files-found: error
+  portable-metadata-controls:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.11'
+          - os: ubuntu-latest
+            python: '3.13'
+          - os: macos-15
+            python: '3.12'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install exact wheel without QA or MiniLM model assets
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/language-runtime
+          TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
+        run: |
+          set -euo pipefail
+          python -m pip install uv==0.9.25
+          uv sync --frozen --no-dev --no-install-project --python "$(command -v python)"
+          uv build --wheel --out-dir "$RUNNER_TEMP/wheels"
+          uv pip install --python "$RUNNER_TEMP/language-runtime/bin/python" --no-deps "$RUNNER_TEMP/wheels/"*.whl
+          "$RUNNER_TEMP/language-runtime/bin/python" -I -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+      - name: Public stdio metadata, active manifest, scope and invalid-request controls
+        env:
+          TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
+          HF_HUB_OFFLINE: '1'
+        run: |
+          set -euo pipefail
+          private_tmp=$(mktemp -d "$RUNNER_TEMP/language-private.XXXXXX")
+          chmod 700 "$private_tmp"
+          export TMPDIR=$(cd "$private_tmp" && pwd -P)
+          TESTED_SHA="$(git rev-parse HEAD)" "$RUNNER_TEMP/language-runtime/bin/python" -I eval/docs_language_integration.py \
+            --controls-only --repo "$PWD" --work "$RUNNER_TEMP/language-work" \
+            --out "$RUNNER_TEMP/language-results" --model "$RUNNER_TEMP/not-provisioned"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: docs-language-${{ matrix.os }}-${{ matrix.python }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/language-results/
+          retention-days: 30
+          if-no-files-found: error

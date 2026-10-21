@@ -1,11 +1,7 @@
-name: Answerability reference and QNLI pilot
+# Historical negative experiment. Reproduce the frozen original code only;
+# current product intentionally no longer supports answerability enforcement.
+name: Historical answerability reference and QNLI pilot
 on:
-  push:
-    branches: [experiment/answerability-reference-qnli]
-    paths:
-      - 'eval/answerability_reference_qnli.py'
-      - 'eval/answerability_probe.Dockerfile*'
-      - '.github/workflows/answerability-reference-qnli.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,11 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          ref: ${{ github.sha }}
+          ref: e893460f27d2759283308634608da1c8dcc63b06
           persist-credentials: false
-      - name: Freeze code and preregistered experiment
+      - name: Freeze historical code and preregistered experiment
         run: |
           set -euo pipefail
+          test "$(git rev-parse HEAD)" = e893460f27d2759283308634608da1c8dcc63b06
           mkdir -p "$RUNNER_TEMP/probe-evidence"
           git rev-parse HEAD > "$RUNNER_TEMP/probe-evidence/head.txt"
           git diff --exit-code
@@ -35,7 +32,7 @@ jobs:
         run: |
           docker build -f eval/answerability_probe.Dockerfile -t docatlas-answerability-probe .
           docker image inspect docatlas-answerability-probe > "$RUNNER_TEMP/probe-evidence/image.json"
-      - name: Actual public MCP all40 with frozen reader; no network; hard 1.5GB
+      - name: Historical public MCP all40; no network; hard 1.5GB
         env:
           ARM: ${{ matrix.arm }}
         run: |

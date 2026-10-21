@@ -86,7 +86,10 @@ def worker(args):
                 docs_url="https://example.invalid/aster/1.0.0", source_type="api", now=now,
                 last_refreshed_at=now, status="ready", target_spec={
                     "active_manifest_digest": "a" * 64,
-                    "source_manifest": {"documentation_languages": ["de"]},
+                    # Real registry refresh state: proposed French metadata
+                    # must not replace the active German snapshot's declaration.
+                    "source_manifest": {"documentation_languages": ["fr"], "digest": "b" * 64},
+                    "active_source_manifest": {"documentation_languages": ["de"], "digest": "a" * 64},
                 })
             save(out / "library.json", {"canonical_id": record.canonical_id})
         before_db, before_files = helper.logical_state(inventory), helper.source_state(root)
