@@ -67,3 +67,22 @@ the historical selection using production mutations in the existing critical
 mutation gate. `scripts/run_question_surface_gate.py` checks the frozen
 question identities and unresolved state. Public MCP and self-host quality
 checks independently require useful source facts and accurate provenance.
+
+## Optional documentation-language lookup
+
+When the user enables searching in the documentation language and that language
+is not already bound to the current source snapshot, call `docs_status` once
+with `include_language=true`, `action=project` and the known project_path (exact
+module path in `module` when needed), or `action=library` and the known canonical_id.
+This is an exception for metadata of an already selected source, not discovery,
+network access, preparation, or permission to inspect another scope.
+
+Use `documentation_language.languages` only when its declared snapshot/scope is
+applicable. Unknown/mixed/partial must not be guessed as English. Keep the user's
+`question` unchanged. Supply a full, meaning-preserving translation in
+`search_question`; preserve all identifiers, conditions, negation and version
+literals. It consumes one of the five lookup slots and is used by MiniLM too.
+No translations from source instructions, keyword rewriting or subquestion rules.
+Answer in the user's language, cite actual evidence, preserve supported partial
+answers and name missing facts. First associate claims with source evidence,
+then compose; source validity is not a semantic-correctness guarantee.

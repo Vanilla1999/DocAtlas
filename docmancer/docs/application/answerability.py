@@ -1,8 +1,8 @@
-"""Explicit local SQuAD2 null-answer gate; no model downloads during requests.
+"""Observation-only local QA diagnostics; no model downloads during requests.
 
-A non-null span is only a reason NOT to abstain, never proof of full sufficiency.
-A null verdict concerns the acquired, source-checked context, not the corpus.
-The decision policy is not fitted to V40; quality failures remain blocking.
+The readers tested in #216 and #218 failed semantic acceptance. Their predictions
+cannot remove sources or grant answer authority. Automatic enforcement is not a
+supported product mode; independent training/validation is tracked in #217.
 """
 from __future__ import annotations
 from contextlib import contextmanager
@@ -43,7 +43,11 @@ class AnswerabilityError(ValueError):
 
 def mode() -> str:
     value = os.environ.get("DOCATLAS_CONTEXT_ABSTENTION", "off")
-    if value not in {"off", "observe", "enforce"}:
+    if value == "enforce":
+        # A failed model is not an evidence veto. Never silently downgrade this
+        # setting: the host must explicitly select off or diagnostic observation.
+        raise AnswerabilityError("answerability_enforcement_not_validated")
+    if value not in {"off", "observe"}:
         raise AnswerabilityError("answerability_invalid_config")
     return value
 
@@ -199,7 +203,7 @@ def apply_answerability(payload: dict, snapshot: dict, retrieval: dict, question
         return payload, snapshot
     if payload.get("requires_confirmation") or payload.get("hard_stop") or (payload.get("delivery_decision") or {}).get("deliverable") is False:
         return payload, snapshot
-    from .model_visible_projection import validate_model_visible_projection, project_insufficient, _refresh_estimate
+    from .model_visible_projection import validate_model_visible_projection
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active() or validate_model_visible_projection(payload, snapshot=snapshot):
         raise AnswerabilityError("answerability_requires_valid_native_sources")
@@ -230,15 +234,6 @@ def apply_answerability(payload: dict, snapshot: dict, retrieval: dict, question
     if observed is not None:
         observed.append(deepcopy(receipt))
     retrieval.setdefault("retrieval_diagnostics", {})["answerability"] = deepcopy(receipt)
-    if setting != "enforce" or receipt["decision"] != "no_answer":
-        return payload, snapshot
-    result = project_insufficient(kind="docs_context", missing=[
-        "The local answerability model found no answer in the checked acquired context; this does not prove absence from the corpus."
-    ], recommended_next_action=None)
-    result.update(sources=[], read_next=[], context_available=False, answer_available=False,
-                  answer_supported=False, edit_ready=False, support_status="insufficient_evidence",
-                  reason_code="answer_not_found_in_acquired_context",
-                  answerability={"status": "no_answer", "basis": "squad2_null_prediction",
-                                 "scope": "acquired_source_context", "corpus_absence_proven": False})
-    _refresh_estimate(result)
-    return result, {}
+    # The receipt is host-only. Neither a QA span nor a null prediction is
+    # sufficient to change the verified source payload or its authority.
+    return payload, snapshot

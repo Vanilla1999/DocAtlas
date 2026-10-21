@@ -23,7 +23,7 @@ ROLES = {
 AUTHORITIES = {"source_of_truth", "supporting", "historical", "generated"}
 STATUSES = {"active", "completed", "superseded"}
 IMPACT_POLICIES = {"track", "search_only"}
-TOP_LEVEL_FIELDS = ("schema_version", "documents", "roots", "code_files")
+TOP_LEVEL_FIELDS = ("schema_version", "documents", "roots", "code_files", "documentation_languages")
 DOCUMENT_FIELDS = (
     "path", "role", "scope", "description", "module_path", "authority", "status", "impact",
 )
@@ -100,6 +100,7 @@ class ProjectDocCatalog:
     roots: list[ProjectDocCatalogRoot] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     code_files: tuple[str, ...] = ()
+    documentation_languages: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
 
 def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
@@ -204,7 +205,12 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
         roots.append(catalog_root)
     if warnings:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=warnings)
-    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, roots, [], tuple(code_files))
+    from docmancer.docs.documentation_language import catalog_language_declarations
+    try:
+        languages = catalog_language_declarations(data.get("documentation_languages", {}), entries)
+    except ValueError as exc:
+        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[str(exc)])
+    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, roots, [], tuple(code_files), languages)
 
 
 def _literal_path(value: str) -> bool:

@@ -223,6 +223,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     if [row["evidence_id"] for row in result["sources"]] != [r["evidence_id"] for r in retained]:
         raise SectionCompressionError("section_compression_identity_mismatch")
     receipt.update(method=MODE, model_revision=MODEL_REVISION,
+                   scoring_question_sha256=hashlib.sha256(question.encode()).hexdigest(),
                    candidate_rows=len(rows), candidate_sections=len(sections),
                    selected_rows=len(retained), selected_sections=min(TOP_K, len(sections)),
                    selected_evidence_ids=[r["evidence_id"] for r in retained])

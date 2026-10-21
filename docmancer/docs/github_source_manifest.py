@@ -194,6 +194,9 @@ def normalize_resolved_github_manifest(value: Mapping[str, Any]) -> dict[str, An
         "complete": value.get("complete") is True,
         "truncated": value.get("truncated") is True,
     }
+    if "documentation_languages" in value:
+        from docmancer.docs.documentation_language import language_tags
+        normalized["documentation_languages"] = list(language_tags(value["documentation_languages"]))
     normalized["digest"] = canonical_manifest_digest(normalized)
     supplied_digest = value.get("digest")
     if supplied_digest is not None and supplied_digest != normalized["digest"]:

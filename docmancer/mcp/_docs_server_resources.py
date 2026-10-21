@@ -21,7 +21,7 @@ It is not:
 - a code generator;
 - an AST-perfect/LSP code intelligence engine.
 
-Use the unchanged original question and explicit project/library/version/scope/path bindings. Do not infer scope, translations, rewrites or subquestions from question wording.
+Use the unchanged original question and explicit project/library/version/scope/path bindings. Do not infer scope or subquestions. An explicit full translation to a declared documentation language belongs in search_question; keep question unchanged.
 
 The default public surface has exactly three tools:
 - `get_docs_context`: first tool for content and coding questions;
@@ -46,11 +46,11 @@ The default public surface has exactly three tools:
    - `status="truncated"`: honor `omitted_counts`; do not infer completeness from a truncated packet.
    - `status="insufficient_evidence"`: identify gaps without filling them from memory or absence of evidence. Diagnostic rephrases are not automatically executed lookups. `hard_stop=true` blocks editing; `hard_stop=false` is not permission.
 
-Use `docs_status` only for explicit status requests, returned recommended actions or returned preparation job IDs, not discovery.
+Use `docs_status` for explicit status, returned actions/jobs, or include_language=true on an already selected source before search; never source discovery or preparation.
 
 ## Gap-directed follow-up
 
-Keep the original question unchanged. Use only explicitly supplied same-question `lookup_queries`, at most five; independent questions use separate calls. Lookup coverage does not transfer to the original question. Follow up only with explicit lookups or an issued bounded source read, within existing scope, freshness, provenance, consent, network and budget limits. Unverified flags alone do not require another read. Do not reread the same span or replenish budgets by renaming a question. Never infer equivalence, semantic proof, answer completeness or edit authorization from retrieval context.
+Keep the original question unchanged. Optionally inspect declared source languages once via `docs_status(include_language=true)` for the already selected source. Keep question unchanged and supply a full translation as search_question for retrieval and MiniLM. Use only explicitly supplied same-question `lookup_queries`, at most five including the translation; independent questions use separate calls. Lookup coverage does not transfer to the original question. Follow up only with explicit lookups or an issued bounded source read, within existing scope, freshness, provenance, consent, network and budget limits. Unverified flags alone do not require another read. Do not reread the same span or replenish budgets by renaming a question. A supplied translation is a retrieval hypothesis, not verified equivalence, semantic proof, answer completeness or edit authorization.
 
 Explicit scope selects retrieval boundaries, not instruction authorization: `scope="project"` selects repository-level docs, `scope="module"` selects one exact module, and `scope="all"` stays within the same repository without module filters. `module_path` implies module scope. For current project dependencies omit `version` unless an exact/historical version is explicitly requested; re-query after lockfile changes.
 
