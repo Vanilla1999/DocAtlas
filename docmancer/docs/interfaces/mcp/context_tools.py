@@ -303,6 +303,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
+    from docmancer.docs.documentation_language import translated_query
+    search_question, lookup_queries = translated_query(question, args.get("search_question"), lookup_queries)
+    if args.get("search_question") is not None and context_format == "patch_context":
+        return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
     # Explicit presentation choice is read-only; it is not a mutation contract
     # and is never forwarded as permission or inferred from request prose.
     kind = "patch_context" if context_format == "patch_context" else "docs_answer"
@@ -359,6 +363,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    if args.get("search_question") is not None:
+        import hashlib
+        raw.setdefault("retrieval_diagnostics", {})["language_lookup"] = {
+            "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),
+            "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),
+            "basis": "explicit_host_translation", "semantic_equivalence_verified": False,
+        }
     # Check the original operational decision before support/recovery decoration
     # can overwrite its reason or retain a previously admitted partial quote.
     blocked_kind = (
@@ -518,7 +529,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 section_compression_active = section_compression_enabled()
                 if section_compression_active:
-                    projection, snapshot = select_sections(projection, snapshot, raw, question)
+                    projection, snapshot = select_sections(projection, snapshot, raw, search_question)
                     # Price the complete compact packet before issuing references.
                     # No window is dropped to make an oversized selection fit.
                     encode_sections(projection)

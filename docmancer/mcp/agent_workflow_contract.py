@@ -36,6 +36,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "documentation_context_format": None,
         "context_format_inferred_from_prose": False,
         "skill_read_required": False,
+        "optional_preflight": "docs_status(include_language=true) on already selected project/module/library",
     },
     "advanced_patch": {
         "default_available": False,
@@ -51,7 +52,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
     },
     "docs_status": {
         "tool": "docs_status",
-        "allowed_when": ["explicit_status_request", "recommended_next_action", "returned_job_id"],
+        "allowed_when": ["explicit_status_request", "recommended_next_action", "returned_job_id", "declared_language_preflight_for_bound_source"],
         "discovery": False,
     },
     "scope_planning": {
@@ -65,6 +66,9 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "explicit_lookup_queries_only": True,
         "maximum_lookup_queries": 5,
         "original_question_unchanged": True,
+        "search_question": "explicit_full_translation_in_declared_documentation_language",
+        "search_question_counts_as_lookup": True,
+        "section_scorer_uses_explicit_search_question": True,
         "preserve_exact_technical_anchors": True,
         "preserve_conditions_negation_and_comparison_sides": True,
         "expected_answer_in_lookup_allowed": False,

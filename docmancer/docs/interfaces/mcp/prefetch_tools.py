@@ -371,6 +371,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
     dependency_docs_app = getattr(service, "dependency_docs", service)
     if name == "docs_status":
         action = str(args.get("action") or "").strip()
+        if args.get("include_language") and action not in {"project", "library"}:
+            return {"tool": "docs_status", "status": "error", "reason_code": "language_status_action_required",
+                    "message": "include_language requires project or library action"}
         if action == "project":
             project_path = str(args.get("project_path") or "").strip()
             if not project_path:
@@ -382,7 +385,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                 }
             project = asdict(project_docs_app.inspect_project_docs(project_path))
             details = args.get("details")
-            return {
+            payload = {
                 "tool": "docs_status",
                 "action": action,
                 "project": _bounded_project_status(
@@ -391,6 +394,10 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                     module=str(args.get("module") or "").strip() or None,
                 ),
             }
+            if args.get("include_language"):
+                from docmancer.docs.documentation_language import project_language
+                payload["documentation_language"] = project_language(project_path, project, args.get("module"))
+            return payload
         if action == "library":
             canonical_id = str(args.get("canonical_id") or "").strip()
             if not canonical_id:
@@ -400,11 +407,15 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                     "reason_code": "canonical_id_required",
                     "message": "canonical_id is required for action='library'",
                 }
-            return {
+            payload = {
                 "tool": "docs_status",
                 "action": action,
                 "library": asdict(service.inspect_library_docs(canonical_id)),
             }
+            if args.get("include_language"):
+                from docmancer.docs.documentation_language import library_language
+                payload["documentation_language"] = library_language(service, canonical_id, payload["library"])
+            return payload
         if action == "jobs":
             jobs = service.list_docs_jobs(
                 status=args.get("status"),

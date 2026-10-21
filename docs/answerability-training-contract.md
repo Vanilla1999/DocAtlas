@@ -1,6 +1,8 @@
 # Decision: train for technical context, not extractive QA null prediction
 
-Status: **proposed next implementation, not an executed training run**.
+Status: **historical proposal, paused; no training run is scheduled**.
+The current direction is source-language preflight and evidence-based answers
+without new model training; see `documentation-language.md`.
 Baseline main: `f8e17489733798c731f6b9c555adaee48b92fbf3`.
 Related: #217 and negative experiments #216/#218. Runtime inference limit remains
 1,500,000,000 bytes for DocAtlas + both models + client, CPU and offline.

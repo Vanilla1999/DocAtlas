@@ -17,7 +17,7 @@ Agent workflow:
 - Optional context_format="patch_context" returns a read-only v4 patch evidence packet with full admitted source windows. It selects representation only, never mutation/workflow permission; omitted/null keeps the existing docs response. Patch representation has no internal token/byte compaction cap; retrieval scope and runtime guards remain unchanged.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - Pass the user's original request unchanged as question.
-- Use only explicit same-question lookup_queries, at most five; never infer translations, rewrites or subquestions. Independent questions use separate calls.
+- Use only explicit same-question lookup_queries, at most five. With declared source language, the host may supply search_question as a full meaning-preserving translation; it consumes one lookup slot and drives MiniLM. Never add expected answers or independent subquestions.
 - Preserve exact identifiers, filenames, commands, and versions verbatim.
 - Lookup coverage does not transfer to the original question. Cite returned source context without inferred equivalence or proof; keep freshness, provenance, consent, network and budget limits unchanged.
 """,
@@ -25,8 +25,9 @@ Agent workflow:
             "type": "object",
             "properties": {
                 "question": {"type": "string"},
+                "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500, "description": "Explicit full translation of the same question into the declared documentation language; original question remains authoritative. Used as one host lookup and for section ranking; never proof or scope authority."},
                 "context_format": {"type": ["string", "null"], "enum": ["patch_context", None], "description": "Optional read-only v4 patch evidence representation. Omitted/null retains docs defaults. Never supplies mutation or workflow permission."},
-                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Explicit lookups for the same question, at most five; unchanged original question. Never infer rewrites, translations, subquestions, expected answers or source names. Never batch independent questions. Lookup coverage does not transfer to the original question; returned cited context does not certify an answer or authorize editing."},
+                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Explicit lookups for the same question, at most five; unchanged original question. For language adaptation use search_question with a full translation of the same original question; never add subquestions, expected answers or source names. Never batch independent questions. Lookup coverage does not transfer to the original question; returned cited context does not certify an answer or authorize editing."},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
@@ -121,12 +122,13 @@ Agent workflow:
         "name": "docs_status",
         "description": """Read-only diagnostics for project documentation freshness and asynchronous documentation jobs.
 
-Use only for an explicit status request, a returned recommended action or a returned preparation job_id; never for discovery. For documentation content use get_docs_context instead.
+Use for explicit status, returned actions/jobs, or an opt-in include_language preflight of an already bound project/module/library. Never discover sources, prepare, fetch or translate here; for documentation content use get_docs_context.
 """,
         "inputSchema": {
             "type": "object",
             "properties": {
                 "action": {"type": "string", "enum": ["project", "library", "jobs", "job"]},
+                "include_language": {"type": "boolean", "description": "Read declared language metadata of an already selected project/module or canonical library; project/library actions only, read-only, no discovery or preparation."},
                 "project_path": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "job_id": {"type": ["string", "null"]},
@@ -573,7 +575,8 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
         "One unchanged concrete original question; no benchmark/evaluation/docs-governance meta-questions. "
-        "Explicit same-question lookups only; never infer rewrites/translations/subquestions/expected answers/source names "
+        "Explicit same-question lookups only. search_question may carry a full translation to the declared doc language, "
+        "preserving the original question and all technical literals. No inferred subquestions/expected answers/source names "
         "or batch independent questions. Keep exact literals and explicit project/library/version/scope/path; "
         "never widen scope from prose. project=repo-level docs only; module=one exact module; "
         "all=repo+modules, same repository, no module filters; module_path implies module scope. "
@@ -590,8 +593,10 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "Poll returned job_id via docs_status; retry unchanged once only after verified success/readiness."
     ),
     "docs_status": (
-        "Read-only; no discovery. Only explicit health/freshness/indexing/job-progress requests, "
-        "returned recommended_next_action or returned prepare_docs job_id."
+        "Read-only; no discovery. Explicit health/freshness/indexing/job requests, returned actions/jobs, "
+        "or include_language=true before search for an already selected project/module/canonical library. "
+        "Project language defaults to project scope; module must be the exact declared module path. "
+        "Returns declared languages or unknown, never downloads, guesses, translates or prepares."
     ),
 }
 
@@ -600,6 +605,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
+            "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
@@ -724,6 +730,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "action": {"enum": ["project", "library", "jobs", "job"]},
+                "include_language": {"type": "boolean", "description": "Read declared language metadata of an already selected project/module or canonical library; project/library actions only, read-only, no discovery or preparation."},
             "project_path": {"type": ["string", "null"]},
             "canonical_id": {"type": ["string", "null"]},
             "job_id": {"type": ["string", "null"]},

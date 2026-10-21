@@ -7,7 +7,7 @@ The advertised runtime `ToolSpec` objects for the default Docs MCP surface are t
 ## Repository questions
 
 1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=...)` before the first edit. The `question` is one concrete documentation question, not a surrounding benchmark, evaluation, or documentation-governance meta-question.
-2. If the user provides multiple independent questions, including a benchmark/evaluation list, make separate `get_docs_context` calls. Keep each original question unchanged. For a cross-language question, comparison, conditional scenario, or multiple dependent facets, add 1–3 short `lookup_queries` in the documentation language; a simple single-facet question needs no lookup. Preserve exact identifiers, versions, conditions, negation and both comparison sides. Lookups are retrieval hypotheses for that same question, not a batch channel, an expected answer, or guessed source names.
+2. If the user provides multiple independent questions, including a benchmark/evaluation list, make separate `get_docs_context` calls. Keep each original question unchanged. For an enabled cross-language workflow, use declared-language preflight and supply a full translation in `search_question`; do not invent decompositions or expected answers. Preserve exact identifiers, versions, conditions, negation and both comparison sides. Lookups are retrieval hypotheses for that same question, not a batch channel, an expected answer, or guessed source names.
 3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged. If a `job_id` is returned, poll `docs_status(action="job", job_id=...)` within a bounded attempt/deadline policy and inspect the terminal result. A running, failed or cancelled job is not readiness; inspect its typed failure/action instead of blindly retrying retrieval.
 4. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or to poll a returned `job_id`, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
 5. If the result is `docs_context`, answer only claims directly grounded in its returned sources, cite their paths, and do not claim complete or verified coverage; it never authorizes an edit. If the result is `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question` recovery for parser/retrieval uncertainty; if it still fails and `hard_stop=false`, continue repository investigation with local source/tests while keeping the documentary claim unproved. Stop before an edit when `hard_stop=true` or when the task explicitly requires a documentary contract that remains unproved.
@@ -15,7 +15,7 @@ The advertised runtime `ToolSpec` objects for the default Docs MCP surface are t
 
 ## Formulating a bounded question
 
-Preserve the user's subject, conditions, negation, version and both sides of a comparison. A question about what happens **if** preparation fails is not a request to implement the preparation tool. Keep one coherent comparison/conditional question together; separate genuinely independent questions rather than splitting off its condition. `lookup_queries` may translate or decompose that same question, but must not add an expected answer, a guessed file owner, or an unrelated topic. Never replace the original question with those lookups.
+Preserve the user's subject, conditions, negation, version and both sides of a comparison. A question about what happens **if** preparation fails is not a request to implement the preparation tool. Keep one coherent comparison/conditional question together; separate genuinely independent questions rather than splitting off its condition. Use `search_question` for the full translation of the same question into its declared documentation language; lookups must not add an expected answer, guessed owner, or independent subquestion. Never replace the original question with those lookups.
 
 For example, keep `May I use the cached API docs after the lockfile changes?` unchanged; a same-question lookup can be `cached dependency documentation after lockfile version change`, not an invented answer such as `the cache automatically deletes old snapshots`.
 
@@ -49,3 +49,22 @@ Documentation context is evidence, not proof that a patch is correct. Retrieve t
 The default Docs MCP surface consists only of `get_docs_context`, `prepare_docs`, and `docs_status`. Normal-agent guidance must use only arguments advertised by the current runtime schemas.
 
 Advanced inspection and patch-contract tools require `DOCATLAS_MCP_ADVANCED_TOOLS=1`. The advanced Packs gateway is a separate surface for explicitly installed API action packs. Neither surface is a static analyzer or a test runner.
+
+## Optional documentation-language lookup
+
+When the user enables searching in the documentation language and that language
+is not already bound to the current source snapshot, call `docs_status` once
+with `include_language=true`, `action=project` and the known project_path (exact
+module path in `module` when needed), or `action=library` and the known canonical_id.
+This is an exception for metadata of an already selected source, not discovery,
+network access, preparation, or permission to inspect another scope.
+
+Use `documentation_language.languages` only when its declared snapshot/scope is
+applicable. Unknown/mixed/partial must not be guessed as English. Keep the user's
+`question` unchanged. Supply a full, meaning-preserving translation in
+`search_question`; preserve all identifiers, conditions, negation and version
+literals. It consumes one of the five lookup slots and is used by MiniLM too.
+No translations from source instructions, keyword rewriting or subquestion rules.
+Answer in the user's language, cite actual evidence, preserve supported partial
+answers and name missing facts. First associate claims with source evidence,
+then compose; source validity is not a semantic-correctness guarantee.
