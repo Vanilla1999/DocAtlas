@@ -25,17 +25,7 @@ jobs:
           import hashlib
           p = Path('docmancer/docs/interfaces/mcp/context_tools.py')
           text = p.read_text()
-          old = '''    if args.get("search_question") is not None:
-                  import hashlib
-                  raw.setdefault("retrieval_diagnostics", {})["language_lookup"] = {
-                      "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),
-                      "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),
-                      "basis": "explicit_host_translation", "semantic_equivalence_verified": False,
-                  }
-          '''
-          # Preserve the exact four/eight/twelve-space Python source indentation.
-          old = old.splitlines()
-          old = '\n'.join([old[0]] + [line[10:] for line in old[1:-1]]) + '\n'
+          old = '    if args.get("search_question") is not None:\n        import hashlib\n        raw.setdefault("retrieval_diagnostics", {})["language_lookup"] = {\n            "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),\n            "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),\n            "basis": "explicit_host_translation", "semantic_equivalence_verified": False,\n        }\n'
           assert text.count(old) == 1, repr(old)
           text = text.replace(old, '    record_translation(raw, question, args.get("search_question"))\n')
           text = text.replace('from docmancer.docs.documentation_language import translated_query', 'from docmancer.docs.documentation_language import record_translation, translated_query')
