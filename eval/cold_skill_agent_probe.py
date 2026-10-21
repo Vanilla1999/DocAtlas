@@ -259,7 +259,7 @@ async def client(args):
     outgroup=args.out/args.group
     stderr=(outgroup/'model.stderr').open('w')
     model_process=await asyncio.create_subprocess_exec(str(args.model_python),
-        '-I',str(args.repo/'eval/cold_skill_model_worker.py'),
+        str(args.repo/'eval/cold_skill_model_worker.py'),
         '--identity',str(outgroup/'MODEL.json'),
         stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=stderr)
     try:
