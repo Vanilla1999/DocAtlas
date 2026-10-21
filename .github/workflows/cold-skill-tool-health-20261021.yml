@@ -1,0 +1,50 @@
+name: Qwen MCP tool emission health check
+on:
+  push:
+    branches: [audit/cold-skill-tool-health-20261021]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Exact actual public MCP tool list from completed original live run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/old-mcp" "$RUNNER_TEMP/health"
+          gh run download 39590568016 --repo Vanilla1999/DocAtlas \
+            --name cold-skill-model-volna-39590568016 --dir "$RUNNER_TEMP/old-mcp"
+          test -s "$RUNNER_TEMP/old-mcp/results/volna/TOOLS.json"
+      - name: Pinned Qwen CPU worker
+        run: |
+          python -m venv "$RUNNER_TEMP/qwen"
+          "$RUNNER_TEMP/qwen/bin/python" -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          "$RUNNER_TEMP/qwen/bin/python" -m pip install transformers==4.53.3
+      - name: Two controlled true-tool-call probes, separate from natural tasks
+        env:
+          HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+        run: |
+          python -I eval/cold_skill_tool_health.py \
+            --worker "$PWD/eval/cold_skill_model_worker.py" \
+            --model-python "$RUNNER_TEMP/qwen/bin/python" \
+            --tools "$RUNNER_TEMP/old-mcp/results/volna/TOOLS.json" \
+            --out "$RUNNER_TEMP/health"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: cold-skill-tool-health-${{ github.run_id }}
+          path: ${{ runner.temp }}/health/
+          retention-days: 30
+          if-no-files-found: error
