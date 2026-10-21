@@ -14,8 +14,6 @@ jobs:
       matrix:
         group: [meridian, volna, mixed]
     env:
-      UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/docatlas-runtime
-      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
       HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
       HF_HUB_DISABLE_TELEMETRY: '1'
       TOKENIZERS_PARALLELISM: 'false'
@@ -24,6 +22,10 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
+      - name: Configure paths after runner allocation
+        run: |
+          echo "UV_PROJECT_ENVIRONMENT=$RUNNER_TEMP/docatlas-runtime" >> "$GITHUB_ENV"
+          echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/tokenizer-cache" >> "$GITHUB_ENV"
       - name: Freeze exact main product and syntax
         shell: bash
         run: |
