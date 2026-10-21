@@ -12,10 +12,6 @@ from dataclasses import asdict, is_dataclass
 import json
 from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
 from docmancer.docs.domain.original_body_discovery import original_body_read_scope, experimental_context_max_tokens
-# Terminal budget selection is disabled: preserve the source-checked context.
-# from docmancer.docs.application.experimental_context_finalization import (
-#     check_experimental_context_budget, enforce_experimental_context_budget,
-# )
 import math
 import sys
 from uuid import uuid4
@@ -303,7 +299,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
-    from docmancer.docs.documentation_language import translated_query
+    from docmancer.docs.documentation_language import record_translation, translated_query
     search_question, lookup_queries = translated_query(question, args.get("search_question"), lookup_queries)
     if args.get("search_question") is not None and context_format == "patch_context":
         return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
@@ -363,13 +359,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
-    if args.get("search_question") is not None:
-        import hashlib
-        raw.setdefault("retrieval_diagnostics", {})["language_lookup"] = {
-            "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),
-            "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),
-            "basis": "explicit_host_translation", "semantic_equivalence_verified": False,
-        }
+    record_translation(raw, question, args.get("search_question"))
     # Check the original operational decision before support/recovery decoration
     # can overwrite its reason or retain a previously admitted partial quote.
     blocked_kind = (

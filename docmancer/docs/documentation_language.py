@@ -161,3 +161,13 @@ def translated_query(question: str, search_question: Any, lookups: tuple[str, ..
     if len(combined) > 5:
         raise DocumentationLanguageError("search_question_lookup_limit")
     return search_question, tuple(combined)
+
+
+def record_translation(retrieval: dict, question: str, search_question: str | None) -> None:
+    """Record explicit translation identity without granting semantic authority."""
+    if search_question is not None:
+        retrieval.setdefault("retrieval_diagnostics", {})["language_lookup"] = {
+            "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),
+            "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),
+            "basis": "explicit_host_translation", "semantic_equivalence_verified": False,
+        }
