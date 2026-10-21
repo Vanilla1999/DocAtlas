@@ -1,0 +1,71 @@
+name: Real LLM answers from saved installed MiniLM MCP V40
+on:
+  push:
+    branches: [audit/v40-llm-answers-from-mcp-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-llm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        family: [black, poetry, textual, vite, eslint]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze unchanged production code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch -q origin f8e17489733798c731f6b9c555adaee48b92fbf3 --depth=1
+          git diff --exit-code f8e17489733798c731f6b9c555adaee48b92fbf3 HEAD -- docmancer pyproject.toml uv.lock eval/prepared_model_comparison40
+          python -m py_compile eval/v40_llm_answer_probe_20261021.py
+          mkdir -p "$RUNNER_TEMP/v40-model-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/v40-model-evidence/audit-head.txt"
+          sha256sum eval/v40_llm_answer_probe_20261021.py > "$RUNNER_TEMP/v40-model-evidence/script-sha256.txt"
+      - name: Retrieve captured actual MCP client wire (already accepted)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/actual-mcp"
+          gh run download 38792169982 --repo Vanilla1999/DocAtlas \
+            --name minilm-sections-installed-38792169982 --dir "$RUNNER_TEMP/actual-mcp"
+          test "$(cat "$RUNNER_TEMP/actual-mcp/head.txt")" = fd4d3d884b363a59a3e0dcd241b293347c036abf
+          ls -l "$RUNNER_TEMP/actual-mcp/run/SUMMARY.json"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Provision public pinned CPU model with no account credentials
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/model-runner"
+          "$RUNNER_TEMP/model-runner/bin/python" -m pip install --disable-pip-version-check \
+            torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          "$RUNNER_TEMP/model-runner/bin/python" -m pip install --disable-pip-version-check \
+            transformers==4.53.3
+          "$RUNNER_TEMP/model-runner/bin/python" -m pip freeze > "$RUNNER_TEMP/v40-model-evidence/packages.txt"
+      - name: Generate 8 actual evidence-only answers (gold inaccessible to runner)
+        shell: bash
+        env:
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+          PYTHONHASHSEED: '0'
+        run: |
+          "$RUNNER_TEMP/model-runner/bin/python" -I eval/v40_llm_answer_probe_20261021.py \
+            --repo "$PWD" --evidence "$RUNNER_TEMP/actual-mcp" \
+            --out "$RUNNER_TEMP/v40-model-evidence/generated" \
+            --family ${{ matrix.family }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: v40-llm-${{ matrix.family }}-20261021
+          path: ${{ runner.temp }}/v40-model-evidence/
+          retention-days: 30
+          if-no-files-found: error
