@@ -57,7 +57,7 @@ jobs:
           "$RUNNER_TEMP/qwen-runtime/bin/python" -m pip install --disable-pip-version-check torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
           "$RUNNER_TEMP/qwen-runtime/bin/python" -m pip install --disable-pip-version-check transformers==4.53.3
           "$RUNNER_TEMP/qwen-runtime/bin/python" -m pip freeze > "$RUNNER_TEMP/agent-audit/qwen-freeze.txt"
-          "$RUNNER_TEMP/docatlas-runtime/bin/python" -m pip freeze > "$RUNNER_TEMP/agent-audit/docatlas-freeze.txt"
+          uv pip freeze --python "$RUNNER_TEMP/docatlas-runtime/bin/python" > "$RUNNER_TEMP/agent-audit/docatlas-freeze.txt"
       - name: Cold tasks in paired A/B with real public stdio MCP, no scripted calls
         shell: bash
         env:
