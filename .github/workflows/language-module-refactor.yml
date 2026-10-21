@@ -1,0 +1,70 @@
+name: Extract language diagnostics on dedicated feature branch
+on:
+  push:
+    branches: [feat/docs-status-language]
+    paths: ['.github/workflows/language-module-refactor.yml']
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Extract diagnostics without changing translation or retrieval behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/feat/docs-status-language
+          git diff --exit-code
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p = Path('docmancer/docs/interfaces/mcp/context_tools.py')
+          text = p.read_text()
+          old = '''    if args.get("search_question") is not None:
+                  import hashlib
+                  raw.setdefault("retrieval_diagnostics", {})["language_lookup"] = {
+                      "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),
+                      "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),
+                      "basis": "explicit_host_translation", "semantic_equivalence_verified": False,
+                  }
+          '''
+          # Preserve the exact four/eight/twelve-space Python source indentation.
+          old = old.splitlines()
+          old = '\n'.join([old[0]] + [line[10:] for line in old[1:-1]]) + '\n'
+          assert text.count(old) == 1, repr(old)
+          text = text.replace(old, '    record_translation(raw, question, args.get("search_question"))\n')
+          text = text.replace('from docmancer.docs.documentation_language import translated_query', 'from docmancer.docs.documentation_language import record_translation, translated_query')
+          dead = '# Terminal budget selection is disabled: preserve the source-checked context.\n# from docmancer.docs.application.experimental_context_finalization import (\n#     check_experimental_context_budget, enforce_experimental_context_budget,\n# )\n'
+          assert text.count(dead) == 1
+          text = text.replace(dead, '')
+          assert hashlib.sha256(text.encode()).hexdigest() == '12ff35f7e5029b2e1ca43cf7adb03eaf80881111a1e1c78ee49fca36f163cec4'
+          p.write_text(text)
+          p = Path('docmancer/docs/documentation_language.py')
+          text = p.read_text()
+          assert 'def record_translation' not in text
+          text += '\n\ndef record_translation(retrieval: dict, question: str, search_question: str | None) -> None:\n    """Record explicit translation identity without granting semantic authority."""\n    if search_question is not None:\n        retrieval.setdefault("retrieval_diagnostics", {})["language_lookup"] = {\n            "original_question_sha256": hashlib.sha256(question.encode()).hexdigest(),\n            "search_question_sha256": hashlib.sha256(search_question.encode()).hexdigest(),\n            "basis": "explicit_host_translation", "semantic_equivalence_verified": False,\n        }\n'
+          assert hashlib.sha256(text.encode()).hexdigest() == '34544984d6609dc451e878d20248b5fc55ba623a54ac2db03eebbd579f4312bc'
+          p.write_text(text)
+          PY
+          python -m compileall -q docmancer/docs/documentation_language.py docmancer/docs/interfaces/mcp/context_tools.py
+          python scripts/check_python_module_size.py
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docmancer/docs/documentation_language.py docmancer/docs/interfaces/mcp/context_tools.py
+          test "$(git diff --cached --name-only | wc -l)" -eq 2
+          git commit -m 'refactor: keep translation diagnostics in language module and satisfy source line budget'
+      - name: Publish only to the same feature branch with unchanged remote head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/feat/docs-status-language
+          remote=$(gh api repos/Vanilla1999/DocAtlas/git/ref/heads/feat/docs-status-language --jq .object.sha)
+          test "$remote" = "$GITHUB_SHA"
+          git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin HEAD:refs/heads/feat/docs-status-language
