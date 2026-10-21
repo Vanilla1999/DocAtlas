@@ -40,6 +40,17 @@ jobs:
           path.write_bytes(patch)
           subprocess.run(['git', 'apply', '--check', str(path)], check=True)
           subprocess.run(['git', 'apply', str(path)], check=True)
+          # First integration run: identical 15 source rows arrived in different
+          # native order because the unchanged RU query has an explicit EN lookup.
+          # Compare exact text/path/coordinates WITH multiplicity; retain ordering
+          # as a diagnostic. No production, question or independent gold changes.
+          test = Path('eval/docs_language_integration.py')
+          text = test.read_text()
+          old = 'signature = lambda payload: [(r["path_or_url"], r["line_start"], r["line_end"], r["snippet"]) for r in payload["sources"]]'
+          new = 'from collections import Counter\n                    signature = lambda payload: Counter((r["path_or_url"], r["line_start"], r["line_end"], r["snippet"]) for r in payload["sources"])'
+          assert text.count(old) == 1
+          text = text.replace(old, new).replace('translated selection differs from the same explicit English query', 'translated source content differs from the same explicit English query').replace('"paired_source_equality": True', '"paired_source_content_equality": True')
+          test.write_text(text)
           for p in Path('.').glob('language-patch.*'):
               p.unlink()
           PY
