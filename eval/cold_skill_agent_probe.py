@@ -309,8 +309,10 @@ def main():
     p.add_argument('--group',choices=list(GROUPS),required=True)
     p.add_argument('--worker',action='store_true')
     args=p.parse_args()
-    for key in ('repo','work','out','model','model_python'):
+    for key in ('repo','work','out','model'):
         setattr(args,key,getattr(args,key).resolve())
+    # Virtualenv/bin/python is often a symlink. Resolving it escapes the venv.
+    args.model_python=args.model_python.absolute()
     if args.worker:server(args)
     else:
         assert not args.work.exists() and not args.out.exists(), 'fresh immutable trial workspace required'
