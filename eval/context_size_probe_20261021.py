@@ -158,8 +158,10 @@ async def main(args):
         a,b=(by[(family,label,m)] for m in ("off","minilm"))
         baseline=json.loads((args.out/"off"/family/f"{label}-expanded.json").read_text())
         reduced=json.loads((args.out/"minilm"/family/f"{label}-expanded.json").read_text())
-        available={r["evidence_id"]:r for r in baseline["sources"]}
-        assert all(r==available[r["evidence_id"]] for r in reduced["sources"])
+        from collections import Counter
+        old=Counter((r.get("path_or_url"),r.get("section"),r.get("snippet")) for r in baseline["sources"])
+        selected=Counter((r.get("path_or_url"),r.get("section"),r.get("snippet")) for r in reduced["sources"])
+        assert not (selected-old), "selected exact snippets must originate from the same indexed corpus"
         assert b["groups"]<=5
         joined.append({"family":family,"variant":label,"question":a["question"],
           "default_tokens":a["tokens_o200k"],"minilm_tokens":b["tokens_o200k"],
