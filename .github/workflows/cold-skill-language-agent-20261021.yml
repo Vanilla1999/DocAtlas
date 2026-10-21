@@ -1,0 +1,79 @@
+name: Cold model with and without installed DocAtlas skill
+on:
+  push:
+    branches: [audit/cold-skill-language-agent-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  paired-real-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [meridian, volna, mixed]
+    env:
+      UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/docatlas-runtime
+      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze exact main product and syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch -q origin 2959a248988ef57b30490278d973de65f75a2f7a --depth=1
+          git diff --exit-code 2959a248988ef57b30490278d973de65f75a2f7a HEAD -- docmancer pyproject.toml uv.lock SKILL.md eval/evidence_quality_v2
+          python -m py_compile eval/cold_skill_agent_probe.py eval/cold_skill_model_worker.py
+          mkdir -p "$RUNNER_TEMP/agent-audit"
+          git rev-parse HEAD > "$RUNNER_TEMP/agent-audit/head.txt"
+          sha256sum SKILL.md eval/cold_skill_agent_probe.py eval/cold_skill_model_worker.py > "$RUNNER_TEMP/agent-audit/source-hashes.txt"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Build and install verified DocAtlas wheel, prepare pinned MiniLM
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install uv==0.9.25
+          uv sync --frozen --no-dev --no-install-project --python "$(command -v python)"
+          uv build --wheel --out-dir "$RUNNER_TEMP/wheels"
+          uv pip install --python "$RUNNER_TEMP/docatlas-runtime/bin/python" --no-deps "$RUNNER_TEMP/wheels/"*.whl
+          "$RUNNER_TEMP/docatlas-runtime/bin/python" -c 'import tiktoken;tiktoken.get_encoding("o200k_base")'
+          "$RUNNER_TEMP/docatlas-runtime/bin/python" -m docmancer.docs.application.section_model "$RUNNER_TEMP/minilm"
+      - name: Build isolated public Qwen CPU worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/qwen-runtime"
+          "$RUNNER_TEMP/qwen-runtime/bin/python" -m pip install --disable-pip-version-check torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          "$RUNNER_TEMP/qwen-runtime/bin/python" -m pip install --disable-pip-version-check transformers==4.53.3
+          "$RUNNER_TEMP/qwen-runtime/bin/python" -m pip freeze > "$RUNNER_TEMP/agent-audit/qwen-freeze.txt"
+          "$RUNNER_TEMP/docatlas-runtime/bin/python" -m pip freeze > "$RUNNER_TEMP/agent-audit/docatlas-freeze.txt"
+      - name: Cold tasks in paired A/B with real public stdio MCP, no scripted calls
+        shell: bash
+        env:
+          GROUP: ${{ matrix.group }}
+        run: |
+          set -euo pipefail
+          TESTED_SHA="$(git rev-parse HEAD)" "$RUNNER_TEMP/docatlas-runtime/bin/python" -I \
+            eval/cold_skill_agent_probe.py \
+            --repo "$PWD" \
+            --work "$RUNNER_TEMP/cold-work" \
+            --out "$RUNNER_TEMP/agent-audit/results" \
+            --model "$RUNNER_TEMP/minilm" \
+            --model-python "$RUNNER_TEMP/qwen-runtime/bin/python" \
+            --group "$GROUP"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: cold-skill-model-${{ matrix.group }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/agent-audit/
+          retention-days: 30
+          if-no-files-found: error
