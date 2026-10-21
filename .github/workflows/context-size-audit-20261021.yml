@@ -1,0 +1,52 @@
+name: Audit actual context size on current main
+on:
+  push:
+    branches: [audit/context-size-current-main-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-stdio-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Verify main product code unchanged by audit branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch -q origin f8e17489733798c731f6b9c555adaee48b92fbf3 --depth=1
+          git diff --exit-code f8e17489733798c731f6b9c555adaee48b92fbf3 HEAD -- docmancer pyproject.toml uv.lock
+          python -m py_compile eval/context_size_probe_20261021.py
+          mkdir -p "$RUNNER_TEMP/context-probe-results"
+          git rev-parse HEAD > "$RUNNER_TEMP/context-probe-results/audit-head.txt"
+      - name: Build installed wheel and pinned MiniLM model for offline test
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-current-context-audit .
+      - name: Ask 20 fresh EN/RU questions twice over real MCP under 1GB
+        id: probe
+        shell: bash
+        run: |
+          set +e
+          docker run --name docatlas-current-context-audit \
+            --network none --cpus=2 --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/context-probe-results:/evidence" \
+            --entrypoint /opt/venv/bin/python docatlas-current-context-audit \
+            -I /repo/eval/context_size_probe_20261021.py \
+            --repo /repo --work /tmp/context-size-work --out /evidence/probe --model /model
+          rc=$?
+          docker inspect docatlas-current-context-audit > "$RUNNER_TEMP/context-probe-results/container.json"
+          echo "$rc" > "$RUNNER_TEMP/context-probe-results/exit-code.txt"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: current-main-mcp-context-size-20261021
+          path: ${{ runner.temp }}/context-probe-results/
+          retention-days: 30
+          if-no-files-found: error
