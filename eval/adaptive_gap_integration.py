@@ -276,7 +276,7 @@ def main():
     for flag in ("repo","work","out","model"):
         ap.add_argument("--"+flag,type=Path,required=True)
     ap.add_argument("--suite",choices=("v40","holdout"),required=True)
-    ap.add_argument("--policy",choices=("fixed","adaptive-gap-v1"),required=True)
+    ap.add_argument("--policy",choices=("fixed","adaptive-gap-v1","adaptive-gap-b1-v1"),required=True)
     ap.add_argument("--worker",action="store_true")
     ap.add_argument("--family")
     args=ap.parse_args()
@@ -297,7 +297,7 @@ def main():
     frozen={str(p.relative_to(args.repo)):sha(p.read_bytes()) for p in inputs_root.rglob("*") if p.is_file()}
     save(args.out/"FREEZE.json",{"head":os.environ.get("TESTED_SHA"),"installed":hashes,
         "corpus":frozen,"policy":args.policy,"suite":args.suite,"python":sys.version,
-        "selection":"fixed5 or full first90%-gap, B0, cap5; no fitted thresholds"})
+        "selection":"fixed5 or full first90%-gap, predeclared B0/B1, cap5; no fitted thresholds"})
     records=asyncio.run(client(args))
     assess(args,records)
     assert all(sha((args.repo/p).read_bytes())==h for p,h in frozen.items())
