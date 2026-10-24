@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/compact-context-delivery
-      - name: Apply anchored patch, remove this builder, push without force
+      - name: Apply hash-verified patch, remove temporary files, push without force
         shell: bash
         run: |
           set -euo pipefail
@@ -23,16 +23,15 @@ jobs:
           python - <<'PY'
           import base64,gzip,hashlib,subprocess
           from pathlib import Path
-          encoded='H4sIAAAAAAAC/8V9a3PbyJXod/2KDiZVJkcgJepliR5mR2PLsWr8iiVPNpdRoSASlDACAQYAJTOOqjZ7v9yqe6v2N9x/kNrarZvdrc3+Bfsf3fPobnTjQdIeJ+tkbAlonO4+fd7ndPc4nExEp3MV5sLf6sI/1/PLrbskvZlEyV22NUriPHiXd8ZBFN4G6aK7mEbics2GG2E8Dt4Jf3w4Hu3tdruH/sHRw9FE9La3D/b2Njqdztp9bmxubq7f77ffis7BobsrNuHvvX0Bv/+YXGb9DVH8mfn5dV/8/P17kc7jOEi7eTCdift7DTG4DcdBPAq2zK/SIA/iPEzizthfZH2xu22+DSedOOlMwijIOpNkHo/7IkjTJN3Y3NiEHpMoHC06WT4fL/r4QIjYnwZ98ZpeiHHoX8VJlocj0YqTXPxu7kdhvhD+aBTMch+G0qbxTv08Dd9182Tm3cCAO8azeRzmGTxj6DCxrJPEfTG/nMf5vBP5eZDl/C4Pp0EyzzvTMJ7DU5jJPr/I8hSaXakRCjHxw6gz8bO8Dz9GWaCec5e6Gcw+HkXzcWA8EaIj3tM4+6LnChpdX0TBlT9a3Nc321mv2e56zfZ1s6mf3oyTu7gD/wVp57Z3r6YbzDI95I6YZ4gMf4RrDNR1HYxuAE3fTi5HB5Pdo6Od8c7e5cOjg/G+v713OJnsPNydPJyMRnv+w8uD0fZRMYw7oFQLFWkwYXpjGu4Gt0BJ3dk8irw0+N0cVqZ7Hfjjbnbtiz/7MfFH+NhDnJ2fnJ0+8s2fHA+fnrepitR1s9eyp9+ztd96rp0+fn748GfQqgG6XL2l/S9NGw6pUZoU4Flv0d6dDaNjKpzMJGB4BLwoNdYuROE1A+Ist/qeKJ3zcuQ2DO/gFxELnpk6IwjuWnTXCFN7JQRcS2mLs0eDnf1ezxMBsMyBRe31XcQFqHz9EffRjlsQWLwTvYJ2cn6cjp0lczWdR4o87fpqHE3j2beD3DvYnh+OD/cuD4OH+5f7e9t7eUXC0c7l3eHgw2ds92H448bd3DBkOMsqP7kC3tdpLZBmzkBz7mjqpY8g+WDgvHJcFW5NGLuPIlqoVhby5hkIem2YPrNcU1WuKP2Vb/mwG/fkIdEvKGG+UTGcgBzL4uTtbgCXyyd9IY2hn/+Fkf6/X7Y52LseT3bFtDH06VLaLPv07NJEO990DsQl/7/TQRBoBe2bCO+MPpLGEplAfjYINAf/bHAcTkGmRhBmF0zBvtUXnF0DsuaQQx3FO3mH/gNtrYBYx8mcgMsGg8UFZ+ynqoWw+mUADWM3Fln+Z4aqK/BqGd51E4y5AYFAg7OeBGIgk6wbxbZjC0K+CvOU8efX4+Pz58Zl3dvL4/PTVS+/81Wvve8fFcbbo57ak3nAigWD/YSzeOz1o5uzgX7v4175zb1B26ocgASUGHhcYO0GiaTk1uPTCGDoIxx6RviO7BaqcpzjDEADBEEF'
-          # Never apply a truncated or corrupted upload.
-          patch=gzip.decompress(base64.b64decode(encoded,validate=True))
+          parts=[Path(f'.ci/pr221-completion-{i}.b64') for i in range(4)]
+          patch=gzip.decompress(base64.b64decode(''.join(p.read_text() for p in parts),validate=True))
           assert hashlib.sha256(patch).hexdigest()=='926e9e1495527238b5adc61a735b4e72ba86bc48c6bec529f7e927df7c71795b'
           Path('/tmp/pr221-followup.patch').write_bytes(patch)
           subprocess.run(['git','apply','--check','/tmp/pr221-followup.patch'],check=True)
           subprocess.run(['git','apply','--index','/tmp/pr221-followup.patch'],check=True)
           PY
           python -m compileall -q docmancer eval/context_delivery_integration.py eval/minilm_sections_integration.py
-          git rm .github/workflows/context-completion-apply-once.yml
+          git rm .github/workflows/context-completion-apply-once.yml .ci/pr221-completion-{0,1,2,3}.b64
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'fix: bounded MCP host history, SDK budgets and structural selection pilot'
