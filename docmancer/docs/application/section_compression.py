@@ -100,14 +100,14 @@ def selection_units() -> str:
     return value
 
 
-def _adaptive_cutoff(sorted_scores: list[float], cap: int) -> tuple[int, dict]:
+def _adaptive_cutoff(sorted_scores: list[float], cap: int, *, buffer: int = 0) -> tuple[int, dict]:
     """Experimental raw-logit largest gap; not semantic sufficiency or refusal.
 
-    Frozen from the archived full-gap-b0 experiment: search the first ceil(0.9N)
-    adjacent gaps, B=0, then cap at the host's fixed limit. Equal maximum gaps
-    choose the first. An exactly flat distribution retains the fixed cap because
-    it contains no ordering signal. No learned/calibrated probability threshold,
-    gold access, new model call, query rule, budget crop or source rewrite.
+    The archived study predeclared full-gap B0 and B1: search the first ceil(0.9N)
+    adjacent gaps, add the chosen fixed buffer, then cap at the host's limit.
+    Equal maximum gaps choose the first. An exactly flat distribution retains
+    the cap because it contains no ordering signal. No calibrated probability
+    threshold, gold access, new model call, query rule or source rewrite.
     This is an adaptation, NOT the cosine-similarity Adaptive-k paper algorithm.
     """
     count = len(sorted_scores)
@@ -118,7 +118,7 @@ def _adaptive_cutoff(sorted_scores: list[float], cap: int) -> tuple[int, dict]:
             or any(a < b for a, b in zip(sorted_scores, sorted_scores[1:]))):
         raise SectionCompressionError("section_compression_invalid_score")
     if count == 1:
-        return limit, {"gap_count": 0, "cutoff_rank": 1, "reason": "single_candidate"}
+        return limit, {"gap_count": 0, "cutoff_rank": 1, "reason": "single_candidate", "buffer": buffer}
     gap_count = min(count - 1, (9 * count + 9) // 10)
     gaps = [sorted_scores[i] - sorted_scores[i + 1] for i in range(gap_count)]
     position = max(range(gap_count), key=lambda i: gaps[i])
@@ -127,10 +127,10 @@ def _adaptive_cutoff(sorted_scores: list[float], cap: int) -> tuple[int, dict]:
         raise SectionCompressionError("section_compression_invalid_score")
     if largest == 0:
         return limit, {"gap_count": gap_count, "cutoff_rank": limit,
-                       "largest_gap": 0.0, "reason": "flat_scores_keep_cap"}
+                       "largest_gap": 0.0, "reason": "flat_scores_keep_cap", "buffer": buffer}
     cutoff = position + 1
-    return min(limit, cutoff), {"gap_count": gap_count, "cutoff_rank": cutoff,
-                               "largest_gap": largest, "reason": "largest_gap", "buffer": 0}
+    return min(limit, cutoff + buffer), {"gap_count": gap_count, "cutoff_rank": cutoff,
+                                        "largest_gap": largest, "reason": "largest_gap", "buffer": buffer}
 
 
 def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
@@ -328,7 +328,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         raise SectionCompressionError("section_compression_requires_native_read")
     top_k = selection_limit()
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
-    if policy not in {"fixed", "adaptive-gap-v1"}:
+    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"}:
         raise SectionCompressionError("section_compression_invalid_selection_policy")
     configured_top_k = top_k
     units = selection_units()
@@ -348,8 +348,9 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = directory
         scores, receipt = _ENGINE.score(question, sections)
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
-    if policy == "adaptive-gap-v1":
-        top_k, cutoff = _adaptive_cutoff([scores[i] for i in ranking], top_k)
+    if policy != "fixed":
+        top_k, cutoff = _adaptive_cutoff([scores[i] for i in ranking], top_k,
+                                       buffer=1 if policy == "adaptive-gap-b1-v1" else 0)
         receipt["adaptive_cutoff"] = cutoff
     selected = {row["evidence_id"] for i in ranking[:top_k] for row in sections[i].rows}
     retained = [row for row in rows if row["evidence_id"] in selected]
@@ -437,8 +438,8 @@ def _encode_section_candidate(payload: dict, *, context_format: str, group_by: s
         return payload
     if context_format == FORMAT and (
         payload.get("requires_confirmation") or payload.get("hard_stop")
-        or payload.get("status") == "confirmation_required"
         or (payload.get("delivery_decision") or {}).get("deliverable") is False
+        or payload.get("status") == "confirmation_required"
     ):
         return payload
     from .projection_tokenizer import projection_token_count
