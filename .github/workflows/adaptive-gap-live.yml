@@ -1,0 +1,126 @@
+name: Adaptive-gap live MCP paired acceptance
+on:
+  push:
+    branches: [experiment/minilm-adaptive-gap-20261025]
+    paths: ['docmancer/**', 'eval/adaptive_gap*', 'eval/adaptive_gap_holdout/**', '.github/workflows/adaptive-gap-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: adaptive-live-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [v40, holdout]
+        policy: [fixed, adaptive-gap-v1]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze source; preserve original V40 and tokenizer/scorer
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/adaptive-evidence"
+          git fetch -q origin 2c64d10aaee987d54da6974658812b9ae6d822ef --depth=1
+          git diff --exit-code 2c64d10aaee987d54da6974658812b9ae6d822ef HEAD -- eval/prepared_model_comparison40 pyproject.toml uv.lock
+          git rev-parse HEAD > "$RUNNER_TEMP/adaptive-evidence/head.txt"
+          python -m compileall -q docmancer eval/adaptive_gap_integration.py
+          git archive HEAD docmancer eval/adaptive_gap_integration.py eval/adaptive_gap_holdout .github/workflows/adaptive-gap-live.yml | gzip > "$RUNNER_TEMP/adaptive-evidence/tested-source.tar.gz"
+      - name: Install wheel and provision frozen model/tokenizers before offline execution
+        run: |
+          set -euo pipefail
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-adaptive-base .
+          docker build -t docatlas-adaptive-live - <<'DOCKER'
+          FROM docatlas-adaptive-base
+          RUN /opt/venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("cl100k_base")'
+          DOCKER
+      - name: Real SQLite, CPU ONNX and actual stdio responses under hard 1GB
+        env:
+          SUITE: ${{ matrix.suite }}
+          POLICY: ${{ matrix.policy }}
+        run: |
+          set +e
+          docker run --name adaptive-run --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/adaptive-evidence:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-adaptive-live -I /repo/eval/adaptive_gap_integration.py \
+            --repo /repo --work /tmp/live-study --out /evidence/run --model /model \
+            --suite "$SUITE" --policy "$POLICY"
+          rc=$?
+          docker inspect adaptive-run > "$RUNNER_TEMP/adaptive-evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/adaptive-evidence/exit-code.txt"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: adaptive-live-${{ matrix.suite }}-${{ matrix.policy }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/adaptive-evidence/
+          retention-days: 30
+          if-no-files-found: error
+
+  compare:
+    needs: live
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download exact-run arms
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/arms" "$RUNNER_TEMP/paired"
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'adaptive-live-*' --dir "$RUNNER_TEMP/arms"
+      - name: Report both quality and exact model-text cost, never confuse execution with quality
+        run: |
+          python - <<'PY'
+          import json, pathlib, os, statistics
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'arms'
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'paired'
+          summaries={}
+          rows=[]
+          missing=[]
+          for suite in ('v40','holdout'):
+              arms={}
+              for policy in ('fixed','adaptive-gap-v1'):
+                  folder=root/f'adaptive-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
+                  if not (folder/'SUMMARY.json').exists():
+                      missing.append(str(folder)); continue
+                  summary=json.loads((folder/'SUMMARY.json').read_text())
+                  assert summary['head']==os.environ['GITHUB_SHA']
+                  summaries[f'{suite}/{policy}']=summary
+                  arms[policy]={r['case_id']:r for r in json.loads((folder/'ASSESSMENTS.json').read_text())}
+              if len(arms)!=2: continue
+              assert arms['fixed'].keys()==arms['adaptive-gap-v1'].keys()
+              for cid,a in arms['fixed'].items():
+                  b=arms['adaptive-gap-v1'][cid]
+                  assert a['question']==b['question'] and a['search_question']==b['search_question']
+                  rows.append({'suite':suite,'case_id':cid,'category':a['answerability'],
+                      'fixed_pass':a['passed'],'adaptive_pass':b['passed'],
+                      'fixed_tokens':a['tokens'],'adaptive_tokens':b['tokens'],
+                      'fixed_k':a['selected_groups'],'adaptive_k':b['selected_groups'],
+                      'new_documented_loss':a['answerability']!='unanswerable' and a['passed'] and not b['passed']})
+          result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'cases':rows,
+              'missing_arms':missing,'new_documented_losses':[r['case_id'] for r in rows if r['new_documented_loss']],
+              'answer_generation_tested':False,'paid_selector_calls':0,'provider_usage':None}
+          result['accepted_for_default']=not missing and len(rows)==56 and not result['new_documented_losses'] and all(s['quality_gate_passed'] for s in summaries.values())
+          # A PASS here is only a retrieval regression gate; rollout still requires independent answer/client checks.
+          result['default_rollout_performed']=False
+          (out/'PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps({k:v for k,v in result.items() if k!='cases'},ensure_ascii=False,indent=2))
+          assert not missing, 'incomplete actual-MCP experiment'
+          assert result['accepted_for_default'], 'documented evidence quality failed; keep adaptive mode experimental'
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: adaptive-paired-${{ github.run_id }}
+          path: ${{ runner.temp }}/paired/
+          retention-days: 30
+          if-no-files-found: error
