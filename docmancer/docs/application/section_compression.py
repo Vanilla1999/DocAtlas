@@ -248,7 +248,17 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     retrieval.setdefault("retrieval_diagnostics", {})["section_compression"] = deepcopy(receipt)
     observed = _OBSERVER.get()
     if observed is not None:
-        observed.append(deepcopy(receipt))
+        # Host-only: no bodies, new inference calls, thresholds or input changes.
+        detail = deepcopy(receipt)
+        detail["ranked_sections"] = [
+            {"rank": rank, "score": scores[index], "selected": rank <= TOP_K,
+             "path": sections[index].rows[0].get("path_or_url"),
+             "section": sections[index].rows[0].get("section"),
+             "scoring_text_sha256": hashlib.sha256(sections[index].text.encode()).hexdigest(),
+             "evidence_ids": [r["evidence_id"] for r in sections[index].rows]}
+            for rank, index in enumerate(ranking, 1)
+        ]
+        observed.append(detail)
     return result, bindings
 
 

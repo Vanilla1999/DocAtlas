@@ -24,13 +24,13 @@ It is not:
 Use the unchanged original question and explicit project/library/version/scope/path bindings. Do not infer scope or subquestions. An explicit full translation to a declared documentation language belongs in search_question; keep question unchanged.
 
 The default public surface has exactly three tools:
-- `get_docs_context`: first tool for content and coding questions;
+- `get_docs_context`: documentation retrieval; in enabled language mode with unknown bound language, docs_status language preflight comes first;
 - `prepare_docs`: lifecycle work only after recommended_next_action or an explicit user request;
 - `docs_status`: explicit freshness, health, source-state, or job-progress checks.
 
 ## Default project workflow
 
-1. For documentation, including coding questions before the first edit, call:
+1. In enabled documentation-language mode, obtain unknown bound-source language with `docs_status(include_language=true)` BEFORE searching. Otherwise, for documentation and coding questions before the first edit, call:
    `get_docs_context(project_path=..., question=...)`
 
     Default calls return documentation context. No skill or guide read is required first. Cite returned sources and evidence IDs. Context is not answer proof or edit readiness; mutation requires a separate explicit target and authorization.

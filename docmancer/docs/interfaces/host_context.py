@@ -170,6 +170,8 @@ def extract_tool_payload(result: Any, *, structured_supported: bool = True) -> d
         raise EvidenceDeliveryError('error_tool_result')
     if 'isError' in value and type(value['isError']) is not bool:
         raise EvidenceDeliveryError('invalid_tool_error_flag')
+    # Pydantic dump uses meta; the JSON-RPC wire uses its _meta alias.
+    metadata = value.get('_meta') or value.get('meta') or {}
     structured = value.get('structuredContent')
     if structured is not None and not isinstance(structured, dict):
         raise EvidenceDeliveryError('malformed_structured_evidence')
@@ -186,6 +188,14 @@ def extract_tool_payload(result: Any, *, structured_supported: bool = True) -> d
     if len(candidates) != 1:
         if candidates or structured is None:
             raise EvidenceDeliveryError('missing_or_ambiguous_evidence_channel')
+    if len(candidates) == 1 and candidates[0].get('context_format') == 'docatlas.model-context.v1':
+        if structured is not None:
+            raise EvidenceDeliveryError('conflicting_evidence_channels')
+        from docmancer.docs.application.model_context_view import restore_model_result
+        try:
+            return restore_model_result(candidates[0], metadata)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise EvidenceDeliveryError('invalid_model_view_manifest') from exc
     if structured is not None:
         if not structured_supported:
             raise EvidenceDeliveryError('structured_evidence_unsupported: configure DOCATLAS_MCP_TEXT_FALLBACK=1')

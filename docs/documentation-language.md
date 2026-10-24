@@ -7,7 +7,7 @@ models, or implement semantic refusal.
 
 ## Optional lookup for an already selected source
 
-Normally call `get_docs_context` first; language preflight is not mandatory.
+Normally call `get_docs_context` directly unless enabled language mode requires unknown-language preflight first; language preflight is not mandatory.
 Request language metadata only when needed for an already bound source.
 
 ```json
@@ -102,3 +102,7 @@ Before composing an answer, connect each factual claim to an actual returned
 source. Retain supported parts, identify missing parts, and cite the supporting
 IDs. Valid source IDs or language hints alone do not prove semantic correctness.
 The existing Qwen answer-quality failures are not fixed by this metadata change.
+
+## Compact model delivery
+
+See [model context delivery](./model-context-delivery.md) for the explicit compatible-host opt-in. In enabled documentation-language mode, unknown bound-source language is read BEFORE any search. Otherwise retrieve directly. Unassessed coverage or whole-section selection alone does not require another query.

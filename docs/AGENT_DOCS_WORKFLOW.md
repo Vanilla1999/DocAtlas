@@ -6,7 +6,7 @@ The advertised runtime `ToolSpec` objects for the default Docs MCP surface are t
 
 ## Repository questions
 
-1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=...)` before the first edit. The `question` is one concrete documentation question, not a surrounding benchmark, evaluation, or documentation-governance meta-question.
+1. For documentation questions and coding or patch tasks, first obtain unknown bound-source language when language mode is enabled, then call `get_docs_context(project_path=..., question=...)` before the first edit. The `question` is one concrete documentation question, not a surrounding benchmark, evaluation, or documentation-governance meta-question.
 2. If the user provides multiple independent questions, including a benchmark/evaluation list, make separate `get_docs_context` calls. Keep each original question unchanged. For an enabled cross-language workflow, use declared-language preflight and supply a full translation in `search_question`; do not invent decompositions or expected answers. Preserve exact identifiers, versions, conditions, negation and both comparison sides. Lookups are retrieval hypotheses for that same question, not a batch channel, an expected answer, or guessed source names.
 3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged. If a `job_id` is returned, poll `docs_status(action="job", job_id=...)` within a bounded attempt/deadline policy and inspect the terminal result. A running, failed or cancelled job is not readiness; inspect its typed failure/action instead of blindly retrying retrieval.
 4. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or to poll a returned `job_id`, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
@@ -68,3 +68,7 @@ No translations from source instructions, keyword rewriting or subquestion rules
 Answer in the user's language, cite actual evidence, preserve supported partial
 answers and name missing facts. First associate claims with source evidence,
 then compose; source validity is not a semantic-correctness guarantee.
+
+## Compact model delivery
+
+See [model context delivery](./model-context-delivery.md) for the explicit compatible-host opt-in. In enabled documentation-language mode, unknown bound-source language is read BEFORE any search. Otherwise retrieve directly. Unassessed coverage or whole-section selection alone does not require another query.

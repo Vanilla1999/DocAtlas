@@ -346,6 +346,26 @@ def _mcp_tool_result(
     text_fallback: bool,
 ) -> Any:
     payload = compact_mcp_payload(payload)
+    if os.environ.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
+        from docmancer.docs.application.model_context_view import encode_model_result, canonical
+        try:
+            rendered = encode_model_result(payload)
+        except (ValueError, TypeError, KeyError) as exc:
+            payload = build_mcp_error_payload(
+                reason_code=getattr(exc, "reason_code", "invalid_model_context"),
+                message="Model context could not be delivered without losing source bindings.",
+                tool="get_docs_context", phase="validation",
+            )
+            rendered = None
+            text_fallback = True
+        if rendered is not None:
+            view, private = rendered
+            # Compatible host retains _meta outside the model transcript.
+            # Errors, denials and lifecycle actions bypass this representation.
+            return mcp_types.CallToolResult(
+                content=[mcp_types.TextContent(type="text", text=canonical(view))],
+                _meta=private,
+            )
     kwargs: dict[str, Any] = {
         "content": _json_text(mcp_types, payload, text_fallback=text_fallback),
     }
@@ -361,6 +381,8 @@ async def _run_async(service: LibraryDocsService) -> None:
     from mcp.server.stdio import stdio_server
     import mcp.types as mcp_types
 
+    if os.environ.get("DOCATLAS_MCP_MODEL_VIEW", "off") not in ("", "off", "1"):
+        raise ValueError("invalid DOCATLAS_MCP_MODEL_VIEW: use off or 1")
     server: Server = Server("docmancer-docs")
 
     @server.list_tools()
