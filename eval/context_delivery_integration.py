@@ -17,6 +17,7 @@ import sys
 DOCUMENT = "# QuillTransit\n\n## Session lease\n\nA session lease lasts 37 seconds. Renewal is allowed twice, with a 9 second pause. A signed refusal is never retried.\n\n## Export\n\nExports require an active session lease and explicit user approval.\n"
 QUESTION = "Сколько действует аренда сессии QuillTransit, сколько разрешено продлений и повторяется ли подписанный отказ?"
 TRANSLATION = "How long does a QuillTransit session lease last, how many renewals are allowed, and is a signed refusal retried?"
+ARMS = ("plain", "view", "view-structured")
 
 
 def load(name, path):
@@ -29,7 +30,18 @@ def load(name, path):
 
 def save(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + "\n")
+    path.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def ordinary_payload(reply):
+    """Status/error are not source-evidence packets; do not use the evidence SDK."""
+    if reply.structuredContent is not None:
+        assert isinstance(reply.structuredContent, dict)
+        return reply.structuredContent
+    assert len(reply.content) == 1 and reply.content[0].type == "text"
+    value = json.loads(reply.content[0].text)
+    assert isinstance(value, dict)
+    return value
 
 
 def worker(args):
@@ -44,13 +56,14 @@ def worker(args):
     catalog = root / "docatlas.project-docs.yaml"
     value = yaml.safe_load(catalog.read_text())
     value["documentation_languages"] = {"README.md": ["en"]}
-    catalog.write_text(yaml.safe_dump(value, sort_keys=False))
+    catalog.write_text(yaml.safe_dump(value, sort_keys=False), encoding="utf-8")
     with runtime.isolated_service(args.work / args.arm / "state") as (service, cfg):
         inventory = runtime.index_project(service, cfg, root)
         before = (helper.logical_state(inventory), helper.source_state(root))
         os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="minilm-sections-v1",
             DOCATLAS_MINILM_MODEL_DIR=str(args.model), DOCATLAS_CONTEXT_ABSTENTION="off",
-            DOCATLAS_MCP_TEXT_FALLBACK="1", DOCATLAS_MCP_MODEL_VIEW="1" if args.arm == "view" else "off")
+            DOCATLAS_MCP_TEXT_FALLBACK="0" if args.arm == "view-structured" else "1",
+            DOCATLAS_MCP_MODEL_VIEW="1" if args.arm.startswith("view") else "off")
         req = {"question": QUESTION, "search_question": TRANSLATION, "project_path": str(root)}
         off = call_docs_tool_payload("get_docs_context", req, service)
         with observe_section_compression() as trace:
@@ -61,8 +74,10 @@ def worker(args):
         try:
             asyncio.run(_run_async(service))
         finally:
+            peak = Path("/sys/fs/cgroup/memory.peak")
             save(out / "state.json", {"database_unchanged": before[0] == helper.logical_state(inventory),
-                "sources_unchanged": before[1] == helper.source_state(root)})
+                "sources_unchanged": before[1] == helper.source_state(root),
+                "container_peak_bytes": int(peak.read_text()) if peak.exists() else None})
 
 
 async def run(args):
@@ -75,7 +90,7 @@ async def run(args):
     from copy import deepcopy
     counts = {"preparations": 0, "stdio_tool_calls": 0, "public_handler_calls": 0, "resource_reads": 0}
     records = []
-    for arm in ("plain", "view"):
+    for arm in ARMS:
         out = args.out / arm
         out.mkdir(parents=True)
         root = args.work / arm / "project"
@@ -90,14 +105,19 @@ async def run(args):
                 await client.initialize()
                 tools = (await client.list_tools()).tools
                 assert {t.name for t in tools} == {"get_docs_context", "prepare_docs", "docs_status"}
+                if arm.startswith("view"):
+                    assert next(t for t in tools if t.name == "get_docs_context").outputSchema is None
                 save(out / "tools.json", [t.model_dump() for t in tools])
                 status = await client.call_tool("docs_status", {
                     "action": "project", "project_path": str(root), "include_language": True})
                 counts["stdio_tool_calls"] += 1
-                assert extract_tool_payload(status)["documentation_language"]["languages"] == ["en"]
+                save(out / "language.json", status.model_dump(by_alias=True))
+                assert not status.isError
+                assert ordinary_payload(status)["documentation_language"]["languages"] == ["en"]
                 req = {"question": QUESTION, "search_question": TRANSLATION, "project_path": str(root)}
                 result = await client.call_tool("get_docs_context", req)
                 counts["stdio_tool_calls"] += 1
+                save(out / "reply.json", result.model_dump(by_alias=True))
                 assert not result.isError
                 wire = extract_tool_payload(result)
                 payload = expand_sections(wire)
@@ -113,8 +133,7 @@ async def run(args):
                     span = "".join(DOCUMENT.splitlines(keepends=True)[row["line_start"]-1:row["line_end"]])
                     assert row["snippet"] in span
                 visible = json.loads(result.content[0].text)
-                save(out / "reply.json", result.model_dump(by_alias=True))
-                if arm == "view":
+                if arm.startswith("view"):
                     assert visible["context_format"] == FORMAT and result.structuredContent is None
                     meta = result.model_dump(by_alias=True)["_meta"]
                     source = resolve_model_reference(visible, meta, visible["sources"][0]["ref"])
@@ -157,7 +176,7 @@ async def run(args):
                 ):
                     response = await client.call_tool("get_docs_context", request)
                     counts["stdio_tool_calls"] += 1
-                    error = json.loads(response.content[0].text)
+                    error = ordinary_payload(response)
                     assert response.isError and error["error"]["reason_code"] == expected
                     assert error.get("context_format") != FORMAT and not response.model_dump(by_alias=True).get("_meta")
                     save(out / f"{label}.json", error)
@@ -165,7 +184,7 @@ async def run(args):
                 full = json.dumps(wire, ensure_ascii=False, separators=(",", ":")).encode()
                 record = {"arm": arm, "status": payload["status"], "rows": len(payload["sources"]),
                     "model_text_tokens": projection_token_count(body), "machine_packet_tokens": projection_token_count(full)}
-                if arm == "view":
+                if arm.startswith("view"):
                     assert record["model_text_tokens"] < record["machine_packet_tokens"]
                 records.append(record)
         state = json.loads((out / "state.json").read_text())
@@ -183,7 +202,7 @@ def main():
     for name in ("repo", "work", "out", "model"):
         parser.add_argument("--"+name, type=Path, required=True)
     parser.add_argument("--worker", action="store_true")
-    parser.add_argument("--arm", choices=("plain", "view"))
+    parser.add_argument("--arm", choices=ARMS)
     args = parser.parse_args()
     for name in ("repo", "work", "out", "model"):
         setattr(args, name, getattr(args, name).resolve())
