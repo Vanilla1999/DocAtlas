@@ -2,7 +2,7 @@ name: Adaptive-gap live MCP paired acceptance
 on:
   push:
     branches: [experiment/minilm-adaptive-gap-20261025]
-    paths: ['.github/workflows/adaptive-gap-live.yml']
+    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/docs/application/section_compression.py', 'eval/adaptive_gap_integration.py']
   workflow_dispatch:
 permissions:
   contents: read
@@ -109,11 +109,18 @@ jobs:
               'new_documented_losses':{p:[r['case_id'] for r in rows if r['policy']==p and r['new_documented_loss']]
                   for p in ('adaptive-gap-v1','adaptive-gap-b1-v1')},
               'answer_generation_tested':False,'paid_selector_calls':0,'provider_usage':None,'default_rollout_performed':False}
-          result['buffer1_documented_evidence_gate_passed']=not missing and len(rows)==112 and not result['new_documented_losses']['adaptive-gap-b1-v1'] and all(s['quality_gate_passed'] for key,s in summaries.items() if not key.endswith('/adaptive-gap-v1'))
+          result['uncapped_b1_examples']=[{'suite':r['suite'],'case_id':r['case_id'],'groups':r['candidate_k']} for r in rows if r['policy']=='adaptive-gap-b1-v1' and r['candidate_k']>5]
+          result['buffer1_documented_evidence_gate_passed']=(
+              not missing and len(rows)==112
+              and not result['new_documented_losses']['adaptive-gap-b1-v1']
+              and bool(result['uncapped_b1_examples'])
+              and all(s['quality_gate_passed'] for key,s in summaries.items() if not key.endswith('/adaptive-gap-v1'))
+              and all(s['tokens_max'] <= 12000 for s in summaries.values())
+          )
           (out/'PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps({k:v for k,v in result.items() if k!='cases'},ensure_ascii=False,indent=2))
           assert not missing, 'incomplete actual-MCP experiment'
-          assert result['buffer1_documented_evidence_gate_passed'], 'buffer1 loses required facts; keep experimental'
+          assert result['buffer1_documented_evidence_gate_passed'], 'uncapped buffer1 regression, oversized context or no >5-group actual delivery'
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
