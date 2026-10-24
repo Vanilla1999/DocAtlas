@@ -8,6 +8,7 @@ opaque continuation URIs and MCP _meta never enter that projection.
 from __future__ import annotations
 
 from copy import deepcopy
+import asyncio
 import hashlib
 import json
 from typing import Any
@@ -77,10 +78,12 @@ class ModelContextSession:
         allowed = {"project_path", "library", "version", "module_path", "scope"}
         if not isinstance(question, str) or not question.strip():
             raise ModelSessionError("question_required")
-        if set(bindings) - allowed or not (bindings.get("project_path") or bindings.get("library")):
+        if not isinstance(bindings, dict) or set(bindings) - allowed or not (bindings.get("project_path") or bindings.get("library")):
             raise ModelSessionError("exact_source_bindings_required")
         if bindings.get("module_path") and bindings.get("scope") not in (None, "module"):
             raise ModelSessionError("conflicting_module_scope")
+        if bindings.get("scope") == "module" and not bindings.get("module_path"):
+            raise ModelSessionError("exact_module_path_required")
         if type(language_mode) is not bool:
             raise ModelSessionError("invalid_language_mode")
         if language_mode and bindings.get("scope") == "all":
@@ -89,6 +92,9 @@ class ModelContextSession:
             if type(value) is not int or value < 1:
                 raise ModelSessionError("invalid_host_budget")
         self.client = client
+        self._lock = asyncio.Lock()
+        self._epoch = 0
+        self._pending = False
         self._question = question
         self._bindings = deepcopy(bindings)
         self._canonical_id = canonical_id
@@ -113,6 +119,7 @@ class ModelContextSession:
 
     def invalidate(self) -> None:
         """Host explicit source/version/access change: drop active, not audit."""
+        self._epoch += 1
         self._language = None
         self._snapshot = None
         self._events.clear()
@@ -129,18 +136,57 @@ class ModelContextSession:
 
     async def tools(self, *, lifecycle_requested: bool = False) -> list[dict]:
         """Only expose relevant definitions; the server keeps all three tools."""
-        if not self._tools:
-            response = await self.client.list_tools()
-            self._tools = [tool.model_dump(exclude_none=True) for tool in response.tools]
-        names = {"get_docs_context"}
-        if self._language_mode and self._language is None:
-            names = {"docs_status"}
-        if lifecycle_requested or (self._recommended or {}).get("tool") == "prepare_docs":
-            names.add("prepare_docs")
-        # This adapter never executes lifecycle changes or supplies confirmations.
-        return deepcopy([tool for tool in self._tools if tool["name"] in names])
+        if type(lifecycle_requested) is not bool:
+            raise ModelSessionError("invalid_lifecycle_request")
+        async with self._lock:
+            if not self._tools:
+                response = await self.client.list_tools()
+                self._tools = [tool.model_dump(exclude_none=True) for tool in response.tools]
+            names = {"get_docs_context"}
+            if self._language_mode and self._language is None:
+                names = {"docs_status"}
+            if lifecycle_requested or (self._recommended or {}).get("tool") == "prepare_docs":
+                names.add("prepare_docs")
+            # Exposure never executes lifecycle changes or supplies confirmations.
+            return deepcopy([tool for tool in self._tools if tool["name"] in names])
+
+    async def _exchange(self, tool: str, request: dict) -> Any:
+        """Record every real attempt and reject replies from an invalidated turn.
+
+        Methods serialize on _lock; invalidate() intentionally remains callable
+        while awaiting transport. A delayed reply cannot resurrect revoked refs.
+        """
+        self._room()
+        epoch = self._epoch
+        record = {"tool": tool, "arguments": deepcopy(request)}
+        self._audit.append(record)
+        self._pending = True
+        try:
+            result = await self.client.call_tool(tool, request)
+            record["result"] = _wire(result)
+        except BaseException as exc:
+            # Never retain old active evidence after a failed freshness/read
+            # check. Do not forward exception text (paths/credentials) to LLMs.
+            record["transport_error"] = type(exc).__name__
+            self.invalidate()
+            self._events.append({"error": {"reason_code": "mcp_transport_failed"}})
+            if isinstance(exc, Exception):
+                raise ModelSessionError("mcp_transport_failed") from exc
+            raise
+        finally:
+            self._pending = False
+        if epoch != self._epoch:
+            record["discarded_reason"] = "session_invalidated_during_request"
+            raise ModelSessionError("session_invalidated_during_request")
+        return result
 
     async def language(self, *, refresh: bool = False) -> dict:
+        if type(refresh) is not bool:
+            raise ModelSessionError("invalid_refresh")
+        async with self._lock:
+            return await self._language_request(refresh=refresh)
+
+    async def _language_request(self, *, refresh: bool) -> dict:
         if self._language is not None and not refresh:
             return deepcopy(self._language)
         self._room()
@@ -153,13 +199,17 @@ class ModelContextSession:
             if self._bindings.get("module_path"):
                 request["module"] = self._bindings["module_path"]
         request["include_language"] = True
-        result = await self.client.call_tool("docs_status", request)
-        self._audit.append({"tool": "docs_status", "arguments": deepcopy(request), "result": _wire(result)})
-        profile = _status(result).get("documentation_language")
-        if not isinstance(profile, dict):
-            raise ModelSessionError("language_metadata_unavailable")
+        result = await self._exchange("docs_status", request)
+        try:
+            profile = _status(result).get("documentation_language")
+            if not isinstance(profile, dict):
+                raise ModelSessionError("language_metadata_unavailable")
+        except (ValueError, KeyError, TypeError) as exc:
+            self.invalidate()
+            self._events.append({"error": {"reason_code": "language_metadata_unavailable"}})
+            raise ModelSessionError("language_metadata_unavailable") from exc
         snapshot = profile.get("snapshot_sha256")
-        if snapshot != self._snapshot:
+        if snapshot != self._snapshot or not snapshot:
             self.invalidate()
         self._snapshot = snapshot if isinstance(snapshot, str) and snapshot else None
         self._language = deepcopy(profile)
@@ -168,6 +218,13 @@ class ModelContextSession:
     async def retrieve(self, *, search_question: str | None = None,
                        lookup_queries: list[str] | None = None,
                        missing_fact: str | None = None) -> dict:
+        async with self._lock:
+            return await self._retrieve_request(search_question=search_question,
+                lookup_queries=lookup_queries, missing_fact=missing_fact)
+
+    async def _retrieve_request(self, *, search_question: str | None,
+                                lookup_queries: list[str] | None,
+                                missing_fact: str | None) -> dict:
         if self._language_mode and self._language is None:
             raise ModelSessionError("language_preflight_required")
         if self._searches >= self._max_searches:
@@ -189,9 +246,8 @@ class ModelContextSession:
         self._room()
         self._seen.add(fingerprint)
         self._searches += 1
-        result = await self.client.call_tool("get_docs_context", request)
+        result = await self._exchange("get_docs_context", request)
         raw = _wire(result)
-        self._audit.append({"tool": "get_docs_context", "arguments": deepcopy(request), "result": raw})
         if raw.get("isError"):
             self.invalidate()
             self._events.append({"error": _status_error(raw)})
@@ -239,7 +295,11 @@ class ModelContextSession:
         if missing_fact is not None:
             event["caller_assessed_gap"] = missing_fact
         candidate = self._input(new_sources, [*self._events, event])
-        self._check_budget(candidate)
+        try:
+            self._check_budget(candidate)
+        except ModelSessionError:
+            self.invalidate()
+            raise
         self._sources, self._originals, self._identities = new_sources, new_originals, new_identities
         self._events.append(event)
         self._recommended = deepcopy(payload.get("recommended_next_action"))
@@ -269,11 +329,15 @@ class ModelContextSession:
 
     def model_input(self) -> dict:
         """Fresh deduplicated input, NOT an append-only transcript or full prompt."""
+        if self._pending:
+            raise ModelSessionError("session_operation_in_progress")
         value = self._input(self._sources, self._events)
         self._check_budget(value)
         return value
 
     def resolve(self, reference: str) -> dict:
+        if self._pending:
+            raise ModelSessionError("session_operation_in_progress")
         if reference not in self._originals:
             raise ModelSessionError("unknown_or_invalidated_reference")
         return deepcopy(self._originals[reference])

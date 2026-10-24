@@ -76,7 +76,7 @@ jobs:
           if-no-files-found: error
 
   policy-study:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'run-selection-study')
     name: Policy diagnostic (not quality acceptance) ${{ matrix.top_k }}-${{ matrix.units }}
     runs-on: ubuntu-latest
     timeout-minutes: 35

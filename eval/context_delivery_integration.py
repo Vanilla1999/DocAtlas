@@ -82,6 +82,59 @@ def worker(args):
                 "container_peak_bytes": int(peak.read_text()) if peak.exists() else None})
 
 
+async def invalidation_during_delivery(client, root, out, counts):
+    """Delay an ACTUAL transport response; retrieval/model/SQLite are unchanged.
+
+    This transport scheduling gate supplies no fake result and makes exactly
+    one real get_docs_context call. The host revokes its turn before delivery.
+    """
+    from docmancer.docs.interfaces.model_context_session import ModelContextSession, ModelSessionError
+
+    class DeliveryGate:
+        def __init__(self):
+            self.arrived, self.release = asyncio.Event(), asyncio.Event()
+
+        async def call_tool(self, tool, arguments):
+            response = await client.call_tool(tool, arguments)
+            self.arrived.set()
+            await self.release.wait()
+            return response
+
+    gate = DeliveryGate()
+    turn = ModelContextSession(gate, question=QUESTION, bindings={"project_path": str(root)})
+    task = asyncio.create_task(turn.retrieve(search_question=TRANSLATION))
+    try:
+        await asyncio.wait_for(gate.arrived.wait(), timeout=180)
+        counts["stdio_tool_calls"] += 1
+        try:
+            turn.model_input()
+        except ModelSessionError as exc:
+            assert str(exc) == "session_operation_in_progress"
+        else:
+            raise AssertionError("in-flight evidence was exposed as current")
+        turn.invalidate()
+        gate.release.set()
+        try:
+            await task
+        except ModelSessionError as exc:
+            assert str(exc) == "session_invalidated_during_request", str(exc)
+        else:
+            raise AssertionError("delayed reply resurrected invalidated sources")
+        assert not turn.model_input()["sources"]
+        assert turn.audit[0]["result"] and not turn.audit[0]["result"]["isError"]
+        save(out / "inflight-invalidation.json", {"passed": True,
+            "audit": turn.audit, "input": turn.model_input(),
+            "boundary": "real MCP response paused at transport delivery; no fabricated evidence"})
+    finally:
+        gate.release.set()
+        if not task.done():
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+
 async def run(args):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
@@ -146,8 +199,9 @@ async def run(args):
                     raise AssertionError("retrieval bypassed language preflight")
                 assert not managed.audit
                 assert {t["name"] for t in await managed.tools()} == {"docs_status"}
-                assert (await managed.language())["languages"] == ["en"]
-                assert (await managed.language())["languages"] == ["en"]
+                # Concurrent caller requests must share ONE real preflight.
+                profiles = await asyncio.gather(managed.language(), managed.language())
+                assert all(profile["languages"] == ["en"] for profile in profiles)
                 assert len(managed.audit) == 1, "cached preflight made another product call"
                 assert {t["name"] for t in await managed.tools()} == {"get_docs_context"}
                 first = await managed.retrieve(search_question=TRANSLATION)
@@ -247,6 +301,15 @@ async def run(args):
                     save(out / f"{label}.json", {"isError": response.isError, "payload": error})
                     assert response.isError and error["error"]["reason_code"] == expected, (label, error)
                     assert error.get("context_format") != FORMAT and not response.model_dump(by_alias=True).get("_meta")
+                # Keep a real active response for the closed-transport probe below.
+                transport_guard = ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root)})
+                active = await transport_guard.retrieve(search_question=TRANSLATION)
+                counts["stdio_tool_calls"] += 1
+                active_ref = active["sources"][0]["ref"]
+                assert transport_guard.resolve(active_ref)["snippet"]
+                if arm == "view":
+                    await invalidation_during_delivery(client, root, out, counts)
                 body = result.content[0].text.encode()
                 full = json.dumps(wire, ensure_ascii=False, separators=(",", ":")).encode()
                 record = {"arm": arm, "status": payload["status"], "rows": len(payload["sources"]),
@@ -254,6 +317,24 @@ async def run(args):
                 if arm.startswith("view"):
                     assert record["model_text_tokens"] < record["machine_packet_tokens"]
                 records.append(record)
+        # A genuine closed MCP session, not a mocked failure: freshness failure
+        # must make retained evidence and references unavailable to the model.
+        try:
+            await transport_guard.language(refresh=True)
+        except ModelSessionError as exc:
+            assert str(exc) == "mcp_transport_failed", str(exc)
+        else:
+            raise AssertionError("closed transport unexpectedly remained usable")
+        assert not transport_guard.model_input()["sources"]
+        try:
+            transport_guard.resolve(active_ref)
+        except ModelSessionError:
+            pass
+        else:
+            raise AssertionError("failed freshness check retained a citation")
+        counts["closed_transport_attempts"] = counts.get("closed_transport_attempts", 0) + 1
+        save(out / "closed-transport.json", {"passed": True,
+            "input": transport_guard.model_input(), "audit": transport_guard.audit})
         state = json.loads((out / "state.json").read_text())
         assert state["database_unchanged"] and state["sources_unchanged"]
         trace = json.loads((out / "trace.json").read_text())[0]
