@@ -3,8 +3,8 @@
 This extends the existing local `cross-encoder/ms-marco-MiniLM-L6-v2` selector.
 There is no extra model, training, network call, hosted selector, new MCP tool,
 source summary or rewriting. The original MiniLM scores all admitted groups;
-only the number of top-ranked whole groups changes. Fixed Top-5 remains the
-default. This is not semantic sufficiency or an absence-of-answer classifier.
+only the number of top-ranked whole groups changes. The fixed Top-5 remains
+a backwards-compatible fallback, NOT a limit on Adaptive-k. It remains the default. This is not semantic sufficiency or an absence-of-answer classifier.
 
 ## Host settings
 
@@ -13,22 +13,27 @@ Provision and enable MiniLM as in `minilm-sections.md`, then explicitly select:
 ```sh
 export DOCATLAS_CONTEXT_COMPRESSION=minilm-sections-v1
 export DOCATLAS_MINILM_MODEL_DIR=/absolute/private/minilm-model
-export DOCATLAS_SECTION_TOP_K=5
 export DOCATLAS_SECTION_SELECTION=adaptive-gap-b1-v1
 ```
 
 `DOCATLAS_SECTION_SELECTION` accepts:
 
-- `fixed` (default): existing fixed cap.
+- `fixed` (default): existing fixed Top-5 (or a host-selected fixed cap).
 - `adaptive-gap-v1`: experimental largest gap, no buffer (B0).
-- `adaptive-gap-b1-v1`: same rule plus one additional ranked group (B1), bounded
-  by the same host cap and available groups.
+- `adaptive-gap-b1-v1`: same rule plus one additional ranked group (B1).
+  Adaptive-k now has **no hard-coded maximum of 5 groups** and ignores
+  `DOCATLAS_SECTION_TOP_K`; it may select 6, 10 or more admitted groups.
 
 Unsupported values fail operationally; a runtime error is never a semantic
 refusal. Existing query/model memory/output limits still apply. No selected
 source is silently truncated to satisfy a token budget. `question` is unchanged;
 when explicitly provided, its full translation `search_question` still drives
 MiniLM. This selector does not translate or infer source language.
+
+The earlier capped B1 measurements are historical and **cannot be extrapolated
+to uncapped selection**. An uncapped policy may return *more* tokens on some
+questions. Compare complete model-visible content, source witnesses, operational
+errors and full inference costs before default rollout.
 
 The reduced model-text measurements also use the existing compatible-host-only
 `DOCATLAS_MCP_MODEL_VIEW=1`. A host must retain `_meta` for source resolution and
@@ -40,11 +45,19 @@ packet remains larger. See `model-context-delivery.md` and
 
 For N descending finite raw cross-encoder scores, consider
 `min(N-1, ceil(0.9*N))` adjacent differences. Pick the first maximum difference.
-B0 keeps that prefix; B1 adds one further group. Clamp to the configured cap and
-N. A single candidate is retained. An exactly flat distribution keeps the cap;
-it has no gap signal. Source groups and selected original rows remain unchanged.
-Diagnostics record the policy, configured cap, raw cutoff rank, gap count and
-largest difference outside the model context. No expected answers, keywords,
+B0 keeps that prefix; B1 adds one further group, up to N, **without a five-group
+ceiling**. A single candidate is retained. An exactly flat distribution proposes
+all N groups; it has no gap signal. Source groups and original rows stay intact.
+
+The independent full-machine-packet **12,000-token output budget** remains. If
+all proposed groups do not fit, the server finds the largest whole-group prefix
+that fits and exposes a real `status=truncated`, `source_selection.budget_limited`
+and host-only `adaptive_cutoff.selected_after_budget` instead of silently omitting
+text or claiming semantic completeness. If even the highest-ranked full group
+cannot fit, the server returns an explicit operational output-limit error.
+This is a *token budget*, not a substitute fixed number of groups.
+Diagnostics record policy, raw cutoff rank, gap count, budget limit and actual
+delivered groups outside the model context. No expected answers, keywords,
 question-specific exceptions or fitted relevance probabilities are consulted.
 
 This is an empirical adaptation of a gap-selection idea, NOT a reproduction
