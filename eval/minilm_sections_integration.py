@@ -87,6 +87,7 @@ def worker(args):
                     save(out / (case["id"] + "-baseline-time.json"), time.perf_counter() - start)
                 assert observations == [], "disabled mode must not score"
             os.environ.update(
+                DOCATLAS_MCP_MODEL_VIEW="1" if args.model_view else "off",
                 DOCATLAS_CONTEXT_COMPRESSION="minilm-sections-v1",
                 DOCATLAS_MINILM_MODEL_DIR=str(args.model),
                 DOCATLAS_MCP_TEXT_FALLBACK="1",
@@ -122,7 +123,7 @@ def assert_operational_error(response, expected, receipt_path):
 async def client(args):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
-    from docmancer.docs.application.section_compression import expand_sections, FORMAT
+    from docmancer.docs.application.section_compression import expand_sections, encode_sections, FORMAT, LEGACY_FORMAT
     _, cases, families = dataset(args.repo)
     records, controls = [], []
     for family in families:
@@ -131,6 +132,7 @@ async def client(args):
         out.mkdir(parents=True, exist_ok=True)
         params = StdioServerParameters(command=sys.executable, args=[
             "-I", str(Path(__file__).resolve()), "--worker", "--family", group,
+            *( ["--model-view"] if args.model_view else [] ),
             "--repo", str(args.repo), "--work", str(args.work),
             "--out", str(args.out), "--model", str(args.model),
         ], env=dict(os.environ))
@@ -149,12 +151,35 @@ async def client(args):
                         assert not result.isError, result
                         assert len(result.content) == 1 and result.content[0].type == "text"
                         text = result.content[0].text
-                        wire = json.loads(text)
-                        assert wire.get("context_format") == FORMAT, wire
+                        display = json.loads(text)
+                        if args.model_view:
+                            from docmancer.docs.interfaces.host_context import extract_tool_payload
+                            from docmancer.docs.application.model_context_view import resolve_model_reference, FORMAT as VIEW_FORMAT
+                            assert display["context_format"] == VIEW_FORMAT
+                            raw_result = result.model_dump(by_alias=True)
+                            wire = extract_tool_payload(result)
+                            metadata = raw_result["_meta"]
+                            restored = expand_sections(wire)
+                            assert [x["text"] for x in display["sources"]] == [x["snippet"] for x in restored["sources"]]
+                            for visible, source in zip(display["sources"], restored["sources"], strict=True):
+                                assert resolve_model_reference(display, metadata, visible["ref"]) == source
+                            save(out / (case["id"] + "-private.json"), metadata)
+                        else:
+                            wire = display
+                        source_wire_text = json.dumps(wire, ensure_ascii=False, separators=(",", ":"))
+                        assert wire.get("context_format") in (FORMAT, LEGACY_FORMAT), wire
                         assert result.structuredContent is None, "must not duplicate full metadata in another output"
-                        assert text == json.dumps(wire, ensure_ascii=False, separators=(",", ":"))
+                        assert text == json.dumps(display, ensure_ascii=False, separators=(",", ":"), sort_keys=args.model_view)
                         expanded = expand_sections(wire)
-                        assert wire["estimated_tokens"] == wire_cost(text)[0] <= 12000
+                        assert wire == json.loads(source_wire_text), "decoder must not mutate received wire data"
+                        assert expand_sections(expanded) == expanded, "expanded public DTO must remain lossless"
+                        # Diagnostic serialization of the same delivered sources,
+                        # not a second retrieval or historical emitted-wire run.
+                        legacy = encode_sections(expanded, context_format=LEGACY_FORMAT)
+                        assert expand_sections(legacy) == expanded
+                        legacy_text = json.dumps(legacy, ensure_ascii=False, separators=(",", ":"))
+                        assert wire["estimated_tokens"] == wire_cost(source_wire_text)[0] <= 12000
+                        assert wire_cost(text)[0] <= 12000
                         baseline = json.loads((out / (case["id"] + "-baseline.json")).read_text())
                         old = {r["evidence_id"]: r for r in baseline["sources"]}
                         assert expanded["sources"], "ranking failure must not masquerade as abstention"
@@ -172,8 +197,17 @@ async def client(args):
                         save(out / (case["id"] + "-expanded.json"), expanded)
                         records.append({
                             "case_id": case["id"], "family": group,
+                            "context_format": display["context_format"],
+                            "model_view": args.model_view,
+                            "same_call_machine_tokens": wire_cost(source_wire_text)[1],
                             "baseline_tokens": wire_cost(json.dumps(baseline, ensure_ascii=False))[1],
                             "tokens": wire_cost(text)[1], "cost": wire_cost(text)[0],
+                            "wire_utf8_bytes": len(text.encode("utf-8")),
+                            "same_payload_v1_tokens": wire_cost(legacy_text)[1],
+                            "same_payload_v1_cost": wire_cost(legacy_text)[0],
+                            "same_payload_v1_utf8_bytes": len(legacy_text.encode("utf-8")),
+                            "v1_comparison_boundary": "diagnostic reserialization; not historical emitted wire",
+                            "expanded_utf8_bytes": len(json.dumps(expanded, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
                             "rows": len(expanded["sources"]), "sections": len(chosen),
                             "seconds": elapsed, "whole_acquired_sections": True, "roundtrip_sources": True,
                         })
@@ -264,8 +298,10 @@ def assess(args, records, controls):
         valid = not errors and not coverage.get("errors")
         passed = valid and (not payload["sources"] if case["answerability"] == "unanswerable"
                             else coverage["all_documented_claims_covered"])
+        cost_non_regression = record["cost"] <= record["same_payload_v1_cost"]
         results.append({**record, "answerability": case["answerability"],
-                        "passed": passed, "integrity": valid, "coverage": coverage, "errors": errors})
+                        "passed": passed, "integrity": valid, "coverage": coverage, "errors": errors,
+                        "cost_non_regression": cost_non_regression})
     import statistics
     server_reports = [json.loads((args.out / family / "server.json").read_text()) for family in families]
     summary = {
@@ -274,6 +310,8 @@ def assess(args, records, controls):
         "partial_pass": sum(r["passed"] for r in results if r["answerability"] == "partial"),
         "strict_empty_pass": sum(r["passed"] for r in results if r["answerability"] == "unanswerable"),
         "integrity_pass": sum(r["integrity"] for r in results),
+        "model_view": args.model_view,
+        "same_call_machine_tokens_mean": statistics.mean(r["same_call_machine_tokens"] for r in results),
         "tokens_mean": statistics.mean(r["tokens"] for r in results),
         "tokens_max": max(r["tokens"] for r in results),
         "baseline_tokens_mean": statistics.mean(r["baseline_tokens"] for r in results),
@@ -281,6 +319,7 @@ def assess(args, records, controls):
         "server_rss_peak_bytes": max(r["rss_peak_bytes"] for r in server_reports),
         "container_memory_peak": max((r["container_memory_peak"] or 0) for r in server_reports),
         "controls": controls, "failed": [r["case_id"] for r in results if not r["passed"]],
+        "cost_regressions": [r["case_id"] for r in results if not r["cost_non_regression"]],
         "boundary": "installed wheel; real SQLite; public stdio MCP; client-received bytes",
         "semantic_refusal_implemented": False,
     }
@@ -292,12 +331,14 @@ def assess(args, records, controls):
     print(json.dumps(summary, indent=2), flush=True)
     assert all(r["integrity"] for r in results)
     assert all(r["passed"] for r in results if r["answerability"] != "unanswerable"), "positive/partial quality gate"
+    assert all(r["cost_non_regression"] for r in results), "emitted cost exceeds same-payload v1 diagnostic"
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("repo", "work", "out", "model"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--model-view", action="store_true")
     parser.add_argument("--worker", action="store_true")
     parser.add_argument("--family")
     parser.add_argument("--missing-model", action="store_true")

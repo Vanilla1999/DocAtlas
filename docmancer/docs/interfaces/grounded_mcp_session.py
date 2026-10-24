@@ -12,6 +12,7 @@ from pathlib import PurePosixPath
 
 from .host_context import SourceReadController, extract_tool_payload, validate_patch_context_payload
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+from docmancer.docs.application.section_compression import expand_sections
 
 RECOVERY_BINDING_KEYS = (
     'project_path', 'library', 'libraries', 'ecosystem', 'version', 'source_type',
@@ -32,6 +33,11 @@ class GroundedMCPSession:
         return cls(client, arguments, context, requested_facts)
 
     def __init__(self, client, arguments, context, requested_facts):
+        # Price the received representation, then restore evidence/defaults for
+        # host decisions. Expansion does not issue source or edit capabilities.
+        if context.get('kind') != 'patch_context' and docs_context_budget_tokens(context) > 800:
+            raise ValueError('project response exceeds the host evidence budget')
+        context = expand_sections(context)
         if any(context.get(flag) is True for flag in ('answer_supported', 'answer_available', 'edit_ready')):
             raise ValueError('grounded project sessions require retrieval-only evidence')
         self._arguments = deepcopy(arguments)
@@ -40,8 +46,6 @@ class GroundedMCPSession:
         self._patch = context.get('kind') == 'patch_context'
         if arguments.get('context_format') == 'patch_context' and not self._patch:
             raise ValueError('explicit patch representation was not delivered')
-        if not self._patch and docs_context_budget_tokens(context) > 800:
-            raise ValueError('project response exceeds the host evidence budget')
         reading_context = context if context.get('kind') in {'docs_context', 'patch_context'} else {'kind': 'docs_context', 'sources': []}
         self._controller = SourceReadController(reading_context, requested_facts=requested_facts,
                                                  read_resource=self._read_resource)
@@ -155,6 +159,7 @@ class GroundedMCPSession:
                 return self._retain_patch_recovery(result)
             if not isinstance(result, dict) or docs_context_budget_tokens(result) > 600:
                 return self._stop('invalid_or_oversized_recovery')
+            result = expand_sections(result)
             sources = result.get('sources') or []
             if not isinstance(sources, list) or len(sources) > 3:
                 return self._stop('invalid_recovery_sources')

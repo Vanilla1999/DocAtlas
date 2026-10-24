@@ -81,7 +81,7 @@ lifecycle safeguards. Host conversation limits are a separate responsibility.
 
 ## Project documentation
 
-For a repository question, call `get_docs_context` first. Reads never reconcile
+For a repository question, call `get_docs_context` directly unless enabled language mode requires unknown-language preflight first. Reads never reconcile
 an index or write to the repository. Project documentation must belong to a
 finite explicit `docatlas.project-docs.yaml` catalog; common names such as README
 or a `docs/` directory do not grant automatic read membership.
@@ -165,3 +165,7 @@ No translations from source instructions, keyword rewriting or subquestion rules
 Answer in the user's language, cite actual evidence, preserve supported partial
 answers and name missing facts. First associate claims with source evidence,
 then compose; source validity is not a semantic-correctness guarantee.
+
+## Compact model delivery
+
+See [model context delivery](./model-context-delivery.md) for the explicit compatible-host opt-in. In enabled documentation-language mode, unknown bound-source language is read BEFORE any search. Otherwise retrieve directly. Unassessed coverage or whole-section selection alone does not require another query.

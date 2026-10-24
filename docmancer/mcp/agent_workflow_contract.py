@@ -36,7 +36,8 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "documentation_context_format": None,
         "context_format_inferred_from_prose": False,
         "skill_read_required": False,
-        "optional_preflight": "docs_status(include_language=true) on already selected project/module/library",
+        "optional_preflight": "language mode enabled + bound language unknown: docs_status(include_language=true) BEFORE retrieval",
+        "selection_or_unassessed_coverage_requires_retry": False,
     },
     "advanced_patch": {
         "default_available": False,
