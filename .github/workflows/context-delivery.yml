@@ -5,6 +5,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: compact-context-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
 jobs:
   installed-model-view:
     runs-on: ubuntu-latest
@@ -14,14 +17,27 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - name: Freeze exact source
+      - name: Freeze exact source and owner baseline instructions
         run: |
-          mkdir -p "$RUNNER_TEMP/context-evidence"
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/context-evidence/baseline"
           git rev-parse HEAD > "$RUNNER_TEMP/context-evidence/head.txt"
           git diff --exit-code
           python -m compileall -q docmancer eval/context_delivery_integration.py eval/minilm_sections_integration.py
+          base=bde2a101032b204e6a4168c0e8a63f45040b3ddc
+          git fetch -q origin "$base" --depth=1
+          git show "$base:SKILL.md" > "$RUNNER_TEMP/context-evidence/baseline/SKILL.md"
+          git show "$base:docmancer/templates/agent_contract.md" > "$RUNNER_TEMP/context-evidence/baseline/agent_contract.md"
+          git show "$base:docmancer/mcp/_docs_server_tool_data.py" > "$RUNNER_TEMP/context-evidence/baseline/tools.py"
+          git archive HEAD docmancer SKILL.md eval/context_delivery_integration.py eval/context_instruction_measurements.py eval/minilm_sections_integration.py .github/workflows/context-delivery.yml | gzip > "$RUNNER_TEMP/context-evidence/tested-source.tar.gz"
       - name: Build non-editable wheel and explicitly provision pinned MiniLM
         run: docker build -f eval/minilm_sections.Dockerfile -t docatlas-context-delivery .
+      - name: Measure actual instruction and schema tokens (tokenizer provisioning, no model requests)
+        run: |
+          docker run --rm -v "$RUNNER_TEMP/context-evidence:/evidence" \
+            --entrypoint /opt/venv/bin/python docatlas-context-delivery \
+            -I /repo/eval/context_instruction_measurements.py --repo /repo \
+            --baseline /evidence/baseline --out /evidence/INSTRUCTIONS.json
       - name: Real stdio, exact citations, observer equivalence, all-retained status and revocation
         run: |
           set +e
