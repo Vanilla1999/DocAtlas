@@ -201,6 +201,20 @@ async def client(args):
             assert obs["selection_policy"] == args.policy
             assert obs["scoring_question_sha256"] == sha((case.get("search_question") or case["question"]).encode())
             assert set(obs["selected_evidence_ids"]) == {r["evidence_id"] for r in expanded["sources"]}
+            if args.policy == "fixed":
+                assert obs["configured_top_k"] == 5 and obs["selected_sections"] <= 5
+            else:
+                cutoff = obs["adaptive_cutoff"]
+                assert obs["configured_top_k"] is None  # no fixed Adaptive-k cap
+                assert cutoff["requested_sections"] <= obs["candidate_sections"]
+                assert 1 <= obs["selected_sections"] <= cutoff["requested_sections"]
+                assert cutoff["selected_after_budget"] == obs["selected_sections"]
+                if cutoff["budget_limited"]:
+                    assert expanded["status"] == "truncated"
+                    assert expanded["source_selection"]["budget_limited"] is True
+                    assert expanded["source_selection"]["omitted_rows"] > 0
+                else:
+                    assert obs["selected_sections"] == cutoff["requested_sections"]
             record.update(selected_groups=obs["selected_sections"], candidates=obs["candidate_sections"],
                           forward_passes=obs["forward_passes"], cutoff=obs.get("adaptive_cutoff"))
     save(args.out / "DELIVERY.json", {"records":records, "controls":controls,
@@ -260,6 +274,9 @@ def assess(args, records):
         "machine_tokens_mean":statistics.mean(r["machine_o200k"] for r in results),
         "k_histogram":dict(Counter(r["selected_groups"] for r in results)),
         "mean_k":statistics.mean(r["selected_groups"] for r in results),
+        "max_selected_groups":max(r["selected_groups"] for r in results),
+        "more_than_five_groups_delivered":sum(r["selected_groups"] > 5 for r in results),
+        "budget_limited_cases":[r["case_id"] for r in results if (r.get("cutoff") or {}).get("budget_limited")],
         "seconds_median":statistics.median(r["seconds"] for r in results),
         "container_peak_bytes":max(r["container_memory_peak"] or 0 for r in reports),
         "semantic_refusal_implemented":False,"answer_model_calls":0,"provider_usage":None,
@@ -297,7 +314,7 @@ def main():
     frozen={str(p.relative_to(args.repo)):sha(p.read_bytes()) for p in inputs_root.rglob("*") if p.is_file()}
     save(args.out/"FREEZE.json",{"head":os.environ.get("TESTED_SHA"),"installed":hashes,
         "corpus":frozen,"policy":args.policy,"suite":args.suite,"python":sys.version,
-        "selection":"fixed5 or full first90%-gap, predeclared B0/B1, cap5; no fitted thresholds"})
+        "selection":"fixed5 baseline; adaptive first90% full-score gap with B0/B1, no section-count cap; exact full-packet 12k budget"})
     records=asyncio.run(client(args))
     assess(args,records)
     assert all(sha((args.repo/p).read_bytes())==h for p,h in frozen.items())
