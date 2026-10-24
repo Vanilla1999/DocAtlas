@@ -1,4 +1,4 @@
-# Opt-in MiniLM sections (v1)
+# Opt-in MiniLM sections (selection v1, wire v2)
 
 This feature is **off by default**. It is experimental; it does not implement
 semantic abstention and does not authorize edits. An unanswerable question may
@@ -48,21 +48,72 @@ is a fixed ranking policy, not a proof of sufficiency or a set optimum.
 
 ## Explicit compact wire format
 
-In this mode `get_docs_context` returns `context_format=docatlas.sections.v1`.
-Client integrations must opt in to that version before setting the host flag.
+With the host mode enabled, `get_docs_context` now uses an adaptive encoder:
+it considers `context_format=docatlas.sections.v2` with path-only and
+section/identity grouping, and the legacy `docatlas.sections.v1` packet. It
+emits the cheapest complete packet, so clients must accept **both versions**.
+The cost is the final packet's fixed-point `estimated_tokens` (the maximum of
+actual tokenizer tokens and UTF-8 bytes/4, rounded up); ties prefer fewer UTF-8
+bytes, then v2. Thus its estimated wire cost cannot exceed encoding the same
+payload as v1. V2 is not guaranteed to be smaller, nor always emitted.
+No evidence is removed to obtain this saving. The host setting
+remains `minilm-sections-v1`: the selection algorithm has not changed. There is
+no per-client wire-version negotiation or additional opt-in argument. Existing
+clients that assumed v1 or a flat `sources` array must use the decoder below
+(or implement v2) before consuming these responses. Disabling the host mode
+still restores the unencoded response.
 
-Top-level decisions remain present. `source_defaults` holds common source
-fields. Each `source_groups` entry has `common` and `fragments`, whose `fields`
-hold the remaining fields and whose `index` preserves original source order.
-Every snippet, evidence ID, source fingerprint, authority and coordinate is
-preserved verbatim. There is no second full copy sent in structuredContent.
+`source_defaults` holds fields identical across all selected rows. V2 chooses
+between grouping rows by exact `path_or_url` and the legacy grouping by path,
+section, project identity, scope, version and authority. Path-only grouping can
+save repeated paths but repeat section metadata, so it is not always cheaper.
+Each
+`source_groups` entry has `common` and `fragments`, whose `fields` hold the
+remaining fields and whose `index` preserves original source order. This is
+lossless factoring, not source merging or another selection pass. Differing
+sections, scopes, versions and authorities remain explicit where needed.
+Every source field, exact snippet (including headings), evidence ID, URI,
+fingerprint/hash and line/character span is preserved. No heading heuristics
+remove evidence. There is no second full copy sent in structuredContent.
+
+V2 includes `context_meaning="Retrieved evidence only; not completeness or edit authority."`
+Top-level non-default decisions remain explicit. `envelope_defaults`, when
+present, is a nonnegative integer bitmap with these fixed zero-based positions:
+
+| Bit | Field | Restored value |
+| --- | --- | --- |
+| 0 | `answer_supported` | `false` |
+| 1 | `answer_available` | `false` |
+| 2 | `edit_ready` | `false` |
+| 3 | `requires_confirmation` | `false` |
+| 4 | `hard_stop` | `false` |
+| 5 | `covered_query_ids` | `[]` |
+| 6 | `missing_query_ids` | `[]` |
+| 7 | `missing_facets` | `[]` |
+| 8 | `read_next` | `[]` |
+| 9 | `missing` | `[]` |
+| 10 | `warnings` | `[]` |
+
+A set bit means the original envelope contained exactly that typed default;
+the field is omitted on the wire and restored on decoding. An unset bit does
+not create an absent field. Missing bitmap means zero. Non-default values
+(including nonempty arrays and true flags) are never omitted. Unknown bits,
+boolean/noninteger masks and overlapping explicit/default fields are rejected.
+These omissions never mean answer support, completeness or edit permission.
 
 ```python
 from docmancer.docs.application.section_compression import expand_sections
 legacy_shape = expand_sections(received_payload)
 ```
 
-Decoding restores all selected source rows and original envelope values.
+The decoder accepts both v1 and v2 and passes unencoded packets through as
+copies. It restores all selected source rows and original envelope values,
+removing format-only fields. Python callers can still explicitly encode v1
+using `encode_sections(payload, context_format=LEGACY_FORMAT)`; the MCP tool
+does not expose that encoder option; the default encoder may also emit v1 when
+it is cheaper. Repository host sessions and source-read
+controllers use the decoder before consuming source rows; transport extraction
+retains the wire packet so channel comparisons and wire budgets remain exact.
 `estimated_tokens` in the compact packet is the maximum of actual o200k_base
 tokens and UTF-8 bytes/4; `source_estimated_tokens` retains the original legacy
 estimate for decoding. The entire compact JSON is checked against 12,000.
@@ -73,8 +124,9 @@ silently dropped to fit. This is not the host model's complete prompt budget.
 It is not a new whole-document lookup or an edit capability. Existing server
 expiry, snapshot and access checks still apply when a resource is read.
 
-Operational denials/confirmation requests with no source rows retain their
-existing shape. Missing/corrupt assets, input overflow, and resource exhaustion
+Packets without source rows and v2 confirmation/hard-stop/delivery-denied
+packets retain their existing shape, including operational reasons and denials.
+Missing/corrupt assets, input overflow, and resource exhaustion
 are explicit operational errors, not semantic empty answers or full-pool fallback.
 
 ## Resources and diagnostics

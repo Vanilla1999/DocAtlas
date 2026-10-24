@@ -5,10 +5,13 @@ The public surface still has three tools. This feature adds one opt-in flag to
 MiniLM by default, change access boundaries, translate text in the server, train
 models, or implement semantic refusal.
 
-## Ask once for an already selected source
+## Optional lookup for an already selected source
+
+Normally call `get_docs_context` first; language preflight is not mandatory.
+Request language metadata only when needed for an already bound source.
 
 ```json
-{"action":"project","project_path":"/repo","include_language":true,"details":false}
+{"action":"project","project_path":"/repo","include_language":true}
 ```
 
 Use `module` with the **exact declared module path** for module language. No
@@ -18,6 +21,18 @@ For a known registered library use `action=library`, its `canonical_id`, and
 missing documents. Omit the flag to retain the existing status response unchanged.
 Job actions reject the flag. All reads remain read-only and require existing
 access/ownership bindings; an unprepared store is not initialized by this call.
+
+For both project and library actions, `include_language=true` defaults to a
+compact response: bound identifiers and the complete `documentation_language`
+block, including available hashes and scope/version/snapshot bindings. Omitted,
+null or false `details` excludes unrelated status diagnostics. Set `details=true`
+to return the full ordinary status payload alongside language metadata:
+
+```json
+{"action":"library","canonical_id":"<registered-canonical-id>","include_language":true,"details":true}
+```
+
+Use the actual registered `canonical_id`; this call does not discover a library.
 
 The added `documentation_language` block has `languages`, `status`, `basis`,
 `hint_only` and source/scope snapshot bindings. Status is `declared`, `mixed`,

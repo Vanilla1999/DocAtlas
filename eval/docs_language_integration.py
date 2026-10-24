@@ -166,6 +166,16 @@ async def client(args):
                     base = await call("legacy", "docs_status", status_req)
                     assert "documentation_language" not in base
                     project = await call("project", "docs_status", {**status_req, "include_language": True})
+                    default_project = await call("project-default", "docs_status", {
+                        "action": "project", "project_path": str(root), "include_language": True})
+                    assert default_project == project, "omitted details must use language-only preflight"
+                    assert project["project"] == {"project_path": str(root)}
+                    detailed_base = await call("legacy-detailed", "docs_status", {**status_req, "details": True})
+                    detailed = await call("project-detailed", "docs_status", {
+                        **status_req, "include_language": True, "details": True})
+                    assert detailed == {**detailed_base, "documentation_language": project["documentation_language"]}
+                    assert set(base["project"]) > {"project_path"}, "normal status must retain diagnostics"
+                    assert await call("legacy-after-preflight", "docs_status", status_req) == base
                     assert project["documentation_language"]["languages"] == ["en"]
                     assert project["documentation_language"]["source_count"] == 1
                     auth = await call("module", "docs_status", {**status_req, "include_language": True, "module": "packages/auth"})
@@ -178,6 +188,11 @@ async def client(args):
                     await call("invalid-action", "docs_status", {"action": "jobs", "include_language": True}, "language_status_action_required")
                     lib = json.loads((out / "library.json").read_text())["canonical_id"]
                     library = await call("library", "docs_status", {"action": "library", "canonical_id": lib, "include_language": True})
+                    assert library["library"] == {"canonical_id": lib}
+                    library_base = await call("library-legacy", "docs_status", {"action": "library", "canonical_id": lib})
+                    library_full = await call("library-detailed", "docs_status", {
+                        "action": "library", "canonical_id": lib, "include_language": True, "details": True})
+                    assert library_full == {**library_base, "documentation_language": library["documentation_language"]}
                     assert library["documentation_language"]["languages"] == ["de"], library
                     missing = await call("missing-library", "docs_status", {"action": "library", "canonical_id": lib + "-missing", "include_language": True})
                     assert missing["documentation_language"]["status"] == "unknown"
@@ -201,11 +216,23 @@ async def client(args):
                         assert not invalid["documentation_language"]["languages"]
                     finally:
                         path.write_bytes(original)
-                    req = {"project_path": str(root), "question": "Какой порт использует Aster?"}
+                    req = {"project_path": str(root), "scope": "project", "question": "Какой порт использует Aster?"}
                     await call("too-many-lookups", "get_docs_context", {**req, "search_question": "What port does Aster use?", "lookup_queries": [f"Aster port {i}" for i in range(5)]}, "search_question_lookup_limit")
                     await call("blank-translation", "get_docs_context", {**req, "search_question": "  "}, "invalid_search_question")
                     ok = await call("translated-source", "get_docs_context", {**req, "search_question": "What port does Aster use?"})
                     assert any("8127" in r["snippet"] for r in ok["sources"])
+                    assert ok["sources"]
+                    for row in ok["sources"]:
+                        assert row["path_or_url"] == "README.md", "module source escaped project scope"
+                        assert row["scope"] == "project"
+                        assert row["version_binding"] == "unversioned"
+                        assert row["authority"] == "source_of_truth"
+                        assert row["project_identity"] == "local:" + sha(str(root).encode())
+                        source = (root / "README.md").read_bytes()
+                        # content_sha256 is a projection fingerprint, not the raw file hash.
+                        assert len(row["content_sha256"].removeprefix("sha256:")) == 64
+                        lines = source.decode().splitlines(keepends=True)
+                        assert row["snippet"] in "".join(lines[row["line_start"] - 1:row["line_end"]])
                     results.append({"group": "controls", "passed": True})
         state = json.loads((out / "server.json").read_text())
         assert state["files_unchanged"] and state["database_unchanged"], state

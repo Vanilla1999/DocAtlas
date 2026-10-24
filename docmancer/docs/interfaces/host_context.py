@@ -13,6 +13,7 @@ import re
 from typing import Callable, Any
 
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+from docmancer.docs.application.section_compression import expand_sections
 from docmancer.docs.application.action_packet import (
     estimate_action_packet_tokens,
 )
@@ -204,6 +205,7 @@ class SourceReadController:
     """Issued-resource I/O guards, independent of retained v4 evidence size."""
 
     def __init__(self, context: dict, *, requested_facts: dict[str, str], read_resource: Callable[[str], dict]):
+        context = expand_sections(context)
         patch = context.get('kind') == 'patch_context'
         if patch:
             validate_patch_context_payload(context)

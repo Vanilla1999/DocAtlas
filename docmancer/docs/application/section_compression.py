@@ -19,7 +19,25 @@ import threading
 import time
 
 MODE = "minilm-sections-v1"
-FORMAT = "docatlas.sections.v1"
+LEGACY_FORMAT = "docatlas.sections.v1"
+FORMAT = "docatlas.sections.v2"
+# Positional wire contract: append only; never reorder or change these values.
+# A set bit restores a field that was PRESENT with exactly this default. An
+# unset bit never invents a field absent from the original envelope.
+_ENVELOPE_DEFAULTS = (
+    ("answer_supported", False),
+    ("answer_available", False),
+    ("edit_ready", False),
+    ("requires_confirmation", False),
+    ("hard_stop", False),
+    ("covered_query_ids", []),
+    ("missing_query_ids", []),
+    ("missing_facets", []),
+    ("read_next", []),
+    ("missing", []),
+    ("warnings", []),
+)
+_CONTEXT_MEANING = "Retrieved evidence only; not completeness or edit authority."
 MODEL_REVISION = "233902d25c440f23af6f7d6e94d2946bac0bee0a"
 MODEL_FILES = {
     "tokenizer.json": (711396, "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"),
@@ -240,26 +258,83 @@ def _common(rows: list[dict]) -> dict:
             and all(k in row and row[k] == v for row in rows[1:])}
 
 
-def encode_sections(payload: dict) -> dict:
+def encode_sections(payload: dict, *, context_format: str = FORMAT) -> dict:
+    """Choose the cheapest complete lossless wire packet; v2 wins exact ties.
+
+    FORMAT requests adaptive v2 with v1 fallback, not a forced wire version.
+    LEGACY_FORMAT requests only v1 for backwards-compatible callers.
+    """
+    if context_format not in (LEGACY_FORMAT, FORMAT):
+        raise SectionCompressionError("section_compression_unknown_format")
+    if payload.get("kind") != "docs_context" or not payload.get("sources"):
+        return payload
+    if context_format == FORMAT and (
+        payload.get("requires_confirmation") or payload.get("hard_stop")
+        or payload.get("status") == "confirmation_required"
+        or (payload.get("delivery_decision") or {}).get("deliverable") is False
+    ):
+        return payload
+    candidates = [_encode_section_candidate(payload, context_format=LEGACY_FORMAT)]
+    if context_format == FORMAT:
+        candidates.extend(
+            _encode_section_candidate(payload, context_format=FORMAT, group_by=group_by)
+            for group_by in ("path", "section")
+        )
+    # All candidates include their own fixed-point estimate. Price the actual
+    # complete JSON, never an approximation of just the source rows.
+    result = min(candidates, key=lambda candidate: (
+        candidate["estimated_tokens"],
+        len(json.dumps(candidate, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
+        candidate["context_format"] != FORMAT,
+    ))
+    if result["estimated_tokens"] > OUTPUT_LIMIT:
+        raise SectionCompressionError("section_compression_output_limit")
+    return result
+
+
+def _encode_section_candidate(payload: dict, *, context_format: str, group_by: str = "section") -> dict:
     """Versioned lossless factoring, not a second semantic compression pass.
 
     Every selected source field and exact string is retained. Existing source_uri
     values remain continuation capabilities, NOT new provenance/read grants.
     """
+    if context_format not in (LEGACY_FORMAT, FORMAT):
+        raise SectionCompressionError("section_compression_unknown_format")
     if payload.get("kind") != "docs_context" or not payload.get("sources"):
+        return payload
+    if context_format == FORMAT and (
+        payload.get("requires_confirmation") or payload.get("hard_stop")
+        or payload.get("status") == "confirmation_required"
+        or (payload.get("delivery_decision") or {}).get("deliverable") is False
+    ):
         return payload
     from .projection_tokenizer import projection_token_count
     rows = payload["sources"]
     groups = {}
     for ordinal, row in enumerate(rows):
-        key = tuple(str(row.get(k) or "") for k in (
-            "path_or_url", "section", "project_identity", "scope", "version_binding", "authority",
-        ))
+        if group_by == "section":
+            key = tuple(str(row.get(k) or "") for k in (
+                "path_or_url", "section", "project_identity", "scope", "version_binding", "authority",
+            ))
+        else:
+            # Factoring is not semantic merging: differing section, scope,
+            # version and authority remain explicit per fragment when needed.
+            key = json.dumps(row.get("path_or_url"), ensure_ascii=False, sort_keys=True)
         groups.setdefault(key, []).append((ordinal, row))
     result = {k: deepcopy(v) for k, v in payload.items() if k != "sources"}
-    if any(k in result for k in ("context_format", "source_defaults", "source_groups", "source_estimated_tokens")):
+    if any(k in result for k in ("context_format", "source_defaults", "source_groups", "source_estimated_tokens",
+                               "envelope_defaults", "context_meaning")):
         raise SectionCompressionError("section_compression_format_collision")
-    result["context_format"] = FORMAT
+    result["context_format"] = context_format
+    if context_format == FORMAT:
+        mask = 0
+        for bit, (name, default) in enumerate(_ENVELOPE_DEFAULTS):
+            if name in result and type(result[name]) is type(default) and result[name] == default:
+                del result[name]
+                mask |= 1 << bit
+        if mask:
+            result["envelope_defaults"] = mask
+        result["context_meaning"] = _CONTEXT_MEANING
     result["source_defaults"] = _common(rows)
     result["source_groups"] = []
     for key, group in sorted(groups.items()):
@@ -278,19 +353,35 @@ def encode_sections(payload: dict) -> dict:
         result["estimated_tokens"] = cost
     else:
         raise SectionCompressionError("section_compression_budget_estimate")
-    if cost > OUTPUT_LIMIT:
-        raise SectionCompressionError("section_compression_output_limit")
     if expand_sections(result) != payload:
         raise SectionCompressionError("section_compression_roundtrip")
     return result
 
 
 def expand_sections(payload: dict) -> dict:
-    """Decode the explicit v1 format. Decoding does not authorize any source."""
-    if payload.get("context_format") != FORMAT:
+    """Decode v1/v2 losslessly. Decoding does not authorize any source.
+
+    V2 envelope_defaults is a presence bitmap over _ENVELOPE_DEFAULTS;
+    omitted false flags remain false, not permission/completeness grants.
+    """
+    context_format = payload.get("context_format")
+    if context_format not in (LEGACY_FORMAT, FORMAT):
         return deepcopy(payload)
+    reserved = {"context_format", "source_defaults", "source_groups", "source_estimated_tokens"}
+    if context_format == FORMAT:
+        reserved.update(("envelope_defaults", "context_meaning"))
     result = {k: deepcopy(v) for k, v in payload.items()
-              if k not in {"context_format", "source_defaults", "source_groups", "source_estimated_tokens"}}
+              if k not in reserved}
+    if context_format == FORMAT:
+        mask = payload.get("envelope_defaults", 0)
+        if (type(mask) is not int or not 0 <= mask < (1 << len(_ENVELOPE_DEFAULTS))
+                or payload.get("context_meaning") != _CONTEXT_MEANING):
+            raise ValueError("invalid compact envelope defaults")
+        for bit, (name, default) in enumerate(_ENVELOPE_DEFAULTS):
+            if mask & (1 << bit):
+                if name in result:
+                    raise ValueError("overlapping envelope defaults")
+                result[name] = deepcopy(default)
     sources = {}
     defaults = payload["source_defaults"]
     for group in payload["source_groups"]:

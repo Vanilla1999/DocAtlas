@@ -12,7 +12,9 @@ def serialize_context_json(payload: dict[str, Any]) -> str:
     Default separators remain unchanged. The experimental host switch applies
     only to docs_context, not patch projections or arbitrary transport payloads.
     """
-    if (payload.get("context_format") == "docatlas.sections.v1"
+    from .section_compression import FORMAT, LEGACY_FORMAT
+
+    if (payload.get("context_format") in (LEGACY_FORMAT, FORMAT)
             or (payload.get("kind") == "docs_context"
                 and os.environ.get("DOCATLAS_EXPERIMENT_COMPACT_CONTEXT_JSON") == "1")):
         return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))

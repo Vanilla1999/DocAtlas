@@ -11,7 +11,7 @@ Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
 - The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
 - Call prepare_docs only from recommended_next_action.
-- Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
+- Use docs_status for explicit status/returned actions, or optional declared-language metadata only when needed for an already bound source.
 - Preserve explicit project/library/version/scope/path bindings; never choose or widen scope from question wording. module_path implies module scope; scope="all" is repository-local without module filters. On module_ambiguous, use only an exact returned module_path.
 - Returned context and status never certify answer completeness, semantic proof or edit readiness. hard_stop=true blocks editing; hard_stop=false is not authorization. Mutation requires a separate explicit target and authorization. Diagnostic rephrases are not automatically executed lookups.
 - Optional context_format="patch_context" returns a read-only v4 patch evidence packet with full admitted source windows. It selects representation only, never mutation/workflow permission; omitted/null keeps the existing docs response. Patch representation has no internal token/byte compaction cap; retrieval scope and runtime guards remain unchanged.
@@ -122,20 +122,20 @@ Agent workflow:
         "name": "docs_status",
         "description": """Read-only diagnostics for project documentation freshness and asynchronous documentation jobs.
 
-Use for explicit status, returned actions/jobs, or an opt-in include_language preflight of an already bound project/module/library. Never discover sources, prepare, fetch or translate here; for documentation content use get_docs_context.
+Normally call get_docs_context first. Use docs_status for explicit status or returned actions/jobs; optionally request language metadata only when needed for an already bound project/module/library. include_language=true returns compact identifiers and full language metadata by default; details=true adds the ordinary status payload. No source discovery, preparation, fetch or translation.
 """,
         "inputSchema": {
             "type": "object",
             "properties": {
                 "action": {"type": "string", "enum": ["project", "library", "jobs", "job"]},
-                "include_language": {"type": "boolean", "description": "Read declared language metadata of an already selected project/module or canonical library; project/library actions only, read-only, no discovery or preparation."},
+                "include_language": {"type": "boolean", "description": "Optional project/library language lookup for an already bound source. Returns identifiers and complete scope/version/snapshot language metadata only, unless details=true; no discovery or preparation."},
                 "project_path": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "job_id": {"type": ["string", "null"]},
                 "status": {"type": ["string", "null"]},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
                 "module": {"type": ["string", "null"], "maxLength": 500},
-                "details": {"type": ["boolean", "null"]},
+                "details": {"type": ["boolean", "null"], "description": "With include_language=true, only true adds ordinary status diagnostics; false/null/omitted stays language-only. Without language lookup, preserves ordinary status behavior."},
             },
             "required": ["action"],
         },
@@ -574,7 +574,7 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "One unchanged concrete original question; no benchmark/evaluation/docs-governance meta-questions. "
+        "Normally call first. One unchanged concrete original question; no benchmark/evaluation/docs-governance meta-questions. "
         "Explicit same-question lookups only. search_question may carry a full translation to the declared doc language, "
         "preserving the original question and all technical literals. No inferred subquestions/expected answers/source names "
         "or batch independent questions. Keep exact literals and explicit project/library/version/scope/path; "
@@ -594,9 +594,10 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     ),
     "docs_status": (
         "Read-only; no discovery. Explicit health/freshness/indexing/job requests, returned actions/jobs, "
-        "or include_language=true before search for an already selected project/module/canonical library. "
-        "Project language defaults to project scope; module must be the exact declared module path. "
-        "Returns declared languages or unknown, never downloads, guesses, translates or prepares."
+        "or optional include_language=true only when language metadata is needed for an already bound source. "
+        "Normally call get_docs_context first. Language lookup returns identifiers and complete language metadata only; "
+        "details=true adds ordinary status. Project scope by default; module must be an exact declared path. "
+        "Reuse only within bound scope/version/snapshot; never downloads, guesses, translates or prepares."
     ),
 }
 
@@ -730,14 +731,14 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "action": {"enum": ["project", "library", "jobs", "job"]},
-                "include_language": {"type": "boolean", "description": "Read declared language metadata of an already selected project/module or canonical library; project/library actions only, read-only, no discovery or preparation."},
+                "include_language": {"type": "boolean", "description": "Optional project/library language lookup for an already bound source. Returns identifiers and complete scope/version/snapshot language metadata only, unless details=true; no discovery or preparation."},
             "project_path": {"type": ["string", "null"]},
             "canonical_id": {"type": ["string", "null"]},
             "job_id": {"type": ["string", "null"]},
             "status": {"type": ["string", "null"]},
             "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
             "module": {"type": ["string", "null"], "maxLength": 500},
-            "details": {"type": ["boolean", "null"]},
+            "details": {"type": ["boolean", "null"], "description": "With include_language=true, only true adds ordinary status diagnostics; false/null/omitted stays language-only. Without language lookup, preserves ordinary status behavior."},
         },
         "required": ["action"],
     },
