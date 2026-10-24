@@ -154,32 +154,37 @@ async def run(args):
                             pass
                         else:
                             raise AssertionError(case + " not rejected")
-                    uri = next(row["source_uri"] for row in payload["sources"] if row.get("source_uri"))
-                    actual = await client.read_resource(uri)
+                    candidates = [row for row in payload["sources"] if row.get("source_uri")]
+                    assert len(candidates) >= 2
+                    actual = await client.read_resource(candidates[0]["source_uri"])
                     counts["resource_reads"] += 1
                     assert json.loads(actual.contents[0].text)["status"] in ("complete", "truncated")
-                    path = root / "README.md"
+                    path = root / candidates[-1]["path_or_url"]
                     prior = path.read_bytes()
                     try:
                         path.write_bytes(prior + b"\nChanged source snapshot.\n")
-                        stale = json.loads((await client.read_resource(uri)).contents[0].text)
+                        stale = json.loads((await client.read_resource(candidates[-1]["source_uri"])).contents[0].text)
                         counts["resource_reads"] += 1
                         assert stale["status"] in ("source_changed", "source_unavailable") and not stale.get("snippet")
+                        assert stale.get("reason_code") in ("source_policy_or_snapshot_changed", "snapshot_digest_mismatch")
                         save(out / "stale-resource.json", stale)
                     finally:
                         path.write_bytes(prior)
                 else:
                     assert visible.get("context_format") != FORMAT
                 for label, request, expected in (
-                    ("long-query", {"question": "environment " * 140, "project_path": str(root)}, "section_compression_query_limit"),
+                    # A scorer overflow must actually acquire source candidates.
+                    # 'environment' belongs to Poetry's separate existing control,
+                    # not to this independent session-lease document.
+                    ("long-query", {"question": "lease " * 140, "project_path": str(root)}, "section_compression_query_limit"),
                     ("blank-search", {**req, "search_question": " "}, "invalid_search_question"),
                 ):
                     response = await client.call_tool("get_docs_context", request)
                     counts["stdio_tool_calls"] += 1
                     error = ordinary_payload(response)
-                    assert response.isError and error["error"]["reason_code"] == expected
+                    save(out / f"{label}.json", {"isError": response.isError, "payload": error})
+                    assert response.isError and error["error"]["reason_code"] == expected, (label, error)
                     assert error.get("context_format") != FORMAT and not response.model_dump(by_alias=True).get("_meta")
-                    save(out / f"{label}.json", error)
                 body = result.content[0].text.encode()
                 full = json.dumps(wire, ensure_ascii=False, separators=(",", ":")).encode()
                 record = {"arm": arm, "status": payload["status"], "rows": len(payload["sources"]),
