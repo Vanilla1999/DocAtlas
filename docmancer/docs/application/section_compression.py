@@ -100,6 +100,38 @@ def selection_units() -> str:
     return value
 
 
+def _adaptive_cutoff(sorted_scores: list[float], *, buffer: int = 0) -> tuple[int, dict]:
+    """Choose k from all scored sections, without a hard-coded group ceiling.
+
+    The 90%-window raw-logit gap is an experimental ranking signal, NOT
+    evidence that the returned text suffices to answer the original question.
+    A flat set has no distinguishing gap, so it proposes all admitted groups.
+    A separate complete-packet token budget still applies.
+    """
+    count = len(sorted_scores)
+    if not count:
+        raise SectionCompressionError("section_compression_empty_scores")
+    if (not all(math.isfinite(s) for s in sorted_scores)
+            or any(a < b for a, b in zip(sorted_scores, sorted_scores[1:]))):
+        raise SectionCompressionError("section_compression_invalid_score")
+    if count == 1:
+        return 1, {"gap_count": 0, "cutoff_rank": 1, "reason": "single_candidate", "buffer": buffer}
+    gap_count = min(count - 1, (9 * count + 9) // 10)
+    gaps = [sorted_scores[i] - sorted_scores[i + 1] for i in range(gap_count)]
+    position = max(range(gap_count), key=lambda i: gaps[i])
+    largest = gaps[position]
+    if not math.isfinite(largest):
+        raise SectionCompressionError("section_compression_invalid_score")
+    if largest == 0:
+        return count, {"gap_count": gap_count, "cutoff_rank": count,
+                       "largest_gap": 0.0, "reason": "flat_scores_keep_all", "buffer": buffer}
+    cutoff = position + 1
+    return min(count, cutoff + buffer), {
+        "gap_count": gap_count, "cutoff_rank": cutoff, "largest_gap": largest,
+        "reason": "largest_gap", "buffer": buffer,
+    }
+
+
 def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
     """Group checked occurrences, retaining gaps and never fetching a neighbor."""
     if len(rows) > MAX_ROWS or sum(len(r["snippet"]) for r in rows) > MAX_INPUT_CHARS:
@@ -282,18 +314,26 @@ _ENGINE_PATH = None
 
 
 def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: str):
-    """Return complete original rows from five groups; errors never mean abstention."""
+    """Select original whole sections with an uncapped Adaptive-k decision.
+
+    There is no arbitrary Adaptive-k five-section ceiling. If the selected
+    prefix exceeds the existing 12k *full machine packet* budget, deliver the
+    longest affordable whole-section prefix with an explicit truncated status
+    and diagnostic, never with proof of answer completeness.
+    """
     rows = payload.get("sources") or []
     if not enabled() or payload.get("kind") != "docs_context" or not rows:
         return payload, snapshot
     if (payload.get("requires_confirmation") or payload.get("hard_stop")
             or (payload.get("delivery_decision") or {}).get("deliverable") is False):
         return payload, snapshot
-    # This method is only valid on the live source-native path, not arbitrary DTOs.
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
-    top_k = selection_limit()
+    policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
+    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"}:
+        raise SectionCompressionError("section_compression_invalid_selection_policy")
+    fixed_limit = selection_limit() if policy == "fixed" else None
     units = selection_units()
     sections = _sections(rows, snapshot)
     configured = os.environ.get("DOCATLAS_MINILM_MODEL_DIR", "")
@@ -301,8 +341,6 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         raise SectionCompressionError("section_compression_model_unavailable")
     directory = Path(configured).resolve()
     global _ENGINE, _ENGINE_PATH
-    # One model/session, batch=1, serialized scoring: concurrent calls cannot
-    # multiply the model working set. Inputs remain request-local.
     with _LOCK:
         if _ENGINE is None or _ENGINE_PATH != directory:
             _ENGINE = None
@@ -311,21 +349,85 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = directory
         scores, receipt = _ENGINE.score(question, sections)
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
-    selected = {row["evidence_id"] for i in ranking[:top_k] for row in sections[i].rows}
-    retained = [row for row in rows if row["evidence_id"] in selected]
-    from .experimental_context_finalization import _rebuild
-    result, bindings = _rebuild(payload, snapshot, retrieval, retained, reason="section_selection")
-    if [row["evidence_id"] for row in result["sources"]] != [r["evidence_id"] for r in retained]:
-        raise SectionCompressionError("section_compression_identity_mismatch")
-    receipt.update(method=MODE, model_revision=MODEL_REVISION,
-                   scoring_question_sha256=hashlib.sha256(question.encode()).hexdigest(),
-                   candidate_rows=len(rows), candidate_sections=len(sections),
-                   selected_rows=len(retained), selected_sections=min(top_k, len(sections)), top_k=top_k, units=units,
-                   selected_evidence_ids=[r["evidence_id"] for r in retained])
+    if policy == "fixed":
+        requested_k = min(fixed_limit, len(sections))
+    else:
+        requested_k, cutoff = _adaptive_cutoff(
+            [scores[i] for i in ranking],
+            buffer=1 if policy == "adaptive-gap-b1-v1" else 0,
+        )
+        receipt["adaptive_cutoff"] = cutoff
+    from .experimental_context_finalization import _rebuild, _refresh_estimate
+
+    def project(prefix_k: int):
+        selected = {r["evidence_id"] for i in ranking[:prefix_k] for r in sections[i].rows}
+        retained = [r for r in rows if r["evidence_id"] in selected]
+        limited = prefix_k < requested_k
+        result, bindings = _rebuild(
+            payload, snapshot, retrieval, retained,
+            reason="budget_limited" if limited else "section_selection",
+        )
+        if limited:
+            result["status"] = "truncated"
+            result["source_selection"] = {
+                "candidate_rows": len(rows),
+                "selected_rows": len(retained),
+                "omitted_rows": len(rows) - len(retained),
+                "scope": "admitted_candidates",
+                "budget_limited": True,
+            }
+            _refresh_estimate(result)
+        if [r["evidence_id"] for r in result["sources"]] != [r["evidence_id"] for r in retained]:
+            raise SectionCompressionError("section_compression_identity_mismatch")
+        return result, bindings, retained
+
+    if policy == "fixed":
+        top_k = requested_k
+        result, bindings, retained = project(top_k)
+    else:
+        # Price the negotiated v1/v2 *complete* packet, not just its snippets.
+        # All trials reuse the same MiniLM scores. Non-budget errors propagate.
+        def fits(prefix_k: int):
+            candidate = project(prefix_k)
+            try:
+                encode_sections(candidate[0])
+            except SectionCompressionError as exc:
+                if exc.reason_code == "section_compression_output_limit":
+                    return None
+                raise
+            return candidate
+
+        top_k, selected_result = requested_k, fits(requested_k)
+        if selected_result is None:
+            low, high = 1, requested_k - 1
+            top_k = 0
+            while low <= high:
+                middle = (low + high) // 2
+                trial = fits(middle)
+                if trial is None:
+                    high = middle - 1
+                else:
+                    top_k, selected_result = middle, trial
+                    low = middle + 1
+            if selected_result is None:
+                # One section is too large: fail explicitly, no invented answer.
+                raise SectionCompressionError("section_compression_output_limit")
+        result, bindings, retained = selected_result
+        receipt["adaptive_cutoff"].update(
+            requested_sections=requested_k, selected_after_budget=top_k,
+            budget_limited=top_k < requested_k, budget_limit_tokens=OUTPUT_LIMIT,
+        )
+    receipt.update(
+        method=MODE, model_revision=MODEL_REVISION,
+        selection_policy=policy, configured_top_k=fixed_limit,
+        scoring_question_sha256=hashlib.sha256(question.encode()).hexdigest(),
+        candidate_rows=len(rows), candidate_sections=len(sections),
+        selected_rows=len(retained), selected_sections=top_k, top_k=top_k,
+        units=units, selected_evidence_ids=[r["evidence_id"] for r in retained],
+    )
     retrieval.setdefault("retrieval_diagnostics", {})["section_compression"] = deepcopy(receipt)
     observed = _OBSERVER.get()
     if observed is not None:
-        # Host-only: no bodies, new inference calls, thresholds or input changes.
         detail = deepcopy(receipt)
         detail["ranked_sections"] = [
             {"rank": rank, "score": scores[index], "selected": rank <= top_k,
@@ -396,8 +498,8 @@ def _encode_section_candidate(payload: dict, *, context_format: str, group_by: s
         return payload
     if context_format == FORMAT and (
         payload.get("requires_confirmation") or payload.get("hard_stop")
-        or payload.get("status") == "confirmation_required"
         or (payload.get("delivery_decision") or {}).get("deliverable") is False
+        or payload.get("status") == "confirmation_required"
     ):
         return payload
     from .projection_tokenizer import projection_token_count

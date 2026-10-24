@@ -1,0 +1,54 @@
+name: Experimental MiniLM Adaptive-k receipt replay
+on:
+  push:
+    branches: [experiment/minilm-adaptive-gap-20261025]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  offline-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Retrieve frozen real installed-MCP score receipts, no new model calls
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/original-artifacts" "$RUNNER_TEMP/adaptive-k-replay"
+          gh api repos/Vanilla1999/DocAtlas/actions/artifacts/12573704617/zip > "$RUNNER_TEMP/original-artifacts/pr221-final-a19bb752.zip"
+          gh api repos/Vanilla1999/DocAtlas/actions/artifacts/12573940504/zip > "$RUNNER_TEMP/original-artifacts/pr221-policy-k1-a19bb752.zip"
+          gh api repos/Vanilla1999/DocAtlas/actions/artifacts/12573039268/zip > "$RUNNER_TEMP/original-artifacts/pr221-policy-k2-a19bb752.zip"
+          gh api repos/Vanilla1999/DocAtlas/actions/artifacts/12573369784/zip > "$RUNNER_TEMP/original-artifacts/pr221-policy-k3-a19bb752.zip"
+          echo "e3d6d6f92a969297ad634e13cd7f352ea0007d5ed6a8535dc054ed25d50cb783  $RUNNER_TEMP/original-artifacts/pr221-final-a19bb752.zip" > "$RUNNER_TEMP/expected-sha256.txt"
+          echo "1e6d9252cbaf6328c73bdeff7f9635dd7095074fbafbdee58fcbbeb44419f219  $RUNNER_TEMP/original-artifacts/pr221-policy-k1-a19bb752.zip" >> "$RUNNER_TEMP/expected-sha256.txt"
+          echo "e1d5376d8eb8120a807282e5f72454a223ef2e4aa5801be2c3bc0a65ac37f394  $RUNNER_TEMP/original-artifacts/pr221-policy-k2-a19bb752.zip" >> "$RUNNER_TEMP/expected-sha256.txt"
+          echo "25d97dfcd8a1fc71d84c721c349b18153fb1cea4dbd00eda92bf7d2cea661a48  $RUNNER_TEMP/original-artifacts/pr221-policy-k3-a19bb752.zip" >> "$RUNNER_TEMP/expected-sha256.txt"
+          sha256sum -c "$RUNNER_TEMP/expected-sha256.txt"
+      - name: Offline experiment and post-selection frozen assessments
+        run: |
+          set -euo pipefail
+          python eval/experimental_adaptive_k_replay.py --artifacts "$RUNNER_TEMP/original-artifacts" --out "$RUNNER_TEMP/adaptive-k-replay"
+          git rev-parse HEAD > "$RUNNER_TEMP/adaptive-k-replay/experimental-head.txt"
+          sha256sum eval/experimental_adaptive_k_replay.py > "$RUNNER_TEMP/adaptive-k-replay/algorithm-sha256.txt"
+          python - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"adaptive-k-replay"/"REPLAY.json"
+          r=json.loads(p.read_text())
+          assert len(r["policies"])==4
+          for arm,v in r["policies"].items():
+              assert sum(v["k_histogram"].values())==40, arm
+              assert v["positive_total"]==24 and v["partial_total"]==8, arm
+              assert 1<=v["mean_k"]<=5
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: minilm-adaptive-k-replay-${{ github.run_id }}
+          path: ${{ runner.temp }}/adaptive-k-replay/
+          retention-days: 30
+          if-no-files-found: error

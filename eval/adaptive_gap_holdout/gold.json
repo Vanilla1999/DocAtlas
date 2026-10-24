@@ -1,0 +1,21 @@
+{
+  "note": "Evaluation-only. Never indexed, sent to a selector, or included in answer prompts. Witnesses are exact original source sentences, not generated answers.",
+  "cases": [
+    {"id":"N01","path":"docs/operations.md","witnesses":["An AsterQueue session lease lasts 43 seconds.","At most three renewals are allowed, with a 7-second pause between renewals.","A signed refusal must never be retried."]},
+    {"id":"N02","path":"docs/operations.md","witnesses":["Ordinary delivery receipts are retained for 19 hours and then removed.","A receipt under a legal hold is not removed by the 19-hour retention job.","It remains until an administrator explicitly releases the hold."]},
+    {"id":"N03","path":"docs/operations.md","witnesses":["For settings accepted at startup, command-line flags override environment variables, and environment variables override the configuration file.","A tenant marked configuration_locked rejects startup overrides for that tenant, including command-line flags and environment variables."]},
+    {"id":"N04","path":"docs/operations.md","witnesses":["A delivery batch contains at most 11 jobs and at most 48 KiB of encoded payload.","Both limits must be satisfied; the size includes JSON framing."]},
+    {"id":"N05","path":"docs/operations.md","witnesses":["An export requires an active session lease and explicit user approval.","An existing lease does not count as approval.","Every export must use encryption profile AQ-2."]},
+    {"id":"N06","path":"docs/operations.md","witnesses":["A request that receives HTTP 503 may be retried twice, after delays of 120 ms and 360 ms.","Retries require the original idempotency key.","HTTP 401 is a terminal authentication failure and is never retried automatically.","The operator must refresh credentials before creating a new request."]},
+    {"id":"N07","path":"docs/operations.md","witnesses":["Ordinary delivery receipts are retained for 19 hours and then removed."],"unsupported":"Guaranteed retention period for CDN copies is not specified anywhere in this frozen corpus."},
+    {"id":"N08","path":"docs/operations.md","witnesses":[],"unsupported":"No numerical p99 delivery latency guarantee is specified. The metrics interval is not a delivery guarantee."},
+    {"id":"N09","path":"docs/cache.md","witnesses":["A successful cache entry has a default lifetime of 83 seconds.","A cached not-found result has a lifetime of 6 seconds.","Failed upstream requests are not cached."]},
+    {"id":"N10","path":"docs/cache.md","witnesses":["After an entry expires, stale data may be served for at most 17 additional seconds while revalidation is running.","Without an active revalidation, an expired entry must not be served.","Entries tagged confidential are excluded from stale reads, even when revalidation is active."]},
+    {"id":"N11","path":"docs/cache.md","witnesses":["The default capacity is 192 MiB.","When the capacity is reached, least-recently-used unpinned entries are evicted first.","Pinned entries cannot be evicted to reclaim capacity.","If every entry is pinned, a new write fails with CACHE_FULL instead of exceeding the configured capacity."]},
+    {"id":"N12","path":"docs/cache.md","witnesses":["The cache directory is configured with BOREAL_CACHE_DIR.","For example: `BOREAL_CACHE_DIR=/srv/boreal/cache boreal serve`.","This variable specifies a directory, not an entry lifetime."]},
+    {"id":"N13","path":"docs/cache.md","witnesses":["The listener uses port 6419 by default.","If BOREAL_PORT is set, it overrides the port in cache.toml.","An explicit --port option overrides both."]},
+    {"id":"N14","path":"docs/cache.md","witnesses":["When validation fails, the existing configuration remains active and the reload reports CONFIG_INVALID.","Reloading the configuration does not clear cached entries.","Entries retain their original expiry timestamps; only new entries use a changed default lifetime."]},
+    {"id":"N15","path":"docs/cache.md","witnesses":["A local snapshot is created every 13 minutes."],"unsupported":"No cloud provider availability SLA is specified in the frozen corpus."},
+    {"id":"N16","path":"docs/cache.md","witnesses":[],"unsupported":"The configured cache capacity is not a bound on the entire process; no total-process memory guarantee is specified."}
+  ]
+}
