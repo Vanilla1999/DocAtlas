@@ -1,0 +1,54 @@
+name: Compact model context installed MCP
+on:
+  pull_request:
+    paths: ['docmancer/**', 'SKILL.md', 'eval/*context*', 'eval/minilm_sections*', '.github/workflows/context-delivery.yml', 'uv.lock']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installed-model-view:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Freeze exact source
+        run: |
+          mkdir -p "$RUNNER_TEMP/context-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/context-evidence/head.txt"
+          git diff --exit-code
+          python -m compileall -q docmancer eval/context_delivery_integration.py eval/minilm_sections_integration.py
+      - name: Build non-editable wheel and explicitly provision pinned MiniLM
+        run: docker build -f eval/minilm_sections.Dockerfile -t docatlas-context-delivery .
+      - name: Real stdio, exact citations, observer equivalence, all-retained status and revocation
+        run: |
+          set +e
+          docker run --name context-controls --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/context-evidence:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-context-delivery -I /repo/eval/context_delivery_integration.py \
+            --repo /repo --work /tmp/controls --out /evidence/controls --model /model
+          rc=$?
+          docker inspect context-controls > "$RUNNER_TEMP/context-evidence/controls-container.json"
+          exit "$rc"
+      - name: Same original V40 through model text and exact private ledger; offline under hard 1GB
+        run: |
+          set +e
+          docker run --name context-v40 --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/context-evidence:/evidence" docatlas-context-delivery \
+            --repo /repo --work /tmp/sections --out /evidence/v40 --model /model --model-view
+          rc=$?
+          docker inspect context-v40 > "$RUNNER_TEMP/context-evidence/v40-container.json"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: context-delivery-${{ github.run_id }}
+          path: ${{ runner.temp }}/context-evidence/
+          retention-days: 30
+          if-no-files-found: error
