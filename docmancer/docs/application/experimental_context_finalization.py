@@ -255,7 +255,18 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
     # It must not retain references or apparent coverage of omitted evidence.
     result["read_next"] = []
     if rows:
-        result["status"] = "truncated"
+        # Whole-section selection does not clip delivered text. Preserve a real
+        # upstream truncation, but do not manufacture one from uncertainty.
+        if reason == "section_selection":
+            result["status"] = "truncated" if payload.get("status") == "truncated" else "ok"
+            result["source_selection"] = {
+                "candidate_rows": len(payload.get("sources") or ()),
+                "selected_rows": len(rows),
+                "omitted_rows": len(payload.get("sources") or ()) - len(rows),
+                "scope": "admitted_candidates",
+            }
+        else:
+            result["status"] = "truncated"
         result["context_quality"] = {
             "status": "unverified", "reasons": ["coverage_unverified", reason],
         }

@@ -44,12 +44,14 @@ def _tool_spec(raw: dict[str, Any], *, config: DocsServerConfig) -> ToolSpec:
         )
         description += " Optional context_format=patch_context selects read-only evidence, never edit permission; omitted/null returns docs."
         output_schema = {"oneOf": [output_schema, copy.deepcopy(_PATCH_CONTEXT_OUTPUT_SCHEMA)]}
+    # This opt-in uses text plus a private ledger, not the legacy structured schema.
+    model_view = name == "get_docs_context" and os.environ.get("DOCATLAS_MCP_MODEL_VIEW") == "1"
     return ToolSpec(
         name=name,
         description=description,
         input_schema=advertised_schema,
         handler=_handler_for_tool(name),
-        output_schema=None if config.text_fallback else output_schema,
+        output_schema=None if config.text_fallback or model_view else output_schema,
         validation_schema=copy.deepcopy(advertised_schema),
     )
 
@@ -81,13 +83,6 @@ CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)
 PROJECT_TOOLS = project_tools(TOOLS)
 PREFETCH_TOOLS = prefetch_tools(TOOLS)
-
-
-
-
-
-
-
 
 from ._docs_server_resources import *  # noqa: F401,F403
 

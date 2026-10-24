@@ -12,6 +12,7 @@ from pathlib import PurePosixPath
 
 from .host_context import SourceReadController, extract_tool_payload, validate_patch_context_payload
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+from docmancer.docs.application.section_compression import expand_sections, OUTPUT_LIMIT
 
 RECOVERY_BINDING_KEYS = (
     'project_path', 'library', 'libraries', 'ecosystem', 'version', 'source_type',
@@ -23,15 +24,26 @@ RECOVERY_BINDING_KEYS = (
 class GroundedMCPSession:
     @classmethod
     async def start(cls, client, *, arguments: dict, requested_facts: dict[str, str],
-                    structured_supported: bool = True):
+                    structured_supported: bool = True, evidence_budget: int = OUTPUT_LIMIT,
+                    recovery_budget: int = 600):
         arguments = deepcopy(arguments)
         if not arguments.get('question') or not arguments.get('project_path'):
             raise ValueError('a question and project path are required')
         context = extract_tool_payload(await client.call_tool('get_docs_context', arguments),
                                        structured_supported=structured_supported)
-        return cls(client, arguments, context, requested_facts)
+        return cls(client, arguments, context, requested_facts,
+                   evidence_budget=evidence_budget, recovery_budget=recovery_budget)
 
-    def __init__(self, client, arguments, context, requested_facts):
+    def __init__(self, client, arguments, context, requested_facts, *,
+                 evidence_budget: int = OUTPUT_LIMIT, recovery_budget: int = 600):
+        if any(type(v) is not int or v < 1 for v in (evidence_budget, recovery_budget)):
+            raise ValueError('invalid host evidence budget')
+        self._evidence_budget, self._recovery_budget = evidence_budget, recovery_budget
+        # Price the received representation, then restore evidence/defaults for
+        # host decisions. Expansion does not issue source or edit capabilities.
+        if context.get('kind') != 'patch_context' and docs_context_budget_tokens(context) > self._evidence_budget:
+            raise ValueError('project response exceeds the host evidence budget')
+        context = expand_sections(context)
         if any(context.get(flag) is True for flag in ('answer_supported', 'answer_available', 'edit_ready')):
             raise ValueError('grounded project sessions require retrieval-only evidence')
         self._arguments = deepcopy(arguments)
@@ -40,8 +52,6 @@ class GroundedMCPSession:
         self._patch = context.get('kind') == 'patch_context'
         if arguments.get('context_format') == 'patch_context' and not self._patch:
             raise ValueError('explicit patch representation was not delivered')
-        if not self._patch and docs_context_budget_tokens(context) > 800:
-            raise ValueError('project response exceeds the host evidence budget')
         reading_context = context if context.get('kind') in {'docs_context', 'patch_context'} else {'kind': 'docs_context', 'sources': []}
         self._controller = SourceReadController(reading_context, requested_facts=requested_facts,
                                                  read_resource=self._read_resource)
@@ -153,8 +163,9 @@ class GroundedMCPSession:
                         if verified is not True:
                             return self._stop('unverified_recovery_request_bindings')
                 return self._retain_patch_recovery(result)
-            if not isinstance(result, dict) or docs_context_budget_tokens(result) > 600:
+            if not isinstance(result, dict) or docs_context_budget_tokens(result) > self._recovery_budget:
                 return self._stop('invalid_or_oversized_recovery')
+            result = expand_sections(result)
             sources = result.get('sources') or []
             if not isinstance(sources, list) or len(sources) > 3:
                 return self._stop('invalid_recovery_sources')

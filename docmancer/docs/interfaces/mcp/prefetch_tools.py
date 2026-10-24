@@ -397,6 +397,10 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             if args.get("include_language"):
                 from docmancer.docs.documentation_language import project_language
                 payload["documentation_language"] = project_language(project_path, project, args.get("module"))
+                if args.get("details") is not True:
+                    # Keep the inspector's validated identity and the complete
+                    # scope/snapshot binding, not unrelated status diagnostics.
+                    payload["project"] = {"project_path": project.get("project_path")}
             return payload
         if action == "library":
             canonical_id = str(args.get("canonical_id") or "").strip()
@@ -415,6 +419,8 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             if args.get("include_language"):
                 from docmancer.docs.documentation_language import library_language
                 payload["documentation_language"] = library_language(service, canonical_id, payload["library"])
+                if args.get("details") is not True:
+                    payload["library"] = {"canonical_id": canonical_id}
             return payload
         if action == "jobs":
             jobs = service.list_docs_jobs(

@@ -1,0 +1,375 @@
+"""Installed real stdio/SQLite acceptance for model view and truthful selection.
+
+Independent source facts; no mock retrieval, selection, storage or validators.
+Client tamper probes start with an actual delivered response, never a fake source.
+"""
+from __future__ import annotations
+import argparse
+import asyncio
+from datetime import timedelta
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import sys
+
+DOCUMENT = "# QuillTransit\n\n## Session lease\n\nA session lease lasts 37 seconds. Renewal is allowed twice, with a 9 second pause. A signed refusal is never retried.\n\n## Export\n\nExports require an active session lease and explicit user approval.\n"
+QUESTION = "Сколько действует аренда сессии QuillTransit, сколько разрешено продлений и повторяется ли подписанный отказ?"
+TRANSLATION = "How long does a QuillTransit session lease last, how many renewals are allowed, and is a signed refusal retried?"
+ARMS = ("plain", "view", "view-structured", "view-structural")
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    obj = importlib.util.module_from_spec(spec)
+    sys.modules[name] = obj
+    spec.loader.exec_module(obj)
+    return obj
+
+
+def save(path, obj):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def ordinary_payload(reply):
+    """Status/error are not source-evidence packets; do not use the evidence SDK."""
+    if reply.structuredContent is not None:
+        assert isinstance(reply.structuredContent, dict)
+        return reply.structuredContent
+    assert len(reply.content) == 1 and reply.content[0].type == "text"
+    value = json.loads(reply.content[0].text)
+    assert isinstance(value, dict)
+    return value
+
+
+def worker(args):
+    import yaml
+    from docmancer.mcp._docs_server_part01 import _run_async, call_docs_tool_payload
+    from docmancer.docs.application.section_compression import observe_section_compression
+    runtime = load("delivery_runtime", args.repo / "eval/evidence_quality_v2/runtime.py")
+    helper = load("delivery_state", args.repo / "eval/prepared_model_comparison40/run.py")
+    root = args.work / args.arm / "project"
+    out = args.out / args.arm
+    runtime.write_project(root, {"README.md": DOCUMENT})
+    catalog = root / "docatlas.project-docs.yaml"
+    value = yaml.safe_load(catalog.read_text())
+    value["documentation_languages"] = {"README.md": ["en"]}
+    catalog.write_text(yaml.safe_dump(value, sort_keys=False), encoding="utf-8")
+    with runtime.isolated_service(args.work / args.arm / "state") as (service, cfg):
+        inventory = runtime.index_project(service, cfg, root)
+        before = (helper.logical_state(inventory), helper.source_state(root))
+        os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="minilm-sections-v1",
+            DOCATLAS_MINILM_MODEL_DIR=str(args.model), DOCATLAS_CONTEXT_ABSTENTION="off",
+            DOCATLAS_MCP_TEXT_FALLBACK="0" if args.arm == "view-structured" else "1",
+            DOCATLAS_MCP_MODEL_VIEW="1" if args.arm.startswith("view") else "off",
+            DOCATLAS_SECTION_UNITS="markdown-owner-v1" if args.arm == "view-structural" else "legacy",
+            DOCATLAS_SECTION_WIRE_FORMAT="adaptive-v2" if args.arm == "view-structured" else "v1")
+        req = {"question": QUESTION, "search_question": TRANSLATION, "project_path": str(root)}
+        off = call_docs_tool_payload("get_docs_context", req, service)
+        with observe_section_compression() as trace:
+            on = call_docs_tool_payload("get_docs_context", req, service)
+        assert off == on, "host-only rank traces changed public response"
+        save(out / "trace.json", trace)
+        save(out / "observer-equivalence.json", {"equal": True, "public_handler_calls": 2})
+        try:
+            asyncio.run(_run_async(service))
+        finally:
+            peak = Path("/sys/fs/cgroup/memory.peak")
+            save(out / "state.json", {"database_unchanged": before[0] == helper.logical_state(inventory),
+                "sources_unchanged": before[1] == helper.source_state(root),
+                "container_peak_bytes": int(peak.read_text()) if peak.exists() else None})
+
+
+async def invalidation_during_delivery(client, root, out, counts):
+    """Delay an ACTUAL transport response; retrieval/model/SQLite are unchanged.
+
+    This transport scheduling gate supplies no fake result and makes exactly
+    one real get_docs_context call. The host revokes its turn before delivery.
+    """
+    from docmancer.docs.interfaces.model_context_session import ModelContextSession, ModelSessionError
+
+    class DeliveryGate:
+        def __init__(self):
+            self.arrived, self.release = asyncio.Event(), asyncio.Event()
+
+        async def call_tool(self, tool, arguments):
+            response = await client.call_tool(tool, arguments)
+            self.arrived.set()
+            await self.release.wait()
+            return response
+
+    gate = DeliveryGate()
+    turn = ModelContextSession(gate, question=QUESTION, bindings={"project_path": str(root)})
+    task = asyncio.create_task(turn.retrieve(search_question=TRANSLATION))
+    try:
+        await asyncio.wait_for(gate.arrived.wait(), timeout=180)
+        counts["stdio_tool_calls"] += 1
+        try:
+            turn.model_input()
+        except ModelSessionError as exc:
+            assert str(exc) == "session_operation_in_progress"
+        else:
+            raise AssertionError("in-flight evidence was exposed as current")
+        turn.invalidate()
+        gate.release.set()
+        try:
+            await task
+        except ModelSessionError as exc:
+            assert str(exc) == "session_invalidated_during_request", str(exc)
+        else:
+            raise AssertionError("delayed reply resurrected invalidated sources")
+        assert not turn.model_input()["sources"]
+        assert turn.audit[0]["result"] and not turn.audit[0]["result"]["isError"]
+        save(out / "inflight-invalidation.json", {"passed": True,
+            "audit": turn.audit, "input": turn.model_input(),
+            "boundary": "real MCP response paused at transport delivery; no fabricated evidence"})
+    finally:
+        gate.release.set()
+        if not task.done():
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+
+async def run(args):
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+    from docmancer.docs.interfaces.host_context import extract_tool_payload, EvidenceDeliveryError
+    from docmancer.docs.application.section_compression import expand_sections
+    from docmancer.docs.application.model_context_view import resolve_model_reference, FORMAT
+    from docmancer.docs.application.projection_tokenizer import projection_token_count
+    from copy import deepcopy
+    counts = {"preparations": 0, "stdio_tool_calls": 0, "public_handler_calls": 0, "resource_reads": 0}
+    records = []
+    for arm in ARMS:
+        out = args.out / arm
+        out.mkdir(parents=True)
+        root = args.work / arm / "project"
+        params = StdioServerParameters(command=sys.executable, args=["-I", str(Path(__file__).resolve()),
+            "--worker", "--arm", arm, "--repo", str(args.repo), "--work", str(args.work),
+            "--out", str(args.out), "--model", str(args.model)], env=dict(os.environ))
+        counts["preparations"] += 1
+        counts["public_handler_calls"] += 2
+        with (out / "stderr.log").open("w") as err:
+          async with stdio_client(params, errlog=err) as (read, write):
+            async with ClientSession(read, write, read_timeout_seconds=timedelta(seconds=180)) as client:
+                await client.initialize()
+                tools = (await client.list_tools()).tools
+                assert {t.name for t in tools} == {"get_docs_context", "prepare_docs", "docs_status"}
+                if arm.startswith("view"):
+                    assert next(t for t in tools if t.name == "get_docs_context").outputSchema is None
+                save(out / "tools.json", [t.model_dump() for t in tools])
+                status = await client.call_tool("docs_status", {
+                    "action": "project", "project_path": str(root), "include_language": True})
+                counts["stdio_tool_calls"] += 1
+                save(out / "language.json", status.model_dump(by_alias=True))
+                assert not status.isError
+                assert ordinary_payload(status)["documentation_language"]["languages"] == ["en"]
+                req = {"question": QUESTION, "search_question": TRANSLATION, "project_path": str(root)}
+                result = await client.call_tool("get_docs_context", req)
+                counts["stdio_tool_calls"] += 1
+                save(out / "reply.json", result.model_dump(by_alias=True))
+                assert not result.isError
+                wire = extract_tool_payload(result)
+                payload = expand_sections(wire)
+                assert payload["status"] == "ok", payload
+                assert payload["source_selection"]["omitted_rows"] == 0
+                assert payload["source_selection"]["selected_rows"] == len(payload["sources"])
+                assert payload["answer_supported"] is False and payload["edit_ready"] is False
+                text = "\n".join(row["snippet"] for row in payload["sources"])
+                for fact in ("37 seconds", "twice", "9 second", "signed refusal is never retried"):
+                    assert fact in text, fact
+                for row in payload["sources"]:
+                    assert row["path_or_url"] == "README.md" and row["snippet"] in DOCUMENT
+                    span = "".join(DOCUMENT.splitlines(keepends=True)[row["line_start"]-1:row["line_end"]])
+                    assert row["snippet"] in span
+                visible = json.loads(result.content[0].text)
+                from docmancer.docs.interfaces.model_context_session import ModelContextSession, ModelSessionError
+                managed = ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root)}, language_mode=True)
+                try:
+                    await managed.retrieve(search_question=TRANSLATION)
+                except ModelSessionError as exc:
+                    assert str(exc) == "language_preflight_required"
+                else:
+                    raise AssertionError("retrieval bypassed language preflight")
+                assert not managed.audit
+                assert {t["name"] for t in await managed.tools()} == {"docs_status"}
+                # Concurrent caller requests must share ONE real preflight.
+                profiles = await asyncio.gather(managed.language(), managed.language())
+                assert all(profile["languages"] == ["en"] for profile in profiles)
+                assert len(managed.audit) == 1, "cached preflight made another product call"
+                assert {t["name"] for t in await managed.tools()} == {"get_docs_context"}
+                first = await managed.retrieve(search_question=TRANSLATION)
+                count_before = len(managed.audit)
+                try:
+                    await managed.retrieve(search_question=TRANSLATION, missing_fact="renewal condition")
+                except ModelSessionError as exc:
+                    assert str(exc) == "duplicate_retrieval"
+                else:
+                    raise AssertionError("duplicate product request was sent")
+                assert len(managed.audit) == count_before
+                second = await managed.retrieve(search_question=TRANSLATION,
+                    lookup_queries=["QuillTransit session lease renewal"], missing_fact="renewal condition")
+                counts["stdio_tool_calls"] += len(managed.audit)
+                assert len(second["sources"]) == len(first["sources"])
+                assert {r["ref"] for r in second["sources"]} == {r["ref"] for r in first["sources"]}
+                serialized = json.dumps(second, ensure_ascii=False)
+                assert "docatlas/source-packet" not in serialized and "source_uri" not in serialized
+                for item in second["sources"]:
+                    assert item["text"] == managed.resolve(item["ref"])["snippet"]
+                original_ref = first["sources"][0]["ref"]
+                raw_replies = [a["result"] for a in managed.audit if a["tool"] == "get_docs_context"]
+                appended = sum(projection_token_count(json.dumps(r, ensure_ascii=False).encode()) for r in raw_replies)
+                compact = projection_token_count(serialized.encode())
+                assert compact < appended
+                save(out / "managed-session.json", {"input": second, "audit": managed.audit,
+                    "append_all_transport_tokens": appended, "deduplicated_input_tokens": compact,
+                    "model_calls": 0, "provider_usage": None})
+                limited = ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root)}, max_input_tokens=16)
+                try:
+                    await limited.retrieve(search_question=TRANSLATION)
+                except ModelSessionError as exc:
+                    assert str(exc) == "model_input_budget_exceeded"
+                else:
+                    raise AssertionError("host prompt budget was not enforced")
+                counts["stdio_tool_calls"] += 1
+                assert len(limited.audit) == 1
+                if arm.startswith("view"):
+                    assert visible["context_format"] == FORMAT and result.structuredContent is None
+                    meta = result.model_dump(by_alias=True)["_meta"]
+                    source = resolve_model_reference(visible, meta, visible["sources"][0]["ref"])
+                    assert source == payload["sources"][0]
+                    assert [r["text"] for r in visible["sources"]] == [r["snippet"] for r in payload["sources"]]
+                    assert all("content_sha256" not in r and "source_uri" not in r for r in visible["sources"])
+                    for case in ("changed-text", "missing-meta", "wrong-ref"):
+                        modified = deepcopy(result.model_dump(by_alias=True))
+                        if case == "missing-meta":
+                            modified.pop("_meta")
+                        else:
+                            body = json.loads(modified["content"][0]["text"])
+                            body["sources"][0]["text" if case == "changed-text" else "ref"] = "not the issued value"
+                            modified["content"][0]["text"] = json.dumps(body)
+                        try:
+                            extract_tool_payload(modified)
+                        except EvidenceDeliveryError:
+                            pass
+                        else:
+                            raise AssertionError(case + " not rejected")
+                    candidates = [row for row in payload["sources"] if row.get("source_uri")]
+                    assert len(candidates) >= 2
+                    actual = await client.read_resource(candidates[0]["source_uri"])
+                    counts["resource_reads"] += 1
+                    assert json.loads(actual.contents[0].text)["status"] in ("complete", "truncated")
+                    path = root / candidates[-1]["path_or_url"]
+                    prior = path.read_bytes()
+                    try:
+                        path.write_bytes(prior + b"\nChanged source snapshot.\n")
+                        stale = json.loads((await client.read_resource(candidates[-1]["source_uri"])).contents[0].text)
+                        counts["resource_reads"] += 1
+                        assert stale["status"] in ("source_changed", "source_unavailable") and not stale.get("snippet")
+                        assert stale.get("reason_code") in ("source_policy_or_snapshot_changed", "snapshot_digest_mismatch")
+                        save(out / "stale-resource.json", stale)
+                        await managed.language(refresh=True)
+                        counts["stdio_tool_calls"] += 1
+                        assert not managed.model_input()["sources"]
+                        try:
+                            managed.resolve(original_ref)
+                        except ModelSessionError:
+                            pass
+                        else:
+                            raise AssertionError("stale reference survived source refresh")
+                    finally:
+                        path.write_bytes(prior)
+                else:
+                    assert visible.get("context_format") != FORMAT
+                for label, request, expected in (
+                    # A scorer overflow must actually acquire source candidates.
+                    # 'environment' belongs to Poetry's separate existing control,
+                    # not to this independent session-lease document.
+                    ("long-query", {"question": "lease " * 140, "project_path": str(root)}, "section_compression_query_limit"),
+                    ("blank-search", {**req, "search_question": " "}, "invalid_search_question"),
+                ):
+                    response = await client.call_tool("get_docs_context", request)
+                    counts["stdio_tool_calls"] += 1
+                    error = ordinary_payload(response)
+                    save(out / f"{label}.json", {"isError": response.isError, "payload": error})
+                    assert response.isError and error["error"]["reason_code"] == expected, (label, error)
+                    assert error.get("context_format") != FORMAT and not response.model_dump(by_alias=True).get("_meta")
+                # Keep a real active response for the closed-transport probe below.
+                transport_guard = ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root)})
+                active = await transport_guard.retrieve(search_question=TRANSLATION)
+                counts["stdio_tool_calls"] += 1
+                active_ref = active["sources"][0]["ref"]
+                assert transport_guard.resolve(active_ref)["snippet"]
+                if arm == "view":
+                    await invalidation_during_delivery(client, root, out, counts)
+                body = result.content[0].text.encode()
+                full = json.dumps(wire, ensure_ascii=False, separators=(",", ":")).encode()
+                record = {"arm": arm, "status": payload["status"], "rows": len(payload["sources"]),
+                    "model_text_tokens": projection_token_count(body), "machine_packet_tokens": projection_token_count(full)}
+                if arm.startswith("view"):
+                    assert record["model_text_tokens"] < record["machine_packet_tokens"]
+                records.append(record)
+        # A genuine closed MCP session, not a mocked failure: freshness failure
+        # must make retained evidence and references unavailable to the model.
+        try:
+            await transport_guard.language(refresh=True)
+        except ModelSessionError as exc:
+            assert str(exc) == "mcp_transport_failed", str(exc)
+        else:
+            raise AssertionError("closed transport unexpectedly remained usable")
+        assert not transport_guard.model_input()["sources"]
+        try:
+            transport_guard.resolve(active_ref)
+        except ModelSessionError:
+            pass
+        else:
+            raise AssertionError("failed freshness check retained a citation")
+        counts["closed_transport_attempts"] = counts.get("closed_transport_attempts", 0) + 1
+        save(out / "closed-transport.json", {"passed": True,
+            "input": transport_guard.model_input(), "audit": transport_guard.audit})
+        state = json.loads((out / "state.json").read_text())
+        assert state["database_unchanged"] and state["sources_unchanged"]
+        trace = json.loads((out / "trace.json").read_text())[0]
+        assert len(trace["ranked_sections"]) == trace["candidate_sections"]
+        assert all(r["selected"] for r in trace["ranked_sections"])
+        if arm == "view-structural":
+            assert trace["candidate_sections"] == 2, "empty ancestor still consumes a section slot"
+        else:
+            assert trace["candidate_sections"] == 3
+    save(args.out / "SUMMARY.json", {"head": os.getenv("TESTED_SHA"), "passed": True, "records": records,
+        "counts": counts, "source_fact_checks": True, "observer_equal": True,
+        "claim_boundary": "installed public stdio and SDK adapter, NOT autonomous strong-model behavior or provider billing"})
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    for name in ("repo", "work", "out", "model"):
+        parser.add_argument("--"+name, type=Path, required=True)
+    parser.add_argument("--worker", action="store_true")
+    parser.add_argument("--arm", choices=ARMS)
+    args = parser.parse_args()
+    for name in ("repo", "work", "out", "model"):
+        setattr(args, name, getattr(args, name).resolve())
+    if args.worker:
+        return worker(args)
+    import docmancer
+    installed = Path(docmancer.__file__).resolve().parent
+    assert not installed.is_relative_to(args.repo)
+    assert all(p.read_bytes() == (args.repo / "docmancer" / p.relative_to(installed)).read_bytes() for p in installed.rglob("*.py"))
+    assert not args.work.exists() and not args.out.exists()
+    args.work.mkdir(mode=0o700, parents=True)
+    args.out.mkdir(parents=True)
+    save(args.out / "FREEZE.json", {"question": QUESTION, "search_question": TRANSLATION,
+        "source_sha256": hashlib.sha256(DOCUMENT.encode()).hexdigest(), "source": DOCUMENT})
+    asyncio.run(run(args))
+
+if __name__ == "__main__":
+    main()

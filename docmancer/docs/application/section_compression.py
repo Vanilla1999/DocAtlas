@@ -19,7 +19,25 @@ import threading
 import time
 
 MODE = "minilm-sections-v1"
-FORMAT = "docatlas.sections.v1"
+LEGACY_FORMAT = "docatlas.sections.v1"
+FORMAT = "docatlas.sections.v2"
+# Positional wire contract: append only; never reorder or change these values.
+# A set bit restores a field that was PRESENT with exactly this default. An
+# unset bit never invents a field absent from the original envelope.
+_ENVELOPE_DEFAULTS = (
+    ("answer_supported", False),
+    ("answer_available", False),
+    ("edit_ready", False),
+    ("requires_confirmation", False),
+    ("hard_stop", False),
+    ("covered_query_ids", []),
+    ("missing_query_ids", []),
+    ("missing_facets", []),
+    ("read_next", []),
+    ("missing", []),
+    ("warnings", []),
+)
+_CONTEXT_MEANING = "Retrieved evidence only; not completeness or edit authority."
 MODEL_REVISION = "233902d25c440f23af6f7d6e94d2946bac0bee0a"
 MODEL_FILES = {
     "tokenizer.json": (711396, "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"),
@@ -67,6 +85,21 @@ class _Section:
     text: str
 
 
+def selection_limit() -> int:
+    """Explicit host cap, not a learned sufficiency/absence threshold."""
+    value = os.environ.get("DOCATLAS_SECTION_TOP_K", str(TOP_K))
+    if value not in {"1", "2", "3", "5"}:
+        raise SectionCompressionError("section_compression_invalid_top_k")
+    return int(value)
+
+
+def selection_units() -> str:
+    value = os.environ.get("DOCATLAS_SECTION_UNITS", "legacy")
+    if value not in {"legacy", "markdown-owner-v1"}:
+        raise SectionCompressionError("section_compression_invalid_units")
+    return value
+
+
 def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
     """Group checked occurrences, retaining gaps and never fetching a neighbor."""
     if len(rows) > MAX_ROWS or sum(len(r["snippet"]) for r in rows) > MAX_INPUT_CHARS:
@@ -110,6 +143,66 @@ def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
                 spans.append([a, b])
         text = "\n\n".join(group["raw"][a:b] for a, b in spans)
         result.append(_Section(key, group["rows"], text))
+    if selection_units() == "markdown-owner-v1":
+        return _attach_owned_headings(result, groups)
+    return result
+
+
+def _attach_owned_headings(sections: list[_Section], groups: dict) -> list[_Section]:
+    """Only parsed empty heading ancestors join already-acquired descendants.
+
+    Not a short-text or keyword filter. Orphan headings stay independent.
+    No unacquired span is fetched, inferred or delivered. All selected original
+    rows remain intact; shared ancestry is emitted only once by evidence ID.
+    """
+    from docmancer.core.structured_chunking import parse_markdown_parents
+    structures, owners = {}, {}
+    for i, section in enumerate(sections):
+        source_key = (section.key[0], *section.key[2:])
+        raw = groups[section.key]["raw"]
+        if source_key not in structures:
+            structures[source_key] = parse_markdown_parents(raw, json.dumps(source_key, ensure_ascii=False))
+        spans = groups[section.key]["spans"]
+        found = [p for p in structures[source_key]
+                 if all(p.char_start <= a < b <= p.char_end for a, b in spans)]
+        if len(found) == 1:
+            owners[i] = found[0]
+    parents_for = {i: [] for i in range(len(sections))}
+    attached = set()
+    for i, parent in owners.items():
+        raw = groups[sections[i].key]["raw"]
+        body = raw[parent.char_start:parent.char_end].splitlines(keepends=True)
+        if not parent.level or not body or "".join(body[1:]).strip():
+            continue
+        stop = next((p.char_start for p in structures[(sections[i].key[0], *sections[i].key[2:])]
+                     if p.char_start > parent.char_start and p.level <= parent.level), len(raw))
+        for j, child in owners.items():
+            if (i != j and (sections[i].key[0], *sections[i].key[2:]) == (sections[j].key[0], *sections[j].key[2:])
+                    and parent.char_end <= child.char_start < stop and child.level > parent.level):
+                child_body = raw[child.char_start:child.char_end].splitlines(keepends=True)
+                if "".join(child_body[1:]).strip():
+                    parents_for[j].append(i)
+                    attached.add(i)
+    result = []
+    for i, section in enumerate(sections):
+        if i in attached:
+            continue
+        ids, spans, rows = set(), [], []
+        for j in [*parents_for[i], i]:
+            group = groups[sections[j].key]
+            spans.extend(group["spans"])
+            for row in group["rows"]:
+                if row["evidence_id"] not in ids:
+                    ids.add(row["evidence_id"])
+                    rows.append(row)
+        merged = []
+        for a, b in sorted(spans):
+            if merged and a <= merged[-1][1]:
+                merged[-1][1] = max(merged[-1][1], b)
+            else:
+                merged.append([a, b])
+        raw = groups[section.key]["raw"]
+        result.append(_Section(section.key, rows, "\n\n".join(raw[a:b] for a, b in merged)))
     return result
 
 
@@ -200,6 +293,8 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
+    top_k = selection_limit()
+    units = selection_units()
     sections = _sections(rows, snapshot)
     configured = os.environ.get("DOCATLAS_MINILM_MODEL_DIR", "")
     if not configured or not Path(configured).is_absolute():
@@ -216,7 +311,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = directory
         scores, receipt = _ENGINE.score(question, sections)
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
-    selected = {row["evidence_id"] for i in ranking[:TOP_K] for row in sections[i].rows}
+    selected = {row["evidence_id"] for i in ranking[:top_k] for row in sections[i].rows}
     retained = [row for row in rows if row["evidence_id"] in selected]
     from .experimental_context_finalization import _rebuild
     result, bindings = _rebuild(payload, snapshot, retrieval, retained, reason="section_selection")
@@ -225,12 +320,22 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     receipt.update(method=MODE, model_revision=MODEL_REVISION,
                    scoring_question_sha256=hashlib.sha256(question.encode()).hexdigest(),
                    candidate_rows=len(rows), candidate_sections=len(sections),
-                   selected_rows=len(retained), selected_sections=min(TOP_K, len(sections)),
+                   selected_rows=len(retained), selected_sections=min(top_k, len(sections)), top_k=top_k, units=units,
                    selected_evidence_ids=[r["evidence_id"] for r in retained])
     retrieval.setdefault("retrieval_diagnostics", {})["section_compression"] = deepcopy(receipt)
     observed = _OBSERVER.get()
     if observed is not None:
-        observed.append(deepcopy(receipt))
+        # Host-only: no bodies, new inference calls, thresholds or input changes.
+        detail = deepcopy(receipt)
+        detail["ranked_sections"] = [
+            {"rank": rank, "score": scores[index], "selected": rank <= top_k,
+             "path": sections[index].rows[0].get("path_or_url"),
+             "section": sections[index].rows[0].get("section"),
+             "scoring_text_sha256": hashlib.sha256(sections[index].text.encode()).hexdigest(),
+             "evidence_ids": [r["evidence_id"] for r in sections[index].rows]}
+            for rank, index in enumerate(ranking, 1)
+        ]
+        observed.append(detail)
     return result, bindings
 
 
@@ -240,26 +345,88 @@ def _common(rows: list[dict]) -> dict:
             and all(k in row and row[k] == v for row in rows[1:])}
 
 
-def encode_sections(payload: dict) -> dict:
+def encode_sections(payload: dict, *, context_format: str | None = None) -> dict:
+    """Use safe v1 by default; explicit adaptive v2 chooses the cheapest packet.
+
+    FORMAT requests adaptive v2 with v1 fallback, not a forced wire version.
+    LEGACY_FORMAT requests only v1 for backwards-compatible callers.
+    """
+    if context_format is None:
+        setting = os.environ.get("DOCATLAS_SECTION_WIRE_FORMAT", "v1")
+        if setting not in {"v1", "adaptive-v2"}:
+            raise SectionCompressionError("section_compression_unknown_format")
+        context_format = LEGACY_FORMAT if setting == "v1" else FORMAT
+    if context_format not in (LEGACY_FORMAT, FORMAT):
+        raise SectionCompressionError("section_compression_unknown_format")
+    if payload.get("kind") != "docs_context" or not payload.get("sources"):
+        return payload
+    if context_format == FORMAT and (
+        payload.get("requires_confirmation") or payload.get("hard_stop")
+        or payload.get("status") == "confirmation_required"
+        or (payload.get("delivery_decision") or {}).get("deliverable") is False
+    ):
+        return payload
+    candidates = [_encode_section_candidate(payload, context_format=LEGACY_FORMAT)]
+    if context_format == FORMAT:
+        candidates.extend(
+            _encode_section_candidate(payload, context_format=FORMAT, group_by=group_by)
+            for group_by in ("path", "section")
+        )
+    # All candidates include their own fixed-point estimate. Price the actual
+    # complete JSON, never an approximation of just the source rows.
+    result = min(candidates, key=lambda candidate: (
+        candidate["estimated_tokens"],
+        len(json.dumps(candidate, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
+        candidate["context_format"] != FORMAT,
+    ))
+    if result["estimated_tokens"] > OUTPUT_LIMIT:
+        raise SectionCompressionError("section_compression_output_limit")
+    return result
+
+
+def _encode_section_candidate(payload: dict, *, context_format: str, group_by: str = "section") -> dict:
     """Versioned lossless factoring, not a second semantic compression pass.
 
     Every selected source field and exact string is retained. Existing source_uri
     values remain continuation capabilities, NOT new provenance/read grants.
     """
+    if context_format not in (LEGACY_FORMAT, FORMAT):
+        raise SectionCompressionError("section_compression_unknown_format")
     if payload.get("kind") != "docs_context" or not payload.get("sources"):
+        return payload
+    if context_format == FORMAT and (
+        payload.get("requires_confirmation") or payload.get("hard_stop")
+        or payload.get("status") == "confirmation_required"
+        or (payload.get("delivery_decision") or {}).get("deliverable") is False
+    ):
         return payload
     from .projection_tokenizer import projection_token_count
     rows = payload["sources"]
     groups = {}
     for ordinal, row in enumerate(rows):
-        key = tuple(str(row.get(k) or "") for k in (
-            "path_or_url", "section", "project_identity", "scope", "version_binding", "authority",
-        ))
+        if group_by == "section":
+            key = tuple(str(row.get(k) or "") for k in (
+                "path_or_url", "section", "project_identity", "scope", "version_binding", "authority",
+            ))
+        else:
+            # Factoring is not semantic merging: differing section, scope,
+            # version and authority remain explicit per fragment when needed.
+            key = json.dumps(row.get("path_or_url"), ensure_ascii=False, sort_keys=True)
         groups.setdefault(key, []).append((ordinal, row))
     result = {k: deepcopy(v) for k, v in payload.items() if k != "sources"}
-    if any(k in result for k in ("context_format", "source_defaults", "source_groups", "source_estimated_tokens")):
+    if any(k in result for k in ("context_format", "source_defaults", "source_groups", "source_estimated_tokens",
+                               "envelope_defaults", "context_meaning")):
         raise SectionCompressionError("section_compression_format_collision")
-    result["context_format"] = FORMAT
+    result["context_format"] = context_format
+    if context_format == FORMAT:
+        mask = 0
+        for bit, (name, default) in enumerate(_ENVELOPE_DEFAULTS):
+            if name in result and type(result[name]) is type(default) and result[name] == default:
+                del result[name]
+                mask |= 1 << bit
+        if mask:
+            result["envelope_defaults"] = mask
+        result["context_meaning"] = _CONTEXT_MEANING
     result["source_defaults"] = _common(rows)
     result["source_groups"] = []
     for key, group in sorted(groups.items()):
@@ -278,19 +445,35 @@ def encode_sections(payload: dict) -> dict:
         result["estimated_tokens"] = cost
     else:
         raise SectionCompressionError("section_compression_budget_estimate")
-    if cost > OUTPUT_LIMIT:
-        raise SectionCompressionError("section_compression_output_limit")
     if expand_sections(result) != payload:
         raise SectionCompressionError("section_compression_roundtrip")
     return result
 
 
 def expand_sections(payload: dict) -> dict:
-    """Decode the explicit v1 format. Decoding does not authorize any source."""
-    if payload.get("context_format") != FORMAT:
+    """Decode v1/v2 losslessly. Decoding does not authorize any source.
+
+    V2 envelope_defaults is a presence bitmap over _ENVELOPE_DEFAULTS;
+    omitted false flags remain false, not permission/completeness grants.
+    """
+    context_format = payload.get("context_format")
+    if context_format not in (LEGACY_FORMAT, FORMAT):
         return deepcopy(payload)
+    reserved = {"context_format", "source_defaults", "source_groups", "source_estimated_tokens"}
+    if context_format == FORMAT:
+        reserved.update(("envelope_defaults", "context_meaning"))
     result = {k: deepcopy(v) for k, v in payload.items()
-              if k not in {"context_format", "source_defaults", "source_groups", "source_estimated_tokens"}}
+              if k not in reserved}
+    if context_format == FORMAT:
+        mask = payload.get("envelope_defaults", 0)
+        if (type(mask) is not int or not 0 <= mask < (1 << len(_ENVELOPE_DEFAULTS))
+                or payload.get("context_meaning") != _CONTEXT_MEANING):
+            raise ValueError("invalid compact envelope defaults")
+        for bit, (name, default) in enumerate(_ENVELOPE_DEFAULTS):
+            if mask & (1 << bit):
+                if name in result:
+                    raise ValueError("overlapping envelope defaults")
+                result[name] = deepcopy(default)
     sources = {}
     defaults = payload["source_defaults"]
     for group in payload["source_groups"]:

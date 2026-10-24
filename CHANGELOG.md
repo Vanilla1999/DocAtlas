@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Optional `docs_status(include_language=true)` now returns compact bound identifiers and complete language metadata by default for projects and libraries; use `details=true` to include ordinary status diagnostics. Ordinary status is unchanged, and language preflight is not required before `get_docs_context`.
+
 ## [1.3.2] - 2026-09-08
 
 ### Added
