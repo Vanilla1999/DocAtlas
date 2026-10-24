@@ -83,6 +83,8 @@ class ModelContextSession:
             raise ModelSessionError("conflicting_module_scope")
         if type(language_mode) is not bool:
             raise ModelSessionError("invalid_language_mode")
+        if language_mode and bindings.get("scope") == "all":
+            raise ModelSessionError("language_preflight_requires_exact_scope")
         for value in (max_input_tokens, max_searches, max_events):
             if type(value) is not int or value < 1:
                 raise ModelSessionError("invalid_host_budget")
@@ -194,10 +196,15 @@ class ModelContextSession:
             self.invalidate()
             self._events.append({"error": _status_error(raw)})
             raise ModelSessionError("retrieval_failed")
-        packet = extract_tool_payload(result)
-        payload = expand_sections(packet)
-        encoded = encode_model_result(packet)
+        try:
+            packet = extract_tool_payload(result)
+            payload = expand_sections(packet)
+            encoded = encode_model_result(packet)
+        except (ValueError, KeyError, TypeError) as exc:
+            self.invalidate()
+            raise ModelSessionError("invalid_evidence_delivery") from exc
         if encoded is None:
+            self._events.clear()
             self._sources.clear()
             self._originals.clear()
             self._identities.clear()
@@ -229,6 +236,8 @@ class ModelContextSession:
             refs.append(ref)
         event = {k: deepcopy(v) for k, v in view.items() if k not in {"sources", "source_context"}}
         event["source_refs"] = list(dict.fromkeys(refs))
+        if missing_fact is not None:
+            event["caller_assessed_gap"] = missing_fact
         candidate = self._input(new_sources, [*self._events, event])
         self._check_budget(candidate)
         self._sources, self._originals, self._identities = new_sources, new_originals, new_identities

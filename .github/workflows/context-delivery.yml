@@ -68,3 +68,45 @@ jobs:
           path: ${{ runner.temp }}/context-evidence/
           retention-days: 30
           if-no-files-found: error
+
+  policy-study:
+    name: Policy diagnostic (not quality acceptance) ${{ matrix.top_k }}-${{ matrix.units }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {top_k: 1, units: legacy}
+          - {top_k: 2, units: legacy}
+          - {top_k: 3, units: legacy}
+          - {top_k: 5, units: markdown-owner-v1}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Build same pinned installed wheel and scorer
+        run: |
+          mkdir -p "$RUNNER_TEMP/policy-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/policy-evidence/head.txt"
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-policy-study .
+      - name: Actual stdio V40 policy arm; quality failures are reported, never accepted
+        run: |
+          set +e
+          docker run --name policy-study --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/policy-evidence:/evidence" docatlas-policy-study \
+            --repo /repo --work /tmp/policy --out /evidence/run --model /model \
+            --model-view --top-k ${{ matrix.top_k }} --units ${{ matrix.units }} --policy-diagnostic
+          rc=$?
+          docker inspect policy-study > "$RUNNER_TEMP/policy-evidence/container.json"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: policy-${{ matrix.top_k }}-${{ matrix.units }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/policy-evidence/
+          retention-days: 30
+          if-no-files-found: error
