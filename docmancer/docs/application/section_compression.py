@@ -100,6 +100,39 @@ def selection_units() -> str:
     return value
 
 
+def _adaptive_cutoff(sorted_scores: list[float], cap: int) -> tuple[int, dict]:
+    """Experimental raw-logit largest gap; not semantic sufficiency or refusal.
+
+    Frozen from the archived full-gap-b0 experiment: search the first ceil(0.9N)
+    adjacent gaps, B=0, then cap at the host's fixed limit. Equal maximum gaps
+    choose the first. An exactly flat distribution retains the fixed cap because
+    it contains no ordering signal. No learned/calibrated probability threshold,
+    gold access, new model call, query rule, budget crop or source rewrite.
+    This is an adaptation, NOT the cosine-similarity Adaptive-k paper algorithm.
+    """
+    count = len(sorted_scores)
+    limit = min(cap, count)
+    if not count:
+        raise SectionCompressionError("section_compression_empty_scores")
+    if (not all(math.isfinite(s) for s in sorted_scores)
+            or any(a < b for a, b in zip(sorted_scores, sorted_scores[1:]))):
+        raise SectionCompressionError("section_compression_invalid_score")
+    if count == 1:
+        return limit, {"gap_count": 0, "cutoff_rank": 1, "reason": "single_candidate"}
+    gap_count = min(count - 1, (9 * count + 9) // 10)
+    gaps = [sorted_scores[i] - sorted_scores[i + 1] for i in range(gap_count)]
+    position = max(range(gap_count), key=lambda i: gaps[i])
+    largest = gaps[position]
+    if not math.isfinite(largest):
+        raise SectionCompressionError("section_compression_invalid_score")
+    if largest == 0:
+        return limit, {"gap_count": gap_count, "cutoff_rank": limit,
+                       "largest_gap": 0.0, "reason": "flat_scores_keep_cap"}
+    cutoff = position + 1
+    return min(limit, cutoff), {"gap_count": gap_count, "cutoff_rank": cutoff,
+                               "largest_gap": largest, "reason": "largest_gap", "buffer": 0}
+
+
 def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
     """Group checked occurrences, retaining gaps and never fetching a neighbor."""
     if len(rows) > MAX_ROWS or sum(len(r["snippet"]) for r in rows) > MAX_INPUT_CHARS:
@@ -282,7 +315,7 @@ _ENGINE_PATH = None
 
 
 def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: str):
-    """Return complete original rows from five groups; errors never mean abstention."""
+    """Return whole original groups; configurable cutoff never certifies an answer."""
     rows = payload.get("sources") or []
     if not enabled() or payload.get("kind") != "docs_context" or not rows:
         return payload, snapshot
@@ -294,6 +327,10 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
     top_k = selection_limit()
+    policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
+    if policy not in {"fixed", "adaptive-gap-v1"}:
+        raise SectionCompressionError("section_compression_invalid_selection_policy")
+    configured_top_k = top_k
     units = selection_units()
     sections = _sections(rows, snapshot)
     configured = os.environ.get("DOCATLAS_MINILM_MODEL_DIR", "")
@@ -311,6 +348,9 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = directory
         scores, receipt = _ENGINE.score(question, sections)
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
+    if policy == "adaptive-gap-v1":
+        top_k, cutoff = _adaptive_cutoff([scores[i] for i in ranking], top_k)
+        receipt["adaptive_cutoff"] = cutoff
     selected = {row["evidence_id"] for i in ranking[:top_k] for row in sections[i].rows}
     retained = [row for row in rows if row["evidence_id"] in selected]
     from .experimental_context_finalization import _rebuild
@@ -318,6 +358,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     if [row["evidence_id"] for row in result["sources"]] != [r["evidence_id"] for r in retained]:
         raise SectionCompressionError("section_compression_identity_mismatch")
     receipt.update(method=MODE, model_revision=MODEL_REVISION,
+                   selection_policy=policy, configured_top_k=configured_top_k,
                    scoring_question_sha256=hashlib.sha256(question.encode()).hexdigest(),
                    candidate_rows=len(rows), candidate_sections=len(sections),
                    selected_rows=len(retained), selected_sections=min(top_k, len(sections)), top_k=top_k, units=units,
