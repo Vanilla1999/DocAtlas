@@ -92,6 +92,8 @@ def worker(args):
                 DOCATLAS_MINILM_MODEL_DIR=str(args.model),
                 DOCATLAS_MCP_TEXT_FALLBACK="1",
                 HF_HUB_OFFLINE="1",
+                DOCATLAS_SECTION_TOP_K=str(args.top_k), DOCATLAS_SECTION_UNITS=args.units,
+                DOCATLAS_SECTION_WIRE_FORMAT=args.wire_format,
             )
             try:
                 asyncio.run(_run_async(service))
@@ -133,6 +135,7 @@ async def client(args):
         params = StdioServerParameters(command=sys.executable, args=[
             "-I", str(Path(__file__).resolve()), "--worker", "--family", group,
             *( ["--model-view"] if args.model_view else [] ),
+            "--top-k", str(args.top_k), "--units", args.units, "--wire-format", args.wire_format,
             "--repo", str(args.repo), "--work", str(args.work),
             "--out", str(args.out), "--model", str(args.model),
         ], env=dict(os.environ))
@@ -188,7 +191,8 @@ async def client(args):
                             assert row == previous, ("selected source was altered", case["id"], row, previous)
                         chosen = {(r["path_or_url"], r.get("section"), r["project_identity"], r["scope"],
                                    r["version_binding"], r["authority"]) for r in expanded["sources"]}
-                        assert len(chosen) <= 5
+                        if args.units == "legacy":
+                            assert len(chosen) <= args.top_k
                         wanted = [r["evidence_id"] for r in baseline["sources"]
                                   if (r["path_or_url"], r.get("section"), r["project_identity"], r["scope"],
                                       r["version_binding"], r["authority"]) in chosen]
@@ -211,9 +215,19 @@ async def client(args):
                             "rows": len(expanded["sources"]), "sections": len(chosen),
                             "seconds": elapsed, "whole_acquired_sections": True, "roundtrip_sources": True,
                         })
+                        if case["id"] == "V40-B01":
+                            from docmancer.docs.interfaces.grounded_mcp_session import GroundedMCPSession
+                            sdk = GroundedMCPSession(session, request, wire, {"answer": "documented constraints"})
+                            assert sdk.context["sources"] == expanded["sources"]
+                            try:
+                                GroundedMCPSession(session, request, wire, {}, evidence_budget=10)
+                            except ValueError:
+                                pass
+                            else:
+                                raise AssertionError("explicit SDK budget ignored")
                         group_rows = expanded["sources"]
                         print(json.dumps(records[-1]), flush=True)
-                    if group == "poetry":
+                    if group == "poetry" and not args.policy_diagnostic:
                         # Distinct public error: no query truncation or full-pool fallback.
                         bad = await session.call_tool("get_docs_context", {
                             "question": "environment " * 140, "project_path": str(root), "scope": "project",
@@ -271,7 +285,8 @@ async def client(args):
     assert server["observations"] == []
     controls.append({"scenario": "missing_model_no_fallback", "pass": True})
     save(args.out / "DELIVERY.json", {"cases": records, "controls": controls,
-                                     "public_calls": 82, "preparations": 6, "resource_reads": 2})
+                                     "public_calls": 81 if args.policy_diagnostic else 82,
+                                     "preparations": 6, "resource_reads": 0 if args.policy_diagnostic else 2})
     return records, controls
 
 
@@ -306,6 +321,7 @@ def assess(args, records, controls):
     server_reports = [json.loads((args.out / family / "server.json").read_text()) for family in families]
     summary = {
         "head": os.environ.get("TESTED_SHA"),
+        "top_k": args.top_k, "units": args.units, "policy_diagnostic_only": args.policy_diagnostic,
         "cases": len(results), "positive_pass": sum(r["passed"] for r in results if r["answerability"] == "within_budget"),
         "partial_pass": sum(r["passed"] for r in results if r["answerability"] == "partial"),
         "strict_empty_pass": sum(r["passed"] for r in results if r["answerability"] == "unanswerable"),
@@ -323,6 +339,7 @@ def assess(args, records, controls):
         "boundary": "installed wheel; real SQLite; public stdio MCP; client-received bytes",
         "semantic_refusal_implemented": False,
     }
+    summary["quality_gate_passed"] = all(r["passed"] for r in results if r["answerability"] != "unanswerable")
     summary["counts"] = {kind: {"total": sum(r["answerability"] == kind for r in results),
                                 "pass": sum(r["passed"] for r in results if r["answerability"] == kind)}
                          for kind in sorted({r["answerability"] for r in results})}
@@ -330,7 +347,8 @@ def assess(args, records, controls):
     save(args.out / "SUMMARY.json", summary)
     print(json.dumps(summary, indent=2), flush=True)
     assert all(r["integrity"] for r in results)
-    assert all(r["passed"] for r in results if r["answerability"] != "unanswerable"), "positive/partial quality gate"
+    if not args.policy_diagnostic:
+        assert summary["quality_gate_passed"], "positive/partial quality gate"
     assert all(r["cost_non_regression"] for r in results), "emitted cost exceeds same-payload v1 diagnostic"
 
 
@@ -339,6 +357,11 @@ def main():
     for name in ("repo", "work", "out", "model"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--model-view", action="store_true")
+    parser.add_argument("--top-k", type=int, choices=(1, 2, 3, 5), default=5)
+    parser.add_argument("--units", choices=("legacy", "markdown-owner-v1"), default="legacy")
+    parser.add_argument("--wire-format", choices=("v1", "adaptive-v2"), default="v1")
+    parser.add_argument("--policy-diagnostic", action="store_true",
+                        help="Report experimental quality FAIL without claiming acceptance; integrity remains mandatory")
     parser.add_argument("--worker", action="store_true")
     parser.add_argument("--family")
     parser.add_argument("--missing-model", action="store_true")
@@ -359,7 +382,9 @@ def main():
     corpus, _, _ = dataset(args.repo)
     frozen = {str(p.relative_to(args.repo)): sha(p.read_bytes()) for p in corpus.rglob("*") if p.is_file()}
     save(args.out / "FREEZE.json", {"head": os.environ.get("TESTED_SHA"), "installed": product,
-                                    "corpus": frozen, "model_path": str(args.model), "python": sys.version})
+                                    "corpus": frozen, "model_path": str(args.model), "python": sys.version,
+                                    "top_k": args.top_k, "units": args.units,
+                                    "quality_claim": "diagnostic only" if args.policy_diagnostic else "regression gate"})
     records, controls = asyncio.run(client(args))
     assess(args, records, controls)
     assert all(sha((args.repo / path).read_bytes()) == h for path, h in frozen.items())

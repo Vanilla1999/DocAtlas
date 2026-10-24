@@ -85,6 +85,21 @@ class _Section:
     text: str
 
 
+def selection_limit() -> int:
+    """Explicit host cap, not a learned sufficiency/absence threshold."""
+    value = os.environ.get("DOCATLAS_SECTION_TOP_K", str(TOP_K))
+    if value not in {"1", "2", "3", "5"}:
+        raise SectionCompressionError("section_compression_invalid_top_k")
+    return int(value)
+
+
+def selection_units() -> str:
+    value = os.environ.get("DOCATLAS_SECTION_UNITS", "legacy")
+    if value not in {"legacy", "markdown-owner-v1"}:
+        raise SectionCompressionError("section_compression_invalid_units")
+    return value
+
+
 def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
     """Group checked occurrences, retaining gaps and never fetching a neighbor."""
     if len(rows) > MAX_ROWS or sum(len(r["snippet"]) for r in rows) > MAX_INPUT_CHARS:
@@ -128,6 +143,66 @@ def _sections(rows: list[dict], snapshot: dict) -> list[_Section]:
                 spans.append([a, b])
         text = "\n\n".join(group["raw"][a:b] for a, b in spans)
         result.append(_Section(key, group["rows"], text))
+    if selection_units() == "markdown-owner-v1":
+        return _attach_owned_headings(result, groups)
+    return result
+
+
+def _attach_owned_headings(sections: list[_Section], groups: dict) -> list[_Section]:
+    """Only parsed empty heading ancestors join already-acquired descendants.
+
+    Not a short-text or keyword filter. Orphan headings stay independent.
+    No unacquired span is fetched, inferred or delivered. All selected original
+    rows remain intact; shared ancestry is emitted only once by evidence ID.
+    """
+    from docmancer.core.structured_chunking import parse_markdown_parents
+    structures, owners = {}, {}
+    for i, section in enumerate(sections):
+        source_key = (section.key[0], *section.key[2:])
+        raw = groups[section.key]["raw"]
+        if source_key not in structures:
+            structures[source_key] = parse_markdown_parents(raw, json.dumps(source_key, ensure_ascii=False))
+        spans = groups[section.key]["spans"]
+        found = [p for p in structures[source_key]
+                 if all(p.char_start <= a < b <= p.char_end for a, b in spans)]
+        if len(found) == 1:
+            owners[i] = found[0]
+    parents_for = {i: [] for i in range(len(sections))}
+    attached = set()
+    for i, parent in owners.items():
+        raw = groups[sections[i].key]["raw"]
+        body = raw[parent.char_start:parent.char_end].splitlines(keepends=True)
+        if not parent.level or not body or "".join(body[1:]).strip():
+            continue
+        stop = next((p.char_start for p in structures[(sections[i].key[0], *sections[i].key[2:])]
+                     if p.char_start > parent.char_start and p.level <= parent.level), len(raw))
+        for j, child in owners.items():
+            if (i != j and (sections[i].key[0], *sections[i].key[2:]) == (sections[j].key[0], *sections[j].key[2:])
+                    and parent.char_end <= child.char_start < stop and child.level > parent.level):
+                child_body = raw[child.char_start:child.char_end].splitlines(keepends=True)
+                if "".join(child_body[1:]).strip():
+                    parents_for[j].append(i)
+                    attached.add(i)
+    result = []
+    for i, section in enumerate(sections):
+        if i in attached:
+            continue
+        ids, spans, rows = set(), [], []
+        for j in [*parents_for[i], i]:
+            group = groups[sections[j].key]
+            spans.extend(group["spans"])
+            for row in group["rows"]:
+                if row["evidence_id"] not in ids:
+                    ids.add(row["evidence_id"])
+                    rows.append(row)
+        merged = []
+        for a, b in sorted(spans):
+            if merged and a <= merged[-1][1]:
+                merged[-1][1] = max(merged[-1][1], b)
+            else:
+                merged.append([a, b])
+        raw = groups[section.key]["raw"]
+        result.append(_Section(section.key, rows, "\n\n".join(raw[a:b] for a, b in merged)))
     return result
 
 
@@ -218,6 +293,8 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
+    top_k = selection_limit()
+    units = selection_units()
     sections = _sections(rows, snapshot)
     configured = os.environ.get("DOCATLAS_MINILM_MODEL_DIR", "")
     if not configured or not Path(configured).is_absolute():
@@ -234,7 +311,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = directory
         scores, receipt = _ENGINE.score(question, sections)
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
-    selected = {row["evidence_id"] for i in ranking[:TOP_K] for row in sections[i].rows}
+    selected = {row["evidence_id"] for i in ranking[:top_k] for row in sections[i].rows}
     retained = [row for row in rows if row["evidence_id"] in selected]
     from .experimental_context_finalization import _rebuild
     result, bindings = _rebuild(payload, snapshot, retrieval, retained, reason="section_selection")
@@ -243,7 +320,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     receipt.update(method=MODE, model_revision=MODEL_REVISION,
                    scoring_question_sha256=hashlib.sha256(question.encode()).hexdigest(),
                    candidate_rows=len(rows), candidate_sections=len(sections),
-                   selected_rows=len(retained), selected_sections=min(TOP_K, len(sections)),
+                   selected_rows=len(retained), selected_sections=min(top_k, len(sections)), top_k=top_k, units=units,
                    selected_evidence_ids=[r["evidence_id"] for r in retained])
     retrieval.setdefault("retrieval_diagnostics", {})["section_compression"] = deepcopy(receipt)
     observed = _OBSERVER.get()
@@ -251,7 +328,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         # Host-only: no bodies, new inference calls, thresholds or input changes.
         detail = deepcopy(receipt)
         detail["ranked_sections"] = [
-            {"rank": rank, "score": scores[index], "selected": rank <= TOP_K,
+            {"rank": rank, "score": scores[index], "selected": rank <= top_k,
              "path": sections[index].rows[0].get("path_or_url"),
              "section": sections[index].rows[0].get("section"),
              "scoring_text_sha256": hashlib.sha256(sections[index].text.encode()).hexdigest(),
@@ -268,12 +345,17 @@ def _common(rows: list[dict]) -> dict:
             and all(k in row and row[k] == v for row in rows[1:])}
 
 
-def encode_sections(payload: dict, *, context_format: str = FORMAT) -> dict:
-    """Choose the cheapest complete lossless wire packet; v2 wins exact ties.
+def encode_sections(payload: dict, *, context_format: str | None = None) -> dict:
+    """Use safe v1 by default; explicit adaptive v2 chooses the cheapest packet.
 
     FORMAT requests adaptive v2 with v1 fallback, not a forced wire version.
     LEGACY_FORMAT requests only v1 for backwards-compatible callers.
     """
+    if context_format is None:
+        setting = os.environ.get("DOCATLAS_SECTION_WIRE_FORMAT", "v1")
+        if setting not in {"v1", "adaptive-v2"}:
+            raise SectionCompressionError("section_compression_unknown_format")
+        context_format = LEGACY_FORMAT if setting == "v1" else FORMAT
     if context_format not in (LEGACY_FORMAT, FORMAT):
         raise SectionCompressionError("section_compression_unknown_format")
     if payload.get("kind") != "docs_context" or not payload.get("sources"):

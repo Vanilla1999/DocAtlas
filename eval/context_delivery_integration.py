@@ -17,7 +17,7 @@ import sys
 DOCUMENT = "# QuillTransit\n\n## Session lease\n\nA session lease lasts 37 seconds. Renewal is allowed twice, with a 9 second pause. A signed refusal is never retried.\n\n## Export\n\nExports require an active session lease and explicit user approval.\n"
 QUESTION = "Сколько действует аренда сессии QuillTransit, сколько разрешено продлений и повторяется ли подписанный отказ?"
 TRANSLATION = "How long does a QuillTransit session lease last, how many renewals are allowed, and is a signed refusal retried?"
-ARMS = ("plain", "view", "view-structured")
+ARMS = ("plain", "view", "view-structured", "view-structural")
 
 
 def load(name, path):
@@ -63,7 +63,9 @@ def worker(args):
         os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="minilm-sections-v1",
             DOCATLAS_MINILM_MODEL_DIR=str(args.model), DOCATLAS_CONTEXT_ABSTENTION="off",
             DOCATLAS_MCP_TEXT_FALLBACK="0" if args.arm == "view-structured" else "1",
-            DOCATLAS_MCP_MODEL_VIEW="1" if args.arm.startswith("view") else "off")
+            DOCATLAS_MCP_MODEL_VIEW="1" if args.arm.startswith("view") else "off",
+            DOCATLAS_SECTION_UNITS="markdown-owner-v1" if args.arm == "view-structural" else "legacy",
+            DOCATLAS_SECTION_WIRE_FORMAT="adaptive-v2" if args.arm == "view-structured" else "v1")
         req = {"question": QUESTION, "search_question": TRANSLATION, "project_path": str(root)}
         off = call_docs_tool_payload("get_docs_context", req, service)
         with observe_section_compression() as trace:
@@ -133,6 +135,57 @@ async def run(args):
                     span = "".join(DOCUMENT.splitlines(keepends=True)[row["line_start"]-1:row["line_end"]])
                     assert row["snippet"] in span
                 visible = json.loads(result.content[0].text)
+                from docmancer.docs.interfaces.model_context_session import ModelContextSession, ModelSessionError
+                managed = ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root)}, language_mode=True)
+                try:
+                    await managed.retrieve(search_question=TRANSLATION)
+                except ModelSessionError as exc:
+                    assert str(exc) == "language_preflight_required"
+                else:
+                    raise AssertionError("retrieval bypassed language preflight")
+                assert not managed.audit
+                assert {t["name"] for t in await managed.tools()} == {"docs_status"}
+                assert (await managed.language())["languages"] == ["en"]
+                assert (await managed.language())["languages"] == ["en"]
+                assert len(managed.audit) == 1, "cached preflight made another product call"
+                assert {t["name"] for t in await managed.tools()} == {"get_docs_context"}
+                first = await managed.retrieve(search_question=TRANSLATION)
+                count_before = len(managed.audit)
+                try:
+                    await managed.retrieve(search_question=TRANSLATION, missing_fact="renewal condition")
+                except ModelSessionError as exc:
+                    assert str(exc) == "duplicate_retrieval"
+                else:
+                    raise AssertionError("duplicate product request was sent")
+                assert len(managed.audit) == count_before
+                second = await managed.retrieve(search_question=TRANSLATION,
+                    lookup_queries=["QuillTransit session lease renewal"], missing_fact="renewal condition")
+                counts["stdio_tool_calls"] += len(managed.audit)
+                assert len(second["sources"]) == len(first["sources"])
+                assert {r["ref"] for r in second["sources"]} == {r["ref"] for r in first["sources"]}
+                serialized = json.dumps(second, ensure_ascii=False)
+                assert "docatlas/source-packet" not in serialized and "source_uri" not in serialized
+                for item in second["sources"]:
+                    assert item["text"] == managed.resolve(item["ref"])["snippet"]
+                original_ref = first["sources"][0]["ref"]
+                raw_replies = [a["result"] for a in managed.audit if a["tool"] == "get_docs_context"]
+                appended = sum(projection_token_count(json.dumps(r, ensure_ascii=False).encode()) for r in raw_replies)
+                compact = projection_token_count(serialized.encode())
+                assert compact < appended
+                save(out / "managed-session.json", {"input": second, "audit": managed.audit,
+                    "append_all_transport_tokens": appended, "deduplicated_input_tokens": compact,
+                    "model_calls": 0, "provider_usage": None})
+                limited = ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root)}, max_input_tokens=16)
+                try:
+                    await limited.retrieve(search_question=TRANSLATION)
+                except ModelSessionError as exc:
+                    assert str(exc) == "model_input_budget_exceeded"
+                else:
+                    raise AssertionError("host prompt budget was not enforced")
+                counts["stdio_tool_calls"] += 1
+                assert len(limited.audit) == 1
                 if arm.startswith("view"):
                     assert visible["context_format"] == FORMAT and result.structuredContent is None
                     meta = result.model_dump(by_alias=True)["_meta"]
@@ -168,6 +221,15 @@ async def run(args):
                         assert stale["status"] in ("source_changed", "source_unavailable") and not stale.get("snippet")
                         assert stale.get("reason_code") in ("source_policy_or_snapshot_changed", "snapshot_digest_mismatch")
                         save(out / "stale-resource.json", stale)
+                        await managed.language(refresh=True)
+                        counts["stdio_tool_calls"] += 1
+                        assert not managed.model_input()["sources"]
+                        try:
+                            managed.resolve(original_ref)
+                        except ModelSessionError:
+                            pass
+                        else:
+                            raise AssertionError("stale reference survived source refresh")
                     finally:
                         path.write_bytes(prior)
                 else:
@@ -197,6 +259,10 @@ async def run(args):
         trace = json.loads((out / "trace.json").read_text())[0]
         assert len(trace["ranked_sections"]) == trace["candidate_sections"]
         assert all(r["selected"] for r in trace["ranked_sections"])
+        if arm == "view-structural":
+            assert trace["candidate_sections"] == 2, "empty ancestor still consumes a section slot"
+        else:
+            assert trace["candidate_sections"] == 3
     save(args.out / "SUMMARY.json", {"head": os.getenv("TESTED_SHA"), "passed": True, "records": records,
         "counts": counts, "source_fact_checks": True, "observer_equal": True,
         "claim_boundary": "installed public stdio and SDK adapter, NOT autonomous strong-model behavior or provider billing"})
