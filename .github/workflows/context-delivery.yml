@@ -23,13 +23,13 @@ jobs:
           mkdir -p "$RUNNER_TEMP/context-evidence/baseline"
           git rev-parse HEAD > "$RUNNER_TEMP/context-evidence/head.txt"
           git diff --exit-code
-          python -m compileall -q docmancer eval/context_delivery_integration.py eval/minilm_sections_integration.py
+          python -m compileall -q docmancer eval/context_delivery_integration.py eval/context_history_audit.py eval/minilm_sections_integration.py
           base=bde2a101032b204e6a4168c0e8a63f45040b3ddc
           git fetch -q origin "$base" --depth=1
           git show "$base:SKILL.md" > "$RUNNER_TEMP/context-evidence/baseline/SKILL.md"
           git show "$base:docmancer/templates/agent_contract.md" > "$RUNNER_TEMP/context-evidence/baseline/agent_contract.md"
           git show "$base:docmancer/mcp/_docs_server_tool_data.py" > "$RUNNER_TEMP/context-evidence/baseline/tools.py"
-          git archive HEAD docmancer SKILL.md eval/context_delivery_integration.py eval/context_instruction_measurements.py eval/minilm_sections_integration.py .github/workflows/context-delivery.yml | gzip > "$RUNNER_TEMP/context-evidence/tested-source.tar.gz"
+          git archive HEAD docmancer SKILL.md eval/context_delivery_integration.py eval/context_history_audit.py eval/context_instruction_measurements.py eval/minilm_sections_integration.py .github/workflows/context-delivery.yml | gzip > "$RUNNER_TEMP/context-evidence/tested-source.tar.gz"
       - name: Build non-editable wheel and explicitly provision pinned MiniLM
         run: docker build -f eval/minilm_sections.Dockerfile -t docatlas-context-delivery .
       - name: Measure actual instruction and schema tokens (tokenizer provisioning, no model requests)
@@ -50,6 +50,12 @@ jobs:
           rc=$?
           docker inspect context-controls > "$RUNNER_TEMP/context-evidence/controls-container.json"
           exit "$rc"
+      - name: Independently audit exact history and count public model blocks, excluding private metadata
+        run: |
+          docker run --rm --network none \
+            -v "$RUNNER_TEMP/context-evidence:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-context-delivery -I /repo/eval/context_history_audit.py \
+            --controls /evidence/controls --out /evidence/HISTORY.json
       - name: Same original V40 through model text and exact private ledger; offline under hard 1GB
         run: |
           set +e
@@ -70,6 +76,7 @@ jobs:
           if-no-files-found: error
 
   policy-study:
+    if: github.event_name == 'workflow_dispatch'
     name: Policy diagnostic (not quality acceptance) ${{ matrix.top_k }}-${{ matrix.units }}
     runs-on: ubuntu-latest
     timeout-minutes: 35

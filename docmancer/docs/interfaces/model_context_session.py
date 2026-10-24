@@ -33,7 +33,7 @@ def _wire(result: Any) -> dict:
 
 def _status(result: Any) -> dict:
     value = _wire(result)
-    if value.get("isError"):
+    if not value or value.get("isError"):
         raise ModelSessionError("status_failed")
     structured = value.get("structuredContent")
     bodies = []
@@ -246,8 +246,22 @@ class ModelContextSession:
         return candidate
 
     def _input(self, sources: dict, events: list) -> dict:
-        return {"question": self._question, "language": deepcopy(self._language),
-                "results": deepcopy(events), "sources": deepcopy(list(sources.values()))}
+        # Factor exact repeated metadata, never source text or distinct decisions.
+        def factor(rows, excluded):
+            rows = deepcopy(rows)
+            common = {key: deepcopy(value) for key, value in rows[0].items()
+                      if key not in excluded and all(key in row
+                          and canonical(row[key]) == canonical(value) for row in rows[1:])} if rows else {}
+            return common, [{key: value for key, value in row.items() if key not in common} for row in rows]
+        context, results = factor(events, {"source_refs", "caller_assessed_gap", "error", "result"})
+        source_context, source_rows = factor(list(sources.values()), {"ref", "text", "path", "section", "line_start", "line_end"})
+        language = (None if self._language is None else {
+            key: deepcopy(value) for key, value in self._language.items()
+            if key not in {"snapshot_sha256", "catalog_sha256", "manifest_digest"}})
+        # Full language bindings remain in private state/audit and drive invalidation.
+        return {"question": self._question, "language": language,
+                "result_context": context, "results": results,
+                "source_context": source_context, "sources": source_rows}
 
     def _check_budget(self, value: dict) -> None:
         if projection_token_count(canonical(value).encode()) > self._limit:
