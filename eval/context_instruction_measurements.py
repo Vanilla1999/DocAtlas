@@ -1,7 +1,8 @@
-"""Measurement of instructions, not a model-quality or provider-cost test.
+"""Measure instructions, not model quality or provider cost.
 
-Parse baseline constant schemas without importing/executing baseline code;
-compare current installed public schemas to the same text-only host profile.
+Parse baseline schemas without executing baseline code. Compare the installed
+public schema in the same text-only host profile. Descriptions may shrink;
+actual validation rules must not change.
 """
 from __future__ import annotations
 import argparse
@@ -13,10 +14,6 @@ from pathlib import Path
 NAMES = ("get_docs_context", "prepare_docs", "docs_status")
 
 
-def count_text(encoder, text):
-    return len(encoder.encode(text, disallowed_special=()))
-
-
 def baseline_tools(source):
     values = {}
     for node in ast.parse(source).body:
@@ -25,6 +22,14 @@ def baseline_tools(source):
                 values[node.target.id] = ast.literal_eval(node.value)
     return [{"name": name, "description": values["PUBLIC_ADVERTISED_DESCRIPTIONS"][name],
              "inputSchema": values["PUBLIC_ADVERTISED_INPUT_SCHEMAS"][name]} for name in NAMES]
+
+
+def validation(value):
+    if isinstance(value, dict):
+        return {k: validation(v) for k, v in value.items() if k != "description"}
+    if isinstance(value, list):
+        return [validation(v) for v in value]
+    return value
 
 
 def main():
@@ -38,8 +43,7 @@ def main():
     current = [tool.to_tool_dict() for tool in build_docs_surface(DocsServerConfig(text_fallback=True)).tools]
     assert tuple(t["name"] for t in current) == NAMES
     prior = baseline_tools((args.baseline / "tools.py").read_text())
-    # Descriptions are shorter, but schema validation must remain identical.
-    assert [t["inputSchema"] for t in current] == [t["inputSchema"] for t in prior], "input validation drifted"
+    assert [validation(t["inputSchema"]) for t in current] == [validation(t["inputSchema"]) for t in prior], "input validation drifted"
     files = (("root_skill", args.baseline / "SKILL.md", args.repo / "SKILL.md"),
              ("installed_bootstrap_template", args.baseline / "agent_contract.md", args.repo / "docmancer/templates/agent_contract.md"))
     source = {name: (old.read_text(), new.read_text()) for name, old, new in files}
@@ -54,7 +58,8 @@ def main():
         encoding = tiktoken.get_encoding(codec)
         rows = {}
         for name, (before, after) in source.items():
-            old, new = count_text(encoding, before), count_text(encoding, after)
+            old = len(encoding.encode(before, disallowed_special=()))
+            new = len(encoding.encode(after, disallowed_special=()))
             rows[name] = {"before": old, "after": new, "saved": old-new,
                           "saved_percent": round(100*(1-new/old), 2)}
             assert new < old, (codec, name, old, new)
