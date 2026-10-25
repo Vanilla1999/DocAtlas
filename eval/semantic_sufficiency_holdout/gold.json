@@ -1,0 +1,400 @@
+{
+  "schema_version": "selenemesh-semantic-gold.v1",
+  "evaluation_boundary": "Opened after public MCP delivery only; never in selector, QA checker or model prompts.",
+  "cases": [
+    {
+      "id": "S01",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S01.fact1",
+          "witnesses": [
+            {
+              "path": "docs/sessions.md",
+              "text": "Each SeleneMesh session ticket expires 53 seconds after issuance. Being idle does not stop the expiry clock."
+            }
+          ]
+        },
+        {
+          "id": "S01.fact2",
+          "witnesses": [
+            {
+              "path": "docs/sessions.md",
+              "text": "A ticket may be renewed at most two times, only by its bound worker and only before the active expiry."
+            }
+          ]
+        },
+        {
+          "id": "S01.fact3",
+          "witnesses": [
+            {
+              "path": "docs/sessions.md",
+              "text": "At least eleven seconds must pass after issuance or the last successful renewal. A successful renewal grants another 53-second lifetime."
+            }
+          ]
+        },
+        {
+          "id": "S01.fact4",
+          "witnesses": [
+            {
+              "path": "docs/sessions.md",
+              "text": "Receipt of a signed revocation invalidates the ticket immediately. Never retry or renew that ticket; a new one requires a fresh authorization check."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S02.fact1",
+          "witnesses": [
+            {
+              "path": "docs/retries.md",
+              "text": "After HTTP 429, automatic retry requires Retry-After to be a nonnegative integer no greater than 75 seconds. Wait exactly the indicated interval."
+            }
+          ]
+        },
+        {
+          "id": "S02.fact2",
+          "witnesses": [
+            {
+              "path": "docs/retries.md",
+              "text": "An absent, malformed, or greater-than-75 Retry-After prevents automatic retry; there is no fallback delay."
+            }
+          ]
+        },
+        {
+          "id": "S02.fact3",
+          "witnesses": [
+            {
+              "path": "docs/retries.md",
+              "text": "Automatic retry of HTTP 503 requires the Idempotency-Key from the original attempt, with exactly the same key and body on retries."
+            }
+          ]
+        },
+        {
+          "id": "S02.fact4",
+          "witnesses": [
+            {
+              "path": "docs/retries.md",
+              "text": "At most two HTTP 503 retries are permitted: the first after six seconds, the second after nineteen seconds. Without the original key, do not retry automatically."
+            }
+          ]
+        },
+        {
+          "id": "S02.fact5",
+          "witnesses": [
+            {
+              "path": "docs/retries.md",
+              "text": "HTTP 401 must not be automatically retried and the client must not acquire broader credentials on the caller's behalf; fresh authorization must occur separately."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S03.fact1",
+          "witnesses": [
+            {
+              "path": "docs/imports.md",
+              "text": "The complete uploaded input has a SHA-256 digest bound to its batch identifier. Reusing the identifier with changed contents is a conflict and cannot mutate the existing batch."
+            }
+          ]
+        },
+        {
+          "id": "S03.fact2",
+          "witnesses": [
+            {
+              "path": "docs/imports.md",
+              "text": "Resume an interrupted batch no later than fourteen minutes after its last accepted chunk, with the same identifier and complete-input digest. After expiry begin a new batch."
+            }
+          ]
+        },
+        {
+          "id": "S03.fact3",
+          "witnesses": [
+            {
+              "path": "docs/imports.md",
+              "text": "Chunks in staging are invisible to readers and exports. After validating the entire batch, an explicit commit atomically publishes it; incomplete batches never become partially visible."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S04.fact1",
+          "witnesses": [
+            {
+              "path": "docs/consumer.md",
+              "text": "Write the business effect and workspace-scoped processed-event identifier in one durable application transaction. The service does not provide exactly-once external effects."
+            }
+          ]
+        },
+        {
+          "id": "S04.fact2",
+          "witnesses": [
+            {
+              "path": "docs/consumer.md",
+              "text": "Acknowledge the event only after the application transaction commits; earlier acknowledgement can lose the effect on crash."
+            }
+          ]
+        },
+        {
+          "id": "S04.fact3",
+          "witnesses": [
+            {
+              "path": "docs/consumer.md",
+              "text": "Move the durable checkpoint only after the server confirms the acknowledgement, not when the event is merely read."
+            }
+          ]
+        },
+        {
+          "id": "S04.fact4",
+          "witnesses": [
+            {
+              "path": "docs/consumer.md",
+              "text": "After crash, reopen the same workspace stream immediately after the durable checkpoint. Process replayed events in ascending sequence before later arrivals."
+            }
+          ]
+        },
+        {
+          "id": "S04.fact5",
+          "witnesses": [
+            {
+              "path": "docs/consumer.md",
+              "text": "An event committed before a crash but not acknowledged may be redelivered. Read the durable event-identifier record, skip the duplicate business effect, then acknowledge."
+            }
+          ]
+        },
+        {
+          "id": "S04.fact6",
+          "witnesses": [
+            {
+              "path": "docs/consumer.md",
+              "text": "At an unprocessable event, stop the consumer and report the sequence. Do not drop or acknowledge it or advance the checkpoint; quarantine requires a separate authorized operator action."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S05.fact1",
+          "witnesses": [
+            {
+              "path": "docs/exports.md",
+              "text": "An export reads the committed manifest current when its request was accepted, excluding later commits and uncommitted import chunks."
+            }
+          ]
+        },
+        {
+          "id": "S05.fact2",
+          "witnesses": [
+            {
+              "path": "docs/exports.md",
+              "text": "Export creation requires an active ticket and read permission for the requested workspace; it grants no read permission for another workspace."
+            }
+          ]
+        },
+        {
+          "id": "S05.fact3",
+          "witnesses": [
+            {
+              "path": "docs/exports.md",
+              "text": "An export object is retained four hours, while a signed download link lasts eighteen minutes. Every download rechecks permission; revocation blocks access immediately."
+            }
+          ]
+        },
+        {
+          "id": "S05.fact4",
+          "witnesses": [
+            {
+              "path": "docs/exports.md",
+              "text": "Resume with the same export identifier and byte Range, checking that the snapshot identifier matches. A renewed link requires fresh authorization and does not refresh the object's four-hour retention."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S06.fact1",
+          "witnesses": [
+            {
+              "path": "docs/workers.md",
+              "text": "Draining a worker stops new assignments only to that worker. Its current task, sibling workers and the workspace continue."
+            }
+          ]
+        },
+        {
+          "id": "S06.fact2",
+          "witnesses": [
+            {
+              "path": "docs/workers.md",
+              "text": "Pausing a workspace stops new assignments to every worker in that workspace; running tasks and other workspaces continue."
+            }
+          ]
+        },
+        {
+          "id": "S06.fact3",
+          "witnesses": [
+            {
+              "path": "docs/workers.md",
+              "text": "Cancelling a running task requires its exact task identifier, workspace identifier and explicit cancel permission; worker drain and workspace pause are not cancellation."
+            }
+          ]
+        },
+        {
+          "id": "S06.fact4",
+          "witnesses": [
+            {
+              "path": "docs/workers.md",
+              "text": "Resuming a workspace clears its pause flag but not a separately drained worker; that worker must be resumed explicitly."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S07.fact1",
+          "witnesses": [
+            {
+              "path": "docs/security.md",
+              "text": "Encryption keys rotate at most every thirty-nine days; newly encrypted records use the new key."
+            }
+          ]
+        },
+        {
+          "id": "S07.fact2",
+          "witnesses": [
+            {
+              "path": "docs/security.md",
+              "text": "For eight minutes after a planned rotation, an older key can decrypt existing records but cannot encrypt new ones."
+            }
+          ]
+        },
+        {
+          "id": "S07.fact3",
+          "witnesses": [
+            {
+              "path": "docs/security.md",
+              "text": "A revoked key is rejected immediately for both encryption and decryption, regardless of the planned overlap window."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S08.fact1",
+          "witnesses": [
+            {
+              "path": "docs/quotas.md",
+              "text": "The steady API request quota is 250 requests per minute per workspace."
+            }
+          ]
+        },
+        {
+          "id": "S08.fact2",
+          "witnesses": [
+            {
+              "path": "docs/quotas.md",
+              "text": "At seven gigabytes, a workspace gets a storage warning; at eight gigabytes, new writes are rejected until usage falls."
+            }
+          ]
+        },
+        {
+          "id": "S08.fact3",
+          "witnesses": [
+            {
+              "path": "docs/quotas.md",
+              "text": "At most twenty requests are accepted per ten-second burst window, independently of the minute quota."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "category": "partial",
+      "required_facts": [
+        {
+          "id": "S09.fact1",
+          "witnesses": [
+            {
+              "path": "docs/audit.md",
+              "text": "SeleneMesh keeps AuditTrail entries for thirty-three days before scheduled deletion."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "category": "no_answer",
+      "required_facts": []
+    },
+    {
+      "id": "S11",
+      "category": "no_answer",
+      "required_facts": []
+    },
+    {
+      "id": "S12",
+      "category": "full",
+      "required_facts": [
+        {
+          "id": "S12.fact1",
+          "witnesses": [
+            {
+              "path": "docs/workers.md",
+              "text": "Pausing a workspace stops new assignments to every worker in that workspace; running tasks and other workspaces continue."
+            }
+          ]
+        },
+        {
+          "id": "S12.fact2",
+          "witnesses": [
+            {
+              "path": "docs/exports.md",
+              "text": "An export object is retained four hours, while a signed download link lasts eighteen minutes. Every download rechecks permission; revocation blocks access immediately."
+            }
+          ]
+        },
+        {
+          "id": "S12.fact3",
+          "witnesses": [
+            {
+              "path": "docs/workers.md",
+              "text": "Resuming a workspace clears its pause flag but not a separately drained worker; that worker must be resumed explicitly."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
