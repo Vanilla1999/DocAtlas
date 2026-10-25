@@ -46,8 +46,9 @@ def inputs(args):
         plan = json.loads((base / "source_plan.json").read_text())["families"]
         docs = {f["id"]: {p: (base / "sources" / f["id"] / p).read_text(encoding="utf-8")
                           for p in f["paths"]} for f in plan}
-    elif args.suite == "new16":
-        value = json.loads((args.repo / "eval/adaptive_gap_holdout/inputs.json").read_text())
+    elif args.suite in {"new16", "semantic12"}:
+        dirname = "adaptive_gap_holdout" if args.suite == "new16" else "semantic_sufficiency_holdout"
+        value = json.loads((args.repo / "eval" / dirname / "inputs.json").read_text())
         cases, docs = value["cases"], {f["id"]: f["documents"] for f in value["families"]}
     else:
         base = args.repo / "eval/fresh_dialogues/fixtures"
@@ -198,7 +199,8 @@ def assess(args, records):
     corpus = args.repo / "eval/prepared_model_comparison40"
     oracle = load("coverage_oracle", corpus / "evaluate.py")
     paths = {"v40": corpus / "gold_spans.json", "new16": args.repo / "eval/adaptive_gap_holdout/gold.json",
-             "fresh8": args.repo / "eval/fresh_dialogues/oracle/gold.json"}
+             "fresh8": args.repo / "eval/fresh_dialogues/oracle/gold.json",
+             "semantic12": args.repo / "eval/semantic_sufficiency_holdout/gold.json"}
     gold = {r["id"]: r for r in json.loads(paths[args.suite].read_text())["cases"]}
     for row in records:
         case = next(c for c in cases if c["id"] == row["case_id"])
@@ -265,7 +267,7 @@ def main():
     p = argparse.ArgumentParser()
     for name in ("repo", "work", "out", "model", "qa-model"):
         p.add_argument("--" + name, type=Path, required=True)
-    p.add_argument("--suite", choices=("v40", "new16", "fresh8"), required=True)
+    p.add_argument("--suite", choices=("v40", "new16", "fresh8", "semantic12"), required=True)
     p.add_argument("--policy", choices=POLICIES, required=True)
     p.add_argument("--worker", action="store_true")
     p.add_argument("--family")
@@ -281,7 +283,7 @@ def main():
     args.work.mkdir(parents=True, mode=0o700)
     args.out.mkdir(parents=True)
     # Freeze bytes without reading gold's content into retrieval or scoring.
-    dirs = ("prepared_model_comparison40", "adaptive_gap_holdout", "fresh_dialogues/fixtures", "fresh_dialogues/oracle")
+    dirs = ("prepared_model_comparison40", "adaptive_gap_holdout", "fresh_dialogues/fixtures", "fresh_dialogues/oracle", "semantic_sufficiency_holdout")
     hashes = {str(f.relative_to(args.repo)): digest(f.read_bytes()) for d in dirs
               for f in sorted((args.repo / "eval" / d).rglob("*")) if f.is_file() and "__pycache__" not in f.parts}
     save(args.out / "FREEZE.json", {"head": os.environ.get("TESTED_SHA"), "files": hashes, "policies": POLICIES})

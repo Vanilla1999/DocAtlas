@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        suite: [v40, new16, fresh8]
+        suite: [v40, new16, fresh8, semantic12]
         policy: [facet-guarded-v1, semantic-audit-v1, semantic-rescue-v1, semantic-prune-v1]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
@@ -89,7 +89,7 @@ jobs:
           base=pathlib.Path(os.environ['RUNNER_TEMP'])
           root=base/'arms'; output=base/'paired'
           policies=('facet-guarded-v1','semantic-audit-v1','semantic-rescue-v1','semantic-prune-v1')
-          suites=('v40','new16','fresh8')
+          suites=('v40','new16','fresh8','semantic12')
           results={}; missing=[]; regressions={}
           for suite in suites:
               for p in policies:
