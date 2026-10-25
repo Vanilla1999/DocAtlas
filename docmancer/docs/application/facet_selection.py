@@ -15,7 +15,7 @@ SCORE_MARGIN = 1.0  # development heuristic in frozen-model logits, NOT calibrat
 CAPSULE_TOKENS = 512  # maximum admitted source-text cost of one parent, not top-k
 
 
-def question_probes(question: str, *, contextual: bool = False) -> tuple[list[str], str | None]:
+def question_probes(question: str) -> tuple[list[str], str | None]:
     """Keep the full query and expose literal clauses/enumerated query items.
 
     Quotes, inline code and brackets are protected from splitting. Excerpts
@@ -47,10 +47,6 @@ def question_probes(question: str, *, contextual: bool = False) -> tuple[list[st
             protected[i] = True
     cuts = []
     pattern = r"[,:;?!\n]|\.(?=\s|$)|\b(?:and|or|и|или)\b"
-    if contextual:
-        # Do not split adjective/verb coordination such as "consistent and resumable".
-        lead = r"how|when|what|which|where|why|whether|may|can|do|does|is|are|should|must|will|как|когда|что|где|почему"
-        pattern = r"[,:;?!\n]|\.(?=\s|$)|\b(?:and|or|и|или)\b(?=\s+(?:" + lead + r")\b)"
     for match in re.finditer(pattern, question, re.IGNORECASE):
         if not any(protected[match.start():match.end()]):
             cuts.append((match.start(), match.end()))
@@ -60,7 +56,6 @@ def question_probes(question: str, *, contextual: bool = False) -> tuple[list[st
         if text:
             pieces.append(text)
         start = right
-    # A split such as 'when and how often' must not produce the probe 'when'.
     interrogatives = {"when", "how", "what", "which", "where", "why", "whether",
                       "когда", "как", "что", "где", "почему"}
     merged = []
@@ -73,11 +68,10 @@ def question_probes(question: str, *, contextual: bool = False) -> tuple[list[st
         pending = ""
     if pending:
         return [question], "incomplete_clause_keep_all"
-    # Only an actual introductory sentence/colon is used as a topic anchor.
     anchor = ""
     first = next((m for m in re.finditer(r"[:.!?]", question)
                   if not protected[m.start()]), None)
-    if first and first.group() in (":.!?" if contextual else ":.") and first.start() < len(question) - 1:
+    if first and first.group() in ":." and first.start() < len(question) - 1:
         anchor = question[:first.start()].strip()
     probes = [question]
     def normalized(text):
@@ -146,13 +140,13 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     """Select query-facet candidates, not a semantically certified answer set.
 
     MAX keeps exact best matches; ENVELOPE adds short-parent siblings.
-    GUARDED restricts parent expansion and uses clause-aware splitting.
-    MARGIN-ENVELOPE combines original literal probes, near-best alternatives,
-    and complete acquired short-parent groups. All remain experimental.
+    MARGIN-ENVELOPE gives every probe a raw-score band (often too expensive).
+    GUARDED revision 2 limits that band to the full original scoring question;
+    fragment probes supply only their best matches, avoiding flat-score floods.
     """
     guarded = policy == "facet-guarded-v1"
     margin = policy in {"facet-guarded-v1", "facet-margin-envelope-v1"}
-    probes, fallback = question_probes(question, contextual=guarded)
+    probes, fallback = question_probes(question)
     matrix = [global_scores]
     if not fallback:
         for probe in probes[1:]:
@@ -168,10 +162,11 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     support = {i: [] for i in range(len(sections))}
     for p, scores in enumerate(matrix):
         maximum = max(scores)
+        band = SCORE_MARGIN if margin and (not guarded or p == 0) else 0.0
         for i, score in enumerate(scores):
             if score == maximum:
                 wins[i].append(p)
-            if maximum - score <= (SCORE_MARGIN if margin else 0.0):
+            if maximum - score <= band:
                 support[i].append(p)
     seeds = {i for i in support if support[i]}
     chosen = set(range(len(sections))) if fallback else set(seeds)
@@ -181,8 +176,6 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
         capsules = _capsules(sections, snapshot)
         for index in sorted(seeds):
             neighbors = capsules.get(index, ())
-            if guarded and 2 * len(set(neighbors) & seeds) < len(neighbors):
-                continue  # short parent alone is not a reason to return unrelated siblings
             chosen.update(neighbors)
             expanded[index] = list(neighbors)
     # Facet witnesses first, then structural support, then omitted rows.
@@ -192,6 +185,8 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     ordered += [i for i in rank if i not in chosen]
     receipt["facet_selection"] = {
         "version": policy, "completeness": "unassessed",
+        "strategy_revision": "global-margin-envelope-v2" if guarded else policy,
+        "margin_scope": "full_question_only" if guarded else "all_probes",
         "score_margin": SCORE_MARGIN if margin else 0.0,
         "margin_is_calibrated_probability": False,
         "probe_count": len(matrix), "planned_probe_count": len(probes),

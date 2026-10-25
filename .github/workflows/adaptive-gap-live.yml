@@ -1,4 +1,4 @@
-name: Conservative facet selection installed MCP acceptance
+name: Guarded global-margin facet installed MCP acceptance
 on:
   push:
     branches: [experiment/facet-selection-20261025]
@@ -53,7 +53,7 @@ jobs:
             -v "$RUNNER_TEMP/facet-evidence:/evidence" --entrypoint /opt/venv/bin/python \
             docatlas-facet-live -I /repo/eval/facet_selection_integration.py \
             --repo /repo --work /tmp/facet-study --out /evidence/run --model /model \
-            --suite "$SUITE" --policy facet-margin-envelope-v1
+            --suite "$SUITE" --policy facet-guarded-v1
           rc=$?
           docker inspect facet-run > "$RUNNER_TEMP/facet-evidence/container.json"
           echo "$rc" > "$RUNNER_TEMP/facet-evidence/exit-code.txt"
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: facet-live-${{ matrix.suite }}-facet-margin-envelope-v1-${{ github.run_id }}
+          name: facet-live-${{ matrix.suite }}-facet-guarded-v1-${{ github.run_id }}
           path: ${{ runner.temp }}/facet-evidence/
           retention-days: 30
           if-no-files-found: error

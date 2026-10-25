@@ -7,7 +7,7 @@ from pathlib import Path
 
 def main():
     temp = Path(os.environ['RUNNER_TEMP'])
-    policy = 'facet-margin-envelope-v1'
+    policy = 'facet-guarded-v1'
     summaries, rows, missing = {}, [], []
     for suite in ('v40', 'holdout', 'fresh'):
         candidate = temp / 'arms' / f'facet-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}' / 'run'
@@ -41,7 +41,8 @@ def main():
     passed = (not missing and len(rows) == 64 and not any(r['new_loss'] for r in rows)
         and totals['candidate']['documented_pass'] == totals['candidate']['documented_total']
         and totals['candidate']['tokens'] < totals['fixed']['tokens'])
-    result = {'head': os.environ['GITHUB_SHA'], 'policy': policy, 'summaries': summaries,
+    result = {'head': os.environ['GITHUB_SHA'], 'policy': policy,
+        'strategy_revision': 'global-margin-envelope-v2', 'summaries': summaries,
         'cases': rows, 'totals': totals, 'missing_arms': missing, 'regression_gate_passed': passed,
         'answer_model_calls': 0, 'provider_usage': None, 'default_rollout': False,
         'boundary': 'Development-selected margin; 64 known regression questions, not unseen generalization. First retrieval evidence, not final answers or total dialogue cost.'}
