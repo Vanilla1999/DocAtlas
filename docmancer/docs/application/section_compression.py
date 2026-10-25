@@ -274,7 +274,8 @@ class _MiniLM:
             raise SectionCompressionError("section_compression_model_integrity")
         self.inputs = {entry.name for entry in self.session.get_inputs()}
 
-    def score(self, question: str, sections: list[_Section]) -> tuple[list[float], dict]:
+    def score(self, question: str, sections: list[_Section], *,
+              max_pairs: int = MAX_PAIRS, max_seconds: float = MAX_SECONDS) -> tuple[list[float], dict]:
         import numpy as np
         query = self.tokenizer.encode(question, add_special_tokens=False).ids
         if len(query) > 128:
@@ -286,7 +287,7 @@ class _MiniLM:
             passage = self.tokenizer.encode(section.text, add_special_tokens=False).ids
             best = -math.inf
             for offset in range(0, max(len(passage), 1), width):
-                if calls >= MAX_PAIRS or time.monotonic() - started > MAX_SECONDS:
+                if calls >= max_pairs or time.monotonic() - started > max_seconds:
                     raise SectionCompressionError("section_compression_resource_limit")
                 part = passage[offset:offset + width]
                 ids = [self.cls] + query + [self.sep] + part + [self.sep]
@@ -331,6 +332,9 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
+    from .coverage_selection import POLICIES, select_coverage_sections
+    if policy in POLICIES:
+        return select_coverage_sections(payload, snapshot, retrieval, question, policy)
     if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"}:
         raise SectionCompressionError("section_compression_invalid_selection_policy")
     fixed_limit = selection_limit() if policy == "fixed" else None
