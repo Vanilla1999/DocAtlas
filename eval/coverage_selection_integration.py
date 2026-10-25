@@ -19,7 +19,7 @@ import sys
 import time
 
 POLICIES = ("fixed", "adaptive-gap-b1-v1", "mmr-budget-v1", "facet-cover-v1", "facet-guarded-v1",
-            "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1")
+            "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1", "facet-bundled-cover-v1")
 
 
 def load(name, path):

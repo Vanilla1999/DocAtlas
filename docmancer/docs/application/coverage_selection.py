@@ -16,7 +16,8 @@ import re
 import time
 
 POLICIES = frozenset({"mmr-budget-v1", "facet-cover-v1", "facet-guarded-v1",
-                      "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1"})
+                      "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1",
+                      "facet-bundled-cover-v1"})
 MAX_PROBES = 16
 MMR_RELEVANCE = 0.7  # Frozen experiment parameter, not a confidence threshold.
 
@@ -93,9 +94,9 @@ def bundle_short_sources(sections, tokenizer):
     groups = {}
     for section in sections:
         groups.setdefault((section.key[0], *section.key[2:]), []).append(section)
-    result, bundled = [], []
+    result, bundled, bundled_keys = [], [], set()
     for identity, members in sorted(groups.items()):
-        members.sort(key=lambda s: (min(r.get("line_start", 0) for r in s.rows), s.key))
+        members.sort(key=lambda s: (min(r.get("line_start") or 0 for r in s.rows), s.key))
         text = "\n\n".join(s.text for s in members)
         if len(members) > 1 and len(tokenizer.encode(text, add_special_tokens=False).ids) <= 512:
             rows, ids = [], set()
@@ -105,10 +106,12 @@ def bundle_short_sources(sections, tokenizer):
                         rows.append(row)
                         ids.add(row["evidence_id"])
             result.append(_Section((members[0].key[0], "", *members[0].key[2:]), rows, text))
+            bundled_keys.add(result[-1].key)
             bundled.append({"path": identity[0], "acquired_sections": len(members)})
         else:
             result.extend(members)
-    return sorted(result, key=lambda s: s.key), bundled
+    ordered = sorted(result, key=lambda s: s.key)
+    return ordered, bundled, frozenset(i for i, s in enumerate(ordered) if s.key in bundled_keys)
 
 
 def _tokens(section) -> int:
@@ -120,7 +123,7 @@ def _tokens(section) -> int:
     return max(1, projection_token_count(json.dumps(visible, ensure_ascii=False).encode()))
 
 
-def _plan(policy, sections, columns, costs):
+def _plan(policy, sections, columns, costs, bundled_indices=frozenset()):
     from .section_compression import _adaptive_cutoff
     scores = columns[0]
     root_order = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
@@ -160,11 +163,13 @@ def _plan(policy, sections, columns, costs):
         chosen.append(best)
         uncovered = {p for p in uncovered if best not in winners[p]}
     protected = list(chosen)
-    if policy in {"facet-guarded-v1", "facet-guarded-v2", "facet-bundled-v1"}:
+    structural_cover = policy == "facet-bundled-cover-v1" and all(i in bundled_indices for i in chosen)
+    if (policy in {"facet-guarded-v1", "facet-guarded-v2", "facet-bundled-v1"}
+            or (policy == "facet-bundled-cover-v1" and not structural_cover)):
         # Keep the complete B1 proposal as a safety reference, not fixed five.
         # Facet winners are delivered first if the full-packet budget is tight.
         chosen.extend(i for i in root_order[:count] if i not in chosen)
-    return chosen, {"probe_winners": [sorted(w) for w in winners],
+    return chosen, {"structural_probe_cover_only": structural_cover, "probe_winners": [sorted(w) for w in winners],
                     "protected_probe_sections": protected, "root_gap": gap,
                     "root_requested_sections": count}
 
@@ -181,17 +186,17 @@ def select_coverage_sections(payload, snapshot, retrieval, question, policy):
     directory = Path(configured).resolve()
     probes = [question] if policy == "mmr-budget-v1" else literal_probes(question)
     columns, receipts = [], []
-    probe_fallbacks, bundles = [], []
+    probe_fallbacks, bundles, bundle_indices = [], [], frozenset()
     started = time.monotonic()
     with core._LOCK:
         if core._ENGINE is None or core._ENGINE_PATH != directory:
             core._ENGINE, core._ENGINE_PATH = None, None
             core._ENGINE = core._MiniLM(directory)
             core._ENGINE_PATH = directory
-        if policy in {"facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1"}:
+        if policy in {"facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1", "facet-bundled-cover-v1"}:
             probes, probe_fallbacks = contextual_probes(question, core._ENGINE.tokenizer)
-        if policy == "facet-bundled-v1":
-            sections, bundles = bundle_short_sources(sections, core._ENGINE.tokenizer)
+        if policy in {"facet-bundled-v1", "facet-bundled-cover-v1"}:
+            sections, bundles, bundle_indices = bundle_short_sources(sections, core._ENGINE.tokenizer)
         # One common resource allowance for the ENTIRE request, not per probe.
         for probe in probes:
             remaining_pairs = core.MAX_PAIRS - sum(r["forward_passes"] for r in receipts)
@@ -203,7 +208,7 @@ def select_coverage_sections(payload, snapshot, retrieval, question, policy):
             columns.append(values)
             receipts.append(receipt)
     costs = [_tokens(section) for section in sections]
-    order, selection = _plan(policy, sections, columns, costs)
+    order, selection = _plan(policy, sections, columns, costs, bundle_indices)
     requested = len(order)
 
     def project(indices):

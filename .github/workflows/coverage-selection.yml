@@ -4,6 +4,7 @@ on:
     paths:
       - 'docmancer/docs/application/coverage_selection.py'
       - 'eval/coverage_selection_integration.py'
+      - 'eval/compare_coverage_selection.py'
       - '.github/workflows/coverage-selection.yml'
   workflow_dispatch:
 permissions:
@@ -18,24 +19,24 @@ jobs:
     timeout-minutes: 35
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 3
       matrix:
         suite: [v40, new16, fresh8]
-        policy: [facet-cover-v2, facet-guarded-v2, facet-bundled-v1]
+        policy: [facet-bundled-cover-v1]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - name: Freeze source, unchanged inputs and reusable baseline implementation
+      - name: Freeze inputs and shared implementation before comparing against archived controls
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/coverage-evidence"
-          git fetch -q origin f4a885a49494bedb65154af48403a378b1b8d208 --depth=1
-          git diff --exit-code f4a885a49494bedb65154af48403a378b1b8d208 HEAD -- eval/prepared_model_comparison40 eval/adaptive_gap_holdout eval/fresh_dialogues/fixtures eval/fresh_dialogues/oracle pyproject.toml uv.lock eval/minilm_sections.Dockerfile docmancer/docs/application/section_compression.py docmancer/docs/interfaces/mcp/context_tools.py
+          git fetch -q origin 95c7bf4bedeefa98a565ec44c83b5df0aa7c526d --depth=1
+          git diff --exit-code 95c7bf4bedeefa98a565ec44c83b5df0aa7c526d HEAD -- eval/prepared_model_comparison40 eval/adaptive_gap_holdout eval/fresh_dialogues/fixtures eval/fresh_dialogues/oracle pyproject.toml uv.lock eval/minilm_sections.Dockerfile docmancer/docs/application/section_compression.py docmancer/docs/interfaces/mcp/context_tools.py
           git rev-parse HEAD > "$RUNNER_TEMP/coverage-evidence/head.txt"
-          python -m compileall -q docmancer eval/coverage_selection_integration.py
-          git archive HEAD docmancer eval/coverage_selection_integration.py .github/workflows/coverage-selection.yml | gzip > "$RUNNER_TEMP/coverage-evidence/tested-source.tar.gz"
+          python -m compileall -q docmancer eval/coverage_selection_integration.py eval/compare_coverage_selection.py
+          git archive HEAD docmancer eval/coverage_selection_integration.py eval/compare_coverage_selection.py .github/workflows/coverage-selection.yml | gzip > "$RUNNER_TEMP/coverage-evidence/tested-source.tar.gz"
       - name: Build exact installed wheel and provision pinned MiniLM
         run: docker build -f eval/minilm_sections.Dockerfile -t docatlas-coverage .
       - name: Public MCP, real SQLite and local MiniLM; offline, hard 1 GB
@@ -67,87 +68,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Reuse immutable controls; download new paired evidence
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Reuse immutable prior arms and download this run
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p "$RUNNER_TEMP/arms" "$RUNNER_TEMP/comparison"
           gh run download 40219786995 --repo "$GITHUB_REPOSITORY" --pattern 'coverage-*' --dir "$RUNNER_TEMP/arms"
+          gh run download 40221157968 --repo "$GITHUB_REPOSITORY" --pattern 'coverage-*' --dir "$RUNNER_TEMP/arms"
           gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'coverage-*' --dir "$RUNNER_TEMP/arms"
-      - name: Accuracy first, token cost second; never average away a lost fact
+      - name: Compare every preserved fact, actual scored pool, and frozen input hashes
         env:
           TESTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          root = Path(os.environ['RUNNER_TEMP'])/'arms'
-          old = ('fixed','adaptive-gap-b1-v1','mmr-budget-v1','facet-cover-v1','facet-guarded-v1')
-          new = ('facet-cover-v2','facet-guarded-v2','facet-bundled-v1')
-          policies = old + new
-          summaries, rows, missing, pools = {}, {}, [], []
-          for suite in ('v40','new16','fresh8'):
-              for policy in policies:
-                  run = '40219786995' if policy in old else os.environ['GITHUB_RUN_ID']
-                  sha = 'f4a885a49494bedb65154af48403a378b1b8d208' if policy in old else os.environ['TESTED_SHA']
-                  folder = root/f'coverage-{suite}-{policy}-{run}'/'run'
-                  key = suite+'/'+policy
-                  if not (folder/'SUMMARY.json').exists():
-                      missing.append(key); continue
-                  summaries[key] = json.loads((folder/'SUMMARY.json').read_text())
-                  assert summaries[key]['head'] == sha, 'unexpected source revision'
-                  rows[key] = {r['case_id']: r for r in json.loads((folder/'ASSESSMENTS.json').read_text())}
-              if any(suite+'/'+p not in rows for p in policies): continue
-              for policy in policies[1:]:
-                  assert rows[suite+'/fixed'].keys() == rows[suite+'/'+policy].keys()
-              for cid, base in rows[suite+'/fixed'].items():
-                  for policy in policies[1:]:
-                      other = rows[suite+'/'+policy][cid]
-                      if base['candidate_fingerprint'] != other['candidate_fingerprint']:
-                          pools.append({'suite':suite,'case':cid,'policy':policy})
-                      assert base['question'] == other['question'] and base['search_question'] == other['search_question']
-          aggregates, losses = {}, {}
-          for policy in policies:
-              items = [r for key, group in rows.items() if key.endswith('/'+policy) for r in group.values()]
-              aggregates[policy] = {'cases':len(items),
-                  'complete_documented':sum(r['passed'] for r in items if r['answerability']!='unanswerable'),
-                  'documented_cases':sum(r['answerability']!='unanswerable' for r in items),
-                  'retained_facts':sum(c['covered'] for r in items for c in r['claims']),
-                  'required_facts':sum(len(r['claims']) for r in items),
-                  'strict_negatives_passed':sum(r['passed'] for r in items if r['answerability']=='unanswerable'),
-                  'model_visible_tokens':sum(r.get('tokens',0) for r in items),
-                  'prepared_input_tokens':sum(r.get('prepared_input_tokens',0) for r in items),
-                  'runtime_errors':sum(r['runtime_error'] for r in items),
-                  'integrity_errors':sum(not r['integrity'] for r in items),
-                  'seconds_total':sum(r['seconds'] for r in items)}
-              losses[policy] = []
-              for suite in ('v40','new16','fresh8'):
-                  if suite+'/'+policy not in rows: continue
-                  for reference in ('fixed','adaptive-gap-b1-v1'):
-                      if suite+'/'+reference not in rows: continue
-                      for cid, a in rows[suite+'/'+reference].items():
-                          if a['answerability']=='unanswerable': continue
-                          b=rows[suite+'/'+policy][cid]
-                          old_facts={c['id'] for c in a['claims'] if c['covered']}
-                          new_facts={c['id'] for c in b['claims'] if c['covered']}
-                          if old_facts-new_facts:
-                              losses[policy].append({'suite':suite,'case':cid,'reference':reference,'lost_facts':sorted(old_facts-new_facts)})
-          eligible=[p for p in policies[2:] if not missing and not pools and not losses[p]
-                    and aggregates[p]['cases']==64 and not aggregates[p]['runtime_errors']
-                    and not aggregates[p]['integrity_errors']]
-          best=min(eligible,key=lambda p:(-aggregates[p]['complete_documented'], -aggregates[p]['retained_facts'],
-                   aggregates[p]['model_visible_tokens'],aggregates[p]['seconds_total'])) if eligible else None
-          result={'head':os.environ['TESTED_SHA'],'reference_head':'f4a885a49494bedb65154af48403a378b1b8d208',
-                  'reference_run':40219786995,'summaries':summaries,'aggregate':aggregates,'fact_losses':losses,'missing_arms':missing,
-                  'candidate_pool_mismatches':pools,'eligible_new_policies':eligible,'recommended_by_evidence_gate':best,
-                  'new_search_calls':192,'reused_search_calls':320,'provider_usage':None,
-                  'answer_generation_tested':False,'all_suites_are_known_regressions':True,'default_promoted':False}
-          out=Path(os.environ['RUNNER_TEMP'])/'comparison'/'PAIRED.json'
-          out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-          print(json.dumps({k:v for k,v in result.items() if k!='summaries'},ensure_ascii=False,indent=2))
-          assert not missing and not pools, 'Incomplete or unmatched paired experiment'
-          assert eligible, 'No non-regressing candidate: keep experimental, do not promote'
-          PY
+          python eval/compare_coverage_selection.py --artifacts "$RUNNER_TEMP/arms" \
+            --out "$RUNNER_TEMP/comparison" --head "$TESTED_SHA" --run "$GITHUB_RUN_ID"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
