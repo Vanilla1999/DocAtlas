@@ -52,12 +52,14 @@ The audit checker returned `unknown` on **all 12 questions**; this is an honest 
 
 ## Combined 76-question observed context (not provider billing)
 
+**Primary final comparison is the one completed 16-arm CI matrix**: [40231394528](https://github.com/Vanilla1999/DocAtlas/actions/runs/40231394528), compared by its own same-run control, with independent fact-by-fact comparisons. Paired artifact: `12613318214`, SHA-256 `a3a2e428e983230725c8d8c76ee0831dcb541e3152c9cf43229173e322635bcc`. The earlier cross-run combined figures are superseded by this single-run pair; keep earlier runs as reproducibility observations.
+
 | Policy | Required witness groups | Visible tokens | vs baseline |
 |---|---:|---:|---:|
-| `facet-guarded-v1` | **133/133** | **72,364** | control |
-| `semantic-audit-v1` | 133/133 | 72,370 | ≈0% |
-| `semantic-rescue-v1` | 133/133 | 80,489 | **+11.2%** |
-| `semantic-prune-v1` | 133/133 | 71,568 | **−1.1%** |
+| `facet-guarded-v1` | **133/133** | **72,361** | control |
+| `semantic-audit-v1` | 133/133 | 72,363 | ≈0% |
+| `semantic-rescue-v1` | 133/133 | 82,185 | **+13.6%** |
+| `semantic-prune-v1` | 133/133 | 72,025 | **−0.46%** |
 
 Strict empty retrieval: **0/13** for all modes. No semantic answer refusal is validated. These 76 include previously inspected known questions and 12 newly frozen but template-similar questions; there are only **63** full/partial documented cases, not 76 fully answerable questions.
 
@@ -70,6 +72,6 @@ All completed installed-MCP experimental arms use real non-editable wheel, SQLit
 - Short bounded question views may omit unspoken dependencies. In particular S10 returned extra unrelated material.
 - End-to-end generated strong-model answer quality and actual provider `usage` were **not** measured: previous live replay attempted and was blocked by unavailable `OPENAI_API_KEY` (0 calls). No full-dialogue token savings are claimed.
 - Common compact projection and source-native admission protections remain. Defaults and `main` unchanged; PR remains draft.
-- Another two V40 diagnostic jobs in the full holdout-matrix repetition were still pending at the time of this summary; the **complete first-run V40 evidence** and **complete four-arm separately frozen SeleneMesh12 evidence** above are already available. Do not claim that redundant second V40 replay is complete until it is.
+- The **second full 16-arm run and its comparator completed successfully**; no source or runtime errors in its completed arms. Local QA CPU-time in the final run: audit ~1,002s, rescue ~427s and prune ~1,077s for 76 questions, compared with zero QA inference in the baseline. Different run-to-run timings and optional QA proposals show it is not safe to assume deterministic throughput or stable added-context cost.
 
 **Recommended next scientific step**: project-disjoint samples with human-reviewed per-requirement entailment labels; train/calibrate an NLI/sufficiency classifier that predicts `entailed / contradicted / unknown` for each requirement, and require no missing critical facts on blind datasets before any automatic deletions. A generic SQuAD2 answer-span model alone is insufficient.
