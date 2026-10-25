@@ -1,4 +1,4 @@
-name: Facet selection fresh fixture correction (same product)
+name: Guarded facet selection installed MCP acceptance
 on:
   push:
     branches: [experiment/facet-selection-20261025]
@@ -17,8 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [fresh]
-        policy: [fixed, adaptive-gap-b1-v1, facet-max-v1, facet-envelope-v1]
+        suite: [v40, holdout, fresh]
+        policy: [facet-guarded-v1]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -29,8 +29,10 @@ jobs:
           mkdir -p "$RUNNER_TEMP/facet-evidence"
           git fetch -q origin d6fc18256ffe91a1d26e03783642e521b056ce12 --depth=1
           git fetch -q origin 2376217843bb2ac236195f9ccb05f7bba257c256 --depth=1
+          git fetch -q origin ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0 --depth=1
           git diff --exit-code d6fc18256ffe91a1d26e03783642e521b056ce12 HEAD -- eval/prepared_model_comparison40 eval/adaptive_gap_holdout pyproject.toml uv.lock
           git diff --exit-code 2376217843bb2ac236195f9ccb05f7bba257c256 HEAD -- eval/fresh_dialogues
+          git diff --exit-code ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0 HEAD -- docmancer ':!docmancer/docs/application/facet_selection.py'
           git rev-parse HEAD > "$RUNNER_TEMP/facet-evidence/head.txt"
           python -m compileall -q docmancer eval/facet_selection_integration.py
           git archive HEAD docmancer eval .github/workflows/adaptive-gap-live.yml | gzip > "$RUNNER_TEMP/facet-evidence/tested-source.tar.gz"
@@ -71,60 +73,56 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Download exact-run evidence
+      - name: Retrieve exact current candidate and previously executed fixed controls
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p "$RUNNER_TEMP/arms" "$RUNNER_TEMP/paired"
+          mkdir -p "$RUNNER_TEMP/arms" "$RUNNER_TEMP/baselines" "$RUNNER_TEMP/paired"
           gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'facet-live-*' --dir "$RUNNER_TEMP/arms"
-      - name: Report accuracy-first comparison without claiming answer-model acceptance
+          for suite in v40 holdout; do
+            gh run download 40215652617 --repo "$GITHUB_REPOSITORY" --name "facet-live-$suite-fixed-40215652617" --dir "$RUNNER_TEMP/baselines/$suite"
+          done
+          gh run download 40216114357 --repo "$GITHUB_REPOSITORY" --name facet-live-fresh-fixed-40216114357 --dir "$RUNNER_TEMP/baselines/fresh"
+      - name: Require complete documented coverage and lower total visible tokens
         run: |
           python - <<'PY'
           import json, pathlib, os
-          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'arms'
-          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'paired'
-          policies=('fixed','adaptive-gap-b1-v1','facet-max-v1','facet-envelope-v1')
-          summaries={}; assessments={}; missing=[]
-          for suite in ('fresh',):
-              for policy in policies:
-                  folder=root/f'facet-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
-                  if not (folder/'SUMMARY.json').exists():
-                      missing.append(str(folder)); continue
-                  s=json.loads((folder/'SUMMARY.json').read_text())
-                  assert s['head']==os.environ['GITHUB_SHA']
-                  summaries[f'{suite}/{policy}']=s
-                  assessments[suite,policy]={r['case_id']:r for r in json.loads((folder/'ASSESSMENTS.json').read_text())}
-          totals={}
-          for policy in policies:
-              arms=[s for k,s in summaries.items() if k.endswith('/'+policy)]
-              losses=[]
-              for suite in ('fresh',):
-                  if (suite,'fixed') not in assessments or (suite,policy) not in assessments: continue
-                  a,b=assessments[suite,'fixed'],assessments[suite,policy]
-                  assert a.keys()==b.keys()
-                  for cid in a:
-                      assert a[cid]['question']==b[cid]['question'] and a[cid]['search_question']==b[cid]['search_question']
-                      if a[cid]['answerability']!='unanswerable' and a[cid]['passed'] and not b[cid]['passed']:
-                          losses.append(suite+'/'+cid)
-              totals[policy]={'cases':sum(s['cases'] for s in arms),
-                  'documented_pass':sum(s['documented_pass'] for s in arms),
-                  'documented_total':sum(s['documented_total'] for s in arms),
-                  'model_context_tokens':sum(s['tokens_sum'] for s in arms),
-                  'new_documented_losses_vs_fixed':losses}
-          eligible=[p for p in policies if p.startswith('facet-') and not missing
-                    and not totals[p]['new_documented_losses_vs_fixed']
-                    and totals[p]['documented_pass']>=totals['fixed']['documented_pass']
-                    and totals[p]['model_context_tokens']<totals['fixed']['model_context_tokens']]
-          winner=max(eligible,key=lambda p:(totals[p]['documented_pass'],-totals[p]['model_context_tokens'])) if eligible else None
-          result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'totals':totals,
-                  'missing_arms':missing,'eligible_on_regression_only':eligible,'candidate':winner,
+          temp=pathlib.Path(os.environ['RUNNER_TEMP'])
+          summaries={}; rows=[]; missing=[]
+          for suite in ('v40','holdout','fresh'):
+              candidate=temp/'arms'/f'facet-live-{suite}-facet-guarded-v1-{os.environ["GITHUB_RUN_ID"]}'/'run'
+              baseline=temp/'baselines'/suite/'run'
+              if not (candidate/'SUMMARY.json').exists():
+                  missing.append(suite); continue
+              a=json.loads((baseline/'SUMMARY.json').read_text())
+              b=json.loads((candidate/'SUMMARY.json').read_text())
+              expected='ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0' if suite=='fresh' else '828bace5d111890dbb8830cc0c478d352f7564ca'
+              assert a['head']==expected and b['head']==os.environ['GITHUB_SHA']
+              assert json.loads((baseline/'FREEZE.json').read_text())['inputs']==json.loads((candidate/'FREEZE.json').read_text())['inputs']
+              summaries[suite]={'fixed':a,'guarded':b}
+              aa={r['case_id']:r for r in json.loads((baseline/'ASSESSMENTS.json').read_text())}
+              bb={r['case_id']:r for r in json.loads((candidate/'ASSESSMENTS.json').read_text())}
+              assert aa.keys()==bb.keys()
+              for cid in aa:
+                  a,b=aa[cid],bb[cid]
+                  assert a['question']==b['question'] and a['search_question']==b['search_question']
+                  rows.append({'suite':suite,'case_id':cid,'answerability':a['answerability'],
+                    'fixed_pass':a['passed'],'guarded_pass':b['passed'],'fixed_tokens':a['tokens'],
+                    'guarded_tokens':b['tokens'],'fixed_groups':a['selected_groups'],'guarded_groups':b['selected_groups'],
+                    'new_loss':a['answerability']!='unanswerable' and a['passed'] and not b['passed']})
+          totals={p:{'tokens':sum(r[p+'_tokens'] for r in rows),
+                     'documented_pass':sum(r[p+'_pass'] for r in rows if r['answerability']!='unanswerable'),
+                     'documented_total':sum(r['answerability']!='unanswerable' for r in rows)} for p in ('fixed','guarded')}
+          passed=(not missing and len(rows)==64 and not any(r['new_loss'] for r in rows)
+                  and totals['guarded']['documented_pass']==totals['guarded']['documented_total']
+                  and totals['guarded']['tokens']<totals['fixed']['tokens'])
+          result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'cases':rows,'totals':totals,
+                  'missing_arms':missing,'regression_gate_passed':passed,
                   'answer_model_calls':0,'provider_usage':None,'default_rollout':False,
-                  'boundary':'8 frozen fresh regression questions; other 56 use unchanged product run 40215652617; first retrieval evidence, not final answer quality or total dialogue cost'}
-          (out/'PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-          print(json.dumps(result,ensure_ascii=False,indent=2))
-          assert not missing, 'incomplete real-MCP execution'
-          assert all(t['cases']==8 for t in totals.values())
-          assert winner is not None, 'neither new selector met documented non-regression and lower visible-context cost'
+                  'boundary':'Development-selected margin; 64 known regression questions, not unseen generalization. First retrieval evidence, not final answers or total dialogue cost.'}
+          (temp/'paired/PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps({k:v for k,v in result.items() if k!='cases'},ensure_ascii=False,indent=2))
+          assert passed, 'documented coverage, source execution or visible-token acceptance failed'
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

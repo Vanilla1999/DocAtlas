@@ -9,12 +9,13 @@ from __future__ import annotations
 import hashlib
 import re
 
-POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1"})
+POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1"})
 MAX_PROBES = 16
+SCORE_MARGIN = 1.0  # development heuristic in frozen-model logits, NOT calibrated probability
 CAPSULE_TOKENS = 512  # maximum admitted source-text cost of one parent, not top-k
 
 
-def question_probes(question: str) -> tuple[list[str], str | None]:
+def question_probes(question: str, *, contextual: bool = False) -> tuple[list[str], str | None]:
     """Keep the full query and expose literal clauses/enumerated query items.
 
     Quotes, inline code and brackets are protected from splitting. Excerpts
@@ -46,6 +47,10 @@ def question_probes(question: str) -> tuple[list[str], str | None]:
             protected[i] = True
     cuts = []
     pattern = r"[,:;?!\n]|\.(?=\s|$)|\b(?:and|or|и|или)\b"
+    if contextual:
+        # Do not split adjective/verb coordination such as "consistent and resumable".
+        lead = r"how|when|what|which|where|why|whether|may|can|do|does|is|are|should|must|will|как|когда|что|где|почему"
+        pattern = r"[,:;?!\n]|\.(?=\s|$)|\b(?:and|or|и|или)\b(?=\s+(?:" + lead + r")\b)"
     for match in re.finditer(pattern, question, re.IGNORECASE):
         if not any(protected[match.start():match.end()]):
             cuts.append((match.start(), match.end()))
@@ -72,7 +77,7 @@ def question_probes(question: str) -> tuple[list[str], str | None]:
     anchor = ""
     first = next((m for m in re.finditer(r"[:.!?]", question)
                   if not protected[m.start()]), None)
-    if first and first.group() in ":." and first.start() < len(question) - 1:
+    if first and first.group() in (":.!?" if contextual else ":.") and first.start() < len(question) - 1:
         anchor = question[:first.start()].strip()
     probes = [question]
     def normalized(text):
@@ -138,13 +143,14 @@ def _capsules(sections, snapshot):
 
 
 def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot, budget):
-    """Return a variable-size prefix ordering and private score diagnostics.
+    """Select query-facet candidates, not a semantically certified answer set.
 
-    MAX: union of exact best local relevance witnesses for each literal probe.
-    ENVELOPE: additionally retain admitted siblings in short structural parents.
-    Neither policy treats a score, a tie, or a covered probe as proof of an answer.
+    MAX keeps exact best matches; ENVELOPE adds short-parent siblings.
+    GUARDED keeps near-best alternatives and expands only predominantly selected
+    short parents. Its margin and structural density are development heuristics.
     """
-    probes, fallback = question_probes(question)
+    guarded = policy == "facet-guarded-v1"
+    probes, fallback = question_probes(question, contextual=guarded)
     matrix = [global_scores]
     if not fallback:
         for probe in probes[1:]:
@@ -157,35 +163,42 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
                 receipt[field] += extra[field]
     rank = sorted(range(len(sections)), key=lambda i: (-global_scores[i], sections[i].key))
     wins = {i: [] for i in range(len(sections))}
+    support = {i: [] for i in range(len(sections))}
     for p, scores in enumerate(matrix):
         maximum = max(scores)
         for i, score in enumerate(scores):
             if score == maximum:
                 wins[i].append(p)
-    seeds = {i for i in wins if wins[i]}
+            if maximum - score <= (SCORE_MARGIN if guarded else 0.0):
+                support[i].append(p)
+    seeds = {i for i in support if support[i]}
     chosen = set(range(len(sections))) if fallback else set(seeds)
     expanded = {}
-    if not fallback and policy == "facet-envelope-v1":
+    if not fallback and policy in {"facet-envelope-v1", "facet-guarded-v1"}:
         capsules = _capsules(sections, snapshot)
         for index in sorted(seeds):
             neighbors = capsules.get(index, ())
+            if guarded and 2 * len(set(neighbors) & seeds) < len(neighbors):
+                continue  # short parent alone is not a reason to return unrelated siblings
             chosen.update(neighbors)
             expanded[index] = list(neighbors)
     # Facet witnesses first, then structural support, then omitted rows.
     # A budget cut is explicitly reported by the existing packet finalizer.
-    ordered = sorted(chosen, key=lambda i: (not bool(wins[i]), -len(wins[i]),
+    ordered = sorted(chosen, key=lambda i: (not bool(support[i]), -len(support[i]),
                                           -global_scores[i], sections[i].key))
     ordered += [i for i in rank if i not in chosen]
     receipt["facet_selection"] = {
         "version": policy, "completeness": "unassessed",
+        "score_margin": SCORE_MARGIN if guarded else 0.0,
+        "margin_is_calibrated_probability": False,
         "probe_count": len(matrix), "planned_probe_count": len(probes),
-        "fallback": fallback, "capsule_tokens": CAPSULE_TOKENS if policy == "facet-envelope-v1" else None,
+        "fallback": fallback, "capsule_tokens": CAPSULE_TOKENS if policy in {"facet-envelope-v1", "facet-guarded-v1"} else None,
         "probes": [{"text": p, "sha256": hashlib.sha256(p.encode()).hexdigest()}
                    for p in probes[:len(matrix)]],
         "scores": matrix,
         "sections": [{"key_sha256": hashlib.sha256(str(s.key).encode()).hexdigest(),
                       "path": s.rows[0].get("path_or_url"), "section": s.key[1],
-                      "winning_probes": wins[i], "seed": i in seeds,
+                      "winning_probes": wins[i], "retained_probes": support[i], "seed": i in seeds,
                       "selected": i in chosen, "capsule_members": expanded.get(i, [])}
                      for i, s in enumerate(sections)],
         "no_answer_judge": True, "paid_model_calls": 0,
