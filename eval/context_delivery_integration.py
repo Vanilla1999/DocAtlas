@@ -191,6 +191,18 @@ async def run(args):
                 from docmancer.docs.interfaces.model_context_session import ModelContextSession, ModelSessionError
                 managed = ModelContextSession(client, question=QUESTION,
                     bindings={"project_path": str(root)}, language_mode=True)
+                # A mixed docs query is legitimate, but a SINGLE source-language
+                # preflight must not silently use library metadata for project docs.
+                try:
+                    ModelContextSession(client, question=QUESTION, language_mode=True,
+                        bindings={"project_path": str(root), "library": "other-library"})
+                except ModelSessionError as exc:
+                    assert str(exc) == "language_preflight_requires_single_source"
+                else:
+                    raise AssertionError("mixed language preflight was wrongly accepted")
+                # The ordinary mixed path remains available without that mode.
+                assert not ModelContextSession(client, question=QUESTION,
+                    bindings={"project_path": str(root), "library": "other-library"}).audit
                 try:
                     await managed.retrieve(search_question=TRANSLATION)
                 except ModelSessionError as exc:
@@ -204,6 +216,26 @@ async def run(args):
                 assert all(profile["languages"] == ["en"] for profile in profiles)
                 assert len(managed.audit) == 1, "cached preflight made another product call"
                 assert {t["name"] for t in await managed.tools()} == {"get_docs_context"}
+                # Public schema and translation-slot errors must not consume
+                # another MCP call or require post-error LLM retry.
+                for invalid_args, reason in (
+                    ({"search_question": "x" * 501}, "invalid_search_question"),
+                    ({"search_question": TRANSLATION,
+                      "lookup_queries": ["renewal term " + str(n) for n in range(5)]},
+                     "search_question_lookup_limit"),
+                    ({"lookup_queries": ["duplicate", "duplicate"]}, "invalid_lookup_queries"),
+                    ({"lookup_queries": ["extra " + str(n) for n in range(6)]},
+                     "invalid_lookup_queries"),
+                    ({"lookup_queries": [" "]}, "invalid_lookup_queries"),
+                ):
+                    call_count = len(managed.audit)
+                    try:
+                        await managed.retrieve(**invalid_args)
+                    except ModelSessionError as exc:
+                        assert str(exc) == reason, (invalid_args, exc)
+                    else:
+                        raise AssertionError("invalid query reached the MCP transport")
+                    assert len(managed.audit) == call_count
                 first = await managed.retrieve(search_question=TRANSLATION)
                 count_before = len(managed.audit)
                 try:

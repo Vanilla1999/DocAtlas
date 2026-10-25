@@ -86,6 +86,10 @@ class ModelContextSession:
             raise ModelSessionError("exact_module_path_required")
         if type(language_mode) is not bool:
             raise ModelSessionError("invalid_language_mode")
+        # get_docs_context supports mixed project+library retrieval, but one
+        # docs_status language profile cannot describe both independent lanes.
+        if language_mode and bindings.get("project_path") and bindings.get("library"):
+            raise ModelSessionError("language_preflight_requires_single_source")
         if language_mode and bindings.get("scope") == "all":
             raise ModelSessionError("language_preflight_requires_exact_scope")
         for value in (max_input_tokens, max_searches, max_events):
@@ -233,12 +237,24 @@ class ModelContextSession:
             raise ModelSessionError("concrete_gap_required")
         request = {**self._bindings, "question": self._question}
         if search_question is not None:
-            if not isinstance(search_question, str) or not search_question.strip():
+            if (not isinstance(search_question, str) or not search_question.strip()
+                    or len(search_question) > 500):
                 raise ModelSessionError("invalid_search_question")
             if self._language_mode and (self._language or {}).get("status") != "declared":
                 raise ModelSessionError("translation_language_unresolved")
             request["search_question"] = search_question
         if lookup_queries is not None:
+            # Match the public MCP schema BEFORE spending a product call.
+            if (type(lookup_queries) is not list or len(lookup_queries) > 5
+                    or any(type(q) is not str or not q.strip() or len(q) > 500
+                           for q in lookup_queries)
+                    or len(set(lookup_queries)) != len(lookup_queries)):
+                raise ModelSessionError("invalid_lookup_queries")
+            # The server charges the explicit translation as one lookup only
+            # when distinct from the original question and listed lookups.
+            if (search_question is not None and search_question != self._question
+                    and search_question not in lookup_queries and len(lookup_queries) == 5):
+                raise ModelSessionError("search_question_lookup_limit")
             request["lookup_queries"] = deepcopy(lookup_queries)
         fingerprint = canonical(request)
         if fingerprint in self._seen:

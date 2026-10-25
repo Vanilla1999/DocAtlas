@@ -31,7 +31,12 @@ model_context = await turn.retrieve(search_question=translated_question)
 Without language mode, retrieve directly. Library mode requires a previously
 known canonical_id. Module mode uses its exact path. Language preflight with
 scope=all fails explicitly: a project-only language profile must not be reused
-for sibling modules. This does not restrict the server's existing all-scope read.
+for sibling modules. It also rejects simultaneous project_path and library
+bindings: one library-language profile cannot describe an independently
+declared project-language lane. The server still supports mixed project/library
+and all-scope retrieval with language_mode=False; use separate exactly bound
+source turns if language-specific translation is required for each lane. These
+host restrictions never change the server's normal mixed or all-scope reads.
 
 `tools()` returns the genuine advertised definitions for the current phase:
 only docs_status before required preflight, get_docs_context afterwards, and
@@ -78,8 +83,13 @@ GroundedMCPSession now defaults to the same 12,000-token packet ceiling;
 `evidence_budget=800` retains a host's historical stricter choice. Recovery has
 its own explicit `recovery_budget` (default600). Query limits are unchanged:
 MiniLM still refuses over128 model tokens, and search_question remains <=500
-characters. Paths and task instructions belong in separate arguments, not in
-question. No semantic truncation is introduced to make long questions pass.
+characters. The managed host rejects a blank/overlong translation, invalid
+lookup list or a sixth distinct translation lookup BEFORE making an MCP call.
+It does not over-reject a translation identical to the original question or
+already included in the lookups. The 128-model-token limit still belongs to
+the server's real scorer; the host does not guess it or silently shorten input.
+Paths and task instructions belong in separate arguments, not in question.
+No semantic truncation is introduced to make long questions pass.
 
 For compatibility, section wire now defaults to v1. Explicit host setting
 `DOCATLAS_SECTION_WIRE_FORMAT=adaptive-v2` enables the existing adaptive v1/v2
