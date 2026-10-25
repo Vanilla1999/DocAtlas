@@ -402,6 +402,14 @@ def main():
     save(args.out / "FREEZE.json", {"question": QUESTION, "search_question": TRANSLATION,
         "source_sha256": hashlib.sha256(DOCUMENT.encode()).hexdigest(), "source": DOCUMENT})
     asyncio.run(run(args))
+    # Owner-requested fresh questions reuse this existing installed-MCP scenario.
+    # This captures evidence for separate strong-model replay, not provider usage.
+    import subprocess
+    subprocess.run([
+        sys.executable, "-I", str(args.repo / "eval/fresh_dialogues/run.py"),
+        "--repo", str(args.repo), "--work", str(args.work / "fresh-dialogues"),
+        "--out", str(args.out / "fresh-dialogues"), "--model", str(args.model),
+    ], check=True)
 
 if __name__ == "__main__":
     main()
