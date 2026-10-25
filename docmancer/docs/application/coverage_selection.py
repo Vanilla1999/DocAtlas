@@ -15,7 +15,8 @@ import os
 import re
 import time
 
-POLICIES = frozenset({"mmr-budget-v1", "facet-cover-v1", "facet-guarded-v1"})
+POLICIES = frozenset({"mmr-budget-v1", "facet-cover-v1", "facet-guarded-v1",
+                      "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1"})
 MAX_PROBES = 16
 MMR_RELEVANCE = 0.7  # Frozen experiment parameter, not a confidence threshold.
 
@@ -55,6 +56,59 @@ def literal_probes(question: str) -> list[str]:
     if len(unique) > MAX_PROBES:
         raise SectionCompressionError("section_compression_probe_limit")
     return unique
+
+
+def contextual_probes(question, tokenizer):
+    """Preserve the original subject when scoring a literal follow-up clause.
+
+    Uses only original query text, not gold, source facts or model-generated
+    claims. Overlength derived views explicitly fall back to the unchanged
+    whole question; no token slice or silent source/query truncation occurs.
+    """
+    parts = literal_probes(question)
+    masked = list(question)
+    for m in re.finditer(r'`[^`]*`|"[^"\n]*"|\([^)]*\)|\[[^]]*\]', question):
+        masked[m.start():m.end()] = "_" * len(m.group())
+    stop = re.search(r"[.!?:;\n]", "".join(masked))
+    anchor = question[:stop.end()] if stop else question
+    result, fallback = [question], []
+    for index, part in enumerate(parts[1:], 1):
+        view = anchor if part.strip().rstrip(".?!:;") == anchor.strip().rstrip(".?!:;") else anchor + "\n" + part
+        if len(tokenizer.encode(view, add_special_tokens=False).ids) > 128:
+            fallback.append(index)
+            view = question
+        if view not in result:
+            result.append(view)
+    return result, fallback
+
+
+def bundle_short_sources(sections, tokenizer):
+    """Treat a short native document as one indivisible acquired evidence unit.
+
+    The 512-token bound is the scorer's standard input scale, not a top-k or
+    sufficiency threshold. Long documents stay unchanged. Only acquired text
+    is joined; unacquired gaps and neighbors are never read or filled.
+    """
+    from .section_compression import _Section
+    groups = {}
+    for section in sections:
+        groups.setdefault((section.key[0], *section.key[2:]), []).append(section)
+    result, bundled = [], []
+    for identity, members in sorted(groups.items()):
+        members.sort(key=lambda s: (min(r.get("line_start", 0) for r in s.rows), s.key))
+        text = "\n\n".join(s.text for s in members)
+        if len(members) > 1 and len(tokenizer.encode(text, add_special_tokens=False).ids) <= 512:
+            rows, ids = [], set()
+            for section in members:
+                for row in section.rows:
+                    if row["evidence_id"] not in ids:
+                        rows.append(row)
+                        ids.add(row["evidence_id"])
+            result.append(_Section((members[0].key[0], "", *members[0].key[2:]), rows, text))
+            bundled.append({"path": identity[0], "acquired_sections": len(members)})
+        else:
+            result.extend(members)
+    return sorted(result, key=lambda s: s.key), bundled
 
 
 def _tokens(section) -> int:
@@ -106,7 +160,7 @@ def _plan(policy, sections, columns, costs):
         chosen.append(best)
         uncovered = {p for p in uncovered if best not in winners[p]}
     protected = list(chosen)
-    if policy == "facet-guarded-v1":
+    if policy in {"facet-guarded-v1", "facet-guarded-v2", "facet-bundled-v1"}:
         # Keep the complete B1 proposal as a safety reference, not fixed five.
         # Facet winners are delivered first if the full-packet budget is tight.
         chosen.extend(i for i in root_order[:count] if i not in chosen)
@@ -127,12 +181,17 @@ def select_coverage_sections(payload, snapshot, retrieval, question, policy):
     directory = Path(configured).resolve()
     probes = [question] if policy == "mmr-budget-v1" else literal_probes(question)
     columns, receipts = [], []
+    probe_fallbacks, bundles = [], []
     started = time.monotonic()
     with core._LOCK:
         if core._ENGINE is None or core._ENGINE_PATH != directory:
             core._ENGINE, core._ENGINE_PATH = None, None
             core._ENGINE = core._MiniLM(directory)
             core._ENGINE_PATH = directory
+        if policy in {"facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1"}:
+            probes, probe_fallbacks = contextual_probes(question, core._ENGINE.tokenizer)
+        if policy == "facet-bundled-v1":
+            sections, bundles = bundle_short_sources(sections, core._ENGINE.tokenizer)
         # One common resource allowance for the ENTIRE request, not per probe.
         for probe in probes:
             remaining_pairs = core.MAX_PAIRS - sum(r["forward_passes"] for r in receipts)
@@ -187,6 +246,7 @@ def select_coverage_sections(payload, snapshot, retrieval, question, policy):
         "input_pair_tokens": sum(r["input_pair_tokens"] for r in receipts),
         "truncated_tokens": 0, "scoring_seconds": sum(r["scoring_seconds"] for r in receipts),
         "selection_diagnostics": {**selection, "probe_count": len(probes),
+            "contextual_probe_fallbacks": probe_fallbacks, "short_source_bundles": bundles,
             "probe_sha256": [hashlib.sha256(p.encode()).hexdigest() for p in probes],
             "ranking_targets_retained": probe_best_retained, "semantic_sufficiency_certified": False,
             "requested_sections": requested, "selected_after_budget": len(selected),
