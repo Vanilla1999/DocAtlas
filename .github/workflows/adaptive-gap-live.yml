@@ -1,14 +1,14 @@
-name: Adaptive-gap live MCP paired acceptance
+name: Facet selection paired installed MCP experiment
 on:
   push:
-    branches: [experiment/minilm-adaptive-gap-20261025]
-    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/docs/application/section_compression.py', 'eval/adaptive_gap_integration.py']
+    branches: [experiment/facet-selection-20261025]
+    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/docs/application/section_compression.py', 'docmancer/docs/application/facet_selection.py', 'eval/facet_selection_integration.py']
   workflow_dispatch:
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: adaptive-live-${{ github.sha }}
+  group: facet-live-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   live:
@@ -17,115 +17,119 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [v40, holdout]
-        policy: [fixed, adaptive-gap-v1, adaptive-gap-b1-v1]
+        suite: [v40, holdout, fresh]
+        policy: [fixed, adaptive-gap-b1-v1, facet-max-v1, facet-envelope-v1]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Freeze source and confirm no question, document, oracle, weight or dependency tuning
+      - name: Freeze exact source and unchanged regression inputs
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/adaptive-evidence"
-          git fetch -q origin 2dde352c6c717f12e6c7d60d682416c780236e52 --depth=1
-          git diff --exit-code 2dde352c6c717f12e6c7d60d682416c780236e52 HEAD -- eval/prepared_model_comparison40 eval/adaptive_gap_holdout pyproject.toml uv.lock
-          git rev-parse HEAD > "$RUNNER_TEMP/adaptive-evidence/head.txt"
-          python -m compileall -q docmancer eval/adaptive_gap_integration.py
-          git archive HEAD docmancer eval/adaptive_gap_integration.py eval/adaptive_gap_holdout .github/workflows/adaptive-gap-live.yml | gzip > "$RUNNER_TEMP/adaptive-evidence/tested-source.tar.gz"
-      - name: Install wheel and provision frozen model/tokenizers before offline execution
+          mkdir -p "$RUNNER_TEMP/facet-evidence"
+          git fetch -q origin d6fc18256ffe91a1d26e03783642e521b056ce12 --depth=1
+          git fetch -q origin 2376217843bb2ac236195f9ccb05f7bba257c256 --depth=1
+          git diff --exit-code d6fc18256ffe91a1d26e03783642e521b056ce12 HEAD -- eval/prepared_model_comparison40 eval/adaptive_gap_holdout pyproject.toml uv.lock
+          git diff --exit-code 2376217843bb2ac236195f9ccb05f7bba257c256 HEAD -- eval/fresh_dialogues
+          git rev-parse HEAD > "$RUNNER_TEMP/facet-evidence/head.txt"
+          python -m compileall -q docmancer eval/facet_selection_integration.py
+          git archive HEAD docmancer eval .github/workflows/adaptive-gap-live.yml | gzip > "$RUNNER_TEMP/facet-evidence/tested-source.tar.gz"
+      - name: Build exact installed wheel and provision frozen MiniLM and tokenizers
         run: |
-          set -euo pipefail
-          docker build -f eval/minilm_sections.Dockerfile -t docatlas-adaptive-base .
-          docker build -t docatlas-adaptive-live - <<'DOCKER'
-          FROM docatlas-adaptive-base
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-facet-base .
+          docker build -t docatlas-facet-live - <<'DOCKER'
+          FROM docatlas-facet-base
           RUN /opt/venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("cl100k_base")'
           DOCKER
-      - name: Real SQLite, CPU ONNX and actual stdio responses under hard 1GB
+      - name: Real SQLite and CPU ONNX through public stdio under hard 1GB
         env:
           SUITE: ${{ matrix.suite }}
           POLICY: ${{ matrix.policy }}
         run: |
           set +e
-          docker run --name adaptive-run --network none --cpus=2 \
+          docker run --name facet-run --network none --cpus=2 \
             --memory=1000000000 --memory-swap=1000000000 \
             -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
-            -v "$RUNNER_TEMP/adaptive-evidence:/evidence" --entrypoint /opt/venv/bin/python \
-            docatlas-adaptive-live -I /repo/eval/adaptive_gap_integration.py \
-            --repo /repo --work /tmp/live-study --out /evidence/run --model /model \
+            -v "$RUNNER_TEMP/facet-evidence:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-facet-live -I /repo/eval/facet_selection_integration.py \
+            --repo /repo --work /tmp/facet-study --out /evidence/run --model /model \
             --suite "$SUITE" --policy "$POLICY"
           rc=$?
-          docker inspect adaptive-run > "$RUNNER_TEMP/adaptive-evidence/container.json"
-          echo "$rc" > "$RUNNER_TEMP/adaptive-evidence/exit-code.txt"
+          docker inspect facet-run > "$RUNNER_TEMP/facet-evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/facet-evidence/exit-code.txt"
           exit "$rc"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: adaptive-live-${{ matrix.suite }}-${{ matrix.policy }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/adaptive-evidence/
+          name: facet-live-${{ matrix.suite }}-${{ matrix.policy }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/facet-evidence/
           retention-days: 30
           if-no-files-found: error
-
   compare:
     needs: live
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Download exact-run arms
+      - name: Download exact-run evidence
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p "$RUNNER_TEMP/arms" "$RUNNER_TEMP/paired"
-          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'adaptive-live-*' --dir "$RUNNER_TEMP/arms"
-      - name: Reject quality regressions; retain failed B0 evidence instead of hiding it
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'facet-live-*' --dir "$RUNNER_TEMP/arms"
+      - name: Report accuracy-first comparison without claiming answer-model acceptance
         run: |
           python - <<'PY'
           import json, pathlib, os
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'arms'
           out=pathlib.Path(os.environ['RUNNER_TEMP'])/'paired'
-          summaries={}; rows=[]; missing=[]
-          for suite in ('v40','holdout'):
-              arms={}
-              for policy in ('fixed','adaptive-gap-v1','adaptive-gap-b1-v1'):
-                  folder=root/f'adaptive-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
+          policies=('fixed','adaptive-gap-b1-v1','facet-max-v1','facet-envelope-v1')
+          summaries={}; assessments={}; missing=[]
+          for suite in ('v40','holdout','fresh'):
+              for policy in policies:
+                  folder=root/f'facet-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
                   if not (folder/'SUMMARY.json').exists():
                       missing.append(str(folder)); continue
                   s=json.loads((folder/'SUMMARY.json').read_text())
                   assert s['head']==os.environ['GITHUB_SHA']
                   summaries[f'{suite}/{policy}']=s
-                  arms[policy]={r['case_id']:r for r in json.loads((folder/'ASSESSMENTS.json').read_text())}
-              if len(arms)!=3: continue
-              for policy in ('adaptive-gap-v1','adaptive-gap-b1-v1'):
-                  assert arms['fixed'].keys()==arms[policy].keys()
-                  for cid,a in arms['fixed'].items():
-                      b=arms[policy][cid]
-                      assert a['question']==b['question'] and a['search_question']==b['search_question']
-                      rows.append({'suite':suite,'policy':policy,'case_id':cid,'category':a['answerability'],
-                          'fixed_pass':a['passed'],'candidate_pass':b['passed'],
-                          'fixed_tokens':a['tokens'],'candidate_tokens':b['tokens'],
-                          'fixed_k':a['selected_groups'],'candidate_k':b['selected_groups'],
-                          'new_documented_loss':a['answerability']!='unanswerable' and a['passed'] and not b['passed']})
-          result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'cases':rows,'missing_arms':missing,
-              'new_documented_losses':{p:[r['case_id'] for r in rows if r['policy']==p and r['new_documented_loss']]
-                  for p in ('adaptive-gap-v1','adaptive-gap-b1-v1')},
-              'answer_generation_tested':False,'paid_selector_calls':0,'provider_usage':None,'default_rollout_performed':False}
-          result['uncapped_b1_examples']=[{'suite':r['suite'],'case_id':r['case_id'],'groups':r['candidate_k']} for r in rows if r['policy']=='adaptive-gap-b1-v1' and r['candidate_k']>5]
-          result['buffer1_documented_evidence_gate_passed']=(
-              not missing and len(rows)==112
-              and not result['new_documented_losses']['adaptive-gap-b1-v1']
-              and bool(result['uncapped_b1_examples'])
-              and all(s['quality_gate_passed'] for key,s in summaries.items() if not key.endswith('/adaptive-gap-v1'))
-              and all(s['tokens_max'] <= 12000 for s in summaries.values())
-          )
+                  assessments[suite,policy]={r['case_id']:r for r in json.loads((folder/'ASSESSMENTS.json').read_text())}
+          totals={}
+          for policy in policies:
+              arms=[s for k,s in summaries.items() if k.endswith('/'+policy)]
+              losses=[]
+              for suite in ('v40','holdout','fresh'):
+                  if (suite,'fixed') not in assessments or (suite,policy) not in assessments: continue
+                  a,b=assessments[suite,'fixed'],assessments[suite,policy]
+                  assert a.keys()==b.keys()
+                  for cid in a:
+                      assert a[cid]['question']==b[cid]['question'] and a[cid]['search_question']==b[cid]['search_question']
+                      if a[cid]['answerability']!='unanswerable' and a[cid]['passed'] and not b[cid]['passed']:
+                          losses.append(suite+'/'+cid)
+              totals[policy]={'cases':sum(s['cases'] for s in arms),
+                  'documented_pass':sum(s['documented_pass'] for s in arms),
+                  'documented_total':sum(s['documented_total'] for s in arms),
+                  'model_context_tokens':sum(s['tokens_sum'] for s in arms),
+                  'new_documented_losses_vs_fixed':losses}
+          eligible=[p for p in policies if p.startswith('facet-') and not missing
+                    and not totals[p]['new_documented_losses_vs_fixed']
+                    and totals[p]['documented_pass']>=totals['fixed']['documented_pass']
+                    and totals[p]['model_context_tokens']<totals['fixed']['model_context_tokens']]
+          winner=max(eligible,key=lambda p:(totals[p]['documented_pass'],-totals[p]['model_context_tokens'])) if eligible else None
+          result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'totals':totals,
+                  'missing_arms':missing,'eligible_on_regression_only':eligible,'candidate':winner,
+                  'answer_model_calls':0,'provider_usage':None,'default_rollout':False,
+                  'boundary':'64 previously inspected regression questions; first retrieval evidence, not final answer quality or total dialogue cost'}
           (out/'PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-          print(json.dumps({k:v for k,v in result.items() if k!='cases'},ensure_ascii=False,indent=2))
-          assert not missing, 'incomplete actual-MCP experiment'
-          assert result['buffer1_documented_evidence_gate_passed'], 'uncapped buffer1 regression, oversized context or no >5-group actual delivery'
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          assert not missing, 'incomplete real-MCP execution'
+          assert all(t['cases']==64 for t in totals.values())
+          assert winner is not None, 'neither new selector met documented non-regression and lower visible-context cost'
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: adaptive-paired-${{ github.run_id }}
+          name: facet-paired-${{ github.run_id }}
           path: ${{ runner.temp }}/paired/
           retention-days: 30
           if-no-files-found: error

@@ -1,0 +1,70 @@
+{
+  "schema_version": "docatlas.new-dialogues.v1",
+  "experiment_id": "nacrerelay-new-cold-dialogues-20261025",
+  "corpus_root": "project",
+  "source_language": "en",
+  "source_version": "2.7",
+  "bindings": {"scope": "project"},
+  "translation_policy": "Fixed full meaning-preserving translations, frozen before product inference; not an autonomous translation test.",
+  "history_policy": "Two predeclared follow-up requests are scripted context-replay probes, not evidence that an autonomous answering agent judged an actual missing fact.",
+  "cases": [
+    {
+      "id": "N01",
+      "question": "Опишите жизненный цикл session ticket в NacreRelay: сколько он действует, когда и сколько раз его можно продлить и что меняется после подписанного отзыва. Сохраните все условия и исключения.",
+      "search_question": "Describe the lifecycle of a session ticket in NacreRelay: how long it lasts, when and how many times it may be renewed, and what changes after a signed revocation. Preserve all conditions and exceptions.",
+      "lookup_queries": []
+    },
+    {
+      "id": "N02",
+      "question": "Как клиент NacreRelay должен повторять запросы после HTTP 429, HTTP 502 и HTTP 403? Сравните условия, задержки и пределы повторов, включая случай отсутствующего Retry-After и запроса без Idempotency-Key.",
+      "search_question": "How should a NacreRelay client retry requests after HTTP 429, HTTP 502 and HTTP 403? Compare the conditions, delays and retry limits, including a missing Retry-After and a request without an Idempotency-Key.",
+      "lookup_queries": [],
+      "history_followup": {
+        "lookup_queries": ["NacreRelay HTTP retry conditions and exceptions: missing Retry-After, absent original Idempotency-Key, permission denial"],
+        "missing_fact": "Conditions and exceptions for automatic retries across all three response statuses in the original question.",
+        "probe_type": "predeclared_same_question_replay"
+      }
+    },
+    {
+      "id": "N03",
+      "question": "Загрузка импорта NacreRelay оборвалась. Как безопасно продолжить тот же batch, что произойдёт при повторе batch identifier с другим содержимым и когда импортированные записи станут видны запросам?",
+      "search_question": "A NacreRelay import upload was interrupted. How can the same batch be resumed safely, what happens if its batch identifier is reused with different content, and when do the imported records become visible to queries?",
+      "lookup_queries": []
+    },
+    {
+      "id": "N04",
+      "question": "Как устроен согласованный и возобновляемый экспорт NacreRelay? Объясните, какие данные он включает, как продолжить скачивание и чем ограничен срок доступа, в том числе после отзыва разрешения.",
+      "search_question": "How does a consistent and resumable NacreRelay export work? Explain which data it includes, how to resume a download, and what limits the period of access, including after permission revocation.",
+      "lookup_queries": []
+    },
+    {
+      "id": "N05",
+      "question": "Составьте порядок восстановления consumer NacreRelay после сбоя: как согласовать применение бизнес-эффекта, acknowledgement, checkpoint и replay, обработать повторно доставленное событие и поступить с необрабатываемым событием? Не обещайте гарантий, которых нет в документации.",
+      "search_question": "Describe recovery of a NacreRelay consumer after a crash: how should applying the business effect, acknowledgement, checkpoint and replay be ordered, how should a redelivered event be handled, and what should happen to an unprocessable event? Do not promise undocumented guarantees.",
+      "lookup_queries": [],
+      "history_followup": {
+        "lookup_queries": ["NacreRelay consumer crash recovery acknowledgement checkpoint replay duplicate delivery and poison event handling"],
+        "missing_fact": "The duplicate-delivery and unprocessable-event rules needed to complete the original recovery procedure.",
+        "probe_type": "predeclared_same_question_replay"
+      }
+    },
+    {
+      "id": "N06",
+      "question": "Чем в NacreRelay отличаются drain одного worker, pause workspace и cancel текущей task? Какие уже запущенные и соседние задачи затрагиваются, какие права нужны для cancel и восстановит ли resume workspace работу отдельно drained worker?",
+      "search_question": "In NacreRelay, how do draining one worker, pausing a workspace and cancelling a running task differ? Which running and sibling tasks are affected, what permissions are needed for cancellation, and does resuming a workspace restore a separately drained worker?",
+      "lookup_queries": []
+    },
+    {
+      "id": "N07",
+      "question": "Как долго NacreRelay хранит AuditTrail и в какой стране располагаются резервные копии этого журнала? Отделите подтверждённые сведения от того, что в документации не указано.",
+      "search_question": "How long does NacreRelay retain AuditTrail, and in which country are backups of that log located? Separate supported information from what the documentation does not specify.",
+      "lookup_queries": []
+    },
+    {
+      "id": "N08",
+      "question": "По какой формуле NacreRelay начисляет клиенту денежную компенсацию за недоступность и сколько положено за 45 минут простоя? Ответ обоснуйте документацией, без предположений о стандартных условиях.",
+      "search_question": "What formula does NacreRelay use to calculate monetary compensation for unavailability, and how much is due for 45 minutes of downtime? Ground the answer in documentation without assuming standard terms.",
+      "lookup_queries": []
+    }
+  ]
+}

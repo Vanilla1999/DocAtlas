@@ -274,19 +274,21 @@ class _MiniLM:
             raise SectionCompressionError("section_compression_model_integrity")
         self.inputs = {entry.name for entry in self.session.get_inputs()}
 
-    def score(self, question: str, sections: list[_Section]) -> tuple[list[float], dict]:
+    def score(self, question: str, sections: list[_Section], *, budget: dict | None = None) -> tuple[list[float], dict]:
         import numpy as np
         query = self.tokenizer.encode(question, add_special_tokens=False).ids
         if len(query) > 128:
             raise SectionCompressionError("section_compression_query_limit")
         width = 512 - len(query) - 3
         started = time.monotonic()
+        if budget is None:
+            budget = {"started": started, "pairs": 0}
         scores, calls, tokens = [], 0, 0
         for section in sections:
             passage = self.tokenizer.encode(section.text, add_special_tokens=False).ids
             best = -math.inf
             for offset in range(0, max(len(passage), 1), width):
-                if calls >= MAX_PAIRS or time.monotonic() - started > MAX_SECONDS:
+                if budget["pairs"] >= MAX_PAIRS or time.monotonic() - budget["started"] > MAX_SECONDS:
                     raise SectionCompressionError("section_compression_resource_limit")
                 part = passage[offset:offset + width]
                 ids = [self.cls] + query + [self.sep] + part + [self.sep]
@@ -302,6 +304,7 @@ class _MiniLM:
                     raise SectionCompressionError("section_compression_invalid_score")
                 best = max(best, value)
                 calls += 1
+                budget["pairs"] += 1
                 tokens += len(ids)
             scores.append(best)
         return scores, {"forward_passes": calls, "input_pair_tokens": tokens,
@@ -331,7 +334,8 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
-    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"}:
+    from .facet_selection import POLICIES as FACET_POLICIES
+    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"} | FACET_POLICIES:
         raise SectionCompressionError("section_compression_invalid_selection_policy")
     fixed_limit = selection_limit() if policy == "fixed" else None
     units = selection_units()
@@ -347,10 +351,19 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = None
             _ENGINE = _MiniLM(directory)
             _ENGINE_PATH = directory
-        scores, receipt = _ENGINE.score(question, sections)
+        budget = {"started": time.monotonic(), "pairs": 0}
+        scores, receipt = _ENGINE.score(question, sections, budget=budget)
+        if policy in FACET_POLICIES:
+            from .facet_selection import plan
+            facet_order, facet_count = plan(
+                _ENGINE, question, sections, scores, receipt,
+                policy=policy, snapshot=snapshot, budget=budget,
+            )
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
     if policy == "fixed":
         requested_k = min(fixed_limit, len(sections))
+    elif policy in FACET_POLICIES:
+        ranking, requested_k = facet_order, facet_count
     else:
         requested_k, cutoff = _adaptive_cutoff(
             [scores[i] for i in ranking],
@@ -431,6 +444,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         detail = deepcopy(receipt)
         detail["ranked_sections"] = [
             {"rank": rank, "score": scores[index], "selected": rank <= top_k,
+             "rank_meaning": "selection_priority" if policy in FACET_POLICIES else "global_score",
              "path": sections[index].rows[0].get("path_or_url"),
              "section": sections[index].rows[0].get("section"),
              "scoring_text_sha256": hashlib.sha256(sections[index].text.encode()).hexdigest(),

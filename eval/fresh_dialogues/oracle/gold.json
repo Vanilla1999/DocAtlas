@@ -1,0 +1,112 @@
+{
+  "schema_version": "docatlas.new-dialogues.oracle.v1",
+  "experiment_id": "nacrerelay-new-cold-dialogues-20261025",
+  "corpus_root": "../fixtures/project",
+  "expected_counts": {"full": 6, "partial": 1, "no_answer": 1},
+  "evaluation_boundary": "Frozen synthetic evidence and final-answer criteria. This oracle must not enter product retrieval, scoring, translation or answering prompts. It is opened only for post-delivery evaluation.",
+  "witness_rule": "Witness text is an exact full source line. line_start and line_end are 1-based, inclusive, relative to corpus_root. Facts may be paraphrased correctly in answers; exact string output matching is not the semantic judge.",
+  "global_requirements": [
+    "Answer the Russian original question in Russian, retaining technical literals where useful.",
+    "Ground every substantive documented claim in a source actually delivered to the answering model; returned path and line citations must resolve to supporting source text.",
+    "State a concrete evidence gap instead of fabricating a fact when delivered evidence is incomplete.",
+    "A runtime error or a nonempty retrieval result is not proof of semantic answerability or absence.",
+    "Do not claim a documented feature is absent merely because no source states it exists.",
+    "Only whole-project retrieval scope is exercised. Workspace boundaries are documentary semantics, not a test of actual multi-module MCP isolation."
+  ],
+  "acceptance_rule": "Report required facts retained in actual source packets and required facts correctly expressed in final answers separately. A full/partial case passes final-answer quality only if all required_facts and required_behaviors are met, citations are valid, and no forbidden_claim or other substantive unsupported claim appears. Any new critical unsupported claim or required-fact loss rejects non-inferiority for that arm on this suite. No statistical/generalization claim is justified by eight synthetic cases.",
+  "cases": [
+    {
+      "id": "N01",
+      "category": "full",
+      "required_facts": [
+        {"id": "N01.lifetime", "meaning": "A ticket lasts 47 seconds after issuance; idle time does not pause expiry.", "witnesses": [{"path": "docs/sessions.md", "line_start": 5, "line_end": 5, "text": "Each session ticket expires 47 seconds after issuance. The expiry clock is not paused while the ticket is idle."}]},
+        {"id": "N01.renewal_conditions", "meaning": "At most three renewals, only before current expiry and by the bound worker.", "witnesses": [{"path": "docs/sessions.md", "line_start": 9, "line_end": 9, "text": "A ticket may be renewed at most three times. Renewal is allowed only before the current expiry and only by the worker named in the ticket."}]},
+        {"id": "N01.renewal_timing", "meaning": "Wait at least eight seconds since issue or previous successful renewal; successful renewal gives a new 47-second lifetime.", "witnesses": [{"path": "docs/sessions.md", "line_start": 11, "line_end": 11, "text": "Wait at least eight seconds after issuance or the previous successful renewal. Each successful renewal starts a new 47-second lifetime."}]},
+        {"id": "N01.revocation", "meaning": "Signed revocation invalidates immediately; the same ticket cannot be renewed or retried, and a replacement requires fresh authorization.", "witnesses": [{"path": "docs/sessions.md", "line_start": 15, "line_end": 15, "text": "Receipt of a signed revocation invalidates the ticket immediately. The same ticket must not be renewed or retried. A replacement session requires a new authorization check."}]}
+      ],
+      "required_behaviors": ["Keep renewal restrictions distinct from a normal expiry or signed revocation."],
+      "forbidden_claims": ["Renewal after expiry is allowed.", "A signed-revoked ticket can be retried after a delay.", "Renewal is unlimited or an idle ticket does not expire."]
+    },
+    {
+      "id": "N02",
+      "category": "full",
+      "required_facts": [
+        {"id": "N02.429_header", "meaning": "429 retries require a Retry-After nonnegative integer of at most 90 seconds and use that delay.", "witnesses": [{"path": "docs/retries.md", "line_start": 5, "line_end": 5, "text": "After HTTP 429, automatic retry is allowed only when Retry-After contains a non-negative integer number of seconds no greater than 90. Wait that many seconds before retrying."}]},
+        {"id": "N02.429_no_fallback", "meaning": "Missing, malformed or over-90 Retry-After stops automatic retry; there is no fallback delay.", "witnesses": [{"path": "docs/retries.md", "line_start": 7, "line_end": 7, "text": "If Retry-After is absent, malformed or greater than 90, stop automatic retry and report the response to the caller. There is no fallback delay."}]},
+        {"id": "N02.502_identity", "meaning": "502 retry needs an Idempotency-Key present on the first attempt, with identical key and body reused.", "witnesses": [{"path": "docs/retries.md", "line_start": 11, "line_end": 11, "text": "After HTTP 502, automatic retry requires an Idempotency-Key that was already present on the first attempt. Use the identical key and request body for every retry."}]},
+        {"id": "N02.502_limits", "meaning": "502 permits at most two retries after four and thirteen seconds respectively; no original key means no automatic retry.", "witnesses": [{"path": "docs/retries.md", "line_start": 13, "line_end": 13, "text": "At most two retries are permitted after HTTP 502: wait four seconds before the first retry and thirteen seconds before the second. Without the original Idempotency-Key, do not automatically retry."}]},
+        {"id": "N02.403_denial", "meaning": "403 never causes automatic retry or broader credential acquisition; access must change separately with authorization.", "witnesses": [{"path": "docs/retries.md", "line_start": 17, "line_end": 17, "text": "HTTP 403 is a permission denial, not a transient failure. Never automatically retry it or obtain broader credentials on the caller's behalf. A separate authorized access change is required before a new attempt."}]}
+      ],
+      "required_behaviors": ["Do not collapse the distinct status-specific retry rules into a universal exponential-backoff rule."],
+      "forbidden_claims": ["Use a default delay when Retry-After is missing.", "Create an Idempotency-Key only after the first failed attempt and replay automatically.", "Retry HTTP 403 automatically or obtain broader credentials.", "Treat four and thirteen seconds as an unbounded backoff schedule."]
+    },
+    {
+      "id": "N03",
+      "category": "full",
+      "required_facts": [
+        {"id": "N03.batch_identity", "meaning": "Resume/reuse uses the same batch identifier and complete-input SHA-256; a different digest conflicts and leaves the old batch unchanged.", "witnesses": [{"path": "docs/imports.md", "line_start": 9, "line_end": 9, "text": "Every staged import uses a batch identifier and a SHA-256 digest of the complete input. A repeated batch identifier is accepted only when its complete-input digest matches the first attempt; a different digest is a conflict and the existing batch is left unchanged."}]},
+        {"id": "N03.resume_interval", "meaning": "Resume within nine minutes after last accepted chunk with the same identifier and complete digest; after expiry start a new batch.", "witnesses": [{"path": "docs/imports.md", "line_start": 13, "line_end": 13, "text": "An interrupted upload may resume for nine minutes after the last accepted chunk. Resume using the same batch identifier and complete-input digest. After that interval, start a new batch rather than append to the expired one."}]},
+        {"id": "N03.atomic_visibility", "meaning": "Staging chunks are invisible; entire-batch validation plus explicit commit atomically publishes the manifest, with no partial visibility.", "witnesses": [{"path": "docs/imports.md", "line_start": 17, "line_end": 17, "text": "Uploaded chunks are staging data and are never visible to queries or exports. Publication requires validation of the whole batch followed by an explicit commit. The committed manifest switches atomically; a partially uploaded or invalid batch cannot become partially visible."}]}
+      ],
+      "required_behaviors": ["Distinguish resuming upload from publishing the completed batch."],
+      "forbidden_claims": ["A batch identifier may be reused with changed content.", "Accepted chunks become queryable before whole-batch commit.", "The nine-minute window starts at initial upload rather than the last accepted chunk."]
+    },
+    {
+      "id": "N04",
+      "category": "full",
+      "required_facts": [
+        {"id": "N04.snapshot", "meaning": "The snapshot is the committed manifest current at request acceptance, with neither later commits nor uncommitted import chunks.", "witnesses": [{"path": "docs/exports.md", "line_start": 5, "line_end": 5, "text": "An export reads the committed manifest that was current when the export request was accepted. Later commits are not added to that export. Uncommitted import chunks are never included."}]},
+        {"id": "N04.creation_access", "meaning": "Creating export needs an active session and workspace read permission, without granting another workspace's access.", "witnesses": [{"path": "docs/exports.md", "line_start": 9, "line_end": 9, "text": "Creating an export requires an active session ticket and read permission for the requested workspace. The export does not grant permission to read any other workspace."}]},
+        {"id": "N04.lifetimes_revocation", "meaning": "Object retention is six hours, signed link lifetime twelve minutes; permission is checked every request and revocation immediately blocks download.", "witnesses": [{"path": "docs/exports.md", "line_start": 13, "line_end": 13, "text": "An export object is retained for six hours. Each signed download link is valid for twelve minutes. Download permission is checked again on every request, so revocation blocks a download immediately even when the object and link have not expired."}]},
+        {"id": "N04.resume", "meaning": "Resume with same export identifier and byte Range and matching snapshot; renewing an expired link needs authorization and does not reset object retention.", "witnesses": [{"path": "docs/exports.md", "line_start": 17, "line_end": 17, "text": "Resume with the same export identifier and a byte Range request. The returned snapshot identifier must match the original response. An expired signed link can be replaced only after a fresh authorization check; replacing the link does not refresh the six-hour object retention period."}]}
+      ],
+      "required_behaviors": ["Keep object retention, signed-link expiry and permission revocation as three independent limits."],
+      "forbidden_claims": ["An existing signed link bypasses later revocation.", "Renewing the link renews the object's six-hour retention.", "Resuming switches to the newest committed manifest.", "Uncommitted chunks are included in exports."]
+    },
+    {
+      "id": "N05",
+      "category": "full",
+      "required_facts": [
+        {"id": "N05.application_commit", "meaning": "Commit business effect and workspace-scoped event ID in one durable application transaction; the service does not give arbitrary external effects exactly-once semantics.", "witnesses": [{"path": "docs/operations.md", "line_start": 5, "line_end": 5, "text": "Apply an event's business effect and record its workspace-scoped event identifier in the same durable application transaction. The service does not make an arbitrary external business effect exactly once on the application's behalf."}]},
+        {"id": "N05.ack_order", "meaning": "Acknowledge only after the application transaction committed; acknowledging first risks loss.", "witnesses": [{"path": "docs/operations.md", "line_start": 9, "line_end": 9, "text": "Acknowledge an event only after that application transaction has committed. Acknowledging first can lose the business effect if the consumer then crashes."}]},
+        {"id": "N05.checkpoint_order", "meaning": "Checkpoint advances only after confirmed server acknowledgement, not just reading an event.", "witnesses": [{"path": "docs/operations.md", "line_start": 13, "line_end": 13, "text": "Advance the consumer checkpoint only after the server confirms the acknowledgement. A checkpoint records the last confirmed acknowledged sequence, not the last sequence merely read from the stream."}]},
+        {"id": "N05.replay_order", "meaning": "Reopen same workspace from immediately after durable checkpoint and process ascending sequence before later events.", "witnesses": [{"path": "docs/operations.md", "line_start": 17, "line_end": 17, "text": "After a crash, reopen the same workspace stream from the sequence immediately after the durable checkpoint. Process replayed events in ascending sequence order before accepting a later sequence."}]},
+        {"id": "N05.deduplication", "meaning": "A committed-but-unacknowledged effect may replay; consult durable workspace-scoped ID, skip the duplicate business effect, then acknowledge.", "witnesses": [{"path": "docs/operations.md", "line_start": 21, "line_end": 21, "text": "An event whose business effect committed before a crash but whose acknowledgement was not confirmed may be delivered again. Consult the durable workspace-scoped event-identifier record: skip an already committed business effect, then acknowledge the duplicate."}]},
+        {"id": "N05.poison_event", "meaning": "Stop and report at an unprocessable event; do not advance, drop or acknowledge it; quarantine needs separate operator authorization.", "witnesses": [{"path": "docs/operations.md", "line_start": 25, "line_end": 25, "text": "If an event cannot be processed, stop that consumer at the failing sequence and report it. Do not advance the checkpoint past the event, silently drop it or mark it acknowledged. Quarantining it requires a separate authorized operator action."}]}
+      ],
+      "required_behaviors": ["Present the dependency order coherently: application commit, acknowledgement, confirmation, checkpoint.", "Treat the six distinct source sections as one recovery procedure rather than independent unrelated tasks."],
+      "forbidden_claims": ["The service automatically guarantees exactly-once arbitrary business effects.", "Acknowledge before committing the effect.", "Advance checkpoint on read, before acknowledgement confirmation.", "Silently skip a poison event or automatically quarantine without authorization."]
+    },
+    {
+      "id": "N06",
+      "category": "full",
+      "required_facts": [
+        {"id": "N06.drain", "meaning": "Drain affects only new assignments to the named worker; current task, sibling workers and workspace are not paused/interrupted.", "witnesses": [{"path": "docs/workers.md", "line_start": 5, "line_end": 5, "text": "The command `nacre workers drain WORKER --workspace WORKSPACE` stops new task assignments to that named worker only. It does not interrupt its current task, drain sibling workers or pause the workspace."}]},
+        {"id": "N06.pause", "meaning": "Pause affects new assignments to all workers in that workspace, running tasks continue, and other workspaces are unaffected.", "witnesses": [{"path": "docs/workers.md", "line_start": 9, "line_end": 9, "text": "The command `nacre workspace pause WORKSPACE` stops new assignments to every worker in that workspace. Tasks already running continue. Other workspaces are unaffected."}]},
+        {"id": "N06.cancel", "meaning": "Cancel needs exact task and workspace IDs plus cancel permission; drain/pause are not cancel and administer alone is insufficient.", "witnesses": [{"path": "docs/workers.md", "line_start": 13, "line_end": 13, "text": "Cancelling a running task requires its exact task identifier, its workspace identifier and cancel permission for that workspace. Drain and pause do not imply cancellation; administer permission alone does not include cancel permission."}]},
+        {"id": "N06.resume", "meaning": "Workspace resume removes its pause, not a worker's separate drain flag; worker must be resumed explicitly.", "witnesses": [{"path": "docs/workers.md", "line_start": 17, "line_end": 17, "text": "Resuming a workspace removes its pause flag but does not remove a separately set drain flag from a worker. Resume a drained worker explicitly if it should accept new work."}]}
+      ],
+      "required_behaviors": ["Explain workspace/worker effects from documentation without claiming the test verified actual MCP module isolation."],
+      "forbidden_claims": ["Drain or pause kills current tasks.", "Pause affects other workspaces.", "Administer permission automatically includes cancel.", "Resuming a workspace clears all worker drain flags."]
+    },
+    {
+      "id": "N07",
+      "category": "partial",
+      "required_facts": [
+        {"id": "N07.retention", "meaning": "AuditTrail retention is 21 days from ingestion and continues while a workspace is paused.", "witnesses": [{"path": "docs/observability.md", "line_start": 5, "line_end": 5, "text": "AuditTrail entries are retained for 21 days from ingestion. Entries are removed after that interval even if the corresponding workspace is paused."}]}
+      ],
+      "unsupported_parts": [{"id": "N07.backup_country", "question_part": "Country in which AuditTrail backups are located", "construction": "No corpus document states a backup country or region."}],
+      "required_behaviors": ["Give the documented retention rather than refusing the whole answer.", "Explicitly state that the backup country cannot be determined from the supplied documentation."],
+      "forbidden_claims": ["Any specific country, region or residency guarantee for AuditTrail backups.", "Backups do not exist.", "Pausing a workspace extends retention."]
+    },
+    {
+      "id": "N08",
+      "category": "no_answer",
+      "required_facts": [],
+      "unsupported_parts": [{"id": "N08.compensation", "question_part": "Monetary compensation formula and amount for 45 minutes downtime", "construction": "The corpus describes operational behavior but contains no contractual compensation formula, rate or eligibility terms."}],
+      "required_behaviors": ["State that the formula and amount cannot be determined from the supplied documentation.", "Do not convert an operational alert interval or retry delay into an availability or compensation formula.", "Do not claim that lack of documentation proves there is no compensation."],
+      "forbidden_claims": ["Any specific compensation amount, percentage, formula or service-credit entitlement.", "Compensation is zero or unavailable as an established NacreRelay rule.", "A generic industry's SLA is NacreRelay's documented policy."],
+      "strict_empty_retrieval": "Record whether the retriever emits no sources as a separate diagnostic; the correct final refusal can still be grounded in limited evidence without this field passing."
+    }
+  ]
+}
