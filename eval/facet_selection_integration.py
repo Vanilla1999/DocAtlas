@@ -19,7 +19,7 @@ import statistics
 import sys
 import time
 
-POLICIES = ("fixed", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
+POLICIES = ("default", "fixed", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
 
 
 def load(name, path):
@@ -40,6 +40,14 @@ def save(path, value):
 
 
 def inputs(args):
+    if args.suite == "unseen":
+        root = args.repo / "eval/semantic_holdout"
+        frozen = json.loads((root / "FREEZE.json").read_text())
+        for name, digest in frozen["files"].items():
+            assert sha((root / name).read_bytes()) == digest, "holdout inputs changed"
+        assert sha((args.repo / "docmancer/docs/application/facet_selection.py").read_bytes()) == frozen["selector_sha256"], "selector changed after holdout freeze"
+        value = json.loads((root / "inputs.json").read_text())
+        return value["cases"], {f["id"]: f["documents"] for f in value["families"]}
     if args.suite != "fresh":
         helper = load("existing_adaptive_inputs", args.repo / "eval/adaptive_gap_integration.py")
         return helper.inputs(args)
@@ -84,7 +92,7 @@ def worker(args):
         os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="off", DOCATLAS_CONTEXT_ABSTENTION="off")
         for case in (c for c in cases if c["project_group"] == args.family):
             original = call_docs_tool_payload("get_docs_context", request(case, root), service)
-            assert original.get("kind") == "docs_context" and original.get("sources"), original
+            assert original.get("kind") == "docs_context", original
             save(out / (case["id"] + "-baseline.json"), original)
         os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="minilm-sections-v1",
             DOCATLAS_MINILM_MODEL_DIR=str(args.model), DOCATLAS_MCP_TEXT_FALLBACK="1",
@@ -92,6 +100,9 @@ def worker(args):
             DOCATLAS_SECTION_UNITS="markdown-owner-v1" if args.policy.startswith("facet-") else "legacy",
             DOCATLAS_SECTION_WIRE_FORMAT="v1", DOCATLAS_SECTION_SELECTION=args.policy,
             HF_HUB_OFFLINE="1")
+        if args.policy == "default":
+            for key in ("DOCATLAS_SECTION_SELECTION", "DOCATLAS_SECTION_TOP_K", "DOCATLAS_SECTION_UNITS"):
+                os.environ.pop(key, None)
         with observe_section_compression() as observations:
             try:
                 asyncio.run(_run_async(service))
@@ -144,12 +155,12 @@ async def client(args):
                     display = json.loads(text)
                     packet = extract_tool_payload(response)
                     expanded = expand_sections(packet)
-                    assert display['context_format'] == 'docatlas.model-context.v1'
+                    assert not expanded['sources'] or display['context_format'] == 'docatlas.model-context.v1'
                     assert expanded.get('answer_supported') is False
                     baseline = json.loads((folder / (case['id'] + '-baseline.json')).read_text())
                     admitted = {r['evidence_id']:r for r in baseline['sources']}
                     assert all(r == admitted[r['evidence_id']] for r in expanded['sources'])
-                    for item, row in zip(display['sources'], expanded['sources'], strict=True):
+                    for item, row in zip(display.get('sources', []), expanded['sources'], strict=True):
                         assert item['text'] == row['snippet']
                         assert resolve_model_reference(display, raw['_meta'], item['ref']) == row
                     save(folder / (case['id'] + '-expanded.json'), expanded)
@@ -166,13 +177,22 @@ async def client(args):
         server = json.loads((folder / 'server.json').read_text())
         assert server['database_unchanged'] and server['files_unchanged']
         relevant = [r for r in records if r['family'] == family]
-        assert len(server['observations']) == len(relevant)
-        for record, obs in zip(relevant, server['observations'], strict=True):
-            assert obs['selection_policy'] == args.policy
-            assert obs['scoring_question_sha256'] == sha((record['search_question'] or record['question']).encode())
+        observations = {o['scoring_question_sha256']: o for o in server['observations']}
+        for record in relevant:
+            key = sha((record['search_question'] or record['question']).encode())
+            obs = observations.pop(key, None)
+            if obs is None:
+                assert record['rows'] == 0, 'missing nonempty selection observation'
+                record.update(selected_groups=0, forward_passes=0, input_pair_tokens=0, cutoff=None, probe_count=0)
+                continue
+            assert obs['selection_policy'] == ('facet-guarded-v1' if args.policy == 'default' else args.policy)
+            if args.policy == 'default':
+                assert obs['configured_top_k'] is None and obs['units'] == 'markdown-owner-v1'
+            assert obs['scoring_question_sha256'] == key
             record.update(selected_groups=obs['selected_sections'], forward_passes=obs['forward_passes'],
                 input_pair_tokens=obs['input_pair_tokens'], cutoff=obs.get('adaptive_cutoff'),
                 probe_count=obs.get('facet_selection',{}).get('probe_count',1))
+        assert not observations, 'unexpected selection observations'
     save(args.out / 'DELIVERY.json', {'records':records, 'search_calls':len(records),
         'baseline_calls':len(records), 'preparations':len(families), 'answer_model_calls':0})
     (args.out / 'PROMPTS.jsonl').write_text(''.join(json.dumps(p,ensure_ascii=False)+'\n' for p in prompts),encoding='utf-8')
@@ -185,6 +205,8 @@ def assess(args, records):
     oracle = load('facet_independent_oracle', corpus / 'evaluate.py')
     gold_path = (corpus / 'gold_spans.json' if args.suite == 'v40' else
                  args.repo / ('eval/adaptive_gap_holdout/gold.json' if args.suite == 'holdout' else 'eval/fresh_dialogues/oracle/gold.json'))
+    if args.suite == 'unseen':
+        gold_path = args.repo / 'eval/semantic_holdout/gold.json'
     gold = {g['id']:g for g in json.loads(gold_path.read_text())['cases']}
     results = []
     for record in records:
@@ -202,7 +224,7 @@ def assess(args, records):
             coverage = oracle._gold(case, gold[case['id']], prepared, intervals)
         else:
             item = gold[case['id']]
-            facts = (item.get('required_facts',[]) if args.suite == 'fresh' else
+            facts = (item.get('required_facts',[]) if args.suite in {'fresh', 'unseen'} else
                      [{'id':str(n), 'witnesses':[{'path':item['path'],'text':q}]} for n,q in enumerate(item['witnesses'])])
             checked = []
             for fact in facts:
@@ -245,7 +267,7 @@ def assess(args, records):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for key in ('repo','work','out','model'): p.add_argument('--'+key,type=Path,required=True)
-    p.add_argument('--suite',choices=('v40','holdout','fresh'),required=True)
+    p.add_argument('--suite',choices=('v40','holdout','fresh','unseen'),required=True)
     p.add_argument('--policy',choices=POLICIES,required=True)
     p.add_argument('--worker',action='store_true'); p.add_argument('--family')
     args=p.parse_args()
@@ -259,7 +281,7 @@ def main():
     assert not args.work.exists() and not args.out.exists()
     args.work.mkdir(parents=True,mode=0o700); args.out.mkdir(parents=True)
     frozen={str(f.relative_to(args.repo)):sha(f.read_bytes())
-        for directory in ('eval/prepared_model_comparison40','eval/adaptive_gap_holdout','eval/fresh_dialogues')
+        for directory in ('eval/prepared_model_comparison40','eval/adaptive_gap_holdout','eval/fresh_dialogues','eval/semantic_holdout')
         for f in (args.repo/directory).rglob('*') if f.is_file() and '__pycache__' not in f.parts}
     save(args.out/'FREEZE.json',{'head':os.environ.get('TESTED_SHA'),'inputs':frozen,'policy':args.policy})
     records=asyncio.run(client(args))

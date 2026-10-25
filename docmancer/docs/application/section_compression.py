@@ -1,7 +1,7 @@
 """Opt-in CPU MiniLM-MaxP over complete *acquired* source sections.
 
-Source checks are upstream and downstream. No new retrieval, remote inference,
-semantic thresholds, source rewrites, or budget-driven removal of selected rows.
+Source checks are upstream and downstream. No new retrieval or remote inference.
+Selection is not semantic sufficiency; packet budget cuts are explicit.
 Default imports only the standard library. Model assets are provisioned explicitly.
 """
 from __future__ import annotations
@@ -93,8 +93,20 @@ def selection_limit() -> int:
     return int(value)
 
 
+def selection_policy() -> str:
+    """The enabled compressor uses facets; fixed-k is an explicit rollback only."""
+    from .facet_selection import POLICIES as FACET_POLICIES
+    value = os.environ.get("DOCATLAS_SECTION_SELECTION", "facet-guarded-v1")
+    if value not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"} | FACET_POLICIES:
+        raise SectionCompressionError("section_compression_invalid_selection_policy")
+    return value
+
+
 def selection_units() -> str:
-    value = os.environ.get("DOCATLAS_SECTION_UNITS", "legacy")
+    # One configuration selects the tested combination. Explicit legacy controls
+    # keep their old grouping; production no longer requires a second opt-in.
+    default = "markdown-owner-v1" if selection_policy().startswith("facet-") else "legacy"
+    value = os.environ.get("DOCATLAS_SECTION_UNITS", default)
     if value not in {"legacy", "markdown-owner-v1"}:
         raise SectionCompressionError("section_compression_invalid_units")
     return value
@@ -333,10 +345,8 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
-    policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
+    policy = selection_policy()
     from .facet_selection import POLICIES as FACET_POLICIES
-    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"} | FACET_POLICIES:
-        raise SectionCompressionError("section_compression_invalid_selection_policy")
     fixed_limit = selection_limit() if policy == "fixed" else None
     units = selection_units()
     sections = _sections(rows, snapshot)

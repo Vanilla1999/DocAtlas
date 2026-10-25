@@ -1,14 +1,14 @@
-name: Guarded global-margin facet installed MCP acceptance
+name: Reviewed facet defaults and semantic sufficiency acceptance
 on:
   push:
     branches: [experiment/facet-selection-20261025]
-    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/docs/application/section_compression.py', 'docmancer/docs/application/facet_selection.py', 'eval/facet_selection_integration.py', 'eval/compare_facet_selection.py']
+    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/**', 'eval/facet_selection_integration.py', 'eval/compare_facet_selection.py', 'eval/semantic*', 'eval/semantic_holdout/**', 'eval/compare_semantic_holdout.py']
   workflow_dispatch:
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: facet-live-${{ github.sha }}
+  group: semantic-selection-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   live:
@@ -17,34 +17,37 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [v40, holdout, fresh]
+        include:
+          - {suite: v40, policy: default}
+          - {suite: holdout, policy: default}
+          - {suite: fresh, policy: default}
+          - {suite: unseen, policy: fixed}
+          - {suite: unseen, policy: default}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Freeze exact product, data and independent expected witnesses
+      - name: Materialize preregistered source-only holdout; refuse any tuning
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/facet-evidence"
-          git fetch -q origin d6fc18256ffe91a1d26e03783642e521b056ce12 --depth=1
-          git fetch -q origin 2376217843bb2ac236195f9ccb05f7bba257c256 --depth=1
-          git fetch -q origin ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0 --depth=1
-          git diff --exit-code d6fc18256ffe91a1d26e03783642e521b056ce12 HEAD -- eval/prepared_model_comparison40 eval/adaptive_gap_holdout pyproject.toml uv.lock
-          git diff --exit-code 2376217843bb2ac236195f9ccb05f7bba257c256 HEAD -- eval/fresh_dialogues
-          git diff --exit-code ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0 HEAD -- docmancer ':!docmancer/docs/application/facet_selection.py'
+          python eval/semantic_holdout/build.py
+          git fetch -q origin cf8ed00b73449cbd6346d0433f40cb38bd5bd5c1 --depth=1
+          git diff --exit-code cf8ed00b73449cbd6346d0433f40cb38bd5bd5c1 HEAD -- docmancer/docs/application/facet_selection.py eval/prepared_model_comparison40 eval/adaptive_gap_holdout eval/fresh_dialogues pyproject.toml uv.lock
           git rev-parse HEAD > "$RUNNER_TEMP/facet-evidence/head.txt"
-          python -m compileall -q docmancer eval/facet_selection_integration.py eval/compare_facet_selection.py
+          python -m compileall -q docmancer eval/facet_selection_integration.py eval/semantic_selection_live.py
           git archive HEAD docmancer eval .github/workflows/adaptive-gap-live.yml | gzip > "$RUNNER_TEMP/facet-evidence/tested-source.tar.gz"
-      - name: Build installed wheel and provision verified local MiniLM
+      - name: Build exact installed wheel and verified local model
         run: |
           docker build -f eval/minilm_sections.Dockerfile -t docatlas-facet-base .
           docker build -t docatlas-facet-live - <<'DOCKER'
           FROM docatlas-facet-base
           RUN /opt/venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("cl100k_base")'
           DOCKER
-      - name: Real SQLite and local ONNX through public stdio under hard 1GB
+      - name: Actual stdio, real SQLite and MiniLM under hard 1GB
         env:
           SUITE: ${{ matrix.suite }}
+          POLICY: ${{ matrix.policy }}
         run: |
           set +e
           docker run --name facet-run --network none --cpus=2 \
@@ -53,7 +56,7 @@ jobs:
             -v "$RUNNER_TEMP/facet-evidence:/evidence" --entrypoint /opt/venv/bin/python \
             docatlas-facet-live -I /repo/eval/facet_selection_integration.py \
             --repo /repo --work /tmp/facet-study --out /evidence/run --model /model \
-            --suite "$SUITE" --policy facet-guarded-v1
+            --suite "$SUITE" --policy "$POLICY"
           rc=$?
           docker inspect facet-run > "$RUNNER_TEMP/facet-evidence/container.json"
           echo "$rc" > "$RUNNER_TEMP/facet-evidence/exit-code.txt"
@@ -61,7 +64,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: facet-live-${{ matrix.suite }}-facet-guarded-v1-${{ github.run_id }}
+          name: facet-live-${{ matrix.suite }}-${{ matrix.policy }}-${{ github.run_id }}
           path: ${{ runner.temp }}/facet-evidence/
           retention-days: 30
           if-no-files-found: error
@@ -74,7 +77,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Retrieve current candidate and exact already-executed controls
+      - name: Reuse exact executed fixed controls, not substitute predictions
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -84,12 +87,90 @@ jobs:
             gh run download 40215652617 --repo "$GITHUB_REPOSITORY" --name "facet-live-$suite-fixed-40215652617" --dir "$RUNNER_TEMP/baselines/$suite"
           done
           gh run download 40216114357 --repo "$GITHUB_REPOSITORY" --name facet-live-fresh-fixed-40216114357 --dir "$RUNNER_TEMP/baselines/fresh"
-      - name: Require complete documented evidence and lower visible token total
+      - name: Existing 64-question regression gate for the actual new default
         run: python eval/compare_facet_selection.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: facet-paired-${{ github.run_id }}
           path: ${{ runner.temp }}/paired/
+          retention-days: 30
+          if-no-files-found: error
+  unseen-compare:
+    needs: live
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Download both real holdout arms from this exact commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/unseen-arms" "$RUNNER_TEMP/unseen-paired"
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'facet-live-unseen-*' --dir "$RUNNER_TEMP/unseen-arms"
+      - name: Require no new fact losses, complete documented coverage and fewer visible tokens
+        run: python eval/compare_semantic_holdout.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: unseen-paired-${{ github.run_id }}
+          path: ${{ runner.temp }}/unseen-paired/
+          retention-days: 30
+          if-no-files-found: error
+  strong-model:
+    if: github.repository == 'Vanilla1999/DocAtlas' && github.ref == 'refs/heads/experiment/facet-selection-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Check explicitly configured provider access without exposing credentials
+        id: access
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          ready=bool(os.environ.get('OPENAI_API_KEY','').strip())
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'semantic-evidence'
+          out.mkdir()
+          (out/'ACCESS.json').write_text(json.dumps({'status':'configured' if ready else 'blocked','reason':None if ready else 'OPENAI_API_KEY_not_configured','provider_usage':None,'acceptance_passed':False}))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write('ready='+str(ready).lower()+'\n')
+          PY
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        if: steps.access.outputs.ready == 'true'
+        with:
+          python-version: '3.12'
+      - name: Build provider-neutral installed host and offline source process
+        if: steps.access.outputs.ready == 'true'
+        run: |
+          python eval/semantic_holdout/build.py
+          python -m pip install uv==0.9.25
+          uv sync --frozen --no-dev --no-install-project
+          uv build --wheel --out-dir "$RUNNER_TEMP/semantic-wheel"
+          uv pip install --python .venv/bin/python --no-deps "$RUNNER_TEMP"/semantic-wheel/*.whl
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-semantic-live .
+      - name: Same strong model, real answers and complete provider accounting
+        if: steps.access.outputs.ready == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DOCATLAS_STRONG_MODEL: ${{ vars.DOCATLAS_STRONG_MODEL }}
+        run: |
+          .venv/bin/python -I eval/semantic_selection_live.py --repo "$GITHUB_WORKSPACE" \
+            --out "$RUNNER_TEMP/semantic-evidence/run" --image docatlas-semantic-live
+      - name: Missing credentials are BLOCKED, not successful quality acceptance
+        if: steps.access.outputs.ready != 'true'
+        run: |
+          echo 'BLOCKED: configured strong-model credentials are absent. No replacement model, fabricated answers or estimated provider usage.'
+          exit 2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: semantic-provider-${{ github.run_id }}
+          path: ${{ runner.temp }}/semantic-evidence/
           retention-days: 30
           if-no-files-found: error

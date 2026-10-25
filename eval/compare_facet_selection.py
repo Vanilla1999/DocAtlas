@@ -7,7 +7,7 @@ from pathlib import Path
 
 def main():
     temp = Path(os.environ['RUNNER_TEMP'])
-    policy = 'facet-guarded-v1'
+    policy = 'default'
     summaries, rows, missing = {}, [], []
     for suite in ('v40', 'holdout', 'fresh'):
         candidate = temp / 'arms' / f'facet-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}' / 'run'
@@ -21,7 +21,10 @@ def main():
                     else '828bace5d111890dbb8830cc0c478d352f7564ca')
         assert a['head'] == expected and b['head'] == os.environ['GITHUB_SHA']
         assert b['policy'] == policy and b['integrity_pass'] == b['cases']
-        assert json.loads((baseline / 'FREEZE.json').read_text())['inputs'] == json.loads((candidate / 'FREEZE.json').read_text())['inputs']
+        old_inputs = json.loads((baseline / 'FREEZE.json').read_text())['inputs']
+        new_inputs = json.loads((candidate / 'FREEZE.json').read_text())['inputs']
+        prefixes = ('eval/prepared_model_comparison40/', 'eval/adaptive_gap_holdout/', 'eval/fresh_dialogues/')
+        assert old_inputs == {k: v for k, v in new_inputs.items() if k.startswith(prefixes)}
         summaries[suite] = {'fixed': a, 'candidate': b}
         aa = {r['case_id']: r for r in json.loads((baseline / 'ASSESSMENTS.json').read_text())}
         bb = {r['case_id']: r for r in json.loads((candidate / 'ASSESSMENTS.json').read_text())}
