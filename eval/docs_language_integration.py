@@ -217,8 +217,16 @@ async def client(args):
                         **request, "scope": "module", "module_path": "packages/other"})
                     assert not any(row["path_or_url"] == "docs/exports.md"
                                    for row in restricted.get("sources", [])), "translated lookup escaped module scope"
-                    await call("exports-no-patch", "get_docs_context", {
-                        **request, "context_format": "patch_context"}, "search_question_docs_only")
+                    # Public MCP may surface patch/schema rejection as a plain
+                    # protocol error rather than a JSON tool-result envelope.
+                    # In either form, it must never return a successful read.
+                    denied = await session.call_tool("get_docs_context", {
+                        **request, "context_format": "patch_context"})
+                    calls += 1
+                    assert denied.isError, "translated lookup must not authorize patch context"
+                    denied_wire = "\n".join(item.text for item in denied.content if item.type == "text")
+                    (out / "exports-no-patch-wire.txt").write_text(denied_wire, encoding="utf-8")
+                    assert denied_wire and all(fact not in denied_wire for fact in EXPORT_WITNESSES)
                     results.append({"group": group, "covered": len(EXPORT_WITNESSES),
                                     "required": len(EXPORT_WITNESSES), "source_sha256": sha(original),
                                     "wrong_scope_excluded": True, "patch_context_rejected": True})
