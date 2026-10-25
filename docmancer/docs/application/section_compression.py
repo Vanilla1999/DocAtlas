@@ -274,7 +274,7 @@ class _MiniLM:
             raise SectionCompressionError("section_compression_model_integrity")
         self.inputs = {entry.name for entry in self.session.get_inputs()}
 
-    def score(self, question: str, sections: list[_Section], *,
+    def score(self, question: str, sections: list[_Section], *, budget: dict | None = None,
               max_pairs: int = MAX_PAIRS, max_seconds: float = MAX_SECONDS) -> tuple[list[float], dict]:
         import numpy as np
         query = self.tokenizer.encode(question, add_special_tokens=False).ids
@@ -282,12 +282,14 @@ class _MiniLM:
             raise SectionCompressionError("section_compression_query_limit")
         width = 512 - len(query) - 3
         started = time.monotonic()
+        if budget is None:
+            budget = {"started": started, "pairs": 0}
         scores, calls, tokens = [], 0, 0
         for section in sections:
             passage = self.tokenizer.encode(section.text, add_special_tokens=False).ids
             best = -math.inf
             for offset in range(0, max(len(passage), 1), width):
-                if calls >= max_pairs or time.monotonic() - started > max_seconds:
+                if budget["pairs"] >= min(MAX_PAIRS, max_pairs) or time.monotonic() - budget["started"] > min(MAX_SECONDS, max_seconds):
                     raise SectionCompressionError("section_compression_resource_limit")
                 part = passage[offset:offset + width]
                 ids = [self.cls] + query + [self.sep] + part + [self.sep]
@@ -303,6 +305,7 @@ class _MiniLM:
                     raise SectionCompressionError("section_compression_invalid_score")
                 best = max(best, value)
                 calls += 1
+                budget["pairs"] += 1
                 tokens += len(ids)
             scores.append(best)
         return scores, {"forward_passes": calls, "input_pair_tokens": tokens,
@@ -332,12 +335,15 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
-    from .coverage_selection import POLICIES, select_coverage_sections
-    if policy in POLICIES:
+    from .facet_selection import POLICIES as FACET_POLICIES
+    from .semantic_sufficiency import POLICIES as SEMANTIC_POLICIES
+    from .coverage_selection import POLICIES as EXPERIMENT_POLICIES, select_coverage_sections
+    if policy in EXPERIMENT_POLICIES and policy not in FACET_POLICIES:
         return select_coverage_sections(payload, snapshot, retrieval, question, policy)
-    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"}:
+    if policy not in {"fixed", "adaptive-gap-v1", "adaptive-gap-b1-v1"} | FACET_POLICIES | SEMANTIC_POLICIES:
         raise SectionCompressionError("section_compression_invalid_selection_policy")
     fixed_limit = selection_limit() if policy == "fixed" else None
+    effective_policy = "facet-guarded-v1" if policy in SEMANTIC_POLICIES else policy
     units = selection_units()
     sections = _sections(rows, snapshot)
     configured = os.environ.get("DOCATLAS_MINILM_MODEL_DIR", "")
@@ -351,16 +357,30 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
             _ENGINE_PATH = None
             _ENGINE = _MiniLM(directory)
             _ENGINE_PATH = directory
-        scores, receipt = _ENGINE.score(question, sections)
+        budget = {"started": time.monotonic(), "pairs": 0}
+        scores, receipt = _ENGINE.score(question, sections, budget=budget)
+        if effective_policy in FACET_POLICIES:
+            from .facet_selection import plan
+            facet_order, facet_count = plan(
+                _ENGINE, question, sections, scores, receipt,
+                policy=effective_policy, snapshot=snapshot, budget=budget,
+            )
     ranking = sorted(range(len(sections)), key=lambda i: (-scores[i], sections[i].key))
     if policy == "fixed":
         requested_k = min(fixed_limit, len(sections))
+    elif effective_policy in FACET_POLICIES:
+        ranking, requested_k = facet_order, facet_count
     else:
         requested_k, cutoff = _adaptive_cutoff(
             [scores[i] for i in ranking],
             buffer=1 if policy == "adaptive-gap-b1-v1" else 0,
         )
         receipt["adaptive_cutoff"] = cutoff
+    if policy in SEMANTIC_POLICIES:
+        from .semantic_sufficiency import review
+        ranking, requested_k, semantic_receipt = review(
+            question, rows, sections, snapshot, ranking, requested_k, policy)
+        receipt["semantic_sufficiency"] = semantic_receipt
     from .experimental_context_finalization import _rebuild, _refresh_estimate
 
     def project(prefix_k: int):
@@ -429,12 +449,17 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         selected_rows=len(retained), selected_sections=top_k, top_k=top_k,
         units=units, selected_evidence_ids=[r["evidence_id"] for r in retained],
     )
+    if policy in SEMANTIC_POLICIES:
+        receipt["semantic_sufficiency"]["delivered_groups"] = top_k
+        receipt["semantic_sufficiency"]["budget_limited"] = top_k < requested_k
+        receipt["semantic_sufficiency"]["final_semantic_completeness"] = "unverified"
     retrieval.setdefault("retrieval_diagnostics", {})["section_compression"] = deepcopy(receipt)
     observed = _OBSERVER.get()
     if observed is not None:
         detail = deepcopy(receipt)
         detail["ranked_sections"] = [
             {"rank": rank, "score": scores[index], "selected": rank <= top_k,
+             "rank_meaning": "selection_priority" if effective_policy in FACET_POLICIES else "global_score",
              "path": sections[index].rows[0].get("path_or_url"),
              "section": sections[index].rows[0].get("section"),
              "scoring_text_sha256": hashlib.sha256(sections[index].text.encode()).hexdigest(),
