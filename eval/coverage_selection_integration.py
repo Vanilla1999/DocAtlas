@@ -19,7 +19,7 @@ import sys
 import time
 
 POLICIES = ("fixed", "adaptive-gap-b1-v1", "mmr-budget-v1", "facet-cover-v1", "facet-guarded-v1",
-            "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1", "facet-bundled-cover-v1")
+            "facet-cover-v2", "facet-guarded-v2", "facet-bundled-v1", "facet-bundled-cover-v1", "semantic-audit-v1", "semantic-rescue-v1", "semantic-prune-v1")
 
 
 def load(name, path):
@@ -97,7 +97,8 @@ def worker(args):
         os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="minilm-sections-v1",
             DOCATLAS_MINILM_MODEL_DIR=str(args.model), DOCATLAS_MCP_MODEL_VIEW="1",
             DOCATLAS_MCP_TEXT_FALLBACK="1", DOCATLAS_SECTION_TOP_K="5",
-            DOCATLAS_SECTION_UNITS="legacy", DOCATLAS_SECTION_WIRE_FORMAT="v1",
+            DOCATLAS_SECTION_UNITS="markdown-owner-v1" if (args.policy=="facet-guarded-v1" or args.policy.startswith("semantic-")) else "legacy",
+            DOCATLAS_SUFFICIENCY_MODEL_DIR=str(args.qa_model), DOCATLAS_SECTION_WIRE_FORMAT="v1",
             DOCATLAS_SECTION_SELECTION=args.policy, HF_HUB_OFFLINE="1")
         with observe_section_compression() as observations:
             try:
@@ -126,7 +127,7 @@ async def client(args):
         params = StdioServerParameters(command=sys.executable, args=["-I", str(Path(__file__).resolve()),
             "--worker", "--family", family, "--suite", args.suite, "--policy", args.policy,
             "--repo", str(args.repo), "--work", str(args.work), "--out", str(args.out),
-            "--model", str(args.model)], env=dict(os.environ))
+            "--model", str(args.model), "--qa-model", str(args.qa_model)], env=dict(os.environ))
         with (out / "stderr.log").open("w") as err:
           async with stdio_client(params, errlog=err) as (read, write):
             async with ClientSession(read, write, read_timeout_seconds=timedelta(seconds=180)) as session:
@@ -172,15 +173,21 @@ async def client(args):
                     records.append(record)
         server = json.loads((out / "server.json").read_text())
         assert server["database_unchanged"] and server["files_unchanged"]
-        assert server["rss_peak_bytes"] <= 1_000_000_000
+        assert server["rss_peak_bytes"] <= 1_500_000_000
         good = [r for r in records if r["family"] == family and not r["runtime_error"]]
         assert len(server["observations"]) == len(good)
         for record, obs in zip(good, server["observations"], strict=True):
             assert obs["candidate_rows"] == record["candidate_rows"]
             assert obs["selection_policy"] == args.policy
             assert obs["scoring_question_sha256"] == digest((record["search_question"] or record["question"]).encode())
+            semantic = obs.get("semantic_sufficiency") or {}
             record.update(groups=obs["selected_sections"], forward_passes=obs["forward_passes"],
-                probe_count=obs.get("selection_diagnostics", {}).get("probe_count", 1))
+                probe_count=obs.get("selection_diagnostics", {}).get("probe_count", 1),
+                semantic_status=semantic.get("status"), semantic_added=semantic.get("added_groups", 0),
+                semantic_removed=semantic.get("removed_groups", 0),
+                semantic_qa_seconds=semantic.get("runtime_seconds", 0),
+                semantic_probes_scored=semantic.get("probes_scored", 0),
+                semantic_unknown=len(semantic.get("probes_unscored", [])))
     save(args.out / "DELIVERY.json", records)
     (args.out / "PROMPTS.jsonl").write_text("".join(json.dumps(p, ensure_ascii=False) + "\n" for p in prompts), encoding="utf-8")
     return records
@@ -242,6 +249,9 @@ def assess(args, records):
         "seconds_total": sum(r["seconds"] for r in records),
         "seconds_median": statistics.median(r["seconds"] for r in records),
         "forward_passes": sum(r.get("forward_passes", 0) for r in records),
+        "qa_seconds": sum(r.get("semantic_qa_seconds", 0) for r in records),
+        "semantic_gap_cases": [r["case_id"] for r in records if r.get("semantic_status") == "candidate_gap"],
+        "qa_probe_count": sum(r.get("semantic_probes_scored", 0) for r in records),
         "stdio_search_calls": len(records), "baseline_public_calls": len(records), "language_calls": len(families),
         "answer_model_calls": 0, "provider_usage": None,
         "boundary": "installed wheel; real SQLite, CPU MiniLM, public stdio; evidence not final-answer accuracy"}
@@ -253,13 +263,14 @@ def assess(args, records):
 
 def main():
     p = argparse.ArgumentParser()
-    for name in ("repo", "work", "out", "model"):
+    for name in ("repo", "work", "out", "model", "qa-model"):
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--suite", choices=("v40", "new16", "fresh8"), required=True)
     p.add_argument("--policy", choices=POLICIES, required=True)
     p.add_argument("--worker", action="store_true")
     p.add_argument("--family")
     args = p.parse_args()
+    args.qa_model = args.qa_model.resolve()
     if args.worker:
         return worker(args)
     import docmancer
