@@ -1,8 +1,8 @@
-name: Guarded facet selection installed MCP acceptance
+name: Conservative facet selection installed MCP acceptance
 on:
   push:
     branches: [experiment/facet-selection-20261025]
-    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/docs/application/section_compression.py', 'docmancer/docs/application/facet_selection.py', 'eval/facet_selection_integration.py']
+    paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/docs/application/section_compression.py', 'docmancer/docs/application/facet_selection.py', 'eval/facet_selection_integration.py', 'eval/compare_facet_selection.py']
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,12 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         suite: [v40, holdout, fresh]
-        policy: [facet-guarded-v1]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Freeze exact source and unchanged regression inputs
+      - name: Freeze exact product, data and independent expected witnesses
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/facet-evidence"
@@ -34,19 +33,18 @@ jobs:
           git diff --exit-code 2376217843bb2ac236195f9ccb05f7bba257c256 HEAD -- eval/fresh_dialogues
           git diff --exit-code ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0 HEAD -- docmancer ':!docmancer/docs/application/facet_selection.py'
           git rev-parse HEAD > "$RUNNER_TEMP/facet-evidence/head.txt"
-          python -m compileall -q docmancer eval/facet_selection_integration.py
+          python -m compileall -q docmancer eval/facet_selection_integration.py eval/compare_facet_selection.py
           git archive HEAD docmancer eval .github/workflows/adaptive-gap-live.yml | gzip > "$RUNNER_TEMP/facet-evidence/tested-source.tar.gz"
-      - name: Build exact installed wheel and provision frozen MiniLM and tokenizers
+      - name: Build installed wheel and provision verified local MiniLM
         run: |
           docker build -f eval/minilm_sections.Dockerfile -t docatlas-facet-base .
           docker build -t docatlas-facet-live - <<'DOCKER'
           FROM docatlas-facet-base
           RUN /opt/venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("cl100k_base")'
           DOCKER
-      - name: Real SQLite and CPU ONNX through public stdio under hard 1GB
+      - name: Real SQLite and local ONNX through public stdio under hard 1GB
         env:
           SUITE: ${{ matrix.suite }}
-          POLICY: ${{ matrix.policy }}
         run: |
           set +e
           docker run --name facet-run --network none --cpus=2 \
@@ -55,7 +53,7 @@ jobs:
             -v "$RUNNER_TEMP/facet-evidence:/evidence" --entrypoint /opt/venv/bin/python \
             docatlas-facet-live -I /repo/eval/facet_selection_integration.py \
             --repo /repo --work /tmp/facet-study --out /evidence/run --model /model \
-            --suite "$SUITE" --policy "$POLICY"
+            --suite "$SUITE" --policy facet-margin-envelope-v1
           rc=$?
           docker inspect facet-run > "$RUNNER_TEMP/facet-evidence/container.json"
           echo "$rc" > "$RUNNER_TEMP/facet-evidence/exit-code.txt"
@@ -63,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: facet-live-${{ matrix.suite }}-${{ matrix.policy }}-${{ github.run_id }}
+          name: facet-live-${{ matrix.suite }}-facet-margin-envelope-v1-${{ github.run_id }}
           path: ${{ runner.temp }}/facet-evidence/
           retention-days: 30
           if-no-files-found: error
@@ -73,7 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Retrieve exact current candidate and previously executed fixed controls
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Retrieve current candidate and exact already-executed controls
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -83,47 +84,8 @@ jobs:
             gh run download 40215652617 --repo "$GITHUB_REPOSITORY" --name "facet-live-$suite-fixed-40215652617" --dir "$RUNNER_TEMP/baselines/$suite"
           done
           gh run download 40216114357 --repo "$GITHUB_REPOSITORY" --name facet-live-fresh-fixed-40216114357 --dir "$RUNNER_TEMP/baselines/fresh"
-      - name: Require complete documented coverage and lower total visible tokens
-        run: |
-          python - <<'PY'
-          import json, pathlib, os
-          temp=pathlib.Path(os.environ['RUNNER_TEMP'])
-          summaries={}; rows=[]; missing=[]
-          for suite in ('v40','holdout','fresh'):
-              candidate=temp/'arms'/f'facet-live-{suite}-facet-guarded-v1-{os.environ["GITHUB_RUN_ID"]}'/'run'
-              baseline=temp/'baselines'/suite/'run'
-              if not (candidate/'SUMMARY.json').exists():
-                  missing.append(suite); continue
-              a=json.loads((baseline/'SUMMARY.json').read_text())
-              b=json.loads((candidate/'SUMMARY.json').read_text())
-              expected='ed61b4d31a3f2d1e8ca72f950fe1ba9d3fba65f0' if suite=='fresh' else '828bace5d111890dbb8830cc0c478d352f7564ca'
-              assert a['head']==expected and b['head']==os.environ['GITHUB_SHA']
-              assert json.loads((baseline/'FREEZE.json').read_text())['inputs']==json.loads((candidate/'FREEZE.json').read_text())['inputs']
-              summaries[suite]={'fixed':a,'guarded':b}
-              aa={r['case_id']:r for r in json.loads((baseline/'ASSESSMENTS.json').read_text())}
-              bb={r['case_id']:r for r in json.loads((candidate/'ASSESSMENTS.json').read_text())}
-              assert aa.keys()==bb.keys()
-              for cid in aa:
-                  a,b=aa[cid],bb[cid]
-                  assert a['question']==b['question'] and a['search_question']==b['search_question']
-                  rows.append({'suite':suite,'case_id':cid,'answerability':a['answerability'],
-                    'fixed_pass':a['passed'],'guarded_pass':b['passed'],'fixed_tokens':a['tokens'],
-                    'guarded_tokens':b['tokens'],'fixed_groups':a['selected_groups'],'guarded_groups':b['selected_groups'],
-                    'new_loss':a['answerability']!='unanswerable' and a['passed'] and not b['passed']})
-          totals={p:{'tokens':sum(r[p+'_tokens'] for r in rows),
-                     'documented_pass':sum(r[p+'_pass'] for r in rows if r['answerability']!='unanswerable'),
-                     'documented_total':sum(r['answerability']!='unanswerable' for r in rows)} for p in ('fixed','guarded')}
-          passed=(not missing and len(rows)==64 and not any(r['new_loss'] for r in rows)
-                  and totals['guarded']['documented_pass']==totals['guarded']['documented_total']
-                  and totals['guarded']['tokens']<totals['fixed']['tokens'])
-          result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'cases':rows,'totals':totals,
-                  'missing_arms':missing,'regression_gate_passed':passed,
-                  'answer_model_calls':0,'provider_usage':None,'default_rollout':False,
-                  'boundary':'Development-selected margin; 64 known regression questions, not unseen generalization. First retrieval evidence, not final answers or total dialogue cost.'}
-          (temp/'paired/PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-          print(json.dumps({k:v for k,v in result.items() if k!='cases'},ensure_ascii=False,indent=2))
-          assert passed, 'documented coverage, source execution or visible-token acceptance failed'
-          PY
+      - name: Require complete documented evidence and lower visible token total
+        run: python eval/compare_facet_selection.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

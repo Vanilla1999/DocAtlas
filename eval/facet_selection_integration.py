@@ -19,7 +19,7 @@ import statistics
 import sys
 import time
 
-POLICIES = ("fixed", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1")
+POLICIES = ("fixed", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
 
 
 def load(name, path):

@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import re
 
-POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1"})
+POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1"})
 MAX_PROBES = 16
 SCORE_MARGIN = 1.0  # development heuristic in frozen-model logits, NOT calibrated probability
 CAPSULE_TOKENS = 512  # maximum admitted source-text cost of one parent, not top-k
@@ -146,10 +146,12 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     """Select query-facet candidates, not a semantically certified answer set.
 
     MAX keeps exact best matches; ENVELOPE adds short-parent siblings.
-    GUARDED keeps near-best alternatives and expands only predominantly selected
-    short parents. Its margin and structural density are development heuristics.
+    GUARDED restricts parent expansion and uses clause-aware splitting.
+    MARGIN-ENVELOPE combines original literal probes, near-best alternatives,
+    and complete acquired short-parent groups. All remain experimental.
     """
     guarded = policy == "facet-guarded-v1"
+    margin = policy in {"facet-guarded-v1", "facet-margin-envelope-v1"}
     probes, fallback = question_probes(question, contextual=guarded)
     matrix = [global_scores]
     if not fallback:
@@ -169,12 +171,13 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
         for i, score in enumerate(scores):
             if score == maximum:
                 wins[i].append(p)
-            if maximum - score <= (SCORE_MARGIN if guarded else 0.0):
+            if maximum - score <= (SCORE_MARGIN if margin else 0.0):
                 support[i].append(p)
     seeds = {i for i in support if support[i]}
     chosen = set(range(len(sections))) if fallback else set(seeds)
     expanded = {}
-    if not fallback and policy in {"facet-envelope-v1", "facet-guarded-v1"}:
+    envelopes = {"facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1"}
+    if not fallback and policy in envelopes:
         capsules = _capsules(sections, snapshot)
         for index in sorted(seeds):
             neighbors = capsules.get(index, ())
@@ -189,10 +192,10 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     ordered += [i for i in rank if i not in chosen]
     receipt["facet_selection"] = {
         "version": policy, "completeness": "unassessed",
-        "score_margin": SCORE_MARGIN if guarded else 0.0,
+        "score_margin": SCORE_MARGIN if margin else 0.0,
         "margin_is_calibrated_probability": False,
         "probe_count": len(matrix), "planned_probe_count": len(probes),
-        "fallback": fallback, "capsule_tokens": CAPSULE_TOKENS if policy in {"facet-envelope-v1", "facet-guarded-v1"} else None,
+        "fallback": fallback, "capsule_tokens": CAPSULE_TOKENS if policy in envelopes else None,
         "probes": [{"text": p, "sha256": hashlib.sha256(p.encode()).hexdigest()}
                    for p in probes[:len(matrix)]],
         "scores": matrix,
