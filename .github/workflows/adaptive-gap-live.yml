@@ -1,4 +1,4 @@
-name: Facet selection paired installed MCP experiment
+name: Facet selection fresh fixture correction (same product)
 on:
   push:
     branches: [experiment/facet-selection-20261025]
@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [v40, holdout, fresh]
+        suite: [fresh]
         policy: [fixed, adaptive-gap-b1-v1, facet-max-v1, facet-envelope-v1]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
@@ -85,7 +85,7 @@ jobs:
           out=pathlib.Path(os.environ['RUNNER_TEMP'])/'paired'
           policies=('fixed','adaptive-gap-b1-v1','facet-max-v1','facet-envelope-v1')
           summaries={}; assessments={}; missing=[]
-          for suite in ('v40','holdout','fresh'):
+          for suite in ('fresh',):
               for policy in policies:
                   folder=root/f'facet-live-{suite}-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
                   if not (folder/'SUMMARY.json').exists():
@@ -98,7 +98,7 @@ jobs:
           for policy in policies:
               arms=[s for k,s in summaries.items() if k.endswith('/'+policy)]
               losses=[]
-              for suite in ('v40','holdout','fresh'):
+              for suite in ('fresh',):
                   if (suite,'fixed') not in assessments or (suite,policy) not in assessments: continue
                   a,b=assessments[suite,'fixed'],assessments[suite,policy]
                   assert a.keys()==b.keys()
@@ -119,11 +119,11 @@ jobs:
           result={'head':os.environ['GITHUB_SHA'],'summaries':summaries,'totals':totals,
                   'missing_arms':missing,'eligible_on_regression_only':eligible,'candidate':winner,
                   'answer_model_calls':0,'provider_usage':None,'default_rollout':False,
-                  'boundary':'64 previously inspected regression questions; first retrieval evidence, not final answer quality or total dialogue cost'}
+                  'boundary':'8 frozen fresh regression questions; other 56 use unchanged product run 40215652617; first retrieval evidence, not final answer quality or total dialogue cost'}
           (out/'PAIRED.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(result,ensure_ascii=False,indent=2))
           assert not missing, 'incomplete real-MCP execution'
-          assert all(t['cases']==64 for t in totals.values())
+          assert all(t['cases']==8 for t in totals.values())
           assert winner is not None, 'neither new selector met documented non-regression and lower visible-context cost'
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

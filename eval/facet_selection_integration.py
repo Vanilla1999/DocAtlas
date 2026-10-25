@@ -49,7 +49,7 @@ def inputs(args):
     cases = [{**c, "project_group": "nacrerelay", "answerability": categories.get(c["id"], "within_budget")}
              for c in cases]
     docs = {p.relative_to(root / "project").as_posix(): p.read_text(encoding="utf-8")
-            for p in (root / "project").rglob("*") if p.is_file()}
+            for p in (root / "project").rglob("*.md") if p.is_file()}
     return cases, {"nacrerelay": docs}
 
 
@@ -70,6 +70,10 @@ def worker(args):
     cases, families = inputs(args)
     root, out = args.work / args.family / "project", args.out / args.family
     runtime.write_project(root, families[args.family])
+    if args.suite == "fresh":
+        # Match the frozen runner: project marker is not a documentation entry.
+        marker = args.repo / "eval/fresh_dialogues/fixtures/project/pyproject.toml"
+        (root / "pyproject.toml").write_bytes(marker.read_bytes())
     catalog_path = root / "docatlas.project-docs.yaml"
     catalog = yaml.safe_load(catalog_path.read_text())
     catalog["documentation_languages"] = {p: ["en"] for p in families[args.family] if p.endswith('.md')}
