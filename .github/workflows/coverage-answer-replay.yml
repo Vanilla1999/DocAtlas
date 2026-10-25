@@ -1,0 +1,54 @@
+name: Bounded coverage answer replay
+on:
+  push:
+    branches: [eval/coverage-answer-replay-20261025]
+    paths: [eval/coverage_answer_replay.py, .github/workflows/coverage-answer-replay.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: coverage-answer-replay-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  answer-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Obtain completed, immutable public-MCP contexts without rerunning retrieval
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/replay-inputs" "$RUNNER_TEMP/replay-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/replay-evidence/replay-head.txt"
+          gh run watch 40222270221 --repo "$GITHUB_REPOSITORY" --exit-status --interval 15
+          gh run download 40222270221 --repo "$GITHUB_REPOSITORY" --name coverage-comparison-40222270221 --dir "$RUNNER_TEMP/replay-evidence/comparison"
+          for run in 40219786995 40221157968 40222270221; do
+            gh run download "$run" --repo "$GITHUB_REPOSITORY" --pattern 'coverage-fresh8-*' --dir "$RUNNER_TEMP/replay-inputs"
+          done
+      - name: Install HTTP client, no credentials in installation environment
+        run: |
+          python -m pip install httpx==0.28.1
+          python -m py_compile eval/coverage_answer_replay.py
+      - name: At most 24 one-shot requests, pinned repository model, no retries or substitutions
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python eval/coverage_answer_replay.py --artifacts "$RUNNER_TEMP/replay-inputs" \
+            --comparison "$RUNNER_TEMP/replay-evidence/comparison/PAIRED.json" \
+            --candidate-run 40222270221 --out "$RUNNER_TEMP/replay-evidence/answers"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: coverage-answer-replay-${{ github.run_id }}
+          path: ${{ runner.temp }}/replay-evidence/
+          retention-days: 30
+          if-no-files-found: error
