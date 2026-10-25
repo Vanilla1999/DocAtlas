@@ -1,0 +1,35 @@
+{
+  "boundary": "Post-delivery oracle only. Alternative witnesses denote manually authored equivalent source assertions, not model predictions.",
+  "cases": [
+    {"id":"P01","answerability":"within_budget","claims":[
+      {"id":"P01.1","witness_sets":[[{"path":"README.md","text":"Records whose commit was acknowledged survive a worker restart."}],[{"path":"README.md","text":"A worker restart preserves records with an acknowledged commit."}]]},
+      {"id":"P01.2","witness_sets":[[{"path":"README.md","text":"The page cache may be discarded after restart; cached data without a commit acknowledgement is not durable."}]]}
+    ]},
+    {"id":"P02","answerability":"within_budget","claims":[
+      {"id":"P02.1","witness_sets":[[{"path":"README.md","text":"The public endpoint listens on port 8121."}],[{"path":"README.md","text":"Port 8121 is used by the public endpoint."}]]},
+      {"id":"P02.2","witness_sets":[[{"path":"README.md","text":"The administration endpoint listens on port 8122."}]]}
+    ]},
+    {"id":"P03","answerability":"within_budget","claims":[
+      {"id":"P03.1","witness_sets":[[{"path":"README.md","text":"The commit acknowledgement is sent only after the journal flush completes."}]]},
+      {"id":"P03.2","witness_sets":[[{"path":"README.md","text":"The checkpoint moves only after acknowledgement is confirmed."}]]},
+      {"id":"P03.3","witness_sets":[[{"path":"README.md","text":"Moving the checkpoint before acknowledgement is confirmed can skip an uncommitted record."}]]}
+    ]},
+    {"id":"P04","answerability":"within_budget","claims":[
+      {"id":"P04.1","witness_sets":[[{"path":"README.md","text":"An access link remains valid for 14 minutes."}],[{"path":"README.md","text":"The normal lifetime of an access link is 14 minutes."}]]},
+      {"id":"P04.2","witness_sets":[[{"path":"README.md","text":"Revocation invalidates the link immediately, even before the 14-minute expiry."}]]}
+    ]},
+    {"id":"P05","answerability":"within_budget","claims":[
+      {"id":"P05.1","witness_sets":[[{"path":"README.md","text":"Production snapshots are retained for 21 days."}]]},
+      {"id":"P05.2","witness_sets":[[{"path":"README.md","text":"Staging snapshots are retained for 2 days, not 21 days."}]]},
+      {"id":"P05.3","witness_sets":[[{"path":"README.md","text":"The production retention rule does not apply to staging snapshots."}]]}
+    ]},
+    {"id":"P06","answerability":"within_budget","claims":[
+      {"id":"P06.1","witness_sets":[[{"path":"README.md","text":"A successful checksum verification permits retry of the same immutable payload."}],[{"path":"README.md","text":"Retrying the same immutable payload is permitted when checksum verification succeeds."}]]},
+      {"id":"P06.2","witness_sets":[[{"path":"README.md","text":"A failed checksum verification does not permit retry; an operator must inspect the payload."}]]}
+    ]},
+    {"id":"P07","answerability":"partial","claims":[
+      {"id":"P07.1","witness_sets":[[{"path":"README.md","text":"Submit an invoice within 17 days after the billing period closes."}]]}
+    ]},
+    {"id":"P08","answerability":"unanswerable","claims":[]}
+  ]
+}
