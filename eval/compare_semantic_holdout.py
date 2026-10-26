@@ -7,12 +7,24 @@ from pathlib import Path
 def main():
     root=Path(os.environ['RUNNER_TEMP'])
     values={}
-    for policy in ('fixed','default'):
+    for policy in ('fixed','facet-guarded-v1','default'):
         folder=root/'unseen-arms'/f'facet-live-unseen-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
         values[policy]={'summary':json.loads((folder/'SUMMARY.json').read_text()),
                         'rows':json.loads((folder/'ASSESSMENTS.json').read_text()),
                         'freeze':json.loads((folder/'FREEZE.json').read_text())}
-    a,b=values['fixed'],values['default']
+    a,b=values['fixed'],values['facet-guarded-v1']
+    # The restored default is independently required to behave as the old fixed policy.
+    prior=values['default']
+    assert prior['freeze']['inputs']==a['freeze']['inputs']
+    assert prior['summary']['head']==a['summary']['head']
+    assert prior['summary']['cases']==a['summary']['cases']
+    old_rows={r['case_id']:r for r in a['rows']}
+    restored_rows={r['case_id']:r for r in prior['rows']}
+    assert old_rows.keys()==restored_rows.keys()
+    for cid in old_rows:
+        assert old_rows[cid]['question']==restored_rows[cid]['question']
+        assert old_rows[cid]['selected_groups']==restored_rows[cid]['selected_groups']
+        assert old_rows[cid]['coverage']['facts']==restored_rows[cid]['coverage']['facts']
     assert a['freeze']['inputs']==b['freeze']['inputs']
     assert a['summary']['head']==b['summary']['head']==os.environ['GITHUB_SHA']
     old={r['case_id']:r for r in a['rows']}

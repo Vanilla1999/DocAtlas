@@ -88,7 +88,7 @@ jobs:
             gh run download 40215652617 --repo "$GITHUB_REPOSITORY" --name "facet-live-$suite-fixed-40215652617" --dir "$RUNNER_TEMP/baselines/$suite"
           done
           gh run download 40216114357 --repo "$GITHUB_REPOSITORY" --name facet-live-fresh-fixed-40216114357 --dir "$RUNNER_TEMP/baselines/fresh"
-      - name: Existing 64-question regression gate for the actual new default
+      - name: Existing 64-question gate for explicit opt-in facet selection
         run: python eval/compare_facet_selection.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Download both real holdout arms from this exact commit
+      - name: Download actual old-default and opt-in holdout arms from this commit
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
