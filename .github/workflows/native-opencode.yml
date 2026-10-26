@@ -1,0 +1,59 @@
+name: Native OpenCode evidence delivery (no model billing)
+on:
+  push:
+    branches: [fix/native-opencode-delivery-20261026]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-opencode-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  installed-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          repository: anomalyco/opencode
+          ref: a517687fde98a7329ada3ae644a01a9fc6c4e99e
+          path: upstream-opencode
+          persist-credentials: false
+      - name: Freeze original documents, questions, gold and dependencies
+        run: |
+          set -euo pipefail
+          git fetch -q origin 439815771b96edc77a12f42f90f1fecb35f5e5d7 --depth=1
+          git diff --exit-code 439815771b96edc77a12f42f90f1fecb35f5e5d7 HEAD -- \
+            eval/prepared_model_comparison40 pyproject.toml uv.lock
+          mkdir -p "$RUNNER_TEMP/native-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/native-evidence/head.txt"
+          python -m compileall -q docmancer eval/native_opencode_integration.py
+          git archive HEAD docmancer eval/native_opencode_integration.py eval/native_opencode_client.ts \
+            .github/workflows/native-opencode.yml | gzip > "$RUNNER_TEMP/native-evidence/tested-source.tar.gz"
+      - name: Install exact wheel and pinned OpenCode v2.1.2 runtime, no provider key
+        run: |
+          python -m pip install uv==0.9.25
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/native-venv" uv sync --frozen --no-dev --no-install-project
+          uv build --wheel --out-dir "$RUNNER_TEMP/native-wheel"
+          uv pip install --python "$RUNNER_TEMP/native-venv/bin/python" --no-deps "$RUNNER_TEMP"/native-wheel/*.whl
+          npm install -g bun@1.4.2
+          cd upstream-opencode
+          bun install --frozen-lockfile
+      - name: One real 15-document catalog; native stdio delivery and real OpenCode truncator
+        env:
+          TESTED_SHA: ${{ github.sha }}
+          HF_HUB_OFFLINE: '1'
+        run: |
+          "$RUNNER_TEMP/native-venv/bin/python" -I eval/native_opencode_integration.py \
+            --repo "$GITHUB_WORKSPACE" --work "$RUNNER_TEMP/native-work" \
+            --out "$RUNNER_TEMP/native-evidence/run" --opencode "$GITHUB_WORKSPACE/upstream-opencode"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-opencode-${{ github.run_id }}
+          path: ${{ runner.temp }}/native-evidence/
+          retention-days: 30
+          if-no-files-found: error
