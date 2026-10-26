@@ -1,5 +1,4 @@
-// Integration executed INSIDE the pinned OpenCode v2.1.2 checkout. Its real
-// MCP normalizer and output truncator are not reimplemented or mocked here.
+// Runs INSIDE pinned OpenCode v2.1.2. Real MCP and ToolOutput, no model calls.
 import fs from "node:fs/promises"
 import path from "node:path"
 import assert from "node:assert/strict"
@@ -19,11 +18,10 @@ const outputLayer=AppNodeBuilder.build(LayerNode.group([ToolOutput.node,FSUtil.n
 ])
 const work=Effect.gen(function*(){
   const output=yield* ToolOutput.Service
-  for(const arm of ["legacy","delivery-only","ranked"]){
+  for(const arm of ["delivery-only","guarded"]){
     const environment={...protocol.registration.environment,
-      DOCATLAS_CONTEXT_COMPRESSION:"off",
-      DOCATLAS_MCP_PRESENTATION:arm==="legacy"?"legacy":"opencode-v1",
-      ...(arm==="ranked"?{DOCATLAS_NATIVE_SELECTION:"lexical-v1"}:{})}
+      DOCATLAS_CONTEXT_COMPRESSION:"off",DOCATLAS_MCP_PRESENTATION:"opencode-v1",
+      ...(arm==="delivery-only"?{DOCATLAS_NATIVE_SELECTION:"preserve"}:{})}
     const connection=yield* McpClient.connect("docatlas",{type:"local",
       command:[protocol.cli,"mcp","docs-serve"],environment},protocol.root)
     const tools=yield* connection.tools()
@@ -32,8 +30,6 @@ const work=Effect.gen(function*(){
       const reply=yield* connection.callTool({name:"get_docs_context",args:{
         question:item.question,project_path:protocol.root,scope:"project"}})
       assert(!reply.isError)
-      // OpenCode's actual adapter drops MCP _meta. No full machine packet
-      // should survive in content/structured; there is no SDK ledger dependency.
       const text=reply.content.filter(c=>c.type==="text").map(c=>(c as any).text).join("\n")
       const normalized=yield* output.truncate({content:[{type:"text",text}]})
       const visible=normalized.content.filter(c=>c.type==="text").map(c=>(c as any).text).join("\n")
@@ -41,19 +37,16 @@ const work=Effect.gen(function*(){
                  output_path:normalized.metadata?.outputPath??null,model_visible_text:visible,
                  meta_retained:"_meta" in reply,structured_retained:reply.structured!==undefined}
       results.push(row)
-      if(arm!=="legacy"){
-        assert.equal(row.truncated,false,item.id)
-        assert.equal(row.output_path,null)
-        assert.equal(row.meta_retained,false)
-        assert.equal(row.structured_retained,false)
-        assert.equal(visible,text)
-        assert(!visible.includes('"content_sha256"')&&!visible.includes('"source_uri"'))
-      }
+      assert.equal(row.truncated,false,item.id)
+      assert.equal(row.output_path,null)
+      assert.equal(row.meta_retained,false)
+      assert.equal(row.structured_retained,false)
+      assert.equal(visible,text)
+      assert(!visible.includes('"content_sha256"')&&!visible.includes('"source_uri"'))
     }
   }
 })
 await Effect.runPromise(Effect.scoped(work).pipe(Effect.provide(hostEnvironmentLayer),Effect.provide(outputLayer)))
 await fs.writeFile(path.join(protocol.out,"OPENCODE.json"),JSON.stringify({version:"2.1.2",
   source_commit:"a517687fde98a7329ada3ae644a01a9fc6c4e99e",model_calls:0,tool_calls:results.length,results},null,2))
-console.log(JSON.stringify({calls:results.length,old_truncations:results.filter(r=>r.arm==="legacy"&&r.truncated).length,
-  native_truncations:results.filter(r=>r.arm!=="legacy"&&r.truncated).length}))
+console.log(JSON.stringify({calls:results.length,native_truncations:results.filter(r=>r.truncated).length}))

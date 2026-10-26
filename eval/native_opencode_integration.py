@@ -1,15 +1,16 @@
 """Installed CLI/MCP and actual pinned OpenCode adapter; no answering model.
 
 The SAME fifteen frozen documents are one catalog project, not five isolated
-projects. First ten questions are unchanged. Gold is opened only after delivery.
-Three arms isolate old JSON, readable paging, and lexical-first readable paging.
+projects. All forty questions are unchanged. Gold is opened only after delivery.
+Four native arms compare existing pagination, aggressive lexical coverage,
+whole-owner coverage and the guarded smaller evidence prefix. Raw JSON is an
+additional source-identity control, not an answering-model benchmark.
 No source/SQLite/retrieval/selection mocks, private model endpoints or paid calls.
 """
 from __future__ import annotations
 import argparse
 import asyncio
 from datetime import timedelta
-import hashlib
 import importlib.util
 import json
 import os
@@ -58,7 +59,6 @@ def witness_report(cases, docs, texts, gold):
         for row in rows:
             assert row['path'] in docs
             original = docs[row['path']]
-            # Every body slice must be verbatim in the unchanged source.
             assert row['text'] in original
             assert row['start'] and row['end'] >= row['start']
             window = ''.join(original.splitlines(keepends=True)[row['start']-1:row['end']])
@@ -100,10 +100,12 @@ async def execute(args, cli, env, cases, root, arm):
     from docmancer.docs.application.projection_tokenizer import projection_token_count
     settings = dict(env)
     settings['DOCATLAS_MCP_PRESENTATION'] = 'legacy' if arm == 'legacy' else 'opencode-v1'
-    if arm == 'delivery-only':
-        settings.pop('DOCATLAS_NATIVE_SELECTION', None)  # exercise actual installed default
+    policies = {'delivery-only':'preserve','query-cover':'query-cover-v1',
+                'owner-cover':'owner-cover-v1','guarded':'guarded-cover-v1'}
+    if arm == 'guarded':
+        settings.pop('DOCATLAS_NATIVE_SELECTION', None)
     else:
-        settings['DOCATLAS_NATIVE_SELECTION'] = 'lexical-v1'
+        settings['DOCATLAS_NATIVE_SELECTION'] = policies.get(arm, 'preserve')
     settings['DOCATLAS_CONTEXT_COMPRESSION'] = 'off'
     settings['DOCATLAS_MCP_TEXT_FALLBACK'] = '1'
     settings['DOCATLAS_NATIVE_TRACE'] = '1'
@@ -133,16 +135,20 @@ async def execute(args, cli, env, cases, root, arm):
                     assert len(text.encode()) <= 24_000 and len(text.splitlines()) <= 900
                     assert projection_token_count(text.encode()) <= 3_000
                     assert meta['minilm_applied'] is False
-                    assert meta['policy'] == ('preserve' if arm == 'delivery-only' else 'lexical-v1')
+                    assert meta['policy'] == policies[arm]
                     assert 'not certified' in text.lower()
-            if arm == 'delivery-only':
-                # Consume ONE real query's explicit pages and prove all original
-                # source bytes remain reachable; no silently dropped fragments.
+            if arm == 'guarded':
+                # Fresh capability: the forty preceding calls are not required
+                # to finish inside the ten-minute continuation lifetime.
                 case = cases[0]; request = {'question':case['question'], 'project_path':str(root), 'scope':'project'}
-                first = json.loads((args.out/arm/(case['id']+'.json')).read_text())
+                refreshed = await client.call_tool('get_docs_context', request); calls += 1
+                assert not refreshed.isError
+                first = refreshed.model_dump(by_alias=True)
+                first_text = '\n'.join(c.text for c in refreshed.content if c.type == 'text')
+                save(args.out/'pages'/'1.json', first)
                 cursor = first['_meta']['docatlas/native-delivery']['continuation']
                 original_cursor = cursor
-                all_slices = visible_sources(texts[case['id']]); pages = 1
+                all_slices = visible_sources(first_text); pages = 1
                 while cursor:
                     response = await client.call_tool('get_docs_context', dict(request,continuation=cursor)); calls += 1
                     assert not response.isError, response
@@ -166,8 +172,6 @@ async def execute(args, cli, env, cases, root, arm):
                         assert part['a']==offset
                         offset=part['b']
                     assert ''.join(p['text'] for p in parts)==source_packet['sources'][number]['snippet']
-                # Forgery and changed scope fail before retrieving under the new
-                # arguments. Old cursor never authorizes other roots/scopes.
                 for override in ({'continuation':original_cursor+'0'},
                                  {'continuation':original_cursor,'question':'different question'},
                                  {'continuation':original_cursor,'scope':'all'}):
@@ -199,7 +203,7 @@ def main():
     assert not Path(docmancer.__file__).resolve().is_relative_to(args.repo), 'installed wheel required'
     cli=str(Path(sys.executable).with_name('doc-atlas'));assert Path(cli).is_file()
     corpus=args.repo/'eval/prepared_model_comparison40'
-    cases=json.loads((corpus/'questions.json').read_text())['cases'][:10]
+    cases=json.loads((corpus/'questions.json').read_text())['cases']
     families=json.loads((corpus/'source_plan.json').read_text())['families']
     docs={f['id']+'/'+p:(corpus/'sources'/f['id']/p).read_text() for f in families for p in f['paths']}
     assert len(docs)==15
@@ -208,7 +212,6 @@ def main():
     helper=load('native_state',corpus/'run.py')
     runtime.write_project(root,docs)
     with runtime.isolated_service(args.work/'state') as (service,config):
-        # Normal install command, not a manually assumed optimized environment.
         install=subprocess.run([cli,'install','opencode','--project'],cwd=root,text=True,capture_output=True)
         assert install.returncode==0,install.stderr
         registration=json.loads((root/'opencode.json').read_text())['mcp']['servers']['docatlas']
@@ -218,16 +221,15 @@ def main():
         source_state=helper.source_state(root);db_state=helper.logical_state(inventory)
         save(args.out/'preparation.json',inventory)
         replies,calls={},0
-        for arm in ('legacy','delivery-only','ranked'):
+        for arm in ('legacy','delivery-only','query-cover','owner-cover','guarded'):
             replies[arm],n=asyncio.run(execute(args,cli,dict(os.environ),cases,root,arm));calls+=n
-        # Actual OpenCode v2.1.2 native MCP adapter + ToolOutput. No model API.
         config_path=args.out/'opencode-protocol.json'
         save(config_path,{'cli':cli,'root':str(root),'out':str(args.out),'cases':cases,'registration':registration})
         target=args.opencode/'packages/core/test/docatlas-native-integration.ts'
         shutil.copyfile(args.repo/'eval/native_opencode_client.ts',target)
         upstream_env={**os.environ,'DOCATLAS_PROTOCOL':str(config_path)}
         run=subprocess.run(['bun','run',str(target)],cwd=args.opencode,env=upstream_env,
-                           text=True,capture_output=True,timeout=600)
+                           text=True,capture_output=True,timeout=1200)
         (args.out/'opencode-stdout.log').write_text(run.stdout)
         (args.out/'opencode-stderr.log').write_text(run.stderr)
         assert run.returncode==0,run.stderr[-5000:]
@@ -236,15 +238,45 @@ def main():
     gold={x['id']:x for x in json.loads((corpus/'gold_spans.json').read_text())['cases']}
     normalized=json.loads((args.out/'OPENCODE.json').read_text())['results']
     actual={arm:{row['id']:row['model_visible_text'] for row in normalized if row['arm']==arm}
-            for arm in ('delivery-only','ranked')}
+            for arm in ('delivery-only','guarded')}
     result={'head':os.environ.get('TESTED_SHA'),'provider_usage':None,'answer_model_calls':0,
             'model_answer_quality_tested':False,'python_stdio_calls':calls,'one_catalog_documents':15,
-            'arms':{arm:witness_report(cases,docs,replies[arm],gold) for arm in ('delivery-only','ranked')},
-            'opencode_arms':{arm:witness_report(cases,docs,actual[arm],gold) for arm in ('delivery-only','ranked')}}
+            'arms':{arm:witness_report(cases,docs,replies[arm],gold) for arm in ('delivery-only','query-cover','owner-cover','guarded')},
+            'opencode_arms':{arm:witness_report(cases,docs,actual[arm],gold) for arm in ('delivery-only','guarded')}}
+    losses = []
+    for boundary in ('arms','opencode_arms'):
+        old = {x['id']:x for x in result[boundary]['delivery-only']}
+        new = {x['id']:x for x in result[boundary]['guarded']}
+        for cid in old:
+            a = {f['id']:f['covered'] for f in old[cid]['facts']}
+            b = {f['id']:f['covered'] for f in new[cid]['facts']}
+            assert a.keys() == b.keys()
+            losses.extend({'boundary':boundary,'case':cid,'fact':k}
+                          for k in a if a[k] and not b[k])
+    metrics = {arm:json.loads((args.out/(arm+'-metrics.json')).read_text())
+               for arm in ('delivery-only','query-cover','owner-cover','guarded')}
+    totals = {arm:{'tokens':sum(x['text_tokens'] for x in rows),
+                   'bytes':sum(x['bytes'] for x in rows),
+                   'rows':sum(x['diagnostic']['delivered_rows'] for x in rows),
+                   'budget_limited':sum(x['diagnostic']['transport_budget_limited'] for x in rows),
+                   'complete_documented_cases':sum(x['all_documented'] is True for x in result['arms'][arm]),
+                   'documented_cases':sum(bool(x['facts']) for x in result['arms'][arm])}
+              for arm,rows in metrics.items()}
+    result.update(lost_control_facts=losses, totals=totals,
+        test_set='40 existing questions in one 15-document project; development/regression, not blind',
+        no_provider_cost_or_final_answer_claim=True)
     save(args.out/'SUMMARY.json',result)
     print(json.dumps(result,indent=2))
-    assert all(r['all_documented'] for boundary in ('arms','opencode_arms')
-               for arm in ('delivery-only','ranked') for r in result[boundary][arm] if r['facts']), 'first page missing documented evidence'
+    assert not losses, 'guarded selection lost a fact delivered by original paging'
+    assert totals['guarded']['tokens'] < totals['delivery-only']['tokens'], 'no delivered-input saving'
+    for row in metrics['guarded']:
+        if row['id'] in {'V40-B01','V40-B05'}:
+            assert row['diagnostic']['delivered_rows'] == 1
+            assert row['diagnostic']['stopped_after_selected_evidence']
+            assert not row['diagnostic']['transport_budget_limited']
+    first_ten = {x['id'] for x in cases[:10]}
+    assert all(row['all_documented'] for row in result['opencode_arms']['guarded']
+               if row['id'] in first_ten and row['facts'])
 
 
 if __name__=='__main__':main()

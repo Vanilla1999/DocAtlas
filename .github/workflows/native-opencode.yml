@@ -15,7 +15,7 @@ concurrency:
 jobs:
   installed-native:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -46,7 +46,7 @@ jobs:
           npm install -g bun@1.4.2
           cd upstream-opencode
           bun install --frozen-lockfile
-      - name: One real 15-document catalog; native stdio delivery and real OpenCode truncator
+      - name: 40 frozen questions; compare evidence selection before unchanged native delivery
         env:
           TESTED_SHA: ${{ github.sha }}
           HF_HUB_OFFLINE: '1'
