@@ -1,7 +1,7 @@
 name: Semantic session transport contract (not model quality)
 on:
   push:
-    branches: [experiment/facet-selection-20261025]
+    branches: [experiment/facet-selection-20261025, integration/restore-fixed5-20261026]
     paths: ['.github/workflows/semantic-session-contract.yml', 'eval/checked_context_contract.py', 'docmancer/docs/interfaces/checked_context_session.py', 'docmancer/docs/interfaces/semantic_provider.py', 'docmancer/docs/application/semantic_sufficiency.py']
   workflow_dispatch:
 permissions:

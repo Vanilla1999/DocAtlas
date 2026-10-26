@@ -82,7 +82,7 @@ async def run(args):
     root = args.work / 'lumen/project'
     params = StdioServerParameters(command=sys.executable, args=[
         '-I', str(args.repo / 'eval/facet_selection_integration.py'), '--worker', '--family', 'lumen',
-        '--suite', 'unseen', '--policy', 'default', '--repo', str(args.repo), '--work', str(args.work),
+        '--suite', 'unseen', '--policy', 'facet-guarded-v1', '--repo', str(args.repo), '--work', str(args.work),
         '--out', str(args.out / 'server'), '--model', str(args.model)], env=dict(os.environ))
     results = []
     try:
