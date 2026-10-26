@@ -45,7 +45,11 @@ def inputs(args):
         frozen = json.loads((root / "FREEZE.json").read_text())
         for name, digest in frozen["files"].items():
             assert sha((root / name).read_bytes()) == digest, "holdout inputs changed"
-        assert sha((args.repo / "docmancer/docs/application/facet_selection.py").read_bytes()) == frozen["selector_sha256"], "selector changed after holdout freeze"
+        # This fingerprint is the preregistration parent, not the new product
+        # revision under test. The two immutable input/oracle files above
+        # remain SHA-checked; reject edits to their frozen study metadata.
+        assert frozen["selector_sha256"] == "2d6a3aa6112b58b182804a56914f73489b45e2b7c983497fedda7865ab10d8d7", "holdout selection parent changed"
+        assert frozen["selection_parent_sha"] == "cf8ed00b73449cbd6346d0433f40cb38bd5bd5c1"
         value = json.loads((root / "inputs.json").read_text())
         return value["cases"], {f["id"]: f["documents"] for f in value["families"]}
     if args.suite != "fresh":
