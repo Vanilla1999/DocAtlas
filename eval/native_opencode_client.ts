@@ -23,7 +23,7 @@ const work=Effect.gen(function*(){
     const environment={...protocol.registration.environment,
       DOCATLAS_CONTEXT_COMPRESSION:"off",
       DOCATLAS_MCP_PRESENTATION:arm==="legacy"?"legacy":"opencode-v1",
-      DOCATLAS_NATIVE_SELECTION:arm==="delivery-only"?"preserve":"lexical-v1"}
+      ...(arm==="ranked"?{DOCATLAS_NATIVE_SELECTION:"lexical-v1"}:{})}
     const connection=yield* McpClient.connect("docatlas",{type:"local",
       command:[protocol.cli,"mcp","docs-serve"],environment},protocol.root)
     const tools=yield* connection.tools()

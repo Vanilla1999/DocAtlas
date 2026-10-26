@@ -2,6 +2,10 @@ name: Native OpenCode evidence delivery (no model billing)
 on:
   push:
     branches: [fix/native-opencode-delivery-20261026]
+    paths:
+      - 'docmancer/**'
+      - 'eval/native_opencode*'
+      - '.github/workflows/native-opencode.yml'
   workflow_dispatch:
 permissions:
   contents: read

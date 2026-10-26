@@ -88,7 +88,8 @@ def witness_report(cases, docs, texts, gold):
                 continue
             covered = any(all(covered_part(part) for part in group['parts']) for group in alternatives)
             facts.append({'id':claim['id'], 'covered':covered})
-        records.append({'id':case['id'], 'facts':facts, 'all_documented':all(f['covered'] for f in facts),
+        records.append({'id':case['id'], 'facts':facts, 'all_documented':all(f['covered'] for f in facts) if facts else None,
+                        'absence_or_answer_quality_tested':False,
                         'source_rows':len(rows), 'source_documents':len({r['path'] for r in rows})})
     return records
 
@@ -99,7 +100,10 @@ async def execute(args, cli, env, cases, root, arm):
     from docmancer.docs.application.projection_tokenizer import projection_token_count
     settings = dict(env)
     settings['DOCATLAS_MCP_PRESENTATION'] = 'legacy' if arm == 'legacy' else 'opencode-v1'
-    settings['DOCATLAS_NATIVE_SELECTION'] = 'preserve' if arm == 'delivery-only' else 'lexical-v1'
+    if arm == 'delivery-only':
+        settings.pop('DOCATLAS_NATIVE_SELECTION', None)  # exercise actual installed default
+    else:
+        settings['DOCATLAS_NATIVE_SELECTION'] = 'lexical-v1'
     settings['DOCATLAS_CONTEXT_COMPRESSION'] = 'off'
     settings['DOCATLAS_MCP_TEXT_FALLBACK'] = '1'
     settings['DOCATLAS_NATIVE_TRACE'] = '1'
@@ -129,6 +133,7 @@ async def execute(args, cli, env, cases, root, arm):
                     assert len(text.encode()) <= 24_000 and len(text.splitlines()) <= 900
                     assert projection_token_count(text.encode()) <= 3_000
                     assert meta['minilm_applied'] is False
+                    assert meta['policy'] == ('preserve' if arm == 'delivery-only' else 'lexical-v1')
                     assert 'not certified' in text.lower()
             if arm == 'delivery-only':
                 # Consume ONE real query's explicit pages and prove all original
@@ -229,12 +234,17 @@ def main():
         assert helper.source_state(root)==source_state
         assert helper.logical_state(inventory)==db_state
     gold={x['id']:x for x in json.loads((corpus/'gold_spans.json').read_text())['cases']}
+    normalized=json.loads((args.out/'OPENCODE.json').read_text())['results']
+    actual={arm:{row['id']:row['model_visible_text'] for row in normalized if row['arm']==arm}
+            for arm in ('delivery-only','ranked')}
     result={'head':os.environ.get('TESTED_SHA'),'provider_usage':None,'answer_model_calls':0,
             'model_answer_quality_tested':False,'python_stdio_calls':calls,'one_catalog_documents':15,
-            'arms':{arm:witness_report(cases,docs,replies[arm],gold) for arm in ('delivery-only','ranked')}}
+            'arms':{arm:witness_report(cases,docs,replies[arm],gold) for arm in ('delivery-only','ranked')},
+            'opencode_arms':{arm:witness_report(cases,docs,actual[arm],gold) for arm in ('delivery-only','ranked')}}
     save(args.out/'SUMMARY.json',result)
     print(json.dumps(result,indent=2))
-    assert all(r['all_documented'] for r in result['arms']['ranked']), 'first page missing documented evidence'
+    assert all(r['all_documented'] for boundary in ('arms','opencode_arms')
+               for arm in ('delivery-only','ranked') for r in result[boundary][arm] if r['facts']), 'first page missing documented evidence'
 
 
 if __name__=='__main__':main()
