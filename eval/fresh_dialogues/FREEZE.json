@@ -1,0 +1,36 @@
+{
+  "schema_version": "docatlas.new-dialogues.freeze.v1",
+  "experiment_id": "nacrerelay-new-cold-dialogues-20261025",
+  "freeze_date_utc": "2026-10-25",
+  "frozen_before_first_product_execution": true,
+  "product_executed_by_fixture_author": false,
+  "source_kind": "New evaluation-only synthetic English technical documentation, version 2.7",
+  "not_historical_q02": true,
+  "case_count": 8,
+  "required_fact_count": 27,
+  "category_counts": {"full": 6, "partial": 1, "no_answer": 1},
+  "scripted_history_probe_cases": ["N02", "N05"],
+  "boundaries": [
+    "The original questions, full translations, scripted followups, source texts and independent oracle must not change after inference results are observed.",
+    "Gold is for post-delivery evaluation only and must not enter selector or answering-model prompts.",
+    "All source retrieval uses one exact whole-project binding; workspace control semantics are not an actual MCP module-isolation test.",
+    "Fixed translations test cross-language retrieval with correct supplied translations, not autonomous translation quality.",
+    "Scripted second lookups test a controlled history replay, not autonomous missing-fact assessment.",
+    "Visible-context token counts are not provider usage. Provider usage is unavailable in this environment unless separately obtained from an authorized provider interface.",
+    "This small synthetic development-independent input set does not establish broad natural-document generalization or repair the unavailable historical Q02."
+  ],
+  "files": [
+    {"path": "fixtures/cases.json", "sha256": "1c34057d6328621d3d8a1bd6e0ba8f62dcb304f03ac6304a11d79802d1b78798", "bytes": 6729},
+    {"path": "fixtures/project/README.md", "sha256": "720f4bed7c60d326bf954346dfa58500dad630098e1131ff04177c173f315ffd", "bytes": 1056},
+    {"path": "fixtures/project/docs/exports.md", "sha256": "73f82812d96dbd0d1807b43148e70cef0bc5f5f4e87f743d5b370b3a2eca86dc", "bytes": 1162},
+    {"path": "fixtures/project/docs/imports.md", "sha256": "28235c510a3e599ab38f9709f468108b64f222ceec69e1ac594598bda8edc1b6", "bytes": 1221},
+    {"path": "fixtures/project/docs/observability.md", "sha256": "ca9f0a6610387343b1013a0942d089e3ab4a65673e67ef0b851aeddc5a29598f", "bytes": 1048},
+    {"path": "fixtures/project/docs/operations.md", "sha256": "0d09b69b3c78a80f536801b08eb428120bd29ee9a85bf3dc9ea6a42471e182e6", "bytes": 1676},
+    {"path": "fixtures/project/docs/retries.md", "sha256": "ab56d686b5487462ab5a17b3bb35a63f1b7cf44cd5ce473dfe22ebc6d2c3cb04", "bytes": 1403},
+    {"path": "fixtures/project/docs/security.md", "sha256": "5eff047ec2914676b9180870bb74778f7be434f51885217c7fb62ea0072c75f7", "bytes": 934},
+    {"path": "fixtures/project/docs/sessions.md", "sha256": "745ef2d7f2fdb0b29c9e8976e5a7cf114f7ba6fb3d4f52f1f6a5a22a61b63ac4", "bytes": 1058},
+    {"path": "fixtures/project/docs/workers.md", "sha256": "31020315e603c03cd8332cf3b27a5844d6052f192c0456797320abd18de0416c", "bytes": 1118},
+    {"path": "fixtures/project/pyproject.toml", "sha256": "fe2a1cb706fdf76bb75a4107b7e1da8afe7e8843be503117317d2ebb6262c5e8", "bytes": 174},
+    {"path": "oracle/gold.json", "sha256": "2bc398df8a94f402556cc5be0d2bd479e1fb3b0811e8a9ca766fda400770b920", "bytes": 18967}
+  ]
+}

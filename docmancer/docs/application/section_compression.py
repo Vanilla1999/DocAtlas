@@ -336,7 +336,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         raise SectionCompressionError("section_compression_requires_native_read")
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
     from .facet_selection import POLICIES as FACET_POLICIES
-    from .semantic_sufficiency import POLICIES as SEMANTIC_POLICIES
+    from .semantic_local_sufficiency import POLICIES as SEMANTIC_POLICIES
     from .coverage_selection import POLICIES as EXPERIMENT_POLICIES, select_coverage_sections
     if policy in EXPERIMENT_POLICIES and policy not in FACET_POLICIES:
         return select_coverage_sections(payload, snapshot, retrieval, question, policy)
@@ -377,7 +377,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
         )
         receipt["adaptive_cutoff"] = cutoff
     if policy in SEMANTIC_POLICIES:
-        from .semantic_sufficiency import review
+        from .semantic_local_sufficiency import review
         ranking, requested_k, semantic_receipt = review(
             question, rows, sections, snapshot, ranking, requested_k, policy)
         receipt["semantic_sufficiency"] = semantic_receipt

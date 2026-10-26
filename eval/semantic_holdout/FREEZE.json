@@ -1,0 +1,24 @@
+{
+  "schema_version": "docatlas.semantic-holdout.freeze.v1",
+  "selection_parent_sha": "cf8ed00b73449cbd6346d0433f40cb38bd5bd5c1",
+  "selector_sha256": "2d6a3aa6112b58b182804a56914f73489b45e2b7c983497fedda7865ab10d8d7",
+  "cases": 16,
+  "documented_cases": 14,
+  "negative_cases": 2,
+  "facts": 34,
+  "frozen_before_execution": true,
+  "no_post_result_tuning": true,
+  "files": {
+    "inputs.json": "e89765dfafebd958e704c7341f0ef83e80fa6fffbb2a31666379ad9f0ad9ffec",
+    "gold.json": "72f702d006bbd5396a2771cb2477709fef53b2e065ee70c32e519ceaf11393e2"
+  },
+  "protocol": {
+    "arms": ["fixed", "default", "checked"],
+    "priority": ["no_new_evidence_loss", "no_new_unsupported_final_claims", "provider_total_tokens"],
+    "max_retrievals_per_question": 2,
+    "same_model_across_arms": true,
+    "no_model_fallback": true,
+    "generation_and_provider_usage_required_for_rollout": true,
+    "fixed_search_translations": "These are controlled supplied translations, not an autonomous translation quality test."
+  }
+}
