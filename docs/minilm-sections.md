@@ -21,7 +21,7 @@ When a verified absolute DOCATLAS_MINILM_MODEL_DIR is configured, omitted
 DOCATLAS_CONTEXT_COMPRESSION now enables the local MiniLM scorer automatically.
 Without a provisioned path it stays off; DOCATLAS_CONTEXT_COMPRESSION=off is a
 hard rollback. Request handling never downloads model weights or calls an external
-model API. With the compressor enabled, the default selection is facet-guarded-lexical-v1
+model API. With the compressor enabled, the default selection is facet-guarded-lexical-v2
 using markdown-owner-v1 units; use DOCATLAS_SECTION_SELECTION=fixed and
 DOCATLAS_SECTION_UNITS=legacy for the previous fixed-5 behavior.
 
@@ -152,7 +152,7 @@ https://arxiv.org/abs/1905.09217
 ## Current default candidate (2026-10-26; lexical source-diversity guard)
 
 With an explicitly provisioned trusted local MiniLM directory, the default
-section selector is `facet-guarded-lexical-v1` / `global-margin-envelope-v2` with
+section selector is `facet-guarded-lexical-v2` / `global-margin-envelope-v2` with
 `markdown-owner-v1` units. It scores the full question and literal sub-question
 fragments, retains near-best full-question alternatives, and preserves bounded
 already admitted Markdown-parent siblings. No semantic answer-certification or
@@ -165,7 +165,7 @@ runs found no extra required facts and no useful safe NLI removals.
 export DOCATLAS_MINILM_MODEL_DIR=/absolute/private/minilm-model
 # Optional: choose the new profile explicitly (it is already the default
 # inside a configured compressor).
-export DOCATLAS_SECTION_SELECTION=facet-guarded-lexical-v1
+export DOCATLAS_SECTION_SELECTION=facet-guarded-lexical-v2
 export DOCATLAS_SECTION_UNITS=markdown-owner-v1
 # Safe rollback:
 # export DOCATLAS_SECTION_SELECTION=fixed
@@ -189,3 +189,11 @@ score is a bounded near-match. Its associated short Markdown-owner rules are
 kept only from the admitted source pool. It never certifies sufficiency,
 absence, or a calibrated probability. Default controls and retrieval trace
 must independently confirm no documented fact losses before rollout.
+
+The v2 cross-document guard replaces whole-parent rescue with at most two
+already-admitted independently scored rule sections from a newly selected
+source identity. It skips generic topic-only sections and preserves all
+previous facet winner groups ahead of optional recovery under packet budgets.
+This design aims to reduce irrelevant over-selection seen in the v1 guard.
+Prior v1 results remain an explicitly available benchmark; neither variant
+proves semantic answer completeness.

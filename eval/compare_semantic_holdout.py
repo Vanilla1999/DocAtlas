@@ -7,13 +7,14 @@ from pathlib import Path
 def main():
     root=Path(os.environ['RUNNER_TEMP'])
     values={}
-    for policy in ('fixed','facet-guarded-v1','facet-guarded-lexical-v1','default','auto'):
+    for policy in ('fixed','facet-guarded-v1','facet-guarded-lexical-v1','facet-guarded-lexical-v2','default','auto'):
         folder=root/'unseen-arms'/f'facet-live-unseen-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
         values[policy]={'summary':json.loads((folder/'SUMMARY.json').read_text()),
                         'rows':json.loads((folder/'ASSESSMENTS.json').read_text()),
                         'freeze':json.loads((folder/'FREEZE.json').read_text())}
-    a,b=values['fixed'],values['facet-guarded-lexical-v1']
+    a,b=values['fixed'],values['facet-guarded-lexical-v2']
     old_facet=values['facet-guarded-v1']
+    broad_guard=values['facet-guarded-lexical-v1']
     # Both effective defaults must match the explicit facet selector in the
     # same source-pool execution. Citation nonces differ between executions;
     # compare mandatory facts, section counts, and original input hashes.
@@ -53,6 +54,7 @@ def main():
             'retrieval_gate_passed':complete and cheaper and integrity and not losses and not fact_losses,
             'default_matches_explicit_facets':True,'auto_with_preprovisioned_model_matches_facets':True,
             'historical_facet_control_retained':old_facet['summary']['head']==b['summary']['head'],
+            'broad_lexical_control_retained':broad_guard['summary']['head']==b['summary']['head'],
             'provider_usage':None,'answer_model_calls':0,'default_rollout':False,
             'boundary':'New frozen source-authored synthetic holdout, not externally authored or a production sample. No tuning after execution.'}
     out=root/'unseen-paired';out.mkdir(parents=True,exist_ok=True)

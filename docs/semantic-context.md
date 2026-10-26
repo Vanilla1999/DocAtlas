@@ -6,7 +6,7 @@ The local compressor is enabled automatically **only if the trusted host has
 already provisioned `DOCATLAS_MINILM_MODEL_DIR`** and has not explicitly set
 `DOCATLAS_CONTEXT_COMPRESSION=off`. Otherwise it remains off; no downloads or
 paid inference run during serving. Within the enabled compressor, omitted
-`DOCATLAS_SECTION_SELECTION` now uses **`facet-guarded-lexical-v1`**, and omitted
+`DOCATLAS_SECTION_SELECTION` now uses **`facet-guarded-lexical-v2`**, and omitted
 `DOCATLAS_SECTION_UNITS` uses **`markdown-owner-v1`**.
 The previous fixed-five profile is an explicit rollback:
 `DOCATLAS_SECTION_SELECTION=fixed`, `DOCATLAS_SECTION_UNITS=legacy`,
@@ -97,9 +97,15 @@ unknown accounting. General repository CI is independent and must not be declare
 green merely because this focused integration ran successfully.
 
 
-The latest default candidate `facet-guarded-lexical-v1` also contains a
+The latest default candidate `facet-guarded-lexical-v2` also contains a
 positive-only cross-document lexical guard. The earlier `facet-guarded-v1`
 remains available as a frozen research/rollback comparator. This change was
 triggered by a genuine missing cross-document restore rule in the 16-question
 holdout, so that corpus is now **development data**, not a blind acceptance.
 No answer-model semantic accuracy or provider cost was measured.
+
+The v2 lexical guard is an opt-in refinement of the v1 broader group rescue.
+It restricts the auxiliary source evidence to at most two scored statement
+units, excluding generic topic-only summaries. It must be independently
+compared with both the original facet selector and v1 guard. These are heuristic
+source decisions, not NLI/sufficiency proof.

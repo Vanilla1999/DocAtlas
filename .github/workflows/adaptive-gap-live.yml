@@ -20,13 +20,17 @@ jobs:
         include:
           - {suite: v40, policy: facet-guarded-v1}
           - {suite: v40, policy: facet-guarded-lexical-v1}
+          - {suite: v40, policy: facet-guarded-lexical-v2}
           - {suite: holdout, policy: facet-guarded-v1}
           - {suite: holdout, policy: facet-guarded-lexical-v1}
+          - {suite: holdout, policy: facet-guarded-lexical-v2}
           - {suite: fresh, policy: facet-guarded-v1}
           - {suite: fresh, policy: facet-guarded-lexical-v1}
+          - {suite: fresh, policy: facet-guarded-lexical-v2}
           - {suite: unseen, policy: fixed}
           - {suite: unseen, policy: facet-guarded-v1}
           - {suite: unseen, policy: facet-guarded-lexical-v1}
+          - {suite: unseen, policy: facet-guarded-lexical-v2}
           - {suite: unseen, policy: default}
           - {suite: unseen, policy: auto}
     steps:

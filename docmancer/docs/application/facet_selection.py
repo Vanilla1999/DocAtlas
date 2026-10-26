@@ -10,7 +10,8 @@ import hashlib
 import re
 
 POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1",
-                      "facet-margin-envelope-v1", "facet-guarded-lexical-v1"})
+                      "facet-margin-envelope-v1", "facet-guarded-lexical-v1",
+                      "facet-guarded-lexical-v2"})
 MAX_PROBES = 16
 SCORE_MARGIN = 1.0  # development heuristic in frozen-model logits, NOT calibrated probability
 CAPSULE_TOKENS = 512  # maximum admitted source-text cost of one parent, not top-k
@@ -151,6 +152,13 @@ conditions happen happens including please report reports""".split())
 _LEXICAL_MAX_SECTIONS = 64
 _LEXICAL_MAX_PROBES = 16
 _LEXICAL_MAX_MARGIN = 5.0  # exploratory cross-ranker guard, never a probability
+_RULE_MARKER = re.compile(
+    r"\b(?:must|require(?:s|d)?|only|never|cannot|not|without|before|after|"
+    r"expires?|expire|bound|reuse|recheck|fails?|blocks?|invalidates?|"
+    r"retains?|preserves?|allowed|may|resume|retry|renew|current)\b|(?<!\w)\d+(?!\w)",
+    re.IGNORECASE,
+)
+_LEXICAL_SECONDARY_LIMIT = 2  # exact source sections, not whole parent bundles
 
 
 def _lexical_words(value: str) -> frozenset[str]:
@@ -175,7 +183,7 @@ def _lexical_words(value: str) -> frozenset[str]:
     return frozenset(result)
 
 
-def _lexical_cross_source_guard(probes, sections, matrix, already_selected, capsules):
+def _lexical_cross_source_guard(probes, sections, matrix, already_selected, capsules, *, variant='v1'):
     """Choose <=one missing native document from a matching query obligation.
 
     Require both lexical evidence and an independent, bounded MiniLM near-match.
@@ -198,7 +206,11 @@ def _lexical_cross_source_guard(probes, sections, matrix, already_selected, caps
             continue
         ceiling = max(scores)
         for i, section in enumerate(sections):
-            if (section.key[0], *section.key[2:]) in present:
+            if i in already_selected or (section.key[0], *section.key[2:]) in present:
+                continue
+            if variant == 'v2' and not _RULE_MARKER.search(section.text):
+                # A topic/navigation summary without an explicit operational
+                # condition is not enough to pull in an extra source.
                 continue
             overlap = query_terms.intersection(corpus_terms[i])
             count = len(overlap)
@@ -215,16 +227,35 @@ def _lexical_cross_source_guard(probes, sections, matrix, already_selected, caps
     if best is None:
         return set(), {"status": "no_safe_cross_source_candidate"}
     _, probe_index, index, overlapping = best
-    added = set(capsules.get(index, (index,)))
-    # Some document sections are not short-owner grouped; keep the seed.
-    added.add(index)
+    if variant == 'v2':
+        # Keep at most two independently scored substantive original groups,
+        # rather than a whole short parent which may include unrelated rules.
+        # The query view that justified the bridge also ranks its companion.
+        scores = matrix[probe_index]
+        identity = (sections[index].key[0], *sections[index].key[2:])
+        qwords = _lexical_words(probes[probe_index])
+        alternatives = [j for j, section in enumerate(sections)
+                        if j not in already_selected
+                        and (section.key[0], *section.key[2:]) == identity
+                        and _RULE_MARKER.search(section.text)
+                        and len(qwords.intersection(corpus_terms[j])) >= 2]
+        alternatives.sort(key=lambda j: (-scores[j], sections[j].key))
+        added = {index, *alternatives[:_LEXICAL_SECONDARY_LIMIT]}
+        # The seed is selected independently, and only one companion is
+        # required to protect common two-rule dependencies.
+        if len(added) > _LEXICAL_SECONDARY_LIMIT:
+            added = set([index] + [j for j in alternatives if j != index][:_LEXICAL_SECONDARY_LIMIT - 1])
+    else:
+        added = set(capsules.get(index, (index,)))
+        # Some document sections are not short-owner grouped; keep the seed.
+        added.add(index)
     return added, {
-        "status": "one_already_admitted_source_added",
+        "status": "bounded_source_sections_added" if variant == "v2" else "one_already_admitted_source_added",
         "probe_index": probe_index,
         "path": sections[index].rows[0].get("path_or_url"),
         "seed_section": sections[index].key[1],
         "matched_stems": overlapping,
-        "proposed_groups": sorted(added),
+        "proposed_groups": sorted(added), "guard_variant": variant,
         "semantic_sufficiency_certified": False,
     }
 
@@ -238,8 +269,8 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     GUARDED revision 2 limits that band to the full original scoring question;
     fragment probes supply only their best matches, avoiding flat-score floods.
     """
-    guarded = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1"}
-    margin = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1", "facet-margin-envelope-v1"}
+    guarded = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1", "facet-guarded-lexical-v2"}
+    margin = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1", "facet-guarded-lexical-v2", "facet-margin-envelope-v1"}
     probes, fallback = question_probes(question)
     matrix = [global_scores]
     if not fallback:
@@ -265,7 +296,7 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     seeds = {i for i in support if support[i]}
     chosen = set(range(len(sections))) if fallback else set(seeds)
     expanded = {}
-    envelopes = {"facet-envelope-v1", "facet-guarded-v1", "facet-guarded-lexical-v1", "facet-margin-envelope-v1"}
+    envelopes = {"facet-envelope-v1", "facet-guarded-v1", "facet-guarded-lexical-v1", "facet-guarded-lexical-v2", "facet-margin-envelope-v1"}
     if not fallback and policy in envelopes:
         capsules = _capsules(sections, snapshot)
         for index in sorted(seeds):
@@ -273,9 +304,10 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
             chosen.update(neighbors)
             expanded[index] = list(neighbors)
     lexical_added, lexical_receipt = set(), {"status": "not_requested"}
-    if policy == "facet-guarded-lexical-v1" and not fallback:
+    if policy in {"facet-guarded-lexical-v1", "facet-guarded-lexical-v2"} and not fallback:
         lexical_added, lexical_receipt = _lexical_cross_source_guard(
-            probes[:len(matrix)], sections, matrix, chosen, capsules)
+            probes[:len(matrix)], sections, matrix, chosen, capsules,
+            variant="v2" if policy == "facet-guarded-lexical-v2" else "v1")
         chosen.update(lexical_added)
     # Facet winners first. The independent lexical bridge is secondary; a
     # complete-packet budget cut can remove it before any original facet seed.
@@ -287,7 +319,8 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     receipt["facet_selection"] = {
         "version": policy, "completeness": "unassessed",
         "strategy_revision": (
-            "lexical-cross-source-v1" if policy == "facet-guarded-lexical-v1"
+            "lexical-cross-source-v2" if policy == "facet-guarded-lexical-v2"
+            else "lexical-cross-source-v1" if policy == "facet-guarded-lexical-v1"
             else "global-margin-envelope-v2" if guarded else policy),
         "margin_scope": "full_question_only" if guarded else "all_probes",
         "score_margin": SCORE_MARGIN if margin else 0.0,
