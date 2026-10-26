@@ -131,3 +131,123 @@ def prepare_packed_context(result: Any, *, policy: str = "adaptive-v1") -> tuple
         raise ValueError("model_context_packing_ineligible_result")
     view, metadata = encoded
     return pack_model_view(view, metadata, policy=policy), metadata
+
+
+# Managed per-question sessions use a different, history-deduplicated model
+# input shape than the single-response v1 view above. Pack only public model
+# fields here; ModelContextSession keeps exact original source rows privately.
+MANAGED_FORMAT = "docatlas.packed-managed-context.v1"
+MANAGED_NOTICE = "Source keys refer to source_catalog. Cite each exact ref, path and line span."
+MANAGED_MODES = ("off", "paths-v1", "sections-v1", "adaptive-v1")
+_MANAGED_RESERVED = frozenset(("context_format", "packing_policy", "packing_notice", "source_catalog"))
+
+
+def _pack_managed(view: dict, policy: str) -> dict:
+    """Catalog repeated source attributes without changing any original text."""
+    if policy not in POLICIES or _MANAGED_RESERVED.intersection(view):
+        raise ValueError("invalid_managed_packing_policy_or_collision")
+    rows = view.get("sources")
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("managed_packing_requires_sources")
+    result = deepcopy(view)
+    result.update(context_format=MANAGED_FORMAT, packing_policy=policy,
+                  packing_notice=MANAGED_NOTICE)
+    catalog, seen, compact = {}, {}, []
+    for row in rows:
+        if (not isinstance(row, dict) or "source" in row or "lines" in row
+                or not isinstance(row.get("ref"), str)
+                or not isinstance(row.get("text"), str)):
+            raise ValueError("invalid_managed_source")
+        names = ("path", "section") if policy == "sections-v1" else ("path",)
+        common = {name: deepcopy(row[name]) for name in names if name in row}
+        key = canonical(common)
+        if key not in seen:
+            ident = "d" + str(len(catalog) + 1)
+            seen[key] = ident
+            catalog[ident] = common
+        item = {name: deepcopy(value) for name, value in row.items() if name not in common}
+        item["source"] = seen[key]
+        if "line_start" in item and "line_end" in item:
+            item["lines"] = [item.pop("line_start"), item.pop("line_end")]
+        compact.append(item)
+    result["source_catalog"] = catalog
+    result["sources"] = compact
+    return result
+
+
+def unpack_managed_model_input(view: dict) -> dict:
+    """Decode the model representation. The session, not this decoder, owns refs.
+
+    This is not a source-read/citation authorization function. The caller must
+    still call ModelContextSession.resolve on a retained exact source ref.
+    """
+    if not isinstance(view, dict):
+        raise ValueError("invalid_managed_model_input")
+    if not _MANAGED_RESERVED.intersection(view):
+        return deepcopy(view)
+    if (view.get("context_format") != MANAGED_FORMAT
+            or view.get("packing_policy") not in POLICIES
+            or view.get("packing_notice") != MANAGED_NOTICE
+            or not isinstance(view.get("source_catalog"), dict)
+            or not isinstance(view.get("sources"), list)):
+        raise ValueError("invalid_managed_packed_view")
+    catalogue = view["source_catalog"]
+    originals, visited = [], set()
+    for row in view["sources"]:
+        if not isinstance(row, dict) or not isinstance(row.get("source"), str):
+            raise ValueError("invalid_managed_packed_source")
+        code = row["source"]
+        meta = catalogue.get(code)
+        if not isinstance(meta, dict) or set(meta) - {"path", "section"}:
+            raise ValueError("invalid_managed_catalogue")
+        visited.add(code)
+        item = {k: deepcopy(v) for k, v in row.items() if k not in {"source", "lines"}}
+        if set(item).intersection(meta) or "line_start" in item and "lines" in row:
+            raise ValueError("invalid_managed_source_collision")
+        item.update(deepcopy(meta))
+        if "lines" in row:
+            span = row["lines"]
+            if (not isinstance(span, list) or len(span) != 2
+                    or any(type(value) is not int or value < 1 for value in span)
+                    or span[0] > span[1] or "line_end" in item):
+                raise ValueError("invalid_managed_line_span")
+            item["line_start"], item["line_end"] = span
+        originals.append(item)
+    if visited != set(catalogue):
+        raise ValueError("unused_or_malformed_managed_catalogue")
+    result = {k: deepcopy(v) for k, v in view.items()
+              if k not in _MANAGED_RESERVED and k != "sources"}
+    result["sources"] = originals
+    # Reject noncanonical packed inputs; prevents hidden/colliding/extra fields.
+    if canonical(_pack_managed(result, view["packing_policy"])) != canonical(view):
+        raise ValueError("managed_view_not_canonical")
+    return result
+
+
+def pack_managed_model_input(view: dict, *, policy: str = "adaptive-v1") -> dict:
+    """Host-managed counterpart of adaptive-v1: never enlarge a single input.
+
+    Use the identical source identity and issued short refs. For multiple source
+    rows compare whole serialized representations, including catalogue cost.
+    For smaller inputs or hostile/ineligible content retain the original form.
+    """
+    if policy not in MANAGED_MODES:
+        raise ValueError("unknown_managed_packing_policy")
+    if policy == "off" or not isinstance(view, dict) or not view.get("sources"):
+        return deepcopy(view)
+    original = _cost(view)
+    if policy in POLICIES:
+        packed = _pack_managed(view, policy)
+        if _cost(packed)[2] > 12000:
+            raise ValueError("managed_packing_output_limit")
+        return packed
+    variants = [(original, 0, view)]
+    for index, candidate_mode in enumerate(POLICIES, 1):
+        candidate = _pack_managed(view, candidate_mode)
+        cost = _cost(candidate)
+        if all(after <= before for after, before in zip(cost, original)):
+            variants.append((cost, index, candidate))
+    best = deepcopy(min(variants, key=lambda item: (item[0], item[1]))[2])
+    if best is not view and canonical(unpack_managed_model_input(best)) != canonical(view):
+        raise ValueError("managed_packing_integrity_mismatch")
+    return best

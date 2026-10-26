@@ -7,24 +7,28 @@ from pathlib import Path
 def main():
     root=Path(os.environ['RUNNER_TEMP'])
     values={}
-    for policy in ('fixed','facet-guarded-v1','default'):
+    for policy in ('fixed','facet-guarded-v1','default','auto'):
         folder=root/'unseen-arms'/f'facet-live-unseen-{policy}-{os.environ["GITHUB_RUN_ID"]}'/'run'
         values[policy]={'summary':json.loads((folder/'SUMMARY.json').read_text()),
                         'rows':json.loads((folder/'ASSESSMENTS.json').read_text()),
                         'freeze':json.loads((folder/'FREEZE.json').read_text())}
     a,b=values['fixed'],values['facet-guarded-v1']
-    # The restored default is independently required to behave as the old fixed policy.
-    prior=values['default']
-    assert prior['freeze']['inputs']==a['freeze']['inputs']
-    assert prior['summary']['head']==a['summary']['head']
-    assert prior['summary']['cases']==a['summary']['cases']
-    old_rows={r['case_id']:r for r in a['rows']}
-    restored_rows={r['case_id']:r for r in prior['rows']}
-    assert old_rows.keys()==restored_rows.keys()
-    for cid in old_rows:
-        assert old_rows[cid]['question']==restored_rows[cid]['question']
-        assert old_rows[cid]['selected_groups']==restored_rows[cid]['selected_groups']
-        assert old_rows[cid]['coverage']['facts']==restored_rows[cid]['coverage']['facts']
+    # Both effective defaults must match the explicit facet selector in the
+    # same source-pool execution. Citation nonces differ between executions;
+    # compare mandatory facts, section counts, and original input hashes.
+    for label in ('default', 'auto'):
+        implicit=values[label]
+        assert implicit['freeze']['inputs']==b['freeze']['inputs']
+        assert implicit['summary']['head']==b['summary']['head']==os.environ['GITHUB_SHA']
+        assert implicit['summary']['cases']==b['summary']['cases']==16
+        rows={r['case_id']:r for r in implicit['rows']}
+        explicit={r['case_id']:r for r in b['rows']}
+        assert rows.keys()==explicit.keys()
+        for cid in rows:
+            assert rows[cid]['question']==explicit[cid]['question']
+            assert rows[cid]['selected_groups']==explicit[cid]['selected_groups']
+            assert rows[cid]['coverage']['facts']==explicit[cid]['coverage']['facts']
+            assert rows[cid]['integrity']==explicit[cid]['integrity']
     assert a['freeze']['inputs']==b['freeze']['inputs']
     assert a['summary']['head']==b['summary']['head']==os.environ['GITHUB_SHA']
     old={r['case_id']:r for r in a['rows']}
@@ -46,6 +50,7 @@ def main():
             'new_case_losses':losses,'new_fact_losses':fact_losses,'all_documented_covered':complete,
             'less_visible_context':cheaper,'integrity':integrity,
             'retrieval_gate_passed':complete and cheaper and integrity and not losses and not fact_losses,
+            'default_matches_explicit_facets':True,'auto_with_preprovisioned_model_matches_facets':True,
             'provider_usage':None,'answer_model_calls':0,'default_rollout':False,
             'boundary':'New frozen source-authored synthetic holdout, not externally authored or a production sample. No tuning after execution.'}
     out=root/'unseen-paired';out.mkdir(parents=True,exist_ok=True)

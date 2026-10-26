@@ -1,7 +1,7 @@
 name: Reviewed facet defaults and semantic sufficiency acceptance
 on:
   push:
-    branches: [experiment/facet-selection-20261025, integration/restore-fixed5-20261026]
+    branches: [experiment/facet-selection-20261025, integration/restore-fixed5-20261026, feat/facet-default-adaptive-packing-20261026]
     paths: ['.github/workflows/adaptive-gap-live.yml', 'docmancer/**', 'eval/facet_selection_integration.py', 'eval/compare_facet_selection.py', 'eval/semantic*', 'eval/semantic_holdout/**', 'eval/compare_semantic_holdout.py']
   workflow_dispatch:
 permissions:
@@ -24,6 +24,7 @@ jobs:
           - {suite: unseen, policy: fixed}
           - {suite: unseen, policy: facet-guarded-v1}
           - {suite: unseen, policy: default}
+          - {suite: unseen, policy: auto}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -106,7 +107,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Download actual old-default and opt-in holdout arms from this commit
+      - name: Download explicit fixed, explicit facet, default facet, and provisioned auto arms
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

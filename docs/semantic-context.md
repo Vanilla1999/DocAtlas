@@ -2,22 +2,22 @@
 
 ## Two separate defaults
 
-The compressor remains OFF unless `DOCATLAS_CONTEXT_COMPRESSION=minilm-sections-v1`
-is explicitly enabled and verified local MiniLM assets are provisioned. **Within
-that enabled compressor**, omitted `DOCATLAS_SECTION_SELECTION` **continues to select `fixed`**
-with five groups and legacy units. This is the restored old behavior requested
-for integration to main. The newer `facet-guarded-v1` with
-`markdown-owner-v1` remains an **explicit opt-in** research profile:
-`DOCATLAS_SECTION_SELECTION=facet-guarded-v1`,
-`DOCATLAS_SECTION_UNITS=markdown-owner-v1`.
-To explicitly select the old mode: `DOCATLAS_SECTION_SELECTION=fixed`,
+The local compressor is enabled automatically **only if the trusted host has
+already provisioned `DOCATLAS_MINILM_MODEL_DIR`** and has not explicitly set
+`DOCATLAS_CONTEXT_COMPRESSION=off`. Otherwise it remains off; no downloads or
+paid inference run during serving. Within the enabled compressor, omitted
+`DOCATLAS_SECTION_SELECTION` now uses **`facet-guarded-v1`**, and omitted
+`DOCATLAS_SECTION_UNITS` uses **`markdown-owner-v1`**.
+The previous fixed-five profile is an explicit rollback:
+`DOCATLAS_SECTION_SELECTION=fixed`, `DOCATLAS_SECTION_UNITS=legacy`,
 `DOCATLAS_SECTION_TOP_K=5`.
 Other fixed-k values remain restricted by the existing contract. None of these
 settings is an LLM-supplied tool argument. Model-view transport still requires a
 compatible host; raw v1 remains the wire default.
 
 The prior 53/53 development evidence result is NOT independent answer acceptance.
-This branch is a draft, not an enabled production rollout. No automatic merge.
+These defaults are changing in main through the integration PR. The original
+regression suites are development tests, not independent production acceptance.
 
 ## Semantic model, not another relevance threshold
 
