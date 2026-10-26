@@ -19,7 +19,7 @@ import statistics
 import sys
 import time
 
-POLICIES = ("auto", "default", "fixed", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
+POLICIES = ("auto", "default", "fixed", "facet-guarded-lexical-v1", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
 
 
 def load(name, path):
@@ -189,7 +189,7 @@ async def client(args):
                 assert record['rows'] == 0, 'missing nonempty selection observation'
                 record.update(selected_groups=0, forward_passes=0, input_pair_tokens=0, cutoff=None, probe_count=0)
                 continue
-            assert obs['selection_policy'] == ('facet-guarded-v1' if args.policy in ('default', 'auto') else args.policy)
+            assert obs['selection_policy'] == ('facet-guarded-lexical-v1' if args.policy in ('default', 'auto') else args.policy)
             if args.policy in ('default', 'auto'):
                 assert obs['configured_top_k'] is None and obs['units'] == 'markdown-owner-v1'
             assert obs['scoring_question_sha256'] == key

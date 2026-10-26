@@ -21,7 +21,7 @@ When a verified absolute DOCATLAS_MINILM_MODEL_DIR is configured, omitted
 DOCATLAS_CONTEXT_COMPRESSION now enables the local MiniLM scorer automatically.
 Without a provisioned path it stays off; DOCATLAS_CONTEXT_COMPRESSION=off is a
 hard rollback. Request handling never downloads model weights or calls an external
-model API. With the compressor enabled, the default selection is facet-guarded-v1
+model API. With the compressor enabled, the default selection is facet-guarded-lexical-v1
 using markdown-owner-v1 units; use DOCATLAS_SECTION_SELECTION=fixed and
 DOCATLAS_SECTION_UNITS=legacy for the previous fixed-5 behavior.
 
@@ -149,10 +149,10 @@ MiniLM, not a reproduction of the authors' BERT training or overlapping slicing:
 https://arxiv.org/abs/1905.09217
 
 
-## Current default (2026-10-26)
+## Current default candidate (2026-10-26; lexical source-diversity guard)
 
 With an explicitly provisioned trusted local MiniLM directory, the default
-section selector is `facet-guarded-v1` / `global-margin-envelope-v2` with
+section selector is `facet-guarded-lexical-v1` / `global-margin-envelope-v2` with
 `markdown-owner-v1` units. It scores the full question and literal sub-question
 fragments, retains near-best full-question alternatives, and preserves bounded
 already admitted Markdown-parent siblings. No semantic answer-certification or
@@ -165,7 +165,7 @@ runs found no extra required facts and no useful safe NLI removals.
 export DOCATLAS_MINILM_MODEL_DIR=/absolute/private/minilm-model
 # Optional: choose the new profile explicitly (it is already the default
 # inside a configured compressor).
-export DOCATLAS_SECTION_SELECTION=facet-guarded-v1
+export DOCATLAS_SECTION_SELECTION=facet-guarded-lexical-v1
 export DOCATLAS_SECTION_UNITS=markdown-owner-v1
 # Safe rollback:
 # export DOCATLAS_SECTION_SELECTION=fixed
@@ -180,3 +180,12 @@ continue to receive the original v1 view; use `prepare_packed_context()`
 explicitly for a compatible direct-response host. See
 `docs/model-context-packing.md`. These measurements concern delivered context,
 not fully priced strong-model dialogues or generated-answer quality.
+
+The lexically guarded profile is a new explicitly benchmarked revision, not a
+retroactive claim for the original `facet-guarded-v1`/global-margin variant.
+It retains the original facet winners and may add one already-admitted separate
+document when several terms of the question's clause match it and its MiniLM
+score is a bounded near-match. Its associated short Markdown-owner rules are
+kept only from the admitted source pool. It never certifies sufficiency,
+absence, or a calibrated probability. Default controls and retrieval trace
+must independently confirm no documented fact losses before rollout.

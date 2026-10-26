@@ -9,7 +9,8 @@ from __future__ import annotations
 import hashlib
 import re
 
-POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1"})
+POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1",
+                      "facet-margin-envelope-v1", "facet-guarded-lexical-v1"})
 MAX_PROBES = 16
 SCORE_MARGIN = 1.0  # development heuristic in frozen-model logits, NOT calibrated probability
 CAPSULE_TOKENS = 512  # maximum admitted source-text cost of one parent, not top-k
@@ -136,6 +137,99 @@ def _capsules(sections, snapshot):
     return result
 
 
+
+# Lexical evidence bridging is a *positive-only* safety guard, not answer
+# sufficiency, entailment, or a document-specific dictionary. It can only add
+# already-admitted original sections; all previously protected facet winners
+# retain priority under the full packet budget.
+_LEXICAL_STOPWORDS = frozenset("""the a an and or if is are was were be been being to from
+of on in at for with by as its it that this those these what which who whose
+where when why how does do did may can could should would will shall all every
+each same than then more less about before after during into out through
+without also still there here our your their some not no yes explain describe
+conditions happen happens including please report reports""".split())
+_LEXICAL_MAX_SECTIONS = 64
+_LEXICAL_MAX_PROBES = 16
+_LEXICAL_MAX_MARGIN = 5.0  # exploratory cross-ranker guard, never a probability
+
+
+def _lexical_words(value: str) -> frozenset[str]:
+    result = set()
+    for word in re.findall(r"[A-Za-z]+", value.casefold()):
+        if len(word) < 3 or word in _LEXICAL_STOPWORDS:
+            continue
+        if word.endswith("ies") and len(word) >= 6:
+            word = word[:-3] + "y"
+        elif word.endswith("ing") and len(word) >= 7:
+            word = word[:-3]
+        elif word.endswith("ed") and len(word) >= 6:
+            word = word[:-2]
+        elif word.endswith("es") and len(word) >= 6:
+            word = word[:-2]
+        elif word.endswith("s") and not word.endswith("ss") and len(word) >= 5:
+            word = word[:-1]
+        if len(word) >= 5 and word.endswith("e"):
+            word = word[:-1]
+        if len(word) >= 3:
+            result.add(word)
+    return frozenset(result)
+
+
+def _lexical_cross_source_guard(probes, sections, matrix, already_selected, capsules):
+    """Choose <=one missing native document from a matching query obligation.
+
+    Require both lexical evidence and an independent, bounded MiniLM near-match.
+    This prevents one exceptionally ranked document's unrelated sibling capsule
+    from crowding out an entirely different document needed by the question.
+    No new source is read. Subword heuristics cannot certify sufficiency.
+    """
+    if (len(sections) > _LEXICAL_MAX_SECTIONS or len(probes) > _LEXICAL_MAX_PROBES
+            or not matrix or not sections):
+        return set(), {"status": "skipped_complexity_limit"}
+    present = {(sections[i].key[0], *sections[i].key[2:]) for i in already_selected}
+    corpus_terms = [
+        _lexical_words(str(section.key[1]) + "\n" + section.text[:16_384])
+        for section in sections
+    ]
+    best = None
+    for p, (view, scores) in enumerate(zip(probes, matrix)):
+        query_terms = _lexical_words(view)
+        if len(query_terms) < 3:
+            continue
+        ceiling = max(scores)
+        for i, section in enumerate(sections):
+            if (section.key[0], *section.key[2:]) in present:
+                continue
+            overlap = query_terms.intersection(corpus_terms[i])
+            count = len(overlap)
+            if count < 3 or count / len(query_terms) < 0.27:
+                continue
+            margin = ceiling - scores[i]
+            if margin > _LEXICAL_MAX_MARGIN:
+                continue
+            # Keep language-only overlap secondary to the actual locally
+            # measured relevance. At most one new source-document is admitted.
+            order = (count, count / len(query_terms), -margin, scores[i], -i)
+            if best is None or order > best[0]:
+                best = (order, p, i, sorted(overlap))
+    if best is None:
+        return set(), {"status": "no_safe_cross_source_candidate"}
+    _, probe_index, index, overlapping = best
+    added = set(capsules.get(index, (index,)))
+    # Some document sections are not short-owner grouped; keep the seed.
+    added.add(index)
+    return added, {
+        "status": "one_already_admitted_source_added",
+        "probe_index": probe_index,
+        "path": sections[index].rows[0].get("path_or_url"),
+        "seed_section": sections[index].key[1],
+        "matched_stems": overlapping,
+        "proposed_groups": sorted(added),
+        "semantic_sufficiency_certified": False,
+    }
+
+
+
 def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot, budget):
     """Select query-facet candidates, not a semantically certified answer set.
 
@@ -144,8 +238,8 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     GUARDED revision 2 limits that band to the full original scoring question;
     fragment probes supply only their best matches, avoiding flat-score floods.
     """
-    guarded = policy == "facet-guarded-v1"
-    margin = policy in {"facet-guarded-v1", "facet-margin-envelope-v1"}
+    guarded = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1"}
+    margin = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1", "facet-margin-envelope-v1"}
     probes, fallback = question_probes(question)
     matrix = [global_scores]
     if not fallback:
@@ -171,13 +265,20 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     seeds = {i for i in support if support[i]}
     chosen = set(range(len(sections))) if fallback else set(seeds)
     expanded = {}
-    envelopes = {"facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1"}
+    envelopes = {"facet-envelope-v1", "facet-guarded-v1", "facet-guarded-lexical-v1", "facet-margin-envelope-v1"}
     if not fallback and policy in envelopes:
         capsules = _capsules(sections, snapshot)
         for index in sorted(seeds):
             neighbors = capsules.get(index, ())
             chosen.update(neighbors)
             expanded[index] = list(neighbors)
+    lexical_added, lexical_receipt = set(), {"status": "not_requested"}
+    if policy == "facet-guarded-lexical-v1" and not fallback:
+        lexical_added, lexical_receipt = _lexical_cross_source_guard(
+            probes[:len(matrix)], sections, matrix, chosen, capsules)
+        chosen.update(lexical_added)
+    # Facet winners first. The independent lexical bridge is secondary; a
+    # complete-packet budget cut can remove it before any original facet seed.
     # Facet witnesses first, then structural support, then omitted rows.
     # A budget cut is explicitly reported by the existing packet finalizer.
     ordered = sorted(chosen, key=lambda i: (not bool(support[i]), -len(support[i]),
@@ -185,12 +286,15 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     ordered += [i for i in rank if i not in chosen]
     receipt["facet_selection"] = {
         "version": policy, "completeness": "unassessed",
-        "strategy_revision": "global-margin-envelope-v2" if guarded else policy,
+        "strategy_revision": (
+            "lexical-cross-source-v1" if policy == "facet-guarded-lexical-v1"
+            else "global-margin-envelope-v2" if guarded else policy),
         "margin_scope": "full_question_only" if guarded else "all_probes",
         "score_margin": SCORE_MARGIN if margin else 0.0,
         "margin_is_calibrated_probability": False,
         "probe_count": len(matrix), "planned_probe_count": len(probes),
         "fallback": fallback, "capsule_tokens": CAPSULE_TOKENS if policy in envelopes else None,
+        "cross_source_lexical_guard": lexical_receipt,
         "probes": [{"text": p, "sha256": hashlib.sha256(p.encode()).hexdigest()}
                    for p in probes[:len(matrix)]],
         "scores": matrix,
