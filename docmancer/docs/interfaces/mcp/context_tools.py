@@ -12,6 +12,7 @@ from dataclasses import asdict, is_dataclass
 import json
 from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
 from docmancer.docs.domain.original_body_discovery import original_body_read_scope, experimental_context_max_tokens
+from docmancer.docs.documentation_language import record_translation, translated_query
 import math
 import sys
 from uuid import uuid4
@@ -286,7 +287,6 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
     return updated
 
 
-@original_body_read_scope
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
@@ -299,10 +299,25 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
-    from docmancer.docs.documentation_language import record_translation, translated_query
     search_question, lookup_queries = translated_query(question, args.get("search_question"), lookup_queries)
     if args.get("search_question") is not None and context_format == "patch_context":
         return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
+    # Freeze the validated effective query plan before opening the request-owned
+    # native body read. The translated host lookup must be in the same plan used
+    # to acquire sources and to verify their original-read receipts; otherwise
+    # a successful translated search is incorrectly rejected at admission.
+    prepared_args = {**args, "lookup_queries": lookup_queries}
+    return _handle_prepared_context_tool(name, prepared_args, service)
+
+
+@original_body_read_scope
+def _handle_prepared_context_tool(
+    name: str, args: dict[str, Any], service: LibraryDocsService,
+) -> dict[str, Any] | None:
+    question = args["question"]
+    context_format = args.get("context_format")
+    lookup_queries = args["lookup_queries"]
+    search_question = args.get("search_question") if args.get("search_question") is not None else question
     # Explicit presentation choice is read-only; it is not a mutation contract
     # and is never forwarded as permission or inferred from request prose.
     kind = "patch_context" if context_format == "patch_context" else "docs_answer"

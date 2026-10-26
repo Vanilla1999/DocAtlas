@@ -1,0 +1,110 @@
+{
+  "schema_version": "selenemesh-semantic-holdout.v1",
+  "source_kind": "new independent synthetic project for sufficiency evaluation",
+  "source_language": "en",
+  "frozen_before_inference": true,
+  "not_previously_used_in_64": true,
+  "families": [
+    {
+      "id": "selene",
+      "documents": {
+        "README.md": "# README.md\n\n## Overview\nSeleneMesh processes isolated workspaces, message streams, imports and exports. Consult each topic document for the exact rule; this overview grants no access permissions.\n\n## Operations\nThe platform records activity and exposes counters. Operational indicators are not service-credit or financial-compensation terms.\n",
+        "docs/sessions.md": "# docs/sessions.md\n\n## Ticket lifetime\nEach SeleneMesh session ticket expires 53 seconds after issuance. Being idle does not stop the expiry clock.\n\n## Renewal authorization\nA ticket may be renewed at most two times, only by its bound worker and only before the active expiry.\n\n## Renewal spacing\nAt least eleven seconds must pass after issuance or the last successful renewal. A successful renewal grants another 53-second lifetime.\n\n## Signed revocation\nReceipt of a signed revocation invalidates the ticket immediately. Never retry or renew that ticket; a new one requires a fresh authorization check.\n",
+        "docs/retries.md": "# docs/retries.md\n\n## HTTP 429 rule\nAfter HTTP 429, automatic retry requires Retry-After to be a nonnegative integer no greater than 75 seconds. Wait exactly the indicated interval.\n\n## HTTP 429 exception\nAn absent, malformed, or greater-than-75 Retry-After prevents automatic retry; there is no fallback delay.\n\n## HTTP 503 identity\nAutomatic retry of HTTP 503 requires the Idempotency-Key from the original attempt, with exactly the same key and body on retries.\n\n## HTTP 503 timing\nAt most two HTTP 503 retries are permitted: the first after six seconds, the second after nineteen seconds. Without the original key, do not retry automatically.\n\n## HTTP 401 denial\nHTTP 401 must not be automatically retried and the client must not acquire broader credentials on the caller's behalf; fresh authorization must occur separately.\n",
+        "docs/imports.md": "# docs/imports.md\n\n## Batch identity\nThe complete uploaded input has a SHA-256 digest bound to its batch identifier. Reusing the identifier with changed contents is a conflict and cannot mutate the existing batch.\n\n## Resume window\nResume an interrupted batch no later than fourteen minutes after its last accepted chunk, with the same identifier and complete-input digest. After expiry begin a new batch.\n\n## Atomic visibility\nChunks in staging are invisible to readers and exports. After validating the entire batch, an explicit commit atomically publishes it; incomplete batches never become partially visible.\n",
+        "docs/consumer.md": "# docs/consumer.md\n\n## Durable application commit\nWrite the business effect and workspace-scoped processed-event identifier in one durable application transaction. The service does not provide exactly-once external effects.\n\n## Acknowledgement order\nAcknowledge the event only after the application transaction commits; earlier acknowledgement can lose the effect on crash.\n\n## Checkpoint order\nMove the durable checkpoint only after the server confirms the acknowledgement, not when the event is merely read.\n\n## Replay order\nAfter crash, reopen the same workspace stream immediately after the durable checkpoint. Process replayed events in ascending sequence before later arrivals.\n\n## Duplicate deliveries\nAn event committed before a crash but not acknowledged may be redelivered. Read the durable event-identifier record, skip the duplicate business effect, then acknowledge.\n\n## Poison events\nAt an unprocessable event, stop the consumer and report the sequence. Do not drop or acknowledge it or advance the checkpoint; quarantine requires a separate authorized operator action.\n",
+        "docs/exports.md": "# docs/exports.md\n\n## Export snapshot\nAn export reads the committed manifest current when its request was accepted, excluding later commits and uncommitted import chunks.\n\n## Creation permission\nExport creation requires an active ticket and read permission for the requested workspace; it grants no read permission for another workspace.\n\n## Independent expiry limits\nAn export object is retained four hours, while a signed download link lasts eighteen minutes. Every download rechecks permission; revocation blocks access immediately.\n\n## Resume and renewal\nResume with the same export identifier and byte Range, checking that the snapshot identifier matches. A renewed link requires fresh authorization and does not refresh the object's four-hour retention.\n",
+        "docs/workers.md": "# docs/workers.md\n\n## Worker drain\nDraining a worker stops new assignments only to that worker. Its current task, sibling workers and the workspace continue.\n\n## Workspace pause\nPausing a workspace stops new assignments to every worker in that workspace; running tasks and other workspaces continue.\n\n## Task cancel\nCancelling a running task requires its exact task identifier, workspace identifier and explicit cancel permission; worker drain and workspace pause are not cancellation.\n\n## Workspace resume\nResuming a workspace clears its pause flag but not a separately drained worker; that worker must be resumed explicitly.\n",
+        "docs/security.md": "# docs/security.md\n\n## Key rotation\nEncryption keys rotate at most every thirty-nine days; newly encrypted records use the new key.\n\n## Overlap window\nFor eight minutes after a planned rotation, an older key can decrypt existing records but cannot encrypt new ones.\n\n## Revoked key\nA revoked key is rejected immediately for both encryption and decryption, regardless of the planned overlap window.\n\n## Workspace isolation\nAccess tokens are bound to a single workspace. No cross-workspace read is authorized by a token for another workspace.\n",
+        "docs/quotas.md": "# docs/quotas.md\n\n## Steady request rate\nThe steady API request quota is 250 requests per minute per workspace.\n\n## Storage thresholds\nAt seven gigabytes, a workspace gets a storage warning; at eight gigabytes, new writes are rejected until usage falls.\n\n## Burst rule\nAt most twenty requests are accepted per ten-second burst window, independently of the minute quota.\n",
+        "docs/audit.md": "# docs/audit.md\n\n## Audit retention\nSeleneMesh keeps AuditTrail entries for thirty-three days before scheduled deletion.\n"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "S01",
+      "project_group": "selene",
+      "question": "When does a session ticket expire if idle, what are renewal limits and timing, and how must signed revocation be handled?",
+      "search_question": "When does a session ticket expire if idle, what are renewal limits and timing, and how must signed revocation be handled?",
+      "lookup_queries": []
+    },
+    {
+      "id": "S02",
+      "project_group": "selene",
+      "question": "Compare SeleneMesh automatic retries after 429, 503, and 401, including absent Retry-After and the original Idempotency-Key requirement.",
+      "search_question": "Compare SeleneMesh automatic retries after 429, 503, and 401, including absent Retry-After and the original Idempotency-Key requirement.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S03",
+      "project_group": "selene",
+      "question": "How can an interrupted import resume, what happens if a batch identifier is reused with altered bytes, and when do records become visible?",
+      "search_question": "How can an interrupted import resume, what happens if a batch identifier is reused with altered bytes, and when do records become visible?",
+      "lookup_queries": []
+    },
+    {
+      "id": "S04",
+      "project_group": "selene",
+      "question": "Describe full SeleneMesh consumer crash recovery: durable business effects, acknowledgement, checkpoint, replay, duplicates and poison events.",
+      "search_question": "Describe full SeleneMesh consumer crash recovery: durable business effects, acknowledgement, checkpoint, replay, duplicates and poison events.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S05",
+      "project_group": "selene",
+      "question": "Explain export snapshot contents, required permission, signed-link expiry, object retention, revocation and resumable download.",
+      "search_question": "Explain export snapshot contents, required permission, signed-link expiry, object retention, revocation and resumable download.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S06",
+      "project_group": "selene",
+      "question": "How do worker drain, workspace pause, task cancel and workspace resume differ, including existing tasks and permissions?",
+      "search_question": "How do worker drain, workspace pause, task cancel and workspace resume differ, including existing tasks and permissions?",
+      "lookup_queries": []
+    },
+    {
+      "id": "S07",
+      "project_group": "selene",
+      "question": "What are the encryption key rotation period, temporary old-key allowances and behavior of revoked keys? Include all restrictions.",
+      "search_question": "What are the encryption key rotation period, temporary old-key allowances and behavior of revoked keys? Include all restrictions.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S08",
+      "project_group": "selene",
+      "question": "State steady API quota, independent burst quota and soft versus hard storage thresholds for a workspace.",
+      "search_question": "State steady API quota, independent burst quota and soft versus hard storage thresholds for a workspace.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S09",
+      "project_group": "selene",
+      "question": "For how many days does SeleneMesh retain AuditTrail, and in which country are its backup copies kept? Distinguish known and undocumented parts.",
+      "search_question": "For how many days does SeleneMesh retain AuditTrail, and in which country are its backup copies kept? Distinguish known and undocumented parts.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S10",
+      "project_group": "selene",
+      "question": "What financial compensation formula applies to 45 minutes of SeleneMesh downtime? Give the amount or state what the documentation supports.",
+      "search_question": "What financial compensation formula applies to 45 minutes of SeleneMesh downtime? Give the amount or state what the documentation supports.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S11",
+      "project_group": "selene",
+      "question": "Who is the named escrow officer and what is their telephone number for SeleneMesh encryption keys? Use only documented facts.",
+      "search_question": "Who is the named escrow officer and what is their telephone number for SeleneMesh encryption keys? Use only documented facts.",
+      "lookup_queries": []
+    },
+    {
+      "id": "S12",
+      "project_group": "selene",
+      "question": "If a workspace is paused and a download permission is revoked, can running tasks continue, can the export still be downloaded and does workspace resume clear a worker's drain?",
+      "search_question": "If a workspace is paused and a download permission is revoked, can running tasks continue, can the export still be downloaded and does workspace resume clear a worker's drain?",
+      "lookup_queries": []
+    }
+  ]
+}

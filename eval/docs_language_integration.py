@@ -24,6 +24,26 @@ PAIRS = {
     "eslint": ("V40-E01", "Какие имена файлов ESLint может использовать для плоской конфигурации?"),
 }
 
+# Independent source-only case: the Russian request has no export vocabulary,
+# while the explicit English translation can find the four original windows.
+# Neither source text nor these literal facts are derived from retrieval output.
+EXPORT_QUESTION_RU = (
+    "Как устроен согласованный и возобновляемый экспорт NacreRelay? "
+    "Объясните, какие данные он включает, как продолжить скачивание и чем "
+    "ограничен срок доступа, в том числе после отзыва разрешения."
+)
+EXPORT_QUESTION_EN = (
+    "How does a consistent and resumable NacreRelay export work? Explain "
+    "which data it includes, how to resume a download, and what limits the "
+    "period of access, including after permission revocation."
+)
+EXPORT_WITNESSES = (
+    "An export reads the committed manifest that was current when the export request was accepted. Later commits are not added to that export. Uncommitted import chunks are never included.",
+    "Creating an export requires an active session ticket and read permission for the requested workspace. The export does not grant permission to read any other workspace.",
+    "An export object is retained for six hours. Each signed download link is valid for twelve minutes. Download permission is checked again on every request, so revocation blocks a download immediately even when the object and link have not expired.",
+    "Resume with the same export identifier and a byte Range request. The returned snapshot identifier must match the original response. An expired signed link can be replaced only after a fresh authorization check; replacing the link does not refresh the six-hour object retention period.",
+)
+
 
 def load(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -62,6 +82,11 @@ def worker(args):
         docs = {"README.md": "# Aster\n\nAster listens on port 8127.\n",
                 "packages/auth/README.md": "# Вход\n\nМодуль auth использует порт 9201.\n",
                 "packages/other/README.md": "# Andere\n\nPort 9401.\n"}
+    elif args.group == "translation-only":
+        docs = {
+            "README.md": "# NacreRelay\n\nNacreRelay publishes workspace API documentation.\n",
+            "docs/exports.md": (args.repo / "eval/fixtures/translation_only_exports/docs/exports.md").read_text(encoding="utf-8"),
+        }
     else:
         docs = {p: (corpus / "sources" / args.group / p).read_text(encoding="utf-8")
                 for p in families[args.group]["paths"]}
@@ -93,7 +118,7 @@ def worker(args):
                 })
             save(out / "library.json", {"canonical_id": record.canonical_id})
         before_db, before_files = helper.logical_state(inventory), helper.source_state(root)
-        os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="off" if args.group == "controls" else "minilm-sections-v1",
+        os.environ.update(DOCATLAS_CONTEXT_COMPRESSION="off" if args.group in {"controls", "translation-only"} else "minilm-sections-v1",
                           DOCATLAS_MINILM_MODEL_DIR=str(args.model), DOCATLAS_CONTEXT_ABSTENTION="off",
                           DOCATLAS_MCP_TEXT_FALLBACK="1", HF_HUB_OFFLINE="1")
         with observe_section_compression() as receipts:
@@ -115,7 +140,7 @@ async def client(args):
     from docmancer.docs.application.section_compression import expand_sections
     _, cases, _ = dataset(args)
     results, calls = [], 0
-    groups = ["controls"] if args.controls_only else [*PAIRS, "controls"]
+    groups = ["controls"] if args.controls_only else [*PAIRS, "controls", "translation-only"]
     for group in groups:
         out = args.out / group
         out.mkdir(parents=True)
@@ -145,7 +170,7 @@ async def client(args):
                         assert not reply.isError, raw
                     return expand_sections(raw)
                 status_req = {"action": "project", "project_path": str(root), "details": False}
-                if group != "controls":
+                if group in PAIRS:
                     status = await call("language", "docs_status", {**status_req, "include_language": True})
                     assert status["documentation_language"]["languages"] == ["en"]
                     assert status["documentation_language"]["basis"] == "catalog_declaration"
@@ -162,6 +187,49 @@ async def client(args):
                         save(out / f"{name}-expanded.json", payload)
                     results.append({"group": group, "case_id": case_id, "paired_source_content_equality": paired_equal,
                                     "english_question": en, "original_question": ru})
+                elif group == "translation-only":
+                    language = await call("exports-language", "docs_status", {
+                        "action": "project", "project_path": str(root), "include_language": True})
+                    assert language["documentation_language"]["languages"] == ["en"]
+                    assert language["documentation_language"]["source_count"] == 2
+                    request = {"project_path": str(root), "scope": "project", "question": EXPORT_QUESTION_RU,
+                               "search_question": EXPORT_QUESTION_EN, "lookup_queries": []}
+                    payload = await call("exports-translation-only", "get_docs_context", request)
+                    save(out / "exports-expanded.json", payload)
+                    original = (args.repo / "eval/fixtures/translation_only_exports/docs/exports.md").read_bytes()
+                    live = (root / "docs/exports.md").read_bytes()
+                    assert live == original, "prepared source must match the independent fixture"
+                    lines = original.decode("utf-8").splitlines(keepends=True)
+                    exported = []
+                    for row in payload.get("sources", []):
+                        if row["path_or_url"] != "docs/exports.md":
+                            continue
+                        assert row["scope"] == "project" and row["authority"] == "source_of_truth"
+                        assert row["project_identity"] == "local:" + sha(str(root).encode())
+                        assert row["version_binding"] == "unversioned"
+                        assert 1 <= row["line_start"] <= row["line_end"] <= len(lines)
+                        assert row["snippet"] in "".join(lines[row["line_start"] - 1:row["line_end"]])
+                        exported.append(row["snippet"])
+                    missing = [fact for fact in EXPORT_WITNESSES if not any(fact in text for text in exported)]
+                    assert not missing, {"missing_required_export_facts": missing,
+                                         "source_paths": [row["path_or_url"] for row in payload.get("sources", [])]}
+                    restricted = await call("exports-wrong-scope", "get_docs_context", {
+                        **request, "scope": "module", "module_path": "packages/other"})
+                    assert not any(row["path_or_url"] == "docs/exports.md"
+                                   for row in restricted.get("sources", [])), "translated lookup escaped module scope"
+                    # Public MCP may surface patch/schema rejection as a plain
+                    # protocol error rather than a JSON tool-result envelope.
+                    # In either form, it must never return a successful read.
+                    denied = await session.call_tool("get_docs_context", {
+                        **request, "context_format": "patch_context"})
+                    calls += 1
+                    assert denied.isError, "translated lookup must not authorize patch context"
+                    denied_wire = "\n".join(item.text for item in denied.content if item.type == "text")
+                    (out / "exports-no-patch-wire.txt").write_text(denied_wire, encoding="utf-8")
+                    assert denied_wire and all(fact not in denied_wire for fact in EXPORT_WITNESSES)
+                    results.append({"group": group, "covered": len(EXPORT_WITNESSES),
+                                    "required": len(EXPORT_WITNESSES), "source_sha256": sha(original),
+                                    "wrong_scope_excluded": True, "patch_context_rejected": True})
                 else:
                     base = await call("legacy", "docs_status", status_req)
                     assert "documentation_language" not in base
@@ -236,7 +304,7 @@ async def client(args):
                     results.append({"group": "controls", "passed": True})
         state = json.loads((out / "server.json").read_text())
         assert state["files_unchanged"] and state["database_unchanged"], state
-        if group != "controls":
+        if group in PAIRS:
             en = cases[PAIRS[group][0]]["question"]
             assert state["observations"][-1]["scoring_question_sha256"] == sha(en.encode())
     save(args.out / "DELIVERY.json", {"public_calls": calls, "preparations": len(groups), "results": results})
@@ -249,7 +317,7 @@ def assess(args, results, calls):
     gold = {c["id"]: c for c in json.loads((corpus / "gold_spans.json").read_text())["cases"]}
     coverage = []
     for row in results:
-        if row["group"] == "controls":
+        if row["group"] in {"controls", "translation-only"}:
             continue
         family, case_id = row["group"], row["case_id"]
         prepared = {"root": str(args.work / family / "project"), "sources": {}}
@@ -280,7 +348,7 @@ def main():
     for flag in ("repo", "work", "out", "model"):
         parser.add_argument("--" + flag, type=Path, required=True)
     parser.add_argument("--worker", action="store_true")
-    parser.add_argument("--group", choices=[*PAIRS, "controls"])
+    parser.add_argument("--group", choices=[*PAIRS, "controls", "translation-only"])
     parser.add_argument("--controls-only", action="store_true")
     args = parser.parse_args()
     for key in ("repo", "work", "out", "model"):

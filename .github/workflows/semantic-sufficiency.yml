@@ -1,0 +1,109 @@
+name: Semantic preservation alternatives and unknown-state safety
+on:
+  push:
+    branches: [experiment/coverage-aware-selection-20261025]
+    paths:
+      - 'docmancer/docs/application/semantic_*.py'
+      - 'eval/semantic_preservation*'
+      - 'eval/semantic_preservation_holdout/**'
+      - 'eval/compare_semantic_preservation.py'
+      - '.github/workflows/semantic-sufficiency.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: semantic-preservation-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        suite: [v40, new16, fresh8, semantic12, preservation8]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze exact installed code, old data, new controls and NLI parameters
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/preservation-evidence"
+          git fetch -q origin 1d39dae23106530bf2dda543613dba1613b06246 --depth=1
+          git diff --exit-code 1d39dae23106530bf2dda543613dba1613b06246 HEAD -- \
+            eval/prepared_model_comparison40 eval/adaptive_gap_holdout \
+            eval/fresh_dialogues/fixtures eval/fresh_dialogues/oracle \
+            eval/semantic_sufficiency_holdout pyproject.toml uv.lock \
+            docmancer/docs/application/facet_selection.py \
+            docmancer/docs/application/section_compression.py
+          python -m compileall -q docmancer eval/semantic_preservation_integration.py eval/compare_semantic_preservation.py
+          git rev-parse HEAD > "$RUNNER_TEMP/preservation-evidence/head.txt"
+          git archive HEAD docmancer eval/semantic_preservation_integration.py eval/compare_semantic_preservation.py eval/semantic_preservation_holdout .github/workflows/semantic-sufficiency.yml | gzip > "$RUNNER_TEMP/preservation-evidence/tested-source.tar.gz"
+      - name: Build non-editable wheel and provision pinned models before disabling network
+        run: |
+          docker build -f eval/answerability.Dockerfile -t docatlas-preservation-base .
+          docker build -t docatlas-preservation - <<'DOCKER'
+          FROM docatlas-preservation-base
+          RUN /opt/venv/bin/python -I -m docmancer.docs.application.semantic_preservation /nli-model
+          DOCKER
+      - name: Compare real public MCP deliveries with unchanged independent witnesses
+        env:
+          SUITE: ${{ matrix.suite }}
+        run: |
+          set -uo pipefail
+          modes='facet-guarded-v1 semantic-exact-prune-v1 semantic-nli-prune-v1'
+          if [ "$SUITE" = semantic12 ] || [ "$SUITE" = preservation8 ]; then
+            modes="$modes semantic-rescue-v1"
+          fi
+          failed=0
+          for policy in $modes; do
+            model=/qa-model
+            if [ "$policy" = semantic-nli-prune-v1 ]; then model=/nli-model; fi
+            name="preservation-$policy"
+            docker run --name "$name" --network none --cpus=2 \
+              --memory=1500000000 --memory-swap=1500000000 \
+              -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+              -v "$RUNNER_TEMP/preservation-evidence:/evidence" \
+              --entrypoint /opt/venv/bin/python docatlas-preservation \
+              -I /repo/eval/semantic_preservation_integration.py \
+              --repo /repo --work /tmp/preservation-study --out "/evidence/$SUITE/$policy" \
+              --model /model --qa-model "$model" --suite "$SUITE" --policy "$policy"
+            rc=$?
+            docker inspect "$name" > "$RUNNER_TEMP/preservation-evidence/$policy-container.json"
+            echo "$rc" > "$RUNNER_TEMP/preservation-evidence/$policy-exit.txt"
+            if [ "$rc" -ne 0 ]; then failed=1; fi
+          done
+          exit "$failed"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: preservation-${{ matrix.suite }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/preservation-evidence/
+          retention-days: 30
+          if-no-files-found: error
+  compare:
+    needs: installed
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Download only these paired executions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/arms" "$RUNNER_TEMP/paired"
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'preservation-*' --dir "$RUNNER_TEMP/arms"
+      - name: Reject lossless or unknown-action regressions; report NLI quality separately
+        run: python eval/compare_semantic_preservation.py --artifacts "$RUNNER_TEMP/arms" --out "$RUNNER_TEMP/paired"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: preservation-paired-${{ github.run_id }}
+          path: ${{ runner.temp }}/paired/
+          retention-days: 30

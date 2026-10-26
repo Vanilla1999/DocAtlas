@@ -1,0 +1,35 @@
+name: Semantic session transport contract (not model quality)
+on:
+  push:
+    branches: [experiment/facet-selection-20261025, integration/restore-fixed5-20261026]
+    paths: ['.github/workflows/semantic-session-contract.yml', 'eval/checked_context_contract.py', 'docmancer/docs/interfaces/checked_context_session.py', 'docmancer/docs/interfaces/semantic_provider.py', 'docmancer/docs/application/semantic_sufficiency.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installed-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Frozen fixture and installed wheel
+        run: |
+          python eval/semantic_holdout/build.py
+          docker build -f eval/minilm_sections.Dockerfile -t docatlas-semantic-contract .
+      - name: Real MCP and HTTP adapter, explicitly scripted external model only
+        run: |
+          mkdir -p "$RUNNER_TEMP/semantic-contract"
+          docker run --name semantic-contract --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -v "$RUNNER_TEMP/semantic-contract:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-semantic-contract -I /repo/eval/checked_context_contract.py \
+            --repo /repo --work /tmp/semantic-contract --out /evidence/run --model /model
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: semantic-contract-${{ github.run_id }}
+          path: ${{ runner.temp }}/semantic-contract/
+          retention-days: 30
+          if-no-files-found: error
