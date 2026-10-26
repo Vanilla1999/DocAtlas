@@ -58,7 +58,12 @@ class SectionCompressionError(ValueError):
 
 
 def enabled() -> bool:
-    setting = os.environ.get("DOCATLAS_CONTEXT_COMPRESSION", "off")
+    # If a trusted host explicitly provisioned a MiniLM model directory, use
+    # the new efficient selection without requiring a second opt-in switch.
+    # No model path -> no network, download, or surprise inference.
+    setting = os.environ.get("DOCATLAS_CONTEXT_COMPRESSION")
+    if setting is None:
+        setting = MODE if os.environ.get("DOCATLAS_MINILM_MODEL_DIR") else "off"
     if setting not in ("", "off", MODE):
         raise SectionCompressionError("section_compression_invalid_config")
     return setting == MODE
@@ -94,7 +99,11 @@ def selection_limit() -> int:
 
 
 def selection_units() -> str:
-    value = os.environ.get("DOCATLAS_SECTION_UNITS", "legacy")
+    # Facet ranking needs actual Markdown owner groupings; explicit fixed-k
+    # rollback keeps the legacy grouping rather than inheriting the new mode.
+    policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "facet-guarded-lexical-v2")
+    default = "markdown-owner-v1" if (policy.startswith("facet-") or policy.startswith("semantic-")) else "legacy"
+    value = os.environ.get("DOCATLAS_SECTION_UNITS", default)
     if value not in {"legacy", "markdown-owner-v1"}:
         raise SectionCompressionError("section_compression_invalid_units")
     return value
@@ -334,7 +343,7 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
-    policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "fixed")
+    policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "facet-guarded-lexical-v2")
     from .facet_selection import POLICIES as FACET_POLICIES
     from .semantic_local_sufficiency import POLICIES as SEMANTIC_POLICIES
     from .coverage_selection import POLICIES as EXPERIMENT_POLICIES, select_coverage_sections

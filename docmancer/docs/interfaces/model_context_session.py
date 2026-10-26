@@ -18,6 +18,9 @@ from docmancer.docs.application.model_context_view import (
 )
 from docmancer.docs.application.section_compression import expand_sections, OUTPUT_LIMIT
 from docmancer.docs.application.projection_tokenizer import projection_token_count
+from docmancer.docs.application.model_context_packing import (
+    MANAGED_MODES, pack_managed_model_input,
+)
 from .host_context import extract_tool_payload
 
 
@@ -74,7 +77,7 @@ class ModelContextSession:
     def __init__(self, client: Any, *, question: str, bindings: dict,
                  language_mode: bool = False, canonical_id: str | None = None,
                  max_input_tokens: int = OUTPUT_LIMIT, max_searches: int = 3,
-                 max_events: int = 12):
+                 max_events: int = 12, context_packing: str = "adaptive-v1"):
         allowed = {"project_path", "library", "version", "module_path", "scope"}
         if not isinstance(question, str) or not question.strip():
             raise ModelSessionError("question_required")
@@ -95,6 +98,8 @@ class ModelContextSession:
         for value in (max_input_tokens, max_searches, max_events):
             if type(value) is not int or value < 1:
                 raise ModelSessionError("invalid_host_budget")
+        if context_packing not in MANAGED_MODES:
+            raise ModelSessionError("invalid_context_packing_mode")
         self.client = client
         self._lock = asyncio.Lock()
         self._epoch = 0
@@ -104,6 +109,7 @@ class ModelContextSession:
         self._canonical_id = canonical_id
         self._language_mode = language_mode
         self._limit, self._max_searches, self._max_events = max_input_tokens, max_searches, max_events
+        self._context_packing = context_packing
         self._audit: list[dict] = []
         self._language: dict | None = None
         self._snapshot: str | None = None
@@ -335,9 +341,13 @@ class ModelContextSession:
             key: deepcopy(value) for key, value in self._language.items()
             if key not in {"snapshot_sha256", "catalog_sha256", "manifest_digest"}})
         # Full language bindings remain in private state/audit and drive invalidation.
-        return {"question": self._question, "language": language,
+        view = {"question": self._question, "language": language,
                 "result_context": context, "results": results,
                 "source_context": source_context, "sources": source_rows}
+        # The host already owns the exact private source rows; this is only
+        # a model-input representation change. Adaptive packing retains v1 if
+        # cataloguing repeated paths/sections would cost additional tokens.
+        return pack_managed_model_input(view, policy=self._context_packing)
 
     def _check_budget(self, value: dict) -> None:
         if projection_token_count(canonical(value).encode()) > self._limit:

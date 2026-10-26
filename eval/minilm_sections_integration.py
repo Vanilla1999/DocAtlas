@@ -93,6 +93,7 @@ def worker(args):
                 DOCATLAS_MCP_TEXT_FALLBACK="1",
                 HF_HUB_OFFLINE="1",
                 DOCATLAS_SECTION_TOP_K=str(args.top_k), DOCATLAS_SECTION_UNITS=args.units,
+                DOCATLAS_SECTION_SELECTION="fixed",  # explicit legacy top-k control
                 DOCATLAS_SECTION_WIRE_FORMAT=args.wire_format,
             )
             try:

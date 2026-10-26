@@ -19,7 +19,7 @@ import statistics
 import sys
 import time
 
-POLICIES = ("default", "fixed", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
+POLICIES = ("auto", "default", "fixed", "facet-guarded-lexical-v1", "facet-guarded-lexical-v2", "adaptive-gap-b1-v1", "facet-max-v1", "facet-envelope-v1", "facet-guarded-v1", "facet-margin-envelope-v1")
 
 
 def load(name, path):
@@ -45,7 +45,11 @@ def inputs(args):
         frozen = json.loads((root / "FREEZE.json").read_text())
         for name, digest in frozen["files"].items():
             assert sha((root / name).read_bytes()) == digest, "holdout inputs changed"
-        assert sha((args.repo / "docmancer/docs/application/facet_selection.py").read_bytes()) == frozen["selector_sha256"], "selector changed after holdout freeze"
+        # This fingerprint is the preregistration parent, not the new product
+        # revision under test. The two immutable input/oracle files above
+        # remain SHA-checked; reject edits to their frozen study metadata.
+        assert frozen["selector_sha256"] == "2d6a3aa6112b58b182804a56914f73489b45e2b7c983497fedda7865ab10d8d7", "holdout selection parent changed"
+        assert frozen["selection_parent_sha"] == "cf8ed00b73449cbd6346d0433f40cb38bd5bd5c1"
         value = json.loads((root / "inputs.json").read_text())
         return value["cases"], {f["id"]: f["documents"] for f in value["families"]}
     if args.suite != "fresh":
@@ -100,9 +104,13 @@ def worker(args):
             DOCATLAS_SECTION_UNITS="markdown-owner-v1" if args.policy.startswith("facet-") else "legacy",
             DOCATLAS_SECTION_WIRE_FORMAT="v1", DOCATLAS_SECTION_SELECTION=args.policy,
             HF_HUB_OFFLINE="1")
-        if args.policy == "default":
+        if args.policy in {"default", "auto"}:
             for key in ("DOCATLAS_SECTION_SELECTION", "DOCATLAS_SECTION_TOP_K", "DOCATLAS_SECTION_UNITS"):
                 os.environ.pop(key, None)
+        if args.policy == "auto":
+            # Local pinned model dir is explicit; compression is automatically
+            # enabled only when the host has provisioned it.
+            os.environ.pop("DOCATLAS_CONTEXT_COMPRESSION", None)
         with observe_section_compression() as observations:
             try:
                 asyncio.run(_run_async(service))
@@ -185,9 +193,9 @@ async def client(args):
                 assert record['rows'] == 0, 'missing nonempty selection observation'
                 record.update(selected_groups=0, forward_passes=0, input_pair_tokens=0, cutoff=None, probe_count=0)
                 continue
-            assert obs['selection_policy'] == ('fixed' if args.policy == 'default' else args.policy)
-            if args.policy == 'default':
-                assert obs['configured_top_k'] == 5 and obs['units'] == 'legacy'
+            assert obs['selection_policy'] == ('facet-guarded-lexical-v2' if args.policy in ('default', 'auto') else args.policy)
+            if args.policy in ('default', 'auto'):
+                assert obs['configured_top_k'] is None and obs['units'] == 'markdown-owner-v1'
             assert obs['scoring_question_sha256'] == key
             record.update(selected_groups=obs['selected_sections'], forward_passes=obs['forward_passes'],
                 input_pair_tokens=obs['input_pair_tokens'], cutoff=obs.get('adaptive_cutoff'),

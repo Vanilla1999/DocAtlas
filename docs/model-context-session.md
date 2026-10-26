@@ -101,8 +101,11 @@ it does not require trusting a generic client's handling of _meta.
 
 ## Selection experiments, not semantic fixes
 
-Default selection remains five legacy groups. Host-only settings allow a
-predeclared diagnostic comparison: `DOCATLAS_SECTION_TOP_K=1|2|3|5` and
+The currently selected default is facet-guarded-v1 with markdown-owner-v1
+grouping when trusted MiniLM assets have been provisioned. Legacy fixed-five is
+still available with DOCATLAS_SECTION_SELECTION=fixed and
+DOCATLAS_SECTION_UNITS=legacy. Host-only controls include
+`DOCATLAS_SECTION_TOP_K=1|2|3|5` (for fixed mode) and
 `DOCATLAS_SECTION_UNITS=legacy|markdown-owner-v1`. Neither is an LLM tool argument.
 Invalid configuration fails explicitly. No relevance threshold, question-specific
 rule, training or oracle-assisted production decision is introduced.
@@ -116,8 +119,8 @@ once by evidence ID. This is not a guarantee of minimal sufficient evidence.
 
 The workflow records real installed-MCP V40 outcomes for k1/k2/k3 and structural
 k5 separately. A diagnostic run finishing is NOT quality acceptance: consult
-`quality_gate_passed`, coverage and failed IDs. Defaultk5 retains its original
-strict positive/partial gate. The original questions/gold are unchanged.
+`quality_gate_passed`, coverage and failed IDs. The fixed-k historical suite retains its original strict positive/partial
+regression gate. The original questions/gold are unchanged.
 
 ## Remaining evidence limits
 
@@ -129,4 +132,29 @@ receipts permit diagnosis once those exact inputs are available.
 No strong-model cold-agent A/B, final-answer correctness, provider history replay
 or cached-input billing is certified by this SDK integration. The full workflow
 must use the same real strong model and deployed client; no small-model substitute.
-Semantic refusal remains separate and unvalidated. Main is not changed by this PR.
+Semantic refusal remains separate and unvalidated. The default selection and
+managed-host packing rollout is tracked in the main integration PR.
+
+
+## Selection and packing defaults (2026-10-26)
+
+When an already provisioned trusted `DOCATLAS_MINILM_MODEL_DIR` exists, new
+retrieval uses the `facet-guarded-v1` selector with `markdown-owner-v1`
+grouping unless a host explicitly requests `fixed`. If the model directory
+is absent and compression is not explicitly requested, selection stays
+uncompressed; nothing is downloaded during a request.
+
+Managed `ModelContextSession.model_input()` defaults to
+`context_packing="adaptive-v1"`. Repeated source paths or path/section fields
+are cataloged only if the full model input becomes smaller by the tokenizer
+and does not grow in bytes or conservative budget. Text, full refs, source
+ordering and private provenance stay unchanged. The returned input may use
+`docatlas.packed-managed-context.v1`. A compatible managed client can call
+`unpack_managed_model_input(view)` to recover the plain visible fields.
+To force the exact older managed input layout, pass `context_packing="off"`
+to the session constructor.
+
+For raw MCP callers, the server's old `docatlas.model-context.v1` wire is
+unchanged; `prepare_packed_context(reply, policy="adaptive-v1")` remains an
+explicit opt-in helper. No generic client's wire format is silently switched.
+Neither packing nor local QA/NLI makes unsupported content answerable.

@@ -6,6 +6,8 @@ from pathlib import Path
 
 SUITES = {"v40": 40, "new16": 16, "fresh8": 8, "semantic12": 12, "preservation8": 8}
 MODES = ("paths-v1", "sections-v1", "adaptive-v1")
+POLICIES = ("fixed", "facet-guarded-v1", "facet-guarded-lexical-v2")
+CANDIDATE = "facet-guarded-lexical-v2"
 
 
 def main():
@@ -15,7 +17,7 @@ def main():
     args = p.parse_args(); args.out.mkdir(parents=True, exist_ok=True)
     arms = {}; missing = []
     for suite in SUITES:
-        for policy in ("fixed", "facet-guarded-v1"):
+        for policy in POLICIES:
             found = list(args.artifacts.glob(f"**/{suite}/{policy}/SUMMARY.json"))
             if len(found) != 1:
                 missing.append([suite, policy]); continue
@@ -35,26 +37,34 @@ def main():
     assert len(heads) == 1, "mixed product revisions"
     totals = {p: {"documented": 0, "complete": 0, "required": 0, "covered": 0,
                   "negative": 0, "negative_passed": 0, "tokens": 0, "seconds": 0.0}
-              for p in ("fixed", "facet-guarded-v1")}
+              for p in POLICIES}
     losses = []; details = {}; controls = 0
     formats = {m: {"baseline_tokens": 0, "tokens": 0, "baseline_bytes": 0, "bytes": 0,
                    "questions": 0, "grew": 0, "shrunk": 0, "host_seconds": 0.0,
                    "unchanged_evidence_cases": 0, "fallback_cases": 0} for m in MODES}
     for suite, n in SUITES.items():
         reference = arms[(suite, "fixed")]
-        candidate = arms[(suite, "facet-guarded-v1")]
+        candidate = arms[(suite, CANDIDATE)]
         assert reference["freeze"]["files"] == candidate["freeze"]["files"]
+        previous = arms[(suite, "facet-guarded-v1")]
+        assert reference["freeze"]["files"] == previous["freeze"]["files"]
         before = {r["case_id"]: r for r in reference["rows"]}
+        before_old_facet = {r["case_id"]: r for r in previous["rows"]}
         after = {r["case_id"]: r for r in candidate["rows"]}
-        assert len(before) == len(after) == n and before.keys() == after.keys()
+        assert len(before) == len(after) == len(before_old_facet) == n and before.keys() == after.keys() == before_old_facet.keys()
         for cid, a in before.items():
             b = after[cid]
             assert a["question"] == b["question"] and a["search_question"] == b["search_question"]
             assert a["candidate_fingerprint"] == b["candidate_fingerprint"]
             ac, bc = {x["id"]: x["covered"] for x in a["claims"]}, {x["id"]: x["covered"] for x in b["claims"]}
             assert ac.keys() == bc.keys()
-            losses.extend({"suite": suite, "case": cid, "claim": key} for key in ac if ac[key] and not bc[key])
-        for policy in ("fixed", "facet-guarded-v1"):
+            losses.extend({"suite": suite, "case": cid, "claim": key, "control": "fixed"}
+                          for key in ac if ac[key] and not bc[key])
+            prior = {x["id"]: x["covered"] for x in before_old_facet[cid]["claims"]}
+            assert prior.keys() == bc.keys()
+            losses.extend({"suite": suite, "case": cid, "claim": key, "control": "facet-guarded-v1"}
+                          for key in prior if prior[key] and not bc[key])
+        for policy in POLICIES:
             arm = arms[(suite, policy)]
             summary = arm["summary"]
             assert summary["runtime_errors"] == summary["integrity_errors"] == 0
@@ -79,7 +89,7 @@ def main():
                 assert x["same_response_packet"] and x["same_full_citation_refs"] and x["visible_fields_identical_after_expansion"]
                 if x["packing"] == "adaptive-v1":
                     assert x["tokens"] <= x["baseline_tokens"] and x["bytes"] <= x["baseline_bytes"]
-                if policy != "facet-guarded-v1":
+                if policy != CANDIDATE:
                     continue
                 t = formats[x["packing"]]
                 for key in ("tokens", "baseline_tokens", "bytes", "baseline_bytes", "host_seconds"):
@@ -89,17 +99,18 @@ def main():
                 t["shrunk"] += x["tokens"] < x["baseline_tokens"]
                 t["fallback_cases"] += x["actual_policy"] == "original-v1"
                 t["unchanged_evidence_cases"] += 1
-        details[suite] = {"fixed": reference["summary"], "facet": candidate["summary"],
+        details[suite] = {"fixed": reference["summary"], "previous_facet": previous["summary"],
+            "facet": candidate["summary"],
             "packing_tokens": {m: sum(x["tokens"] for x in candidate["packing"]["records"] if x["packing"] == m) for m in MODES}}
     for item in formats.values():
         item["saved_tokens"] = item["baseline_tokens"] - item["tokens"]
     report.update(head=next(iter(heads)), arms=len(arms), selection=totals,
         lost_control_witnesses=losses, packing=formats, by_suite=details,
         rejected_tamper_cases=controls,
-        stdio_search_calls=2 * sum(SUITES.values()),
-        public_baseline_calls=2 * sum(SUITES.values()),
+        stdio_search_calls=len(POLICIES) * sum(SUITES.values()),
+        public_baseline_calls=len(POLICIES) * sum(SUITES.values()),
         language_preflights=sum(len({r["family"] for r in a["rows"]}) for a in arms.values()),
-        quality_gate_passed=not losses and totals["facet-guarded-v1"]["complete"] == totals["facet-guarded-v1"]["documented"],
+        quality_gate_passed=not losses and totals[CANDIDATE]["complete"] == totals[CANDIDATE]["documented"],
         packing_gate_passed=formats["adaptive-v1"]["grew"] == 0 and formats["adaptive-v1"]["saved_tokens"] > 0)
     (args.out / "PAIRED.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps(report, ensure_ascii=False, indent=2))

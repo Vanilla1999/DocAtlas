@@ -1,4 +1,4 @@
-# Reversible host-side packing of selected evidence (opt-in)
+# Reversible packing of selected evidence: managed-host adaptive default
 
 The QA/NLI studies in `semantic-preservation-results.md` did not establish useful
 semantic sufficiency or lower context costs. This alternative leaves the entire
@@ -7,14 +7,17 @@ paths/section labels and the spelling of line-coordinate fields.
 
 ## Pipeline and compatibility
 
-Existing native retrieval -> MiniLM/facet selection -> existing v1 MCP reply ->
-**optional compatible-host packing** -> answering model.
+Native retrieval -> MiniLM/facet selection -> existing v1 MCP reply ->
+**adaptive packing in a compatible managed host** -> answering model.
 
 This is NOT a new retrieval, summarization or semantic completeness decision.
-It does not replace the existing public MCP format or automatically change
-`ModelContextSession.model_input()`. A host must explicitly opt in and understand
-the new `docatlas.packed-model-context.v1` representation. A generic old client
-must continue using its existing v1 view; do not append both views to a prompt.
+It does not replace the existing public MCP wire or negotiate a new format with
+generic clients. A **ModelContextSession** now defaults to `context_packing="adaptive-v1"`
+for its OWN model input (a distinct `docatlas.packed-managed-context.v1` format
+when advantageous), and can explicitly rollback with `context_packing="off"`.
+Hosts reading raw MCP results must still opt in to
+`docatlas.packed-model-context.v1` using `prepare_packed_context`, as before.
+An old generic client must continue using existing v1; never append both views.
 
 ```python
 from docmancer.docs.application.model_context_packing import (
@@ -79,3 +82,34 @@ This verifies source-evidence preservation, not generated-answer accuracy or
 complete strong-model dialogue usage. No strong model is invoked by this study;
 provider usage remains null. QA/NLI modes stay experimental. No automatic merge,
 main/default switch, or claim that corpus absence is solved follows from it.
+
+
+## Managed-host default: representation only
+
+```python
+from docmancer.docs.interfaces.model_context_session import ModelContextSession
+from docmancer.docs.application.model_context_packing import unpack_managed_model_input
+
+turn = ModelContextSession(
+    mcp_client, question=user_question,
+    bindings={"project_path": known_project},
+)
+view = await turn.retrieve()  # equivalent to turn.model_input()
+# Existing plain layout, or packed-managed if the whole input got smaller.
+original_fields = unpack_managed_model_input(view)
+source = turn.resolve(original_fields["sources"][0]["ref"])
+```
+
+The transformation applies to the final model-facing `_input` including
+follow-up deduplication and the existing host prompt token budget. It catalogs
+only already-selected exact paths or path/section pairs, preserves source refs
+and text byte-for-byte, and never increases o200k_base tokens, UTF-8 bytes or
+the conservative complete-input budget on any packed individual response.
+`unpack_managed_model_input` only reverses the representation; it **does not**
+authorize source reads. Source authorization remains `turn.resolve(full_ref)`
+and the original validated MCP reader.
+
+This is an unbilled token measurement, not a guarantee of identical final
+answers from a strong model. Local QA/NLI preservation observers and the
+opt-in provider-backed `CheckedContextSession` remain available but are not
+given automatic removal or answer/absence authority.

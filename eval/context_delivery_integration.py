@@ -65,6 +65,7 @@ def worker(args):
             DOCATLAS_MCP_TEXT_FALLBACK="0" if args.arm == "view-structured" else "1",
             DOCATLAS_MCP_MODEL_VIEW="1" if args.arm.startswith("view") else "off",
             DOCATLAS_SECTION_UNITS="markdown-owner-v1" if args.arm == "view-structural" else "legacy",
+            DOCATLAS_SECTION_SELECTION="fixed",  # existing wire/owner control
             DOCATLAS_SECTION_WIRE_FORMAT="adaptive-v2" if args.arm == "view-structured" else "v1")
         req = {"question": QUESTION, "search_question": TRANSLATION, "project_path": str(root)}
         off = call_docs_tool_payload("get_docs_context", req, service)
@@ -189,6 +190,7 @@ async def run(args):
                     assert row["snippet"] in span
                 visible = json.loads(result.content[0].text)
                 from docmancer.docs.interfaces.model_context_session import ModelContextSession, ModelSessionError
+                from docmancer.docs.application.model_context_packing import unpack_managed_model_input
                 managed = ModelContextSession(client, question=QUESTION,
                     bindings={"project_path": str(root)}, language_mode=True)
                 # A mixed docs query is legitimate, but a SINGLE source-language
@@ -236,6 +238,14 @@ async def run(args):
                     else:
                         raise AssertionError("invalid query reached the MCP transport")
                     assert len(managed.audit) == call_count
+                # Invalid host packing fails before any network call.
+                try:
+                    ModelContextSession(client, question=QUESTION,
+                        bindings={"project_path": str(root)}, context_packing="invalid")
+                except ModelSessionError as exc:
+                    assert str(exc) == "invalid_context_packing_mode"
+                else:
+                    raise AssertionError("invalid host packing accepted")
                 first = await managed.retrieve(search_question=TRANSLATION)
                 count_before = len(managed.audit)
                 try:
@@ -248,13 +258,21 @@ async def run(args):
                 second = await managed.retrieve(search_question=TRANSLATION,
                     lookup_queries=["QuillTransit session lease renewal"], missing_fact="renewal condition")
                 counts["stdio_tool_calls"] += len(managed.audit)
-                assert len(second["sources"]) == len(first["sources"])
-                assert {r["ref"] for r in second["sources"]} == {r["ref"] for r in first["sources"]}
+                first_unpacked = unpack_managed_model_input(first)
+                second_unpacked = unpack_managed_model_input(second)
+                assert len(second_unpacked["sources"]) == len(first_unpacked["sources"])
+                assert {r["ref"] for r in second_unpacked["sources"]} == {
+                    r["ref"] for r in first_unpacked["sources"]}
+                from docmancer.docs.application.model_context_view import canonical
+                assert projection_token_count(canonical(second).encode()) <= projection_token_count(
+                    canonical(second_unpacked).encode())
+                assert all(row["text"] == managed.resolve(row["ref"])["snippet"]
+                           for row in second_unpacked["sources"])
                 serialized = json.dumps(second, ensure_ascii=False)
                 assert "docatlas/source-packet" not in serialized and "source_uri" not in serialized
-                for item in second["sources"]:
+                for item in second_unpacked["sources"]:
                     assert item["text"] == managed.resolve(item["ref"])["snippet"]
-                original_ref = first["sources"][0]["ref"]
+                original_ref = first_unpacked["sources"][0]["ref"]
                 raw_replies = [a["result"] for a in managed.audit if a["tool"] == "get_docs_context"]
                 appended = sum(projection_token_count(json.dumps(r, ensure_ascii=False).encode()) for r in raw_replies)
                 compact = projection_token_count(serialized.encode())
