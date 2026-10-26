@@ -132,7 +132,7 @@ class NativeDelivery:
         self.max_bytes = _positive("DOCATLAS_NATIVE_MAX_BYTES", MAX_BYTES, 2048, MAX_BYTES)
         self.max_lines = _positive("DOCATLAS_NATIVE_MAX_LINES", MAX_LINES, 100, MAX_LINES)
         self.max_tokens = _positive("DOCATLAS_NATIVE_MAX_TOKENS", MAX_TOKENS, 512, MAX_TOKENS)
-        self.policy = os.environ.get("DOCATLAS_NATIVE_SELECTION", "guarded-cover-v1")
+        self.policy = os.environ.get("DOCATLAS_NATIVE_SELECTION", "guarded-cover-v2")
         if self.policy not in {"lexical-v1", "preserve", *EVIDENCE_POLICIES}:
             raise ValueError("invalid_native_selection_policy")
 

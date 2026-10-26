@@ -18,10 +18,11 @@ const outputLayer=AppNodeBuilder.build(LayerNode.group([ToolOutput.node,FSUtil.n
 ])
 const work=Effect.gen(function*(){
   const output=yield* ToolOutput.Service
-  for(const arm of ["delivery-only","guarded"]){
+  for(const arm of ["delivery-only","guarded-v1","guarded"]){
     const environment={...protocol.registration.environment,
       DOCATLAS_CONTEXT_COMPRESSION:"off",DOCATLAS_MCP_PRESENTATION:"opencode-v1",
-      ...(arm==="delivery-only"?{DOCATLAS_NATIVE_SELECTION:"preserve"}:{})}
+      ...(arm==="delivery-only"?{DOCATLAS_NATIVE_SELECTION:"preserve"}:
+        arm==="guarded-v1"?{DOCATLAS_NATIVE_SELECTION:"guarded-cover-v1"}:{})}
     const connection=yield* McpClient.connect("docatlas",{type:"local",
       command:[protocol.cli,"mcp","docs-serve"],environment},protocol.root)
     const tools=yield* connection.tools()

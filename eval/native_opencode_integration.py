@@ -2,8 +2,8 @@
 
 The SAME fifteen frozen documents are one catalog project, not five isolated
 projects. All forty questions are unchanged. Gold is opened only after delivery.
-Four native arms compare existing pagination, aggressive lexical coverage,
-whole-owner coverage and the guarded smaller evidence prefix. Raw JSON is an
+Three native arms compare existing pagination, guarded v1 and
+the improved guarded v2 evidence prefix. Earlier aggressive comparators remain archived. Raw JSON is an
 additional source-identity control, not an answering-model benchmark.
 No source/SQLite/retrieval/selection mocks, private model endpoints or paid calls.
 """
@@ -100,8 +100,8 @@ async def execute(args, cli, env, cases, root, arm):
     from docmancer.docs.application.projection_tokenizer import projection_token_count
     settings = dict(env)
     settings['DOCATLAS_MCP_PRESENTATION'] = 'legacy' if arm == 'legacy' else 'opencode-v1'
-    policies = {'delivery-only':'preserve','query-cover':'query-cover-v1',
-                'owner-cover':'owner-cover-v1','guarded':'guarded-cover-v1'}
+    policies = {'delivery-only':'preserve','guarded-v1':'guarded-cover-v1',
+                'guarded':'guarded-cover-v2'}
     if arm == 'guarded':
         settings.pop('DOCATLAS_NATIVE_SELECTION', None)
     else:
@@ -221,7 +221,7 @@ def main():
         source_state=helper.source_state(root);db_state=helper.logical_state(inventory)
         save(args.out/'preparation.json',inventory)
         replies,calls={},0
-        for arm in ('legacy','delivery-only','query-cover','owner-cover','guarded'):
+        for arm in ('legacy','delivery-only','guarded-v1','guarded'):
             replies[arm],n=asyncio.run(execute(args,cli,dict(os.environ),cases,root,arm));calls+=n
         config_path=args.out/'opencode-protocol.json'
         save(config_path,{'cli':cli,'root':str(root),'out':str(args.out),'cases':cases,'registration':registration})
@@ -238,23 +238,24 @@ def main():
     gold={x['id']:x for x in json.loads((corpus/'gold_spans.json').read_text())['cases']}
     normalized=json.loads((args.out/'OPENCODE.json').read_text())['results']
     actual={arm:{row['id']:row['model_visible_text'] for row in normalized if row['arm']==arm}
-            for arm in ('delivery-only','guarded')}
+            for arm in ('delivery-only','guarded-v1','guarded')}
     result={'head':os.environ.get('TESTED_SHA'),'provider_usage':None,'answer_model_calls':0,
             'model_answer_quality_tested':False,'python_stdio_calls':calls,'one_catalog_documents':15,
-            'arms':{arm:witness_report(cases,docs,replies[arm],gold) for arm in ('delivery-only','query-cover','owner-cover','guarded')},
-            'opencode_arms':{arm:witness_report(cases,docs,actual[arm],gold) for arm in ('delivery-only','guarded')}}
+            'arms':{arm:witness_report(cases,docs,replies[arm],gold) for arm in ('delivery-only','guarded-v1','guarded')},
+            'opencode_arms':{arm:witness_report(cases,docs,actual[arm],gold) for arm in ('delivery-only','guarded-v1','guarded')}}
     losses = []
     for boundary in ('arms','opencode_arms'):
-        old = {x['id']:x for x in result[boundary]['delivery-only']}
         new = {x['id']:x for x in result[boundary]['guarded']}
-        for cid in old:
-            a = {f['id']:f['covered'] for f in old[cid]['facts']}
-            b = {f['id']:f['covered'] for f in new[cid]['facts']}
-            assert a.keys() == b.keys()
-            losses.extend({'boundary':boundary,'case':cid,'fact':k}
-                          for k in a if a[k] and not b[k])
+        for control in ('delivery-only','guarded-v1'):
+            old = {x['id']:x for x in result[boundary][control]}
+            for cid in old:
+                a = {f['id']:f['covered'] for f in old[cid]['facts']}
+                b = {f['id']:f['covered'] for f in new[cid]['facts']}
+                assert a.keys() == b.keys()
+                losses.extend({'boundary':boundary,'control':control,'case':cid,'fact':k}
+                              for k in a if a[k] and not b[k])
     metrics = {arm:json.loads((args.out/(arm+'-metrics.json')).read_text())
-               for arm in ('delivery-only','query-cover','owner-cover','guarded')}
+               for arm in ('delivery-only','guarded-v1','guarded')}
     totals = {arm:{'tokens':sum(x['text_tokens'] for x in rows),
                    'bytes':sum(x['bytes'] for x in rows),
                    'rows':sum(x['diagnostic']['delivered_rows'] for x in rows),
@@ -268,7 +269,8 @@ def main():
     save(args.out/'SUMMARY.json',result)
     print(json.dumps(result,indent=2))
     assert not losses, 'guarded selection lost a fact delivered by original paging'
-    assert totals['guarded']['tokens'] < totals['delivery-only']['tokens'], 'no delivered-input saving'
+    assert totals['guarded']['tokens'] < totals['guarded-v1']['tokens'] < totals['delivery-only']['tokens'], 'no incremental delivered-input saving'
+    assert totals['guarded']['complete_documented_cases'] == totals['guarded']['documented_cases'], 'selection omitted required evidence'
     for row in metrics['guarded']:
         if row['id'] in {'V40-B01','V40-B05'}:
             assert row['diagnostic']['delivered_rows'] == 1

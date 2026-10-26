@@ -12,7 +12,7 @@ from dataclasses import dataclass
 import math
 import re
 
-POLICIES = frozenset({'query-cover-v1', 'owner-cover-v1', 'guarded-cover-v1'})
+POLICIES = frozenset({'query-cover-v1', 'owner-cover-v1', 'guarded-cover-v1', 'guarded-cover-v2'})
 _WORD = re.compile(r'[^\W_]+', re.UNICODE)
 _STOP = frozenset('''a an the is are be was were being how what which when where who why
 can could do does did should would will shall to of for in on at by with from and or
@@ -54,6 +54,47 @@ def _identity(row: dict) -> tuple:
     # each original row stays separate and the entire pool is HMAC-bound.
     return tuple(str(row.get(key) or '') for key in
                  ('project_identity','path_or_url','scope','version_binding','authority','instruction_trust','freshness','section'))
+
+
+# Prefer a source that actually INTRODUCES an enumerated answer over broad
+# paragraphs that merely mention the same terms. These are format signals,
+# never facts/identifiers taken from benchmarks or product-specific rules.
+_ENUMERATE = re.compile(r'^\s*[-*]\s+`[^`\n]{2,120}`', re.M)
+_INTRO = re.compile(r'\b(?:following|listed below|may be named|can be named|available names|possible values|such as)\b', re.I)
+_LIST_QUESTION = re.compile(r'^\s*(?:which|what|list|enumerate)\b', re.I)
+
+
+def _enumerated_owner(rows, eligible, question, content_query):
+    if not _LIST_QUESTION.search(question):
+        return None
+    proposals = []
+    for i in eligible:
+        row = rows[i]
+        text = row['snippet']
+        entries = _ENUMERATE.findall(text)
+        if len(entries) < 2 or not _INTRO.search(text):
+            continue
+        heading = terms(str(row.get('section') or '').rsplit(' > ', 1)[-1])
+        common = heading & content_query
+        if len(common) < 2:
+            continue
+        # Lexical alignment in the exact section title, multi-item answer
+        # structure in its original text, and stable retrieval rank as tie-break.
+        proposals.append((len(common), min(len(entries), 8), -i, i))
+    if not proposals:
+        return None
+    return max(proposals)[-1]
+
+
+def _coherent_title_owner(rows, chosen, content_query):
+    # A directly matching native subsection can be safer than an acquisition
+    # prefix dominated by similarly named individual example settings.
+    for i in chosen:
+        title_terms = terms(str(rows[i].get('section') or '').rsplit(' > ', 1)[-1])
+        common = title_terms & content_query
+        if len(common) >= 2 and len(common) / max(1, len(title_terms)) >= 0.5:
+            return True
+    return False
 
 
 @dataclass(frozen=True)
@@ -137,11 +178,15 @@ def _select_clause(rows: list[dict], question: str, *, policy: str) -> Selection
         if feature_sets[i] <= others:
             chosen.remove(i)
     primary = tuple(chosen)
-    if policy in {'owner-cover-v1', 'guarded-cover-v1'} or _PROCEDURE.search(question):
+    if policy in {'owner-cover-v1', 'guarded-cover-v1', 'guarded-cover-v2'} or _PROCEDURE.search(question):
         owners = {_identity(rows[i]) for i in chosen}
         chosen = [i for i in range(len(rows)) if _identity(rows[i]) in owners]
+    enumerated = _enumerated_owner(rows, eligible, question, content_query) if policy == 'guarded-cover-v2' else None
+    if enumerated is not None:
+        members = [i for i in eligible if _identity(rows[i]) == _identity(rows[enumerated])]
+        chosen.extend(members)
     uncertain = None
-    if policy == 'guarded-cover-v1':
+    if policy in {'guarded-cover-v1', 'guarded-cover-v2'}:
         # Do not turn matching vocabulary into a completeness certificate.
         # Native and coverage ranking disagreement is reason to keep the
         # original paging behavior, not to force an aggressively small answer.
@@ -164,7 +209,9 @@ def _select_clause(rows: list[dict], question: str, *, policy: str) -> Selection
                        and len(bodies[i].intersection(content_query)) >= 2]
             # Only add a parent with an independently query-bearing statement;
             # never pull an arbitrary sibling or entire Markdown document.
-            if members:
+            if members and (enumerated is None or parent == _identity(rows[enumerated])):
+                # An explicit list-bearing owner already directly addresses
+                # this clause; do not drag in unrelated parent examples.
                 chosen.extend(i for i in eligible if _identity(rows[i]) == parent)
         # A contrastive/non-identifier question with competitive matches in
         # other owners is ambiguous. Retain the original view in that case.
@@ -175,6 +222,11 @@ def _select_clause(rows: list[dict], question: str, *, policy: str) -> Selection
                          and feature_sets[i] >= winner_terms and winner_terms]
             if ambiguous:
                 uncertain = 'competing_source_owners'
+        if uncertain and policy == 'guarded-cover-v2' and uncertain == 'diffuse_question_coverage':
+            # A small group of directly title-matching sources may override
+            # broad acquisition rank. Not a semantic sufficiency judgement.
+            if len(set(chosen)) <= 10 and _coherent_title_owner(rows, chosen, content_query):
+                uncertain = None
         if uncertain:
             return Selection(tuple(range(len(rows))), tuple(range(len(rows))), {
                 'status':'conservative_original_order', 'reason':uncertain,
