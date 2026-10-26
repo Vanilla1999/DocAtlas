@@ -21,7 +21,7 @@ spec.loader.exec_module(pres)
 base = pres.base
 base.__file__ = __file__
 SUITES = ("v40", "new16", "fresh8", "semantic12", "preservation8")
-POLICIES = ("fixed", "facet-guarded-v1")
+POLICIES = ("fixed", "facet-guarded-v1", "facet-guarded-lexical-v2")
 FORMATS = ("paths-v1", "sections-v1", "adaptive-v1")
 
 

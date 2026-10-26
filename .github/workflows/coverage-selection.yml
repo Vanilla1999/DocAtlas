@@ -46,13 +46,13 @@ jobs:
             .github/workflows/coverage-selection.yml | gzip > "$RUNNER_TEMP/coverage-evidence/tested-source.tar.gz"
       - name: Build actual installed package; provision only the unchanged MiniLM
         run: docker build -f eval/minilm_sections.Dockerfile -t docatlas-packed .
-      - name: Current fixed and facet controls through public MCP; same-response host packing
+      - name: Current fixed, prior facet and guarded v2 through public MCP; same-response packing
         env:
           SUITE: ${{ matrix.suite }}
         run: |
           set -uo pipefail
           failed=0
-          for policy in fixed facet-guarded-v1; do
+          for policy in fixed facet-guarded-v1 facet-guarded-lexical-v2; do
             name="packed-$policy"
             docker run --name "$name" --network none --cpus=2 \
               --memory=1000000000 --memory-swap=1000000000 \
