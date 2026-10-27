@@ -1,0 +1,1931 @@
+{
+  "schema_version": 1,
+  "measurement": "original source witness spans and o200k first public MCP pages normalized by real OpenCode; no answering model",
+  "head": "worktree-on-40cfc413-selector-81c0e094",
+  "installed_product_sha256": {
+    "mcp/evidence_selection.py": "81c0e094fb5377923bee595562846f0ef6aa576a23fb6d3708c3d06cc36b4abb",
+    "mcp/native_delivery.py": "11d6397dcf5f9198a0f8fc0774dc9f806cf2a0c62b8c9d8d5abc7a81601a6ee7"
+  },
+  "infrastructure_result": "PASS",
+  "semantic_acceptance": "NOT_TESTED",
+  "answer_model_calls": 0,
+  "provider_usage": null,
+  "python_tool_calls": 428,
+  "opencode_tool_calls": 280,
+  "corpora": [
+    {
+      "corpus": "v40",
+      "corpus_description": "known development/regression",
+      "questions": 40,
+      "documents": 15,
+      "source_hashes": {
+        "black/docs/usage_and_configuration/the_basics.md": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+        "black/docs/usage_and_configuration/file_collection_and_discovery.md": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+        "black/docs/faq.md": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+        "poetry/docs/configuration.md": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+        "poetry/docs/managing-environments.md": "c0421f9ca65f7b85d0100252f40f29ed3fd92d4acf559b5be7f26f4146c1753d",
+        "poetry/docs/dependency-specification.md": "92cef58e1599af6197fb9e4d3219ed14513319844bbaa04e1c29ac6574e9210c",
+        "textual/docs/guide/reactivity.md": "16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+        "textual/docs/guide/workers.md": "8cb6a813d8c89a37888cbfd38f1537669c629d7bde1e0a702510941e5b8c0fb5",
+        "textual/docs/widgets/input.md": "b7cf600827f1ba96cb069d08b3c9b9bc9fc5af098221f03ea60c93fcd31dbc44",
+        "vite/docs/guide/env-and-mode.md": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31",
+        "vite/docs/config/server-options.md": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+        "vite/docs/guide/assets.md": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+        "eslint/docs/src/use/command-line-interface.md": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+        "eslint/docs/src/use/configure/configuration-files.md": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+        "eslint/docs/src/use/configure/ignore.md": "c8695c3b9c7fb1531054371412e62c948570116cf24401f400a35e16ca81ba1e"
+      },
+      "inputs_frozen_before_delivery": {
+        "questions.json": "67afaaa42ad71d0036d2cde4f5a7da1b4e9c9b836b53b62ef2658ffdb8af80b5",
+        "source_plan.json": "8ec8b19323f4bc4f7d0737aced62527b210ee4ba1c50cf77b62ccafc38594e9a",
+        "gold_spans.json": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc"
+      },
+      "pool_observation_boundary": "legacy public docs_context after admission/upstream projection, before native selector/page renderer",
+      "upstream_failure_localization": "NOT_ESTABLISHED: missing_before_native_selection does not isolate retrieval, admission or upstream projection",
+      "python_tool_calls": 332,
+      "opencode_tool_calls": 200,
+      "answer_model_calls": 0,
+      "provider_usage": null,
+      "model_answer_quality_tested": false,
+      "correct_unknown_tested": false,
+      "source_and_sqlite_state_unchanged": true,
+      "elapsed_seconds": null,
+      "delivery_record_replayed": true,
+      "pagination_integrity": {
+        "preserve": {
+          "pages": 14,
+          "rows": 256,
+          "all_original_bytes_preserved": true,
+          "forged_cursor_rejected": true,
+          "changed_question_rejected": true,
+          "changed_scope_rejected": true,
+          "changed_source_rejected": true
+        },
+        "guarded-cover-v2": {
+          "pages": 15,
+          "rows": 256,
+          "all_original_bytes_preserved": true,
+          "forged_cursor_rejected": true,
+          "changed_question_rejected": true,
+          "changed_scope_rejected": true,
+          "changed_source_rejected": true
+        },
+        "guarded-obligation-v1": {
+          "pages": 15,
+          "rows": 256,
+          "all_original_bytes_preserved": true,
+          "forged_cursor_rejected": true,
+          "changed_question_rejected": true,
+          "changed_scope_rejected": true,
+          "changed_source_rejected": true
+        },
+        "guarded-constraint-v1": {
+          "pages": 14,
+          "rows": 256,
+          "all_original_bytes_preserved": true,
+          "forged_cursor_rejected": true,
+          "changed_question_rejected": true,
+          "changed_scope_rejected": true,
+          "changed_source_rejected": true
+        },
+        "guarded-combined-v1": {
+          "pages": 14,
+          "rows": 256,
+          "all_original_bytes_preserved": true,
+          "forged_cursor_rejected": true,
+          "changed_question_rejected": true,
+          "changed_scope_rejected": true,
+          "changed_source_rejected": true
+        }
+      },
+      "opencode": {
+        "preserve": {
+          "source_witness_result": "FAIL",
+          "first_page_retention_result": "FAIL",
+          "baseline_non_regression_result": "FAIL",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 32,
+          "acquired_claims": 32,
+          "delivered_claims": 29,
+          "complete_documented_cases": 29,
+          "documented_cases": 32,
+          "fully_unsupported_cases_not_graded": 8,
+          "first_page_tokens": 117692,
+          "source_rows": 760,
+          "latency": {
+            "calls": 40,
+            "total_ms": 270804.965,
+            "median_ms": 6763.302,
+            "p95_ms": 7899.888,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 66242,
+          "first_page_token_saving_pct_vs_preserve": 0.0,
+          "failures": [
+            {
+              "case": "V40-P03",
+              "claim": "required",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "V40-P06",
+              "claim": "documented_part",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "V40-E01",
+              "claim": "required",
+              "status": "admitted_not_on_first_page"
+            }
+          ],
+          "lost_control_claims": [
+            {
+              "control": "guarded-cover-v2",
+              "case": "V40-P03",
+              "claim": "required"
+            },
+            {
+              "control": "guarded-cover-v2",
+              "case": "V40-P06",
+              "claim": "documented_part"
+            },
+            {
+              "control": "guarded-cover-v2",
+              "case": "V40-E01",
+              "claim": "required"
+            }
+          ],
+          "case_first_page_tokens": {
+            "V40-B01": 2978,
+            "V40-B02": 2869,
+            "V40-B03": 2914,
+            "V40-B04": 2997,
+            "V40-B05": 2959,
+            "V40-B06": 2894,
+            "V40-B07": 2946,
+            "V40-B08": 2891,
+            "V40-P01": 2884,
+            "V40-P02": 2978,
+            "V40-P03": 2926,
+            "V40-P04": 2873,
+            "V40-P05": 2933,
+            "V40-P06": 2964,
+            "V40-P07": 2937,
+            "V40-P08": 2988,
+            "V40-T01": 2991,
+            "V40-T02": 2896,
+            "V40-T03": 2968,
+            "V40-T04": 2936,
+            "V40-T05": 2965,
+            "V40-T06": 2997,
+            "V40-T07": 2890,
+            "V40-T08": 2928,
+            "V40-V01": 2958,
+            "V40-V02": 2986,
+            "V40-V03": 2899,
+            "V40-V04": 2995,
+            "V40-V05": 2944,
+            "V40-V06": 2890,
+            "V40-V07": 2979,
+            "V40-V08": 2970,
+            "V40-E01": 2934,
+            "V40-E02": 2957,
+            "V40-E03": 2933,
+            "V40-E04": 2939,
+            "V40-E05": 2970,
+            "V40-E06": 2945,
+            "V40-E07": 2942,
+            "V40-E08": 2949
+          },
+          "case_source_rows": {
+            "V40-B01": 19,
+            "V40-B02": 18,
+            "V40-B03": 17,
+            "V40-B04": 20,
+            "V40-B05": 19,
+            "V40-B06": 17,
+            "V40-B07": 19,
+            "V40-B08": 19,
+            "V40-P01": 17,
+            "V40-P02": 20,
+            "V40-P03": 20,
+            "V40-P04": 19,
+            "V40-P05": 16,
+            "V40-P06": 18,
+            "V40-P07": 19,
+            "V40-P08": 19,
+            "V40-T01": 20,
+            "V40-T02": 19,
+            "V40-T03": 19,
+            "V40-T04": 18,
+            "V40-T05": 20,
+            "V40-T06": 20,
+            "V40-T07": 19,
+            "V40-T08": 18,
+            "V40-V01": 20,
+            "V40-V02": 20,
+            "V40-V03": 19,
+            "V40-V04": 20,
+            "V40-V05": 20,
+            "V40-V06": 18,
+            "V40-V07": 19,
+            "V40-V08": 21,
+            "V40-E01": 20,
+            "V40-E02": 18,
+            "V40-E03": 21,
+            "V40-E04": 19,
+            "V40-E05": 18,
+            "V40-E06": 20,
+            "V40-E07": 19,
+            "V40-E08": 19
+          },
+          "complete_documented_case_ids": [
+            "V40-B01",
+            "V40-B02",
+            "V40-B03",
+            "V40-B04",
+            "V40-B05",
+            "V40-B06",
+            "V40-B07",
+            "V40-P01",
+            "V40-P02",
+            "V40-P04",
+            "V40-P05",
+            "V40-T01",
+            "V40-T02",
+            "V40-T03",
+            "V40-T04",
+            "V40-T05",
+            "V40-T06",
+            "V40-T07",
+            "V40-V01",
+            "V40-V02",
+            "V40-V03",
+            "V40-V04",
+            "V40-V05",
+            "V40-V06",
+            "V40-E02",
+            "V40-E03",
+            "V40-E04",
+            "V40-E05",
+            "V40-E06"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "V40-B06": [
+              "blackd_default_port"
+            ],
+            "V40-B07": [
+              "cache_retention_days"
+            ],
+            "V40-B08": [
+              "unsupported_request"
+            ],
+            "V40-P06": [
+              "activated_shell_pid"
+            ],
+            "V40-P07": [
+              "unsupported_request"
+            ],
+            "V40-P08": [
+              "unsupported_request"
+            ],
+            "V40-T06": [
+              "guaranteed_cancel_latency"
+            ],
+            "V40-T07": [
+              "thread_scheduling_policy"
+            ],
+            "V40-T08": [
+              "unsupported_request"
+            ],
+            "V40-V06": [
+              "fs_deny_status"
+            ],
+            "V40-V07": [
+              "unsupported_request"
+            ],
+            "V40-V08": [
+              "unsupported_request"
+            ],
+            "V40-E05": [
+              "jiti_startup_overhead"
+            ],
+            "V40-E06": [
+              "auto_worker_count_8_core"
+            ],
+            "V40-E07": [
+              "unsupported_request"
+            ],
+            "V40-E08": [
+              "unsupported_request"
+            ]
+          }
+        },
+        "guarded-cover-v2": {
+          "source_witness_result": "PASS",
+          "first_page_retention_result": "PASS",
+          "baseline_non_regression_result": "PASS",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 32,
+          "acquired_claims": 32,
+          "delivered_claims": 32,
+          "complete_documented_cases": 32,
+          "documented_cases": 32,
+          "fully_unsupported_cases_not_graded": 8,
+          "first_page_tokens": 51450,
+          "source_rows": 282,
+          "latency": {
+            "calls": 40,
+            "total_ms": 262839.709,
+            "median_ms": 6489.891,
+            "p95_ms": 7854.612,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 0,
+          "first_page_token_saving_pct_vs_preserve": 56.284,
+          "failures": [],
+          "lost_control_claims": [],
+          "case_first_page_tokens": {
+            "V40-B01": 430,
+            "V40-B02": 970,
+            "V40-B03": 1084,
+            "V40-B04": 478,
+            "V40-B05": 451,
+            "V40-B06": 1319,
+            "V40-B07": 728,
+            "V40-B08": 354,
+            "V40-P01": 600,
+            "V40-P02": 573,
+            "V40-P03": 576,
+            "V40-P04": 1152,
+            "V40-P05": 594,
+            "V40-P06": 1254,
+            "V40-P07": 362,
+            "V40-P08": 2981,
+            "V40-T01": 764,
+            "V40-T02": 2902,
+            "V40-T03": 2970,
+            "V40-T04": 803,
+            "V40-T05": 1173,
+            "V40-T06": 2882,
+            "V40-T07": 1196,
+            "V40-T08": 365,
+            "V40-V01": 2964,
+            "V40-V02": 1501,
+            "V40-V03": 424,
+            "V40-V04": 414,
+            "V40-V05": 706,
+            "V40-V06": 1793,
+            "V40-V07": 359,
+            "V40-V08": 2971,
+            "V40-E01": 1372,
+            "V40-E02": 580,
+            "V40-E03": 578,
+            "V40-E04": 2931,
+            "V40-E05": 1550,
+            "V40-E06": 2943,
+            "V40-E07": 2942,
+            "V40-E08": 461
+          },
+          "case_source_rows": {
+            "V40-B01": 1,
+            "V40-B02": 4,
+            "V40-B03": 5,
+            "V40-B04": 1,
+            "V40-B05": 1,
+            "V40-B06": 7,
+            "V40-B07": 2,
+            "V40-B08": 0,
+            "V40-P01": 2,
+            "V40-P02": 2,
+            "V40-P03": 2,
+            "V40-P04": 6,
+            "V40-P05": 2,
+            "V40-P06": 6,
+            "V40-P07": 0,
+            "V40-P08": 19,
+            "V40-T01": 3,
+            "V40-T02": 19,
+            "V40-T03": 19,
+            "V40-T04": 3,
+            "V40-T05": 6,
+            "V40-T06": 19,
+            "V40-T07": 7,
+            "V40-T08": 0,
+            "V40-V01": 20,
+            "V40-V02": 8,
+            "V40-V03": 1,
+            "V40-V04": 1,
+            "V40-V05": 3,
+            "V40-V06": 11,
+            "V40-V07": 0,
+            "V40-V08": 21,
+            "V40-E01": 8,
+            "V40-E02": 2,
+            "V40-E03": 2,
+            "V40-E04": 19,
+            "V40-E05": 10,
+            "V40-E06": 20,
+            "V40-E07": 19,
+            "V40-E08": 1
+          },
+          "complete_documented_case_ids": [
+            "V40-B01",
+            "V40-B02",
+            "V40-B03",
+            "V40-B04",
+            "V40-B05",
+            "V40-B06",
+            "V40-B07",
+            "V40-P01",
+            "V40-P02",
+            "V40-P03",
+            "V40-P04",
+            "V40-P05",
+            "V40-P06",
+            "V40-T01",
+            "V40-T02",
+            "V40-T03",
+            "V40-T04",
+            "V40-T05",
+            "V40-T06",
+            "V40-T07",
+            "V40-V01",
+            "V40-V02",
+            "V40-V03",
+            "V40-V04",
+            "V40-V05",
+            "V40-V06",
+            "V40-E01",
+            "V40-E02",
+            "V40-E03",
+            "V40-E04",
+            "V40-E05",
+            "V40-E06"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "V40-B06": [
+              "blackd_default_port"
+            ],
+            "V40-B07": [
+              "cache_retention_days"
+            ],
+            "V40-B08": [
+              "unsupported_request"
+            ],
+            "V40-P06": [
+              "activated_shell_pid"
+            ],
+            "V40-P07": [
+              "unsupported_request"
+            ],
+            "V40-P08": [
+              "unsupported_request"
+            ],
+            "V40-T06": [
+              "guaranteed_cancel_latency"
+            ],
+            "V40-T07": [
+              "thread_scheduling_policy"
+            ],
+            "V40-T08": [
+              "unsupported_request"
+            ],
+            "V40-V06": [
+              "fs_deny_status"
+            ],
+            "V40-V07": [
+              "unsupported_request"
+            ],
+            "V40-V08": [
+              "unsupported_request"
+            ],
+            "V40-E05": [
+              "jiti_startup_overhead"
+            ],
+            "V40-E06": [
+              "auto_worker_count_8_core"
+            ],
+            "V40-E07": [
+              "unsupported_request"
+            ],
+            "V40-E08": [
+              "unsupported_request"
+            ]
+          }
+        },
+        "guarded-obligation-v1": {
+          "source_witness_result": "PASS",
+          "first_page_retention_result": "PASS",
+          "baseline_non_regression_result": "PASS",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 32,
+          "acquired_claims": 32,
+          "delivered_claims": 32,
+          "complete_documented_cases": 32,
+          "documented_cases": 32,
+          "fully_unsupported_cases_not_graded": 8,
+          "first_page_tokens": 59088,
+          "source_rows": 337,
+          "latency": {
+            "calls": 40,
+            "total_ms": 259260.214,
+            "median_ms": 6456.842,
+            "p95_ms": 7218.647,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 7638,
+          "first_page_token_saving_pct_vs_preserve": 49.794,
+          "failures": [],
+          "lost_control_claims": [],
+          "case_first_page_tokens": {
+            "V40-B01": 433,
+            "V40-B02": 966,
+            "V40-B03": 1290,
+            "V40-B04": 479,
+            "V40-B05": 455,
+            "V40-B06": 1904,
+            "V40-B07": 982,
+            "V40-B08": 356,
+            "V40-P01": 1231,
+            "V40-P02": 569,
+            "V40-P03": 1138,
+            "V40-P04": 1559,
+            "V40-P05": 704,
+            "V40-P06": 1256,
+            "V40-P07": 353,
+            "V40-P08": 2991,
+            "V40-T01": 767,
+            "V40-T02": 2895,
+            "V40-T03": 2971,
+            "V40-T04": 1665,
+            "V40-T05": 1176,
+            "V40-T06": 3000,
+            "V40-T07": 2057,
+            "V40-T08": 362,
+            "V40-V01": 2966,
+            "V40-V02": 2031,
+            "V40-V03": 854,
+            "V40-V04": 1078,
+            "V40-V05": 702,
+            "V40-V06": 2144,
+            "V40-V07": 361,
+            "V40-V08": 2972,
+            "V40-E01": 1378,
+            "V40-E02": 577,
+            "V40-E03": 585,
+            "V40-E04": 2933,
+            "V40-E05": 2191,
+            "V40-E06": 2939,
+            "V40-E07": 2945,
+            "V40-E08": 873
+          },
+          "case_source_rows": {
+            "V40-B01": 1,
+            "V40-B02": 4,
+            "V40-B03": 7,
+            "V40-B04": 1,
+            "V40-B05": 1,
+            "V40-B06": 11,
+            "V40-B07": 4,
+            "V40-B08": 0,
+            "V40-P01": 5,
+            "V40-P02": 2,
+            "V40-P03": 5,
+            "V40-P04": 9,
+            "V40-P05": 3,
+            "V40-P06": 6,
+            "V40-P07": 0,
+            "V40-P08": 19,
+            "V40-T01": 3,
+            "V40-T02": 19,
+            "V40-T03": 19,
+            "V40-T04": 9,
+            "V40-T05": 6,
+            "V40-T06": 20,
+            "V40-T07": 13,
+            "V40-T08": 0,
+            "V40-V01": 20,
+            "V40-V02": 12,
+            "V40-V03": 5,
+            "V40-V04": 6,
+            "V40-V05": 3,
+            "V40-V06": 14,
+            "V40-V07": 0,
+            "V40-V08": 21,
+            "V40-E01": 8,
+            "V40-E02": 2,
+            "V40-E03": 2,
+            "V40-E04": 19,
+            "V40-E05": 15,
+            "V40-E06": 20,
+            "V40-E07": 19,
+            "V40-E08": 4
+          },
+          "complete_documented_case_ids": [
+            "V40-B01",
+            "V40-B02",
+            "V40-B03",
+            "V40-B04",
+            "V40-B05",
+            "V40-B06",
+            "V40-B07",
+            "V40-P01",
+            "V40-P02",
+            "V40-P03",
+            "V40-P04",
+            "V40-P05",
+            "V40-P06",
+            "V40-T01",
+            "V40-T02",
+            "V40-T03",
+            "V40-T04",
+            "V40-T05",
+            "V40-T06",
+            "V40-T07",
+            "V40-V01",
+            "V40-V02",
+            "V40-V03",
+            "V40-V04",
+            "V40-V05",
+            "V40-V06",
+            "V40-E01",
+            "V40-E02",
+            "V40-E03",
+            "V40-E04",
+            "V40-E05",
+            "V40-E06"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "V40-B06": [
+              "blackd_default_port"
+            ],
+            "V40-B07": [
+              "cache_retention_days"
+            ],
+            "V40-B08": [
+              "unsupported_request"
+            ],
+            "V40-P06": [
+              "activated_shell_pid"
+            ],
+            "V40-P07": [
+              "unsupported_request"
+            ],
+            "V40-P08": [
+              "unsupported_request"
+            ],
+            "V40-T06": [
+              "guaranteed_cancel_latency"
+            ],
+            "V40-T07": [
+              "thread_scheduling_policy"
+            ],
+            "V40-T08": [
+              "unsupported_request"
+            ],
+            "V40-V06": [
+              "fs_deny_status"
+            ],
+            "V40-V07": [
+              "unsupported_request"
+            ],
+            "V40-V08": [
+              "unsupported_request"
+            ],
+            "V40-E05": [
+              "jiti_startup_overhead"
+            ],
+            "V40-E06": [
+              "auto_worker_count_8_core"
+            ],
+            "V40-E07": [
+              "unsupported_request"
+            ],
+            "V40-E08": [
+              "unsupported_request"
+            ]
+          }
+        },
+        "guarded-constraint-v1": {
+          "source_witness_result": "PASS",
+          "first_page_retention_result": "PASS",
+          "baseline_non_regression_result": "PASS",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 32,
+          "acquired_claims": 32,
+          "delivered_claims": 32,
+          "complete_documented_cases": 32,
+          "documented_cases": 32,
+          "fully_unsupported_cases_not_graded": 8,
+          "first_page_tokens": 99938,
+          "source_rows": 627,
+          "latency": {
+            "calls": 40,
+            "total_ms": 256129.169,
+            "median_ms": 6458.505,
+            "p95_ms": 6856.699,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 48488,
+          "first_page_token_saving_pct_vs_preserve": 15.085,
+          "failures": [],
+          "lost_control_claims": [],
+          "case_first_page_tokens": {
+            "V40-B01": 2994,
+            "V40-B02": 2883,
+            "V40-B03": 2987,
+            "V40-B04": 849,
+            "V40-B05": 2885,
+            "V40-B06": 2953,
+            "V40-B07": 2058,
+            "V40-B08": 357,
+            "V40-P01": 2977,
+            "V40-P02": 2529,
+            "V40-P03": 2990,
+            "V40-P04": 2930,
+            "V40-P05": 2914,
+            "V40-P06": 2478,
+            "V40-P07": 355,
+            "V40-P08": 2992,
+            "V40-T01": 2038,
+            "V40-T02": 2899,
+            "V40-T03": 2971,
+            "V40-T04": 2828,
+            "V40-T05": 2955,
+            "V40-T06": 2891,
+            "V40-T07": 2908,
+            "V40-T08": 362,
+            "V40-V01": 2966,
+            "V40-V02": 2892,
+            "V40-V03": 2998,
+            "V40-V04": 2997,
+            "V40-V05": 2961,
+            "V40-V06": 2895,
+            "V40-V07": 359,
+            "V40-V08": 2973,
+            "V40-E01": 2882,
+            "V40-E02": 2864,
+            "V40-E03": 2141,
+            "V40-E04": 2937,
+            "V40-E05": 2943,
+            "V40-E06": 2942,
+            "V40-E07": 2950,
+            "V40-E08": 1255
+          },
+          "case_source_rows": {
+            "V40-B01": 19,
+            "V40-B02": 17,
+            "V40-B03": 18,
+            "V40-B04": 4,
+            "V40-B05": 18,
+            "V40-B06": 17,
+            "V40-B07": 11,
+            "V40-B08": 0,
+            "V40-P01": 19,
+            "V40-P02": 18,
+            "V40-P03": 21,
+            "V40-P04": 18,
+            "V40-P05": 18,
+            "V40-P06": 14,
+            "V40-P07": 0,
+            "V40-P08": 19,
+            "V40-T01": 12,
+            "V40-T02": 19,
+            "V40-T03": 19,
+            "V40-T04": 17,
+            "V40-T05": 20,
+            "V40-T06": 19,
+            "V40-T07": 20,
+            "V40-T08": 0,
+            "V40-V01": 20,
+            "V40-V02": 19,
+            "V40-V03": 19,
+            "V40-V04": 20,
+            "V40-V05": 19,
+            "V40-V06": 17,
+            "V40-V07": 0,
+            "V40-V08": 21,
+            "V40-E01": 19,
+            "V40-E02": 18,
+            "V40-E03": 14,
+            "V40-E04": 19,
+            "V40-E05": 20,
+            "V40-E06": 20,
+            "V40-E07": 19,
+            "V40-E08": 6
+          },
+          "complete_documented_case_ids": [
+            "V40-B01",
+            "V40-B02",
+            "V40-B03",
+            "V40-B04",
+            "V40-B05",
+            "V40-B06",
+            "V40-B07",
+            "V40-P01",
+            "V40-P02",
+            "V40-P03",
+            "V40-P04",
+            "V40-P05",
+            "V40-P06",
+            "V40-T01",
+            "V40-T02",
+            "V40-T03",
+            "V40-T04",
+            "V40-T05",
+            "V40-T06",
+            "V40-T07",
+            "V40-V01",
+            "V40-V02",
+            "V40-V03",
+            "V40-V04",
+            "V40-V05",
+            "V40-V06",
+            "V40-E01",
+            "V40-E02",
+            "V40-E03",
+            "V40-E04",
+            "V40-E05",
+            "V40-E06"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "V40-B06": [
+              "blackd_default_port"
+            ],
+            "V40-B07": [
+              "cache_retention_days"
+            ],
+            "V40-B08": [
+              "unsupported_request"
+            ],
+            "V40-P06": [
+              "activated_shell_pid"
+            ],
+            "V40-P07": [
+              "unsupported_request"
+            ],
+            "V40-P08": [
+              "unsupported_request"
+            ],
+            "V40-T06": [
+              "guaranteed_cancel_latency"
+            ],
+            "V40-T07": [
+              "thread_scheduling_policy"
+            ],
+            "V40-T08": [
+              "unsupported_request"
+            ],
+            "V40-V06": [
+              "fs_deny_status"
+            ],
+            "V40-V07": [
+              "unsupported_request"
+            ],
+            "V40-V08": [
+              "unsupported_request"
+            ],
+            "V40-E05": [
+              "jiti_startup_overhead"
+            ],
+            "V40-E06": [
+              "auto_worker_count_8_core"
+            ],
+            "V40-E07": [
+              "unsupported_request"
+            ],
+            "V40-E08": [
+              "unsupported_request"
+            ]
+          }
+        },
+        "guarded-combined-v1": {
+          "source_witness_result": "PASS",
+          "first_page_retention_result": "PASS",
+          "baseline_non_regression_result": "PASS",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 32,
+          "acquired_claims": 32,
+          "delivered_claims": 32,
+          "complete_documented_cases": 32,
+          "documented_cases": 32,
+          "fully_unsupported_cases_not_graded": 8,
+          "first_page_tokens": 100128,
+          "source_rows": 628,
+          "latency": {
+            "calls": 40,
+            "total_ms": 264465.222,
+            "median_ms": 6590.14,
+            "p95_ms": 7737.382,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 48678,
+          "first_page_token_saving_pct_vs_preserve": 14.924,
+          "failures": [],
+          "lost_control_claims": [],
+          "case_first_page_tokens": {
+            "V40-B01": 2994,
+            "V40-B02": 2882,
+            "V40-B03": 2892,
+            "V40-B04": 849,
+            "V40-B05": 2875,
+            "V40-B06": 2973,
+            "V40-B07": 2304,
+            "V40-B08": 359,
+            "V40-P01": 2840,
+            "V40-P02": 2528,
+            "V40-P03": 2986,
+            "V40-P04": 2922,
+            "V40-P05": 2910,
+            "V40-P06": 2474,
+            "V40-P07": 353,
+            "V40-P08": 2989,
+            "V40-T01": 2035,
+            "V40-T02": 2894,
+            "V40-T03": 2973,
+            "V40-T04": 2997,
+            "V40-T05": 2952,
+            "V40-T06": 3000,
+            "V40-T07": 2905,
+            "V40-T08": 363,
+            "V40-V01": 2954,
+            "V40-V02": 2886,
+            "V40-V03": 2926,
+            "V40-V04": 2889,
+            "V40-V05": 2963,
+            "V40-V06": 2606,
+            "V40-V07": 361,
+            "V40-V08": 2971,
+            "V40-E01": 2878,
+            "V40-E02": 2867,
+            "V40-E03": 2143,
+            "V40-E04": 2937,
+            "V40-E05": 2945,
+            "V40-E06": 2945,
+            "V40-E07": 2942,
+            "V40-E08": 1666
+          },
+          "case_source_rows": {
+            "V40-B01": 19,
+            "V40-B02": 17,
+            "V40-B03": 18,
+            "V40-B04": 4,
+            "V40-B05": 18,
+            "V40-B06": 17,
+            "V40-B07": 13,
+            "V40-B08": 0,
+            "V40-P01": 17,
+            "V40-P02": 18,
+            "V40-P03": 19,
+            "V40-P04": 17,
+            "V40-P05": 18,
+            "V40-P06": 14,
+            "V40-P07": 0,
+            "V40-P08": 19,
+            "V40-T01": 12,
+            "V40-T02": 19,
+            "V40-T03": 19,
+            "V40-T04": 18,
+            "V40-T05": 20,
+            "V40-T06": 20,
+            "V40-T07": 20,
+            "V40-T08": 0,
+            "V40-V01": 20,
+            "V40-V02": 19,
+            "V40-V03": 19,
+            "V40-V04": 19,
+            "V40-V05": 19,
+            "V40-V06": 17,
+            "V40-V07": 0,
+            "V40-V08": 21,
+            "V40-E01": 19,
+            "V40-E02": 18,
+            "V40-E03": 14,
+            "V40-E04": 19,
+            "V40-E05": 20,
+            "V40-E06": 20,
+            "V40-E07": 19,
+            "V40-E08": 9
+          },
+          "complete_documented_case_ids": [
+            "V40-B01",
+            "V40-B02",
+            "V40-B03",
+            "V40-B04",
+            "V40-B05",
+            "V40-B06",
+            "V40-B07",
+            "V40-P01",
+            "V40-P02",
+            "V40-P03",
+            "V40-P04",
+            "V40-P05",
+            "V40-P06",
+            "V40-T01",
+            "V40-T02",
+            "V40-T03",
+            "V40-T04",
+            "V40-T05",
+            "V40-T06",
+            "V40-T07",
+            "V40-V01",
+            "V40-V02",
+            "V40-V03",
+            "V40-V04",
+            "V40-V05",
+            "V40-V06",
+            "V40-E01",
+            "V40-E02",
+            "V40-E03",
+            "V40-E04",
+            "V40-E05",
+            "V40-E06"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "V40-B06": [
+              "blackd_default_port"
+            ],
+            "V40-B07": [
+              "cache_retention_days"
+            ],
+            "V40-B08": [
+              "unsupported_request"
+            ],
+            "V40-P06": [
+              "activated_shell_pid"
+            ],
+            "V40-P07": [
+              "unsupported_request"
+            ],
+            "V40-P08": [
+              "unsupported_request"
+            ],
+            "V40-T06": [
+              "guaranteed_cancel_latency"
+            ],
+            "V40-T07": [
+              "thread_scheduling_policy"
+            ],
+            "V40-T08": [
+              "unsupported_request"
+            ],
+            "V40-V06": [
+              "fs_deny_status"
+            ],
+            "V40-V07": [
+              "unsupported_request"
+            ],
+            "V40-V08": [
+              "unsupported_request"
+            ],
+            "V40-E05": [
+              "jiti_startup_overhead"
+            ],
+            "V40-E06": [
+              "auto_worker_count_8_core"
+            ],
+            "V40-E07": [
+              "unsupported_request"
+            ],
+            "V40-E08": [
+              "unsupported_request"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "corpus": "new",
+      "corpus_description": "new authored evaluation; not a blind population estimate",
+      "questions": 16,
+      "documents": 16,
+      "source_hashes": {
+        "lumenrelay/docs/configuration.md": "fd02e1fecf35ef44545ebf30ba2eb7bd2cff744b2b70b70e0f9469a23f0e3f3a",
+        "lumenrelay/docs/production.md": "e312f521cb4382f05df1d3436878f2650ea619179620dcd1f16d04b15e06b50e",
+        "lumenrelay/docs/replay.md": "e40a285d4c7a65903172773c7cef538fa6b73d0e18442b68af4fddc0c110e523",
+        "lumenrelay/docs/recovery.md": "e78244b2719d209cd8a41a7f8676f41b1ed7ab941e39179060355f09aa4225d0",
+        "cairnstore/docs/lifecycle.md": "afeecfa1a47e1306354e49afcdac7655fdcac0403b64a4e924224db1d840f18b",
+        "cairnstore/docs/retention.md": "548d6c747f0f97feb317d8422a770d50075bf3d56ff52afcdc5af2a1a48b264e",
+        "cairnstore/docs/v1/consistency.md": "0dd01445426a6b57ad5c7ba31339364eca56ec328b110f32b695a9a5ce3c496c",
+        "cairnstore/docs/v2/consistency.md": "061753bc81f73a7469746fa4a57287e5fd4c1718c8449b98673a2becf74d489d",
+        "cairnstore/docs/configuration.md": "46db29a03074684925ae94ef6f565d6a511cdfe375d9709bb8870ba23a908404",
+        "vellumbuild/docs/cli.md": "8f8a770900c717b3b2ed87a1a2582427ecc5a5298d51f327934b748ead5d1a44",
+        "vellumbuild/docs/runner.md": "7f08aa3260b3ed95705328392cde84e38ee90ec9781ae651e0e0e7bf94f01d27",
+        "vellumbuild/docs/security.md": "e07e2cf5b90f8ac0a8d22f73dfeb9d58f5fd602c0dda03e964c1b84439d593ba",
+        "vellumbuild/docs/configuration.md": "c37bb57b9d97dd5ea69ddeac8119f89e0e8f733c3c5beefd478c1d0aee8e4f29",
+        "tideplane/docs/rollout.md": "ae13c09644ca969e3048ca19e81b0ebccb3e0f3293a7965453baae823f645134",
+        "tideplane/docs/controller.md": "25a3708b3e09e351a95cede423ff641319b2a1336cb8cd91029703fc94fa91fb",
+        "tideplane/docs/workers.md": "d755237868f91b7ce81f59a335355f280eebbeb99e6ce5bb768908612b6c9b51"
+      },
+      "inputs_frozen_before_delivery": {
+        "questions.json": "571dc8f3d73f3a0546b24d7541f5614e736ab4e76ab369c425343664ebbd32cd",
+        "source_plan.json": "c052cdedf6cc0110382fadfe79ba638e84fe2dea2e1b974c2abfba7fe7d91b20",
+        "gold_spans.json": "82927b9f15c949f5819ed1805de36afb01f1a287cfacf8381c11898fe5f97d72"
+      },
+      "pool_observation_boundary": "legacy public docs_context after admission/upstream projection, before native selector/page renderer",
+      "upstream_failure_localization": "NOT_ESTABLISHED: missing_before_native_selection does not isolate retrieval, admission or upstream projection",
+      "python_tool_calls": 96,
+      "opencode_tool_calls": 80,
+      "answer_model_calls": 0,
+      "provider_usage": null,
+      "model_answer_quality_tested": false,
+      "correct_unknown_tested": false,
+      "source_and_sqlite_state_unchanged": true,
+      "elapsed_seconds": 237.691,
+      "delivery_record_replayed": false,
+      "pagination_integrity": {},
+      "opencode": {
+        "preserve": {
+          "source_witness_result": "PASS",
+          "first_page_retention_result": "PASS",
+          "baseline_non_regression_result": "PASS",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 36,
+          "acquired_claims": 36,
+          "delivered_claims": 36,
+          "complete_documented_cases": 14,
+          "documented_cases": 14,
+          "fully_unsupported_cases_not_graded": 2,
+          "first_page_tokens": 44682,
+          "source_rows": 431,
+          "latency": {
+            "calls": 16,
+            "total_ms": 23785.673,
+            "median_ms": 1653.641,
+            "p95_ms": 1893.269,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 15049,
+          "first_page_token_saving_pct_vs_preserve": 0.0,
+          "failures": [],
+          "lost_control_claims": [],
+          "case_first_page_tokens": {
+            "NS16-L01": 2937,
+            "NS16-L02": 2948,
+            "NS16-L03": 1730,
+            "NS16-L04": 2974,
+            "NS16-C01": 2968,
+            "NS16-C02": 2974,
+            "NS16-C03": 2976,
+            "NS16-C04": 2988,
+            "NS16-V01": 2915,
+            "NS16-V02": 2922,
+            "NS16-V03": 1509,
+            "NS16-V04": 2999,
+            "NS16-T01": 2942,
+            "NS16-T02": 2954,
+            "NS16-T03": 2966,
+            "NS16-T04": 2980
+          },
+          "case_source_rows": {
+            "NS16-L01": 28,
+            "NS16-L02": 28,
+            "NS16-L03": 18,
+            "NS16-L04": 28,
+            "NS16-C01": 28,
+            "NS16-C02": 29,
+            "NS16-C03": 29,
+            "NS16-C04": 30,
+            "NS16-V01": 27,
+            "NS16-V02": 28,
+            "NS16-V03": 16,
+            "NS16-V04": 29,
+            "NS16-T01": 29,
+            "NS16-T02": 27,
+            "NS16-T03": 29,
+            "NS16-T04": 28
+          },
+          "complete_documented_case_ids": [
+            "NS16-L01",
+            "NS16-L02",
+            "NS16-L03",
+            "NS16-L04",
+            "NS16-C01",
+            "NS16-C02",
+            "NS16-C03",
+            "NS16-V01",
+            "NS16-V02",
+            "NS16-V03",
+            "NS16-T01",
+            "NS16-T02",
+            "NS16-T03",
+            "NS16-T04"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "NS16-L04": [
+              "guaranteed_storage_saving"
+            ],
+            "NS16-C04": [
+              "guaranteed_listing_p99"
+            ],
+            "NS16-V04": [
+              "remote_artifact_count_limit"
+            ],
+            "NS16-T04": [
+              "receipt_retention_years"
+            ]
+          }
+        },
+        "guarded-cover-v2": {
+          "source_witness_result": "FAIL",
+          "first_page_retention_result": "FAIL",
+          "baseline_non_regression_result": "FAIL",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 36,
+          "acquired_claims": 36,
+          "delivered_claims": 27,
+          "complete_documented_cases": 10,
+          "documented_cases": 14,
+          "fully_unsupported_cases_not_graded": 2,
+          "first_page_tokens": 29633,
+          "source_rows": 263,
+          "latency": {
+            "calls": 16,
+            "total_ms": 21468.775,
+            "median_ms": 1510.765,
+            "p95_ms": 1629.165,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 0,
+          "first_page_token_saving_pct_vs_preserve": 33.68,
+          "failures": [
+            {
+              "case": "NS16-L03",
+              "claim": "pause_ingress",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "journal_watermark",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "restore_command",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-C01",
+              "claim": "hold_overrides_expired_retention",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "remote_endpoint",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "namespace_credential",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "precedence_order",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception",
+              "status": "admitted_not_on_first_page"
+            }
+          ],
+          "lost_control_claims": [
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "pause_ingress"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "journal_watermark"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "restore_command"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-C01",
+              "claim": "hold_overrides_expired_retention"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "remote_endpoint"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "namespace_credential"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "precedence_order"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception"
+            }
+          ],
+          "case_first_page_tokens": {
+            "NS16-L01": 2939,
+            "NS16-L02": 2946,
+            "NS16-L03": 347,
+            "NS16-L04": 2972,
+            "NS16-C01": 436,
+            "NS16-C02": 2978,
+            "NS16-C03": 2975,
+            "NS16-C04": 420,
+            "NS16-V01": 499,
+            "NS16-V02": 2919,
+            "NS16-V03": 428,
+            "NS16-V04": 482,
+            "NS16-T01": 2939,
+            "NS16-T02": 2958,
+            "NS16-T03": 2966,
+            "NS16-T04": 429
+          },
+          "case_source_rows": {
+            "NS16-L01": 28,
+            "NS16-L02": 28,
+            "NS16-L03": 0,
+            "NS16-L04": 28,
+            "NS16-C01": 1,
+            "NS16-C02": 29,
+            "NS16-C03": 29,
+            "NS16-C04": 1,
+            "NS16-V01": 2,
+            "NS16-V02": 28,
+            "NS16-V03": 1,
+            "NS16-V04": 2,
+            "NS16-T01": 29,
+            "NS16-T02": 27,
+            "NS16-T03": 29,
+            "NS16-T04": 1
+          },
+          "complete_documented_case_ids": [
+            "NS16-L01",
+            "NS16-L02",
+            "NS16-L04",
+            "NS16-C02",
+            "NS16-C03",
+            "NS16-V02",
+            "NS16-T01",
+            "NS16-T02",
+            "NS16-T03",
+            "NS16-T04"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "NS16-L04": [
+              "guaranteed_storage_saving"
+            ],
+            "NS16-C04": [
+              "guaranteed_listing_p99"
+            ],
+            "NS16-V04": [
+              "remote_artifact_count_limit"
+            ],
+            "NS16-T04": [
+              "receipt_retention_years"
+            ]
+          }
+        },
+        "guarded-obligation-v1": {
+          "source_witness_result": "FAIL",
+          "first_page_retention_result": "FAIL",
+          "baseline_non_regression_result": "FAIL",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 36,
+          "acquired_claims": 36,
+          "delivered_claims": 27,
+          "complete_documented_cases": 10,
+          "documented_cases": 14,
+          "fully_unsupported_cases_not_graded": 2,
+          "first_page_tokens": 30005,
+          "source_rows": 267,
+          "latency": {
+            "calls": 16,
+            "total_ms": 21160.742,
+            "median_ms": 1412.584,
+            "p95_ms": 1750.021,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 372,
+          "first_page_token_saving_pct_vs_preserve": 32.848,
+          "failures": [
+            {
+              "case": "NS16-L03",
+              "claim": "pause_ingress",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "journal_watermark",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "restore_command",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-C01",
+              "claim": "hold_overrides_expired_retention",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "remote_endpoint",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "namespace_credential",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "precedence_order",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception",
+              "status": "admitted_not_on_first_page"
+            }
+          ],
+          "lost_control_claims": [
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "pause_ingress"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "journal_watermark"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "restore_command"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-C01",
+              "claim": "hold_overrides_expired_retention"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "remote_endpoint"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "namespace_credential"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "precedence_order"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception"
+            }
+          ],
+          "case_first_page_tokens": {
+            "NS16-L01": 2937,
+            "NS16-L02": 2943,
+            "NS16-L03": 350,
+            "NS16-L04": 2969,
+            "NS16-C01": 532,
+            "NS16-C02": 2978,
+            "NS16-C03": 2971,
+            "NS16-C04": 417,
+            "NS16-V01": 698,
+            "NS16-V02": 2920,
+            "NS16-V03": 423,
+            "NS16-V04": 482,
+            "NS16-T01": 2942,
+            "NS16-T02": 2954,
+            "NS16-T03": 2967,
+            "NS16-T04": 522
+          },
+          "case_source_rows": {
+            "NS16-L01": 28,
+            "NS16-L02": 28,
+            "NS16-L03": 0,
+            "NS16-L04": 28,
+            "NS16-C01": 2,
+            "NS16-C02": 29,
+            "NS16-C03": 29,
+            "NS16-C04": 1,
+            "NS16-V01": 4,
+            "NS16-V02": 28,
+            "NS16-V03": 1,
+            "NS16-V04": 2,
+            "NS16-T01": 29,
+            "NS16-T02": 27,
+            "NS16-T03": 29,
+            "NS16-T04": 2
+          },
+          "complete_documented_case_ids": [
+            "NS16-L01",
+            "NS16-L02",
+            "NS16-L04",
+            "NS16-C02",
+            "NS16-C03",
+            "NS16-V02",
+            "NS16-T01",
+            "NS16-T02",
+            "NS16-T03",
+            "NS16-T04"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "NS16-L04": [
+              "guaranteed_storage_saving"
+            ],
+            "NS16-C04": [
+              "guaranteed_listing_p99"
+            ],
+            "NS16-V04": [
+              "remote_artifact_count_limit"
+            ],
+            "NS16-T04": [
+              "receipt_retention_years"
+            ]
+          }
+        },
+        "guarded-constraint-v1": {
+          "source_witness_result": "FAIL",
+          "first_page_retention_result": "FAIL",
+          "baseline_non_regression_result": "FAIL",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 36,
+          "acquired_claims": 36,
+          "delivered_claims": 28,
+          "complete_documented_cases": 11,
+          "documented_cases": 14,
+          "fully_unsupported_cases_not_graded": 2,
+          "first_page_tokens": 30491,
+          "source_rows": 272,
+          "latency": {
+            "calls": 16,
+            "total_ms": 19848.464,
+            "median_ms": 1366.847,
+            "p95_ms": 1592.174,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 858,
+          "first_page_token_saving_pct_vs_preserve": 31.76,
+          "failures": [
+            {
+              "case": "NS16-L03",
+              "claim": "pause_ingress",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "journal_watermark",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "restore_command",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "remote_endpoint",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "namespace_credential",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "precedence_order",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception",
+              "status": "admitted_not_on_first_page"
+            }
+          ],
+          "lost_control_claims": [
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "pause_ingress"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "journal_watermark"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "restore_command"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "remote_endpoint"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "namespace_credential"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "precedence_order"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception"
+            }
+          ],
+          "case_first_page_tokens": {
+            "NS16-L01": 2937,
+            "NS16-L02": 2943,
+            "NS16-L03": 352,
+            "NS16-L04": 2968,
+            "NS16-C01": 819,
+            "NS16-C02": 2982,
+            "NS16-C03": 2972,
+            "NS16-C04": 507,
+            "NS16-V01": 891,
+            "NS16-V02": 2922,
+            "NS16-V03": 427,
+            "NS16-V04": 487,
+            "NS16-T01": 2940,
+            "NS16-T02": 2950,
+            "NS16-T03": 2964,
+            "NS16-T04": 430
+          },
+          "case_source_rows": {
+            "NS16-L01": 28,
+            "NS16-L02": 28,
+            "NS16-L03": 0,
+            "NS16-L04": 28,
+            "NS16-C01": 5,
+            "NS16-C02": 29,
+            "NS16-C03": 29,
+            "NS16-C04": 2,
+            "NS16-V01": 6,
+            "NS16-V02": 28,
+            "NS16-V03": 1,
+            "NS16-V04": 2,
+            "NS16-T01": 29,
+            "NS16-T02": 27,
+            "NS16-T03": 29,
+            "NS16-T04": 1
+          },
+          "complete_documented_case_ids": [
+            "NS16-L01",
+            "NS16-L02",
+            "NS16-L04",
+            "NS16-C01",
+            "NS16-C02",
+            "NS16-C03",
+            "NS16-V02",
+            "NS16-T01",
+            "NS16-T02",
+            "NS16-T03",
+            "NS16-T04"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "NS16-L04": [
+              "guaranteed_storage_saving"
+            ],
+            "NS16-C04": [
+              "guaranteed_listing_p99"
+            ],
+            "NS16-V04": [
+              "remote_artifact_count_limit"
+            ],
+            "NS16-T04": [
+              "receipt_retention_years"
+            ]
+          }
+        },
+        "guarded-combined-v1": {
+          "source_witness_result": "FAIL",
+          "first_page_retention_result": "FAIL",
+          "baseline_non_regression_result": "FAIL",
+          "final_answer_and_unknown_result": "NOT_TESTED",
+          "documented_claims": 36,
+          "acquired_claims": 36,
+          "delivered_claims": 28,
+          "complete_documented_cases": 11,
+          "documented_cases": 14,
+          "fully_unsupported_cases_not_graded": 2,
+          "first_page_tokens": 30672,
+          "source_rows": 274,
+          "latency": {
+            "calls": 16,
+            "total_ms": 20205.663,
+            "median_ms": 1359.937,
+            "p95_ms": 1834.758,
+            "interpretation": "one sequential run; includes cold/warm order effects, not a latency benchmark"
+          },
+          "first_page_token_change_vs_v2": 1039,
+          "first_page_token_saving_pct_vs_preserve": 31.355,
+          "failures": [
+            {
+              "case": "NS16-L03",
+              "claim": "pause_ingress",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "journal_watermark",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "restore_command",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "remote_endpoint",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V01",
+              "claim": "namespace_credential",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "precedence_order",
+              "status": "admitted_not_on_first_page"
+            },
+            {
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception",
+              "status": "admitted_not_on_first_page"
+            }
+          ],
+          "lost_control_claims": [
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "pause_ingress"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "journal_watermark"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "restore_command"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-L03",
+              "claim": "post_restore_sequence"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "remote_endpoint"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V01",
+              "claim": "namespace_credential"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "precedence_order"
+            },
+            {
+              "control": "preserve",
+              "case": "NS16-V03",
+              "claim": "file_permission_no_exception"
+            }
+          ],
+          "case_first_page_tokens": {
+            "NS16-L01": 2936,
+            "NS16-L02": 2946,
+            "NS16-L03": 350,
+            "NS16-L04": 2975,
+            "NS16-C01": 822,
+            "NS16-C02": 2979,
+            "NS16-C03": 2972,
+            "NS16-C04": 504,
+            "NS16-V01": 979,
+            "NS16-V02": 2920,
+            "NS16-V03": 427,
+            "NS16-V04": 481,
+            "NS16-T01": 2943,
+            "NS16-T02": 2956,
+            "NS16-T03": 2958,
+            "NS16-T04": 524
+          },
+          "case_source_rows": {
+            "NS16-L01": 28,
+            "NS16-L02": 28,
+            "NS16-L03": 0,
+            "NS16-L04": 28,
+            "NS16-C01": 5,
+            "NS16-C02": 29,
+            "NS16-C03": 29,
+            "NS16-C04": 2,
+            "NS16-V01": 7,
+            "NS16-V02": 28,
+            "NS16-V03": 1,
+            "NS16-V04": 2,
+            "NS16-T01": 29,
+            "NS16-T02": 27,
+            "NS16-T03": 29,
+            "NS16-T04": 2
+          },
+          "complete_documented_case_ids": [
+            "NS16-L01",
+            "NS16-L02",
+            "NS16-L04",
+            "NS16-C01",
+            "NS16-C02",
+            "NS16-C03",
+            "NS16-V02",
+            "NS16-T01",
+            "NS16-T02",
+            "NS16-T03",
+            "NS16-T04"
+          ],
+          "ungraded_unknown_parts_by_case": {
+            "NS16-L04": [
+              "guaranteed_storage_saving"
+            ],
+            "NS16-C04": [
+              "guaranteed_listing_p99"
+            ],
+            "NS16-V04": [
+              "remote_artifact_count_limit"
+            ],
+            "NS16-T04": [
+              "receipt_retention_years"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

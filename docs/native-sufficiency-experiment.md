@@ -1,5 +1,15 @@
 # Native evidence sufficiency experiment
 
+**Measured outcome (2026-10-27): do not promote any experimental policy.**
+On the unchanged V40, v2 delivered 32/32 required claims with 51,450
+OpenCode-visible tokens, and the three rescues delivered no additional claims.
+On the new 16-question corpus, the conservative control delivered 36/36 while
+v2 delivered 27/36; obligation also delivered 27/36, and constraint/combined
+delivered 28/36. Every missing new claim was already admitted upstream.
+The complete measured table and case-level failures are in
+[the review report](../reports/native-sufficiency-20261027/RESULT_RU.md),
+with [machine-readable results](../reports/native-sufficiency-20261027/SUMMARY.compact.json).
+
 This experiment extends the native delivery candidate in PR #230 at
 `40cfc413f8060b3d16fe962f6f9fe26bdfd27114`. It adds three opt-in selection
 policies, compares them through the installed public MCP and pinned OpenCode,
@@ -136,3 +146,13 @@ per-policy metrics, actual `OPENCODE.json`, `SUMMARY.json` and `SCORECARD.md`.
 The checkpoint verifies that the installed selector and delivery source bytes
 match the tested checkout. The workflow uploads all evidence, including failed
 candidate results and infrastructure failures.
+
+The initial local V40 run completed all actual Python and OpenCode calls,
+including source/SQLite state verification, then exposed a scoring-only bug:
+public `content_sha256` is a projection fingerprint, not the SHA-256 of an
+individual displayed snippet. The scorer now verifies the documented
+fingerprint shape separately from source bytes, coordinates and provenance.
+To avoid repeating 200 expensive completed OpenCode calls, the local result
+was recovered from persisted on-wire artifacts with
+`--replay-completed-v40`; this revalidates the original source rows and
+pagination. The new corpus was run fresh. CI runs without the replay flag.
