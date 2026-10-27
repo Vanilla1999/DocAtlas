@@ -115,9 +115,12 @@ that claim.
 
 ## Reproduction
 
-The dedicated workflow is
-`.github/workflows/native-sufficiency.yml`. It freezes original V40 inputs and
-dependencies, builds the exact wheel, installs the pinned client, and runs:
+The dedicated workflow definition is
+`.github/workflows/native-sufficiency.yml`. While this experiment is stacked on
+the draft PR branch, the already registered
+`.github/workflows/native-opencode.yml` runs the same experiment through a
+branch-specific step. It freezes original V40 inputs and dependencies, builds
+the exact wheel, installs the pinned client, and runs:
 
 ```bash
 python -I eval/native_sufficiency_integration.py \
