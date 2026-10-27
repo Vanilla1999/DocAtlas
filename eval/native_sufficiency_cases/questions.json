@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "state": "frozen_independent_challenge_not_statistical_blind",
+  "cases": [
+    {
+      "id": "NS16-L01",
+      "project_group": "lumenrelay",
+      "question": "In LumenRelay, may I disable payload capture in production as I do in isolated development, and what is still recorded when audit.capture=false?",
+      "answerability": "within_budget",
+      "family": "environment_scope",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-L02",
+      "project_group": "lumenrelay",
+      "question": "A non-idempotent LumenRelay message timed out. Does that permit another delivery attempt, what exception can authorize replay, which payload and destination restrictions apply, and what attempt ceiling still applies?",
+      "answerability": "within_budget",
+      "family": "negation_exception",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-L03",
+      "project_group": "lumenrelay",
+      "question": "Как восстановить production-снимок LumenRelay: какие две проверки нужны до команды и что выполняется после успешной загрузки?",
+      "answerability": "within_budget",
+      "family": "cross_file_prerequisite_russian",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-L04",
+      "project_group": "lumenrelay",
+      "question": "In LumenRelay, what information remains after audit.capture=false, and what guaranteed percentage reduction in storage usage does this setting provide?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-C01",
+      "project_group": "cairnstore",
+      "question": "A CairnStore object's retention deadline has passed but a legal hold is still active. Is deletion allowed, and what must happen before cairn delete can be accepted?",
+      "answerability": "within_budget",
+      "family": "independent_hold",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-C02",
+      "project_group": "cairnstore",
+      "question": "How does immediate read-after-write visibility differ between CairnStore versions 1 and 2, and does version 2 extend that guarantee to bucket listings?",
+      "answerability": "within_budget",
+      "family": "version_scope",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-C03",
+      "project_group": "cairnstore",
+      "question": "Does storage.sync.interval=0 mean the same as storage.sync.enabled=false in CairnStore? Explain whether an explicit cairn sync request is accepted in each case.",
+      "answerability": "within_budget",
+      "family": "identifier_precision",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-C04",
+      "project_group": "cairnstore",
+      "question": "What guaranteed 99th-percentile bucket-listing latency in milliseconds does CairnStore version 2 provide?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-V01",
+      "project_group": "vellumbuild",
+      "question": "What must be configured for a VellumBuild runner to read a shared cache, and may artifact signature checks be skipped when that cache is on a private network?",
+      "answerability": "within_budget",
+      "family": "authorization_and_authenticity",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-V02",
+      "project_group": "vellumbuild",
+      "question": "Which VellumBuild flag should I use to avoid reusing cached artifacts but still publish the new build result, and how would --no-cache differ?",
+      "answerability": "within_budget",
+      "family": "polarity",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-V03",
+      "project_group": "vellumbuild",
+      "question": "В VellumBuild какое значение побеждает при конфликте CLI, окружения, vellum.toml и машинных настроек? Можно ли положить секрет подписи в vellum.toml с правами только для владельца?",
+      "answerability": "within_budget",
+      "family": "precedence_and_secret_scope_russian",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-V04",
+      "project_group": "vellumbuild",
+      "question": "What hard maximum number of remote artifacts will VellumBuild retain automatically before it deletes older artifacts?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-T01",
+      "project_group": "tideplane",
+      "question": "Which TidePlane command promotes a staged release, how many ready replicas are required, and can promotion proceed while a write migration is active?",
+      "answerability": "within_budget",
+      "family": "cross_file_interlock",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-T02",
+      "project_group": "tideplane",
+      "question": "A healthy TidePlane worker is 500 milliseconds ahead of the controller. May it obtain a new lease, and how long does a lease issued before that clock problem remain valid?",
+      "answerability": "within_budget",
+      "family": "numeric_condition",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-T03",
+      "project_group": "tideplane",
+      "question": "In TidePlane, how do I let work already running on one machine finish naturally while preventing any fresh work from landing there? Should I use cordon or drain?",
+      "answerability": "within_budget",
+      "family": "paraphrase",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    },
+    {
+      "id": "NS16-T04",
+      "project_group": "tideplane",
+      "question": "Where does TidePlane write its most recent promotion receipt, and for how many years is that receipt guaranteed to be retained?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "independent_challenge",
+      "source_kind": "authored_fictional"
+    }
+  ]
+}
+

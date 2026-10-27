@@ -1,0 +1,827 @@
+{
+  "schema_version": 1,
+  "state": "frozen_independently_authored_gold_not_for_retrieval_or_selector",
+  "scope": "Only the authored source snapshot; required conditions are question-specific, not every restriction in a document.",
+  "cases": [
+    {
+      "id": "NS16-L01",
+      "required_claims": [
+        {
+          "id": "capture_effect",
+          "expected_statement": "audit.capture=false disables payload capture.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "remaining_metadata",
+          "expected_statement": "Envelope metadata, including message identifier and delivery result, is still recorded.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "environment_permission",
+          "expected_statement": "The same switch is permitted only in isolated development; production must retain payload capture.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "path": "docs/production.md",
+                  "line_start": 7,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/production.md",
+          "line_start": 20,
+          "line_end": 20,
+          "reason": "A support-export rule is not an additional permission to disable runtime capture."
+        }
+      ]
+    },
+    {
+      "id": "NS16-L02",
+      "required_claims": [
+        {
+          "id": "timeout_not_permission",
+          "expected_statement": "A transport timeout alone does not authorize a retry of a non-idempotent message.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/replay.md",
+                  "line_start": 7,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "token_exception_and_scope",
+          "expected_statement": "A valid reusable replay.token permits the exception only for the original message digest and destination.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/replay.md",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 18,
+                  "line_end": 19
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "attempt_ceiling",
+          "expected_statement": "The configured ceiling still applies: delivery.retry.max=3 means at most three total attempts, including the first.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/replay.md",
+                  "line_start": 10,
+                  "line_end": 10
+                },
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-L03",
+      "required_claims": [
+        {
+          "id": "pause_ingress",
+          "expected_statement": "До восстановления необходимо приостановить приём новых сообщений.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/production.md",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "journal_watermark",
+          "expected_statement": "До восстановления watermark сохранённого журнала должен быть не ниже marker снимка; иначе нужен недостающий журнал.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/production.md",
+                  "line_start": 14,
+                  "line_end": 15
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "restore_command",
+          "expected_statement": "Снимок загружается командой lumen restore --snapshot SNAPSHOT_ID.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/recovery.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "post_restore_sequence",
+          "expected_statement": "После успешной загрузки, до открытия ingress, нужен lumen journal replay --after-snapshot.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/recovery.md",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/recovery.md",
+          "line_start": 19,
+          "line_end": 19,
+          "reason": "The question concerns production recovery, not a separate rehearsal relay."
+        }
+      ]
+    },
+    {
+      "id": "NS16-L04",
+      "required_claims": [
+        {
+          "id": "retained_information",
+          "expected_statement": "Envelope metadata including identifier and delivery result remains.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "guaranteed_storage_saving",
+          "expected_statement": "No guaranteed storage-reduction percentage is supplied by this corpus; do not convert spool size or flush timing into a percentage.",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-C01",
+      "required_claims": [
+        {
+          "id": "hold_overrides_expired_retention",
+          "expected_statement": "Expiry alone does not permit deletion when a legal hold is active.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/lifecycle.md",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "path": "docs/retention.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "required_release",
+          "expected_statement": "A compliance officer must record release of the legal hold before deletion is accepted; the command cannot bypass it.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/retention.md",
+                  "line_start": 8,
+                  "line_end": 9
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-C02",
+      "required_claims": [
+        {
+          "id": "version_one_reads",
+          "expected_statement": "Version 1 may return the previous value after a successful write.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/v1/consistency.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "version_two_reads",
+          "expected_statement": "Version 2 returns the new value for a same-key read after a successful write.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/v2/consistency.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "listing_limit",
+          "expected_statement": "Version 2 bucket listings remain eventually consistent; its object-read guarantee does not extend to the next listing.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/v2/consistency.md",
+                  "line_start": 12,
+                  "line_end": 13
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/retention.md",
+          "line_start": 18,
+          "line_end": 18,
+          "reason": "Export restriction does not explain consistency between versions."
+        }
+      ]
+    },
+    {
+      "id": "NS16-C03",
+      "required_claims": [
+        {
+          "id": "manual_enabled",
+          "expected_statement": "storage.sync.interval=0 selects manual mode while leaving the worker enabled; an explicit cairn sync request is accepted.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "disabled_worker",
+          "expected_statement": "storage.sync.enabled=false disables the worker and rejects an explicit cairn sync request; this is not manual mode.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 12,
+                  "line_end": 13
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/configuration.md",
+          "line_start": 23,
+          "line_end": 23,
+          "reason": "Key rotation does not determine synchronization setting semantics."
+        }
+      ]
+    },
+    {
+      "id": "NS16-C04",
+      "required_claims": [
+        {
+          "id": "guaranteed_listing_p99",
+          "expected_statement": "The corpus gives no numerical guaranteed p99 listing latency; consistency statements cannot supply that number.",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-V01",
+      "required_claims": [
+        {
+          "id": "remote_endpoint",
+          "expected_statement": "Configure cache.remote.url with the shared-cache endpoint.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/runner.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "namespace_credential",
+          "expected_statement": "The credential must be scoped to the selected cache namespace; reachability alone is insufficient.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/runner.md",
+                  "line_start": 8,
+                  "line_end": 9
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "private_network_no_exemption",
+          "expected_statement": "Artifact signatures must still be verified on a private network.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/security.md",
+                  "line_start": 7,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-V02",
+      "required_claims": [
+        {
+          "id": "fresh_skips_reads",
+          "expected_statement": "Use --fresh to skip cache reads.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/cli.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fresh_publishes",
+          "expected_statement": "A successful --fresh build still publishes new artifacts to the configured cache.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/cli.md",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "no_cache_difference",
+          "expected_statement": "--no-cache disables both reads and writes and does not publish the result to the shared cache.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/cli.md",
+                  "line_start": 13,
+                  "line_end": 14
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/security.md",
+          "line_start": 18,
+          "line_end": 18,
+          "reason": "Logging restriction is not a cache read/write effect."
+        }
+      ]
+    },
+    {
+      "id": "NS16-V03",
+      "required_claims": [
+        {
+          "id": "precedence_order",
+          "expected_statement": "Для обычных настроек: CLI выше окружения, затем vellum.toml проекта, затем машинные значения.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 10,
+                  "line_end": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "secret_store_required",
+          "expected_statement": "Секрет подписи должен поступать из secret store runner.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/security.md",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "file_permission_no_exception",
+          "expected_statement": "Приоритет файла не разрешает хранить секрет в vellum.toml; ограниченные права файла не являются исключением.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 15,
+                  "line_end": 15
+                },
+                {
+                  "path": "docs/security.md",
+                  "line_start": 14,
+                  "line_end": 14
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/configuration.md",
+          "line_start": 20,
+          "line_end": 20,
+          "reason": "Alias recursion is not configuration precedence or signing-secret placement."
+        }
+      ]
+    },
+    {
+      "id": "NS16-V04",
+      "required_claims": [
+        {
+          "id": "remote_artifact_count_limit",
+          "expected_statement": "The corpus supplies no automatic hard limit on retained remote artifacts; do not invent a count.",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-T01",
+      "required_claims": [
+        {
+          "id": "promotion_command",
+          "expected_statement": "Use tide promote RELEASE_ID.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/rollout.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "readiness_threshold",
+          "expected_statement": "At least two staged replicas must report ready.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/rollout.md",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "independent_migration_interlock",
+          "expected_statement": "An active write migration blocks promotion even when the ready-replica threshold is met.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/rollout.md",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "path": "docs/controller.md",
+                  "line_start": 7,
+                  "line_end": 9
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    },
+    {
+      "id": "NS16-T02",
+      "required_claims": [
+        {
+          "id": "new_lease_blocked",
+          "expected_statement": "A 500 ms offset exceeds the 250 ms absolute limit, so a new lease is not allowed; healthy status cannot override it.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/controller.md",
+                  "line_start": 13,
+                  "line_end": 14
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "existing_lease_survives",
+          "expected_statement": "The admission failure does not revoke an existing valid lease; it remains valid for 90 seconds from issue, not 90 seconds from detection.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/controller.md",
+                  "line_start": 15,
+                  "line_end": 15
+                },
+                {
+                  "path": "docs/workers.md",
+                  "line_start": 18,
+                  "line_end": 19
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/controller.md",
+          "line_start": 19,
+          "line_end": 19,
+          "reason": "Controller identity maintenance is not worker clock eligibility."
+        }
+      ]
+    },
+    {
+      "id": "NS16-T03",
+      "required_claims": [
+        {
+          "id": "cordon_blocks_new_work",
+          "expected_statement": "Use tide cordon WORKER_ID to prevent assignment of new jobs.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/workers.md",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "existing_work_finishes",
+          "expected_statement": "Cordoning does not cancel existing jobs; they may finish normally.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/workers.md",
+                  "line_start": 8,
+                  "line_end": 9
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "drain_is_different",
+          "expected_statement": "Drain requests termination after a grace period, so it is not the requested leave-running-work-alone action.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/workers.md",
+                  "line_start": 13,
+                  "line_end": 14
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ],
+      "irrelevant_negative_controls": [
+        {
+          "path": "docs/workers.md",
+          "line_start": 23,
+          "line_end": 23,
+          "reason": "Debugger restriction does not require terminating a cordoned job."
+        }
+      ]
+    },
+    {
+      "id": "NS16-T04",
+      "required_claims": [
+        {
+          "id": "receipt_location",
+          "expected_statement": "The most recent receipt is at .tide/receipts/latest.json.",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/rollout.md",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "receipt_retention_years",
+          "expected_statement": "No guaranteed receipt-retention duration in years is provided by this corpus.",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not infer requested facts from prior knowledge of real products; this is an authored fictional corpus.",
+        "Do not treat an omitted condition or a missing numerical guarantee as established."
+      ]
+    }
+  ]
+}
+
