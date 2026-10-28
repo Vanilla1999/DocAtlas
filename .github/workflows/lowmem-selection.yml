@@ -1,81 +1,62 @@
-name: Main selection alternatives under shared 1.5 GB (measurement)
+name: Tiny selection repaired runtime under shared 1.5 GB (measurement)
 on:
   push:
     branches: [experiment/lowmem-selection-20261028]
     paths:
-      - 'docmancer/docs/application/tiny_selection.py'
-      - 'docmancer/docs/application/facet_selection.py'
-      - 'eval/lowmem_selection/**'
+      - 'eval/lowmem_selection/entry.py'
       - '.github/workflows/lowmem-selection.yml'
   workflow_dispatch:
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: lowmem-selection-${{ github.ref }}
-  cancel-in-progress: true
+  group: lowmem-repair-${{ github.sha }}
+  cancel-in-progress: false
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-        with:
-          persist-credentials: false
-      - name: Freeze main, historical datasets and runtime
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          git fetch -q origin 439815771b96edc77a12f42f90f1fecb35f5e5d7 --depth=1
-          git diff --exit-code 439815771b96edc77a12f42f90f1fecb35f5e5d7 HEAD -- pyproject.toml uv.lock eval/prepared_model_comparison40 docmancer/docs/application/section_compression.py
-          python -m compileall -q docmancer eval/lowmem_selection
-          mkdir -p "$RUNNER_TEMP/bundle/runtime" "$RUNNER_TEMP/bundle/tiny"
-          gh run download 40686090024 --repo "$GITHUB_REPOSITORY" --name pinned-llama-server --dir "$RUNNER_TEMP/bundle/runtime"
-          chmod +x "$RUNNER_TEMP/bundle/runtime/llama-server"
-          "$RUNNER_TEMP/bundle/runtime/llama-server" --version > "$RUNNER_TEMP/bundle/runtime/version.txt" 2>&1
-          python eval/lowmem_selection/provision.py "$RUNNER_TEMP/bundle/tiny/model.gguf" > "$RUNNER_TEMP/bundle/tiny/manifest.json"
-          git archive HEAD docmancer eval/lowmem_selection .github/workflows/lowmem-selection.yml | gzip > "$RUNNER_TEMP/bundle/tested-source.tar.gz"
-          git rev-parse HEAD > "$RUNNER_TEMP/bundle/head.txt"
-          docker build -f eval/lowmem_selection/Dockerfile -t docatlas-lowmem .
-          docker image inspect docatlas-lowmem > "$RUNNER_TEMP/bundle/image.json"
-          docker save docatlas-lowmem | gzip > "$RUNNER_TEMP/bundle/image.tar.gz"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: lowmem-runtime-${{ github.run_id }}
-          path: ${{ runner.temp }}/bundle/
-          retention-days: 7
-          compression-level: 0
   installed:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        policy: [main, fixed, adaptive-gap-v1, facet-tiny-select-v1, facet-tiny-plan-v1]
+        policy: [facet-tiny-select-v1, facet-tiny-plan-v1]
         suite: [v40, pilot, fresh]
     steps:
-      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          name: lowmem-runtime-${{ github.run_id }}
-          path: ${{ runner.temp }}/bundle
-      - name: Shared cgroup; 2 CPUs, 1500000000 bytes, no swap, offline
+          persist-credentials: false
+      - name: Reuse exact built product; refuse changing selectors or gold
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch -q origin 3904aa5a04ee984d065d267f0daa279eece52ea9 --depth=1
+          git diff --exit-code 3904aa5a04ee984d065d267f0daa279eece52ea9 HEAD -- \
+            docmancer pyproject.toml uv.lock eval/lowmem_selection/run.py \
+            eval/lowmem_selection/FREEZE.json eval/lowmem_selection/provision.py \
+            eval/lowmem_selection/fresh eval/lowmem_selection/pilot eval/prepared_model_comparison40
+          mkdir -p "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/results"
+          gh run download 40733498447 --repo "$GITHUB_REPOSITORY" \
+            --name lowmem-runtime-40733498447 --dir "$RUNNER_TEMP/bundle"
+          chmod +x "$RUNNER_TEMP/bundle/runtime/llama-server"
+          "$RUNNER_TEMP/bundle/runtime/llama-server" --help > "$RUNNER_TEMP/results/runtime-help.txt"
+          grep -q -- '--load-mode' "$RUNNER_TEMP/results/runtime-help.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/results/harness-head.txt"
+          cp "$RUNNER_TEMP/bundle/head.txt" "$RUNNER_TEMP/bundle/image.json" "$RUNNER_TEMP/results/"
+          cp eval/lowmem_selection/entry.py "$RUNNER_TEMP/results/entry.py"
+          gunzip -c "$RUNNER_TEMP/bundle/image.tar.gz" | docker load
+      - name: Only failed tiny arms; unchanged main controls retained from prior run
         env:
           POLICY: ${{ matrix.policy }}
           SUITE: ${{ matrix.suite }}
-          TESTED_SHA: ${{ github.sha }}
+          TESTED_SHA: 3904aa5a04ee984d065d267f0daa279eece52ea9
         run: |
           set -euo pipefail
-          # Artifact extraction does not preserve executable permission.
-          chmod +x "$RUNNER_TEMP/bundle/runtime/llama-server"
-          gunzip -c "$RUNNER_TEMP/bundle/image.tar.gz" | docker load
-          mkdir -p "$RUNNER_TEMP/results"
-          cp "$RUNNER_TEMP/bundle/head.txt" "$RUNNER_TEMP/bundle/image.json" "$RUNNER_TEMP/results/"
           set +e
           docker run --name lowmem-run --network none --cpus=2 \
             --memory=1500000000 --memory-swap=1500000000 \
             -e POLICY -e SUITE -e TESTED_SHA -e HF_HUB_OFFLINE=1 \
+            -v "$GITHUB_WORKSPACE/eval/lowmem_selection/entry.py:/repo/eval/lowmem_selection/entry.py:ro" \
             -v "$RUNNER_TEMP/results:/evidence" \
             -v "$RUNNER_TEMP/bundle/runtime:/runtime:ro" \
             -v "$RUNNER_TEMP/bundle/tiny:/tiny:ro" docatlas-lowmem
