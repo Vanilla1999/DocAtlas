@@ -19,7 +19,7 @@ try:
         flags=['/runtime/llama-server','-m','/llm/model.gguf','--host','127.0.0.1','--port','8099',
                '--alias','docatlas-light','--ctx-size','2048','--parallel','1','--threads','2',
                '--threads-batch','2','--batch-size','128','--ubatch-size','64',
-               '--cache-ram','0','--no-context-shift','--no-mmap']
+               '--cache-ram','0','--no-context-shift','--load-mode','none']
         if a.group=='qwen-rerank':
             flags+=['--reranking','--pooling','rank']
         else:

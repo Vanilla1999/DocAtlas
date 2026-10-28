@@ -13,7 +13,7 @@ permissions:
   actions: read
 concurrency:
   group: lightweight-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   installed:
     runs-on: ubuntu-latest
@@ -21,7 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [baseline, qwen-rerank, qwen-select]
+        # Runtime-only fixes reuse an unchanged already-running baseline.
+        # Manual dispatch and all ordinary product commits run every arm.
+        group: ${{ contains(github.event.head_commit.message, '[runtime-only]') && fromJSON('["qwen-rerank","qwen-select"]') || fromJSON('["baseline","qwen-rerank","qwen-select"]') }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
