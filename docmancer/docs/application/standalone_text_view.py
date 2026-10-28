@@ -75,4 +75,6 @@ def encode_standalone_text(packet: dict) -> str | None:
     body = text.encode("utf-8")
     if max(projection_token_count(body), math.ceil(len(body) / 4)) > 12000:
         return None
-    return text
+    # Separate, reversible Context Assembly stage. It never chooses evidence.
+    from .context_assembly import assemble_context
+    return assemble_context(text)
