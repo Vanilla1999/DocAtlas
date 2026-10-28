@@ -12,7 +12,8 @@ from dataclasses import dataclass
 import math
 import re
 
-POLICIES = frozenset({'query-cover-v1', 'owner-cover-v1', 'guarded-cover-v1', 'guarded-cover-v2'})
+RESCUE_POLICIES = frozenset({'guarded-obligation-v1', 'guarded-constraint-v1', 'guarded-combined-v1'})
+POLICIES = frozenset({'query-cover-v1', 'owner-cover-v1', 'guarded-cover-v1', 'guarded-cover-v2'}) | RESCUE_POLICIES
 _WORD = re.compile(r'[^\W_]+', re.UNICODE)
 _STOP = frozenset('''a an the is are be was were being how what which when where who why
 can could do does did should would will shall to of for in on at by with from and or
@@ -243,6 +244,109 @@ def _select_clause(rows: list[dict], question: str, *, policy: str) -> Selection
 
 _SPLIT = re.compile(r"[?;]\s*|(?:,\s*(?:and\s+)?|\s+and\s+)(?=(?:exactly\s+)?(?:what|which|where|when|how|why|whether)\b)", re.I)
 
+# Experimental, additive alternatives to v2. These are restriction *candidates*,
+# not an entailment classifier. A matched word never proves applicability or
+# absence. The scan is confined to the same already authorized source pool.
+_CONSTRAINT = re.compile(
+    r'\b(?:no|not|never|cannot|\w+n[\u2019\x27]t|must|only|unless|except|require\w*|prohibit\w*|forbid\w*|'
+    r'не|нельзя|только|кроме|если|запрещ\w*|треб\w*|обязат\w*)\b', re.I)
+
+
+def _rescue_evidence(rows, question, baseline, policy, focus_queries):
+    """Retain v2's prefix, then append whole owners for explicit coverage gaps.
+
+    The three policies are ablations: query obligations alone, related
+    restrictions alone, and their union. They do not read new documents, call a
+    model, reorder the existing selected prefix, or certify completeness. A
+    transport-limited page can still omit a rescued owner; delivery measures it.
+    """
+    if not baseline.chosen or len(baseline.chosen) == len(rows):
+        return Selection(baseline.chosen, baseline.order, {
+            **baseline.diagnostic, 'experimental_policy': policy,
+            'baseline_policy': 'guarded-cover-v2', 'added_rows': 0,
+            'rescue_skipped': 'no_selected_witness' if not baseline.chosen else 'full_pool_selected'})
+
+    # Use literal clauses and query identifiers only. No benchmark labels,
+    # generated obligations or model-written facts enter this stage.
+    clauses = [x.strip(' ,.?') for x in _SPLIT.split(question) if x.strip(' ,.?')]
+    clauses.extend(x for x in focus_queries if isinstance(x, str) and x not in clauses)
+    namespaces = [terms(r['path_or_url'].split('/')[0]) for r in rows]
+    namespace_words = set().union(*namespaces)
+    subjects = terms(question) & namespace_words
+    bodies = [terms(r['snippet']) for r in rows]
+    headings = [terms(str(r.get('section') or '')) for r in rows]
+    literals = [frozenset(x.casefold().split('=', 1)[0] for x in
+                         _TECHNICAL.findall(r['snippet'] + ' ' + str(r.get('section') or '')))
+                for r in rows]
+    owners = {}
+    for i, row in enumerate(rows):
+        owners.setdefault(_identity(row), []).append(i)
+    chosen = list(baseline.chosen)
+    selected = set(chosen)
+    reasons = []
+
+    def add_owner(index, reason):
+        additions = [i for i in owners[_identity(rows[index])] if i not in selected]
+        if additions:
+            chosen.extend(additions)
+            selected.update(additions)
+            reasons.append({'reason': reason, 'rows': additions})
+
+    for clause in clauses:
+        query = terms(clause)
+        named = query & namespace_words
+        if not named and len(subjects) == 1:
+            named = subjects
+        eligible = [i for i in range(len(rows)) if not named or named & namespaces[i]]
+        eligible_set = set(eligible)
+        content = query - named
+        features = [(bodies[i] | headings[i]) & content for i in range(len(rows))]
+        identifiers = frozenset(x.casefold() for x in _TECHNICAL.findall(clause))
+        for i in eligible:
+            features[i] = set(features[i]) | {
+                'identifier:' + ident for ident in identifiers
+                if ident in (rows[i]['snippet'] + ' ' + str(rows[i].get('section') or '')).casefold()}
+        available = set().union(*(features[i] for i in eligible)) if eligible else set()
+        if policy in {'guarded-obligation-v1', 'guarded-combined-v1'}:
+            covered = set().union(*(features[i] for i in chosen if i in eligible_set))
+            missing = available - covered
+            while missing:
+                # One uncovered query term can carry the decisive environment,
+                # version or exception. Unlike v2, do not discard that last gain.
+                candidates = [(len(features[i] & missing) /
+                               max(1, len(rows[i]['snippet'].encode())) ** .35, -i, i)
+                              for i in eligible if i not in selected and features[i] & missing]
+                if not candidates:
+                    break
+                index = max(candidates)[2]
+                add_owner(index, 'uncovered_query_feature')
+                covered = set().union(*(features[i] for i in chosen if i in eligible_set))
+                missing = available - covered
+
+        if policy in {'guarded-constraint-v1', 'guarded-combined-v1'}:
+            # Fixed anchors from the original v2 witnesses prevent additions
+            # from recursively dragging in unrelated topics. Exact identifiers
+            # can connect restrictions across files, not only neighboring leaves.
+            anchors = set().union(*(literals[i] for i in baseline.chosen if i in eligible_set))
+            topical = set().union(*((bodies[i] | headings[i]) & content
+                                   for i in baseline.chosen if i in eligible_set))
+            for i in eligible:
+                if i in selected or not _CONSTRAINT.search(rows[i]['snippet']):
+                    continue
+                exact_link = bool(literals[i] & anchors)
+                topical_link = len((bodies[i] | headings[i]) & topical) >= 2
+                if exact_link or topical_link:
+                    add_owner(i, 'related_constraint_candidate')
+
+    order = tuple(chosen + [i for i in baseline.order if i not in selected])
+    return Selection(tuple(chosen), order, {
+        'status': 'experimental_additive_rescue', 'experimental_policy': policy,
+        'baseline_policy': 'guarded-cover-v2', 'baseline_status': baseline.diagnostic.get('status'),
+        'baseline_selected_rows': len(baseline.chosen), 'selected_rows': len(chosen),
+        'candidate_rows': len(rows), 'added_rows': len(selected - set(baseline.chosen)),
+        'rescue_reasons': reasons, 'baseline': baseline.diagnostic,
+        'semantic_sufficiency_certified': False, 'corpus_absence_proven': False})
+
 
 def select_evidence(rows: list[dict], question: str, *, policy: str = 'guarded-cover-v1',
                     focus_queries: tuple[str, ...] | list[str] = ()) -> Selection:
@@ -254,6 +358,9 @@ def select_evidence(rows: list[dict], question: str, *, policy: str = 'guarded-c
     """
     if policy not in POLICIES:
         raise ValueError('invalid_evidence_selection_policy')
+    if policy in RESCUE_POLICIES:
+        baseline = select_evidence(rows, question, policy='guarded-cover-v2', focus_queries=focus_queries)
+        return _rescue_evidence(rows, question, baseline, policy, focus_queries)
     clauses = [part.strip(' ,.?') for part in _SPLIT.split(question) if part.strip(' ,.?')]
     clauses.extend(q for q in focus_queries if isinstance(q, str) and q not in clauses)
     if len(clauses) > 12 or len(question) > 4096:

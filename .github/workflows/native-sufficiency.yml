@@ -1,0 +1,66 @@
+name: Native sufficiency experiment (not semantic acceptance)
+on:
+  push:
+    branches: [experiment/native-evidence-sufficiency-20261027]
+    paths:
+      - 'docmancer/**'
+      - 'eval/native_sufficiency*'
+      - 'eval/native_sufficiency_cases/**'
+      - '.github/workflows/native-sufficiency.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-sufficiency-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  installed-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          repository: anomalyco/opencode
+          ref: a517687fde98a7329ada3ae644a01a9fc6c4e99e
+          path: upstream-opencode
+          persist-credentials: false
+      - name: Freeze V40, baseline harness and dependencies
+        run: |
+          set -euo pipefail
+          git fetch -q origin 40cfc413f8060b3d16fe962f6f9fe26bdfd27114 --depth=1
+          git diff --exit-code 40cfc413f8060b3d16fe962f6f9fe26bdfd27114 HEAD -- \
+            eval/prepared_model_comparison40 eval/native_opencode_integration.py \
+            eval/native_opencode_client.ts pyproject.toml uv.lock
+          mkdir -p "$RUNNER_TEMP/native-sufficiency"
+          git rev-parse HEAD > "$RUNNER_TEMP/native-sufficiency/head.txt"
+          python -m compileall -q docmancer eval/native_sufficiency_integration.py
+          git archive HEAD docmancer eval/native_sufficiency_integration.py \
+            eval/native_sufficiency_client.ts eval/native_sufficiency_cases \
+            .github/workflows/native-sufficiency.yml | gzip > "$RUNNER_TEMP/native-sufficiency/tested-source.tar.gz"
+      - name: Install exact wheel and pinned OpenCode; no provider key
+        run: |
+          python -m pip install uv==0.9.25
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/native-sufficiency-venv" uv sync --frozen --no-dev --no-install-project
+          uv build --wheel --out-dir "$RUNNER_TEMP/native-sufficiency-wheel"
+          uv pip install --python "$RUNNER_TEMP/native-sufficiency-venv/bin/python" --no-deps "$RUNNER_TEMP"/native-sufficiency-wheel/*.whl
+          npm install -g bun@1.4.2
+          cd upstream-opencode
+          bun install --frozen-lockfile
+      - name: Measure five selectors; source-witness PASS or FAIL is in scorecard
+        env:
+          TESTED_SHA: ${{ github.sha }}
+          HF_HUB_OFFLINE: '1'
+        run: |
+          "$RUNNER_TEMP/native-sufficiency-venv/bin/python" -I eval/native_sufficiency_integration.py \
+            --repo "$GITHUB_WORKSPACE" --work "$RUNNER_TEMP/native-sufficiency-work" \
+            --out "$RUNNER_TEMP/native-sufficiency/run" --opencode "$GITHUB_WORKSPACE/upstream-opencode"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-sufficiency-${{ github.run_id }}
+          path: ${{ runner.temp }}/native-sufficiency/
+          retention-days: 30
+          if-no-files-found: error

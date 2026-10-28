@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "state": "frozen_authored_sources_before_runtime_results",
+  "source_kind": "authored_fictional",
+  "source_root": "sources",
+  "families": [
+    {
+      "id": "lumenrelay",
+      "source_kind": "authored_fictional",
+      "paths": [
+        "docs/configuration.md",
+        "docs/production.md",
+        "docs/replay.md",
+        "docs/recovery.md"
+      ]
+    },
+    {
+      "id": "cairnstore",
+      "source_kind": "authored_fictional",
+      "paths": [
+        "docs/lifecycle.md",
+        "docs/retention.md",
+        "docs/v1/consistency.md",
+        "docs/v2/consistency.md",
+        "docs/configuration.md"
+      ]
+    },
+    {
+      "id": "vellumbuild",
+      "source_kind": "authored_fictional",
+      "paths": [
+        "docs/cli.md",
+        "docs/runner.md",
+        "docs/security.md",
+        "docs/configuration.md"
+      ]
+    },
+    {
+      "id": "tideplane",
+      "source_kind": "authored_fictional",
+      "paths": [
+        "docs/rollout.md",
+        "docs/controller.md",
+        "docs/workers.md"
+      ]
+    }
+  ],
+  "result_rule": "Do not change questions, gold, source bytes or this manifest to fit runtime outcomes. This is a fresh challenge set, not a statistical production-generalization claim."
+}
+

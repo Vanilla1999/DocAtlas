@@ -1,0 +1,8 @@
+{
+  "head": "worktree-on-40cfc413-selector-81c0e094",
+  "installed_matches_checkout": true,
+  "sha256": {
+    "mcp/evidence_selection.py": "81c0e094fb5377923bee595562846f0ef6aa576a23fb6d3708c3d06cc36b4abb",
+    "mcp/native_delivery.py": "11d6397dcf5f9198a0f8fc0774dc9f806cf2a0c62b8c9d8d5abc7a81601a6ee7"
+  }
+}

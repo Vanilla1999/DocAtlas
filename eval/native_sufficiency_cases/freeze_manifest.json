@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "state": "frozen_before_any_challenge_runtime_results",
+  "frozen_at_utc": "2026-10-27T09:57:21.437917+00:00",
+  "selector_sha256_reported_at_freeze": "81c0e094fb5377923bee595562846f0ef6aa576a23fb6d3708c3d06cc36b4abb",
+  "cases": 16,
+  "source_files": 16,
+  "documented_claims": 36,
+  "unsupported_claims": 4,
+  "multi_file_claims": 7,
+  "irrelevant_negative_controls": 8,
+  "witness_parts": 43,
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3763,
+      "sha256": "7f793540545ed51f0ebd3c1567cee2a28a0a651115ef51ea56c1c5de052dd8f7"
+    },
+    {
+      "path": "gold_spans.json",
+      "bytes": 26415,
+      "sha256": "82927b9f15c949f5819ed1805de36afb01f1a287cfacf8381c11898fe5f97d72"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 6800,
+      "sha256": "571dc8f3d73f3a0546b24d7541f5614e736ab4e76ab369c425343664ebbd32cd"
+    },
+    {
+      "path": "source_plan.json",
+      "bytes": 1257,
+      "sha256": "c052cdedf6cc0110382fadfe79ba638e84fe2dea2e1b974c2abfba7fe7d91b20"
+    },
+    {
+      "path": "sources/cairnstore/docs/configuration.md",
+      "bytes": 969,
+      "sha256": "46db29a03074684925ae94ef6f565d6a511cdfe375d9709bb8870ba23a908404"
+    },
+    {
+      "path": "sources/cairnstore/docs/lifecycle.md",
+      "bytes": 792,
+      "sha256": "afeecfa1a47e1306354e49afcdac7655fdcac0403b64a4e924224db1d840f18b"
+    },
+    {
+      "path": "sources/cairnstore/docs/retention.md",
+      "bytes": 662,
+      "sha256": "548d6c747f0f97feb317d8422a770d50075bf3d56ff52afcdc5af2a1a48b264e"
+    },
+    {
+      "path": "sources/cairnstore/docs/v1/consistency.md",
+      "bytes": 512,
+      "sha256": "0dd01445426a6b57ad5c7ba31339364eca56ec328b110f32b695a9a5ce3c496c"
+    },
+    {
+      "path": "sources/cairnstore/docs/v2/consistency.md",
+      "bytes": 489,
+      "sha256": "061753bc81f73a7469746fa4a57287e5fd4c1718c8449b98673a2becf74d489d"
+    },
+    {
+      "path": "sources/lumenrelay/docs/configuration.md",
+      "bytes": 1088,
+      "sha256": "fd02e1fecf35ef44545ebf30ba2eb7bd2cff744b2b70b70e0f9469a23f0e3f3a"
+    },
+    {
+      "path": "sources/lumenrelay/docs/production.md",
+      "bytes": 983,
+      "sha256": "e312f521cb4382f05df1d3436878f2650ea619179620dcd1f16d04b15e06b50e"
+    },
+    {
+      "path": "sources/lumenrelay/docs/recovery.md",
+      "bytes": 763,
+      "sha256": "e78244b2719d209cd8a41a7f8676f41b1ed7ab941e39179060355f09aa4225d0"
+    },
+    {
+      "path": "sources/lumenrelay/docs/replay.md",
+      "bytes": 824,
+      "sha256": "e40a285d4c7a65903172773c7cef538fa6b73d0e18442b68af4fddc0c110e523"
+    },
+    {
+      "path": "sources/tideplane/docs/controller.md",
+      "bytes": 819,
+      "sha256": "25a3708b3e09e351a95cede423ff641319b2a1336cb8cd91029703fc94fa91fb"
+    },
+    {
+      "path": "sources/tideplane/docs/rollout.md",
+      "bytes": 799,
+      "sha256": "ae13c09644ca969e3048ca19e81b0ebccb3e0f3293a7965453baae823f645134"
+    },
+    {
+      "path": "sources/tideplane/docs/workers.md",
+      "bytes": 861,
+      "sha256": "d755237868f91b7ce81f59a335355f280eebbeb99e6ce5bb768908612b6c9b51"
+    },
+    {
+      "path": "sources/vellumbuild/docs/cli.md",
+      "bytes": 695,
+      "sha256": "8f8a770900c717b3b2ed87a1a2582427ecc5a5298d51f327934b748ead5d1a44"
+    },
+    {
+      "path": "sources/vellumbuild/docs/configuration.md",
+      "bytes": 807,
+      "sha256": "c37bb57b9d97dd5ea69ddeac8119f89e0e8f733c3c5beefd478c1d0aee8e4f29"
+    },
+    {
+      "path": "sources/vellumbuild/docs/runner.md",
+      "bytes": 736,
+      "sha256": "7f08aa3260b3ed95705328392cde84e38ee90ec9781ae651e0e0e7bf94f01d27"
+    },
+    {
+      "path": "sources/vellumbuild/docs/security.md",
+      "bytes": 744,
+      "sha256": "e07e2cf5b90f8ac0a8d22f73dfeb9d58f5fd602c0dda03e964c1b84439d593ba"
+    }
+  ],
+  "file_set_sha256": "21b7f4130066738b4b7aa7d8da82fb79a70fbe3ad75134e66968813c2f7fa06a"
+}
+
