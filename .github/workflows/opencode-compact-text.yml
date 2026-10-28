@@ -1,0 +1,60 @@
+name: OpenCode default self-contained compact MCP text (installed proof)
+on:
+  push:
+    branches: [fix/opencode-compact-text-default-20261028]
+    paths:
+      - 'docmancer/docs/application/standalone_text_view.py'
+      - 'docmancer/mcp/agent_config.py'
+      - 'docmancer/mcp/_docs_server_part01.py'
+      - 'eval/opencode_compat/**'
+      - '.github/workflows/opencode-compact-text.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Freeze selection and dependency contracts from main
+        run: |
+          set -euo pipefail
+          git fetch -q origin 439815771b96edc77a12f42f90f1fecb35f5e5d7 --depth=1
+          git diff --exit-code 439815771b96edc77a12f42f90f1fecb35f5e5d7 HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/model_context_view.py docmancer/docs/application/facet_selection.py
+          python -m compileall -q docmancer eval/opencode_compat
+          mkdir -p "$RUNNER_TEMP/evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence/head.txt"
+      - name: Build and install exact candidate wheel in fresh venv
+        run: |
+          set -euo pipefail
+          python -m pip install uv==0.9.25
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/venv" uv sync --frozen --no-dev --no-install-project
+          uv build --wheel --out-dir "$RUNNER_TEMP/wheels"
+          uv pip install --python "$RUNNER_TEMP/venv/bin/python" --no-deps "$RUNNER_TEMP"/wheels/*.whl
+      - name: Real installed stdio, SQLite preparation, migration, source and denial checks
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/venv/bin/python" -I eval/opencode_compat/installed_stdio.py --out "$RUNNER_TEMP/evidence/stdio"
+      - name: Re-score 58 historical live MCP replies without regenerating gold
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 40737675270 --repo "$GITHUB_REPOSITORY" \
+            --pattern 'lowmem-stock-text-*' --dir "$RUNNER_TEMP/stock"
+          "$RUNNER_TEMP/venv/bin/python" -I eval/opencode_compat/recorded_corpus.py \
+            --artifacts "$RUNNER_TEMP/stock" --out "$RUNNER_TEMP/evidence/recorded"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: opencode-compact-text-${{ github.run_id }}
+          path: ${{ runner.temp }}/evidence/
+          retention-days: 30
+          if-no-files-found: error
