@@ -67,6 +67,8 @@ jobs:
           TESTED_SHA: ${{ github.sha }}
         run: |
           set -uo pipefail
+          # Artifact ZIP extraction does not preserve executable mode.
+          chmod +x "$RUNNER_TEMP/bundle/runtime/llama-server"
           gunzip -c "$RUNNER_TEMP/bundle/image.tar.gz" | docker load
           mkdir -p "$RUNNER_TEMP/results"
           cp "$RUNNER_TEMP/bundle/head.txt" "$RUNNER_TEMP/bundle/image.json" "$RUNNER_TEMP/results/"
