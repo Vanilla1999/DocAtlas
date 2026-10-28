@@ -1,136 +1,91 @@
 # Native evidence sufficiency experiment
 
-**Measured outcome (2026-10-27): do not promote any experimental policy.**
-On the unchanged V40, v2 delivered 32/32 required claims with 51,450
-OpenCode-visible tokens, and the three rescues delivered no additional claims.
-On the new 16-question corpus, the conservative control delivered 36/36 while
-v2 delivered 27/36; obligation also delivered 27/36, and constraint/combined
-delivered 28/36. Every missing new claim was already admitted upstream.
-The complete measured table and case-level failures are in
-[the review report](../reports/native-sufficiency-20261027/RESULT_RU.md),
-with [machine-readable results](../reports/native-sufficiency-20261027/SUMMARY.compact.json).
+## Reviewed outcome, 2026-10-28
 
-This experiment extends the native delivery candidate in PR #230 at
-`40cfc413f8060b3d16fe962f6f9fe26bdfd27114`. It adds three opt-in selection
-policies, compares them through the installed public MCP and pinned OpenCode,
-and records source-witness failures as well as token cost. The default remains
-`guarded-cover-v2`. None of these policies certifies semantic sufficiency or
-corpus-wide absence.
+Do not promote the three experimental policies. Fresh installed-client CI runs
+[40503271393](https://github.com/Vanilla1999/DocAtlas/actions/runs/40503271393)
+and [40503271385](https://github.com/Vanilla1999/DocAtlas/actions/runs/40503271385)
+completed on `840ddef6f18acf7f5dd0d1a78bfe9338996f73ae`.
+The detailed [audit and errata](../reports/native-sufficiency-20261027/AUDIT_20261028_RU.md)
+supersede the earlier interpretation of the local measurements.
 
-## Question being tested
+On V40, v2 preserved 32/32 required witness groups; the rescues added no groups
+and increased first-page tokens. On NS16, preserve delivered 36/36, v2 and
+obligation 27/36, and constraint/combined 28/36 under the unchanged strict oracle.
+However, two oracle groups overconstrain the required source combination:
+the delivered retention rule already answers the legal-hold question, and the
+delivered security rule already answers the restrictive-file-permission clause.
+The apparent constraint rescue is therefore not a demonstrated new fact.
+A separately disclosed post-hoc review of these two alternatives gives every
+candidate, including v2, 29/36. Seven real content gaps remain. Gold was not
+edited, and this review is not independent semantic acceptance or answer grading.
 
-The v2 selector can omit an already acquired condition when that condition adds
-only one query term. For example, an explicit environment can be the only new
-feature in a prohibition. It can also omit a relevant restriction because the
-restriction repeats already-covered terms in a different section. Returning
-`not` and `no` to a stop-word vocabulary alone does not solve either problem.
+## Implemented alternatives
 
-This experiment asks whether additive recovery improves independently required
-source coverage at an acceptable first-page cost. It does not assume that an
-extra QA model is necessary. Existing extractive-QA results are documented in
-[semantic-sufficiency-results.md](semantic-sufficiency-results.md); those
-results do not justify automatic semantic enforcement.
-
-## Frozen alternatives
+This experiment is stacked on PR #230 at
+`40cfc413f8060b3d16fe962f6f9fe26bdfd27114`. The default remains
+`guarded-cover-v2`; no semantic completeness certificate is introduced.
 
 | Policy | Behavior |
 |---|---|
-| `preserve` | Existing page-filling control |
-| `guarded-cover-v2` | Unchanged current native selector |
-| `guarded-obligation-v1` | Start with v2; append complete acquired owners that supply any still-uncovered, available literal query feature, including a single feature |
-| `guarded-constraint-v1` | Start with v2; append acquired owners with restriction language linked by a shared technical identifier or at least two query-topic features |
-| `guarded-combined-v1` | Apply both additive recoveries |
+| preserve | Existing page-filling control |
+| guarded-cover-v2 | Unchanged native selector |
+| guarded-obligation-v1 | Append acquired owners carrying still-uncovered literal query features, including a single feature |
+| guarded-constraint-v1 | Append acquired owners with restriction language connected by a shared identifier or at least two query-topic features |
+| guarded-combined-v1 | Apply both additive recoveries |
 
-Here, "obligation" names the experimental policy. Its implementation covers
-lexical query features, not inferred semantic obligations. Constraint words and
-topic overlap are fallible relevance signals. They may miss paraphrases or add
-irrelevant restrictions; the measurements must expose these outcomes.
+Here obligation means literal lexical features, not an inferred semantic plan.
+All policies operate only on already admitted rows. They cannot recover missing
+upstream documents, prove absence, certify answerability, or generate answers.
+Empty v2 selections are not rescued by these policies. Whole acquired owners and
+the v2 selected prefix retain original text and priority; signed continuation,
+permissions and provenance remain unchanged. Additional owners can still exceed
+the unchanged 3,000-token transport ceiling. Actual delivered spans, not selected
+row counts, are the measurement boundary.
 
-All alternatives operate on the same authorized pre-native source pool. This is
-the legacy public packet after upstream acquisition/admission/projection, not a
-trace of every document considered by retrieval. These policies cannot recover
-a source absent from that packet. Sources are not paraphrased,
-deleted, fetched from a new scope, or promoted to instructions. Exact original
-owner identity is retained. Empty v2 selections do not trigger indiscriminate
-restriction scans. A full-pool conservative fallback stays intact.
+A provisioned MiniLM remains on the separate preserve-minilm path. These tests
+exercise normal native installation without MiniLM assets, context compression
+off. Existing unvalidated QA mechanisms are not enabled as evidence vetoes.
+The selector hash remains
+`81c0e094fb5377923bee595562846f0ef6aa576a23fb6d3708c3d06cc36b4abb`.
 
-The v2 selected prefix keeps its order and priority; rescued owners are appended.
-That reduces displacement risk, but it does not prove first-page non-regression:
-framing consumes tokens and the unchanged 3,000-token transport limit can still
-cut off additional evidence. Actual delivered spans are therefore the oracle
-boundary. An applied MiniLM selector continues to use the existing separate
-`preserve-minilm` path; this experiment exercises installation without MiniLM
-assets, with context compression off.
+## Frozen evaluation contract
 
-The selector was frozen before the implementing agent viewed new question gold:
+V40 sources, questions and gold are unchanged. NS16 adds 16 synthetic fictional
+questions and 16 documents, 36 documented claims and four unsupported requested
+claims, including distributed conditions, languages, versions and distractors.
+It is a development/challenge corpus, not a population-level reliability claim.
+No gold or case identifiers enter retrieval or selection. Do not retune the
+selector against the revealed challenge answers.
 
-```text
-docmancer/mcp/evidence_selection.py
-sha256: 81c0e094fb5377923bee595562846f0ef6aa576a23fb6d3708c3d06cc36b4abb
-```
+Each corpus uses one mixed project, real SQLite, a non-editable installed wheel,
+public stdio MCP and actual pinned OpenCode 2.1.2 at
+`a517687fde98a7329ada3ae644a01a9fc6c4e99e`.
+The harness independently compares visible source spans to the original files.
+An empty witness list never counts as a verified unknown response. Missing
+before native selection and admitted-but-not-delivered are distinct outcomes;
+the latter requires trace inspection to distinguish selection from pagination.
+Infrastructure PASS and candidate-quality PASS/FAIL remain separate.
 
-## Evaluation contract
+Source text, coordinates and scope/version provenance, V40 signed pagination and
+tamper rejection, and unchanged source/SQLite state are checked in installed CI.
+Public content_sha256 is an upstream projection fingerprint, not necessarily the
+hash of a displayed snippet; exact snippet bytes are checked separately.
+First-reply o200k_base tokens include framing and signed cursor data. Small
+run-to-run variation can affect what fits at a page boundary.
+Recorded latency is sequential and affected by cold/warm execution order.
 
-The original V40 corpus, questions and gold remain byte-for-byte unchanged. A
-separately authored challenge corpus adds genuinely distributed requirements,
-conditions, exceptions, distractors, version distinctions, partial questions
-and unsupported questions. It is a synthetic challenge set, not a population
-estimate or evidence of general performance on arbitrary repositories.
+No answering model is used: answer_model_calls=0 and provider_usage=null.
+Final-answer accuracy, correct unknowns, full dialogue cost and file-read counts
+remain NOT_TESTED. A strong-model semantic gate and targeted upstream recovery
+are not implemented by these three lexical ablations.
 
-Each corpus is indexed as one mixed project using real SQLite and public
-preparation. Each policy is exercised through an installed, non-editable wheel,
-public stdio MCP and the actual OpenCode 2.1.2 normalizer and ToolOutput. The
-upstream client commit is `a517687fde98a7329ada3ae644a01a9fc6c4e99e`.
+## Reproduction and audit trail
 
-Gold bytes are hashed before inference but expected claims are opened only
-after delivery. The evaluator checks original file spans independently of the
-selector. Multiple claims and multiple source parts must all survive to pass a
-documented case. Unsupported claims are listed but never counted as successful
-unknown answers merely because their witness lists are empty.
-
-The scorecard distinguishes:
-
-- Required evidence missing before native selection (the precise upstream
-  retrieval/admission/projection cause is not isolated by this boundary).
-- Required evidence in that pool but absent from the first delivered page
-  (selection and the page budget are not conflated with retrieval).
-- Newly lost claims versus preserve and v2.
-- Complete documented cases and individually delivered source claims.
-- Complete first-reply `o200k_base` tokens after OpenCode, source counts and
-  recorded request latency. Latency is one sequential observation with cold/warm
-  ordering effects, not a controlled performance estimate.
-
-Source text, coordinates, hash and scope/version provenance are checked. Full
-signed pagination and rejection of forged, changed-question, changed-scope and
-changed-source continuations remain integration controls. Source files and
-SQLite logical state must be unchanged after execution.
-
-## How to interpret the results
-
-Infrastructure PASS means source/delivery/state invariants passed. Candidate
-source-witness PASS/FAIL is reported separately and failed cases remain in the
-scorecard. No policy is promoted automatically because the workflow is green.
-
-A candidate is useful only if it recovers required evidence without losing
-previously delivered requirements, and its context cost is acceptable. The
-comparison keeps all candidate failures, including failures on the fresh corpus.
-Product changes must not be tuned on that corpus after the first execution.
-
-This environment has no configured answering-model provider. Consequently
-`answer_model_calls=0`, `provider_usage=null`, final-answer quality and correct
-unknowns remain NOT_TESTED. Source-span coverage is not an LLM correctness
-score. Token counts are complete first MCP replies, not billed GPT tokens or
-full-dialogue savings. A separate authenticated end-to-end run is needed for
-that claim.
-
-## Reproduction
-
-The dedicated workflow definition is
-`.github/workflows/native-sufficiency.yml`. While this experiment is stacked on
-the draft PR branch, the already registered
-`.github/workflows/native-opencode.yml` runs the same experiment through a
-branch-specific step. It freezes original V40 inputs and dependencies, builds
-the exact wheel, installs the pinned client, and runs:
+Use `.github/workflows/native-sufficiency.yml` for this experiment. The earlier
+branch-specific copy in native-opencode.yml has been removed; that workflow is
+restored to PR #230's original behavior. The dedicated experiment remains intact.
+No duplicate expensive run is needed for the report-only/CI-routing correction.
 
 ```bash
 python -I eval/native_sufficiency_integration.py \
@@ -140,19 +95,15 @@ python -I eval/native_sufficiency_integration.py \
   --opencode /path/to/pinned-opencode
 ```
 
-Use the isolated wheel environment's Python with Bun on PATH. Work/results paths
-must be fresh. Detailed outputs include `PRODUCT_CHECKPOINT.json`, raw replies,
-per-policy metrics, actual `OPENCODE.json`, `SUMMARY.json` and `SCORECARD.md`.
-The checkpoint verifies that the installed selector and delivery source bytes
-match the tested checkout. The workflow uploads all evidence, including failed
-candidate results and infrastructure failures.
+Use the isolated installed-wheel Python and Bun. Fresh CI does not pass
+--replay-completed-v40. The recovery option was used only for the older local
+run after a scorer-only hash assumption failed; it is not the basis of the
+fresh CI results cited above.
 
-The initial local V40 run completed all actual Python and OpenCode calls,
-including source/SQLite state verification, then exposed a scoring-only bug:
-public `content_sha256` is a projection fingerprint, not the SHA-256 of an
-individual displayed snippet. The scorer now verifies the documented
-fingerprint shape separately from source bytes, coordinates and provenance.
-To avoid repeating 200 expensive completed OpenCode calls, the local result
-was recovered from persisted on-wire artifacts with
-`--replay-completed-v40`; this revalidates the original source rows and
-pagination. The new corpus was run fresh. CI runs without the replay flag.
+Artifacts contain tested-source archives, PRODUCT_CHECKPOINT.json, every raw
+MCP reply, per-policy metrics, OPENCODE.json, SUMMARY.json and SCORECARD.md.
+The 28 October audit downloaded both immutable ZIPs, matched their published
+SHA-256 digests, independently recounted 560 OpenCode first replies and rescored
+all 160 NS16 outputs against unchanged source spans. V40 witness grades were
+read from CI, not independently regraded during that offline audit.
+Historical local scorecards are retained in reports/native-sufficiency-20261027.
