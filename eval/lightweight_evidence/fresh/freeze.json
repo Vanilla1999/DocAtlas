@@ -1,0 +1,8 @@
+{
+  "same_author_exploratory": true,
+  "sha256": {
+    "sources.json": "d7c0c716d2a46552b4e183cc72bcf8f2fa62e4dcfce6ce0cef22234501afd066",
+    "questions.json": "b362418b19d12671f0aec5749b26e113134156542f7f379227f6cfb5c47719db",
+    "gold.json": "0cc027ff54abd4f49ca0aa38aa6f4c891adf410a1fbebea63eb84647ebeb8eba"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version":1,
+  "status":"MEASURED_NOT_PRODUCTION_ACCEPTED",
+  "boundary":"installed public stdio MCP, not actual OpenCode or paid model",
+  "paid_calls":0,"paid_usage":null,"paid_access":"BLOCKED_NOT_CONFIGURED",
+  "final_answer_quality":"NOT_TESTED","unknown_answer_quality":"NOT_TESTED",
+  "group_memory":[
+    {"group":"baseline","peak_bytes":608522240,"memory_max":1499996160,"swap_max":0,"max_events":0,"oom":0,"oom_kill":0,"resource_acceptance":"PASS","context_calls":232},
+    {"group":"qwen-select","peak_bytes":1500016640,"memory_max":1499996160,"swap_max":0,"max_events":988,"oom":0,"oom_kill":0,"peak_within_requested_bytes":false,"resource_acceptance":"FAIL_STRICT_PEAK_NO_OOM","context_calls":119},
+    {"group":"qwen-rerank","peak_bytes":1295200256,"memory_max":1499996160,"swap_max":0,"max_events":0,"oom":0,"oom_kill":0,"resource_acceptance":"PASS","context_calls":119}
+  ],
+  "models":[
+    {"mode":"qwen-select","repo":"Qwen/Qwen3-0.6B-GGUF","revision":"1eaf4d9657fe65ad10a51eab76a8db5b363bddaa","filename":"Qwen3-0.6B-Q8_0.gguf","size":639446688,"sha256":"9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"},
+    {"mode":"qwen-rerank","repo":"gorse-io/Qwen3-Reranker-0.6B-GGUF","revision":"257c2d8ebe01523d5a93bd9eab2698b9c7f95ee1","filename":"Qwen3-Reranker-0.6B-Q4_K_M.gguf","size":396476320,"sha256":"5290f5b9a2636be40baf807feafcfb222e0c4670a083fb3447d87993566190a9"}
+  ],
+  "corpora":[
+    {"suite":"l10","questions":10,"requirements":21,"pool_covered":21,"documented_questions":9,"paired_successful_questions":9,"arms":[
+      {"mode":"main","covered":16,"complete":7,"errors":1,"tokens_all_including_errors":9594,"paired_text_change_pct":0,"paired_median_seconds":0.827058473},
+      {"mode":"fixed-five","covered":14,"complete":6,"errors":1,"tokens_all_including_errors":8830,"paired_text_change_pct":-8.031,"paired_median_seconds":0.527371693,"new_losses":4},
+      {"mode":"minilm-window","covered":19,"complete":8,"errors":0,"tokens_all_including_errors":11308,"paired_text_change_pct":0,"paired_median_seconds":0.842070740,"new_losses":0},
+      {"mode":"qwen-select","covered":21,"complete":9,"errors":0,"tokens_all_including_errors":11475,"paired_text_change_pct":6.013,"paired_median_seconds":12.315384665,"new_losses":0,"applied":2,"fallbacks":{"TimeoutError":8}},
+      {"mode":"qwen-rerank","covered":21,"complete":9,"errors":0,"tokens_all_including_errors":11750,"paired_text_change_pct":6.149,"paired_median_seconds":11.482593502,"new_losses":0,"applied":2,"fallbacks":{"TimeoutError":7,"selection_deadline":1}}
+    ]},
+    {"suite":"fresh","questions":8,"requirements":17,"pool_covered":13,"documented_questions":7,"paired_successful_questions":8,"arms":[
+      {"mode":"main","covered":13,"complete":6,"errors":0,"tokens_all_including_errors":6999,"paired_text_change_pct":0,"paired_median_seconds":0.465934574},
+      {"mode":"fixed-five","covered":10,"complete":4,"errors":0,"tokens_all_including_errors":7233,"paired_text_change_pct":3.343,"paired_median_seconds":0.329085156,"new_losses":3},
+      {"mode":"minilm-window","covered":13,"complete":6,"errors":0,"tokens_all_including_errors":6999,"paired_text_change_pct":0,"paired_median_seconds":0.469006023,"new_losses":0},
+      {"mode":"qwen-select","covered":12,"complete":5,"errors":0,"tokens_all_including_errors":9087,"paired_text_change_pct":29.833,"paired_median_seconds":7.545161680,"new_losses":1,"applied":8,"fallbacks":{}},
+      {"mode":"qwen-rerank","covered":13,"complete":6,"errors":0,"tokens_all_including_errors":6973,"paired_text_change_pct":-0.371,"paired_median_seconds":7.451364363,"new_losses":0,"applied":8,"fallbacks":{}}
+    ]},
+    {"suite":"v40","questions":40,"requirements":32,"pool_covered":32,"documented_questions":32,"paired_successful_questions":40,"arms":[
+      {"mode":"main","covered":31,"complete":31,"errors":0,"tokens_all_including_errors":59057,"paired_text_change_pct":0,"paired_median_seconds":14.978973127},
+      {"mode":"fixed-five","covered":32,"complete":32,"errors":0,"tokens_all_including_errors":141130,"paired_text_change_pct":138.973,"paired_median_seconds":8.998061947,"new_losses":0},
+      {"mode":"minilm-window","covered":31,"complete":31,"errors":0,"tokens_all_including_errors":59057,"paired_text_change_pct":0,"paired_median_seconds":15.026512865,"new_losses":0},
+      {"mode":"qwen-select","covered":31,"complete":31,"errors":0,"tokens_all_including_errors":59064,"paired_text_change_pct":0.012,"paired_median_seconds":16.157263672,"new_losses":0,"applied":0,"fallbacks":{"batch_limit_no_truncation":40}},
+      {"mode":"qwen-rerank","covered":31,"complete":31,"errors":0,"tokens_all_including_errors":59090,"paired_text_change_pct":0.056,"paired_median_seconds":22.033282652,"new_losses":0,"applied":0,"fallbacks":{"TimeoutError":40}}
+    ]}
+  ],
+  "source_losses":{"fixed-five":[["L10-03","pause_ingress"],["L10-03","watermark_check"],["L10-04","endpoint"],["L10-04","namespace"],["LW01","sandbox"],["LW01","metadata"],["LW04","precedence"]],"qwen-select":[["LW05","v1"]],"minilm-window":[],"qwen-rerank":[]},
+  "primary_model_attempts":{"qwen-select":{"attempted":18,"completed":10},"qwen-rerank":{"attempted":486,"completed":439}},
+  "limitations":["same-author fresh fixtures, known V40/L10", "Qwen results include fallback to main", "single ordered CPU measurement", "four fresh requirements absent before selection", "no final answer grading or billed token savings"]
+}
