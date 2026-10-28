@@ -5,6 +5,7 @@ on:
     paths:
       - 'docmancer/docs/application/standalone_text_view.py'
       - 'docmancer/mcp/agent_config.py'
+      - 'scripts/install.sh'
       - 'docmancer/mcp/_docs_server_part01.py'
       - 'eval/opencode_compat/**'
       - '.github/workflows/opencode-compact-text.yml'
@@ -42,6 +43,10 @@ jobs:
         run: |
           set -euo pipefail
           "$RUNNER_TEMP/venv/bin/python" -I eval/opencode_compat/installed_stdio.py --out "$RUNNER_TEMP/evidence/stdio"
+      - name: Exercise the actual one-line OpenCode registration shell function
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/venv/bin/python" -I eval/opencode_compat/installer_shell.py             --script scripts/install.sh --out "$RUNNER_TEMP/evidence/installer"
       - name: Re-score 58 historical live MCP replies without regenerating gold
         env:
           GH_TOKEN: ${{ github.token }}
