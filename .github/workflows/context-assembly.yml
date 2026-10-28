@@ -38,7 +38,7 @@ jobs:
           cd "$RUNNER_TEMP/prior"
           gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12855301604/zip" > runtime.zip
           echo '4f80c9b00892442b237c6bb180f9261ea76c4ee3b41242451a11388da87fdc79  runtime.zip' | sha256sum -c -
-          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/123118016158/logs" > runtime.log
+          gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/123118016158/logs" > runtime.log
           cp runtime.zip runtime.log "$RUNNER_TEMP/evidence/"
           cd "$RUNNER_TEMP/recorded"
           gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12839325255/zip" > v40.zip
