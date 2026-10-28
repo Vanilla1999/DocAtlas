@@ -66,12 +66,13 @@ jobs:
           SUITE: ${{ matrix.suite }}
           TESTED_SHA: ${{ github.sha }}
         run: |
-          set -uo pipefail
-          # Artifact ZIP extraction does not preserve executable mode.
+          set -euo pipefail
+          # Artifact extraction does not preserve executable permission.
           chmod +x "$RUNNER_TEMP/bundle/runtime/llama-server"
           gunzip -c "$RUNNER_TEMP/bundle/image.tar.gz" | docker load
           mkdir -p "$RUNNER_TEMP/results"
           cp "$RUNNER_TEMP/bundle/head.txt" "$RUNNER_TEMP/bundle/image.json" "$RUNNER_TEMP/results/"
+          set +e
           docker run --name lowmem-run --network none --cpus=2 \
             --memory=1500000000 --memory-swap=1500000000 \
             -e POLICY -e SUITE -e TESTED_SHA -e HF_HUB_OFFLINE=1 \
@@ -79,6 +80,7 @@ jobs:
             -v "$RUNNER_TEMP/bundle/runtime:/runtime:ro" \
             -v "$RUNNER_TEMP/bundle/tiny:/tiny:ro" docatlas-lowmem
           rc=$?
+          set -e
           docker inspect lowmem-run > "$RUNNER_TEMP/results/container.json"
           printf '%s\n' "$rc" > "$RUNNER_TEMP/results/exit-code.txt"
           exit "$rc"
