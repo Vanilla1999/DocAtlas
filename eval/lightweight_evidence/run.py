@@ -49,7 +49,10 @@ def cgroup():
     result = {n: (root/n).read_text().strip() for n in
               ('memory.max', 'memory.swap.max', 'memory.current', 'memory.peak', 'memory.events')
               if (root/n).exists()}
-    if result.get('memory.max') != '1500000000' or result.get('memory.swap.max') != '0':
+    # Linux rounds byte limits to pages. Require the exact lower page boundary.
+    page = os.sysconf('SC_PAGESIZE')
+    limit = str((1_500_000_000 // page) * page)
+    if result.get('memory.max') != limit or result.get('memory.swap.max') != '0':
         raise RuntimeError('The experiment requires a real 1.5 GB/no-swap cgroup, not a claimed budget.')
     return result
 
