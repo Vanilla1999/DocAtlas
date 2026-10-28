@@ -346,6 +346,18 @@ def _mcp_tool_result(
     text_fallback: bool,
 ) -> Any:
     payload = compact_mcp_payload(payload)
+    if text_fallback and os.environ.get("DOCATLAS_MCP_COMPACT_TEXT") == "1":
+        from docmancer.docs.application.standalone_text_view import encode_standalone_text
+        try:
+            rendered_text = encode_standalone_text(payload)
+        except (ValueError, TypeError, KeyError):
+            # Optional text optimization must not turn valid evidence into a
+            # failure. Deliver the unchanged canonical compatibility packet.
+            rendered_text = None
+        if rendered_text is not None:
+            return mcp_types.CallToolResult(content=[mcp_types.TextContent(
+                type="text", text=rendered_text,
+            )])
     if os.environ.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
         from docmancer.docs.application.model_context_view import encode_model_result, canonical
         try:
@@ -383,6 +395,12 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     if os.environ.get("DOCATLAS_MCP_MODEL_VIEW", "off") not in ("", "off", "1"):
         raise ValueError("invalid DOCATLAS_MCP_MODEL_VIEW: use off or 1")
+    compact = os.environ.get("DOCATLAS_MCP_COMPACT_TEXT", "off")
+    if compact not in ("", "off", "1"):
+        raise ValueError("invalid DOCATLAS_MCP_COMPACT_TEXT: use off or 1")
+    if compact == "1" and (os.environ.get("DOCATLAS_MCP_TEXT_FALLBACK") != "1"
+                           or os.environ.get("DOCATLAS_MCP_MODEL_VIEW") == "1"):
+        raise ValueError("compact text requires text fallback and excludes private model view")
     server: Server = Server("docmancer-docs")
 
     @server.list_tools()

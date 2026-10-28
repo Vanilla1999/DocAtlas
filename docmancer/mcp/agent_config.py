@@ -12,7 +12,7 @@ from typing import Any
 SERVER_KEY = "docatlas"
 COMMAND = "doc-atlas"
 ARGS = ["mcp", "docs-serve"]
-OPENCODE_MCP_ENVIRONMENT = {"DOCATLAS_MCP_TEXT_FALLBACK": "1"}
+OPENCODE_MCP_ENVIRONMENT = {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"}
 
 
 @dataclass
