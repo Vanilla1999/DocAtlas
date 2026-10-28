@@ -15,7 +15,9 @@ try:
  policy=os.environ['POLICY'];suite=os.environ['SUITE']
  if policy.startswith('facet-tiny-'):
   log=(out/'llama.log').open('w')
-  server=subprocess.Popen(['/runtime/llama-server','-m','/tiny/model.gguf','--host','127.0.0.1',
+  # Anonymous weight buffers are charged to this cgroup. Do not borrow
+  # prewarmed mmap pages charged to the host that downloaded the artifact.
+  server=subprocess.Popen(['/runtime/llama-server','-m','/tiny/model.gguf','--no-mmap','--host','127.0.0.1',
    '--port','8099','--alias','docatlas-tiny','--ctx-size','2048','--parallel','1',
    '--threads','2','--threads-batch','2','--batch-size','64','--ubatch-size','64',
    '--jinja','--chat-template-kwargs','{"enable_thinking":false}','--no-context-shift'],stdout=log,stderr=log)
@@ -29,7 +31,8 @@ try:
    if ready:break
    time.sleep(1)
   if not ready:raise RuntimeError('model startup timeout')
- save('STARTUP.json',{'seconds':time.monotonic()-start,'model_started':server is not None})
+ save('STARTUP.json',{'seconds':time.monotonic()-start,'model_started':server is not None,
+                      'model_memory_mapping':False})
  rc=subprocess.run(['/opt/venv/bin/python','-I','-u','/repo/eval/lowmem_selection/run.py',
    '--repo','/repo','--work','/tmp/lowmem-work','--out','/evidence/run',
    '--policy',policy,'--suite',suite]).returncode
