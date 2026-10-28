@@ -222,6 +222,12 @@ def _update_opencode_config(config: dict[str, Any]) -> bool:
     environment = {} if "environment" not in existing else existing["environment"]
     if not isinstance(environment, dict):
         raise ValueError("Existing DocAtlas MCP server has a non-object environment; refusing to overwrite it")
+    if environment.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
+        raise ValueError(
+            "Existing OpenCode DocAtlas entry enables private MCP model view; "
+            "stock OpenCode drops its _meta. Disable that option explicitly "
+            "before registering the self-contained compact text mode."
+        )
     merged = {**existing, **desired, "environment": {**environment, **OPENCODE_MCP_ENVIRONMENT}}
     if "enabled" in merged:
         enabled = merged.pop("enabled")
