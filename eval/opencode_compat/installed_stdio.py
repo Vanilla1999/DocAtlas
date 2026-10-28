@@ -149,6 +149,21 @@ async def run(out: Path):
         assert entry["disabled"] is True
         assert entry["environment"]["USER_SETTING"] == "retain"
         assert entry["environment"]["DOCATLAS_MCP_COMPACT_TEXT"] == "1"
+        # An old custom private-ledger entry is incompatible with stock
+        # OpenCode. Installation must refuse migration without changing it.
+        unsafe_path = root / "opencode-unsafe.json"
+        unsafe_path.write_text(json.dumps({"mcp": {"docatlas": {
+            "type": "local", "command": ["doc-atlas", "mcp", "docs-serve"],
+            "environment": {"DOCATLAS_MCP_MODEL_VIEW": "1"}}}}), encoding="utf-8")
+        unsafe_bytes = unsafe_path.read_bytes()
+        try:
+            register_server(AgentTarget("opencode", unsafe_path, "json_opencode_mcp"))
+        except ValueError as exc:
+            assert "private MCP model view" in str(exc)
+        else:
+            raise AssertionError("unsafe private-ledger mode was silently migrated")
+        assert unsafe_path.read_bytes() == unsafe_bytes
+
         baseline_env = {**env, "DOCATLAS_MCP_COMPACT_TEXT": "off"}
         original, original_text, original_error = await call(baseline_env, root, prepare=mutation)
         baseline_rows = expand_sections(original)["sources"]
