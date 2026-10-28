@@ -1,0 +1,7 @@
+{
+  "runtime_artifact": {"id": 12855301604, "sha256": "4f80c9b00892442b237c6bb180f9261ea76c4ee3b41242451a11388da87fdc79", "original_driver_exit": 1, "failure": "cross-process order assertion after all 105 actual calls completed"},
+  "completed_audit_artifact": {"id": 12854973201, "sha256": "bdae367e4c76840c07c5141a7fb7ce3e1b519a58c5ab76149971be0dde60dd68", "bytes": 5218298, "driver_exit": 0},
+  "independent_audit": {"imports_docatlas": false, "recounts_live_replies": 100, "live_source_occurrences": 690, "new_controlled_views": 100, "historical_views": 285, "historical_source_rows": 373, "frozen_question_bytes_verified": true, "frozen_source_files_verified": 15, "gold_recomputed": true, "all_own_input_orders_match_receipts": true, "cross_process_source_multisets_equal": true, "observed_order_drift_disclosed": "A20-14 grouped-table", "live_timing_records_match_original_job_log": true, "scope_denials": 5, "shared_memory_cap_respected": true, "no_oom": true},
+  "runtime_state_checks": {"projects": 25, "files_and_logical_sqlite_unchanged": true, "executed_by": "live CI; not re-executed by offline audit"},
+  "boundaries": {"provider_usage": null, "paid_calls": 0, "full_opencode_dialogue": "NOT_TESTED", "answer_accuracy": "NOT_TESTED", "sufficiency_certified": false, "all_repository_ci_green_claimed": false}
+}
