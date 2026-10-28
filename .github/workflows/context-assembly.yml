@@ -1,4 +1,4 @@
-name: Context Assembly - installed 20 new questions and 58 recorded replies
+name: Context Assembly - validate completed runtime without repeating inference
 on:
   push:
     branches: [feature/context-assembly-stage-20261029]
@@ -15,27 +15,31 @@ concurrency:
   group: context-assembly-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  installed:
+  installed-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Freeze main selector, budgets, dependencies and source corpus
+      - name: Refuse any product, prompt, gold or source change after measured runtime
         run: |
           set -euo pipefail
-          git fetch -q origin 53590d7db23839c62fa00a833382be56fb6c6954 --depth=1
-          git diff --exit-code 53590d7db23839c62fa00a833382be56fb6c6954 HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/facet_selection.py docmancer/docs/application/model_context_view.py eval/prepared_model_comparison40
+          git fetch -q origin 2ec7c63cf6dc39e2f551a505451216231195995f --depth=1
+          git diff --exit-code 2ec7c63cf6dc39e2f551a505451216231195995f HEAD -- docmancer pyproject.toml uv.lock eval/context_assembly/questions20.json eval/context_assembly/paid_probe.py eval/prepared_model_comparison40
           python -m compileall -q docmancer eval/context_assembly
-          mkdir -p "$RUNNER_TEMP/evidence" "$RUNNER_TEMP/recorded"
-          git rev-parse HEAD > "$RUNNER_TEMP/evidence/head.txt"
-          sha256sum eval/context_assembly/questions20.json > "$RUNNER_TEMP/evidence/questions.sha256"
-      - name: Fetch immutable previously measured public MCP responses
+          mkdir -p "$RUNNER_TEMP/evidence" "$RUNNER_TEMP/prior" "$RUNNER_TEMP/recorded"
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence/audit-head.txt"
+      - name: Download original complete live results, original logs, and prior frozen replies
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          cd "$RUNNER_TEMP/prior"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12855301604/zip" > runtime.zip
+          echo '4f80c9b00892442b237c6bb180f9261ea76c4ee3b41242451a11388da87fdc79  runtime.zip' | sha256sum -c -
+          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/123118016158/logs" > runtime.log
+          cp runtime.zip runtime.log "$RUNNER_TEMP/evidence/"
           cd "$RUNNER_TEMP/recorded"
           gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12839325255/zip" > v40.zip
           gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12839075813/zip" > pilot.zip
@@ -45,35 +49,35 @@ jobs:
             '5ece097099f1e931cb6089ee133a9337e3a14c3cfaa81b3a4bdb17b3cd900334  pilot.zip' \
             'c71126c176c70ab15f1b878f666642e764a1747c78acf3717eb16086727b3879  fresh.zip' | sha256sum -c -
           for suite in v40 pilot fresh; do unzip -q "$suite.zip" -d "$suite"; done
-      - name: Build exact installed wheel and provision pinned MiniLM before bounded runtime
-        run: docker build -f eval/context_assembly/Dockerfile -t docatlas-assembly .
-      - name: Real MCP and source checks in shared 1.5 GB cgroup, no swap, two CPUs
-        env:
-          TESTED_SHA: ${{ github.sha }}
+      - name: Build and install byte-identical product, only evaluator order assertion corrected
+        run: docker build -f eval/context_assembly/Dockerfile -t docatlas-assembly-audit .
+      - name: Exact own-input order, cross-process source multisets, same-ref token comparison
         run: |
           set -uo pipefail
-          docker run --name assembly-run --network none --cpus=2 \
+          docker run --name assembly-audit --network none --cpus=2 \
             --memory=1500000000 --memory-swap=1500000000 \
-            -e TESTED_SHA -e HF_HUB_OFFLINE=1 \
+            --entrypoint /opt/venv/bin/python -e HF_HUB_OFFLINE=1 \
             -v "$RUNNER_TEMP/evidence:/evidence" \
-            -v "$RUNNER_TEMP/recorded:/recorded:ro" docatlas-assembly
+            -v "$RUNNER_TEMP/prior:/prior:ro" \
+            -v "$RUNNER_TEMP/recorded:/recorded:ro" docatlas-assembly-audit \
+            -I /repo/eval/context_assembly/resume.py
           rc=$?
-          docker inspect assembly-run > "$RUNNER_TEMP/evidence/container.json"
-          printf '%s\n' "$rc" > "$RUNNER_TEMP/evidence/exit-code.txt"
+          docker inspect assembly-audit > "$RUNNER_TEMP/evidence/audit-container.json"
+          printf '%s\n' "$rc" > "$RUNNER_TEMP/evidence/audit-exit-code.txt"
           exit "$rc"
-      - name: Optional real paid answering-model A/B, no credentials means unmeasured
+      - name: Optional paid model comparison on complete identical-evidence pairs
         if: always()
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DOCATLAS_STRONG_MODEL: ${{ vars.DOCATLAS_STRONG_MODEL }}
         run: |
           python eval/context_assembly/paid_probe.py \
-            --inputs "$RUNNER_TEMP/evidence/new20/paid-inputs" \
+            --inputs "$RUNNER_TEMP/evidence/original/new20/paid-inputs" \
             --out "$RUNNER_TEMP/evidence/paid"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: context-assembly-${{ github.run_id }}
+          name: context-assembly-audit-${{ github.run_id }}
           path: ${{ runner.temp }}/evidence/
           retention-days: 30
           if-no-files-found: error

@@ -6,6 +6,7 @@ The controlled same-response comparison separates ephemeral ref token noise.
 from __future__ import annotations
 import argparse
 import asyncio
+from collections import Counter
 from datetime import timedelta
 import hashlib
 import importlib.util
@@ -210,13 +211,27 @@ def compare(a, records):
     def canonical(v):
         return json.dumps(v, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
     result = {'cases': [], 'new_questions': 20, 'stdio_get_context_calls': 105,
-              'paid_model_calls': 0, 'provider_usage': None, 'answer_quality': 'NOT_TESTED'}
+              'paid_model_calls': 0, 'provider_usage': None, 'answer_quality': 'NOT_TESTED',
+              'cross_process_input_order_changes': [], 'own_input_order_checks': 0}
     for case in dataset(a.repo)['cases']:
         def get(policy):
             return json.loads((a.out / policy / case['family'] / f"{case['id']}-literal.json").read_text())
         base = get('literal')
-        same = all(stable(get(p)) == stable(base) for p in POLICIES)
-        assert same, (case['id'], 'selection or sources changed across arms')
+        # Separate processes can produce different upstream tied-row orders.
+        # Require identical source multisets across runs AND exact retention of
+        # each run's own pre-assembly selected-evidence order from its receipt.
+        base_set = Counter(canonical(r) for r in stable(base))
+        key = hashlib.sha256(case['question'].encode()).hexdigest()
+        for p in POLICIES:
+            view = get(p)
+            assert Counter(canonical(r) for r in stable(view)) == base_set, (case['id'], p, 'sources changed')
+            state = json.loads((a.out / p / case['family'] / 'server.json').read_text())
+            receipts = [r for r in state['observations'] if r['scoring_question_sha256'] == key]
+            assert len(receipts) == 1
+            assert [r['ref'] for r in source_rows(view)] == receipts[0]['selected_evidence_ids'], (case['id'], p, 'own input order changed')
+            result['own_input_order_checks'] += 1
+            if stable(view) != stable(base):
+                result['cross_process_input_order_changes'].append({'id': case['id'], 'policy': p})
         assert all(next(r for r in records if r['id'] == case['id'] and r['policy'] == p)['facts'] ==
                    next(r for r in records if r['id'] == case['id'] and r['policy'] == 'literal')['facts'] for p in POLICIES)
         text = canonical(base)
@@ -239,7 +254,7 @@ def compare(a, records):
         actual = assemble_context(text, policy='adaptive')
         winner = next(k for k, v in variants.items() if v == actual)
         result['cases'].append({'id': case['id'], 'costs': costs, 'assembly_ms': timings,
-                                'winner': winner, 'exact_roundtrip': True, 'same_sources_all_arms': same})
+                                'winner': winner, 'exact_roundtrip': True, 'same_source_multisets_all_arms': True})
     result['policies'] = {}
     for p in POLICIES:
         rs = [r for r in records if r['policy'] == p]
@@ -254,7 +269,7 @@ def compare(a, records):
             'median_assembly_ms': statistics.median(c['assembly_ms'][p] for c in result['cases'])}
     result['records'] = records
     result['winner_counts'] = {p: sum(c['winner'] == p for c in result['cases']) for p in POLICIES[:-1]}
-    result['note'] = 'Known facts only. Two partially unsupported questions are NOT proof of correct unknown answers.'
+    result['note'] = 'Known facts only. Two partially unsupported questions are NOT proof of correct unknown answers. Cross-process input order variation is reported, never silently repaired; each output retains its own pre-assembly order.'
     save(a.out / 'RESULT.json', result)
     print(json.dumps({k:v for k,v in result.items() if k not in {'cases','records'}}), flush=True)
 
@@ -264,6 +279,7 @@ def main():
     for key in ('repo', 'work', 'out'):
         parser.add_argument('--'+key, type=Path, required=True)
     parser.add_argument('--worker', action='store_true')
+    parser.add_argument('--resume-recorded', action='store_true', help='Re-evaluate saved actual responses; no new retrieval or inference')
     parser.add_argument('--policy', choices=POLICIES)
     parser.add_argument('--family')
     a = parser.parse_args()
@@ -278,9 +294,14 @@ def main():
     source_root = a.repo / 'eval/prepared_model_comparison40/sources'
     for rel, sha in dataset(a.repo)['source_sha256'].items():
         assert hashlib.sha256((source_root/rel).read_bytes()).hexdigest() == sha, rel
-    save(a.out/'FROZEN.json', {'question_sha256': hashlib.sha256((a.repo/'eval/context_assembly/questions20.json').read_bytes()).hexdigest(),
-                             'source_sha256': dataset(a.repo)['source_sha256'], 'git_sha': os.environ.get('TESTED_SHA')})
-    records = asyncio.run(execute(a))
+    if a.resume_recorded:
+        records = json.loads((a.out/'RECORDS.json').read_text())
+        assert len(records) == 100
+    else:
+        save(a.out/'FROZEN.json', {'question_sha256': hashlib.sha256((a.repo/'eval/context_assembly/questions20.json').read_bytes()).hexdigest(),
+                                 'source_sha256': dataset(a.repo)['source_sha256'], 'git_sha': os.environ.get('TESTED_SHA')})
+        records = asyncio.run(execute(a))
+        save(a.out/'RECORDS.json', records)
     compare(a, records)
 
 
