@@ -288,6 +288,9 @@ class _MiniLM:
         import numpy as np
         query = self.tokenizer.encode(question, add_special_tokens=False).ids
         if len(query) > 128:
+            from .lightweight_selection import mode as light_mode, score_long_query
+            if light_mode() == "minilm-window":
+                return score_long_query(self, query, sections, budget, max_pairs, max_seconds)
             raise SectionCompressionError("section_compression_query_limit")
         width = 512 - len(query) - 3
         started = time.monotonic()
@@ -343,6 +346,12 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
+    from .lightweight_selection import try_select as try_light_selection
+    query_plan = retrieval.get("documentation_query_plan") or {}
+    original_question = str(query_plan.get("original_question") or retrieval.get("question") or question)
+    alternative = try_light_selection(payload, snapshot, retrieval, original_question)
+    if alternative is not None:
+        return alternative
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "facet-guarded-lexical-v2")
     from .facet_selection import POLICIES as FACET_POLICIES
     from .semantic_local_sufficiency import POLICIES as SEMANTIC_POLICIES

@@ -1,0 +1,308 @@
+{
+  "L10-01": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "five_total_including_first",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/operations.md",
+              "quote": "The default retry.attempts value is 5 total delivery attempts, including the first attempt."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-02": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "test_switch",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/operations.md",
+              "quote": "Set capture.payload=false to stop recording payload bodies on a test relay."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "metadata_remains",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/operations.md",
+              "quote": "Envelope identifiers and delivery outcomes remain recorded when capture is off."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "production_forbidden",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/production.md",
+              "quote": "Production relays must retain payload recording; capture.payload=false is forbidden in production."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-03": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "pause_ingress",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/production.md",
+              "quote": "Before restoring a production snapshot, pause ingress so new messages cannot arrive."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "watermark_check",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/production.md",
+              "quote": "Before restoring, verify that the retained journal watermark is at least the snapshot marker."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "restore_command",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/operations.md",
+              "quote": "Run aurora restore SNAPSHOT_ID to load a snapshot."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "replay_before_ingress",
+        "alternatives": [
+          [
+            {
+              "path": "aurora/docs/operations.md",
+              "quote": "After loading succeeds, run aurora journal replay before reopening ingress."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-04": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "endpoint",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/cache.md",
+              "quote": "Set cache.remote.url to the shared-cache endpoint."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "namespace",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/cache.md",
+              "quote": "Supply a credential scoped to the selected cache namespace; a credential for a different namespace is rejected."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "signature_private",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/cache.md",
+              "quote": "Every artifact read from a shared cache must have its signature verified, including on a private network."
+            }
+          ],
+          [
+            {
+              "path": "rivet/docs/security.md",
+              "quote": "Every shared-cache artifact requires signature verification."
+            },
+            {
+              "path": "rivet/docs/security.md",
+              "quote": "A private network does not exempt the runner from signature verification."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-05": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "v1_old",
+        "alternatives": [
+          [
+            {
+              "path": "quartz/docs/v1.md",
+              "quote": "After a successful write, a read of the same key may still return the previous value."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "v2_new",
+        "alternatives": [
+          [
+            {
+              "path": "quartz/docs/v2.md",
+              "quote": "After a successful write, a read of the same key returns the new value."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "listing_exception",
+        "alternatives": [
+          [
+            {
+              "path": "quartz/docs/v2.md",
+              "quote": "Bucket listings remain eventually consistent; the object-read guarantee does not extend to listings."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-06": {
+    "expected_status": "partial",
+    "unsupported": [
+      "guaranteed retention in years"
+    ],
+    "facts": [
+      {
+        "id": "receipt_path",
+        "alternatives": [
+          [
+            {
+              "path": "quartz/docs/receipts.md",
+              "quote": "The latest promotion receipt is written to state/receipts/head.json."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-07": {
+    "expected_status": "insufficient",
+    "unsupported": [
+      "guaranteed p99 milliseconds"
+    ],
+    "facts": []
+  },
+  "L10-08": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "priority",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/configuration.md",
+              "quote": "For ordinary settings, the priority from highest to lowest is command line, environment, project rivet.toml, then machine defaults."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "secret_store",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/security.md",
+              "quote": "Supply the signing secret from the runner secret store."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "no_file_exception",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/security.md",
+              "quote": "Never store the signing secret in rivet.toml, even if only its owner can read the file."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-09": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "private_verification",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/cache.md",
+              "quote": "Every artifact read from a shared cache must have its signature verified, including on a private network."
+            }
+          ],
+          [
+            {
+              "path": "rivet/docs/security.md",
+              "quote": "Every shared-cache artifact requires signature verification."
+            },
+            {
+              "path": "rivet/docs/security.md",
+              "quote": "A private network does not exempt the runner from signature verification."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "L10-10": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "fresh_reads_and_writes",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/cache.md",
+              "quote": "rivet build --fresh skips cache reads but still writes new successful build artifacts to the cache."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "no_cache_both",
+        "alternatives": [
+          [
+            {
+              "path": "rivet/docs/cache.md",
+              "quote": "rivet build --no-cache disables both cache reads and cache writes for that invocation."
+            }
+          ]
+        ]
+      }
+    ]
+  }
+}

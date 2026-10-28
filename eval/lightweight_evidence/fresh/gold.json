@@ -1,0 +1,234 @@
+{
+  "LW01": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "sandbox",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/switches.md",
+              "quote": "Set body.capture=false on a sandbox mirror to omit payload bodies."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "metadata",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/switches.md",
+              "quote": "Message identifiers remain in the audit log."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "production",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/production.md",
+              "quote": "Production mirrors must keep body.capture=true."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW02": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "pause",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/production.md",
+              "quote": "Suspend ingress before restoring a production checkpoint."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "journal",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/production.md",
+              "quote": "Confirm that the retained journal reaches the checkpoint sequence."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "load",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/restore.md",
+              "quote": "Run sable load CHECKPOINT to restore its state."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "replay",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/restore.md",
+              "quote": "After loading, run sable replay before enabling ingress again."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW03": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "endpoint",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/cache.md",
+              "quote": "Configure cache.endpoint with the shared service address."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "credential",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/cache.md",
+              "quote": "The access credential must belong to the configured workspace."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "signature",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/security.md",
+              "quote": "A shared-cache write requires an active signing key."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW04": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "precedence",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/config.md",
+              "quote": "Command-line flags override environment values, which override nacre.toml, which overrides machine defaults."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "permission_no_exception",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/config.md",
+              "quote": "Private file permissions do not allow a signing key in nacre.toml; use the OS credential vault."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW05": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "v1",
+        "alternatives": [
+          [
+            {
+              "path": "moss/docs/v1.md",
+              "quote": "The default retry count in version 1 is 3."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "v2",
+        "alternatives": [
+          [
+            {
+              "path": "moss/docs/v2.md",
+              "quote": "The default retry count in version 2 is 6."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW06": {
+    "expected_status": "partial",
+    "facts": [
+      {
+        "id": "default",
+        "alternatives": [
+          [
+            {
+              "path": "sable/docs/switches.md",
+              "quote": "The default batch size is 23 records."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW07": {
+    "expected_status": "sufficient",
+    "facts": [
+      {
+        "id": "key_location",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/security.md",
+              "quote": "Store signing keys only in the OS credential vault, never in nacre.toml."
+            }
+          ],
+          [
+            {
+              "path": "nacre/docs/config.md",
+              "quote": "Private file permissions do not allow a signing key in nacre.toml; use the OS credential vault."
+            }
+          ]
+        ]
+      },
+      {
+        "id": "permission_no_exception",
+        "alternatives": [
+          [
+            {
+              "path": "nacre/docs/config.md",
+              "quote": "Private file permissions do not allow a signing key in nacre.toml; use the OS credential vault."
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "LW08": {
+    "expected_status": "insufficient",
+    "facts": []
+  }
+}

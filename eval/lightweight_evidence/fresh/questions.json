@@ -1,0 +1,34 @@
+[
+  {
+    "id": "LW01",
+    "question": "Как отключить запись тела сообщений SableMirror в песочнице и допустимо ли это в production?"
+  },
+  {
+    "id": "LW02",
+    "question": "Опиши полную последовательность восстановления SableMirror: что проверить заранее и когда снова разрешить входящие сообщения?"
+  },
+  {
+    "id": "LW03",
+    "question": "What is needed to write to the Nacre shared cache, including credentials, configuration and signing?"
+  },
+  {
+    "id": "LW04",
+    "question": "Каков приоритет настроек Nacre и разрешён ли signing key в nacre.toml, если файл доступен только владельцу?"
+  },
+  {
+    "id": "LW05",
+    "question": "Does the default retry count change between Moss version 1 and version 2? Give both values."
+  },
+  {
+    "id": "LW06",
+    "question": "What is the SableMirror default batch size, and what guaranteed p99 processing latency is documented?"
+  },
+  {
+    "id": "LW07",
+    "question": "Can a signing key be stored in nacre.toml with private permissions? Where should it be stored instead?"
+  },
+  {
+    "id": "LW08",
+    "question": "What exact number of hours of outage does the Nacre cache availability guarantee allow each year?"
+  }
+]
