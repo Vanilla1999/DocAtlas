@@ -1,0 +1,74 @@
+name: Tiny selection repaired runtime under shared 1.5 GB (measurement)
+on:
+  push:
+    branches: [experiment/lowmem-selection-20261028]
+    paths:
+      - 'eval/lowmem_selection/entry.py'
+      - '.github/workflows/lowmem-selection.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: lowmem-repair-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        policy: [facet-tiny-select-v1, facet-tiny-plan-v1]
+        suite: [v40, pilot, fresh]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Reuse exact built product; refuse changing selectors or gold
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch -q origin 3904aa5a04ee984d065d267f0daa279eece52ea9 --depth=1
+          git diff --exit-code 3904aa5a04ee984d065d267f0daa279eece52ea9 HEAD -- \
+            docmancer pyproject.toml uv.lock eval/lowmem_selection/run.py \
+            eval/lowmem_selection/FREEZE.json eval/lowmem_selection/provision.py \
+            eval/lowmem_selection/fresh eval/lowmem_selection/pilot eval/prepared_model_comparison40
+          mkdir -p "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/results"
+          gh run download 40733498447 --repo "$GITHUB_REPOSITORY" \
+            --name lowmem-runtime-40733498447 --dir "$RUNNER_TEMP/bundle"
+          chmod +x "$RUNNER_TEMP/bundle/runtime/llama-server"
+          "$RUNNER_TEMP/bundle/runtime/llama-server" --help > "$RUNNER_TEMP/results/runtime-help.txt"
+          grep -q -- '--load-mode' "$RUNNER_TEMP/results/runtime-help.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/results/harness-head.txt"
+          cp "$RUNNER_TEMP/bundle/head.txt" "$RUNNER_TEMP/bundle/image.json" "$RUNNER_TEMP/results/"
+          cp eval/lowmem_selection/entry.py "$RUNNER_TEMP/results/entry.py"
+          gunzip -c "$RUNNER_TEMP/bundle/image.tar.gz" | docker load
+      - name: Only failed tiny arms; unchanged main controls retained from prior run
+        env:
+          POLICY: ${{ matrix.policy }}
+          SUITE: ${{ matrix.suite }}
+          TESTED_SHA: 3904aa5a04ee984d065d267f0daa279eece52ea9
+        run: |
+          set -euo pipefail
+          set +e
+          docker run --name lowmem-run --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            -e POLICY -e SUITE -e TESTED_SHA -e HF_HUB_OFFLINE=1 \
+            -v "$GITHUB_WORKSPACE/eval/lowmem_selection/entry.py:/repo/eval/lowmem_selection/entry.py:ro" \
+            -v "$RUNNER_TEMP/results:/evidence" \
+            -v "$RUNNER_TEMP/bundle/runtime:/runtime:ro" \
+            -v "$RUNNER_TEMP/bundle/tiny:/tiny:ro" docatlas-lowmem
+          rc=$?
+          set -e
+          docker inspect lowmem-run > "$RUNNER_TEMP/results/container.json"
+          printf '%s\n' "$rc" > "$RUNNER_TEMP/results/exit-code.txt"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: lowmem-${{ matrix.policy }}-${{ matrix.suite }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/results/
+          retention-days: 30
+          if-no-files-found: error
