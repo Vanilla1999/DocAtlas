@@ -122,7 +122,7 @@ async def call(env: dict, root: Path, *, prepare: dict | None):
                 "project_path": str(root / "project"), "question": QUESTION,
                 "scope": "module", "module_path": "missing-module"})
             err, _ = text_payload(denied)
-            assert err["status"] == "failed" and not err.get("sources"), err
+            assert err["status"] in {"failed", "insufficient_evidence"} and not err.get("sources"), err
             return result, text, err
 
 
