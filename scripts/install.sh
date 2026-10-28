@@ -298,7 +298,7 @@ if not isinstance(servers, dict):
 desired = {
     "type": "local",
     "command": ["doc-atlas", "mcp", "docs-serve"],
-    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"},
 }
 owned = [(mapping, key, value) for mapping in (mcp, servers)
          for key, value in mapping.items() if not (mapping is mcp and key == "servers")
@@ -328,6 +328,10 @@ else:
     environment = existing["environment"]
 if not isinstance(environment, dict):
     print(f"opencode MCP server {name!r} has a non-object environment; refusing to overwrite it", file=sys.stderr)
+    sys.exit(2)
+if environment.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
+    print("private MCP model view is incompatible with stock OpenCode; "
+          "disable DOCATLAS_MCP_MODEL_VIEW before compact-text registration", file=sys.stderr)
     sys.exit(2)
 merged = {**(existing or {}), **desired, "environment": {**environment, **desired["environment"]}}
 if "enabled" in merged:
@@ -359,7 +363,7 @@ PY
     ok "opencode: '$SERVER_NAME' configured in $cfg"
   else
     warn "opencode: could not update $cfg automatically."
-    step "Add manually under mcp.servers, preserving any existing server name and disabled state: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\"}}}"
+    step "Add manually under mcp.servers, preserving any existing server name and disabled state: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\",\"DOCATLAS_MCP_COMPACT_TEXT\":\"1\"}}}"
   fi
 }
 
