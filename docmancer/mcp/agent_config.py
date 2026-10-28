@@ -12,7 +12,7 @@ from typing import Any
 SERVER_KEY = "docatlas"
 COMMAND = "doc-atlas"
 ARGS = ["mcp", "docs-serve"]
-OPENCODE_MCP_ENVIRONMENT = {"DOCATLAS_MCP_TEXT_FALLBACK": "1"}
+OPENCODE_MCP_ENVIRONMENT = {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"}
 
 
 @dataclass
@@ -222,6 +222,12 @@ def _update_opencode_config(config: dict[str, Any]) -> bool:
     environment = {} if "environment" not in existing else existing["environment"]
     if not isinstance(environment, dict):
         raise ValueError("Existing DocAtlas MCP server has a non-object environment; refusing to overwrite it")
+    if environment.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
+        raise ValueError(
+            "Existing OpenCode DocAtlas entry enables private MCP model view; "
+            "stock OpenCode drops its _meta. Disable that option explicitly "
+            "before registering the self-contained compact text mode."
+        )
     merged = {**existing, **desired, "environment": {**environment, **OPENCODE_MCP_ENVIRONMENT}}
     if "enabled" in merged:
         enabled = merged.pop("enabled")
