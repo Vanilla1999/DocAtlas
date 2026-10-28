@@ -121,11 +121,24 @@ failure, not an answer or an automatic rephrase/retry loop.
 ## Response delivery and host controls
 
 By default, the full result is attached only as MCP `structuredContent`; text
-contains a short constant marker. OpenCode registration sets
-`DOCATLAS_MCP_TEXT_FALLBACK=1`; manual configurations need the same setting when
-the client does not expose structured content to the model. Fallback sends the
-full JSON in text and omits `structuredContent`, avoiding duplicate payloads.
-Validate actual installed client delivery separately from SDK transport checks.
+contains a short constant marker. New and re-registered OpenCode installations
+set **both** `DOCATLAS_MCP_TEXT_FALLBACK=1` and
+`DOCATLAS_MCP_COMPACT_TEXT=1`: the latter delivers an OpenCode-compatible,
+self-contained compact JSON **in the text channel**, with original source
+excerpts, evidence IDs, source URIs, path/lines, scope/version and trust
+metadata. No private MCP `_meta` is required. If an unsupported response
+cannot be represented safely, the original full text JSON is returned.
+Other clients keep their existing structured or full-text response paths;
+manual generic clients that cannot read `structuredContent` still need
+`DOCATLAS_MCP_TEXT_FALLBACK=1`.
+
+The older `DOCATLAS_MCP_MODEL_VIEW=1` requires a host that retains MCP `_meta`
+out of band. **Do not enable it with ordinary OpenCode**, which drops that
+metadata in v2.1.2. Run `doc-atlas install opencode` again to upgrade an
+existing registration; upgrading package bytes alone does not rewrite
+OpenCode settings. See [OpenCode compact text](./opencode-compact-text.md)
+for compatibility, limits and rollback. The installed stdio checks do not
+replace end-to-end agent/provider token measurements.
 
 The MCP server cannot force a client to compact its conversation or stop sending
 tools. The optional [one-call host-loop capability](./one-call-agent-loop.md)
