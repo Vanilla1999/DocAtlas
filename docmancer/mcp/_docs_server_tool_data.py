@@ -611,8 +611,8 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "question": {"type": "string", "minLength": 1},
             "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
-            "project_path": {"type": ["string", "null"], "minLength": 1, "description": "For documents in the selected current project, set to the KNOWN ABSOLUTE repository root; never infer from question or MCP server CWD. Omit for explicit library-only queries."},
-            "library": {"type": ["string", "null"], "minLength": 1, "description": "Registered library target for a library-only lookup. Either this or a known project_path must be provided."},
+            "project_path": {"type": ["string", "null"], "description": "For documents in the selected current project, set to the KNOWN ABSOLUTE repository root; never infer from question or MCP server CWD. Omit for explicit library-only queries."},
+            "library": {"type": ["string", "null"], "description": "Registered library target for a library-only lookup. Either this or a known project_path must be provided."},
             "version": {"type": ["string", "null"]},
             "module_path": {"type": ["string", "null"]},
             "scope": {
