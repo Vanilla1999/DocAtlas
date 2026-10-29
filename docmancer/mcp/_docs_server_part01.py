@@ -361,17 +361,53 @@ def _mcp_tool_result(
 ) -> Any:
     payload = compact_mcp_payload(payload)
     if text_fallback and os.environ.get("DOCATLAS_MCP_COMPACT_TEXT") == "1":
-        from docmancer.docs.application.standalone_text_view import encode_standalone_text
-        try:
-            rendered_text = encode_standalone_text(payload)
-        except (ValueError, TypeError, KeyError):
-            # Optional text optimization must not turn valid evidence into a
-            # failure. Deliver the unchanged canonical compatibility packet.
-            rendered_text = None
-        if rendered_text is not None:
+        from docmancer.docs.application.standalone_text_view import (
+            compact_text_fits, render_standalone_text,
+        )
+        rendered = render_standalone_text(payload)
+        if rendered.text is not None:
             return mcp_types.CallToolResult(content=[mcp_types.TextContent(
-                type="text", text=rendered_text,
+                type="text", text=rendered.text,
             )])
+        # OpenCode's explicitly selected text lane must not silently replace a
+        # refused compact view with an even larger, unreadable success packet.
+        # Preserve lifecycle/denial/patch lanes and all admitted source bytes:
+        # either deliver the complete compatible packet, or report transport
+        # failure without claiming semantic evidence insufficiency.
+        delivery = payload.get("delivery_decision") or {}
+        ordinary_context = (
+            payload.get("kind") == "docs_context"
+            and payload.get("status") in {"ok", "truncated"}
+            and not payload.get("hard_stop")
+            and not payload.get("requires_confirmation")
+            and not payload.get("recommended_next_action")
+            and not (isinstance(delivery, dict) and delivery.get("deliverable") is False)
+        )
+        if ordinary_context:
+            fallback_text = serialize_context_json(payload)
+            fallback_bytes = len(fallback_text.encode("utf-8"))
+            fits = compact_text_fits(fallback_text)
+            from docmancer.docs.application.query_trace import query_trace_enabled
+            if query_trace_enabled():
+                import sys
+                try:
+                    sys.stderr.write(json.dumps({
+                        "event": "docatlas_mcp_text_fallback",
+                        "delivery_reason": rendered.reason_code,
+                        "fallback_utf8_bytes": fallback_bytes,
+                        "outcome": "canonical" if fits else "delivery_error",
+                    }, separators=(",", ":")) + "\n")
+                except Exception:
+                    try:
+                        sys.stderr.write('{"event":"docatlas_trace_gap","operation":"mcp_text_fallback"}\n')
+                    except Exception:
+                        pass  # An unavailable diagnostic sink cannot change delivery.
+            if not fits:
+                from docmancer.docs.interfaces.mcp.error_contract import build_context_delivery_error
+                payload = build_context_delivery_error(
+                    delivery_reason=rendered.reason_code or "invalid_compact_context",
+                    fallback_bytes=fallback_bytes,
+                )
     if os.environ.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
         from docmancer.docs.application.model_context_view import encode_model_result, canonical
         try:

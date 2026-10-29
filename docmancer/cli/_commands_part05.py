@@ -279,8 +279,11 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             installed_paths,
             created_user_config,
             effective_config_path,
-            "Start a new OpenCode session and ask a documentation question to verify get_docs_context routing.",
-            extra_lines=["OpenCode will automatically use the DocAtlas Docs MCP workflow."],
+            "Restart OpenCode to load the updated MCP registration and guidance.",
+            extra_lines=[
+                "Self-contained compact MCP text is enabled; ordinary reads use the advertised tools directly.",
+                "After a package upgrade, rerun this install command to refresh the registration and guidance.",
+            ],
         )
         return
 

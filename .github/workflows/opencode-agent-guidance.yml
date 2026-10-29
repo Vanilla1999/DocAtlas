@@ -1,0 +1,140 @@
+name: OpenCode installed guidance and delivery regression
+
+on:
+  push:
+    branches: [fix/opencode-mcp-guidance-20261029]
+    paths:
+      - 'SKILL.md'
+      - 'docmancer/cli/**'
+      - 'docmancer/templates/**'
+      - 'docmancer/mcp/**'
+      - 'docmancer/docs/agent_contract.py'
+      - 'docmancer/docs/application/standalone_text_view.py'
+      - 'docmancer/docs/interfaces/mcp/error_contract.py'
+      - 'scripts/install.sh'
+      - 'eval/context_instruction_measurements.py'
+      - 'eval/opencode_compat/**'
+      - 'eval/project_binding/**'
+      - '.github/workflows/opencode-agent-guidance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opencode-agent-guidance-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASELINE_SHA: 6478b5ace688c6cb7851afbdcc43bb1160db682e
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze source selection, assembly, dependencies and original questions
+        run: |
+          set -euo pipefail
+          git fetch -q origin "$BASELINE_SHA" --depth=1
+          git diff --exit-code "$BASELINE_SHA" HEAD -- \
+            pyproject.toml uv.lock \
+            docmancer/docs/application/section_compression.py \
+            docmancer/docs/application/context_assembly.py \
+            docmancer/docs/application/model_context_view.py \
+            docmancer/docs/application/projection_tokenizer.py \
+            docmancer/docs/data \
+            eval/prepared_model_comparison40 \
+            eval/context_assembly/questions20.json
+          mkdir -p "$RUNNER_TEMP/guidance-evidence" "$RUNNER_TEMP/guidance-baseline"
+          git rev-parse HEAD > "$RUNNER_TEMP/guidance-evidence/CANDIDATE_SHA"
+          git rev-parse "$BASELINE_SHA" > "$RUNNER_TEMP/guidance-evidence/BASELINE_SHA"
+          git archive "$BASELINE_SHA" | tar -x -C "$RUNNER_TEMP/guidance-baseline"
+          python -m compileall -q docmancer eval/context_instruction_measurements.py \
+            eval/opencode_compat eval/project_binding
+      - name: Build exact candidate wheel and provision pinned MiniLM before offline cap
+        run: docker build -f eval/context_assembly/Dockerfile -t docatlas-agent-guidance .
+      - name: Build baseline wheel with the same frozen dependency set
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$RUNNER_TEMP/guidance-baseline:/baseline:ro" \
+            -v "$RUNNER_TEMP/guidance-evidence:/evidence" \
+            --entrypoint /bin/sh docatlas-agent-guidance -ec '
+              mkdir -p /evidence/wheels/candidate /evidence/wheels/baseline
+              cp /wheels/*.whl /evidence/wheels/candidate/
+              uv build --wheel --out-dir /evidence/wheels/baseline /baseline
+              sha256sum /evidence/wheels/candidate/*.whl /evidence/wheels/baseline/*.whl > /evidence/WHEELS.sha256
+            '
+      - name: Installed before and after, real MCP delivery, and unchanged Black binding cases
+        run: |
+          set +e
+          docker run -i --name docatlas-guidance-checks \
+            --network none --cpus=2 --memory=1500000000 --memory-swap=1500000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e BASELINE_SHA="$BASELINE_SHA" \
+            -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/guidance-baseline:/baseline:ro" \
+            -v "$RUNNER_TEMP/guidance-evidence:/evidence" \
+            --entrypoint /bin/sh docatlas-agent-guidance -s <<'SH'
+          set -eu
+          finish() {
+            runtime_status=$?
+            trap - EXIT
+            cat /sys/fs/cgroup/memory.max > /evidence/MEMORY_MAX
+            cat /sys/fs/cgroup/memory.peak > /evidence/MEMORY_PEAK
+            cat /sys/fs/cgroup/memory.events > /evidence/MEMORY_EVENTS
+            cat /sys/fs/cgroup/memory.swap.max > /evidence/SWAP_MAX
+            if [ "$(cat /evidence/SWAP_MAX)" != 0 ]; then runtime_status=1; fi
+            if [ "$(awk '$1 == "oom_kill" {print $2}' /evidence/MEMORY_EVENTS)" != 0 ]; then runtime_status=1; fi
+            if [ "$(cat /evidence/MEMORY_PEAK)" -gt "$(cat /evidence/MEMORY_MAX)" ]; then runtime_status=1; fi
+            printf '%s\n' "$runtime_status" > /evidence/RUNTIME_EXIT_CODE
+            exit "$runtime_status"
+          }
+          trap finish EXIT
+
+          # Install baseline before sharing dependency paths: the candidate
+          # wheel is neither uninstalled nor overwritten by this preparation.
+          /opt/venv/bin/python -m venv --without-pip /tmp/baseline-venv
+          uv pip install --offline --no-deps --python /tmp/baseline-venv/bin/python \
+            /evidence/wheels/baseline/*.whl
+          /opt/venv/bin/python -I - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import sysconfig
+          target = subprocess.check_output([
+              "/tmp/baseline-venv/bin/python", "-I", "-c",
+              "import sysconfig; print(sysconfig.get_path('purelib'))",
+          ], text=True).strip()
+          Path(target, "shared-frozen-dependencies.pth").write_text(
+              sysconfig.get_path("purelib") + "\n", encoding="utf-8")
+          PY
+          /opt/venv/bin/python -I /repo/eval/context_instruction_measurements.py \
+            --repo /repo --baseline-repo /baseline \
+            --baseline-python /tmp/baseline-venv/bin/python --baseline-ref "$BASELINE_SHA" \
+            --out /evidence/instructions/RESULT.json
+
+          # The oversized B01 delivery control has no MiniLM setting; the
+          # separate binding worker below explicitly uses its pinned /model.
+          /opt/venv/bin/python -I /repo/eval/opencode_compat/installed_stdio.py \
+            --out /evidence/opencode --large-packet
+          /opt/venv/bin/python -I /repo/eval/opencode_compat/installer_shell.py \
+            --script /repo/scripts/install.sh --out /evidence/installer
+          /opt/venv/bin/python -I /repo/eval/project_binding/installed_stdio.py \
+            --repo /repo --work /evidence/binding-work --out /evidence/binding
+          SH
+          rc=$?
+          docker inspect docatlas-guidance-checks > "$RUNNER_TEMP/guidance-evidence/CONTAINER.json"
+          exit "$rc"
+      - name: Record the actual proof boundary
+        if: always()
+        run: |
+          printf '%s\n' '{"paid_calls":0,"provider_usage":null,"actual_opencode_application":"NOT_TESTED","autonomous_argument_selection":"NOT_TESTED","user_original_trace":"UNAVAILABLE","scope":"installed CLI guidance, registered MCP tools/list, real SQLite/stdio delivery, original Black binding questions"}' > "$RUNNER_TEMP/guidance-evidence/BOUNDARIES.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: opencode-agent-guidance-${{ github.run_id }}
+          path: ${{ runner.temp }}/guidance-evidence/
+          retention-days: 30
+          if-no-files-found: error

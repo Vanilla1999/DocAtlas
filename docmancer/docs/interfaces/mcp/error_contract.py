@@ -12,6 +12,7 @@ _RETRYABLE_BY_REASON: dict[str, bool | None] = {
     "bad_request": False,
     "validation_error": False,
     "docs_context_target_missing": False,
+    "context_delivery_unavailable": False,
     "unknown_tool": False,
     "config_shadowing": False,
     "project_local_config_shadowed": False,
@@ -31,6 +32,9 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
         "For documentation in the selected current project, pass its known absolute repository root in project_path, leaving question unchanged.",
         "For a registered library query, pass library instead; do not infer a project from question text or MCP server CWD.",
         "Correct the target binding and retry; this is not evidence that the documents lack an answer.",
+    ],
+    "context_delivery_unavailable": [
+        "Do not repeat the unchanged request. Check the MCP delivery configuration and reported delivery reason.",
     ],
     "empty_question": ["Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."],
     "unknown_tool": ["Use list_tools to discover available MCP tools."],
@@ -163,3 +167,17 @@ def _bounded_warning(value: Any) -> Any:
 
 def build_bad_request_payload(reason_code: str, message: str, *, tool: str | None = None) -> dict[str, Any]:
     return build_mcp_error_payload(reason_code=reason_code, message=message, tool=tool, phase="validation")
+
+
+def build_context_delivery_error(*, delivery_reason: str, fallback_bytes: int) -> dict[str, Any]:
+    """A transport refusal is not an assertion that documentation lacks evidence."""
+    payload = build_mcp_error_payload(
+        reason_code="context_delivery_unavailable",
+        message="Selected documentation could not be delivered within the compact-text output budget.",
+        tool="get_docs_context", phase="delivery", retryable=False,
+    )
+    payload["error"]["details"] = {
+        "delivery_reason": _bounded_text(delivery_reason, 100),
+        "fallback_utf8_bytes": fallback_bytes,
+    }
+    return payload
