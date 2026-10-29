@@ -177,7 +177,7 @@ jobs:
             --work /work --out "$arm_out" --freeze /evidence/PREMINILM_FREEZE.json
           SH
             arm_status=$?
-            docker inspect "preminilm-$experiment_arm" > "$RUNNER_TEMP/preminilm-evidence/$experiment_arm/CONTAINER.json"
+            docker inspect "preminilm-$experiment_arm" > "$RUNNER_TEMP/preminilm-evidence/CONTAINER-$experiment_arm.json"
             if [ "$arm_status" != 0 ]; then overall_status=1; fi
           done
           exit "$overall_status"

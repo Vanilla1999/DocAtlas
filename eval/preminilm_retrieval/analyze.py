@@ -17,6 +17,7 @@ from common import (ARMS, DATASETS, dataset, documents, read, rows_from_wire, sa
                     sha, source_intervals, verify_freeze)
 from gold import Oracle, retrieval_coverage
 from report_metrics import acquisition, aggregate, paired
+from receipt_flush import verify_ack
 
 
 def assert_preparation(preparation: dict, docs: dict[str, str], expected_root: str) -> None:
@@ -170,6 +171,8 @@ def analyze(args) -> dict:
             "Wire o200k counts are actual packets, not paid API usage. Session capability randomness can cause small differences.",
             "All-packet token totals include explicit errors; nonerror paired totals are reported separately.",
             "Single sequential runs include observer overhead and model startup; timings are not a statistically controlled speed claim.",
+            "Diagnostic receipts are streamed and hash-acknowledged before SDK teardown; SIGUSR1 wakes the worker without polling during public calls. Client ACK polling happens only after the final measured call.",
+            "The evaluation fixture's private directory survives worker exit solely for parent read-only database/file verification; isolated container disposal is its explicit cleanup boundary.",
             "No paid model, answer generator, semantic sufficiency judgment or autonomous OpenCode-agent test is included.",
         ],
     }
@@ -208,13 +211,23 @@ def analyze(args) -> dict:
                 if arm in expected_wheels and expected_wheels[arm] != wheel:
                     raise ValueError("installed wheel changed within an arm")
                 expected_wheels[arm] = wheel
+                ack = verify_ack(folder)
                 state, sql = read(folder / "STATE.json"), read(folder / "SQL.json")
+                post_exit = read(folder / "POST_EXIT_STATE.json")
                 native, mini = read(folder / "NATIVE.json"), read(folder / "MINILM.json")
                 if (state["native_observer_errors"] or state["native_observer_calls"] != len(native)
                         or not state["database_unchanged"] or not state["files_unchanged"]
                         or sql["errors"] or sql["connections"] != sql["attached_connections"]
                         or sql["active"] is not False):
                     raise ValueError("observer/source/state integrity failed")
+                if (not post_exit["database_unchanged"] or not post_exit["files_unchanged"]
+                        or post_exit.get("error")
+                        or post_exit["started_monotonic"] < ack["checkpoint_finished_monotonic"]
+                        or post_exit["finished_monotonic"] < post_exit["started_monotonic"]
+                        or post_exit["fixture_cleanup"] != "container_disposal_after_parent_verification"
+                        or state["fixture_cleanup"] != post_exit["fixture_cleanup"]
+                        or preparation["fixture_cleanup"] != post_exit["fixture_cleanup"]):
+                    raise ValueError("post-exit source/state invariant failed")
                 if any(r["question"] not in {c["question"] for c in selected} for r in native):
                     raise ValueError("unexpected native observer query")
                 if any(r["scoring_question_sha256"] not in {sha(c["question"].encode()) for c in selected} for r in mini):
@@ -247,6 +260,8 @@ def analyze(args) -> dict:
     for arm in ARMS:
         measured = result["arms"][arm]
         if (sum(r["preparations"] for r in measured.values()) != summaries[arm]["preparations"]
+                or summaries[arm]["diagnostic_checkpoints"] != summaries[arm]["preparations"]
+                or summaries[arm]["post_exit_state_verifications"] != summaries[arm]["preparations"]
                 or sum(r["scope_controls"] for r in measured.values()) != 1
                 or sum(r["actual_fts_statements"] for r in measured.values()) == 0):
             raise ValueError("operation ledger or SQL observer coverage incomplete")
@@ -257,6 +272,7 @@ def analyze(args) -> dict:
     result["operation_accounting"] = {
         "benchmark_context_calls": len(result["cases"]), "scope_controls": 3,
         "total_context_calls": len(result["cases"]) + 3, "public_preparations": all_preparations,
+        "diagnostic_checkpoints": all_preparations, "post_exit_state_verifications": all_preparations,
         "actual_benchmark_fts_statements": sum(c["actual_fts_statements"] for c in result["cases"]),
         "actual_scope_control_fts_statements": all_safety_sql, "paid_model_calls": 0,
         "source_continuation_calls": 0, "automatic_retries": 0,

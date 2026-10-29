@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from contextlib import contextmanager
 from datetime import timedelta
+from functools import partial
 import json
 import os
 from pathlib import Path
@@ -21,6 +23,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ARMS, DATASETS, dataset, documents, load, read, rows_from_wire,
                     save, sha, source_intervals, verify_freeze)
 from observe_sql import observe_sql
+from receipt_flush import atomic_save, request_flush, serve_with_flush, verify_ack
+
+FIXTURE_CLEANUP = "container_disposal_after_parent_verification"
+
+
+@contextmanager
+def retain_fixture_for_parent(runtime):
+    """Only the evaluation fixture factory changes lifetime, never its path/I/O.
+
+    The existing Dockerfile pins Python 3.12's public delete=False option. Keep
+    the real private member store alive for read-only checks after worker exit;
+    the isolated CI container's disposal removes it after parent verification.
+    """
+    original = runtime.TemporaryDirectory
+    runtime.TemporaryDirectory = partial(original, delete=False)
+    try:
+        yield
+    finally:
+        runtime.TemporaryDirectory = original
 
 
 def check_install(args) -> dict:
@@ -75,7 +96,8 @@ def worker(args) -> None:
     root = args.work / args.dataset / args.family / "project"
     folder = args.out / args.dataset / args.family
     runtime.write_project(root, docs)
-    with observe_sql() as sql, runtime.isolated_service(root.parent / "state") as (service, config):
+    with (observe_sql() as sql, retain_fixture_for_parent(runtime),
+          runtime.isolated_service(root.parent / "state") as (service, config)):
         # isolated_service intentionally clears host DOCATLAS settings. Set the
         # frozen arm only inside this context, before the real preparation.
         os.environ.update(selected_environment(args.arm))
@@ -85,25 +107,28 @@ def worker(args) -> None:
         snapshots = state.snapshots(inventory, root, docs)
         save(folder / "PREPARE.json", {"root": str(root), "inventory": inventory,
              "snapshot_sources": snapshots,
+             "fixture_cleanup": FIXTURE_CLEANUP,
              "source_sha256": {p: sha(v.encode("utf-8")) for p, v in docs.items()},
              "installed": installed, "environment": selected_environment(args.arm)})
         before_db, before_files = state.database(inventory["storage_path"]), state.files(root)
         native = []
         with experimental_selection_observer(native.append) as native_state, observe_section_compression() as mini:
-            try:
-                sql["active"] = True
-                asyncio.run(_run_async(service))
-            finally:
+            def capture():
                 sql["active"] = False
-                save(folder / "NATIVE.json", native)
-                save(folder / "MINILM.json", mini)
-                save(folder / "SQL.json", sql)
-                save(folder / "STATE.json", {
+                checked_state = {
                     "native_observer_calls": native_state.calls,
                     "native_observer_errors": native_state.errors,
+                    "before_database": before_db, "before_files": before_files,
+                    "storage_path": inventory["storage_path"], "root": str(root),
+                    "fixture_cleanup": FIXTURE_CLEANUP,
                     "database_unchanged": state.database(inventory["storage_path"]) == before_db,
                     "files_unchanged": state.files(root) == before_files,
-                })
+                }
+                return {"NATIVE.json": native, "MINILM.json": mini, "SQL.json": sql,
+                        "STATE.json": checked_state}
+
+            sql["active"] = True
+            asyncio.run(serve_with_flush(lambda: _run_async(service), capture, folder))
 
 
 def unpack(reply) -> tuple[dict, str]:
@@ -121,12 +146,38 @@ def append_event(path: Path, event: dict) -> None:
         stream.write(json.dumps(event, ensure_ascii=False, allow_nan=False) + "\n")
 
 
+def verify_after_exit(folder: Path, checker) -> dict:
+    """Check the actual retained store AFTER the SDK has stopped the worker."""
+    before = read(folder / "STATE.json")
+    prepared = read(folder / "PREPARE.json")
+    result = {"started_monotonic": time.monotonic(), "database_unchanged": False,
+              "files_unchanged": False, "fixture_cleanup": FIXTURE_CLEANUP}
+    try:
+        if (before["storage_path"] != prepared["inventory"]["storage_path"]
+                or before["root"] != prepared["root"]
+                or before["fixture_cleanup"] != FIXTURE_CLEANUP):
+            raise ValueError("post-exit state target differs from acknowledged fixture")
+        database = Path(before["storage_path"])
+        if not database.is_file():
+            raise ValueError("actual member database missing after worker exit")
+        result["database_unchanged"] = checker.database(database) == before["before_database"]
+        result["files_unchanged"] = checker.files(Path(before["root"])) == before["before_files"]
+    except Exception as exc:
+        result["error"] = str(exc)
+    result["finished_monotonic"] = time.monotonic()
+    atomic_save(folder / "POST_EXIT_STATE.json", result)
+    if not result["database_unchanged"] or not result["files_unchanged"] or result.get("error"):
+        raise ValueError("post-exit source/state invariant failed: " + str(result))
+    return result
+
+
 async def execute(args) -> int:
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
     from docmancer.docs.application.projection_tokenizer import projection_token_count
 
     frozen = verify_freeze(args.repo, args.freeze, holdout="new20" in args.datasets)
+    checker = load("preminilm_parent_state", args.repo / "eval/heuristic_removal/receipts.py")
     if args.out.exists() or args.work.exists():
         raise ValueError("fresh output and /work required; never overwrite an attempt")
     args.out.mkdir(parents=True)
@@ -135,6 +186,7 @@ async def execute(args) -> int:
     summary = {"arm": args.arm, "baseline_sha": frozen["baseline_sha"],
                "candidate_sha": frozen["candidate_sha"], "datasets": args.datasets,
                "context_calls": 0, "preparations": 0, "safety_calls": 0,
+               "diagnostic_checkpoints": 0, "post_exit_state_verifications": 0,
                "paid_model_calls": 0, "expected_context_calls": expected,
                "status": "running", "records": [], "invariant_errors": [],
                "autonomous_opencode": "NOT_TESTED", "provider_usage": None}
@@ -227,6 +279,13 @@ async def execute(args) -> int:
                                     "status": packet.get("status"), "is_error": bool(denied.isError)})
                                 append_event(ledger, {"operation": "scope_denial_control", "status": "returned",
                                                      "dataset": name, "family": family})
+                            flushed = await request_flush(folder)
+                            summary["diagnostic_checkpoints"] += 1
+                            append_event(ledger, {"operation": "diagnostic_checkpoint", "status": "returned",
+                                                 "dataset": name, "family": family, **flushed})
+                verify_ack(folder)
+                post_exit = verify_after_exit(folder, checker)
+                summary["post_exit_state_verifications"] += 1
                 observer = read(folder / "STATE.json")
                 sql = read(folder / "SQL.json")
                 if (observer["native_observer_errors"] or not observer["database_unchanged"]
@@ -243,11 +302,15 @@ async def execute(args) -> int:
                     if errors:
                         raise ValueError("native source fidelity failed: " + repr(errors[:3]))
                 append_event(ledger, {"operation": "server_completed", "status": "returned",
-                                     "dataset": name, "family": family, "observer": observer})
+                                     "dataset": name, "family": family, "observer": observer,
+                                     "post_exit_state": post_exit})
                 save(args.out / "SUMMARY.json", summary)
         verify_freeze(args.repo, args.freeze, holdout="new20" in args.datasets)
         if summary["context_calls"] != expected or summary["safety_calls"] != 1:
             raise ValueError("incomplete operation counts")
+        if (summary["diagnostic_checkpoints"] != summary["preparations"]
+                or summary["post_exit_state_verifications"] != summary["preparations"]):
+            raise ValueError("incomplete diagnostic checkpoint/state counts")
         summary["status"] = "completed"
     except Exception as exc:
         summary["status"] = "incomplete_or_invariant_failure"
