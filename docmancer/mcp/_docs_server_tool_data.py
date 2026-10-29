@@ -621,13 +621,12 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             },
         },
         "required": ["question"],
-        # The target is required, not specifically the project: a registered
-        # library-only lookup must remain legal. Enforce nonempty strings even
-        # when the nullable public properties are present with null.
-        "anyOf": [
-            {"required": ["project_path"], "properties": {"project_path": {"type": "string", "minLength": 1}}},
-            {"required": ["library"], "properties": {"library": {"type": "string", "minLength": 1}}},
-        ],
+        # A target is REQUIRED at runtime. Keep the question-only shape
+        # syntactically accepted by MCP SDK validation so DocAtlas itself can
+        # return a structured docs_context_target_missing tool error with
+        # actionable hints; schema anyOf is rejected first by the SDK and
+        # replaced with an unstructured generic error.
+        "description": "A nonempty project_path OR library target is required. For current workspace documents pass the known absolute project root in project_path; for an explicitly chosen registered library use library. Targetless calls receive docs_context_target_missing and must correct the binding.",
         "additionalProperties": False,
     },
     "prepare_docs": {
