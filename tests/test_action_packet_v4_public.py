@@ -289,8 +289,11 @@ def test_real_dispatch_and_both_terminal_transports_preserve_over_32000_bytes(ne
     service = OfflineRetrieval(necessary_evidence)
     surface = current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
     result = call_docs_tool_payload(
-        "get_docs_context", {"question": "Inspect protocol implementations", "context_format": "patch_context"}, service,
-        surface=surface,
+        "get_docs_context", {
+            "question": "Inspect protocol implementations",
+            "project_path": str(tmp_path),
+            "context_format": "patch_context",
+        }, service, surface=surface,
     )
     canonical = json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     assert len(canonical.encode("utf-8")) > 32000
