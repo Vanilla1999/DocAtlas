@@ -8,6 +8,16 @@ again (add `--project` for a project-owned config). Updating the package alone
 registration. This changes only OpenCode's registered DocAtlas MCP environment,
 not other MCP consumers or selection policies.
 
+When the compact-text flag is active, **Context Assembly defaults to
+`adaptive`** after upgrading to a package containing this change and
+restarting the MCP server. It may put columns and source-group indexes in the
+model-visible JSON, with a self-contained reading legend and the original
+source refs, paths and line ranges. To restore the previous JSON shape set
+`DOCATLAS_CONTEXT_ASSEMBLY=literal` in the DocAtlas MCP environment and restart.
+Clients that do not enable compact text remain unaffected. This is an
+evidence-preserving transport improvement; paid-model reading accuracy remains
+unverified until a real answering A/B is run.
+
 ## Why not just set `DOCATLAS_MCP_MODEL_VIEW=1`?
 
 That earlier mode transmits a concise `content[].text` plus the complete
