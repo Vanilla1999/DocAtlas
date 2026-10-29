@@ -118,15 +118,20 @@ async def run(a):
                 await session.initialize()
                 spec = next(t for t in (await session.list_tools()).tools if t.name == "get_docs_context")
                 schema = spec.inputSchema
-                assert "KNOWN ABSOLUTE" in spec.description and "anyOf" in schema
+                assert "KNOWN ABSOLUTE" in spec.description
+                assert "docs_context_target_missing" in schema.get("description", "")
+                assert schema.get("required") == ["question"]
                 validator = jsonschema.Draft202012Validator(schema)
                 for _, q in CASES:
-                    assert not validator.is_valid({"question": q})
-                    assert not validator.is_valid({"question": q, "project_path": None, "library": None})
-                    assert not validator.is_valid({"question": q, "project_path": ""})
+                    # MCP SDK validates the public input schema BEFORE handler.
+                    # It must allow an invalid target through to the DocAtlas
+                    # dispatcher so a typed, actionable error reaches the model.
+                    assert validator.is_valid({"question": q})
+                    assert validator.is_valid({"question": q, "project_path": None, "library": None})
+                    assert validator.is_valid({"question": q, "project_path": ""})
                     assert validator.is_valid({"question": q, "project_path": str(root)})
                     assert validator.is_valid({"question": q, "library": "black"})
-                print(json.dumps({"real_advertised_schema": "requires_explicit_target"}), flush=True)
+                print(json.dumps({"real_advertised_schema": "target_required_semantically_and_typed_validation_reachable"}), flush=True)
                 for case_id, question in CASES:
                     started = time.monotonic()
                     unbound = await session.call_tool("get_docs_context", {"question": question})
