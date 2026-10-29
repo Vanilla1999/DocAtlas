@@ -153,12 +153,20 @@ async def run(a):
                     assert answer.get("status") in {"ok", "truncated"}, (case_id, answer)
                     refs, fmt = checked_rows(answer, originals)
                     assert refs, (case_id, "no selected source evidence after binding")
+                    assert fmt in {
+                        "docatlas.standalone-text.v1", "docatlas.assembled-grouped.v1",
+                        "docatlas.assembled-table.v1", "docatlas.assembled-grouped-table.v1",
+                    }, (case_id, "compact text was not delivered", fmt)
+                    text_bytes = len(raw.encode("utf-8"))
+                    text_tokens = projection_token_count(raw.encode("utf-8"))
+                    assert text_bytes <= 48_000 and text_tokens <= 12000, (case_id, text_bytes, text_tokens)
+                    (a.out / f"{case_id}-bound.json").write_text(raw + "\n", encoding="utf-8")
                     item = {"id": case_id, "question": question,
                             "unbound": {"status": denied["status"], "reason_code": error["reason_code"],
                                         "isError": unbound.isError, "sources": 0},
                             "bound": {"status": answer["status"], "source_rows": len(refs),
                                       "context_format": fmt, "tool_isError": bool(found.isError),
-                                      "text_o200k": projection_token_count(raw.encode())},
+                                      "text_utf8_bytes": text_bytes, "text_o200k": text_tokens},
                             "time": {"unbound_s": bound_start-started,
                                      "bound_s": time.monotonic()-bound_start}}
                     rows.append(item)

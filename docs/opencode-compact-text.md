@@ -1,4 +1,6 @@
-# Compact MCP text for ordinary OpenCode (no private metadata required)
+# OpenCode: concise instructions and self-contained MCP text
+
+## Installation and normal use
 
 The default `doc-atlas install opencode` registration now sets both
 `DOCATLAS_MCP_TEXT_FALLBACK=1` and `DOCATLAS_MCP_COMPACT_TEXT=1`. An existing
@@ -18,6 +20,19 @@ Clients that do not enable compact text remain unaffected. This is an
 evidence-preserving transport improvement; paid-model reading accuracy remains
 unverified until a real answering A/B is run.
 
+The advertised three-tool surface is sufficient for ordinary calls. The agent
+passes the unchanged question and the selected workspace's known absolute
+`project_path`, or an explicit registered `library`. It does not need to load a
+skill, enumerate tools again or call `docs_status` before each read. The optional
+documentation-language mode still requires its scoped language metadata when
+unknown. Installed guidance adds the short workflow; repair, preparation and
+advanced patch details remain in guides loaded only when needed.
+
+Global installation writes the optional OpenCode skill. `--project` writes a
+managed repository instruction block and its guides, preserving other text.
+These are separate instruction surfaces: do not add their measurements to the
+tool catalog as if every client always injects all of them.
+
 ## Why not just set `DOCATLAS_MCP_MODEL_VIEW=1`?
 
 That earlier mode transmits a concise `content[].text` plus the complete
@@ -34,8 +49,9 @@ text, its original `evidence_id` (`sources[].ref`), `source_uri`, path, section,
 line range, project identity, scope, version, authority and trust remain in the
 text. Source common values are stated once in `source_context` where possible.
 No new LLM calls, generated paraphrases, selection, fetch or permission grants
-are involved. A different status, denial, edit/lifecycle result, unknown future
-source shape or capacity problem uses the established **full JSON text** route.
+are involved. Denials, errors, edit/lifecycle results and advanced patch packets
+keep their existing routes. An unsupported ordinary documentation shape can use
+the complete canonical JSON only if that fallback fits the compact-text budget.
 `DOCATLAS_MCP_MODEL_VIEW=1` and `DOCATLAS_MCP_COMPACT_TEXT=1` are mutually
 exclusive. For an immediate rollback, remove/set
 `DOCATLAS_MCP_COMPACT_TEXT=off` in OpenCode's DocAtlas environment; retain
@@ -45,8 +61,69 @@ The compact JSON is a model-facing **view**, not a replacement for a full
 DocAtlas `docs_context` machine packet or a sufficiency certificate. It does not
 edit the selected source bytes, widen scope or confer answer/edit authority.
 Clients requiring the full schema must keep the old JSON text interface.
-The existing full-machine packet safety budget remains; no new 3,000-token
-cap is introduced.
+For ordinary successful `docs_context` in this explicitly enabled profile,
+both compact output and a canonical fallback must fit the existing compact-text
+budget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`. The fallback path now
+uses that check too; previously a failed compact rendering could emit a canonical
+packet without this check. This does not change source selection, the
+underlying tokenizer, Context Assembly or private model view. It does not add a
+limit to advanced v4 patch packets or to consumers with compact text disabled.
+
+## Delivery failure is distinct from missing evidence
+
+If compact rendering fails and the complete canonical fallback also exceeds
+the budget, the server now returns a small MCP error:
+`context_delivery_unavailable`, `isError=true`, `retryable=false`. It includes a
+diagnostic reason instead of a partial success packet. The agent must not
+interpret this as missing documentation, repeat the unchanged call, broaden the
+scope or treat a grep recovery from the saved dump as successful MCP delivery.
+Host configuration or the delivery defect must be addressed before retrying.
+
+| Observed text | Interpretation |
+| --- | --- |
+| `docatlas.assembled-*.v1` | Self-contained assembled layout was delivered. |
+| `docatlas.standalone-text.v1` | Self-contained literal layout was delivered; adaptive may select it. |
+| Complete canonical JSON within the budget | Compatibility fallback; no source fields were silently removed. |
+| `context_delivery_unavailable` | Selected evidence could not be delivered in this profile. |
+| OpenCode reports truncation | Inspect the actual model-visible result; server `ok` alone is insufficient. |
+
+Compact JSON can also occupy one physical line. Line count alone does not
+identify the selected representation, and adding newlines does not reduce its
+size. An absent `assembled-*` marker alone does not prove Assembly was skipped:
+literal and its ordinary fallback preserve `docatlas.standalone-text.v1`.
+
+## Diagnose the installed route without a model call
+
+Record the executable and package path actually used by the registered MCP
+command, the active global/project registration, and these effective process
+settings. A checkout SHA alone does not identify a running installed server.
+
+| Setting | Meaning |
+| --- | --- |
+| `DOCATLAS_MCP_TEXT_FALLBACK=1` | Put the response in the text channel consumed by OpenCode. |
+| `DOCATLAS_MCP_COMPACT_TEXT=1` | Enable the self-contained compact route. |
+| `DOCATLAS_MCP_MODEL_VIEW` absent or `off` | Avoid the private-ledger route that stock OpenCode cannot preserve. |
+| `DOCATLAS_CONTEXT_ASSEMBLY` absent or `adaptive` | Choose a reversible layout; `literal` is an explicit rollback. |
+| `DOCATLAS_CONTEXT_COMPRESSION` | Separate section-selection setting; `off` disables it. |
+| `DOCATLAS_MINILM_MODEL_DIR` | Explicitly provisioned MiniLM assets; when compression is unset, a nonempty path enables section selection. |
+
+No model directory is a supported configuration. Installation neither downloads
+MiniLM nor silently enables a new selection policy. When comparing with an
+installed acceptance run, compare these settings too; equal questions and package
+versions alone do not establish equal selection or delivery routes.
+
+Use the saved full MCP response to inspect the first rejected transformation and
+the sizes of its intermediate views. There are two size checks before Context
+Assembly: the initial model view and the standalone view with public refs/URIs.
+A large original packet does not by itself prove either check failed, because
+the transformed view can be smaller. Also check unsupported source fields,
+duplicate refs and an invalid Assembly policy. Keep raw evidence out of routine
+diagnostic output; report bounded reasons and sizes instead.
+
+After repair, verify the selected source text, public refs/URIs and line spans in
+the actual OpenCode tool message. A saved full dump, server `ok`, source count or
+`truncated=false` alone does not establish useful delivery. Client/provider
+quality and billed tokens require a separate real client measurement.
 
 ## Evidence
 

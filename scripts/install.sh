@@ -387,10 +387,10 @@ if [ -n "$SELECTION" ]; then
   case " $SELECTION " in *" claude-code "*) have claude && { printf '  MCP servers:\n'; claude mcp list 2>/dev/null | sed 's/^/    /'; } ;; esac
 fi
 printf '\nNext steps:\n'
-printf '  1. Start your coding agent in a project.\n'
-printf '  2. Ask it to call get_docs_context first for coding tasks; response delivery is server-owned.\n'
-printf '  3. If it receives a prepare_docs next action, let it follow that action and retry.\n'
-printf '  4. Answer from the returned sources.\n'
+printf '  1. Restart your coding agent in the selected project.\n'
+printf '  2. Call get_docs_context with the unchanged question and known absolute project_path (or library).\n'
+printf '  3. Follow explicit returned actions within their consent and scope; cite the returned sources.\n'
+printf '  Optional guidance: doc-atlas install <agent> (add --project for repository instructions).\n'
 printf '  Docs MCP server: doc-atlas mcp docs-serve\n'
 printf '  Advanced Packs and patch-constraint tools are separate from this default workflow.\n'
 printf '\nDocs: %s\n' "$REPO_URL"

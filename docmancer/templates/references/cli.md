@@ -3,6 +3,7 @@
 Use this flow only when Docs MCP is unavailable or the user explicitly requests
 direct index administration. With MCP available, start with `get_docs_context`;
 do not run CLI list/status or ingestion as a discovery prerequisite.
+Do not automatically switch interfaces to bypass a transport delivery error.
 
 ```bash
 doc-atlas query "<unchanged documentation question>"

@@ -43,6 +43,17 @@ update the existing integration; do not invent tool arguments or use legacy
 direct documentation tools. Guides are optional local files, not dynamically
 loaded tools. Normal documentation calls need no preliminary skill read.
 
+Client truncation or `context_delivery_unavailable` is a delivery failure, not
+missing documentation. Keep visible supported facts, disclose the delivery gap
+and follow returned recovery. Do not automatically repeat the unchanged call,
+prepare docs, widen scope, or dump saved output to bypass it. Keep exact tool
+arguments and the client-issued saved-response path for operator review. An
+issued artifact can support a bounded missing-fact read; it grants no access to
+unrelated files. User-requested forensic recovery is separate from successful
+normal delivery. Retry after the reported input or delivery state changes.
+Server partial-context status alone does not establish client truncation.
+For host setup and diagnostics, see [OpenCode delivery](https://github.com/Vanilla1999/DocAtlas/blob/main/docs/opencode-compact-text.md).
+
 ## Optional documentation-language lookup
 
 When the user enables searching in the documentation language and that language

@@ -1,6 +1,6 @@
 """Installed real-stdio MCP acceptance for OpenCode's self-contained text mode.
 
-Uses actual project preparation, SQLite, source reader and two fresh MCP
+Uses actual project preparation, SQLite, source reader and fresh MCP
 processes. No mocked retrieval, source validator or tool transport. This tests
 the OpenCode-facing MCP content shape, not paid-provider billing.
 """
@@ -41,6 +41,7 @@ DOCS = {
     "docs/secure-restoration.md": "# Access review\n\nRecovery operators should verify their approved project access before replaying events or reading secrets.\n",
 }
 QUESTION = "Before replaying queued events, which checks and restore command must run, and where do production API keys belong?"
+LARGE_QUESTION = "What is Black's default line length?"
 
 
 def digest(b: bytes) -> str:
@@ -70,11 +71,11 @@ def environment(root: Path) -> dict[str, str]:
     return env
 
 
-def setup(root: Path) -> None:
+def setup(root: Path, documents: dict[str, str] | None = None) -> None:
     docs = root / "project"
     docs.mkdir()
     catalog = []
-    for name, text in DOCS.items():
+    for name, text in (DOCS if documents is None else documents).items():
         target = docs / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(text.encode("utf-8"))
@@ -112,10 +113,13 @@ def normalize(view: dict, source: dict) -> dict:
             ("scope", "version_binding", "authority", "instruction_trust", "freshness", "source_type", "project_identity")}
 
 
-async def call(env: dict, root: Path, *, prepare: dict | None):
+async def call(env: dict, root: Path, *, prepare: dict | None,
+               question: str = QUESTION, expect_delivery_error: bool = False,
+               check_denial: bool = True, errlog=None):
     params = StdioServerParameters(command=sys.executable, args=["-I", "-m", "docmancer.cli", "mcp", "docs-serve"],
                                    env=env, cwd=str(root))
-    async with stdio_client(params) as streams:
+    options = {"errlog": errlog} if errlog is not None else {}
+    async with stdio_client(params, **options) as streams:
         async with ClientSession(*streams) as session:
             await session.initialize()
             spec = next(x for x in (await session.list_tools()).tools if x.name == "get_docs_context")
@@ -125,18 +129,118 @@ async def call(env: dict, root: Path, *, prepare: dict | None):
                     "action": "sync_project_docs", "project_path": str(root / "project"), "mutation": prepare}))
                 assert result["status"] == "success", result
             reply = await session.call_tool("get_docs_context", {
-                "project_path": str(root / "project"), "question": QUESTION})
-            assert not reply.isError, reply
+                "project_path": str(root / "project"), "question": question})
             result, text = text_payload(reply)
+            assert bool(reply.isError) is expect_delivery_error, {
+                "isError": reply.isError, "status": result.get("status"),
+                "utf8_bytes": len(text.encode("utf-8")), "error": result.get("error"),
+            }
+            if not check_denial:
+                return result, text, None
             denied = await session.call_tool("get_docs_context", {
-                "project_path": str(root / "project"), "question": QUESTION,
+                "project_path": str(root / "project"), "question": question,
                 "scope": "module", "module_path": "missing-module"})
             err, _ = text_payload(denied)
             assert err["status"] in {"failed", "insufficient_evidence"} and not err.get("sources"), err
             return result, text, err
 
 
-async def run(out: Path):
+async def large_packet_check(out: Path) -> dict:
+    """One frozen real question, not a reconstruction of the user's B01 trace.
+
+    Compression is explicitly disabled for this supported runtime route. Three
+    retrieval calls compare complete legacy delivery, guarded delivery, and
+    the trace-off result. Only the isolated fixture is prepared or written.
+    """
+    repo = Path(__file__).resolve().parents[2]
+    source = repo / "eval/prepared_model_comparison40/sources/black"
+    expected = json.loads((repo / "eval/context_assembly/questions20.json").read_text())["source_sha256"]
+    documents = {path.relative_to(source).as_posix(): path.read_text(encoding="utf-8")
+                 for path in source.rglob("*.md")}
+    assert len(documents) == 3
+    for name, text in documents.items():
+        assert digest(text.encode("utf-8")) == expected["black/" + name]
+    out.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix="docatlas-opencode-large-") as temp:
+        root = Path(temp)
+        setup(root, documents)
+        env = {**environment(root), "DOCATLAS_CONTEXT_COMPRESSION": "off",
+               "DOCATLAS_MCP_MODEL_VIEW": "off", "DOCATLAS_TRACE": "0"}
+        mutation, database = prepared_mutation(env, root / "project")
+        with (out / "B01-baseline-stderr.log").open("w") as stderr:
+            baseline, raw_text, _ = await call(
+                {**env, "DOCATLAS_MCP_COMPACT_TEXT": "off"}, root,
+                prepare=mutation, question=LARGE_QUESTION, check_denial=False, errlog=stderr)
+        (out / "B01-baseline.json").write_text(raw_text + "\n", encoding="utf-8")
+        assert baseline.get("kind") == "docs_context" and baseline.get("status") in {"ok", "truncated"}
+        assert not baseline.get("hard_stop") and not baseline.get("requires_confirmation")
+        assert not baseline.get("recommended_next_action")
+        baseline_bytes = len(raw_text.encode("utf-8"))
+        assert baseline_bytes > 48_000, {"baseline_bytes": baseline_bytes}
+        rows = expand_sections(baseline)["sources"]
+        assert rows
+        assert any("How many characters per line to allow. The default is 88." in row["snippet"]
+                   for row in rows), "Original B01 fact missing from the real legacy evidence"
+        for row in rows:
+            path = row["path_or_url"]
+            assert path in documents and row["scope"] == "project"
+            assert row["evidence_id"] and row["source_uri"].startswith("docatlas://source/")
+            start, end = row["line_start"], row["line_end"]
+            lines = documents[path].splitlines(keepends=True)
+            assert type(start) is int and type(end) is int and 1 <= start <= end <= len(lines)
+            assert row["snippet"] in "".join(lines[start - 1:end])
+        before = state(database)
+        compact_env = {**env, "DOCATLAS_MCP_COMPACT_TEXT": "1"}
+        with (out / "B01-compact-trace.log").open("w") as stderr:
+            blocked, blocked_text, _ = await call(
+                {**compact_env, "DOCATLAS_TRACE": "1"}, root, prepare=None,
+                question=LARGE_QUESTION, expect_delivery_error=True, check_denial=False, errlog=stderr)
+        (out / "B01-compact.json").write_text(blocked_text + "\n", encoding="utf-8")
+        error = blocked["error"]
+        assert blocked["status"] == "failed" and not blocked.get("sources")
+        assert error["reason_code"] == "context_delivery_unavailable"
+        assert error["where"]["phase"] == "delivery" and error["retryable"] is False
+        assert error["details"]["delivery_reason"] in {
+            "model_context_output_limit", "standalone_context_output_limit"}
+        assert error["details"]["fallback_utf8_bytes"] > 48_000
+        assert len(blocked_text.encode("utf-8")) <= 48_000
+        assert projection_token_count(blocked_text.encode("utf-8")) <= 12000
+        with (out / "B01-compact-trace-off.log").open("w") as stderr:
+            quiet, quiet_text, _ = await call(
+                compact_env, root, prepare=None, question=LARGE_QUESTION,
+                expect_delivery_error=True, check_denial=False, errlog=stderr)
+        assert quiet == blocked and quiet_text == blocked_text, "Tracing changed the delivered error"
+        events = []
+        for line in (out / "B01-compact-trace.log").read_text().splitlines():
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(event, dict) and event.get("event") == "docatlas_mcp_text_fallback":
+                events.append(event)
+        assert len(events) == 1 and events[0]["outcome"] == "delivery_error"
+        assert events[0]["delivery_reason"] == error["details"]["delivery_reason"]
+        assert "docatlas_mcp_text_fallback" not in (out / "B01-compact-trace-off.log").read_text()
+        assert state(database) == before
+        assert all((root / "project" / name).read_bytes() == text.encode("utf-8")
+                   for name, text in documents.items())
+        result = {
+            "id": "B01", "question": LARGE_QUESTION, "retrieval_calls": 3,
+            "preparation_calls": 1, "compression": "off", "source_rows": len(rows),
+            "legacy_utf8_bytes": baseline_bytes,
+            "legacy_o200k": projection_token_count(raw_text.encode("utf-8")),
+            "delivery_error_utf8_bytes": len(blocked_text.encode("utf-8")),
+            "delivery_error_o200k": projection_token_count(blocked_text.encode("utf-8")),
+            "delivery_reason": error["details"]["delivery_reason"],
+            "source_fidelity": True, "files_and_sqlite_unchanged": True,
+            "trace_does_not_change_result": True,
+            "note": "Installed MCP transport refusal; no delivered evidence, no OpenCode/model answer claim",
+        }
+        (out / "RESULT.json").write_text(json.dumps(result, indent=2) + "\n")
+        return result
+
+
+async def run(out: Path, *, large_packet: bool = False):
     with TemporaryDirectory(prefix="docatlas-opencode-stdio-") as temp:
         root = Path(temp)
         setup(root)
@@ -251,6 +355,8 @@ async def run(out: Path):
                   "literal_rollback_layout": rolled_back["context_format"],
                   "default_registry_compact": True, "default_adaptive_enabled": True,
                   "note": "real installed stdio, not a paid OpenCode conversation"}
+        if large_packet:
+            result["large_packet"] = await large_packet_check(out / "large-packet")
         (out / "RESULT.json").write_text(json.dumps(result, indent=2) + "\n")
         print(json.dumps(result))
 
@@ -258,5 +364,7 @@ async def run(out: Path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--large-packet", action="store_true",
+                        help="Also verify a real oversized Black B01 response is a typed delivery failure")
     args = parser.parse_args()
-    asyncio.run(run(args.out))
+    asyncio.run(run(args.out, large_packet=args.large_packet))

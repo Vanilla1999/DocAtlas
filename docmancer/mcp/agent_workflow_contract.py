@@ -39,6 +39,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "documentation_context_format": None,
         "context_format_inferred_from_prose": False,
         "skill_read_required": False,
+        "tool_catalog_reload_required": False,
         "optional_preflight": "language mode enabled + bound language unknown: docs_status(include_language=true) BEFORE retrieval",
         "selection_or_unassessed_coverage_requires_retry": False,
     },
@@ -90,6 +91,8 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "root_question_immutable": True,
         "inferred_subquestions": False,
         "scope_and_budget_limits_unchanged": True,
+        "missing_fact_required": True,
+        "unchanged_input_and_state_requires_retry": False,
     },
     "version_binding": {
         "project_query_default": "resolve_current_project_version",
@@ -107,6 +110,16 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "hard_stop_false_authorizes_edit": False,
         "documentation_claim_requires_cited_context": True,
         "stop_before_edit_when": "hard_stop",
+    },
+    "transport_delivery": {
+        "client_truncation_means_missing_docs": False,
+        "follow_returned_actionable_recovery": True,
+        "retry_requires_changed_input_or_delivery_state": True,
+        "preparation_or_scope_widening_is_delivery_recovery": False,
+        "automatic_full_saved_output_dump": False,
+        "client_artifact_read_requires": "issued_artifact_and_bounded_missing_fact",
+        "forensic_recovery_is_normal_delivery": False,
+        "server_partial_status_proves_client_truncation": False,
     },
 }
 
