@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           docker build -f eval/context_assembly/Dockerfile -t docatlas-binding .
-      - name: Real public stdio: five original questions with and without target
+      - name: "Real public stdio: five original questions with and without target"
         run: |
           set -uo pipefail
           docker run --name binding-test --network none --cpus=2 \
