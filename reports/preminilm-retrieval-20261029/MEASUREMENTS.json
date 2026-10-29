@@ -1,0 +1,1349 @@
+{
+  "report_schema_version": 1,
+  "status": "completed_comparison_no_quality_improvement_demonstrated",
+  "evidence": {
+    "repository": "Vanilla1999/DocAtlas",
+    "branch": "experiment/preminilm-retrieval-20261029",
+    "retrieval_implementation_freeze_sha": "d38322439f3bf8d561c933ff6021d046d280d413",
+    "tested_sha": "879f5e07951196fb967ceaff3515973a3e41e0fc",
+    "completed_run_id": 40957179011,
+    "completed_run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/40957179011",
+    "artifact_id": 12934683122,
+    "artifact_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/40957179011/artifacts/12934683122",
+    "artifact_zip_sha256": "7acdd9e11817c8f0d63414d2f0628ffcadaa580919204401c660746e314a0ba9",
+    "source_report": "COMPARISON.json",
+    "aggregate_projection": "Selected unchanged fields from COMPARISON aggregates and paired summaries; not a replacement oracle."
+  },
+  "frozen_comparison": {
+    "schema_version": 1,
+    "baseline_sha": "542900e573835aa17a3a21da924a0f7ed400bece",
+    "candidate_sha": "879f5e07951196fb967ceaff3515973a3e41e0fc",
+    "freeze_sha256": "fb30aeff02f2a8ec55b25a995a50a0b96010fd53bbbad51f4352c1a2ba3456ca",
+    "frozen_environment": {
+      "DOCATLAS_MINILM_MODEL_DIR": "/model",
+      "DOCATLAS_CONTEXT_COMPRESSION": "minilm-sections-v1",
+      "DOCATLAS_SECTION_SELECTION": "facet-guarded-lexical-v2",
+      "DOCATLAS_SECTION_UNITS": "markdown-owner-v1",
+      "DOCATLAS_CONTEXT_ASSEMBLY": "adaptive",
+      "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+      "DOCATLAS_MCP_COMPACT_TEXT": "1",
+      "DOCATLAS_MCP_MODEL_VIEW": "off",
+      "DOCATLAS_TRACE": "0",
+      "HF_HUB_OFFLINE": "1",
+      "DOCATLAS_OFFLINE": "1"
+    },
+    "installed_wheel_sha256": {
+      "main": "fd7a2f72132524ef523316a7650aa62c5a0faf661e97304f4a99ca277f888d72",
+      "retrieval_text": "f6f082062fb6ccd599a802a47c3bd1f81f1e6f9d4a30304c1d5757878c3926eb",
+      "rrf": "f6f082062fb6ccd599a802a47c3bd1f81f1e6f9d4a30304c1d5757878c3926eb"
+    },
+    "limits": {
+      "model": "fixed CPU ONNX MiniLM",
+      "acquisition_rows_per_lane": 256,
+      "rrf_raw_row_allocation": [
+        128,
+        128
+      ],
+      "rrf_k": 60,
+      "section_packet_token_cap": 12000
+    },
+    "measurement_notes": [
+      "V40 is historically exposed, not a blind holdout; NEW20 opened only after the recorded code/config freeze.",
+      "A green execution result proves completeness and source/state invariants, never a quality win.",
+      "V40 retains its original coordinate-union oracle; NEW20 retains original literal byte witnesses.",
+      "Source/fact scoring preserves original witness and negative predicates, not the old full budget/answer acceptance: V40 negatives require empty sources AND context_available false; NEW20 requires empty sources.",
+      "Pool rank is the source-checked native order before MiniLM, not an invented graded relevance ranking.",
+      "Acquisition descriptors survive only on observed nonempty source-checked lanes; never sum them as total SQL work.",
+      "Actual FTS work is counted by SQLite trace on real unchanged connections, including empty lanes.",
+      "MiniLM receipts are completed-work observations; a missing receipt means unknown work, not zero cost.",
+      "Wire o200k counts are actual packets, not paid API usage. Session capability randomness can cause small differences.",
+      "All-packet token totals include explicit errors; nonerror paired totals are reported separately.",
+      "Single sequential runs include observer overhead and model startup; timings are not a statistically controlled speed claim.",
+      "Diagnostic receipts are streamed and hash-acknowledged before SDK teardown; SIGUSR1 wakes the worker without polling during public calls. Client ACK polling happens only after the final measured call.",
+      "The evaluation fixture's private directory survives worker exit solely for parent read-only database/file verification; isolated container disposal is its explicit cleanup boundary.",
+      "No paid model, answer generator, semantic sufficiency judgment or autonomous OpenCode-agent test is included."
+    ],
+    "execution_integrity_pass": true,
+    "quality_is_not_a_ci_gate": true,
+    "datasets": [
+      "v40",
+      "new20"
+    ]
+  },
+  "execution_accounting_completed_run": {
+    "benchmark_context_calls": 180,
+    "scope_controls": 3,
+    "total_context_calls": 183,
+    "public_preparations": 27,
+    "diagnostic_checkpoints": 27,
+    "post_exit_state_verifications": 27,
+    "actual_benchmark_fts_statements": 480,
+    "actual_scope_control_fts_statements": 0,
+    "paid_model_calls": 0,
+    "source_continuation_calls": 0,
+    "automatic_retries": 0
+  },
+  "aggregates": [
+    {
+      "arm": "main",
+      "dataset": "v40",
+      "cases": 40,
+      "historic_labels": {
+        "partial": {
+          "cases": 8,
+          "source_fact_contract_pass": 8,
+          "delivery_errors": 0
+        },
+        "unanswerable": {
+          "cases": 8,
+          "source_fact_contract_pass": 0,
+          "delivery_errors": 0
+        },
+        "within_budget": {
+          "cases": 24,
+          "source_fact_contract_pass": 24,
+          "delivery_errors": 0
+        }
+      },
+      "delivery_errors": 0,
+      "documented_facts": 32,
+      "final_covered_facts": 32,
+      "final_fact_coverage": 1,
+      "pool_observed_cases": 40,
+      "pool_unobserved_cases": 0,
+      "pool_covered_facts": 32,
+      "pool_fact_coverage_observed_cases": 1,
+      "pool_prefix_coverage": {
+        "5": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 21,
+          "fact_coverage_observed_cases": 0.65625
+        },
+        "10": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 26,
+          "fact_coverage_observed_cases": 0.8125
+        },
+        "20": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 28,
+          "fact_coverage_observed_cases": 0.875
+        },
+        "40": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 30,
+          "fact_coverage_observed_cases": 0.9375
+        },
+        "100": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 31,
+          "fact_coverage_observed_cases": 0.96875
+        },
+        "256": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 32,
+          "fact_coverage_observed_cases": 1
+        }
+      },
+      "pool_rows": {
+        "n": 40,
+        "sum": 5938,
+        "mean": 148.45,
+        "p50": 117,
+        "p95": 256,
+        "max": 256
+      },
+      "known_markdown_owners": {
+        "n": 40,
+        "sum": 2770,
+        "mean": 69.25,
+        "p50": 64,
+        "p95": 142,
+        "max": 148
+      },
+      "observed_lane_saturation_cases": 6,
+      "actual_fts_statements": 80,
+      "minilm_missing_completion_receipts": 0,
+      "minilm_completed_forward_passes": {
+        "n": 40,
+        "sum": 6083,
+        "mean": 152.075,
+        "p50": 134.5,
+        "p95": 398,
+        "max": 440
+      },
+      "minilm_completed_input_pair_tokens": {
+        "n": 40,
+        "sum": 1272043,
+        "mean": 31801.075,
+        "p50": 27822.5,
+        "p95": 77410,
+        "max": 97126
+      },
+      "final_source_bodies": {
+        "n": 40,
+        "sum": 280,
+        "mean": 7,
+        "p50": 5.5,
+        "p95": 19,
+        "max": 25
+      },
+      "wire_o200k_tokens_all": {
+        "n": 40,
+        "sum": 45931,
+        "mean": 1148.275,
+        "p50": 953,
+        "p95": 2855,
+        "max": 3365
+      },
+      "wire_o200k_tokens_nonerror": {
+        "n": 40,
+        "sum": 45931,
+        "mean": 1148.275,
+        "p50": 953,
+        "p95": 2855,
+        "max": 3365
+      },
+      "wire_utf8_bytes": {
+        "n": 40,
+        "sum": 161263,
+        "mean": 4031.575,
+        "p50": 3406.5,
+        "p95": 9854,
+        "max": 11591
+      },
+      "context_seconds": {
+        "n": 40,
+        "sum": 305.9918879689999,
+        "mean": 7.649797199224997,
+        "p50": 6.772071644499988,
+        "p95": 17.318575677000013,
+        "max": 19.820632095999997
+      }
+    },
+    {
+      "arm": "main",
+      "dataset": "new20",
+      "cases": 20,
+      "historic_labels": {
+        "negative": {
+          "cases": 6,
+          "source_fact_contract_pass": 0,
+          "delivery_errors": 3
+        },
+        "partial": {
+          "cases": 6,
+          "source_fact_contract_pass": 3,
+          "delivery_errors": 3
+        },
+        "positive": {
+          "cases": 8,
+          "source_fact_contract_pass": 4,
+          "delivery_errors": 4
+        }
+      },
+      "delivery_errors": 10,
+      "documented_facts": 26,
+      "final_covered_facts": 12,
+      "final_fact_coverage": 0.46153846153846156,
+      "pool_observed_cases": 20,
+      "pool_unobserved_cases": 0,
+      "pool_covered_facts": 25,
+      "pool_fact_coverage_observed_cases": 0.9615384615384616,
+      "pool_prefix_coverage": {
+        "5": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 20,
+          "fact_coverage_observed_cases": 0.7692307692307693
+        },
+        "10": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 22,
+          "fact_coverage_observed_cases": 0.8461538461538461
+        },
+        "20": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 24,
+          "fact_coverage_observed_cases": 0.9230769230769231
+        },
+        "40": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        },
+        "100": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        },
+        "256": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        }
+      },
+      "pool_rows": {
+        "n": 20,
+        "sum": 1231,
+        "mean": 61.55,
+        "p50": 54,
+        "p95": 110,
+        "max": 110
+      },
+      "known_markdown_owners": {
+        "n": 20,
+        "sum": 20,
+        "mean": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1
+      },
+      "observed_lane_saturation_cases": 0,
+      "actual_fts_statements": 40,
+      "minilm_missing_completion_receipts": 10,
+      "minilm_completed_forward_passes": {
+        "n": 10,
+        "sum": 497,
+        "mean": 49.7,
+        "p50": 45,
+        "p95": 85,
+        "max": 85
+      },
+      "minilm_completed_input_pair_tokens": {
+        "n": 10,
+        "sum": 247464,
+        "mean": 24746.4,
+        "p50": 22399,
+        "p95": 42988,
+        "max": 42988
+      },
+      "final_source_bodies": {
+        "n": 20,
+        "sum": 366,
+        "mean": 18.3,
+        "p50": 12,
+        "p95": 45,
+        "max": 45
+      },
+      "wire_o200k_tokens_all": {
+        "n": 20,
+        "sum": 60992,
+        "mean": 3049.6,
+        "p50": 2215.5,
+        "p95": 7140,
+        "max": 7142
+      },
+      "wire_o200k_tokens_nonerror": {
+        "n": 10,
+        "sum": 60182,
+        "mean": 6018.2,
+        "p50": 7115.5,
+        "p95": 7142,
+        "max": 7142
+      },
+      "wire_utf8_bytes": {
+        "n": 20,
+        "sum": 210796,
+        "mean": 10539.8,
+        "p50": 7910,
+        "p95": 24269,
+        "max": 24269
+      },
+      "context_seconds": {
+        "n": 20,
+        "sum": 158.30612718899994,
+        "mean": 7.915306359449997,
+        "p50": 6.80770222000001,
+        "p95": 15.981693713000027,
+        "max": 16.771117156999935
+      }
+    },
+    {
+      "arm": "retrieval_text",
+      "dataset": "v40",
+      "cases": 40,
+      "historic_labels": {
+        "partial": {
+          "cases": 8,
+          "source_fact_contract_pass": 8,
+          "delivery_errors": 0
+        },
+        "unanswerable": {
+          "cases": 8,
+          "source_fact_contract_pass": 0,
+          "delivery_errors": 0
+        },
+        "within_budget": {
+          "cases": 24,
+          "source_fact_contract_pass": 24,
+          "delivery_errors": 0
+        }
+      },
+      "delivery_errors": 0,
+      "documented_facts": 32,
+      "final_covered_facts": 32,
+      "final_fact_coverage": 1,
+      "pool_observed_cases": 40,
+      "pool_unobserved_cases": 0,
+      "pool_covered_facts": 32,
+      "pool_fact_coverage_observed_cases": 1,
+      "pool_prefix_coverage": {
+        "5": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 21,
+          "fact_coverage_observed_cases": 0.65625
+        },
+        "10": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 26,
+          "fact_coverage_observed_cases": 0.8125
+        },
+        "20": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 29,
+          "fact_coverage_observed_cases": 0.90625
+        },
+        "40": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 30,
+          "fact_coverage_observed_cases": 0.9375
+        },
+        "100": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 31,
+          "fact_coverage_observed_cases": 0.96875
+        },
+        "256": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 32,
+          "fact_coverage_observed_cases": 1
+        }
+      },
+      "pool_rows": {
+        "n": 40,
+        "sum": 5567,
+        "mean": 139.175,
+        "p50": 114,
+        "p95": 256,
+        "max": 256
+      },
+      "known_markdown_owners": {
+        "n": 40,
+        "sum": 2653,
+        "mean": 66.325,
+        "p50": 64,
+        "p95": 127,
+        "max": 148
+      },
+      "observed_lane_saturation_cases": 4,
+      "actual_fts_statements": 80,
+      "minilm_missing_completion_receipts": 0,
+      "minilm_completed_forward_passes": {
+        "n": 40,
+        "sum": 5951,
+        "mean": 148.775,
+        "p50": 134.5,
+        "p95": 398,
+        "max": 440
+      },
+      "minilm_completed_input_pair_tokens": {
+        "n": 40,
+        "sum": 1239371,
+        "mean": 30984.275,
+        "p50": 27259,
+        "p95": 78455,
+        "max": 97126
+      },
+      "final_source_bodies": {
+        "n": 40,
+        "sum": 271,
+        "mean": 6.775,
+        "p50": 5,
+        "p95": 18,
+        "max": 25
+      },
+      "wire_o200k_tokens_all": {
+        "n": 40,
+        "sum": 45233,
+        "mean": 1130.825,
+        "p50": 854.5,
+        "p95": 2861,
+        "max": 3361
+      },
+      "wire_o200k_tokens_nonerror": {
+        "n": 40,
+        "sum": 45233,
+        "mean": 1130.825,
+        "p50": 854.5,
+        "p95": 2861,
+        "max": 3361
+      },
+      "wire_utf8_bytes": {
+        "n": 40,
+        "sum": 159005,
+        "mean": 3975.125,
+        "p50": 3093.5,
+        "p95": 9854,
+        "max": 11591
+      },
+      "context_seconds": {
+        "n": 40,
+        "sum": 297.1926931290002,
+        "mean": 7.429817328225004,
+        "p50": 6.696983104999958,
+        "p95": 17.67370634200006,
+        "max": 19.79744266099999
+      }
+    },
+    {
+      "arm": "retrieval_text",
+      "dataset": "new20",
+      "cases": 20,
+      "historic_labels": {
+        "negative": {
+          "cases": 6,
+          "source_fact_contract_pass": 0,
+          "delivery_errors": 3
+        },
+        "partial": {
+          "cases": 6,
+          "source_fact_contract_pass": 3,
+          "delivery_errors": 3
+        },
+        "positive": {
+          "cases": 8,
+          "source_fact_contract_pass": 4,
+          "delivery_errors": 4
+        }
+      },
+      "delivery_errors": 10,
+      "documented_facts": 26,
+      "final_covered_facts": 12,
+      "final_fact_coverage": 0.46153846153846156,
+      "pool_observed_cases": 20,
+      "pool_unobserved_cases": 0,
+      "pool_covered_facts": 25,
+      "pool_fact_coverage_observed_cases": 0.9615384615384616,
+      "pool_prefix_coverage": {
+        "5": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 20,
+          "fact_coverage_observed_cases": 0.7692307692307693
+        },
+        "10": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 22,
+          "fact_coverage_observed_cases": 0.8461538461538461
+        },
+        "20": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 24,
+          "fact_coverage_observed_cases": 0.9230769230769231
+        },
+        "40": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        },
+        "100": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        },
+        "256": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        }
+      },
+      "pool_rows": {
+        "n": 20,
+        "sum": 1190,
+        "mean": 59.5,
+        "p50": 54,
+        "p95": 104,
+        "max": 104
+      },
+      "known_markdown_owners": {
+        "n": 20,
+        "sum": 20,
+        "mean": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1
+      },
+      "observed_lane_saturation_cases": 0,
+      "actual_fts_statements": 40,
+      "minilm_missing_completion_receipts": 10,
+      "minilm_completed_forward_passes": {
+        "n": 10,
+        "sum": 497,
+        "mean": 49.7,
+        "p50": 45,
+        "p95": 85,
+        "max": 85
+      },
+      "minilm_completed_input_pair_tokens": {
+        "n": 10,
+        "sum": 247464,
+        "mean": 24746.4,
+        "p50": 22399,
+        "p95": 42988,
+        "max": 42988
+      },
+      "final_source_bodies": {
+        "n": 20,
+        "sum": 366,
+        "mean": 18.3,
+        "p50": 12,
+        "p95": 45,
+        "max": 45
+      },
+      "wire_o200k_tokens_all": {
+        "n": 20,
+        "sum": 61021,
+        "mean": 3051.05,
+        "p50": 2217.5,
+        "p95": 7136,
+        "max": 7138
+      },
+      "wire_o200k_tokens_nonerror": {
+        "n": 10,
+        "sum": 60211,
+        "mean": 6021.1,
+        "p50": 7114.5,
+        "p95": 7138,
+        "max": 7138
+      },
+      "wire_utf8_bytes": {
+        "n": 20,
+        "sum": 210796,
+        "mean": 10539.8,
+        "p50": 7910,
+        "p95": 24269,
+        "max": 24269
+      },
+      "context_seconds": {
+        "n": 20,
+        "sum": 155.65169833999983,
+        "mean": 7.782584916999991,
+        "p50": 6.802501981499972,
+        "p95": 15.509384082999986,
+        "max": 16.351601744999925
+      }
+    },
+    {
+      "arm": "rrf",
+      "dataset": "v40",
+      "cases": 40,
+      "historic_labels": {
+        "partial": {
+          "cases": 8,
+          "source_fact_contract_pass": 8,
+          "delivery_errors": 0
+        },
+        "unanswerable": {
+          "cases": 8,
+          "source_fact_contract_pass": 0,
+          "delivery_errors": 0
+        },
+        "within_budget": {
+          "cases": 24,
+          "source_fact_contract_pass": 23,
+          "delivery_errors": 0
+        }
+      },
+      "delivery_errors": 0,
+      "documented_facts": 32,
+      "final_covered_facts": 31,
+      "final_fact_coverage": 0.96875,
+      "pool_observed_cases": 40,
+      "pool_unobserved_cases": 0,
+      "pool_covered_facts": 31,
+      "pool_fact_coverage_observed_cases": 0.96875,
+      "pool_prefix_coverage": {
+        "5": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 21,
+          "fact_coverage_observed_cases": 0.65625
+        },
+        "10": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 26,
+          "fact_coverage_observed_cases": 0.8125
+        },
+        "20": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 29,
+          "fact_coverage_observed_cases": 0.90625
+        },
+        "40": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 30,
+          "fact_coverage_observed_cases": 0.9375
+        },
+        "100": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 31,
+          "fact_coverage_observed_cases": 0.96875
+        },
+        "256": {
+          "observed_cases": 40,
+          "documented_facts": 32,
+          "covered_facts": 31,
+          "fact_coverage_observed_cases": 0.96875
+        }
+      },
+      "pool_rows": {
+        "n": 40,
+        "sum": 4678,
+        "mean": 116.95,
+        "p50": 117,
+        "p95": 131,
+        "max": 133
+      },
+      "known_markdown_owners": {
+        "n": 40,
+        "sum": 2224,
+        "mean": 55.6,
+        "p50": 64,
+        "p95": 72,
+        "max": 83
+      },
+      "observed_lane_saturation_cases": 16,
+      "actual_fts_statements": 160,
+      "minilm_missing_completion_receipts": 0,
+      "minilm_completed_forward_passes": {
+        "n": 40,
+        "sum": 5012,
+        "mean": 125.3,
+        "p50": 128.5,
+        "p95": 231,
+        "max": 311
+      },
+      "minilm_completed_input_pair_tokens": {
+        "n": 40,
+        "sum": 1039656,
+        "mean": 25991.4,
+        "p50": 27822.5,
+        "p95": 46225,
+        "max": 55061
+      },
+      "final_source_bodies": {
+        "n": 40,
+        "sum": 287,
+        "mean": 7.175,
+        "p50": 5.5,
+        "p95": 19,
+        "max": 26
+      },
+      "wire_o200k_tokens_all": {
+        "n": 40,
+        "sum": 47478,
+        "mean": 1186.95,
+        "p50": 953,
+        "p95": 2865,
+        "max": 3878
+      },
+      "wire_o200k_tokens_nonerror": {
+        "n": 40,
+        "sum": 47478,
+        "mean": 1186.95,
+        "p50": 953,
+        "p95": 2865,
+        "max": 3878
+      },
+      "wire_utf8_bytes": {
+        "n": 40,
+        "sum": 167067,
+        "mean": 4176.675,
+        "p50": 3406.5,
+        "p95": 9854,
+        "max": 13951
+      },
+      "context_seconds": {
+        "n": 40,
+        "sum": 246.90127251300055,
+        "mean": 6.172531812825014,
+        "p50": 6.075501925000026,
+        "p95": 9.970711213999948,
+        "max": 10.94943903300009
+      }
+    },
+    {
+      "arm": "rrf",
+      "dataset": "new20",
+      "cases": 20,
+      "historic_labels": {
+        "negative": {
+          "cases": 6,
+          "source_fact_contract_pass": 0,
+          "delivery_errors": 3
+        },
+        "partial": {
+          "cases": 6,
+          "source_fact_contract_pass": 3,
+          "delivery_errors": 3
+        },
+        "positive": {
+          "cases": 8,
+          "source_fact_contract_pass": 4,
+          "delivery_errors": 4
+        }
+      },
+      "delivery_errors": 10,
+      "documented_facts": 26,
+      "final_covered_facts": 12,
+      "final_fact_coverage": 0.46153846153846156,
+      "pool_observed_cases": 20,
+      "pool_unobserved_cases": 0,
+      "pool_covered_facts": 25,
+      "pool_fact_coverage_observed_cases": 0.9615384615384616,
+      "pool_prefix_coverage": {
+        "5": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 20,
+          "fact_coverage_observed_cases": 0.7692307692307693
+        },
+        "10": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 22,
+          "fact_coverage_observed_cases": 0.8461538461538461
+        },
+        "20": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 24,
+          "fact_coverage_observed_cases": 0.9230769230769231
+        },
+        "40": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        },
+        "100": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        },
+        "256": {
+          "observed_cases": 20,
+          "documented_facts": 26,
+          "covered_facts": 25,
+          "fact_coverage_observed_cases": 0.9615384615384616
+        }
+      },
+      "pool_rows": {
+        "n": 20,
+        "sum": 1231,
+        "mean": 61.55,
+        "p50": 54,
+        "p95": 110,
+        "max": 110
+      },
+      "known_markdown_owners": {
+        "n": 20,
+        "sum": 20,
+        "mean": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1
+      },
+      "observed_lane_saturation_cases": 0,
+      "actual_fts_statements": 80,
+      "minilm_missing_completion_receipts": 10,
+      "minilm_completed_forward_passes": {
+        "n": 10,
+        "sum": 497,
+        "mean": 49.7,
+        "p50": 45,
+        "p95": 85,
+        "max": 85
+      },
+      "minilm_completed_input_pair_tokens": {
+        "n": 10,
+        "sum": 247464,
+        "mean": 24746.4,
+        "p50": 22399,
+        "p95": 42988,
+        "max": 42988
+      },
+      "final_source_bodies": {
+        "n": 20,
+        "sum": 366,
+        "mean": 18.3,
+        "p50": 12,
+        "p95": 45,
+        "max": 45
+      },
+      "wire_o200k_tokens_all": {
+        "n": 20,
+        "sum": 61037,
+        "mean": 3051.85,
+        "p50": 2216.5,
+        "p95": 7138,
+        "max": 7146
+      },
+      "wire_o200k_tokens_nonerror": {
+        "n": 10,
+        "sum": 60227,
+        "mean": 6022.7,
+        "p50": 7118.5,
+        "p95": 7146,
+        "max": 7146
+      },
+      "wire_utf8_bytes": {
+        "n": 20,
+        "sum": 210796,
+        "mean": 10539.8,
+        "p50": 7910,
+        "p95": 24269,
+        "max": 24269
+      },
+      "context_seconds": {
+        "n": 20,
+        "sum": 158.70556067500002,
+        "mean": 7.93527803375,
+        "p50": 6.838921529999993,
+        "p95": 15.984469726999805,
+        "max": 16.78018605400007
+      }
+    }
+  ],
+  "paired_summaries": [
+    {
+      "comparison": "retrieval_text vs main",
+      "dataset": "v40",
+      "full_pool": {
+        "paired_cases": 40,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 0,
+        "gained_facts": 0,
+        "lost_facts": 0,
+        "net_positive_cases": 0,
+        "net_negative_cases": 0,
+        "net_tied_cases": 40
+      },
+      "final": {
+        "paired_cases": 40,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 0,
+        "gained_facts": 0,
+        "lost_facts": 0,
+        "net_positive_cases": 0,
+        "net_negative_cases": 0,
+        "net_tied_cases": 40
+      },
+      "source_fact_contract_pass_gains": 0,
+      "source_fact_contract_pass_losses": 0,
+      "wire_token_delta_all": -698,
+      "wire_nonerror_pair_count": 40,
+      "wire_token_delta_nonerror_pairs": -698,
+      "prefix_net_fact_deltas": {
+        "5": 0,
+        "10": 0,
+        "20": 1,
+        "40": 0,
+        "100": 0,
+        "256": 0
+      }
+    },
+    {
+      "comparison": "rrf vs main",
+      "dataset": "v40",
+      "full_pool": {
+        "paired_cases": 40,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 1,
+        "gained_facts": 0,
+        "lost_facts": 1,
+        "net_positive_cases": 0,
+        "net_negative_cases": 1,
+        "net_tied_cases": 39
+      },
+      "final": {
+        "paired_cases": 40,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 1,
+        "gained_facts": 0,
+        "lost_facts": 1,
+        "net_positive_cases": 0,
+        "net_negative_cases": 1,
+        "net_tied_cases": 39
+      },
+      "source_fact_contract_pass_gains": 0,
+      "source_fact_contract_pass_losses": 1,
+      "wire_token_delta_all": 1547,
+      "wire_nonerror_pair_count": 40,
+      "wire_token_delta_nonerror_pairs": 1547,
+      "prefix_net_fact_deltas": {
+        "5": 0,
+        "10": 0,
+        "20": 1,
+        "40": 0,
+        "100": 0,
+        "256": -1
+      }
+    },
+    {
+      "comparison": "retrieval_text vs main",
+      "dataset": "new20",
+      "full_pool": {
+        "paired_cases": 20,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 0,
+        "gained_facts": 0,
+        "lost_facts": 0,
+        "net_positive_cases": 0,
+        "net_negative_cases": 0,
+        "net_tied_cases": 20
+      },
+      "final": {
+        "paired_cases": 20,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 0,
+        "gained_facts": 0,
+        "lost_facts": 0,
+        "net_positive_cases": 0,
+        "net_negative_cases": 0,
+        "net_tied_cases": 20
+      },
+      "source_fact_contract_pass_gains": 0,
+      "source_fact_contract_pass_losses": 0,
+      "wire_token_delta_all": 29,
+      "wire_nonerror_pair_count": 10,
+      "wire_token_delta_nonerror_pairs": 29,
+      "prefix_net_fact_deltas": {
+        "5": 0,
+        "10": 0,
+        "20": 0,
+        "40": 0,
+        "100": 0,
+        "256": 0
+      }
+    },
+    {
+      "comparison": "rrf vs main",
+      "dataset": "new20",
+      "full_pool": {
+        "paired_cases": 20,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 0,
+        "gained_facts": 0,
+        "lost_facts": 0,
+        "net_positive_cases": 0,
+        "net_negative_cases": 0,
+        "net_tied_cases": 20
+      },
+      "final": {
+        "paired_cases": 20,
+        "cases_with_gained_facts": 0,
+        "cases_with_lost_facts": 0,
+        "gained_facts": 0,
+        "lost_facts": 0,
+        "net_positive_cases": 0,
+        "net_negative_cases": 0,
+        "net_tied_cases": 20
+      },
+      "source_fact_contract_pass_gains": 0,
+      "source_fact_contract_pass_losses": 0,
+      "wire_token_delta_all": 45,
+      "wire_nonerror_pair_count": 10,
+      "wire_token_delta_nonerror_pairs": 45,
+      "prefix_net_fact_deltas": {
+        "5": 0,
+        "10": 0,
+        "20": 0,
+        "40": 0,
+        "100": 0,
+        "256": 0
+      }
+    }
+  ],
+  "diagnostic_observations": {
+    "rrf_v40_e01": {
+      "fact_id": "required",
+      "source": "docs/src/use/configure/configuration-files.md",
+      "witness_lines": [
+        19,
+        30
+      ],
+      "witness_char_interval_half_open": [
+        584,
+        1141
+      ],
+      "witness_raw_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+      "source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+      "chunks": [
+        {
+          "char_interval_half_open": [
+            584,
+            993
+          ],
+          "main_rank": 137,
+          "retrieval_text_rank": 137,
+          "present_in_rrf": false
+        },
+        {
+          "char_interval_half_open": [
+            993,
+            1324
+          ],
+          "main_rank": 141,
+          "retrieval_text_rank": 143,
+          "present_in_rrf": false
+        }
+      ],
+      "main_unique_pool_rows": 256,
+      "retrieval_text_unique_pool_rows": 256,
+      "rrf_raw_rows_per_read": [
+        128,
+        128
+      ],
+      "rrf_unique_pool_rows": 128,
+      "rrf_resource_skipped_rows": 0,
+      "main_top128_text_top128_rrf_pool_normalized_set_sha256": "2d74116d9095974cee6dcfd5458a9031c439d251cbb11b2936e2f20038a5283f",
+      "normalized_identity": [
+        "path",
+        "span",
+        "text_sha256",
+        "source_content_sha256"
+      ],
+      "interpretation": "Both chunks of the required witness were outside both truncated input lists, before RRF fusion and MiniLM. This is a failure of this frozen 128+128 allocation, not a general counterexample to RRF."
+    },
+    "new20_delivery": {
+      "same_errors_in_each_arm": [
+        {
+          "id": "NEW01",
+          "family": "click",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW02",
+          "family": "click",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW09",
+          "family": "click",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW10",
+          "family": "click",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW15",
+          "family": "click",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW07",
+          "family": "tox",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW08",
+          "family": "tox",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW14",
+          "family": "tox",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW19",
+          "family": "tox",
+          "reason_code": "section_compression_output_limit"
+        },
+        {
+          "id": "NEW20",
+          "family": "tox",
+          "reason_code": "section_compression_output_limit"
+        }
+      ],
+      "missing_minilm_completion_receipts_per_arm": 10,
+      "missing_completion_cost": null,
+      "missing_completion_cost_meaning": "unknown, not zero",
+      "known_markdown_owners_per_case": 1,
+      "failure_stage": "select_sections -> fits -> encode_sections, before source references and standalone text / Context Assembly",
+      "frozen_section_format": "docatlas.sections.v1",
+      "section_packet_cost": "max(o200k_tokens(packet), ceil(UTF8_bytes(packet) / 4))",
+      "section_packet_limit": 12000,
+      "exact_failed_packet_cost": null,
+      "exact_failed_packet_cost_meaning": "not persisted; no precise Click overrun or cost-branch claim",
+      "parser_observation": "ATX Markdown headings recognized; these RST sources have one Document owner",
+      "source_observations": [
+        {
+          "family": "click",
+          "arms": [
+            "main",
+            "retrieval_text",
+            "rrf"
+          ],
+          "native_rows": 63,
+          "exact_complete_source_reconstructed": true,
+          "source_bytes": 26719,
+          "owner_char_scope": [
+            0,
+            26719
+          ]
+        },
+        {
+          "family": "tox",
+          "arms": [
+            "main",
+            "rrf"
+          ],
+          "native_rows": 110,
+          "exact_complete_source_reconstructed": true,
+          "source_bytes": 54596,
+          "source_chars": 54374,
+          "owner_char_scope": [
+            0,
+            54374
+          ]
+        },
+        {
+          "family": "tox",
+          "arms": [
+            "retrieval_text"
+          ],
+          "native_rows_range": [
+            98,
+            104
+          ],
+          "acquired_source_bytes_range": [
+            49363,
+            51986
+          ],
+          "owner_char_scope": [
+            0,
+            54374
+          ]
+        }
+      ]
+    },
+    "new08_boundary": {
+      "classification": "post_hoc_span_diagnostic_not_a_changed_score",
+      "fact_id": "F2",
+      "source": "docs/config.rst",
+      "new20_frozen_pool_score_per_arm": [
+        25,
+        26
+      ],
+      "witness1_byte_interval_half_open": [
+        7121,
+        7242
+      ],
+      "adjacent_native_spans": [
+        [
+          6800,
+          7231
+        ],
+        [
+          7231,
+          7759
+        ]
+      ],
+      "main_pool_ranks": [
+        4,
+        2
+      ],
+      "witness2_byte_interval_half_open": [
+        7471,
+        7632
+      ],
+      "witness2_frozen_covered": true,
+      "exact_adjacent_source_bytes_present": true,
+      "witness1_inside_either_individual_snippet": false,
+      "witness1_inside_exact_concatenation": true,
+      "interpretation": "The unchanged NEW20 oracle requires each literal witness inside one snippet. The first F2 witness crosses a snippet boundary; the frozen miss is not evidence that retrieval omitted its source bytes."
+    }
+  },
+  "failed_attempt": {
+    "run_id": 40954589560,
+    "tested_sha": "d38322439f3bf8d561c933ff6021d046d280d413",
+    "artifact_id": 12933662046,
+    "artifact_zip_sha256": "9f2e2adfa14cc8cd065775cd01147ec5d917440a59a77efaef1d12b9b30465fc",
+    "quality_verdict": "not_assessable_incomplete_collector",
+    "benchmark_context_calls": 72,
+    "scope_controls": 3,
+    "total_context_calls": 75,
+    "public_preparations": 9,
+    "paid_model_calls": 0,
+    "holdout_opened": false
+  },
+  "cumulative_accounting_both_attempts": {
+    "benchmark_context_calls": 252,
+    "scope_controls": 6,
+    "total_context_calls": 258,
+    "public_preparations": 36,
+    "paid_answering_model_calls": 0
+  },
+  "completed_run_container_memory": {
+    "ceiling_bytes": 1500000000,
+    "peak_bytes": {
+      "main": 1309753344,
+      "retrieval_text": 1274888192,
+      "rrf": 1151655936
+    },
+    "oom_events": {
+      "main": 0,
+      "retrieval_text": 0,
+      "rrf": 0
+    },
+    "oom_kill_events": {
+      "main": 0,
+      "retrieval_text": 0,
+      "rrf": 0
+    },
+    "interpretation": "Includes verbose evaluation receipts; not a production memory benchmark."
+  },
+  "unchanged_after_evaluation": [
+    "retrieval algorithms",
+    "questions",
+    "gold",
+    "corpus",
+    "source spans",
+    "MiniLM",
+    "budgets",
+    "public MCP schema",
+    "default main"
+  ]
+}
