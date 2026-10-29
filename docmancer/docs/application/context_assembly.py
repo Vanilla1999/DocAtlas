@@ -1,7 +1,8 @@
 """Context Assembly: reversible layouts after selection, before MCP delivery.
 
-No retrieval, model calls, evidence pruning or permission changes. The current
-standalone object format remains the default until answering-model A/B passes.
+No retrieval, model calls, evidence pruning or permission changes. Adaptive assembly is the default for explicitly enabled compact-text clients;
+the old literal object remains an explicit rollback. This does not assert that
+an answering model can always understand table layouts equally well.
 All legends, original references and source capabilities stay in the text.
 """
 from __future__ import annotations
@@ -151,7 +152,7 @@ def assemble_context(text: str, *, policy: str | None = None) -> str:
     Deterministic ties prefer literal, then grouped, table, grouped-table.
     No approximate score cutoff. No assumption that smaller means sufficient.
     """
-    policy = policy if policy is not None else os.environ.get("DOCATLAS_CONTEXT_ASSEMBLY", "literal")
+    policy = policy if policy is not None else os.environ.get("DOCATLAS_CONTEXT_ASSEMBLY", "adaptive")
     if policy not in POLICIES:
         raise ValueError("invalid_DOCATLAS_CONTEXT_ASSEMBLY")
     if policy == "literal":

@@ -1,0 +1,94 @@
+name: Default adaptive Context Assembly - installed and replay
+
+on:
+  push:
+    branches: [fix/default-adaptive-context-20261029]
+    paths:
+      - 'docmancer/docs/application/context_assembly.py'
+      - 'eval/opencode_compat/installed_stdio.py'
+      - 'eval/context_assembly/default_rollout.py'
+      - '.github/workflows/context-assembly-default.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze selection, original texts, model-view code and dependencies
+        run: |
+          set -euo pipefail
+          git fetch -q origin 0f2c2023c2242b32728b37065f0afe006aacf519 --depth=1
+          git diff --exit-code 0f2c2023c2242b32728b37065f0afe006aacf519 HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/facet_selection.py docmancer/docs/application/standalone_text_view.py docmancer/docs/application/model_context_view.py eval/context_assembly/questions20.json eval/context_assembly/paid_probe.py eval/prepared_model_comparison40
+          python -m compileall -q docmancer eval/opencode_compat eval/context_assembly
+          mkdir -p "$RUNNER_TEMP/evidence" "$RUNNER_TEMP/previous"
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence/head.txt"
+      - name: Fetch immutable real-context data from PR 236
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12854973201/zip" > "$RUNNER_TEMP/previous/audit.zip"
+          echo "bdae367e4c76840c07c5141a7fb7ce3e1b519a58c5ab76149971be0dde60dd68  $RUNNER_TEMP/previous/audit.zip" | sha256sum -c -
+      - name: Build exact installed wheel and provision MiniLM
+        run: docker build -f eval/context_assembly/Dockerfile -t docatlas-adaptive-default .
+      - name: Real cold stdio + 77 frozen contexts with no local MiniLM
+        run: |
+          set -uo pipefail
+          docker run --name default-no-minilm --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/evidence:/evidence" \
+            -v "$RUNNER_TEMP/previous:/previous:ro" \
+            --entrypoint /bin/sh docatlas-adaptive-default -ec '
+              /opt/venv/bin/python -I /repo/eval/opencode_compat/installed_stdio.py --out /evidence/no-minilm
+              /opt/venv/bin/python -I /repo/eval/context_assembly/default_rollout.py --archive /previous/audit.zip --out /evidence/recorded
+              cat /sys/fs/cgroup/memory.max > /evidence/no-minilm-memory.max
+              cat /sys/fs/cgroup/memory.peak > /evidence/no-minilm-memory.peak
+              cat /sys/fs/cgroup/memory.events > /evidence/no-minilm-memory.events
+              test "$(cat /sys/fs/cgroup/memory.swap.max)" = 0
+              test "$(awk "/^oom_kill / {print \$2}" /sys/fs/cgroup/memory.events)" = 0
+              test "$(cat /sys/fs/cgroup/memory.peak)" -le "$(cat /sys/fs/cgroup/memory.max)"
+            '
+          rc=$?
+          docker inspect default-no-minilm > "$RUNNER_TEMP/evidence/no-minilm-container.json"
+          echo "$rc" > "$RUNNER_TEMP/evidence/no-minilm-exit.txt"
+          exit "$rc"
+      - name: Same real stdio with provisioned MiniLM, no swap, 1.5 GB
+        run: |
+          set -uo pipefail
+          docker run --name default-with-minilm --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            -e HF_HUB_OFFLINE=1 -e DOCATLAS_MINILM_MODEL_DIR=/model \
+            -v "$RUNNER_TEMP/evidence:/evidence" \
+            --entrypoint /bin/sh docatlas-adaptive-default -ec '
+              /opt/venv/bin/python -I /repo/eval/opencode_compat/installed_stdio.py --out /evidence/with-minilm
+              cat /sys/fs/cgroup/memory.max > /evidence/with-minilm-memory.max
+              cat /sys/fs/cgroup/memory.peak > /evidence/with-minilm-memory.peak
+              cat /sys/fs/cgroup/memory.events > /evidence/with-minilm-memory.events
+              test "$(cat /sys/fs/cgroup/memory.swap.max)" = 0
+              test "$(awk "/^oom_kill / {print \$2}" /sys/fs/cgroup/memory.events)" = 0
+              test "$(cat /sys/fs/cgroup/memory.peak)" -le "$(cat /sys/fs/cgroup/memory.max)"
+            '
+          rc=$?
+          docker inspect default-with-minilm > "$RUNNER_TEMP/evidence/with-minilm-container.json"
+          echo "$rc" > "$RUNNER_TEMP/evidence/with-minilm-exit.txt"
+          exit "$rc"
+      - name: State unmeasured provider and answer behavior
+        if: always()
+        run: |
+          printf '%s\n' '{"provider_usage":null,"paid_model_calls":0,"full_opencode_session":false,"answer_quality":"NOT_TESTED"}' > "$RUNNER_TEMP/evidence/provider-boundary.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: adaptive-default-${{ github.run_id }}
+          path: ${{ runner.temp }}/evidence/
+          retention-days: 30
+          if-no-files-found: error
