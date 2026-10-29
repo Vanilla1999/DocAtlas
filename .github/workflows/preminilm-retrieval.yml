@@ -1,0 +1,199 @@
+name: Pre-MiniLM retrieval paired experiment
+
+on:
+  push:
+    branches: [experiment/preminilm-retrieval-20261029]
+    paths:
+      - 'docmancer/core/**'
+      - 'docmancer/retrieval/**'
+      - 'eval/preminilm_retrieval/**'
+      - '.github/workflows/preminilm-retrieval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preminilm-retrieval-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  paired:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      BASELINE_SHA: 542900e573835aa17a3a21da924a0f7ed400bece
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze code, policies and unopened evaluation inputs
+        run: |
+          set -euo pipefail
+          git fetch -q origin "$BASELINE_SHA" --depth=1
+          git diff --exit-code "$BASELINE_SHA" HEAD -- \
+            pyproject.toml uv.lock docmancer/docs docmancer/mcp \
+            docmancer/core/_sqlite_store_active_fts.py \
+            docmancer/core/_sqlite_store_filter_metadata.py \
+            docmancer/core/_sqlite_store_part01.py \
+            docmancer/core/_sqlite_store_part02.py \
+            docmancer/core/_sqlite_store_part04.py \
+            docmancer/core/_sqlite_store_part05.py \
+            docmancer/core/_sqlite_store_shared.py \
+            docmancer/core/structured_chunking.py \
+            docmancer/retrieval/fusion.py \
+            docmancer/retrieval/contextual_indexing.py \
+            eval/prepared_model_comparison40 eval/heuristic_removal_holdout \
+            eval/evidence_quality_v2/runtime.py eval/heuristic_removal/receipts.py \
+            eval/heuristic_removal/assess.py \
+            eval/context_assembly
+          mkdir -p "$RUNNER_TEMP/preminilm-evidence" "$RUNNER_TEMP/preminilm-baseline"
+          git archive "$BASELINE_SHA" | tar -x -C "$RUNNER_TEMP/preminilm-baseline"
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          root = Path.cwd()
+          paths = set()
+          for relative in (
+              'docmancer', 'eval/preminilm_retrieval',
+              'eval/prepared_model_comparison40',
+              'eval/heuristic_removal_holdout/corpus',
+              'eval/heuristic_removal_holdout/sealed',
+          ):
+              paths.update(p for p in (root / relative).rglob('*') if p.is_file())
+          for relative in (
+              'pyproject.toml', 'uv.lock',
+              'eval/heuristic_removal_holdout/INTERFACE.md',
+              'eval/heuristic_removal_holdout/FREEZE_MANIFEST.json',
+              'eval/heuristic_removal_holdout/source-manifest.json',
+              'eval/heuristic_removal_holdout/rubric.json',
+              'eval/evidence_quality_v2/runtime.py',
+              'eval/heuristic_removal/receipts.py',
+              'eval/heuristic_removal/assess.py',
+              'eval/context_assembly/Dockerfile', 'eval/context_assembly/run.py',
+              '.github/workflows/preminilm-retrieval.yml',
+              'docs/preminilm-retrieval-research.md',
+          ):
+              paths.add(root / relative)
+          # Sealed files are hashed as opaque bytes here, not parsed or printed.
+          hashes = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in sorted(paths)}
+          freeze = {
+              'schema_version': 1,
+              'baseline_sha': os.environ['BASELINE_SHA'],
+              'candidate_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'frozen_at_utc': datetime.now(timezone.utc).isoformat(),
+              'code_config_frozen': True, 'holdout_open_after_freeze': True,
+              'inputs_sha256': hashes,
+              'arms': {
+                  'main': {'policy': 'main', 'raw_row_allocation': [256]},
+                  'retrieval_text': {'policy': 'retrieval_text', 'raw_row_allocation': [256]},
+                  'rrf': {'policy': 'rrf', 'raw_row_allocation': [128, 128], 'rrf_k': 60},
+              },
+              'datasets': ['v40', 'new20'],
+              'expected_context_calls': 180, 'expected_benchmark_context_calls': 180,
+              'expected_scope_controls': 3, 'expected_total_context_calls': 183,
+              'expected_preparations': 27,
+              'paid_model_calls': 0, 'provider_usage': None,
+              'tuning_after_holdout': False,
+          }
+          target = Path(os.environ['RUNNER_TEMP']) / 'preminilm-evidence/PREMINILM_FREEZE.json'
+          target.write_text(json.dumps(freeze, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps({k: v for k, v in freeze.items() if k != 'inputs_sha256'}))
+          PY
+          python -m compileall -q docmancer/core docmancer/retrieval eval/preminilm_retrieval
+      - name: Build exact wheel and provision the unchanged pinned ONNX MiniLM
+        run: docker build -f eval/context_assembly/Dockerfile -t docatlas-preminilm .
+      - name: Build the exact main baseline with the same dependencies
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$RUNNER_TEMP/preminilm-baseline:/baseline:ro" \
+            -v "$RUNNER_TEMP/preminilm-evidence:/evidence" \
+            --entrypoint /bin/sh docatlas-preminilm -ec '
+              mkdir -p /evidence/wheels/candidate /evidence/wheels/baseline
+              cp /wheels/*.whl /evidence/wheels/candidate/
+              uv build --wheel --out-dir /evidence/wheels/baseline /baseline
+              sha256sum /evidence/wheels/candidate/*.whl /evidence/wheels/baseline/*.whl > /evidence/WHEELS.sha256
+              find /model -type f -exec sha256sum {} + > /evidence/MODEL.sha256
+            '
+      - name: Three sequential installed arms with the same absolute fixture paths
+        run: |
+          set +e
+          overall_status=0
+          for experiment_arm in main retrieval_text rrf; do
+            docker run -i --name "preminilm-$experiment_arm" \
+              --network none --cpus=2 --memory=1500000000 --memory-swap=1500000000 \
+              -e EXPERIMENT_ARM="$experiment_arm" -e TESTED_SHA="$(git rev-parse HEAD)" \
+              -e BASELINE_SHA="$BASELINE_SHA" -e HF_HUB_OFFLINE=1 \
+              -v "$RUNNER_TEMP/preminilm-baseline:/baseline:ro" \
+              -v "$RUNNER_TEMP/preminilm-evidence:/evidence" \
+              --entrypoint /bin/sh docatlas-preminilm -s <<'SH'
+          set -eu
+          arm_out="/evidence/$EXPERIMENT_ARM"
+          finish() {
+            runtime_status=$?
+            trap - EXIT
+            mkdir -p "$arm_out"
+            cat /sys/fs/cgroup/memory.max > "$arm_out/MEMORY_MAX"
+            cat /sys/fs/cgroup/memory.peak > "$arm_out/MEMORY_PEAK"
+            cat /sys/fs/cgroup/memory.events > "$arm_out/MEMORY_EVENTS"
+            cat /sys/fs/cgroup/memory.swap.max > "$arm_out/SWAP_MAX"
+            if [ "$(cat "$arm_out/SWAP_MAX")" != 0 ]; then runtime_status=1; fi
+            if [ "$(awk '$1 == "oom_kill" {print $2}' "$arm_out/MEMORY_EVENTS")" != 0 ]; then runtime_status=1; fi
+            if [ "$(cat "$arm_out/MEMORY_PEAK")" -gt "$(cat "$arm_out/MEMORY_MAX")" ]; then runtime_status=1; fi
+            printf '%s\n' "$runtime_status" > "$arm_out/RUNTIME_EXIT_CODE"
+            exit "$runtime_status"
+          }
+          trap finish EXIT
+          experiment_python=/opt/venv/bin/python
+          source_root=/repo
+          wheel_root=/evidence/wheels/candidate
+          if [ "$EXPERIMENT_ARM" = main ]; then
+            /opt/venv/bin/python -m venv --without-pip /tmp/baseline-venv
+            uv pip install --offline --no-deps --python /tmp/baseline-venv/bin/python /evidence/wheels/baseline/*.whl
+            /opt/venv/bin/python -I - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import sysconfig
+          target = subprocess.check_output([
+              '/tmp/baseline-venv/bin/python', '-I', '-c',
+              "import sysconfig; print(sysconfig.get_path('purelib'))",
+          ], text=True).strip()
+          Path(target, 'shared-frozen-dependencies.pth').write_text(
+              sysconfig.get_path('purelib') + '\n', encoding='utf-8')
+          PY
+            experiment_python=/tmp/baseline-venv/bin/python
+            source_root=/baseline
+            wheel_root=/evidence/wheels/baseline
+          fi
+          "$experiment_python" -I /repo/eval/preminilm_retrieval/run.py \
+            --repo /repo --source-root "$source_root" --wheel "$wheel_root"/*.whl \
+            --python "$experiment_python" --arm "$EXPERIMENT_ARM" --datasets v40,new20 \
+            --work /work --out "$arm_out" --freeze /evidence/PREMINILM_FREEZE.json
+          SH
+            arm_status=$?
+            docker inspect "preminilm-$experiment_arm" > "$RUNNER_TEMP/preminilm-evidence/$experiment_arm/CONTAINER.json"
+            if [ "$arm_status" != 0 ]; then overall_status=1; fi
+          done
+          exit "$overall_status"
+      - name: Compare saved evidence without changing any arm or threshold
+        if: always()
+        run: |
+          docker run --rm --network none --cpus=2 --memory=1500000000 --memory-swap=1500000000 \
+            -v "$RUNNER_TEMP/preminilm-evidence:/evidence" \
+            --entrypoint /opt/venv/bin/python docatlas-preminilm -I \
+            /repo/eval/preminilm_retrieval/analyze.py --repo /repo \
+            --runs /evidence --out /evidence/COMPARISON.json \
+            --freeze /evidence/PREMINILM_FREEZE.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: preminilm-retrieval-${{ github.run_id }}
+          path: ${{ runner.temp }}/preminilm-evidence/
+          retention-days: 30
+          if-no-files-found: error

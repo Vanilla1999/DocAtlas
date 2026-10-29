@@ -83,9 +83,13 @@ class _RetrievalDispatcherPart01:
         from .experimental_acquisition import (
             ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
             ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+            acquisition_method, acquisition_policy_config, resolve_acquisition_policy,
         )
 
         q_active = effective_mode == "lexical"
+        acquisition_policy = resolve_acquisition_policy()
+        if not q_active and acquisition_policy != "main":
+            raise ValueError("experimental_acquisition_requires_lexical_mode")
         limit = min(40, limit or self.config.query.default_limit)
         budget = budget or self.config.query.default_budget
         per_source_limit = min(40, max(limit * 3, 20))
@@ -122,14 +126,20 @@ class _RetrievalDispatcherPart01:
             },
         })
         if q_active:
-            fusion_config_hash = canonical_hash({
+            acquisition_config = {
                 "schema_version": ACQUISITION_METHOD,
                 "candidate_ceiling": ACQUISITION_CANDIDATES,
                 "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
                 "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
                 "expansion": retrieval_expand or "none",
                 "source_quota": self.config.retrieval.max_sections_per_source,
-            })
+            }
+            if acquisition_policy != "main":
+                acquisition_config.update(
+                    schema_version=acquisition_method(acquisition_policy),
+                    **acquisition_policy_config(acquisition_policy),
+                )
+            fusion_config_hash = canonical_hash(acquisition_config)
 
         def finalized(result: DispatchResult) -> DispatchResult:
             result.query_plan_hash = query_plan.plan_hash
@@ -154,9 +164,13 @@ class _RetrievalDispatcherPart01:
             return result
 
         if q_active:
+            acquisition_options = (
+                {"acquisition_policy": acquisition_policy}
+                if acquisition_policy != "main" else {}
+            )
             chunks = self.store.acquire_candidates(
                 query, expand=retrieval_expand or "none",
-                filters=backend_filters,
+                filters=backend_filters, **acquisition_options,
             )
             acquired_count = len(chunks)
             chunks = self._filter_chunks(chunks, merged_filters)

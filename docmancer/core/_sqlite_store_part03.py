@@ -222,25 +222,36 @@ class _SQLiteStorePart03:
     def acquire_candidates(
         self, text: str, *, expand: str | None = None,
         filters: dict[str, Any] | None = None,
+        acquisition_policy: str | None = None,
     ) -> list[RetrievedChunk]:
         """Internal acquisition; public delivery caps do not shrink this pool."""
+        from docmancer.retrieval.experimental_acquisition import resolve_acquisition_policy
+
         return self._query_bm25_candidates(
             text, expand=expand or "none", filters=filters,
+            acquisition_policy=resolve_acquisition_policy(acquisition_policy),
         )
 
     def _query_bm25_candidates(
         self, text: str, *, expand: str,
         filters: dict[str, Any] | None,
+        acquisition_policy: str = "main",
     ) -> list[RetrievedChunk]:
         """Acquire bounded native children independently of the delivery budget."""
         from docmancer.retrieval.experimental_acquisition import (
             ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
-            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+            ACQUISITION_RRF_K, ACQUISITION_TEXT_BYTES, acquisition_method,
         )
 
         if expand not in {"none", "adjacent", "page"}:
             raise ValueError("expand must be none, adjacent or page")
-        rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
+        method = acquisition_method(acquisition_policy)
+        search_diagnostics: dict[str, Any] = {}
+        rows = self._search_rows(
+            text, ACQUISITION_CANDIDATES, filters=filters,
+            acquisition_policy=acquisition_policy,
+            acquisition_diagnostics=search_diagnostics,
+        )
         native_count = len(rows)
         # Keep all native hits first. Expansion appends existing source windows,
         # never synthetic scores or a second semantic retrieval.
@@ -271,7 +282,7 @@ class _SQLiteStorePart03:
             ):
                 skipped += 1
                 continue
-            selected.append({**row, "_bm25_rank": raw_rank})
+            selected.append({**row, "_acquisition_rank": raw_rank})
             token_total += tokens
             byte_total += text_bytes
 
@@ -279,8 +290,8 @@ class _SQLiteStorePart03:
         savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - token_total / raw_tokens))
         runway = 1.0 if token_total <= 0 else raw_tokens / token_total
         acquisition = {
-            "method": ACQUISITION_METHOD,
-            "sql_rows": native_count,
+            "method": method,
+            "sql_rows": search_diagnostics.get("raw_rows_sum", native_count),
             "candidate_ceiling": ACQUISITION_CANDIDATES,
             "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
             "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
@@ -290,10 +301,15 @@ class _SQLiteStorePart03:
             "resource_skipped_rows": skipped,
             "expansion": expand,
         }
+        # The default receipt remains byte-for-byte shaped as before. Only the
+        # explicit experiment publishes its additional acquisition accounting.
+        if acquisition_policy != "main":
+            acquisition.update(search_diagnostics)
         results: list[RetrievedChunk] = []
         for row in selected:
             cost = float(row["rank"])
-            rank = int(row["_bm25_rank"])
+            rank = int(row["_acquisition_rank"])
+            utility = float(row.get("_rrf_score", -cost))
             metadata = json.loads(row["metadata_json"] or "{}")
             if "_expansion_anchor_id" in row:
                 metadata["expansion"] = {
@@ -312,10 +328,10 @@ class _SQLiteStorePart03:
                     "section_id": int(row["id"]),
                     "score_direction": "higher_is_better",
                     "raw_component_ranks": {"fts5_bm25_cost": cost},
-                    "base_utility": -cost, "feature_contributions": {},
-                    "final_utility": -cost, "raw_rank": rank,
+                    "base_utility": utility, "feature_contributions": {},
+                    "final_utility": utility, "raw_rank": rank,
                     "final_rank": rank, "rank_delta": 0,
-                    "candidate_pool_size": len(rows), "method": ACQUISITION_METHOD,
+                    "candidate_pool_size": len(rows), "method": method,
                 },
                 "lexical_match": self._lexical_match_trace(
                     text, title=str(row["title"]), body=str(row["text"]),
@@ -323,6 +339,22 @@ class _SQLiteStorePart03:
                     mode="or", bm25_cost=cost,
                 ),
             })
+            if "_rrf_score" in row:
+                # Fusion utility is not a BM25 cost. Preserve the component
+                # costs/ranks explicitly rather than relabelling the sum.
+                metadata["ranking"].update(
+                    raw_component_ranks=dict(row["_component_ranks"]),
+                    component_bm25_costs=dict(row["_component_bm25_costs"]),
+                    rrf_k=ACQUISITION_RRF_K,
+                )
+                metadata["lexical_match"].pop("bm25_cost", None)
+                metadata["lexical_match"].update(
+                    mode="two_view_rrf", lexical_score=utility,
+                    component_bm25_costs=dict(row["_component_bm25_costs"]),
+                    component_ranks=dict(row["_component_ranks"]),
+                )
+            elif acquisition_policy == "retrieval_text":
+                metadata["lexical_match"]["mode"] = "retrieval_text_or"
             if "expansion" in metadata:
                 metadata["ranking"] = {
                     "method": "source_expansion", "final_rank": rank,
@@ -331,7 +363,7 @@ class _SQLiteStorePart03:
                 metadata.pop("lexical_match", None)
             results.append(RetrievedChunk(
                 source=row["source"], chunk_index=int(row["chunk_index"]),
-                text=row["text"], score=-cost, metadata=metadata,
+                text=row["text"], score=utility, metadata=metadata,
             ))
         return results
 
@@ -520,6 +552,8 @@ class _SQLiteStorePart03:
         limit: int,
         *,
         filters: dict[str, Any] | None = None,
+        acquisition_policy: str = "main",
+        acquisition_diagnostics: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         cleaned = self._strip_stopwords(query)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
@@ -528,22 +562,37 @@ class _SQLiteStorePart03:
         literal_terms = [f'"{token}"' for token in terms]
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         from docmancer.retrieval.experimental_acquisition import (
-            ACQUISITION_CANDIDATES,
+            ACQUISITION_CANDIDATES, ACQUISITION_RRF_K,
+            acquisition_view_limits, resolve_acquisition_policy,
         )
 
+        policy = resolve_acquisition_policy(acquisition_policy)
+        views = acquisition_view_limits(policy, limit)
+        view_rows: dict[str, list[dict[str, Any]]] = {}
+        sql_calls = 0
         with self._connect() as conn:
+            if policy == "rrf" and not conn.in_transaction:
+                # Capture active generation and both ranked views in one read
+                # snapshot, even if another connection activates a generation.
+                # MemberReadStore already begins its read-only snapshot.
+                conn.execute("BEGIN")
             active_generation = self._active_generation_id(conn)
-            if not active_generation:
-                return []
-            if not literal_terms:
-                return []
-            rows = list(conn.execute(
-                f"""
+            for view, view_limit in views.items():
+                view_rows[view] = []
+                if not active_generation or not literal_terms or not view_limit:
+                    continue
+                expression = " OR ".join(literal_terms)
+                bm25_expression = "bm25(retrieval_children_fts)"
+                if view == "retrieval_text":
+                    expression = f"retrieval_text : ({expression})"
+                    bm25_expression = "bm25(retrieval_children_fts, 0.0, 1.0, 0.0)"
+                fetched = list(conn.execute(
+                    f"""
                 SELECT sections.hydration_id AS id, sections.*,
                        sections.display_text AS text,
                        sections.display_token_estimate AS token_estimate,
                        sections.display_content_hash AS content_hash,
-                       bm25(retrieval_children_fts) AS rank
+                       {bm25_expression} AS rank
                 FROM retrieval_children_fts
                 JOIN retrieval_children AS sections
                   ON sections.id = retrieval_children_fts.rowid
@@ -554,10 +603,53 @@ class _SQLiteStorePart03:
                          sections.stable_chunk_id
                 LIMIT ?
                 """,
-                (" OR ".join(literal_terms), active_generation, *filter_params,
-                 min(limit, ACQUISITION_CANDIDATES)),
+                    (expression, active_generation, *filter_params, view_limit),
+                ))
+                sql_calls += 1
+                view_rows[view] = self._mark_lexical_mode(fetched, "or")
+
+        if policy != "rrf":
+            rows = next(iter(view_rows.values()))
+        else:
+            from docmancer.retrieval.fusion import reciprocal_rank_fusion
+
+            by_identity: dict[str, dict[str, Any]] = {}
+            component_costs: dict[str, dict[str, float]] = {}
+            for view, fetched in view_rows.items():
+                for row in fetched:
+                    identity = self._lexical_row_identity(row)
+                    if identity in by_identity and by_identity[identity]["id"] != row["id"]:
+                        raise ValueError("acquisition_fusion_identity_collision")
+                    by_identity.setdefault(identity, row)
+                    row["_fusion_id"] = identity
+                    component_costs.setdefault(identity, {})[view] = float(row["rank"])
+            fused = reciprocal_rank_fusion(
+                view_rows, k_rrf=ACQUISITION_RRF_K, id_key="_fusion_id",
+            )
+            fused.sort(key=lambda item: (
+                -item[1], str(by_identity[item[0]]["source"]),
+                int(by_identity[item[0]]["chunk_index"]), item[0],
             ))
-            return self._mark_lexical_mode(rows, "or")
+            rows = [{**by_identity[identity], "_rrf_score": score,
+                     "_component_ranks": ranks,
+                     "_component_bm25_costs": component_costs[identity]}
+                    for identity, score, ranks in fused]
+
+        if policy != "main" and acquisition_diagnostics is not None:
+            acquisition_diagnostics.update({
+                "policy": policy, "sql_calls": sql_calls,
+                "sql_calls_measure": "fts_match_statements",
+                "per_view_limits": views,
+                "per_view_rows": {view: len(rows) for view, rows in view_rows.items()},
+                "raw_rows_sum": sum(map(len, view_rows.values())),
+                "unique_count": len(rows),
+                "saturation": {view: len(view_rows[view]) == count and count > 0
+                               for view, count in views.items()},
+                "aggregate_row_budget": min(limit, ACQUISITION_CANDIDATES),
+            })
+            if policy == "rrf":
+                acquisition_diagnostics["rrf_k"] = ACQUISITION_RRF_K
+        return rows
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:
