@@ -577,11 +577,9 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
         "Read documentation for one concrete question. If documentation-language mode is enabled "
         "and the bound source language is unknown, call docs_status(include_language=true) BEFORE this tool; "
-        "otherwise call directly. Bind a target before retrieval: for current project docs pass "
-        "project_path as the KNOWN ABSOLUTE repository root from the selected workspace; for registered "
-        "library docs pass library. Neither target is inferred from question text or server CWD. "
-        "If unknown, ask the user to select the target. A missing target is an argument error, "
-        "not proof that documentation lacks an answer. "
+        "otherwise call directly. For current project docs set project_path to KNOWN ABSOLUTE "
+        "repo root; for registered docs set library. Never infer target from question/CWD; "
+        "ask if unknown. "
         "question is only the unchanged user question, not paths or task instructions. "
         "search_question is a full translation in the declared doc language; preserve technical literals, "
         "negation and conditions. It uses one of five explicit same-question lookup slots and drives MiniLM. "
@@ -611,8 +609,8 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "question": {"type": "string", "minLength": 1},
             "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
-            "project_path": {"type": ["string", "null"], "description": "For documents in the selected current project, set to the KNOWN ABSOLUTE repository root; never infer from question or MCP server CWD. Omit for explicit library-only queries."},
-            "library": {"type": ["string", "null"], "description": "Registered library target for a library-only lookup. Either this or a known project_path must be provided."},
+            "project_path": {"type": ["string", "null"], "description": "Known absolute root of selected project; never infer from CWD."},
+            "library": {"type": ["string", "null"], "description": "Explicit registered library target for library-only calls."},
             "version": {"type": ["string", "null"]},
             "module_path": {"type": ["string", "null"]},
             "scope": {
@@ -626,7 +624,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         # return a structured docs_context_target_missing tool error with
         # actionable hints; schema anyOf is rejected first by the SDK and
         # replaced with an unstructured generic error.
-        "description": "A nonempty project_path OR library target is required. For current workspace documents pass the known absolute project root in project_path; for an explicitly chosen registered library use library. Targetless calls receive docs_context_target_missing and must correct the binding.",
+        "description": "Target required: known absolute project_path or explicit library. No implicit CWD binding; otherwise docs_context_target_missing.",
         "additionalProperties": False,
     },
     "prepare_docs": {
