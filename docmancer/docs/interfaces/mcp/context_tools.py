@@ -374,6 +374,14 @@ def _handle_prepared_context_tool(
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    # Preserve the operational validation failure before evidence projection.
+    # Otherwise invalid_request/docs_context_target_missing becomes an empty
+    # docs_answer and a misleading semantic insufficient_evidence verdict.
+    if raw.get("status") == "invalid_request":
+        return _bad_request(
+            str(raw.get("reason_code") or "invalid_docs_context_request"),
+            str(raw.get("message") or "Invalid documentation target or arguments; fix the binding and retry."),
+        )
     record_translation(raw, question, args.get("search_question"))
     # Check the original operational decision before support/recovery decoration
     # can overwrite its reason or retain a previously admitted partial quote.
