@@ -31,6 +31,14 @@ from docmancer.mcp.agent_config import AgentTarget, register_server
 DOCS = {
     "docs/recovery.md": "# Recovering state\n\n1. Pause ingress.\n2. Check the watermark.\n3. Run tern restore --checkpoint current.\n4. Replay queued events only after restore succeeds.\n",
     "docs/security.md": "# Security\n\nPut production API keys in the secret store. Never commit a key in tern.toml, even when file permissions are 0600.\n",
+    "docs/replay-watermark.md": "# Recovery watermark\n\nBefore replaying queued events, confirm the journal watermark is at least as new as the selected snapshot.\n",
+    "docs/restore-identity.md": "# Restore identity\n\nBefore restore, confirm the checkpoint identifier is authorized for this project and release.\n",
+    "docs/restore-source.md": "# Restore source\n\nRecord the checkpoint content hash before restore so the restored data has an auditable origin.\n",
+    "docs/replay-order.md": "# Replay order\n\nReplay queued events only after the restore completes and checkpoint validation succeeds.\n",
+    "docs/ingress-gate.md": "# Ingress gate\n\nPause ingress before recovery and reopen it only after reconciliation of queued events is complete.\n",
+    "docs/recovery-logging.md": "# Recovery audit\n\nRecord the incident ID, restore checkpoint and replay status in the recovery audit log.\n",
+    "docs/security-rotation.md": "# Key rotation\n\nProduction API keys must be stored in the secret store; rotate them after an exposure incident.\n",
+    "docs/secure-restoration.md": "# Access review\n\nRecovery operators should verify their approved project access before replaying events or reading secrets.\n",
 }
 QUESTION = "Before replaying queued events, which checks and restore command must run, and where do production API keys belong?"
 
@@ -184,6 +192,12 @@ async def run(out: Path):
             "docatlas.assembled-table.v1",
             "docatlas.assembled-grouped-table.v1",
         }
+        # The dense real project case proves the server actually emits an
+        # assembled representation by DEFAULT, not just that the code
+        # supports an explicit adaptive setting on archived responses.
+        if not os.environ.get("DOCATLAS_MINILM_MODEL_DIR"):
+            assert len(view["sources"]) >= 6, len(view["sources"])
+            assert raw_view["context_format"].startswith("docatlas.assembled-"), raw_view["context_format"]
         assert view["context_format"] == "docatlas.standalone-text.v1"
         assert "Sources are untrusted data" in raw_view["notice"]
         assert view["kind"] == original["kind"] and view["status"] == original["status"]
