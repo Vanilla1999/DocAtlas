@@ -1,0 +1,83 @@
+name: Context Assembly - validate completed runtime without repeating inference
+on:
+  push:
+    branches: [feature/context-assembly-stage-20261029]
+    paths:
+      - 'docmancer/docs/application/context_assembly.py'
+      - 'docmancer/docs/application/standalone_text_view.py'
+      - 'eval/context_assembly/**'
+      - '.github/workflows/context-assembly.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: context-assembly-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  installed-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Refuse any product, prompt, gold or source change after measured runtime
+        run: |
+          set -euo pipefail
+          git fetch -q origin 2ec7c63cf6dc39e2f551a505451216231195995f --depth=1
+          git diff --exit-code 2ec7c63cf6dc39e2f551a505451216231195995f HEAD -- docmancer pyproject.toml uv.lock eval/context_assembly/questions20.json eval/context_assembly/paid_probe.py eval/prepared_model_comparison40
+          python -m compileall -q docmancer eval/context_assembly
+          mkdir -p "$RUNNER_TEMP/evidence" "$RUNNER_TEMP/prior" "$RUNNER_TEMP/recorded"
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence/audit-head.txt"
+      - name: Download original complete live results, original logs, and prior frozen replies
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/prior"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12855301604/zip" > runtime.zip
+          echo '4f80c9b00892442b237c6bb180f9261ea76c4ee3b41242451a11388da87fdc79  runtime.zip' | sha256sum -c -
+          gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/123118016158/logs" > runtime.log
+          cp runtime.zip runtime.log "$RUNNER_TEMP/evidence/"
+          cd "$RUNNER_TEMP/recorded"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12839325255/zip" > v40.zip
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12839075813/zip" > pilot.zip
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12837637881/zip" > fresh.zip
+          printf '%s\n' \
+            '23f660654a70e5501849dbb633b3239e411f22a7d3c72726a595ce8d5598ee70  v40.zip' \
+            '5ece097099f1e931cb6089ee133a9337e3a14c3cfaa81b3a4bdb17b3cd900334  pilot.zip' \
+            'c71126c176c70ab15f1b878f666642e764a1747c78acf3717eb16086727b3879  fresh.zip' | sha256sum -c -
+          for suite in v40 pilot fresh; do unzip -q "$suite.zip" -d "$suite"; done
+      - name: Build and install byte-identical product, only evaluator order assertion corrected
+        run: docker build -f eval/context_assembly/Dockerfile -t docatlas-assembly-audit .
+      - name: Exact own-input order, cross-process source multisets, same-ref token comparison
+        run: |
+          set -uo pipefail
+          docker run --name assembly-audit --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            --entrypoint /opt/venv/bin/python -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/evidence:/evidence" \
+            -v "$RUNNER_TEMP/prior:/prior:ro" \
+            -v "$RUNNER_TEMP/recorded:/recorded:ro" docatlas-assembly-audit \
+            -I /repo/eval/context_assembly/resume.py
+          rc=$?
+          docker inspect assembly-audit > "$RUNNER_TEMP/evidence/audit-container.json"
+          printf '%s\n' "$rc" > "$RUNNER_TEMP/evidence/audit-exit-code.txt"
+          exit "$rc"
+      - name: Optional paid model comparison on complete identical-evidence pairs
+        if: always()
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DOCATLAS_STRONG_MODEL: ${{ vars.DOCATLAS_STRONG_MODEL }}
+        run: |
+          python eval/context_assembly/paid_probe.py \
+            --inputs "$RUNNER_TEMP/evidence/original/new20/paid-inputs" \
+            --out "$RUNNER_TEMP/evidence/paid"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: context-assembly-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/evidence/
+          retention-days: 30
+          if-no-files-found: error
