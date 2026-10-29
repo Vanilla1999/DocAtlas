@@ -127,7 +127,9 @@ def test_runtime_public_schema_and_mcp_validation_preserve_null_docs_route():
     schema = next(tool["inputSchema"] for tool in runtime_public_tool_dicts()
                   if tool["name"] == "get_docs_context")
     service = Service()
-    omitted = {"question": "Patch code before editing"}
+    # Bind the same target for both representation choices; question-only
+    # calls now correctly return docs_context_target_missing.
+    omitted = {"question": "Patch code before editing", "project_path": "/repo"}
     null = {**omitted, "context_format": None}
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(null, schema)

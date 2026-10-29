@@ -181,6 +181,20 @@ def call_docs_tool_payload(
         )
     spec = next(spec for spec in active_surface.tools if spec.name == name)
     validation_schema = spec.validation_schema or spec.input_schema
+    # Fail before opening the member store or projecting empty evidence.
+    # This is an invalid binding, not an answerability/absence verdict. An
+    # explicit library-only query is valid and must not gain a guessed project.
+    if name == "get_docs_context" and not any(
+        isinstance(args.get(field), str) and args[field].strip()
+        for field in ("project_path", "library")
+    ):
+        return build_mcp_error_payload(
+            reason_code="docs_context_target_missing",
+            message="Specify a documentation target: known absolute project_path for current project docs, or an explicit registered library.",
+            tool=name,
+            phase="validation",
+            retryable=False,
+        )
     try:
         jsonschema.validate(args, validation_schema)
     except jsonschema.ValidationError as exc:

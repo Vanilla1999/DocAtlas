@@ -11,6 +11,7 @@ MAX_ERROR_HINTS = 5
 _RETRYABLE_BY_REASON: dict[str, bool | None] = {
     "bad_request": False,
     "validation_error": False,
+    "docs_context_target_missing": False,
     "unknown_tool": False,
     "config_shadowing": False,
     "project_local_config_shadowed": False,
@@ -26,6 +27,11 @@ _RETRYABLE_BY_REASON: dict[str, bool | None] = {
 _HINTS_BY_REASON: dict[str, list[str]] = {
     "bad_request": ["Fix the MCP tool arguments and retry."],
     "validation_error": ["Fix the MCP tool arguments and retry."],
+    "docs_context_target_missing": [
+        "For documentation in the selected current project, pass its known absolute repository root in project_path, leaving question unchanged.",
+        "For a registered library query, pass library instead; do not infer a project from question text or MCP server CWD.",
+        "Correct the target binding and retry; this is not evidence that the documents lack an answer.",
+    ],
     "empty_question": ["Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."],
     "unknown_tool": ["Use list_tools to discover available MCP tools."],
     "config_shadowing": ["Start MCP from the repo config, set DOCATLAS_HOME, or use an explicit override if available."],
@@ -47,6 +53,7 @@ _VALIDATION_REASON_CODES = {
     "invalid_integer",
     "bad_request",
     "validation_error",
+    "docs_context_target_missing",
 }
 
 # Exact diagnostics emitted by the local ingest/sync entry guards, not prose

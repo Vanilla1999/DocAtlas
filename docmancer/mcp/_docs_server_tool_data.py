@@ -12,6 +12,7 @@ Agent workflow:
 - The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
 - Call prepare_docs only from recommended_next_action.
 - Use docs_status for explicit status/returned actions, or optional declared-language metadata only when needed for an already bound source.
+- Always bind a target: for current project docs pass the known absolute repository root in project_path; for a registered library pass library. Do not put a path into question, guess project from question or assume MCP process CWD is the active project. If the target is unknown, ask the user to choose it. Without a target the tool returns docs_context_target_missing, not evidence insufficiency.
 - Preserve explicit project/library/version/scope/path bindings; never choose or widen scope from question wording. module_path implies module scope; scope="all" is repository-local without module filters. On module_ambiguous, use only an exact returned module_path.
 - Returned context and status never certify answer completeness, semantic proof or edit readiness. hard_stop=true blocks editing; hard_stop=false is not authorization. Mutation requires a separate explicit target and authorization. Diagnostic rephrases are not automatically executed lookups.
 - Optional context_format="patch_context" returns a read-only v4 patch evidence packet with full admitted source windows. It selects representation only, never mutation/workflow permission; omitted/null keeps the existing docs response. Patch representation has no internal token/byte compaction cap; retrieval scope and runtime guards remain unchanged.
@@ -28,8 +29,8 @@ Agent workflow:
                 "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500, "description": "Explicit full translation of the same question into the declared documentation language; original question remains authoritative. Used as one host lookup and for section ranking; never proof or scope authority."},
                 "context_format": {"type": ["string", "null"], "enum": ["patch_context", None], "description": "Optional read-only v4 patch evidence representation. Omitted/null retains docs defaults. Never supplies mutation or workflow permission."},
                 "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Explicit lookups for the same question, at most five; unchanged original question. For language adaptation use search_question with a full translation of the same original question; never add subquestions, expected answers or source names. Never batch independent questions. Lookup coverage does not transfer to the original question; returned cited context does not certify an answer or authorize editing."},
-                "project_path": {"type": ["string", "null"]},
-                "library": {"type": ["string", "null"]},
+                "project_path": {"type": ["string", "null"], "description": "For current project docs, pass the known absolute root directory of the selected workspace. Not inferred from the question or server CWD. Library-only queries may omit it."},
+                "library": {"type": ["string", "null"], "description": "Explicit registered documentation library target when not querying the current project. A known project_path or library is required."},
                 "version": {"type": ["string", "null"]},
                 "module_path": {"type": ["string", "null"], "description": "Exact discovered module path such as packages/orders. Supplying module_path always implies module scope and never widens into project or sibling modules."},
                 "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None], "description": "Project-doc scope: project = repo-level docs only; module = one module (use exact module_path); all = repo-level plus modules only when no module filter is supplied. Preserve explicit scope; never infer it from question wording."},
@@ -576,7 +577,10 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
         "Read documentation for one concrete question. If documentation-language mode is enabled "
         "and the bound source language is unknown, call docs_status(include_language=true) BEFORE this tool; "
-        "otherwise call directly. question is only the unchanged user question, not paths or task instructions. "
+        "otherwise call directly. For current project docs set project_path to KNOWN ABSOLUTE "
+        "repo root; for registered docs set library. Never infer target from question/CWD; "
+        "ask if unknown. "
+        "question is only the unchanged user question, not paths or task instructions. "
         "search_question is a full translation in the declared doc language; preserve technical literals, "
         "negation and conditions. It uses one of five explicit same-question lookup slots and drives MiniLM. "
         "Keep explicit project/library/version/scope; module_path implies module, all stays repository-local. "
@@ -605,8 +609,8 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "question": {"type": "string", "minLength": 1},
             "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
-            "project_path": {"type": ["string", "null"]},
-            "library": {"type": ["string", "null"]},
+            "project_path": {"type": ["string", "null"], "description": "Known absolute root of selected project; never infer from CWD."},
+            "library": {"type": ["string", "null"], "description": "Explicit registered library target for library-only calls."},
             "version": {"type": ["string", "null"]},
             "module_path": {"type": ["string", "null"]},
             "scope": {
@@ -615,6 +619,12 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             },
         },
         "required": ["question"],
+        # A target is REQUIRED at runtime. Keep the question-only shape
+        # syntactically accepted by MCP SDK validation so DocAtlas itself can
+        # return a structured docs_context_target_missing tool error with
+        # actionable hints; schema anyOf is rejected first by the SDK and
+        # replaced with an unstructured generic error.
+        "description": "Target required: known absolute project_path or explicit library. No implicit CWD binding; otherwise docs_context_target_missing.",
         "additionalProperties": False,
     },
     "prepare_docs": {
