@@ -112,8 +112,14 @@ The distribution and CLI are named `doc-atlas`, while the Python import namespac
 DocAtlas exposes its local project-constraint and documentation runtime through an MCP docs server:
 
 ```bash
-doc-atlas mcp docs-serve
+doc-atlas mcp docs-serve --project-root /absolute/project
 ```
+
+The host selects the current project once. For OpenCode, run
+`doc-atlas install opencode --project` at the intended workspace root; the
+project-local registration supplies this binding. The agent then needs only
+the question, not the location of documentation. Global registrations remain
+unbound; server CWD is never guessed as the project.
 
 By default the server exposes exactly three mutually exclusive tools:
 
@@ -128,18 +134,29 @@ By default the server exposes exactly three mutually exclusive tools:
 For most MCP clients and coding agents:
 
 ```text
-get_docs_context(question=..., project_path=...)
+get_docs_context(question=...)
 → prepare_docs(...) only when returned as recommended_next_action
 → retry get_docs_context(...)
 ```
 
 `get_docs_context` is the single high-level entry point. Project questions return source-attributed, retrieval-only `docs_context`; missing safe evidence uses `status="insufficient_evidence"`. Original questions and explicit host lookups retain separate coverage. The compatibility `docs_answer` schema does not promise lexical answer certification. Explicitly enabled advanced `patch_context` carries evidence and grants no edit permission. The host explains supported facts and identifies gaps.
 
+On a bound connection, omitted target/scope searches all prepared project and
+module documentation; explicit scope/module filters still narrow it. On an
+unbound connection, provide a known absolute `project_path` or registered
+`library`. A conflicting path fails instead of silently switching projects.
+For initial preparation, `prepare_docs(action="discover_project_docs", confirm=true)`
+requires explicit approval: supported docs may be anywhere in the project, and
+the finite manifest/index are stored atomically outside the repository. Existing
+repository catalogs remain strict allowlists. Reads never discover, fetch or
+prepare; an unprepared bound project returns `needs_prepare`, not `repo_write`.
+See [current-project defaults and discovery boundaries](./docs/current-project-default.md).
+
 The complete model-visible response and tool catalog are measured and minimized without fixed 800-token or 6144-byte acceptance ceilings. Preserve admitted text, source identity, hashes, coordinates, and safety guards. Source-read, candidate-work, input, and host-session bounds remain separate. MCP response shape and diagnostics are server-owned. OpenCode registration sets `DOCATLAS_MCP_TEXT_FALLBACK=1` and `DOCATLAS_MCP_COMPACT_TEXT=1`, delivering original sources and resolvable citation references in a shorter self-contained text response without relying on MCP `_meta`. Existing OpenCode entries must be re-registered (`doc-atlas install opencode`) to receive the setting; other clients retain their previous structured lane. This preserves source selection and permits text fallback on incompatible payloads. See [OpenCode compact text](./docs/opencode-compact-text.md). Actual paid-provider token savings still require a live agent A/B.
 
 An optional provider-neutral [one-call host-loop contract](./docs/one-call-agent-loop.md) locally enforces cumulative request, retained-history, repair, test, and output budgets after a model initiates DocAtlas retrieval. Existing generic clients remain supported but are not labelled verified unless their host proves every required control.
 
-`prepare_docs(action="sync_project_docs")` without a confirmed `mutation` performs no writes. The current public sync contract accepts only explicit lexical member upserts bound to a finite `docatlas.project-docs.yaml` catalog, exact source hashes, a host-selected private store outside the project, and the expected generation. Confirmed synchronization replaces the indexed sections of selected members. Changed source hashes prevent stale indexed sections from appearing in current retrieval. Deleted files and documents removed from the catalog are excluded from current retrieval. This operation does not physically prune unselected rows, write vectors, or generate official documentation. See [the project-docs workflow](./docs/project-docs-mcp-workflow.md).
+`prepare_docs(action="sync_project_docs")` without a confirmed `mutation` performs no writes. The exact-member sync contract accepts only explicit lexical member upserts bound to a finite repository catalog or the bound project's prepared host manifest, exact source hashes, a host-selected private store outside the project, and the expected generation. Confirmed synchronization replaces the indexed sections of selected members. Changed source hashes prevent stale indexed sections from appearing in current retrieval. Deleted files and documents removed from the catalog are excluded from current retrieval. This operation does not physically prune unselected rows, write vectors, or generate official documentation. See [the project-docs workflow](./docs/project-docs-mcp-workflow.md).
 
 For an unknown library, DocAtlas does not guess a documentation site silently. It asks for a source and offers `prepare_docs(action="discover_library_docs", ...)`. After approval, this action reads bounded package-registry metadata (PyPI or npm) or constructs the canonical Pub/docs.rs API URL, returns reviewable candidates, and requires confirmation before indexing one. If registry metadata has no authoritative docs URL, the response explains that `docs_url` must be supplied manually.
 

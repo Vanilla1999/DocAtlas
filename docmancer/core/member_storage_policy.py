@@ -132,6 +132,28 @@ class MemberStoragePolicy:
             conn.close()
             raise
 
+    def has_project_members(self, project: Path, paths: tuple[str, ...]) -> bool:
+        """Read readiness for this finite catalog, never initialize/migrate a DB.
+
+        One indexed member permits retrieval, not a claim of full coverage or
+        freshness. Normal source/hash checks still decide which evidence is usable.
+        """
+        if not paths or not self.validate(project):
+            return False
+        conn = sqlite3.connect(self.db_path.as_uri() + "?mode=ro", uri=True, timeout=0.2)
+        try:
+            conn.execute("PRAGMA query_only=ON")
+            placeholders = ",".join("?" for _ in paths)
+            return conn.execute(
+                "SELECT 1 FROM sources WHERE json_extract(metadata_json, '$.project_path') = ? "
+                "AND json_extract(metadata_json, '$.source_class') = 'project_file' "
+                "AND json_extract(metadata_json, '$.project_docs') = 1 "
+                f"AND json_extract(metadata_json, '$.project_doc_path') IN ({placeholders}) LIMIT 1",
+                (str(project), *paths),
+            ).fetchone() is not None
+        finally:
+            conn.close()
+
     def generation(self) -> str | None:
         conn = self.connect()
         try:

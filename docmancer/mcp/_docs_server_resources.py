@@ -30,8 +30,10 @@ The default public surface has exactly three tools:
 
 ## Default project workflow
 
-1. In enabled documentation-language mode, obtain unknown bound-source language with `docs_status(include_language=true)` BEFORE searching. Otherwise, for documentation and coding questions before the first edit, call:
-   `get_docs_context(project_path=..., question=...)`
+1. In enabled documentation-language mode, obtain unknown bound-source language with `docs_status(action="project", include_language=true)` BEFORE searching. Otherwise, for documentation and coding questions before the first edit, call:
+   `get_docs_context(question=...)`
+
+    Omitted target searches all prepared documents of the host-bound current project. Without a host binding, pass a known absolute `project_path` or registered `library`; never guess a docs folder or server CWD. Explicit scope/module filters are preserved. `needs_prepare` requires separate approval for `prepare_docs(action="discover_project_docs", confirm=true)`, not a repository write or hidden query-time scan.
 
     Default calls return documentation context. No skill or guide read is required first. Cite returned sources and evidence IDs. Context is not answer proof or edit readiness; mutation requires a separate explicit target and authorization.
 
@@ -100,7 +102,7 @@ Always separate:
         "mimeType": "text/markdown",
         "text": """# Project docs workflow
 
-1. For documentation, including coding questions before the first edit, call `get_docs_context(project_path=..., question=...)`. Default output is documentation context. No skill or guide read is required first.
+1. For documentation, including coding questions before the first edit, call `get_docs_context(question=...)` on the host-bound project; default scope is all prepared project docs. Otherwise supply a known absolute project_path or registered library. Default output is documentation context. No skill or guide read is required first.
 2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, preserve its exact arguments and required consent. Poll returned job IDs; retry the unchanged request only after terminal success.
 3. Inspect `status`, `kind`, `sources`, `missing`, and any reported `omitted_counts`; source paths/hashes/spans are attribution, not read capabilities.
 4. Use only explicit same-question lookups (at most five) or an issued bounded source read. Do not execute inferred subquestions or diagnostic rephrases. Context and flags do not certify an answer or authorize editing; mutation requires a separate explicit target and authorization. `hard_stop=true` blocks editing; its absence is not permission.

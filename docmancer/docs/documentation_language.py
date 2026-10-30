@@ -54,14 +54,15 @@ def _unknown(reason: str, **binding: Any) -> dict:
 
 def project_language(project_path: str, inspected: dict, module: str | None = None) -> dict:
     from docmancer.docs.domain.project_path_validation import validate_project_path
-    from docmancer.docs.project_docs_catalog import CATALOG_FILENAME, read_project_docs_catalog
+    from docmancer.docs.project_docs_catalog import read_catalog_snapshot
 
     root = validate_project_path(project_path).path
     selector = str(module or "").strip()
     scope = {"scope": "module" if selector else "project"}
     if selector:
         scope["module_path"] = selector
-    catalog = read_project_docs_catalog(root)
+    snapshot = read_catalog_snapshot(root)
+    catalog = snapshot.catalog
     if not catalog.present or not catalog.valid:
         return _unknown("language_catalog_unavailable", **scope)
     # Only already-authorized, literal current candidate paths from the existing
@@ -89,17 +90,16 @@ def project_language(project_path: str, inspected: dict, module: str | None = No
     try:
         # Metadata-only read; reject a final symlink and never read document text here.
         import os
-        if not hasattr(os, "O_NOFOLLOW"):
+        if snapshot.origin == "repository" and not hasattr(os, "O_NOFOLLOW"):
             return _unknown("language_safe_metadata_read_unavailable", **scope)
-        fd = os.open(root / CATALOG_FILENAME, os.O_RDONLY | os.O_NOFOLLOW)
-        with os.fdopen(fd, "rb") as stream:
-            data = stream.read(1024 * 1024 + 1)
-        if len(data) > 1024 * 1024:
+        data = snapshot.raw
+        if data is None or len(data) > 1024 * 1024:
             return _unknown("language_catalog_unavailable", **scope)
         # Detect changes across the inspector/metadata reads without accepting a
         # new member or a changed declaration into the original finite selection.
-        check = read_project_docs_catalog(root)
-        if not check.valid or check.entries != catalog.entries or check.documentation_languages != declarations:
+        check = read_catalog_snapshot(root)
+        if (not check.catalog.valid or check.origin != snapshot.origin or check.sha256 != snapshot.sha256
+            or check.catalog.entries != catalog.entries or check.catalog.documentation_languages != declarations):
             return _unknown("language_catalog_changed", **scope)
     except OSError:
         return _unknown("language_catalog_unavailable", **scope)

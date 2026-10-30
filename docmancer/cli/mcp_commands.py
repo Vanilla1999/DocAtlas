@@ -32,13 +32,15 @@ def mcp_packs_serve_cmd() -> None:
 
 @mcp_group.command("docs-serve")
 @click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
+@click.option("--project-root", envvar="DOCATLAS_PROJECT_ROOT", default=None,
+              help="Host-selected absolute project root; omitted tool targets use this project, never process CWD.")
 @click.pass_context
-def mcp_docs_serve_cmd(ctx: click.Context, config_path: str | None) -> None:
+def mcp_docs_serve_cmd(ctx: click.Context, config_path: str | None, project_root: str | None) -> None:
     """Run the canonical stdio MCP documentation server."""
     from docmancer.mcp.docs_server import serve
     root = ctx.find_root()
     inherited = (root.obj or {}).get("config_path") if isinstance(root.obj, dict) else None
-    serve(config_path=config_path or inherited)
+    serve(config_path=config_path or inherited, project_root=project_root)
 
 
 @mcp_group.command("doctor")

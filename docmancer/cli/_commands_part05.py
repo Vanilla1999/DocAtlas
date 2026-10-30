@@ -19,12 +19,13 @@ from ._commands_part02 import _create_claude_desktop_zip, _install_project_boots
         "doc-atlas install gemini",
         "doc-atlas install github-copilot --project",
         "doc-atlas install opencode",
+        "doc-atlas install opencode --project",
         "doc-atlas install cline",
     ),
 )
 @click.argument("agent", type=click.Choice(INSTALL_TARGETS, case_sensitive=False))
 @click.option("--project", is_flag=True, default=False,
-              help="Install in project-level settings when the agent supports them.")
+              help="Install in project-level settings and bind MCP to this workspace when supported.")
 @click.option("--uninstall", "uninstall", is_flag=True, default=False,
               help="Remove only DocAtlas-managed project guidance for this agent.")
 @click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
@@ -282,6 +283,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             "Restart OpenCode to load the updated MCP registration and guidance.",
             extra_lines=[
                 "Self-contained compact MCP text is enabled; ordinary reads use the advertised tools directly.",
+                ("MCP is bound to this installation workspace; current-project reads may omit project_path."
+                 if project else "Use --project inside a repository to bind its local MCP registration."),
                 "After a package upgrade, rerun this install command to refresh the registration and guidance.",
             ],
         )

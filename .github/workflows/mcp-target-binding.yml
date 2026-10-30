@@ -1,16 +1,29 @@
-name: MCP missing target binding - installed Black B01/B02/B05/B06/B08
+name: MCP current-project host binding - installed CLI and frozen Black facts
 
 on:
-  push:
-    branches: [fix/mcp-docs-target-binding-20261029]
+  pull_request:
     paths:
-      - 'docmancer/mcp/_docs_server_tool_data.py'
-      - 'docmancer/mcp/_docs_server_part01.py'
+      - 'docmancer/mcp/**'
+      - 'docmancer/cli/**'
+      - 'docmancer/core/member_storage_policy.py'
+      - 'docmancer/core/*sqlite*'
+      - 'docmancer/core/_sqlite_store_part01.py'
+      - 'docmancer/docs/host_project_catalog.py'
+      - 'docmancer/docs/project_docs_catalog.py'
+      - 'docmancer/docs/documentation_language.py'
+      - 'docmancer/docs/domain/source_boundary.py'
+      - 'docmancer/docs/infrastructure/project_source_read_gateway.py'
+      - 'docmancer/docs/documentation_language.py'
+      - 'docmancer/docs/application/project_docs_discovery.py'
+      - 'docmancer/docs/application/project_docs_member_transaction.py'
+      - 'docmancer/docs/application/*project_docs_service*'
+      - 'docmancer/docs/domain/project_state.py'
       - 'docmancer/docs/interfaces/mcp/context_tools.py'
       - 'docmancer/docs/interfaces/mcp/error_contract.py'
-      - 'docmancer/mcp/agent_workflow_contract.py'
+      - 'docmancer/docs/interfaces/mcp/prefetch_tools.py'
       - 'SKILL.md'
       - 'docmancer/templates/agent_contract.md'
+      - 'docs/current-project-default.md'
       - 'eval/project_binding/**'
       - '.github/workflows/mcp-target-binding.yml'
   workflow_dispatch:
@@ -27,11 +40,13 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Freeze baseline selector, Context Assembly and Black corpus
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Freeze main selector, model, Context Assembly and Black corpus
         run: |
           set -euo pipefail
-          git fetch -q origin ddd59665a623408ca0ee2107affed1209e267544 --depth=1
-          git diff --exit-code ddd59665a623408ca0ee2107affed1209e267544 HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/context_assembly.py docmancer/docs/application/standalone_text_view.py eval/prepared_model_comparison40 eval/context_assembly/questions20.json
+          baseline=542900e573835aa17a3a21da924a0f7ed400bece
+          git fetch -q origin "$baseline" --depth=1
+          git diff --exit-code "$baseline" HEAD -- pyproject.toml uv.lock docmancer/retrieval docmancer/docs/application/section_compression.py docmancer/docs/application/section_model.py docmancer/docs/application/facet_selection.py docmancer/docs/application/context_assembly.py docmancer/docs/application/standalone_text_view.py docmancer/docs/application/model_context_view.py docmancer/docs/application/experimental_candidate_selection.py eval/prepared_model_comparison40 eval/context_assembly/questions20.json eval/context_assembly/Dockerfile
           python -m compileall -q docmancer eval/project_binding
           mkdir -p "$RUNNER_TEMP/results"
           git rev-parse HEAD > "$RUNNER_TEMP/results/HEAD.txt"
@@ -39,31 +54,42 @@ jobs:
         run: |
           set -euo pipefail
           docker build -f eval/context_assembly/Dockerfile -t docatlas-binding .
-      - name: "Real public stdio: five original questions with and without target"
+      - name: "Real installed config/CLI/stdio: current project, frozen facts and scope"
         run: |
-          set -uo pipefail
+          set -euo pipefail
+          rc=0
           docker run --name binding-test --network none --cpus=2 \
             --memory=1500000000 --memory-swap=1500000000 \
             -e HF_HUB_OFFLINE=1 \
             -v "$RUNNER_TEMP/results:/results" \
             --entrypoint /bin/sh docatlas-binding -ec '
+              trap '\''cat /sys/fs/cgroup/memory.max > /results/MEMORY_MAX; cat /sys/fs/cgroup/memory.peak > /results/MEMORY_PEAK; cat /sys/fs/cgroup/memory.events > /results/MEMORY_EVENTS'\'' EXIT
               /opt/venv/bin/python -I /repo/eval/project_binding/installed_stdio.py \
-                --repo /repo --work /results/work --out /results/verification
+                --repo /repo --work /work --out /results/verification
               cat /sys/fs/cgroup/memory.max > /results/MEMORY_MAX
               cat /sys/fs/cgroup/memory.peak > /results/MEMORY_PEAK
               cat /sys/fs/cgroup/memory.events > /results/MEMORY_EVENTS
               test "$(cat /sys/fs/cgroup/memory.swap.max)" = 0
               test "$(awk "/^oom_kill / {print \$2}" /sys/fs/cgroup/memory.events)" = 0
               test "$(cat /sys/fs/cgroup/memory.peak)" -le "$(cat /sys/fs/cgroup/memory.max)"
-            '
-          rc=$?
+            ' || rc=$?
           docker inspect binding-test > "$RUNNER_TEMP/results/CONTAINER.json"
+          # Keep trusted private storage on container-owned ancestors. Publish
+          # its bytes as an archive, never chmod it or recurse through it as the
+          # differently owned GitHub runner account.
+          archive_rc=0
+          docker cp binding-test:/work - > "$RUNNER_TEMP/results/work.tar" \
+            2> "$RUNNER_TEMP/results/WORK_ARCHIVE_STDERR.log" || archive_rc=$?
+          echo "$archive_rc" > "$RUNNER_TEMP/results/WORK_ARCHIVE_EXIT_CODE"
+          if [ "$rc" -eq 0 ] && [ "$archive_rc" -ne 0 ]; then
+            rc=$archive_rc
+          fi
           echo "$rc" > "$RUNNER_TEMP/results/EXIT_CODE"
           exit "$rc"
       - name: Record full-agent/provider boundary honestly
         if: always()
         run: |
-          printf '%s\n' '{"paid_calls":0,"provider_usage":null,"autonomous_opencode_argument_selection":"NOT_TESTED","same_original_user_workspace":"NOT_VERIFIED"}' > "$RUNNER_TEMP/results/BOUNDARIES.json"
+          printf '%s\n' '{"paid_calls":0,"provider_usage":null,"autonomous_opencode_argument_selection":"NOT_TESTED","actual_client_config_loading":"NOT_TESTED","installed_generated_command":"SEE_RESULT_JSON","same_original_user_workspace":"NOT_VERIFIED"}' > "$RUNNER_TEMP/results/BOUNDARIES.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

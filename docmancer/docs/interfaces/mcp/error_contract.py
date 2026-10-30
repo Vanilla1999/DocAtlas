@@ -29,9 +29,8 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
     "bad_request": ["Fix the MCP tool arguments and retry."],
     "validation_error": ["Fix the MCP tool arguments and retry."],
     "docs_context_target_missing": [
-        "For documentation in the selected current project, pass its known absolute repository root in project_path, leaving question unchanged.",
-        "For a registered library query, pass library instead; do not infer a project from question text or MCP server CWD.",
-        "Correct the target binding and retry; this is not evidence that the documents lack an answer.",
+        "Bind the current project with docs-serve --project-root or project-scoped client installation; then omit project_path.",
+        "Alternatively pass a known absolute project_path or registered library. Never infer a project from question/CWD; this is not evidence absence.",
     ],
     "context_delivery_unavailable": [
         "Do not repeat the unchanged request. Check the MCP delivery configuration and reported delivery reason.",

@@ -188,6 +188,20 @@ def _remove_managed_instruction_block(dest: Path) -> bool:
 
 def _register_mcp_for_agent(agent_name: str, *, project: bool) -> None:
     """Register `doc-atlas mcp docs-serve` into a known agent's MCP config (best-effort)."""
+    if project:
+        from docmancer.mcp.agent_config import find_agent, register_server
+
+        target = find_agent(agent_name, project=True)
+        if target is None:
+            return
+        try:
+            _, message = register_server(target)
+        except ValueError as exc:
+            # A failed explicit project binding must not be reported as a
+            # successful installation while writing unrelated guidance files.
+            raise click.ClickException(f"Could not bind project MCP server: {exc}") from exc
+        _emit_status_line(message, indent=0)
+        return
     try:
         from docmancer.cli.mcp_commands import register_docatlas_mcp_in_agent
     except Exception:

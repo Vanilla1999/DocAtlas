@@ -297,6 +297,8 @@ class _SQLiteStorePart01:
     def upsert_project_members(
         self, documents: Iterable[Document], *, project_path: str,
         expected_generation_id: str | None, storage_policy=None,
+        host_catalog: bytes | None = None,
+        expected_host_catalog_sha256: str | None = None,
     ) -> dict[str, Any]:
         """Publish only to an explicitly selected trusted local MCP store."""
         from docmancer.core.member_storage_policy import MemberCommitUnknown, MemberStoragePolicy
@@ -305,11 +307,29 @@ class _SQLiteStorePart01:
             reject_pathname_sqlite_mutation()
         storage_policy.validate(Path(project_path), str(self.db_path))
         docs = self._validated_project_members(documents, project_path)
+        if host_catalog is not None:
+            from docmancer.docs.project_docs_catalog import parse_project_docs_catalog
+            from docmancer.docs.application.project_docs_member_transaction import catalog_entry_hash
+            catalog = parse_project_docs_catalog(Path(project_path), host_catalog, docs_only=True)
+            entries = {entry.path: entry for entry in catalog.entries}
+            if (not catalog.valid or catalog.code_files or catalog.roots
+                or set(entries) != {doc.metadata["project_doc_path"] for doc in docs}
+                or any(catalog_entry_hash(entries[doc.metadata["project_doc_path"]])
+                       != doc.metadata.get("project_doc_catalog_entry_hash") for doc in docs)):
+                raise PermissionError("host manifest must bind exactly the prepared finite member set")
+        if expected_host_catalog_sha256 is not None and not re.fullmatch(r"[0-9a-f]{64}", expected_host_catalog_sha256):
+            raise ValueError("expected host catalog hash must be an exact SHA256 digest")
         conn = storage_policy.connect()
         commit_started = False
         try:
             conn.execute("BEGIN IMMEDIATE")
-            outcome = self._apply_project_members(conn, docs, project_path, expected_generation_id)
+            if host_catalog is None and expected_host_catalog_sha256 is None:
+                outcome = self._apply_project_members(conn, docs, project_path, expected_generation_id)
+            else:
+                outcome = self._apply_project_members(
+                    conn, docs, project_path, expected_generation_id,
+                    host_catalog=host_catalog, expected_host_catalog_sha256=expected_host_catalog_sha256,
+                )
             commit_started = True
             conn.commit()
         except BaseException as exc:
@@ -382,11 +402,23 @@ class _SQLiteStorePart01:
                 raise PermissionError("member batch has invalid project ownership")
         return docs
 
-    def _apply_project_members(self, conn, docs, project_path, expected_generation_id):
+    def _apply_project_members(self, conn, docs, project_path, expected_generation_id, *,
+                               host_catalog=None, expected_host_catalog_sha256=None):
         # The caller owns the write transaction, including CAS and immutable ownership.
         active = self._active_generation_id(conn)
         if active != expected_generation_id:
             raise ValueError("active generation precondition failed")
+        if host_catalog is not None or expected_host_catalog_sha256 is not None:
+            # A membership-only change can leave the global lexical generation
+            # unchanged. Bind this root's manifest separately, in the same CAS.
+            prior_manifest = None
+            if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='project_doc_manifests'").fetchone():
+                prior_manifest = conn.execute(
+                    "SELECT catalog_sha256 FROM project_doc_manifests WHERE project_path=?", (project_path,),
+                ).fetchone()
+            actual_digest = prior_manifest[0] if prior_manifest is not None else None
+            if actual_digest != expected_host_catalog_sha256:
+                raise ValueError("host catalog precondition failed")
         if active:
             info = conn.execute("SELECT * FROM index_generations WHERE generation_id = ?", (active,)).fetchone()
             config = ChunkingConfig()
@@ -442,13 +474,34 @@ class _SQLiteStorePart01:
         if changed:
             generation = self._build_candidate_generation(conn, changed, recreate=False)
             self._activate_generation(conn, generation)
+        manifest_metrics = {}
+        if host_catalog is not None:
+            # No read path runs this DDL. Literal membership and its lexical
+            # sources become visible atomically, without a repository file or
+            # a second filesystem publication point.
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS project_doc_manifests (
+                    project_path TEXT PRIMARY KEY,
+                    catalog_bytes BLOB NOT NULL,
+                    catalog_sha256 TEXT NOT NULL CHECK(length(catalog_sha256) = 64)
+                )
+            """)
+            digest = hashlib.sha256(host_catalog).hexdigest()
+            written = conn.execute("""
+                INSERT INTO project_doc_manifests(project_path, catalog_bytes, catalog_sha256)
+                VALUES (?, ?, ?)
+                ON CONFLICT(project_path) DO UPDATE SET
+                    catalog_bytes=excluded.catalog_bytes, catalog_sha256=excluded.catalog_sha256
+                WHERE project_doc_manifests.catalog_sha256 != excluded.catalog_sha256
+            """, (project_path, sqlite3.Binary(host_catalog), digest)).rowcount
+            manifest_metrics = {"host_manifest_written": bool(written), "host_manifest_sha256": digest}
         return {"transaction": "committed", "generation_id": generation,
                 "members": len(docs), "new_count": new_count,
                 "changed_count": len(changed) - new_count,
                 "unchanged_files": len(docs) - len(changed),
                 "derived_writes": sections, "derived_deletes": replaced_sections,
                 "sources_deleted": 0,
-                "sections_indexed": sections}
+                "sections_indexed": sections, **manifest_metrics}
 
     def add_documents(
         self,
