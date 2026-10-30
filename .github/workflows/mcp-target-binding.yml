@@ -56,7 +56,8 @@ jobs:
           docker build -f eval/context_assembly/Dockerfile -t docatlas-binding .
       - name: "Real installed config/CLI/stdio: current project, frozen facts and scope"
         run: |
-          set -uo pipefail
+          set -euo pipefail
+          rc=0
           docker run --name binding-test --network none --cpus=2 \
             --memory=1500000000 --memory-swap=1500000000 \
             -e HF_HUB_OFFLINE=1 \
@@ -71,8 +72,7 @@ jobs:
               test "$(cat /sys/fs/cgroup/memory.swap.max)" = 0
               test "$(awk "/^oom_kill / {print \$2}" /sys/fs/cgroup/memory.events)" = 0
               test "$(cat /sys/fs/cgroup/memory.peak)" -le "$(cat /sys/fs/cgroup/memory.max)"
-            '
-          rc=$?
+            ' || rc=$?
           docker inspect binding-test > "$RUNNER_TEMP/results/CONTAINER.json"
           # Keep trusted private storage on container-owned ancestors. Publish
           # its bytes as an archive, never chmod it or recurse through it as the
