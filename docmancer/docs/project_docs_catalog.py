@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import hashlib
+import os
 from pathlib import Path, PurePosixPath
+import stat
 from typing import Any
 
 import yaml
@@ -103,26 +106,66 @@ class ProjectDocCatalog:
     documentation_languages: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class CatalogSnapshot:
+    """One finite catalog representation, never a filesystem discovery grant."""
+
+    catalog: ProjectDocCatalog
+    raw: bytes | None
+    sha256: str | None
+    origin: str
+
+
 def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
+    return read_catalog_snapshot(root).catalog
+
+
+def read_catalog_snapshot(root: Path) -> CatalogSnapshot:
+    """Prefer an explicit repository catalog; host fallback is request-local.
+
+    A broken/symlinked/invalid repository catalog is authoritative failure, not
+    permission to switch to a previously prepared host manifest.
+    """
     catalog_path = root / CATALOG_FILENAME
     if catalog_path.is_symlink():
-        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog must not be a symlink."])
-    if not catalog_path.exists():
-        return ProjectDocCatalog(present=False)
+        return CatalogSnapshot(ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog must not be a symlink."]), None, None, "repository")
+    if not os.path.lexists(catalog_path):
+        from docmancer.docs.host_project_catalog import host_catalog_bytes
+        raw = host_catalog_bytes(root)
+        if raw is None:
+            return CatalogSnapshot(ProjectDocCatalog(present=False), None, None, "missing")
+        return CatalogSnapshot(parse_project_docs_catalog(root, raw, label="host-owned-project-manifest"),
+                               raw, hashlib.sha256(raw).hexdigest(), "host")
     if not catalog_path.is_file():
-        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog must be a regular file."])
+        return CatalogSnapshot(ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog must be a regular file."]), None, None, "repository")
     try:
-        if catalog_path.stat().st_size > MAX_CATALOG_BYTES:
-            return ProjectDocCatalog(
-                True, False, CATALOG_FILENAME,
-                warnings=[f"Project docs catalog exceeds the {MAX_CATALOG_BYTES}-byte limit."],
-            )
-        data = yaml.load(
-            catalog_path.read_text(encoding="utf-8"),
-            Loader=_UniqueKeySafeLoader,
-        )
-    except (OSError, UnicodeError, yaml.YAMLError) as exc:
-        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[f"Could not read project docs catalog: {exc}"])
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        fd = os.open(catalog_path, flags)
+        with os.fdopen(fd, "rb") as stream:
+            before = os.fstat(stream.fileno())
+            if not stat.S_ISREG(before.st_mode) or before.st_size > MAX_CATALOG_BYTES:
+                raise ValueError("Project docs catalog must be a bounded regular file.")
+            raw = stream.read(MAX_CATALOG_BYTES + 1)
+            after = os.fstat(stream.fileno())
+        if (len(raw) > MAX_CATALOG_BYTES or len(raw) != before.st_size
+            or (before.st_size, before.st_mtime_ns, before.st_ctime_ns)
+            != (after.st_size, after.st_mtime_ns, after.st_ctime_ns)):
+            raise ValueError("Project docs catalog changed during its bounded read.")
+    except (OSError, ValueError) as exc:
+        return CatalogSnapshot(ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[f"Could not read project docs catalog: {exc}"]), None, None, "repository")
+    return CatalogSnapshot(parse_project_docs_catalog(root, raw), raw,
+                           hashlib.sha256(raw).hexdigest(), "repository")
+
+
+def parse_project_docs_catalog(root: Path, raw: bytes, *, label: str = CATALOG_FILENAME,
+                               docs_only: bool = False) -> ProjectDocCatalog:
+    """Validate finite bytes regardless of their host-selected storage location."""
+    if not isinstance(raw, bytes) or len(raw) > MAX_CATALOG_BYTES:
+        return ProjectDocCatalog(True, False, label, warnings=["Project docs catalog exceeds its byte limit."])
+    try:
+        data = yaml.load(raw.decode("utf-8"), Loader=_UniqueKeySafeLoader)
+    except (UnicodeError, yaml.YAMLError) as exc:
+        return ProjectDocCatalog(True, False, label, warnings=[f"Could not read project docs catalog: {exc}"])
     if (
         not isinstance(data, dict)
         or type(data.get("schema_version")) is not int
@@ -150,6 +193,8 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
             "Project docs roots do not declare finite membership; list literal documents instead."
         ])
     raw_code_files = data.get("code_files", [])
+    if docs_only and raw_code_files != []:
+        return ProjectDocCatalog(True, False, label, warnings=["Member preparation requires empty code_files."])
     if not isinstance(raw_code_files, list) or len(raw_code_files) > MAX_CATALOG_DOCUMENTS:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["code_files must be a bounded list of literal paths."])
     code_files: list[str] = []
@@ -210,7 +255,7 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
         languages = catalog_language_declarations(data.get("documentation_languages", {}), entries)
     except ValueError as exc:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[str(exc)])
-    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, roots, [], tuple(code_files), languages)
+    return ProjectDocCatalog(True, True, label, entries, roots, [], tuple(code_files), languages)
 
 
 def _literal_path(value: str) -> bool:

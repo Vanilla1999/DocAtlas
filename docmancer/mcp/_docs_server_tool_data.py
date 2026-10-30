@@ -12,7 +12,7 @@ Agent workflow:
 - The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
 - Call prepare_docs only from recommended_next_action.
 - Use docs_status for explicit status/returned actions, or optional declared-language metadata only when needed for an already bound source.
-- Always bind a target: for current project docs pass the known absolute repository root in project_path; for a registered library pass library. Do not put a path into question, guess project from question or assume MCP process CWD is the active project. If the target is unknown, ask the user to choose it. Without a target the tool returns docs_context_target_missing, not evidence insufficiency.
+- Omit project_path for the host-bound current project; omitted scope searches all its prepared docs. Otherwise pass a known absolute project_path or registered library. Never infer a target from the question or server CWD. An unbound target returns docs_context_target_missing; a conflicting path is rejected.
 - Preserve explicit project/library/version/scope/path bindings; never choose or widen scope from question wording. module_path implies module scope; scope="all" is repository-local without module filters. On module_ambiguous, use only an exact returned module_path.
 - Returned context and status never certify answer completeness, semantic proof or edit readiness. hard_stop=true blocks editing; hard_stop=false is not authorization. Mutation requires a separate explicit target and authorization. Diagnostic rephrases are not automatically executed lookups.
 - Optional context_format="patch_context" returns a read-only v4 patch evidence packet with full admitted source windows. It selects representation only, never mutation/workflow permission; omitted/null keeps the existing docs response. Patch representation has no internal token/byte compaction cap; retrieval scope and runtime guards remain unchanged.
@@ -29,8 +29,8 @@ Agent workflow:
                 "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500, "description": "Explicit full translation of the same question into the declared documentation language; original question remains authoritative. Used as one host lookup and for section ranking; never proof or scope authority."},
                 "context_format": {"type": ["string", "null"], "enum": ["patch_context", None], "description": "Optional read-only v4 patch evidence representation. Omitted/null retains docs defaults. Never supplies mutation or workflow permission."},
                 "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Explicit lookups for the same question, at most five; unchanged original question. For language adaptation use search_question with a full translation of the same original question; never add subquestions, expected answers or source names. Never batch independent questions. Lookup coverage does not transfer to the original question; returned cited context does not certify an answer or authorize editing."},
-                "project_path": {"type": ["string", "null"], "description": "For current project docs, pass the known absolute root directory of the selected workspace. Not inferred from the question or server CWD. Library-only queries may omit it."},
-                "library": {"type": ["string", "null"], "description": "Explicit registered documentation library target when not querying the current project. A known project_path or library is required."},
+                "project_path": {"type": ["string", "null"], "description": "Omit for the host-bound current project; otherwise a known absolute project root, never a guessed docs directory."},
+                "library": {"type": ["string", "null"], "description": "Explicit registered documentation library target; does not implicitly add the current project."},
                 "version": {"type": ["string", "null"]},
                 "module_path": {"type": ["string", "null"], "description": "Exact discovered module path such as packages/orders. Supplying module_path always implies module scope and never widens into project or sibling modules."},
                 "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None], "description": "Project-doc scope: project = repo-level docs only; module = one module (use exact module_path); all = repo-level plus modules only when no module filter is supplied. Preserve explicit scope; never infer it from question wording."},
@@ -51,12 +51,12 @@ Agent workflow:
         "inputSchema": {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "discover_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]},
+                "action": {"type": "string", "enum": ["discover_project_docs", "sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "discover_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
                 "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
                 "confirm": {
                     "type": ["boolean", "null"],
-                    "description": "Apply flag for clear_index only.",
+                    "description": "Explicit approval for discover_project_docs or clear_index apply.",
                 },
                 "plan_digest": {
                     "type": ["string", "null"],
@@ -114,7 +114,7 @@ Agent workflow:
                     "properties": {"target": {**DOCS_TARGET_INPUT_SCHEMA, "type": "object"}},
                 },
             }, {
-                "if": {"properties": {"action": {"const": "clear_index"}}},
+                "if": {"properties": {"action": {"enum": ["clear_index", "discover_project_docs"]}}},
                 "else": {"not": {"required": ["confirm"]}},
             }],
         },
@@ -575,9 +575,9 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Retrieve one unchanged user question. Set project_path=KNOWN ABSOLUTE repo root "
-        "or library=registered docs; ask if unknown. Never infer target/scope from prose/CWD. "
-        "Language mode + unknown bound language: docs_status(include_language=true) first. "
+        "Retrieve one unchanged user question. Omit target for the host-bound current project (all prepared docs); "
+        "otherwise set known absolute project_path or registered library. Never guess target from prose/CWD. "
+        "Language mode + unknown bound language: docs_status(action=project or library,include_language=true) first. "
         "search_question: full translation to declared source language preserving meaning and exact literals; "
         "one of five explicit same-question lookups. No invented subquestions/answers/source names; never batch independent questions. "
         "Preserve bindings; never widen scope. module_path implies module; all=same repo+modules without module filters. "
@@ -589,12 +589,13 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     ),
     "prepare_docs": (
         "Only returned recommended_next_action or explicit lifecycle requests; "
-        "preserve bindings, confirmation and network consent. "
+        "preserve bindings, confirmation and network consent. discover_project_docs with confirm=true "
+        "prepares supported docs across the host-bound project in private storage; no repo writes/network. "
         "Poll returned job_id via docs_status; retry unchanged once after terminal success."
     ),
     "docs_status": (
         "Read-only for explicit status, returned actions/job IDs, or the get_docs_context language preflight. "
-        "No discovery/preparation. action=project needs project_path; "
+        "No discovery/preparation. action=project defaults to the host-bound project; "
         "action=library needs canonical_id; module is an exact path. Cache language by scope/version/snapshot; "
         "unknown/mixed/partial is not English. Omit details unless diagnostics are needed."
     ),
@@ -607,22 +608,20 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "question": {"type": "string", "minLength": 1},
             "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
-            "project_path": {"type": ["string", "null"], "description": "Known absolute root of selected project."},
+            "project_path": {"type": ["string", "null"], "description": "Omit for host-bound project; otherwise known absolute root, not a docs subfolder."},
             "library": {"type": ["string", "null"], "description": "Explicit registered library target."},
             "version": {"type": ["string", "null"], "description": "Current project: omit unless an exact/historical version is explicitly requested; requery after lockfile changes."},
             "module_path": {"type": ["string", "null"]},
             "scope": {
                 "type": ["string", "null"],
                 "enum": ["project", "module", "all", None],
+                "description": "Default all for the bound project; project=repo-level docs only. module_path always narrows to that module.",
             },
         },
         "required": ["question"],
-        # A target is REQUIRED at runtime. Keep the question-only shape
-        # syntactically accepted by MCP SDK validation so DocAtlas itself can
-        # return a structured docs_context_target_missing tool error with
-        # actionable hints; schema anyOf is rejected first by the SDK and
-        # replaced with an unstructured generic error.
-        "description": "Missing target returns docs_context_target_missing; correct binding before retry.",
+        # Resolve a connection-local host binding before runtime validation.
+        # SDK validation must allow question-only calls on bound connections.
+        "description": "No host binding or explicit target: docs_context_target_missing, not missing evidence.",
         "additionalProperties": False,
     },
     "prepare_docs": {
@@ -630,7 +629,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "properties": {
             "action": {
                 "enum": [
-                    "sync_project_docs", "prefetch_project_dependency_docs",
+                    "discover_project_docs", "sync_project_docs", "prefetch_project_dependency_docs",
                     "prefetch_library_docs", "discover_library_docs",
                     "inspect_docs_target",
                     "validate_docs_manifest", "prefetch_docs_manifest",
@@ -672,7 +671,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             },
             "confirm": {
                 "type": ["boolean", "null"],
-                "description": "clear_index second-call apply only.",
+                "description": "Explicit approval for discover_project_docs; clear_index second-call apply.",
             },
             "plan_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
             "allow_incomplete": {"type": ["boolean", "null"]},
@@ -702,7 +701,6 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "allOf": [{
             "if": {"properties": {"action": {"const": "sync_project_docs"}}},
             "then": {
-                "required": ["project_path"],
                 "properties": {
                     "action": {},
                     "project_path": {"type": "string", "minLength": 1},
@@ -720,7 +718,14 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
                     "project_path": {"type": "string", "minLength": 1},
                 },
             },
-            "else": {"not": {"required": ["confirm"]}},
+            "else": {
+                "if": {"properties": {"action": {"const": "discover_project_docs"}}},
+                "then": {
+                    "properties": {"action": {}, "project_path": {}, "confirm": {}},
+                    "additionalProperties": False,
+                },
+                "else": {"not": {"required": ["confirm"]}},
+            },
         }, {
             "if": {"properties": {"action": {"const": "remove_library_docs"}}},
             "then": {

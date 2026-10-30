@@ -16,7 +16,7 @@ class LocalMemberService:
     ordinary writable facade and startup recovery.
     """
 
-    def __init__(self, resolved):
+    def __init__(self, resolved, *, project_root: str | Path | None = None):
         import threading
         from docmancer.core.member_storage_policy import MemberStoragePolicy
         from docmancer.core.product_identity import docatlas_home
@@ -24,6 +24,8 @@ class LocalMemberService:
         self.config = resolved.config
         self.config_source = resolved.source
         self.config_path = str(resolved.path) if resolved.path else None
+        from .current_project import CurrentProject
+        self.current_project = CurrentProject.select(project_root) if project_root is not None else None
         self.member_storage_policy = MemberStoragePolicy(
             docatlas_home(), Path(self.config.index.db_path), resolved.path,
         )
@@ -59,9 +61,11 @@ class LocalMemberService:
         return getattr(self.materialize(read_only_startup=True), name)
 
 
-def create_local_mcp_service(config_path: str | Path | None = None) -> LocalMemberService:
+def create_local_mcp_service(
+    config_path: str | Path | None = None, *, project_root: str | Path | None = None,
+) -> LocalMemberService:
     from docmancer.core.config_resolution import resolve_mcp_config
-    return LocalMemberService(resolve_mcp_config(explicit_path=config_path))
+    return LocalMemberService(resolve_mcp_config(explicit_path=config_path), project_root=project_root)
 
 def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
     """Build the docs MCP surface from the current environment.
@@ -91,6 +95,58 @@ def _exception_reason_code(exc: Exception) -> str:
 
 def _public_handler_arguments(name: str, args: dict[str, Any]) -> dict[str, Any]:
     return args
+
+
+def _host_catalog_scope(service, *, enabled: bool = True):
+    from contextlib import nullcontext
+    if not enabled:
+        return nullcontext()
+    binding = vars(service).get("current_project") if service is not None else None
+    policy = vars(service).get("member_storage_policy") if service is not None else None
+    if binding is None or policy is None:
+        return nullcontext()
+    binding.validate()
+    from docmancer.docs.host_project_catalog import catalog_scope
+    return catalog_scope(binding.root, policy)
+
+
+def _bound_project_read_preflight(name: str, args: dict[str, Any], service) -> dict[str, Any] | None:
+    binding = vars(service).get("current_project")
+    policy = vars(service).get("member_storage_policy")
+    project_read = name == "get_docs_context" and not args.get("library")
+    project_status = name == "docs_status" and args.get("action") == "project"
+    if binding is None or policy is None or not (project_read or project_status):
+        return None
+    from docmancer.docs.project_docs_catalog import read_catalog_snapshot
+    exists = policy.validate(binding.root)
+    snapshot = read_catalog_snapshot(binding.root)
+    catalog = snapshot.catalog
+    if catalog.present and not catalog.valid and snapshot.origin != "host":
+        return build_mcp_error_payload(
+            reason_code="invalid_project_docs_catalog", tool=name, phase="validation",
+            message="The selected project's documentation catalog is invalid; discovery cannot replace or widen it.",
+        )
+    if catalog.present and catalog.valid and not catalog.entries:
+        return build_mcp_error_payload(
+            reason_code="no_project_document_members", tool=name, phase="readiness",
+            message="The explicit catalog selects no documentation. No search, discovery or repository write was performed.",
+        )
+    if exists and catalog.present and catalog.valid and policy.has_project_members(binding.root, tuple(entry.path for entry in catalog.entries)):
+        return None
+    payload = build_mcp_error_payload(
+        reason_code="needs_prepare", tool=name, phase="readiness", retryable=False,
+        message="The current project needs a usable prepared documentation snapshot. Explicit preparation is required; no discovery or index write was performed.",
+    )
+    payload.update({
+        "reason_code": "needs_prepare", "context_available": False,
+        "requires_confirmation": True, "confirmation_reason": "local_index_write",
+        "recommended_next_action": {
+            "tool": "prepare_docs", "arguments_patch": {"action": "discover_project_docs", "confirm": True},
+            "requires_confirmation": True, "confirmation_reason": "local_index_write",
+            "auto_execute": False,
+        },
+    })
+    return payload
 
 
 def _service_for_project_path(
@@ -169,7 +225,7 @@ def call_docs_tool_payload(
     *,
     surface: DocsMcpSurface | None = None,
 ) -> dict[str, Any]:
-    args = arguments or {}
+    args = dict(arguments or {})
     active_surface = surface or current_docs_surface()
     handler = active_surface.handlers.get(name)
     if handler is None:
@@ -181,6 +237,16 @@ def call_docs_tool_payload(
         )
     spec = next(spec for spec in active_surface.tools if spec.name == name)
     validation_schema = spec.validation_schema or spec.input_schema
+    binding = vars(service).get("current_project")
+    if binding is not None:
+        from .current_project import ProjectBindingError
+        try:
+            args = binding.arguments(name, args)
+        except ProjectBindingError as exc:
+            return build_mcp_error_payload(
+                reason_code=exc.reason_code, message=str(exc), tool=name,
+                phase="validation", retryable=False,
+            )
     # Fail before opening the member store or projecting empty evidence.
     # This is an invalid binding, not an answerability/absence verdict. An
     # explicit library-only query is valid and must not gain a guessed project.
@@ -190,7 +256,7 @@ def call_docs_tool_payload(
     ):
         return build_mcp_error_payload(
             reason_code="docs_context_target_missing",
-            message="Specify a documentation target: known absolute project_path for current project docs, or an explicit registered library.",
+            message="No current project is bound. Select one with docs-serve --project-root, pass a known absolute project_path, or name a registered library.",
             tool=name,
             phase="validation",
             retryable=False,
@@ -227,11 +293,26 @@ def call_docs_tool_payload(
         # The explicit member executor validates its own project/storage/hash
         # bindings before opening the existing store. Constructing a project
         # facade here would initialize registries/jobs before that validation.
-        member_sync = name == "prepare_docs" and handler_args.get("action") == "sync_project_docs"
-        active_service = service if member_sync else _service_for_project_path(
-            service, handler_args, read_only_startup=name in {"get_docs_context", "docs_status"},
-        )
-        payload = handler(name, handler_args, active_service)
+        with _host_catalog_scope(service, enabled=bool(handler_args.get("project_path"))):
+            preflight = _bound_project_read_preflight(name, handler_args, service)
+            if preflight is not None:
+                return preflight
+            member_sync = name == "prepare_docs" and handler_args.get("action") in {
+                "sync_project_docs", "discover_project_docs",
+            }
+            active_service = service if member_sync else _service_for_project_path(
+                service, handler_args, read_only_startup=name in {"get_docs_context", "docs_status"},
+            )
+            payload = handler(name, handler_args, active_service)
+            if (binding is not None and name == "get_docs_context" and not args.get("library")
+                    and isinstance(payload, dict) and payload.get("confirmation_reason") == "repo_write"):
+                # A read cannot turn an excluded/unavailable documentation set
+                # into permission to create ARCHITECTURE.md. Keep this separate
+                # from absence of the fact being asked about.
+                return build_mcp_error_payload(
+                    reason_code="no_admissible_documentation", tool=name, phase="readiness",
+                    message="No admissible prepared documentation is available under the current source boundary; this does not prove the requested fact is absent.",
+                )
     except Exception as exc:
         reason_code = _exception_reason_code(exc)
         return build_mcp_error_payload(
@@ -264,6 +345,11 @@ def call_docs_tool_payload(
 
 
 def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:
+    with _host_catalog_scope(service, enabled=uri.startswith("docatlas://source/")):
+        return _read_docs_resource(uri, service)
+
+
+def _read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:
     if uri.startswith("docatlas://source/"):
         if isinstance(service, LocalMemberService):
             service = service.materialize(read_only_startup=True) if service.member_storage_policy.validate() else None
@@ -504,7 +590,7 @@ async def _run_async(service: LibraryDocsService) -> None:
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-def serve(config_path: str | Path | None = None) -> None:
-    asyncio.run(_run_async(create_local_mcp_service(config_path)))
+def serve(config_path: str | Path | None = None, *, project_root: str | Path | None = None) -> None:
+    asyncio.run(_run_async(create_local_mcp_service(config_path, project_root=project_root)))
 
 __all__=['current_docs_surface', 'current_tools', '_exception_reason_code', '_public_handler_arguments', '_service_for_project_path', '_destructive_project_scope_error', 'call_docs_tool_payload', 'read_docs_resource', '_json_text', '_mcp_tool_result', '_run_async', 'serve']

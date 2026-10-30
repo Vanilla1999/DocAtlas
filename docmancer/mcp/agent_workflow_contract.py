@@ -31,7 +31,9 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "for": ["documentation_question", "coding_task", "patch_task"],
         "before_first_edit": True,
         "max_calls_before_first_edit": 1,
-        "target_binding": "known_absolute_project_path_or_explicit_registered_library",
+        "target_binding": "host_bound_current_project_or_known_absolute_project_path_or_explicit_registered_library",
+        "bound_project_default_scope": "all",
+        "conflicting_project_path": "typed_error_no_retargeting",
         "missing_target": "typed_validation_error_correct_binding_before_retry",
         "implicit_mcp_process_cwd_is_target": False,
         "call_limit_scope": "per_concrete_question_and_evidence_scope",
@@ -40,7 +42,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "context_format_inferred_from_prose": False,
         "skill_read_required": False,
         "tool_catalog_reload_required": False,
-        "optional_preflight": "language mode enabled + bound language unknown: docs_status(include_language=true) BEFORE retrieval",
+        "optional_preflight": "language mode enabled + bound language unknown: docs_status(action=project or library, include_language=true) BEFORE retrieval",
         "selection_or_unassessed_coverage_requires_retry": False,
     },
     "advanced_patch": {
@@ -54,6 +56,8 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "tool": "prepare_docs",
         "allowed_when": ["recommended_next_action", "explicit_lifecycle_request"],
         "speculative": False,
+        "project_discovery": "host_bound_project_explicit_confirm_only_private_atomic_manifest_and_index",
+        "discovery_in_query": False,
     },
     "docs_status": {
         "tool": "docs_status",
@@ -127,19 +131,17 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
     {
         "id": "repository-first-call",
         "tool": "get_docs_context",
-        "condition": "normal documentation question (omitted format retains docs mode)",
+        "condition": "normal documentation question on a host-bound project (omitted format retains docs mode)",
         "arguments": {
             "question": "How is authentication configured?",
-            "project_path": "/repo",
         },
     },
     {
         "id": "coding-first-call",
         "tool": "get_docs_context",
-        "condition": "coding or patch task before first edit; representation is not authorization",
+        "condition": "coding or patch task on a host-bound project before first edit; representation is not authorization",
         "arguments": {
             "question": "Which documented constraints apply to changing authentication?",
-            "project_path": "/repo",
         },
     },
     {
@@ -189,10 +191,10 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
     {
         "id": "returned-preparation",
         "tool": "prepare_docs",
-        "condition": "only after recommended_next_action or explicit lifecycle request",
+        "condition": "host-bound project; only after a returned action or explicit lifecycle request AND confirmation",
         "arguments": {
-            "action": "sync_project_docs",
-            "project_path": "/repo",
+            "action": "discover_project_docs",
+            "confirm": True,
         },
     },
     {

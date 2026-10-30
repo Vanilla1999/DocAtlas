@@ -20,9 +20,14 @@ Clients that do not enable compact text remain unaffected. This is an
 evidence-preserving transport improvement; paid-model reading accuracy remains
 unverified until a real answering A/B is run.
 
-The advertised three-tool surface is sufficient for ordinary calls. The agent
-passes the unchanged question and the selected workspace's known absolute
-`project_path`, or an explicit registered `library`. It does not need to load a
+The advertised three-tool surface is sufficient for ordinary calls. With
+`doc-atlas install opencode --project`, the installer explicitly binds the
+selected project in the MCP launch command. The agent passes only the unchanged
+question: omitted target/scope searches all prepared docs in that project,
+including catalogued module docs. It does not need to know a documentation folder.
+Global registrations remain unbound: pass a known absolute `project_path` or an
+explicit registered `library`, or configure `docs-serve --project-root` once.
+See [the current-project contract](current-project-default.md). The agent does not need to load a
 skill, enumerate tools again or call `docs_status` before each read. The optional
 documentation-language mode still requires its scoped language metadata when
 unknown. Installed guidance adds the short workflow; repair, preparation and

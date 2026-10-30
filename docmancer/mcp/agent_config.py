@@ -20,6 +20,7 @@ class AgentTarget:
     name: str
     config_path: Path
     style: str
+    project_root: Path | None = None
 
 
 def known_agents(*, project: bool = False) -> list[AgentTarget]:
@@ -71,6 +72,12 @@ def known_agents(*, project: bool = False) -> list[AgentTarget]:
                 "json_vscode_servers",
             )
         )
+        # Installation is an explicit host action in the selected workspace.
+        # Persist that identity here, never infer it from a later server CWD.
+        root = Path.cwd().resolve()
+        for target in targets:
+            if not target.config_path.is_absolute():
+                target.project_root = root
     return targets
 
 
@@ -92,17 +99,17 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     target.config_path.parent.mkdir(parents=True, exist_ok=True)
     config = _load_config(target.config_path)
     if target.style == "json_opencode_mcp":
-        changed = _update_opencode_config(config)
+        changed = _update_opencode_config(config, project_root=target.project_root)
         if changed:
             _backup_and_write(target.config_path, config)
         return changed, f"{'registered' if changed else 'already registered'} in {target.config_path}"
     servers = _json_server_mapping(config, target.style, create=True)
-    desired = _desired_server_entry(target.style)
+    desired = _desired_server_entry(target.style, project_root=target.project_root)
 
     existing = servers.get(SERVER_KEY)
     if _matches_command(existing, desired):
         return False, f"already registered in {target.config_path}"
-    if existing is not None and not _has_same_command(existing, desired):
+    if existing is not None and not _can_register_command(existing, desired, target.style):
         raise ValueError(
             f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a different command; "
             "refusing to overwrite it."
@@ -135,7 +142,7 @@ def unregister_server(target: AgentTarget) -> bool:
     servers = _json_server_mapping(config, target.style, create=False)
     if servers is None:
         return False
-    desired = _desired_server_entry(target.style)
+    desired = _desired_server_entry(target.style, project_root=target.project_root)
 
     existing = servers.get(SERVER_KEY)
     if target.style == "json_opencode_mcp":
@@ -152,16 +159,21 @@ def unregister_server(target: AgentTarget) -> bool:
     return False
 
 
-def _desired_server_entry(style: str) -> dict[str, Any]:
+def _desired_server_entry(style: str, *, project_root: Path | None = None) -> dict[str, Any]:
+    args = list(ARGS)
+    if project_root is not None:
+        if not project_root.is_absolute():
+            raise ValueError("Project MCP registration requires an absolute workspace root")
+        args.extend(["--project-root", str(project_root)])
     if style == "json_opencode_mcp":
         return {
             "type": "local",
-            "command": [COMMAND, *ARGS],
+            "command": [COMMAND, *args],
             "environment": dict(OPENCODE_MCP_ENVIRONMENT),
         }
     if style == "json_vscode_servers":
-        return {"type": "stdio", "command": COMMAND, "args": list(ARGS)}
-    return {"command": COMMAND, "args": list(ARGS)}
+        return {"type": "stdio", "command": COMMAND, "args": args}
+    return {"command": COMMAND, "args": args}
 
 
 def _json_server_mapping(
@@ -199,24 +211,29 @@ def _json_server_mapping(
     return servers
 
 
-def _update_opencode_config(config: dict[str, Any]) -> bool:
+def _update_opencode_config(config: dict[str, Any], *, project_root: Path | None = None) -> bool:
     """Migrate a unique owned registration without changing its identity or state."""
     before = json.dumps(config, sort_keys=True)
     mcp = config.setdefault("mcp", {})
     if not isinstance(mcp, dict):
         raise ValueError("Existing 'mcp' in agent config must be an object")
     servers = _json_server_mapping(config, "json_opencode_mcp", create=True)
-    desired = _desired_server_entry("json_opencode_mcp")
+    desired = _desired_server_entry("json_opencode_mcp", project_root=project_root)
     owned = [(mapping, name, entry) for mapping in (mcp, servers)
              for name, entry in mapping.items()
-             if not (mapping is mcp and name == "servers") and _has_same_command(entry, desired)]
+             if not (mapping is mcp and name == "servers") and _is_docs_server_command(entry)]
     if len(owned) > 1:
         raise ValueError("Ambiguous DocAtlas MCP registrations; refusing to overwrite them")
     for mapping in (mcp, servers):
         for name in (SERVER_KEY, "docmancer"):
-            if name in mapping and not _has_same_command(mapping[name], desired):
+            if name in mapping and not _is_docs_server_command(mapping[name]):
                 raise ValueError("Existing DocAtlas MCP server has a different command; refusing to overwrite it")
     mapping, name, existing = owned[0] if owned else (servers, SERVER_KEY, {})
+    if owned and not _can_register_command(existing, desired, "json_opencode_mcp"):
+        raise ValueError(
+            "Existing DocAtlas MCP server has a different project binding or command options; "
+            "refusing to overwrite it. Remove or update that registration explicitly."
+        )
     if mapping is mcp and name in servers:
         raise ValueError("Conflicting MCP server name; refusing to overwrite it")
     environment = {} if "environment" not in existing else existing["environment"]
@@ -284,13 +301,38 @@ def _has_same_command(existing: Any, desired: dict[str, Any]) -> bool:
     return True
 
 
+def _is_docs_server_command(existing: Any) -> bool:
+    """Recognize owned OpenCode launchers, including conflicting root options."""
+    if not isinstance(existing, dict) or not isinstance(existing.get("command"), list):
+        return False
+    return existing["command"][:3] == [COMMAND, *ARGS]
+
+
+def _can_register_command(existing: Any, desired: dict[str, Any], style: str) -> bool:
+    desired_args = desired["command"][1:] if style == "json_opencode_mcp" else desired["args"]
+    if "--project-root" in desired_args and isinstance(existing, dict):
+        environment = existing.get("environment" if style == "json_opencode_mcp" else "env", {})
+        if isinstance(environment, dict):
+            inherited_root = environment.get("DOCATLAS_PROJECT_ROOT")
+            desired_root = desired_args[desired_args.index("--project-root") + 1]
+            if inherited_root not in (None, "", desired_root):
+                return False
+    if _has_same_command(existing, desired):
+        return True
+    unbound = _desired_server_entry(style)
+    # The explicit project install may upgrade a legacy unbound registration.
+    # A different bound root, extra launcher flags, or a global reinstall must
+    # not silently change the target selected by an existing registration.
+    return desired != unbound and _has_same_command(existing, unbound)
+
+
 def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> bool:
     """Return whether the current server key has the expected command."""
 
     servers = _json_server_mapping(config, target.style, create=False)
     if servers is None:
         return False
-    desired = _desired_server_entry(target.style)
+    desired = _desired_server_entry(target.style, project_root=target.project_root)
     if target.style == "json_opencode_mcp":
         return sum(_matches_command(entry, desired) for entry in servers.values()) == 1
     return _matches_command(servers.get(SERVER_KEY), desired)
@@ -307,7 +349,7 @@ def target_has_current_server_entry(target: AgentTarget) -> bool:
         servers = config.get("mcp_servers", {}) if isinstance(config, dict) else {}
         if not isinstance(servers, dict):
             return False
-        desired = _desired_server_entry(target.style)
+        desired = _desired_server_entry(target.style, project_root=target.project_root)
         return _matches_command(servers.get(SERVER_KEY), desired)
     return has_current_server_entry(_load_config(target.config_path), target)
 
@@ -324,15 +366,34 @@ def _register_toml_server(target: AgentTarget) -> tuple[bool, str]:
     if servers is not None and not isinstance(servers, dict):
         raise ValueError(f"Existing mcp_servers in {target.config_path} must be a table")
     servers = servers or {}
-    desired = _desired_server_entry(target.style)
+    desired = _desired_server_entry(target.style, project_root=target.project_root)
     existing = servers.get(SERVER_KEY)
     if _matches_command(existing, desired):
         return False, f"already registered in {target.config_path}"
-    if existing is not None:
+    if existing is not None and not _can_register_command(existing, desired, target.style):
         raise ValueError(
             f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a different command; "
             "refusing to overwrite it."
         )
+
+    if existing is not None:
+        # An unbound project-local entry is ours to upgrade, but never drop
+        # user-owned TOML options while changing its args.
+        if set(existing) != {"command", "args"}:
+            raise ValueError(
+                "Existing unbound DocAtlas MCP server contains custom TOML options; "
+                "add --project-root explicitly instead of overwriting them."
+            )
+        generated = (f"[mcp_servers.{SERVER_KEY}]\n"
+                     f"command = {json.dumps(COMMAND)}\n"
+                     f"args = {json.dumps(ARGS)}\n")
+        removed = _remove_toml_server_block(text, SERVER_KEY)
+        if generated not in text or text.replace(generated, "", 1) != removed:
+            raise ValueError(
+                "Existing unbound DocAtlas MCP block contains custom TOML text or comments; "
+                "add --project-root explicitly instead of overwriting them."
+            )
+        text = removed
 
     if target.config_path.exists():
         shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
@@ -340,7 +401,7 @@ def _register_toml_server(target: AgentTarget) -> tuple[bool, str]:
     block = (
         f"[mcp_servers.{SERVER_KEY}]\n"
         f"command = {json.dumps(COMMAND)}\n"
-        f"args = {json.dumps(ARGS)}\n"
+        f"args = {json.dumps(desired['args'])}\n"
     )
     target.config_path.write_text(text + separator + block, encoding="utf-8")
     return True, f"registered docatlas in {target.config_path}"
@@ -355,7 +416,7 @@ def _unregister_toml_server(target: AgentTarget) -> bool:
     servers = config.get("mcp_servers", {}) if isinstance(config, dict) else {}
     if not isinstance(servers, dict):
         return False
-    desired = _desired_server_entry(target.style)
+    desired = _desired_server_entry(target.style, project_root=target.project_root)
 
     if servers.get(SERVER_KEY) == desired:
         updated = _remove_toml_server_block(text, SERVER_KEY)

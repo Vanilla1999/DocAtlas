@@ -23,6 +23,7 @@ PREFETCH_TOOL_NAMES = {
 }
 
 _PREPARE_ACTION_FIELDS = {
+    "discover_project_docs": {"action", "project_path", "confirm"},
     "sync_project_docs": {
         "action", "project_path", "with_vectors", "changed_paths", "deleted_paths", "renamed_paths",
         "plan_digest",
@@ -42,6 +43,7 @@ _PREPARE_ACTION_FIELDS = {
     "cancel_docs_job": {"action", "job_id", "project_path"},
 }
 _PREPARE_REQUIRED_FIELDS = {
+    "discover_project_docs": {"project_path"},
     "sync_project_docs": {"project_path"},
     "prefetch_project_dependency_docs": {"project_path"},
     "prefetch_library_docs": {"library"},
@@ -342,6 +344,24 @@ def prefetch_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
+    if name == "prepare_docs" and args.get("action") == "discover_project_docs":
+        binding = vars(service).get("current_project")
+        policy = vars(service).get("member_storage_policy")
+        if binding is None or policy is None or args.get("project_path") != str(binding.root):
+            return {"status": "error", "reason_code": "docs_context_target_missing",
+                    "message": "Project discovery requires an explicit host-selected current project and private member store."}
+        error = validate_prepare_docs_arguments(args)
+        if error:
+            return error
+        binding.validate()
+        if args.get("confirm") is not True:
+            return {"status": "blocked", "reason_code": "confirmation_required",
+                    "requires_confirmation": True, "confirmation_reason": "local_index_write",
+                    "mutation_performed": False,
+                    "message": "Approve bounded local documentation discovery and private-index updates. No repository writes or network access."}
+        from docmancer.docs.host_project_catalog import discover_project_docs
+        return {"tool": name, "action": "discover_project_docs",
+                **discover_project_docs(binding.root, policy, confirm=True)}
     # Member preparation must not instantiate unrelated registry/job services on
     # a cold store. Complete schema/intent validation precedes even their lookup.
     if name == "prepare_docs" and args.get("action") == "sync_project_docs":

@@ -6,6 +6,14 @@ documentation-governance meta-question for the concrete task.
 
 ## Interpret the result
 
+Omitted target uses the host-bound current project and all of its prepared
+documents. If no project is bound, `docs_context_target_missing` requires
+explicit selection; never guess the process CWD or a docs subfolder.
+`docs_context_target_conflict` means the supplied path differs from the selected
+project: omit it for this project or ask the host to reconnect to another one.
+An explicit module/scope is never widened. `needs_prepare` requests separate
+approval for local preparation, not repository edits or automatic fallback scans.
+
 Cite returned source statements through evidence IDs. `status="ok"`, retrieval
 success, citations and flags do not establish semantic proof, completeness or
 answer/edit authority. Preserve exact text, source identity, hash, span, version,

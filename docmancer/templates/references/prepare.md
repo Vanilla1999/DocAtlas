@@ -8,6 +8,21 @@ network consent before work. Never infer preparation flags from retrieval mode.
 
 ## Source discovery
 
+For the host-bound current project, use
+`prepare_docs(action="discover_project_docs", confirm=true)` only after explicit
+approval. It discovers supported documents throughout that project, not just
+`docs/`, then commits a finite manifest and lexical index together in private
+storage. It does not write the repository, fetch the network, index code or
+download models. Omitted/false confirmation performs no discovery or mutation.
+
+An existing repository catalog remains the exact allowlist; invalid catalogs
+are not bypassed. Exclusions, ignore rules, symlink checks and operational
+file/byte/depth/time limits still apply. A limit failure commits no partial
+inventory. New/moved documents require another approved preparation; ordinary
+questions never discover or prepare. `needs_prepare` is a readiness problem,
+not evidence that the requested fact is absent. This action does not exist on
+older runtimes: use only the advertised schema.
+
 For an unknown library source, follow the returned
 `prepare_docs(action="discover_library_docs", ...)` action and review the
 registry-derived candidates. Registered sources are registry-owned; do not guess
@@ -46,6 +61,6 @@ instead of automatically retrying. Use `docs_status` for explicit health,
 freshness, indexing or job-status requests, returned recommended actions or
 returned job IDs; never as discovery.
 
-For current project dependencies, pass `project_path` and omit `version` unless
+For current project dependencies, use the host binding or a known `project_path` and omit `version` unless
 an exact/historical version was explicitly requested. Re-query after lockfile
 changes rather than reusing previous-version context.

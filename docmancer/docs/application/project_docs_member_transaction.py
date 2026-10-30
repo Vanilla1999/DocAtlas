@@ -123,6 +123,10 @@ class UnsafeSQLitePathMutation(PermissionError):
     """No trusted host storage policy was supplied to the member route."""
 
 
+class MemberReadBudgetExceeded(ValueError):
+    """A source-read limit failed before storage provisioning/publication."""
+
+
 _DESCRIPTOR_READ_SUPPORTED = (
     os.name == "posix" and hasattr(os, "O_NOFOLLOW")
     and hasattr(os, "O_DIRECTORY") and os.open in os.supports_dir_fd
@@ -143,7 +147,7 @@ class PinnedProject:
     from a check followed by reopening a pathname. No persistence API is exposed.
     """
 
-    def __init__(self, root: Path):
+    def __init__(self, root: Path, *, capture_reads: bool = False):
         if (not _DESCRIPTOR_READ_SUPPORTED or os.name != "posix"
             or not getattr(os, "O_NOFOLLOW", 0) or not getattr(os, "O_DIRECTORY", 0)
             or _DIR_FD_OPEN not in getattr(os, "supports_dir_fd", ())):
@@ -154,12 +158,16 @@ class PinnedProject:
         self.edges: list[tuple[int, str, int, tuple[int, ...]]] = []
         self.members: dict[str, int] = {}
         self.versions: dict[int, tuple[int, ...]] = {}
+        self.snapshots: dict[str, bytes] = {}
+        self.capture_reads = capture_reads is True
+        self.directories: dict[tuple[str, ...], int] = {}
         try:
             fd = os.open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
             self.fds.append(fd)
             for part in root.parts[1:]:
                 fd = self._open(fd, part, directory=True)
             self.root_fd = fd
+            self.directories[()] = fd
         except BaseException:
             self.close()
             raise
@@ -193,8 +201,15 @@ class PinnedProject:
             raise ValueError("descriptor members require literal relative paths")
         if relative not in self.members:
             parent = self.root_fd
-            for part in Path(relative).parts[:-1]:
-                parent = self._open(parent, part, directory=True)
+            parts = Path(relative).parts
+            for index, part in enumerate(parts[:-1]):
+                key = parts[:index + 1]
+                if self.capture_reads and key in self.directories:
+                    parent = self.directories[key]
+                else:
+                    parent = self._open(parent, part, directory=True)
+                    if self.capture_reads:
+                        self.directories[key] = parent
             self.members[relative] = self._open(parent, Path(relative).name, directory=False)
         self.recheck()
         return self.members[relative]
@@ -219,16 +234,16 @@ class PinnedProject:
 
     def read(self, relative: str, limit: int, *, deadline: float | None = None) -> bytes:
         if limit < 0 or (deadline is not None and time.monotonic() >= deadline):
-            raise ValueError("member read budget exhausted before IO")
+            raise MemberReadBudgetExceeded("member read budget exhausted before IO")
         fd = self.bind(relative)
         before = os.fstat(fd)
         if before.st_size > limit:
-            raise ValueError("member exceeds bounded read limit")
+            raise MemberReadBudgetExceeded("member exceeds bounded read limit")
         os.lseek(fd, 0, os.SEEK_SET)
         data = bytearray()
         while len(data) < limit:
             if deadline is not None and time.monotonic() >= deadline:
-                raise ValueError("member deadline exhausted before chunk read")
+                raise MemberReadBudgetExceeded("member deadline exhausted before chunk read")
             chunk = os.read(fd, min(65536, limit - len(data)))
             if not chunk:
                 break
@@ -238,12 +253,17 @@ class PinnedProject:
         if (len(data) != before.st_size or (before.st_size, before.st_mtime_ns, before.st_ctime_ns) !=
             (after.st_size, after.st_mtime_ns, after.st_ctime_ns)):
             raise PermissionError("selected descriptor content changed during read")
-        return bytes(data)
+        result = bytes(data)
+        if self.capture_reads:
+            self.snapshots[relative] = result
+        return result
 
     def close(self) -> None:
         for fd in reversed(self.fds):
             os.close(fd)
         self.fds.clear()
+        self.snapshots.clear()
+        self.directories.clear()
 
     def __enter__(self) -> PinnedProject:
         return self
@@ -271,10 +291,44 @@ def execute_member_transaction(project_path: str, mutation: Any, *, operation: s
         return _execute_pinned(raw_root, pinned, request, started, storage_policy)
 
 
+def project_member_boundary(root: Path, pinned: PinnedProject, storage: Path) -> SourceBoundary:
+    """Read the same pinned project restrictions for explicit and discovered members."""
+    config = DocmancerConfig()
+    if (root / "docatlas.yaml").exists() or (root / "docatlas.yaml").is_symlink():
+        config = DocmancerConfig(**(yaml.load(
+            _read_member(pinned, "docatlas.yaml", MAX_CATALOG_BYTES).decode("utf-8"),
+            Loader=_UniqueKeySafeLoader,
+        ) or {}))
+        if "db_path" in config.index.model_fields_set:
+            if config.index.db_path != str(storage):
+                raise PermissionError("project config storage is not the host-selected target")
+    if config.index.provider != "sqlite" or str(config.retrieval.default_mode).lower() != "lexical":
+        raise PermissionError("member transaction requires lexical project configuration")
+    configured = config.project.source_boundary()
+    patterns = ()
+    if configured.respect_gitignore and ((root / ".gitignore").exists() or (root / ".gitignore").is_symlink()):
+        lines = _read_member(pinned, ".gitignore", MAX_CATALOG_BYTES).decode("utf-8").splitlines()
+        patterns = tuple(line.strip() for line in lines if line.strip() and not line.lstrip().startswith("#"))
+    boundary = SourceBoundary.from_config(configured.model_copy(update={"respect_gitignore": False}), root=root)
+    return replace(boundary, respect_gitignore=configured.respect_gitignore, gitignore_patterns=patterns)
+
+
 def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransaction,
-                    started: float, storage_policy: MemberStoragePolicy) -> tuple[ProjectMetadata, dict[str, Any]]:
+                    started: float, storage_policy: MemberStoragePolicy, *,
+                    reuse_pinned_reads: bool = False,
+                    read_deadline: float | None = None) -> tuple[ProjectMetadata, dict[str, Any]]:
     storage = storage_policy.db_path
-    catalog_bytes = _read_member(pinned, CATALOG_FILENAME, MAX_CATALOG_BYTES)
+    host_catalog = None
+    expected_host_catalog_sha256 = None
+    host_membership = not os.path.lexists(root / CATALOG_FILENAME)
+    if host_membership:
+        from docmancer.docs.host_project_catalog import host_catalog_bytes, host_catalog_transaction
+        catalog_bytes = host_catalog_bytes(root)
+        if catalog_bytes is None:
+            raise PermissionError("explicit finite project membership is required")
+        host_catalog, expected_host_catalog_sha256 = host_catalog_transaction(root, storage_policy, catalog_bytes)
+    else:
+        catalog_bytes = _read_member(pinned, CATALOG_FILENAME, MAX_CATALOG_BYTES)
     if hashlib.sha256(catalog_bytes).hexdigest() != request.catalog_sha256:
         raise ValueError("catalog hash precondition failed")
     exists = storage_policy.validate(root, request.storage_path)
@@ -298,29 +352,12 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
             raise ValueError("invalid or duplicate catalog document")
         entries[entry.path] = entry
     pinned.recheck()
-    config = DocmancerConfig()
-    if (root / "docatlas.yaml").exists() or (root / "docatlas.yaml").is_symlink():
-        config = DocmancerConfig(**(yaml.load(
-            _read_member(pinned, "docatlas.yaml", MAX_CATALOG_BYTES).decode("utf-8"),
-            Loader=_UniqueKeySafeLoader,
-        ) or {}))
-        # Project settings constrain source reads, never select storage. An
-        # explicit conflicting storage request fails rather than redirecting IO.
-        if "db_path" in config.index.model_fields_set:
-            if config.index.db_path != str(storage):
-                raise PermissionError("project config storage is not the host-selected target")
-    if config.index.provider != "sqlite" or str(config.retrieval.default_mode).lower() != "lexical":
-        raise PermissionError("member transaction requires lexical project configuration")
-    configured = config.project.source_boundary()
-    patterns = ()
-    if configured.respect_gitignore and ((root / ".gitignore").exists() or (root / ".gitignore").is_symlink()):
-        lines = _read_member(pinned, ".gitignore", MAX_CATALOG_BYTES).decode("utf-8").splitlines()
-        patterns = tuple(line.strip() for line in lines if line.strip() and not line.lstrip().startswith("#"))
-    boundary = SourceBoundary.from_config(configured.model_copy(update={"respect_gitignore": False}), root=root)
-    boundary = replace(boundary, respect_gitignore=configured.respect_gitignore, gitignore_patterns=patterns)
+    boundary = project_member_boundary(root, pinned, storage)
     if not boundary.enabled or len(request.documents) > boundary.max_scanned_files:
         raise ValueError("source boundary rejects member transaction")
     deadline = started + boundary.scan_deadline_seconds
+    if read_deadline is not None:
+        deadline = min(deadline, read_deadline)
     documents = []
     spent = 0
     selected = []
@@ -332,19 +369,32 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
         path = finite_local_path(root, member.path, boundary=boundary,
                                  supported_extensions=frozenset(DOC_FILE_EXTENSIONS),
                                  use_configured_extensions=False)
-        if path is None or time.monotonic() >= deadline:
+        if path is None:
             raise PermissionError("member rejected by current source boundary")
+        if time.monotonic() >= deadline:
+            raise MemberReadBudgetExceeded("member transaction deadline exhausted before member read")
         selected.append((member, entry, path))
     pinned.recheck()
     for member, entry, path in selected:
         if time.monotonic() >= deadline:
-            raise ValueError("member transaction deadline exhausted before member read")
+            raise MemberReadBudgetExceeded("member transaction deadline exhausted before member read")
         remaining = boundary.max_scanned_bytes - spent
-        data = _read_member(pinned, member.path, min(boundary.max_file_bytes, remaining),
-                            deadline=deadline)
+        if reuse_pinned_reads is True:
+            # Discovery captured these exact bytes through this still-open
+            # descriptor set. Revalidate its identities/versions rather than
+            # secretly doubling the bounded source-read budget.
+            pinned.recheck()
+            if member.path not in pinned.snapshots or member.path not in pinned.members:
+                raise PermissionError("discovery member has no pinned source snapshot")
+            data = pinned.snapshots[member.path]
+            if len(data) > min(boundary.max_file_bytes, remaining):
+                raise MemberReadBudgetExceeded("pinned member snapshot exceeds its read budget")
+        else:
+            data = _read_member(pinned, member.path, min(boundary.max_file_bytes, remaining),
+                                deadline=deadline)
         spent += len(data)
         if spent > boundary.max_scanned_bytes or time.monotonic() >= deadline:
-            raise ValueError("member transaction exceeds configured read budget")
+            raise MemberReadBudgetExceeded("member transaction exceeds configured read budget")
         document = member_document(root, member, entry, data)
         # Reporting metadata comes from the same checked descriptor as the bytes.
         document.metadata["project_doc_mtime_ns"] = pinned.versions[pinned.members[member.path]][1]
@@ -353,12 +403,18 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
     store.db_path = storage
     store.extracted_dir = storage.parent / "extracted"
     pinned.recheck()
+    if host_membership and os.path.lexists(root / CATALOG_FILENAME):
+        raise PermissionError("repository catalog appeared during host member preparation")
+    if reuse_pinned_reads is True and time.monotonic() >= deadline:
+        raise MemberReadBudgetExceeded("member preparation deadline exhausted before storage publication")
     if not exists:
         storage_policy.initialize()
     pinned.recheck()
     outcome = store.upsert_project_members(
         documents, project_path=str(root), expected_generation_id=request.expected_generation_id,
         storage_policy=storage_policy,
+        **({"host_catalog": host_catalog, "expected_host_catalog_sha256": expected_host_catalog_sha256}
+           if host_membership else {}),
     )
     return ProjectMetadata(project_path=str(root), docs_catalog_present=True,
                            docs_catalog_valid=True), outcome

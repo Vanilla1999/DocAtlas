@@ -61,7 +61,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             "dependencies": dependencies,
         },
         "tool_selection": {
-            "decision_rule": 'Use docs_status for an explicit health, freshness, index, or job-status request, a returned action/job ID, or unknown bound language in enabled language mode. Otherwise call get_docs_context directly before documentation answers or edits, with the unchanged question and known absolute project_path or explicit registered library. Use the advertised schema: context_format="patch_context" is optional only when explicitly requested and exposed by an advanced server. Call prepare_docs only for a returned recommended_next_action or explicit lifecycle request; preserve confirmation and network consent.',
+            "decision_rule": 'Use docs_status for an explicit health, freshness, index, or job-status request, a returned action/job ID, or unknown bound language in enabled language mode. Otherwise call get_docs_context directly before documentation answers or edits, with the unchanged question. Omit target for the host-bound current project (all prepared docs); otherwise use a known absolute project_path or registered library. Use the advertised schema: context_format="patch_context" is optional only when explicitly requested and exposed by an advanced server. Call prepare_docs only for a returned recommended_next_action or explicit lifecycle request; preserve confirmation and network consent.',
             "default_tool": "get_docs_context",
             "tools": [
                 {
@@ -72,7 +72,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
                 {
                     "name": "prepare_docs",
                     "use_when": "Only from recommended_next_action or an explicit user request to sync, refresh, index, or prefetch.",
-                    "requires_user_approval": "Network actions require approval. Project writes require the explicit bound member mutation contract, not catalog membership or status.",
+                    "requires_user_approval": "Network actions require approval. discover_project_docs requires host binding and explicit confirmation for bounded local discovery/private indexing. Other project writes require the explicit bound member mutation contract, not catalog membership or status.",
                 },
                 {
                     "name": "docs_status",
@@ -93,7 +93,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
         ],
         "maintenance": {
             "check_docs_after_code_change": "doc-atlas docs-impact --base <base-ref>",
-            "refresh_project_docs": "Use prepare_docs(action=sync_project_docs) only with the explicit confirmed project/storage/member mutation contract. File changes and clean Git do not authorize writes.",
+            "refresh_project_docs": "On a host-bound project, use prepare_docs(action=discover_project_docs, confirm=true) only after approval; it updates private state, not the repository. Exact-member sync still requires the explicit project/storage/member mutation contract. File changes and clean Git do not authorize writes.",
             "fallback_without_mcp": [
                 "doc-atlas context <project-path> <question>",
                 "doc-atlas query <question>",
