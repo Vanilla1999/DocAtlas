@@ -66,6 +66,33 @@ class _ProjectDocsServicePart01:
         return self.project_state.indexed_project_doc_sources(project_path)
 
     @staticmethod
+    def _project_doc_read_membership(
+        root: Path, indexed_sources: list[dict[str, Any]],
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        """Host manifests distinguish inactive retained rows from missing docs.
+
+        Repository catalogs keep their existing orphan/preflight behavior. Only
+        a valid host snapshot separates storage history from active read state;
+        all declared current members still pass the ordinary freshness checks.
+        """
+        import os
+        from docmancer.docs.project_docs_catalog import CATALOG_FILENAME, read_catalog_snapshot
+        from docmancer.docs.domain.project_state import partition_project_read_membership
+        if os.path.lexists(root / CATALOG_FILENAME):
+            return indexed_sources, {}
+        snapshot = read_catalog_snapshot(root)
+        if snapshot.origin != "host" or not snapshot.catalog.valid:
+            return indexed_sources, {}
+        active, retained = partition_project_read_membership(
+            indexed_sources, frozenset(entry.path for entry in snapshot.catalog.entries),
+        )
+        diagnostics = ({
+            "count": len(retained), "catalog_sha256": snapshot.sha256,
+            "state": "inactive_nonmembers", "deletion_not_authorized": True,
+        } if retained else {})
+        return active, diagnostics
+
+    @staticmethod
 
     def _source_state_guidance() -> dict[str, Any]:
         return ProjectDocsState.source_state_guidance()
@@ -338,7 +365,8 @@ class _ProjectDocsServicePart01:
         catalog_invalid = metadata.docs_catalog_present and not metadata.docs_catalog_valid
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         indexed_sources_all = self._indexed_project_doc_sources(str(root))
-        indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        active_indexed_sources, retained_nonmembers = self._project_doc_read_membership(root, indexed_sources_all)
+        indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, active_indexed_sources)
         preserved_indexed_sources = indexed_sources_all if catalog_invalid else []
         if catalog_invalid:
             # An invalid authoritative catalog cannot classify existing index
@@ -517,6 +545,7 @@ class _ProjectDocsServicePart01:
                 "active_index": active_index,
                 "preflight": preflight,
                 "indexed_sources_preserved": len(preserved_indexed_sources),
+                **({"retained_nonmembers": retained_nonmembers} if retained_nonmembers else {}),
             },
             warnings=metadata.warnings,
         )

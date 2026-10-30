@@ -392,7 +392,9 @@ class _ProjectDocsServicePart03:
         query_scope = scope if scope != "all" else None
         if resolved_module_path:
             query_scope = "module"
-        indexed_sources_all = self._indexed_project_doc_sources(str(root))
+        indexed_sources_all, retained_nonmembers = self._project_doc_read_membership(
+            root, self._indexed_project_doc_sources(str(root)),
+        )
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
         if evidence_path:
             requested_path = normalize_doc_path(evidence_path)
@@ -736,7 +738,9 @@ class _ProjectDocsServicePart03:
         requires_confirmation = False
         confirmation_reason = None
         arguments_patch: dict[str, Any] = {}
-        preflight_diagnostics: dict[str, Any] = {}
+        preflight_diagnostics: dict[str, Any] = (
+            {"retained_nonmembers": retained_nonmembers} if retained_nonmembers else {}
+        )
         if internal_retrieval_diagnostics:
             preflight_diagnostics["same_call_pipeline"] = internal_retrieval_diagnostics
         if dropped_placeholder_chunks:

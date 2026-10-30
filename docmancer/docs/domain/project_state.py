@@ -197,6 +197,23 @@ def bound_project_docs_handoff(
     return bounded
 
 
+def partition_project_read_membership(
+    indexed_sources: list[dict[str, Any]],
+    member_paths: frozenset[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Separate current membership from retained storage without authorizing deletion.
+
+    The caller must supply a validated authoritative finite manifest. This is
+    deliberately separate from candidate/freshness partitioning: a declared
+    member rejected by a source boundary is still a member, not hidden history.
+    """
+    active: list[dict[str, Any]] = []
+    retained: list[dict[str, Any]] = []
+    for indexed in indexed_sources:
+        (active if indexed.get("path") in member_paths else retained).append(indexed)
+    return active, retained
+
+
 def partition_project_doc_state(
     candidates: list[dict[str, Any]],
     indexed_sources: list[dict[str, Any]],

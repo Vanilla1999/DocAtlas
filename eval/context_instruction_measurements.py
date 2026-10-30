@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import ast
 import asyncio
+import copy
 from datetime import timedelta
 import hashlib
 import json
@@ -155,9 +156,17 @@ def probe(repo, out, source_ref):
             assert entry["environment"]["DOCATLAS_MCP_COMPACT_TEXT"] == "1"
             assert entry["environment"].get("DOCATLAS_MCP_MODEL_VIEW") != "1"
             registrations.append(entry)
-        assert registrations[0] == registrations[1], "fresh global/project installs must select the same transport"
+        global_entry, project_entry = registrations
+        global_command = ["doc-atlas", "mcp", "docs-serve"]
+        assert global_entry["command"] == global_command
+        bound_command = global_command + ["--project-root", str(project)]
+        # A historical wheel may leave project installs unbound. The current
+        # contract adds only the exact host-selected root, not another transport.
+        assert project_entry["command"] in (global_command, bound_command)
+        assert {**project_entry, "command": global_command} == global_entry, (
+            "global/project installs must retain the same transport and options")
         catalog, envelope = asyncio.run(tools_list(
-            registrations[0], env, project, out.parent / "tools-list.stderr.log"))
+            project_entry, env, project, out.parent / "tools-list.stderr.log"))
         surfaces = {
             "root_skill": (repo / "SKILL.md").read_text(encoding="utf-8"),
             "installed_bootstrap_template": (installed / "templates/agent_contract.md").read_text(encoding="utf-8"),
@@ -180,7 +189,10 @@ def probe(repo, out, source_ref):
         save(out, {
             "source_ref": source_ref, "boundary": "actual installed CLI and registered MCP stdio tools/list",
             "python": sys.executable, "prefix": sys.prefix, "package_origin": str(installed),
-            "installed_source_sha256": source_hashes, "registration": registrations[0],
+            "installed_source_sha256": source_hashes, "registration": global_entry,
+            "project_registration": project_entry,
+            "project_binding": "exact_install_root" if project_entry["command"] == bound_command else "legacy_unbound",
+            "tools_list_registration": "project",
             "catalog": catalog, "tools_list_envelope": envelope, "surfaces": surfaces,
             "reference_sha256": reference_sets,
             "operations": {"cli_installs": 2, "mcp_sessions": 1, "tools_list_calls": 1, "tool_calls": 0},
@@ -215,8 +227,35 @@ def compare(before, after, out):
     from docmancer.docs.application.projection_tokenizer import projection_token_count
 
     assert tuple(tool["name"] for tool in before["catalog"]) == NAMES
-    assert [validation(t["inputSchema"]) for t in before["catalog"]] == [
-        validation(t["inputSchema"]) for t in after["catalog"]], "input validation drifted"
+    old_validation = [validation(t["inputSchema"]) for t in before["catalog"]]
+    new_validation = [validation(t["inputSchema"]) for t in after["catalog"]]
+    schema_changes = []
+    if old_validation != new_validation:
+        # This PR explicitly changes routing/preparation, unlike the original
+        # instruction-only comparison. Admit only that declared schema delta;
+        # an unrelated validation change still fails this measurement.
+        expected = copy.deepcopy(old_validation)
+        prepare = expected[NAMES.index("prepare_docs")]
+        actions = prepare["properties"]["action"]["enum"]
+        assert "discover_project_docs" not in actions, "unexpected input validation drift"
+        actions.insert(0, "discover_project_docs")
+        sync = next(rule["then"] for rule in prepare["allOf"]
+                    if rule.get("if", {}).get("properties", {}).get("action") == {"const": "sync_project_docs"})
+        assert sync.pop("required") == ["project_path"]
+        confirmation = next(rule for rule in prepare["allOf"]
+                            if rule.get("if", {}).get("properties", {}).get("action") == {"const": "clear_index"})
+        previous_else = confirmation["else"]
+        assert previous_else == {"not": {"required": ["confirm"]}}
+        confirmation["else"] = {
+            "if": {"properties": {"action": {"const": "discover_project_docs"}}},
+            "then": {"properties": {"action": {}, "project_path": {}, "confirm": {}},
+                     "additionalProperties": False},
+            "else": previous_else,
+        }
+        assert expected == new_validation, "unexpected input validation drift"
+        schema_changes = ["explicit_current_project_discovery",
+                          "host_injected_sync_project_target",
+                          "discovery_confirmation_only"]
     def amount(text):
         if text is None:
             return None
@@ -246,7 +285,9 @@ def compare(before, after, out):
         "baseline": before["source_ref"], "candidate": after["source_ref"],
         "baseline_boundary": before["boundary"], "candidate_boundary": after["boundary"],
         "codec": "o200k_base; bundled hash-checked vocabulary from tiktoken 0.11.0",
-        "schema_validation_equal": True, "surfaces": surfaces, "tool_attribution": attribution,
+        "schema_validation_equal": old_validation == new_validation,
+        "declared_schema_changes": schema_changes,
+        "surfaces": surfaces, "tool_attribution": attribution,
         "accounting": {
             "default_total": None,
             "reason": "Do not sum overlapping root/template/installed/frontmatter/schema surfaces. Optional skill/reference loading and provider framing were not observed.",

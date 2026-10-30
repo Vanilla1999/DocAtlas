@@ -6,8 +6,10 @@ are written here before any runtime result exists, not derived from retrieval.
 from __future__ import annotations
 
 import asyncio
+from contextlib import closing
 import json
 from pathlib import Path
+import sqlite3
 
 
 DOCUMENTS = {
@@ -112,6 +114,39 @@ async def run(recorder, work, environment, installed_command, server, checks, st
         assert refreshed["metrics"]["generation_id"] != inventory["generation_id"]
         assert state.files(project) == before_moved[1]
         after_refresh = state.database(storage), state.files(project)
+        # Independent read-only state evidence: upsert is not a deletion grant.
+        # Retained old rows must not become active members of the new manifest.
+        with closing(sqlite3.connect(storage.as_uri() + "?mode=ro", uri=True)) as database:
+            database.execute("PRAGMA query_only=ON")
+            retained_sources = database.execute(
+                "SELECT source, content, metadata_json FROM sources WHERE source IN (?, ?)",
+                (str(project / old_relative), str(project / new_relative)),
+            ).fetchall()
+            manifest_row = database.execute(
+                "SELECT catalog_bytes, catalog_sha256 FROM project_doc_manifests WHERE project_path=?",
+                (str(project),),
+            ).fetchone()
+        assert {row[0] for row in retained_sources} == {str(project / old_relative), str(project / new_relative)}
+        for path, content, metadata_json in retained_sources:
+            assert content == DOCUMENTS[old_relative]
+            metadata = json.loads(metadata_json)
+            assert metadata["project_path"] == str(project)
+            assert metadata["project_doc_path"] == Path(path).relative_to(project).as_posix()
+            assert metadata["project_doc_content_hash"] == "sha256:" + checks.sha(content.encode())
+        assert manifest_row is not None and isinstance(manifest_row[0], bytes)
+        manifest_bytes, manifest_hash = manifest_row
+        assert checks.sha(manifest_bytes) == manifest_hash == refreshed["catalog_sha256"]
+        manifest = json.loads(manifest_bytes)
+        manifest_paths = [entry["path"] for entry in manifest["documents"]]
+        assert len(manifest_paths) == len(moved_documents) and set(manifest_paths) == set(moved_documents)
+        assert old_relative not in manifest_paths and new_relative in manifest_paths
+        checks.save(recorder.out / "discovery-MEMBERSHIP.json", {
+            "retained_source_paths": sorted(Path(row[0]).relative_to(project).as_posix() for row in retained_sources),
+            "retained_source_raw_sha256": checks.sha(DOCUMENTS[old_relative].encode()),
+            "active_manifest_paths": sorted(manifest_paths), "active_manifest_sha256": manifest_hash,
+            "retained_old_source_not_active_member": True,
+        })
+        assert (state.database(storage), state.files(project)) == after_refresh
         current, item = await recorder.call(session, "discovery-current", "get_docs_context", {"question": QUESTION})
         assert not item["isError"], current
         current_rows, _, _ = checks.checked_rows(current, moved_documents, project, authority="supporting")
@@ -169,6 +204,7 @@ async def run(recorder, work, environment, installed_command, server, checks, st
         "ignored_vendor_nested_ignore_symlink_excluded": True, "product_no_repository_writes": True,
         "unconfirmed_and_stale_reads_do_not_prepare": True, "source_move_requires_confirmed_preparation": True,
         "continuation_provider_scope_verified": True, "empty_explicit_catalog_not_widened": True,
+        "retained_old_source_not_active_manifest_member": True,
         "budget_exhaustion_no_partial_manifest_or_index_commit": True,
         "replacement_root_not_followed": True,
         "fixture_mutations": ["source rename", "temporary boundary budget config", "empty explicit catalog", "root replacement"],

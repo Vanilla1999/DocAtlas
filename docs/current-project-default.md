@@ -78,12 +78,10 @@ file, byte, depth and time limits remain. Limit exhaustion aborts without a
 partial inventory commit, with an explicit reason and work counters. Discovery
 excludes individual files above the existing per-file size limit without reading
 their text and reports `max_file_bytes` separately from aggregate budget failure.
-Discovery
-conservatively excludes subtrees with their own `.gitignore` when ignore handling
+Discovery conservatively excludes subtrees with their own `.gitignore` when ignore handling
 is enabled; it reports those exclusions instead of pretending to implement all
 nested/global Git ignore semantics. Root `.gitignore` rules use the existing
-source-boundary matcher. Discovery
-does not infer architectural authority, module boundaries or source language
+source-boundary matcher. Discovery does not infer architectural authority, module boundaries or source language
 from filenames: discovered entries are supporting, search-only documentation.
 Explicit catalog metadata still controls declared modules and scope.
 
@@ -106,6 +104,9 @@ scope/version and generation validation still applies. Adding or moving document
 requires a new approved preparation; no question triggers a hidden rescan. Old
 indexed rows can remain because preparation is an upsert, not a deletion grant,
 but they are not members of a new finite manifest merely by remaining in storage.
+For a valid host manifest these inactive nonmembers remain diagnostic history,
+not an orphan-cleanup prerequisite for reading the current members. Repository
+catalog orphan handling and current-member freshness/exclusion checks are unchanged.
 
 “All” means all **admissible prepared documentation of this project**, not all
 files on disk or proof of exhaustive evidence retrieval. Excluded/unsupported
@@ -120,6 +121,14 @@ reads, exact sources and frozen facts, explicit scope, conflicts and cold-state
 non-mutation. Discovery is checked separately on a fixture with documents outside
 `docs`, exclusions and a moved source; it must not alter the existing Black
 questions or gold to obtain a pass.
+
+The installed instruction measurement retains exact transport/options checks,
+while distinguishing a global unbound registration from a project registration
+with its exact installation root. It reports the declared preparation-schema
+change rather than falsely calling it schema-identical: the new discovery action,
+its confirmation field, and host-injected project targets for exact-member sync.
+Any other validation drift still fails the comparison. These are explicit
+contract changes; original question/fact/source gates are not relaxed.
 
 Runtime evidence must come from authorized CI, not local product execution.
 Installed MCP tests are not real OpenCode model sessions. This MR does not claim

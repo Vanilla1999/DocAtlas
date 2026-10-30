@@ -52,11 +52,14 @@ def environment(root: Path) -> dict[str, str]:
 class Recorder:
     def __init__(self, out: Path):
         self.out, self.counts = out, Counter()
+        self.last_event = None
 
     def note(self, operation, status, **fields):
+        event = {"operation": operation, "status": status,
+                 "monotonic": time.monotonic(), **fields}
+        self.last_event = event
         with (self.out / "OPERATIONS.jsonl").open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps({"operation": operation, "status": status,
-                                     "monotonic": time.monotonic(), **fields}, ensure_ascii=False) + "\n")
+            handle.write(json.dumps(event, ensure_ascii=False) + "\n")
             handle.flush()
             os.fsync(handle.fileno())
 
@@ -106,19 +109,50 @@ async def server(recorder, label, command, env, cwd):
     recorder.counts["server_processes"] += 1
     recorder.note("server", "started", label=label, command=command, cwd=str(cwd))
     params = StdioServerParameters(command=command[0], args=command[1:], env=env, cwd=str(cwd))
-    with (recorder.out / f"{label}-stderr.log").open("w") as stderr:
-        async with stdio_client(params, errlog=stderr) as streams:
-            async with ClientSession(*streams, read_timeout_seconds=timedelta(seconds=240)) as session:
-                await asyncio.wait_for(session.initialize(), 60)
-                recorder.counts["initialize"] += 1
-                listed = await asyncio.wait_for(session.list_tools(), 60)
-                recorder.counts["tools/list"] += 1
-                save(recorder.out / f"{label}-catalog.json", listed.model_dump(mode="json"))
-                assert {tool.name for tool in listed.tools} == {"get_docs_context", "prepare_docs", "docs_status"}
-                spec = next(tool for tool in listed.tools if tool.name == "get_docs_context")
-                assert spec.inputSchema.get("required") == ["question"]
-                assert getattr(spec, "outputSchema", None) is None
-                yield session
+    stderr_path = recorder.out / f"{label}-stderr.log"
+    phase = "spawn"
+    try:
+        with stderr_path.open("w") as stderr:
+            async with stdio_client(params, errlog=stderr) as streams:
+                async with ClientSession(*streams, read_timeout_seconds=timedelta(seconds=240)) as session:
+                    phase = "initialize"
+                    recorder.counts["initialize"] += 1
+                    recorder.note("initialize", "started", label=label)
+                    await asyncio.wait_for(session.initialize(), 60)
+                    recorder.note("initialize", "returned", label=label)
+                    phase = "tools/list"
+                    recorder.counts["tools/list"] += 1
+                    recorder.note("tools/list", "started", label=label)
+                    listed = await asyncio.wait_for(session.list_tools(), 60)
+                    recorder.note("tools/list", "returned", label=label)
+                    save(recorder.out / f"{label}-catalog.json", listed.model_dump(mode="json"))
+                    assert {tool.name for tool in listed.tools} == {"get_docs_context", "prepare_docs", "docs_status"}
+                    spec = next(tool for tool in listed.tools if tool.name == "get_docs_context")
+                    assert spec.inputSchema.get("required") == ["question"]
+                    assert getattr(spec, "outputSchema", None) is None
+                    phase = "scenario"
+                    yield session
+                    phase = "shutdown"
+    except BaseException as exc:
+        # Read only after SDK teardown and errlog close. Keep the full file in
+        # published receipts; bound console output without hiding truncation.
+        tail, size = b"", 0
+        if stderr_path.is_file():
+            with stderr_path.open("rb") as captured:
+                captured.seek(0, 2)
+                size = captured.tell()
+                captured.seek(max(0, size - 32768))
+                tail = captured.read(32768)
+        failure = {"server": label, "phase": phase, "command": command, "cwd": str(cwd),
+                   "exception_type": type(exc).__name__, "exception": str(exc),
+                   "last_operation": recorder.last_event, "stderr_file": stderr_path.name,
+                   "stderr_bytes": size, "console_tail_bytes": len(tail),
+                   "console_tail_truncated": len(tail) < size}
+        save(recorder.out / f"{label}-FAILURE.json", failure)
+        print(json.dumps({"mcp_server_failure": failure}, ensure_ascii=False), file=sys.stderr, flush=True)
+        print(tail.decode("utf-8", errors="replace") or "[server stderr is empty]", file=sys.stderr, flush=True)
+        recorder.note("server", "failed", label=label, phase=phase)
+        raise
     recorder.note("server", "exited", label=label)
 
 
@@ -352,6 +386,10 @@ async def run(a):
         save(a.out / "RESULT.json", summary)
         print(json.dumps({key: value for key, value in summary.items() if key != "black_frozen_gold"},
                          ensure_ascii=False), flush=True)
+    except BaseException as exc:
+        save(a.out / "FAILURE.json", {"exception_type": type(exc).__name__, "exception": str(exc),
+                                     "last_operation": recorder.last_event, "counts": dict(recorder.counts)})
+        raise
     finally:
         save(a.out / "COUNTS.json", dict(recorder.counts))
 

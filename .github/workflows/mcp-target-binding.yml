@@ -16,6 +16,8 @@ on:
       - 'docmancer/docs/documentation_language.py'
       - 'docmancer/docs/application/project_docs_discovery.py'
       - 'docmancer/docs/application/project_docs_member_transaction.py'
+      - 'docmancer/docs/application/*project_docs_service*'
+      - 'docmancer/docs/domain/project_state.py'
       - 'docmancer/docs/interfaces/mcp/context_tools.py'
       - 'docmancer/docs/interfaces/mcp/error_contract.py'
       - 'docmancer/docs/interfaces/mcp/prefetch_tools.py'
@@ -62,7 +64,7 @@ jobs:
             --entrypoint /bin/sh docatlas-binding -ec '
               trap '\''cat /sys/fs/cgroup/memory.max > /results/MEMORY_MAX; cat /sys/fs/cgroup/memory.peak > /results/MEMORY_PEAK; cat /sys/fs/cgroup/memory.events > /results/MEMORY_EVENTS'\'' EXIT
               /opt/venv/bin/python -I /repo/eval/project_binding/installed_stdio.py \
-                --repo /repo --work /results/work --out /results/verification
+                --repo /repo --work /work --out /results/verification
               cat /sys/fs/cgroup/memory.max > /results/MEMORY_MAX
               cat /sys/fs/cgroup/memory.peak > /results/MEMORY_PEAK
               cat /sys/fs/cgroup/memory.events > /results/MEMORY_EVENTS
@@ -72,6 +74,16 @@ jobs:
             '
           rc=$?
           docker inspect binding-test > "$RUNNER_TEMP/results/CONTAINER.json"
+          # Keep trusted private storage on container-owned ancestors. Publish
+          # its bytes as an archive, never chmod it or recurse through it as the
+          # differently owned GitHub runner account.
+          archive_rc=0
+          docker cp binding-test:/work - > "$RUNNER_TEMP/results/work.tar" \
+            2> "$RUNNER_TEMP/results/WORK_ARCHIVE_STDERR.log" || archive_rc=$?
+          echo "$archive_rc" > "$RUNNER_TEMP/results/WORK_ARCHIVE_EXIT_CODE"
+          if [ "$rc" -eq 0 ] && [ "$archive_rc" -ne 0 ]; then
+            rc=$archive_rc
+          fi
           echo "$rc" > "$RUNNER_TEMP/results/EXIT_CODE"
           exit "$rc"
       - name: Record full-agent/provider boundary honestly
