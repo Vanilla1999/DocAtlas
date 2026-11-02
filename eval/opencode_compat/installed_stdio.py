@@ -388,6 +388,9 @@ async def first_use(out: Path):
     with TemporaryDirectory(prefix="docatlas-first-use-") as temp:
         root = Path(temp)
         setup(root)
+        project_config = root / "project" / "docatlas.yaml"
+        project_config_text = "index:\n  provider: sqlite\n  db_path: .docatlas/docatlas.db\n  extracted_dir: .docatlas/extracted\n"
+        project_config.write_text(project_config_text)
         env = environment(root)
         install = subprocess.run(
             [sys.executable, "-I", "-m", "docmancer.cli", "install", "opencode", "--project"],
@@ -410,6 +413,9 @@ async def first_use(out: Path):
             assert row["path"] in DOCS, row
             assert row["text"] in DOCS[row["path"]], row
         assert database.is_file()
+        assert not (root / "project" / ".docatlas" / "docatlas.db").exists()
+        assert not (root / "project" / ".docatlas" / "extracted").exists()
+        assert project_config.read_text() == project_config_text
         assert all((root / "project" / name).read_text() == text for name, text in DOCS.items())
         (out / "response.json").write_text(text)
         (out / "RESULT.json").write_text(json.dumps({
