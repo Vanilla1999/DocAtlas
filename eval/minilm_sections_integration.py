@@ -2,6 +2,8 @@
 
 Five real catalog/SQLite preparations, forty uncompressed public calls, and forty
 compressed calls delivered over stdio. The oracle is loaded only after delivery.
+Uncompressed calls measure the native response, which may itself be selected;
+same-call checked input receipts audit compression fidelity and whole sections.
 Extra public scenarios: overlong query, resource read, changed source rejection,
 and missing model assets. No external transport or scorer is mocked.
 """
@@ -82,7 +84,13 @@ def worker(args):
                     start = time.perf_counter()
                     payload = call_docs_tool_payload("get_docs_context", request, service)
                     save(out / (case["id"] + "-baseline.json"), payload)
-                    assert payload.get("kind") == "docs_context" and payload.get("sources")
+                    # This independently selected public result is a cost
+                    # baseline, not the compressed call's evidence pool. An
+                    # empty result is valid for an unanswerable native query.
+                    assert payload.get("kind") == "docs_context", payload
+                    assert payload.get("status") in {"ok", "truncated", "insufficient_evidence"}, payload
+                    assert isinstance(payload.get("sources"), list), payload
+                    assert not payload.get("hard_stop") and not payload.get("requires_confirmation"), payload
                     assert "context_format" not in payload
                     save(out / (case["id"] + "-baseline-time.json"), time.perf_counter() - start)
                 assert observations == [], "disabled mode must not score"
@@ -121,6 +129,51 @@ def assert_operational_error(response, expected, receipt_path):
     assert response.isError and payload.get("status") == "failed", payload
     assert (payload.get("error") or {}).get("reason_code") == expected, payload
     assert not payload.get("sources") and not payload.get("source_groups"), payload
+
+
+def verify_acquired_sections(args, family, cases, records, observations):
+    """Audit delivered rows against this call's complete checked source pool.
+
+    The observer records operands; it does not choose the expected facts. Exact
+    source bytes, project/scope/version, hashes/spans and the frozen gold claims
+    are independently checked by assess() after all public delivery completes.
+    An off-response is a separately selected public result, not a pool oracle.
+    """
+    group_cases = [case for case in cases if case["project_group"] == family]
+    assert len(observations) == len(group_cases)
+    by_question = {}
+    for receipt in observations:
+        digest = receipt["scoring_question_sha256"]
+        assert digest not in by_question, "ambiguous same-call section receipt"
+        by_question[digest] = receipt
+    group_records = {record["case_id"]: record for record in records if record["family"] == family}
+    assert set(group_records) == {case["id"] for case in group_cases}
+    section_fields = ("path_or_url", "section", "project_identity", "scope", "version_binding", "authority")
+    for case in group_cases:
+        receipt = by_question[sha(case["question"].encode("utf-8"))]
+        candidates = receipt["candidate_sources"]
+        assert len(candidates) == receipt["candidate_rows"]
+        acquired = {row["evidence_id"]: row for row in candidates}
+        assert len(acquired) == len(candidates), "duplicate acquired evidence ID"
+        path = args.out / family / (case["id"] + "-expanded.json")
+        delivered = json.loads(path.read_text())["sources"]
+        assert delivered, "ranking failure must not masquerade as abstention"
+        for row in delivered:
+            assert row["evidence_id"] in acquired, ("unacquired source", case["id"], row)
+            assert row == acquired[row["evidence_id"]], ("selected source was altered", case["id"], row)
+        selected_ids = [row["evidence_id"] for row in delivered]
+        assert selected_ids == receipt["selected_evidence_ids"]
+        assert len(selected_ids) == receipt["selected_rows"]
+        chosen = {tuple(row.get(field) for field in section_fields) for row in delivered}
+        if args.units == "legacy":
+            assert len(chosen) <= args.top_k
+        wanted = [row["evidence_id"] for row in candidates
+                  if tuple(row.get(field) for field in section_fields) in chosen]
+        assert wanted == selected_ids, ("partial acquired section", case["id"], wanted, selected_ids)
+        group_records[case["id"]].update(
+            whole_acquired_sections=True, source_rows_unchanged=True,
+            same_call_candidate_rows=len(candidates),
+        )
 
 
 async def client(args):
@@ -185,19 +238,9 @@ async def client(args):
                         assert wire["estimated_tokens"] == wire_cost(source_wire_text)[0] <= 12000
                         assert wire_cost(text)[0] <= 12000
                         baseline = json.loads((out / (case["id"] + "-baseline.json")).read_text())
-                        old = {r["evidence_id"]: r for r in baseline["sources"]}
                         assert expanded["sources"], "ranking failure must not masquerade as abstention"
-                        for row in expanded["sources"]:
-                            previous = old[row["evidence_id"]]
-                            assert row == previous, ("selected source was altered", case["id"], row, previous)
                         chosen = {(r["path_or_url"], r.get("section"), r["project_identity"], r["scope"],
                                    r["version_binding"], r["authority"]) for r in expanded["sources"]}
-                        if args.units == "legacy":
-                            assert len(chosen) <= args.top_k
-                        wanted = [r["evidence_id"] for r in baseline["sources"]
-                                  if (r["path_or_url"], r.get("section"), r["project_identity"], r["scope"],
-                                      r["version_binding"], r["authority"]) in chosen]
-                        assert wanted == [r["evidence_id"] for r in expanded["sources"]], "partial acquired section"
                         (out / (case["id"] + "-wire.json")).write_bytes(text.encode("utf-8"))
                         save(out / (case["id"] + "-expanded.json"), expanded)
                         records.append({
@@ -206,6 +249,8 @@ async def client(args):
                             "model_view": args.model_view,
                             "same_call_machine_tokens": wire_cost(source_wire_text)[1],
                             "baseline_tokens": wire_cost(json.dumps(baseline, ensure_ascii=False))[1],
+                            "baseline_rows": len(baseline["sources"]),
+                            "baseline_contract": "independently selected native public response",
                             "tokens": wire_cost(text)[1], "cost": wire_cost(text)[0],
                             "wire_utf8_bytes": len(text.encode("utf-8")),
                             "same_payload_v1_tokens": wire_cost(legacy_text)[1],
@@ -214,7 +259,7 @@ async def client(args):
                             "v1_comparison_boundary": "diagnostic reserialization; not historical emitted wire",
                             "expanded_utf8_bytes": len(json.dumps(expanded, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
                             "rows": len(expanded["sources"]), "sections": len(chosen),
-                            "seconds": elapsed, "whole_acquired_sections": True, "roundtrip_sources": True,
+                            "seconds": elapsed, "roundtrip_sources": True,
                         })
                         if case["id"] == "V40-B01":
                             from docmancer.docs.interfaces.grounded_mcp_session import GroundedMCPSession
@@ -262,7 +307,7 @@ async def client(args):
         assert server["database_unchanged"]
         assert server["files_unchanged_before_revoke"] == server["files_after"]
         assert server["rss_peak_bytes"] <= 1_000_000_000
-        assert len(server["observations"]) == len([c for c in cases if c["project_group"] == group])
+        verify_acquired_sections(args, group, cases, records, server["observations"])
     # Separate process: no engine cache can conceal missing local assets.
     group = "poetry"
     badwork, badout = args.work / "missing", args.out / "missing"

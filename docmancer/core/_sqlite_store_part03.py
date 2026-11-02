@@ -1,7 +1,14 @@
 """SQLiteStore implementation shard 3."""
 from __future__ import annotations
 
+from collections import Counter
+from math import log1p
+
 from ._sqlite_store_shared import *  # noqa: F401,F403
+from docmancer.retrieval.lexical_terms import (
+    lexical_field_matches, lexical_field_utility, lexical_terms, lexical_tokens,
+    query_terms, explicit_source_locators, resolve_source_locators,
+)
 
 
 class _SQLiteStorePart03:
@@ -289,6 +296,7 @@ class _SQLiteStorePart03:
             "admitted_text_bytes": byte_total,
             "resource_skipped_rows": skipped,
             "expansion": expand,
+            "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
         }
         results: list[RetrievedChunk] = []
         for row in selected:
@@ -311,7 +319,7 @@ class _SQLiteStorePart03:
                     "stable_id": self._lexical_row_identity(row),
                     "section_id": int(row["id"]),
                     "score_direction": "higher_is_better",
-                    "raw_component_ranks": {"fts5_bm25_cost": cost},
+                    "raw_component_ranks": {"content_lexical_cost": cost},
                     "base_utility": -cost, "feature_contributions": {},
                     "final_utility": -cost, "raw_rank": rank,
                     "final_rank": rank, "rank_delta": 0,
@@ -319,8 +327,9 @@ class _SQLiteStorePart03:
                 },
                 "lexical_match": self._lexical_match_trace(
                     text, title=str(row["title"]), body=str(row["text"]),
-                    retrieval_text=str(row.get("retrieval_text") or ""),
-                    mode="or", bm25_cost=cost,
+                    description=str(metadata.get("project_doc_description") or ""),
+                    source_locator_matches=tuple(row.get("_source_locator_matches") or ()),
+                    mode="or", lexical_cost=cost,
                 ),
             })
             if "expansion" in metadata:
@@ -337,38 +346,27 @@ class _SQLiteStorePart03:
 
     @classmethod
     def _lexical_match_trace(
-        cls, query: str, *, title: str, body: str, retrieval_text: str = "",
-        mode: str, bm25_cost: float,
+        cls, query: str, *, title: str, body: str, description: str = "",
+        source_locator_matches: tuple[str, ...] = (),
+        mode: str, lexical_cost: float,
     ) -> dict[str, Any]:
-        raw_terms = tuple(
-            token for token in re.findall(r"\w+", cls._strip_stopwords(query))
-            if token
-        )
-        terms = tuple(dict.fromkeys(token.casefold() for token in raw_terms))
+        terms = query_terms(query)
         exact_terms = tuple(dict.fromkeys(
             token.casefold()
             for token in re.findall(r"[\w~./:+-]+", query)
             if is_exact_technical_token(token)
         ))
-        fields = {
-            "title": title.casefold(),
-            "body": body.casefold(),
-            "retrieval_text": retrieval_text.casefold(),
-        }
-        haystack = (retrieval_text or f"{title}\n{body}").casefold()
-        matched = tuple(term for term in terms if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack))
+        field_matches = lexical_field_matches(
+            terms, title=title, body=body, description=description,
+        )
+        content_terms = set(field_matches["title"]) | set(field_matches["body"])
+        matched = tuple(term for term in terms if term in content_terms)
+        haystack = f"{title}\n{body}".casefold()
         missing_exact = tuple(
             term for term in exact_terms
             if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack) is None
         )
         ratio = len(matched) / len(terms) if terms else 0.0
-        field_matches = {
-            field: [
-                term for term in terms
-                if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", value)
-            ]
-            for field, value in fields.items()
-        }
         return {
             "mode": mode,
             "query_terms": list(terms),
@@ -378,9 +376,12 @@ class _SQLiteStorePart03:
             "query_term_count": len(terms),
             "matched_term_count": len(matched),
             "match_ratio": round(ratio, 4),
-            "bm25_cost": bm25_cost,
-            "lexical_score": -bm25_cost,
-            "field_matches": field_matches,
+            "content_lexical_cost": lexical_cost,
+            "lexical_score": -lexical_cost,
+            "field_matches": {key: list(value) for key, value in field_matches.items()},
+            "routing_only": not matched and bool(field_matches["description"] or source_locator_matches),
+            "routing_match_ratio": round(len(field_matches["description"]) / len(terms), 4) if terms else 0.0,
+            "source_locator_matches": list(source_locator_matches),
         }
 
     @classmethod
@@ -390,7 +391,7 @@ class _SQLiteStorePart03:
         query: str,
         content_terms: set[str],
     ) -> RankingCandidate:
-        bm25_cost = float(row["rank"])
+        lexical_cost = float(row["rank"])
         title_words = set(re.findall(r"\w+", str(row["title"]).lower()))
         body_lower = str(row["text"]).lower()
         contributions: list[tuple[str, float]] = []
@@ -428,11 +429,11 @@ class _SQLiteStorePart03:
         stable_id = str(row.get("stable_chunk_id") or "") or "lex-" + hashlib.sha256(
             f"{source}\0{chunk_index}\0{content_hash}".encode("utf-8")
         ).hexdigest()[:20]
-        base_utility = -bm25_cost
+        base_utility = -lexical_cost
         return RankingCandidate(
             stable_id=stable_id,
             section_id=int(row["id"]),
-            raw_component_ranks=(("fts5_bm25_cost", bm25_cost),),
+            raw_component_ranks=(("content_lexical_cost", lexical_cost),),
             base_utility=base_utility,
             feature_contributions=tuple(contributions),
             final_utility=base_utility + sum(value for _, value in contributions),
@@ -521,11 +522,14 @@ class _SQLiteStorePart03:
         *,
         filters: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        cleaned = self._strip_stopwords(query)
-        terms = [token for token in re.findall(r"\w+", cleaned) if token]
+        terms = query_terms(query)
         # These are literal query words, never an FTS expression. Quote every
         # token so uppercase AND/OR/NOT remain data in both backend lanes.
-        literal_terms = [f'"{token}"' for token in terms]
+        # Preserve the original FTS grouping: quoted snake_case identifiers
+        # are phrases in unicode61, not OR searches for their separate parts.
+        literal_terms = [f'"{token}"' for token in re.findall(r"\w+", query)]
+        match_expression = "{title retrieval_text} : (" + " OR ".join(literal_terms) + ")"
+        locators = explicit_source_locators(query)
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         from docmancer.retrieval.experimental_acquisition import (
             ACQUISITION_CANDIDATES,
@@ -537,27 +541,132 @@ class _SQLiteStorePart03:
                 return []
             if not literal_terms:
                 return []
-            rows = list(conn.execute(
+
+            locator_sources = {}
+            if locators:
+                # Resolve against the complete allowed generation, not an FTS
+                # top-N. Only whole paths or unique basenames are routing;
+                # technical storage path words never become content matches.
+                catalog_rows = conn.execute(
+                    f"""
+                    SELECT DISTINCT sections.source,
+                           COALESCE(NULLIF(json_extract(sections.metadata_json, '$.project_doc_path'), ''),
+                                    NULLIF(json_extract(sections.metadata_json, '$.source_path'), ''),
+                                    sections.source) AS path
+                    FROM retrieval_children AS sections
+                    WHERE sections.generation_id = ?
+                    {filter_sql}
+                    """, (active_generation, *filter_params),
+                )
+                locator_sources = resolve_source_locators(
+                    locators, ((str(row["source"]), str(row["path"])) for row in catalog_rows),
+                )
+            locator_keys = tuple(sorted(locator_sources))
+            locator_sql = ("sections.source IN (" + ",".join("?" for _ in locator_keys) + ")"
+                           if locator_keys else "0")
+            # Exact locators also work when their spelling occurs only in the
+            # source identity. This is a separate indexed routing union, not
+            # an OR search over individual words in every absolute source path.
+            candidate_sql = (
+                "sections.id IN (SELECT rowid FROM retrieval_children_fts "
+                "WHERE retrieval_children_fts MATCH ?)"
+                + (" OR " + locator_sql if locator_keys else "")
+            )
+
+            class SourceStatistics:
+                def __init__(self) -> None:
+                    self.windows = 0
+                    self.body_length = 0
+                    self.frequencies: Counter[str] = Counter()
+
+                def step(self, title: str, body: str) -> None:
+                    body_tokens = lexical_tokens(body or "")
+                    source_terms = set(body_tokens) | set(lexical_terms(title or ""))
+                    matched = source_terms.intersection(terms)
+                    # Boilerplate/description-only hits do not change source
+                    # document frequencies or average source-window length.
+                    if matched:
+                        self.windows += 1
+                        self.body_length += len(body_tokens)
+                        self.frequencies.update(matched)
+
+                def finalize(self) -> str:
+                    return json.dumps({
+                        "windows": self.windows,
+                        "body_length": self.body_length,
+                        "frequencies": self.frequencies,
+                    })
+
+            # A streaming aggregate keeps only O(query terms) state. It reads
+            # the same scoped postings as acquisition, not unrelated sources,
+            # and requires neither a new index nor a writable connection.
+            conn.create_aggregate("docatlas_source_statistics", 2, SourceStatistics)
+            stats_row = conn.execute(
                 f"""
-                SELECT sections.hydration_id AS id, sections.*,
-                       sections.display_text AS text,
-                       sections.display_token_estimate AS token_estimate,
-                       sections.display_content_hash AS content_hash,
-                       bm25(retrieval_children_fts) AS rank
+                SELECT docatlas_source_statistics(sections.title, sections.display_text)
                 FROM retrieval_children_fts
                 JOIN retrieval_children AS sections
                   ON sections.id = retrieval_children_fts.rowid
                 WHERE retrieval_children_fts MATCH ?
                   AND sections.generation_id = ?
                 {filter_sql}
-                ORDER BY rank, sections.source, sections.chunk_index,
+                """,
+                (match_expression, active_generation, *filter_params),
+            ).fetchone()
+            statistics = json.loads(stats_row[0]) if stats_row and stats_row[0] else {}
+            windows = int(statistics.get("windows") or 0)
+            frequencies = statistics.get("frequencies") or {}
+            average_length = float(statistics.get("body_length") or 0) / max(1, windows)
+            term_weights = {
+                term: log1p((windows - frequencies.get(term, 0) + 0.5) / (frequencies.get(term, 0) + 0.5))
+                for term in terms
+            }
+
+            def source_utility(title: str, body: str, description: str | None) -> float:
+                return lexical_field_utility(
+                    terms, title=title or "", body=body or "",
+                    description=description or "", term_weights=term_weights,
+                    average_body_length=average_length,
+                )
+
+            # Existing immutable generations already contain display_text and
+            # catalog descriptions. Use their FTS postings only as a superset,
+            # then check and rank these clean fields BEFORE the acquisition
+            # LIMIT. Post-filtering the old top-N would let metadata hits crowd
+            # out valid body matches. The connection-local function performs no
+            # schema/index repair and also works on MemberReadStore's ro handle.
+            conn.create_function("docatlas_source_utility", 3, source_utility, deterministic=True)
+            rows = list(conn.execute(
+                f"""
+                SELECT sections.hydration_id AS id, sections.*,
+                       sections.display_text AS text,
+                       sections.display_token_estimate AS token_estimate,
+                       sections.display_content_hash AS content_hash,
+                       -docatlas_source_utility(
+                           sections.title, sections.display_text,
+                           json_extract(sections.metadata_json, '$.project_doc_description')
+                       ) AS rank
+                FROM retrieval_children AS sections
+                WHERE ({candidate_sql})
+                  AND sections.generation_id = ?
+                  AND (docatlas_source_utility(
+                      sections.title, sections.display_text,
+                      json_extract(sections.metadata_json, '$.project_doc_description')
+                  ) > 0 OR {locator_sql})
+                {filter_sql}
+                ORDER BY CASE WHEN {locator_sql} THEN 1 ELSE 0 END DESC,
+                         rank, sections.source, sections.chunk_index,
                          sections.stable_chunk_id
                 LIMIT ?
                 """,
-                (" OR ".join(literal_terms), active_generation, *filter_params,
+                (match_expression, *locator_keys, active_generation, *locator_keys,
+                 *filter_params, *locator_keys,
                  min(limit, ACQUISITION_CANDIDATES)),
             ))
-            return self._mark_lexical_mode(rows, "or")
+            return self._mark_lexical_mode([
+                {**dict(row), "_source_locator_matches": locator_sources.get(str(row["source"]), ())}
+                for row in rows
+            ], "or")
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:

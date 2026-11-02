@@ -8,7 +8,7 @@ the host writes the final answer. Retrieval does not certify an answer or an edi
 
 ## Public boundary
 
-The MCP boundary is `get_docs_context(question, project_path, lookup_queries?, module_path?, scope?)`.
+The MCP boundary is `get_docs_context(question, project_path, search_question?, lookup_queries?, module_path?, scope?)`.
 The original question is authoritative and preserved unchanged. Optional host
 lookups are explicit same-question requests; they cannot become original-query
 coverage, inferred answer obligations, translations, or generated subquestions.
@@ -48,15 +48,42 @@ candidate generation; metadata-only matching may discover a candidate but
 cannot qualify public evidence. Neither infrastructure nor the MCP adapter
 decides answer support.
 
+Lexical retrieval treats the original document text and headings as content.
+Catalog descriptions are separate routing information; scope labels, source
+class labels, and absolute storage paths are not content matches. Existing
+indexes remain readable without an implicit rebuild or preparation operation.
+Identifiers keep their literal word boundaries: `action` does not match
+`next_action`, and a metadata occurrence of `source_of_truth` cannot turn an
+unrelated `of` in the body into a content match. The original quoted FTS query
+grouping is retained; the stricter source-field check runs before acquisition
+limits are applied.
+The original question and explicit translations/lookups share a final selection
+step after their candidates have been combined and source-checked.
+
+An explicit document filename or relative source path remains a separate
+routing signal. It is resolved against the complete allowed generation before
+the candidate limit; an ambiguous basename is not resolved from a shortened
+hit list. Final selection rechecks the source-reference binding against the
+current snapshot. Naming a document does not establish a match in its body or
+increase original-query coverage.
+
 ## MCP adapter and fidelity
 
 The adapter exposes source-attributed `docs_context` for project reads. It keeps
 source identity, content hashes, contiguous text, and coordinates together.
-Admitted evidence windows must survive delivery; an output-size target cannot
-silently remove conditions or the end of a useful passage. MCP tool-catalog bytes and
-complete model-visible DTO bytes/tokens are measured and minimized without a
-fixed 6144-byte catalog or 800-token response acceptance ceiling. Input, source
-read, candidate-work, and lifecycle safety bounds remain distinct controls.
+The native selection route chooses whole checked passages using all explicit
+query lanes and the delivery budget. It measures the complete representation,
+including public source references, rather than estimating source text alone.
+Selected passages are not clipped to make them fit. Omitted candidates and
+unverified coverage remain explicit; a delivered packet is not a completeness
+claim. Input, source-read, candidate-work, and lifecycle safety bounds remain
+distinct controls. An explicitly provisioned MiniLM section selector retains
+its own selection policy.
+
+Source continuation cursors are issued only for the selected batch, within the
+reader's existing capacity. Retaining a previously issued selected cursor does
+not refresh its expiry or read budget. The final packet is priced again after
+binding; the source reader still checks current scope, membership and hashes.
 
 ## Invariants
 

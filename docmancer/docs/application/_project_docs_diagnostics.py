@@ -39,11 +39,12 @@ def _observed_candidate(chunk: Any) -> dict[str, Any]:
         "window_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest() if isinstance(body, str) else None,
         "window_characters": len(body) if isinstance(body, str) else None,
         # This belongs to the acquired candidate. A merged lookup candidate's
-        # store trace must not be interpreted as another query's BM25 receipt.
+        # store trace must not be interpreted as another query's lexical receipt.
         "candidate_lexical_match": _observed_fields(metadata.get("lexical_match"), (
             "mode", "query_terms", "matched_terms", "exact_terms", "missing_exact_terms",
             "query_term_count", "matched_term_count", "match_ratio", "bm25_cost",
-            "lexical_score", "field_matches",
+            "content_lexical_cost", "lexical_score", "field_matches",
+            "routing_only", "routing_match_ratio", "source_locator_matches",
         )),
         "source_reference": _observed_fields(evidence, (
             "source", "member_binding", "char_start", "char_end",

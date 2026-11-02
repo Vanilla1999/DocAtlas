@@ -105,6 +105,7 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
                     "items": {"enum": [
                         "coverage_unverified", "requested_part_missing", "budget_limited",
                         "source_unavailable", "source_changed", "structure_unverified",
+                        "joint_selection_partial",
                     ]},
                 },
             },

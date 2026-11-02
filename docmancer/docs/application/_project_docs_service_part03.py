@@ -66,7 +66,10 @@ def _qualify_candidate_lookups(
             if discovered:
                 trace["lexical_score"] = receipt["lexical_score"]
             else:
-                for field in ("bm25_cost", "field_matches", "mode"):
+                for field in (
+                    "bm25_cost", "content_lexical_cost", "field_matches", "mode",
+                    "routing_only", "routing_match_ratio", "source_locator_matches",
+                ):
                     trace.pop(field, None)
                 trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
                              query_term_count=len(trace.get("query_terms") or ()))

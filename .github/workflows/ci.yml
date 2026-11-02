@@ -164,6 +164,47 @@ jobs:
           cd "$RUNNER_TEMP"
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 
+  bilingual-context-integration:
+    name: bilingual-context-integration (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, macos-15-intel]
+
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Build and install the candidate wheel
+        shell: bash
+        run: |
+          python -m pip wheel --no-deps --wheel-dir "$RUNNER_TEMP/bilingual-wheel" .
+          python -m pip install "$RUNNER_TEMP"/bilingual-wheel/*.whl
+
+      - name: Verify bilingual selection and source continuations over installed MCP
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          python -I "$GITHUB_WORKSPACE/eval/opencode_compat/installed_stdio.py" \
+            --bilingual-selection --large-packet --out "$RUNNER_TEMP/bilingual-selection"
+
+      - name: Upload installed bilingual context evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bilingual-selection-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/bilingual-selection
+          if-no-files-found: error
+          retention-days: 14
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -453,7 +494,7 @@ jobs:
   required-ci:
     name: required-ci
     if: always()
-    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, installed-mcp-harness, static-contract, retrieval-evidence]
+    needs: [docs-contract, installer-smoke, platform-smoke, bilingual-context-integration, test, advanced-contract, installed-mcp-harness, static-contract, retrieval-evidence]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -463,12 +504,13 @@ jobs:
           DOCS_CONTRACT: ${{ needs.docs-contract.result }}
           INSTALLER_SMOKE: ${{ needs.installer-smoke.result }}
           PLATFORM_SMOKE: ${{ needs.platform-smoke.result }}
+          BILINGUAL_CONTEXT: ${{ needs.bilingual-context-integration.result }}
           CORE_TESTS: ${{ needs.test.result }}
           ADVANCED_CONTRACT: ${{ needs.advanced-contract.result }}
           INSTALLED_MCP_HARNESS: ${{ needs.installed-mcp-harness.result }}
           STATIC_CONTRACT: ${{ needs.static-contract.result }}
           RETRIEVAL_EVIDENCE: ${{ needs.retrieval-evidence.result }}
         run: |
-          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT" "$RETRIEVAL_EVIDENCE"; do
+          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$BILINGUAL_CONTEXT" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT" "$RETRIEVAL_EVIDENCE"; do
             test "$result" = "success"
           done

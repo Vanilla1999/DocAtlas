@@ -11,6 +11,7 @@ _ALLOWED_REASONS = {
     "source_unavailable",
     "source_changed",
     "structure_unverified",
+    "joint_selection_partial",
 }
 
 

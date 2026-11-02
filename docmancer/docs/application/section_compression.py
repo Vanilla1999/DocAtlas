@@ -466,6 +466,9 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     observed = _OBSERVER.get()
     if observed is not None:
         detail = deepcopy(receipt)
+        # Explicit host diagnostics only: preserve the same-call checked input
+        # for fidelity audits. These copies are never MCP output or authority.
+        detail["candidate_sources"] = deepcopy(rows)
         detail["ranked_sections"] = [
             {"rank": rank, "score": scores[index], "selected": rank <= top_k,
              "rank_meaning": "selection_priority" if effective_policy in FACET_POLICIES else "global_score",
