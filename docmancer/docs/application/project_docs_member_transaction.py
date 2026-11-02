@@ -304,11 +304,9 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
             _read_member(pinned, "docatlas.yaml", MAX_CATALOG_BYTES).decode("utf-8"),
             Loader=_UniqueKeySafeLoader,
         ) or {}))
-        # Project settings constrain source reads, never select storage. An
-        # explicit conflicting storage request fails rather than redirecting IO.
-        if "db_path" in config.index.model_fields_set:
-            if config.index.db_path != str(storage):
-                raise PermissionError("project config storage is not the host-selected target")
+        # The project index belongs to the CLI, not this MCP member store.
+        # Source constraints still apply, but storage is selected exclusively by
+        # the host policy and the validated mutation storage_path above.
     if config.index.provider != "sqlite" or str(config.retrieval.default_mode).lower() != "lexical":
         raise PermissionError("member transaction requires lexical project configuration")
     configured = config.project.source_boundary()
