@@ -139,6 +139,19 @@ class SourceContinuationReader:
         with self._lock:
             return uri in self._cursors
 
+    def retain_references(self, uris: list[str]) -> None:
+        """Protect already issued members of a bounded selection from eviction.
+
+        Do this for the whole selected batch before issuing missing references.
+        Moving cache entries changes neither their expiry nor remaining reads;
+        it also performs no source read or authorization. The caller still has
+        to authorize every issued reference and fit the batch to max_references.
+        """
+        with self._lock:
+            for uri in dict.fromkeys(uris):
+                if uri in self._cursors:
+                    self._cursors.move_to_end(uri)
+
     def read(self, uri: str) -> dict:
         with self._lock:
             # Consumption also prevents concurrent reads of the same range.
@@ -231,6 +244,10 @@ def attach_source_continuation_locators(payload: dict, snapshot: dict, *, root: 
 
 def bind_project_source_continuations(reader, project_root: str, projection: dict, snapshot: dict) -> None:
     """Register selected references, removing unavailable optional locators."""
+    retain = getattr(reader, "retain_references", None)
+    if callable(retain):
+        retain([source['source_uri'] for source in projection.get('sources') or ()
+                if source.get('source_uri')])
     for source in projection.get('sources') or ():
         uri = source.get('source_uri')
         if not uri:

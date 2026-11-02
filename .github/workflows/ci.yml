@@ -163,6 +163,17 @@ jobs:
           python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/docs-mcp-wheel/*.whl
           cd "$RUNNER_TEMP"
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
+          python -I "$GITHUB_WORKSPACE/eval/opencode_compat/installed_stdio.py" \
+            --bilingual-selection --large-packet --out "$RUNNER_TEMP/bilingual-selection"
+
+      - name: Upload installed bilingual context evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bilingual-selection-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/bilingual-selection
+          if-no-files-found: warn
+          retention-days: 14
 
   test:
     runs-on: ubuntu-latest

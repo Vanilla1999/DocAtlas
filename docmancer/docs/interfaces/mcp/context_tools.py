@@ -546,12 +546,24 @@ def _handle_prepared_context_tool(
                     # Price the complete compact packet before issuing references.
                     # No window is dropped to make an oversized selection fit.
                     encode_sections(projection)
-                # Keep every source-checked row; terminal first-fit is disabled.
-                # projection, snapshot = enforce_experimental_context_budget(projection, snapshot, raw)
+                if not section_compression_active:
+                    from docmancer.docs.application.joint_context_selection import (
+                        select_joint_context, finalize_joint_context_delivery,
+                    )
+                    # One joint choice after lookup merge and live source checks.
+                    # Price already attached URI strings before issuing cursors;
+                    # the explicit MiniLM section policy is not selected twice.
+                    projection, snapshot = select_joint_context(
+                        projection, snapshot, raw,
+                        max_source_references=(reader.max_references if reader is not None else None),
+                    )
                 if experimental_context_max_tokens() is not None and reader is not None and source_root:
+                    # Register only the selected batch. Issuing the entire pool
+                    # first can evict a selected URI from the bounded reader.
                     bind_project_source_continuations(reader, source_root, projection, snapshot)
                     _refresh_projection_estimate(projection)
-                # check_experimental_context_budget(projection)
+                if not section_compression_active:
+                    projection, snapshot = finalize_joint_context_delivery(projection, snapshot, raw)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
