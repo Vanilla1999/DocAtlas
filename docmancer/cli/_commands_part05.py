@@ -284,10 +284,11 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             installed_paths,
             created_user_config,
             effective_config_path,
-            "Restart OpenCode to load the updated MCP registration and guidance.",
+            "Run opencode mcp list to check the connection, then ask your documentation question. OpenCode reloads configuration automatically; use /reload if needed.",
             extra_lines=[
                 "Self-contained compact MCP text is enabled; ordinary reads use the advertised tools directly.",
                 "After a package upgrade, rerun this install command to refresh the registration and guidance.",
+                "Registration does not index documents. On first use, approve the preparation proposed by DocAtlas, then retry your original question.",
             ],
         )
         return

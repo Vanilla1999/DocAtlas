@@ -244,10 +244,32 @@ def call_docs_tool_payload(
         # bindings before opening the existing store. Constructing a project
         # facade here would initialize registries/jobs before that validation.
         member_sync = name == "prepare_docs" and handler_args.get("action") == "sync_project_docs"
-        active_service = service if member_sync else _service_for_project_path(
-            service, handler_args, read_only_startup=name in {"get_docs_context", "docs_status"},
-        )
-        payload = handler(name, handler_args, active_service)
+        cold_read = False
+        if isinstance(service, LocalMemberService) and name in {"get_docs_context", "docs_status"}:
+            project = handler_args.get("project_path")
+            cold_read = not service.member_storage_policy.validate(
+                Path(project) if project is not None else None,
+                service.config.index.db_path,
+            )
+        if cold_read:
+            payload = {
+                "status": "not_prepared",
+                "reason_code": "member_store_uninitialized",
+                "message": "MCP is connected, but documentation has not been prepared. Installation does not index documents.",
+                "project_path": handler_args.get("project_path"),
+                "storage_path": service.config.index.db_path,
+                "recommended_next_action": {
+                    "tool": "prepare_docs",
+                    "action": "sync_project_docs" if handler_args.get("project_path") else "prefetch_library_docs",
+                    "requires_confirmation": True,
+                    "message": "Ask for preparation approval. For project documents, select catalogued files and build an explicit member mutation grant with current catalog/content hashes and the reported storage_path; do not call sync_project_docs without that grant. For a library, use its explicit target and obtain network consent.",
+                },
+            }
+        else:
+            active_service = service if member_sync else _service_for_project_path(
+                service, handler_args, read_only_startup=name in {"get_docs_context", "docs_status"},
+            )
+            payload = handler(name, handler_args, active_service)
     except Exception as exc:
         reason_code = _exception_reason_code(exc)
         return build_mcp_error_payload(
@@ -272,7 +294,7 @@ def call_docs_tool_payload(
             tool=name,
             phase="validation",
         )
-    public_payload = compact_mcp_payload(payload, tool=name)
+    public_payload = payload if payload.get("reason_code") == "member_store_uninitialized" else compact_mcp_payload(payload, tool=name)
     if name == "docs_status":
         public_payload["project_binding"] = configured_binding()
         public_payload["delivery_configuration"] = {

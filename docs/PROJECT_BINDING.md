@@ -22,6 +22,17 @@ sessions in nested directories. Global installation stays unbound. No lookup
 target is inferred from the MCP process working directory. Installation binds a
 target; it does **not** index documents or assert preparation is complete.
 
+On a fresh installation, `docs_status` and documentation questions return
+`status: not_prepared`, `reason_code: member_store_uninitialized`, and a
+preparation recommendation without creating a database. This is not a filesystem
+permission error. Approve preparation of the selected documents; the agent must
+supply the existing explicit mutation grant (including current catalog and file
+hashes) for project synchronization. Retry the original question after successful
+preparation. Actual storage ownership and permission failures remain errors.
+
+OpenCode reloads the registration automatically. Check `opencode mcp list`; use
+`/reload` if needed, rather than restarting the application.
+
 The ordinary call becomes:
 
 ```json
