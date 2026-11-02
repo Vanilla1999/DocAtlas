@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import tomllib
 from dataclasses import dataclass
@@ -83,7 +84,8 @@ def find_agent(name: str, *, project: bool = False) -> AgentTarget | None:
     return None
 
 
-def register_server(target: AgentTarget) -> tuple[bool, str]:
+def register_server(target: AgentTarget, *, project_path: Path | None = None,
+                    workspace_path: Path | None = None) -> tuple[bool, str]:
     """Idempotently add the current DocAtlas MCP entry."""
 
     if target.style == "toml_mcp_servers":
@@ -92,7 +94,18 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     target.config_path.parent.mkdir(parents=True, exist_ok=True)
     config = _load_config(target.config_path)
     if target.style == "json_opencode_mcp":
-        changed = _update_opencode_config(config)
+        environment = dict(OPENCODE_MCP_ENVIRONMENT)
+        if project_path is not None:
+            from docmancer.mcp.project_binding import BINDING_ENV, make_binding
+            environment[BINDING_ENV] = json.dumps(make_binding(
+                project_path, workspace_path or target.config_path.resolve().parent), sort_keys=True)
+        model = os.environ.get("DOCATLAS_MINILM_MODEL_DIR")
+        if model:
+            model_path = Path(model).expanduser().resolve(strict=True)
+            if not model_path.is_dir():
+                raise ValueError("DOCATLAS_MINILM_MODEL_DIR must be an existing directory")
+            environment["DOCATLAS_MINILM_MODEL_DIR"] = str(model_path)
+        changed = _update_opencode_config(config, environment=environment)
         if changed:
             _backup_and_write(target.config_path, config)
         return changed, f"{'registered' if changed else 'already registered'} in {target.config_path}"
@@ -139,7 +152,22 @@ def unregister_server(target: AgentTarget) -> bool:
 
     existing = servers.get(SERVER_KEY)
     if target.style == "json_opencode_mcp":
-        owned = [(name, entry) for name, entry in servers.items() if entry == desired]
+        from docmancer.mcp.project_binding import BINDING_ENV
+        owned = []
+        for name, entry in servers.items():
+            if not isinstance(entry, dict):
+                continue
+            environment = entry.get("environment")
+            if not isinstance(environment, dict):
+                continue
+            # Accept installer-owned binding/model options, still preserve any
+            # unrelated customized entry (disabled/codemode/extra environment).
+            expected = {**desired, "environment": {**desired["environment"], **{
+                key: environment[key] for key in (BINDING_ENV, "DOCATLAS_MINILM_MODEL_DIR")
+                if key in environment
+            }}}
+            if entry == expected:
+                owned.append((name, entry))
         if len(owned) == 1:
             del servers[owned[0][0]]
             _backup_and_write(target.config_path, config)
@@ -199,9 +227,10 @@ def _json_server_mapping(
     return servers
 
 
-def _update_opencode_config(config: dict[str, Any]) -> bool:
+def _update_opencode_config(config: dict[str, Any], *, environment: dict[str, str] | None = None) -> bool:
     """Migrate a unique owned registration without changing its identity or state."""
     before = json.dumps(config, sort_keys=True)
+    requested_environment = environment or OPENCODE_MCP_ENVIRONMENT
     mcp = config.setdefault("mcp", {})
     if not isinstance(mcp, dict):
         raise ValueError("Existing 'mcp' in agent config must be an object")
@@ -228,7 +257,7 @@ def _update_opencode_config(config: dict[str, Any]) -> bool:
             "stock OpenCode drops its _meta. Disable that option explicitly "
             "before registering the self-contained compact text mode."
         )
-    merged = {**existing, **desired, "environment": {**environment, **OPENCODE_MCP_ENVIRONMENT}}
+    merged = {**existing, **desired, "environment": {**environment, **requested_environment}}
     if "enabled" in merged:
         enabled = merged.pop("enabled")
         if not isinstance(enabled, bool):

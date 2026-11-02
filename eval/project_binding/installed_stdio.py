@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import time
 
 CASES = (
@@ -44,20 +45,43 @@ def source_docs(repo):
         assert hashlib.sha256(content.encode()).hexdigest() == expected["black/" + path]
     return found
 
+def scenario_docs(a):
+    black = source_docs(a.repo)
+    if a.layout != "mixed":
+        return black
+    base = a.repo / "eval/prepared_model_comparison40/sources"
+    return {p.relative_to(base).as_posix(): p.read_text(encoding="utf-8")
+            for p in base.rglob("*.md") if p.is_file()}
+
 def worker(a):
     from docmancer.mcp._docs_server_part01 import _run_async
     from docmancer.docs.application.section_compression import observe_section_compression
     runtime = load("binding_runtime", a.repo / "eval/evidence_quality_v2/runtime.py")
     state = load("binding_state", a.repo / "eval/prepared_model_comparison40/run.py")
     root = a.work / "black"
-    runtime.write_project(root, source_docs(a.repo))
+    runtime.write_project(root, scenario_docs(a))
     with runtime.isolated_service(a.work / "state") as (service, config):
         inventory = runtime.index_project(service, config, root)
         save(a.out / "PREPARE.json", inventory)
-        before = state.logical_state(inventory), state.source_state(root)
         os.environ.update(DOCATLAS_MINILM_MODEL_DIR="/model", DOCATLAS_MCP_TEXT_FALLBACK="1",
                           DOCATLAS_MCP_COMPACT_TEXT="1", DOCATLAS_MCP_MODEL_VIEW="off",
-                          HF_HUB_OFFLINE="1", DOCATLAS_OFFLINE="1")
+                           HF_HUB_OFFLINE="1", DOCATLAS_OFFLINE="1")
+        if a.layout != "unbound":
+            # Actual installed CLI writes the exact environment consumed by the server.
+            install = subprocess.run([str(Path(sys.executable).with_name("doc-atlas")),
+                "install", "opencode", "--project"], cwd=root, capture_output=True, text=True)
+            save(a.out / "INSTALL.json", {"returncode": install.returncode,
+                                        "stdout": install.stdout, "stderr": install.stderr})
+            assert install.returncode == 0, install.stderr
+            config = json.loads((root / "opencode.json").read_text())
+            env = config["mcp"]["servers"]["docatlas"]["environment"]
+            binding = json.loads(env["DOCATLAS_PROJECT_BINDING"])
+            assert binding["project_path"] == str(root) == binding["workspace_path"]
+            assert env["DOCATLAS_MCP_COMPACT_TEXT"] == "1"
+            assert env["DOCATLAS_MINILM_MODEL_DIR"] == "/model"
+            os.environ.update(env)
+            save(a.out / "HOST_BINDING.json", binding)
+        before = state.logical_state(inventory), state.source_state(root)
         with observe_section_compression() as observations:
             try:
                 asyncio.run(_run_async(service))
@@ -106,10 +130,10 @@ async def run(a):
     from docmancer.docs.application.projection_tokenizer import projection_token_count
 
     root = a.work / "black"
-    originals = source_docs(a.repo)
+    originals = scenario_docs(a)
     params = StdioServerParameters(command=sys.executable,
         args=["-I", str(Path(__file__).resolve()), "--worker",
-              "--repo", str(a.repo), "--work", str(a.work), "--out", str(a.out)],
+              "--repo", str(a.repo), "--work", str(a.work), "--out", str(a.out), "--layout", a.layout],
         env=dict(os.environ))
     rows = []
     with (a.out / "MCP_STDERR.log").open("w") as stderr:
@@ -136,13 +160,20 @@ async def run(a):
                     started = time.monotonic()
                     unbound = await session.call_tool("get_docs_context", {"question": question})
                     denied, text = contents(unbound)
-                    assert unbound.isError is True, (case_id, denied)
-                    assert denied["status"] == "failed" and not denied.get("sources")
-                    error = denied["error"]
-                    assert error["reason_code"] == "docs_context_target_missing", (case_id, denied)
-                    assert error["where"]["phase"] == "validation" and error["retryable"] is False
-                    assert "project_path" in error["message"] and "library" in error["message"]
-                    assert any("absolute" in h.lower() and "project_path" in h for h in error["hints"])
+                    if a.layout == "unbound":
+                        assert unbound.isError is True, (case_id, denied)
+                        assert denied["status"] == "failed" and not denied.get("sources")
+                        error = denied["error"]
+                        assert error["reason_code"] == "docs_context_target_missing", (case_id, denied)
+                        assert error["where"]["phase"] == "validation" and error["retryable"] is False
+                        assert "project_path" in error["message"] and "library" in error["message"]
+                        assert any("absolute" in h.lower() and "project_path" in h for h in error["hints"])
+                    else:
+                        assert not unbound.isError, denied
+                        implicit_refs, _ = checked_rows(denied, originals)
+                        assert implicit_refs
+                        if case_id == "B01":
+                            assert any("88" in row["text"] for row in implicit_refs)
                     assert "No safe bounded selected context is available." not in text
                     bound_start = time.monotonic()
                     found = await session.call_tool("get_docs_context", {
@@ -153,6 +184,9 @@ async def run(a):
                     assert answer.get("status") in {"ok", "truncated"}, (case_id, answer)
                     refs, fmt = checked_rows(answer, originals)
                     assert refs, (case_id, "no selected source evidence after binding")
+                    if a.layout != "unbound":
+                        signature = lambda rows: [(r["path"], r["line_start"], r["line_end"], r["text"]) for r in rows]
+                        assert signature(refs) == signature(implicit_refs), (case_id, "host/explicit scope differs")
                     assert fmt in {
                         "docatlas.standalone-text.v1", "docatlas.assembled-grouped.v1",
                         "docatlas.assembled-table.v1", "docatlas.assembled-grouped-table.v1",
@@ -162,8 +196,8 @@ async def run(a):
                     assert text_bytes <= 48_000 and text_tokens <= 12000, (case_id, text_bytes, text_tokens)
                     (a.out / f"{case_id}-bound.json").write_text(raw + "\n", encoding="utf-8")
                     item = {"id": case_id, "question": question,
-                            "unbound": {"status": denied["status"], "reason_code": error["reason_code"],
-                                        "isError": unbound.isError, "sources": 0},
+                            "implicit": {"status": denied["status"],
+                                         "isError": bool(unbound.isError)},
                             "bound": {"status": answer["status"], "source_rows": len(refs),
                                       "context_format": fmt, "tool_isError": bool(found.isError),
                                       "text_utf8_bytes": text_bytes, "text_o200k": text_tokens},
@@ -186,12 +220,29 @@ async def run(a):
                 missing_packet, _ = contents(missing)
                 assert missing_packet["status"] not in {"ok", "truncated"}
                 assert not missing_packet.get("sources")
+                if a.layout != "unbound":
+                    mismatch = await session.call_tool("get_docs_context", {
+                        "question": CASES[0][1], "project_path": str(root / ("black" if a.layout == "mixed" else "docs"))
+                    })
+                    rejected, _ = contents(mismatch)
+                    assert mismatch.isError and rejected["error"]["reason_code"] == "docs_context_target_mismatch"
+                    assert rejected["project_binding"]["project_path"] == str(root)
+                    assert not rejected.get("sources") and not rejected.get("requires_confirmation")
+                    status = await session.call_tool("docs_status", {"action": "project"})
+                    ready, _ = contents(status)
+                    assert ready["project_binding"]["project_path"] == str(root)
+                    assert ready["delivery_configuration"]["compact_text"] is True
+                    save(a.out / "STATUS.json", ready)
+                    save(a.out / "MISMATCH.json", rejected)
 
     state = json.loads((a.out / "SERVER.json").read_text())
     assert state["database_unchanged"] and state["files_unchanged"]
     assert len(rows) == 5
     outcome = {"pass": True, "questions": [r["id"] for r in rows],
-               "typed_unbound_errors": 5, "target_bound_with_evidence": 5,
+               "layout": a.layout,
+               "typed_unbound_errors": 5 if a.layout == "unbound" else 0,
+               "host_bound_with_evidence": 5 if a.layout != "unbound" else 0,
+               "target_bound_with_evidence": 5,
                "real_installed_MCP": True, "real_SQLite_prepare": True,
                "real_MiniLM_selection": True, "source_spans_verified": True,
                "unbound_is_not_semantic_insufficiency": True,
@@ -207,6 +258,7 @@ def main():
     for field in ("repo", "work", "out"):
         p.add_argument("--"+field, required=True, type=Path)
     p.add_argument("--worker", action="store_true")
+    p.add_argument("--layout", choices=("unbound", "black", "mixed"), default="unbound")
     a = p.parse_args()
     for field in ("repo","work","out"):
         setattr(a, field, getattr(a,field).resolve())
@@ -217,7 +269,8 @@ def main():
         installed = Path(docmancer.__file__).resolve().parent
         assert not installed.is_relative_to(a.repo)
         for p in ("mcp/_docs_server_tool_data.py", "mcp/_docs_server_part01.py",
-                  "docs/interfaces/mcp/context_tools.py", "docs/interfaces/mcp/error_contract.py"):
+                   "docs/interfaces/mcp/context_tools.py", "docs/interfaces/mcp/error_contract.py",
+                   "mcp/project_binding.py", "mcp/agent_config.py"):
             assert (installed / p).read_bytes() == (a.repo / "docmancer" / p).read_bytes()
         a.out.mkdir(parents=True, exist_ok=True)
         a.work.mkdir(parents=True, exist_ok=True)

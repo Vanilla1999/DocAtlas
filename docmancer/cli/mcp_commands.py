@@ -213,13 +213,18 @@ def _compile_from_url_or_die(package: str, version: str, url: str) -> None:
     click.echo(f"Compiled {package}@{version} from {url} into {pkg_dir}")
 
 
-def register_docatlas_mcp_in_agent(agent_name: str, *, project: bool = False) -> str | None:
+def register_docatlas_mcp_in_agent(agent_name: str, *, project: bool = False,
+                                  project_path: Path | None = None) -> str | None:
     """Helper for the existing `doc-atlas install <agent>` to also register MCP. Returns message or None."""
     target = agent_config.find_agent(agent_name, project=project)
     if target is None:
         return None
     try:
-        _, message = agent_config.register_server(target)
+        root = (project_path or Path.cwd()) if project and agent_name == "opencode" else None
+        _, message = agent_config.register_server(target, project_path=root,
+                                                 workspace_path=Path.cwd() if root else None)
         return message
     except ValueError as exc:
+        if project and agent_name == "opencode":
+            raise click.ClickException(str(exc)) from exc
         return f"warning: {exc}"

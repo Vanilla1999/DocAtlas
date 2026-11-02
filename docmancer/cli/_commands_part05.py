@@ -28,7 +28,10 @@ from ._commands_part02 import _create_claude_desktop_zip, _install_project_boots
 @click.option("--uninstall", "uninstall", is_flag=True, default=False,
               help="Remove only DocAtlas-managed project guidance for this agent.")
 @click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
-def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | None):
+@click.option("--project-path", type=click.Path(exists=True, file_okay=False, path_type=Path),
+              help="Bind OpenCode project integration to this root (defaults to the installation directory).")
+def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | None,
+                project_path: Path | None = None):
     """Install DocAtlas skill files into an AI agent.
 
     Installs the canonical three-tool Docs MCP workflow and registers the local
@@ -39,6 +42,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
     """
     config_path = _effective_config(config_path)
     normalized = agent.lower()
+    if project_path is not None and (not project or normalized != "opencode" or uninstall):
+        raise click.UsageError("--project-path requires install opencode --project")
     if uninstall:
         removed = False
         for path in _managed_instruction_paths(normalized, project=project):
@@ -53,7 +58,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         click.echo("Removed DocAtlas-managed project guidance." if removed else "No DocAtlas-managed project guidance found.")
         click.echo("Removed DocAtlas MCP registration." if unregistered else "No DocAtlas MCP registration found.")
         return
-    _register_mcp_for_agent(normalized, project=project)
+    _register_mcp_for_agent(normalized, project=project, project_path=project_path)
     if not project:
         click.echo(f"Project guidance: run `doc-atlas install {agent} --project` inside the repository.")
     home = Path.home()

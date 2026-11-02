@@ -169,7 +169,7 @@ def call_docs_tool_payload(
     *,
     surface: DocsMcpSurface | None = None,
 ) -> dict[str, Any]:
-    args = arguments or {}
+    args = dict(arguments or {})
     active_surface = surface or current_docs_surface()
     handler = active_surface.handlers.get(name)
     if handler is None:
@@ -181,6 +181,22 @@ def call_docs_tool_payload(
         )
     spec = next(spec for spec in active_surface.tools if spec.name == name)
     validation_schema = spec.validation_schema or spec.input_schema
+    from docmancer.mcp.project_binding import bind_read_target, configured_binding
+    try:
+        args, mismatch = bind_read_target(name, args)
+    except ValueError as exc:
+        return build_mcp_error_payload(
+            reason_code="docs_context_binding_invalid", message=str(exc),
+            tool=name, phase="validation", retryable=False,
+        )
+    if mismatch:
+        error = build_mcp_error_payload(
+            reason_code="docs_context_target_mismatch",
+            message=f"Requested project does not match the configured workspace target: {mismatch['project_path']}. No retrieval performed.",
+            tool=name, phase="validation", retryable=False,
+        )
+        error["project_binding"] = {k: v for k, v in mismatch.items() if k != "reason_code"}
+        return error
     # Fail before opening the member store or projecting empty evidence.
     # This is an invalid binding, not an answerability/absence verdict. An
     # explicit library-only query is valid and must not gain a guessed project.
@@ -257,6 +273,13 @@ def call_docs_tool_payload(
             phase="validation",
         )
     public_payload = compact_mcp_payload(payload, tool=name)
+    if name == "docs_status":
+        public_payload["project_binding"] = configured_binding()
+        public_payload["delivery_configuration"] = {
+            "text_fallback": os.environ.get("DOCATLAS_MCP_TEXT_FALLBACK") == "1",
+            "compact_text": os.environ.get("DOCATLAS_MCP_COMPACT_TEXT") == "1",
+            "minilm_model_dir": os.environ.get("DOCATLAS_MINILM_MODEL_DIR"),
+        }
     if name == "get_docs_context":
         from docmancer.docs.application.context_sufficiency import observe_final_context
         observe_final_context(str(args.get("question") or ""), public_payload)
