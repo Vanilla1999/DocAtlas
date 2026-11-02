@@ -1,6 +1,23 @@
 schema_version: 1
 # Literal read membership only; routing metadata is not action permission.
 code_files: []
+documentation_languages:
+  docs/main-flow-logging.md: [ru]
+  docs/main-flow-evaluation.md: [ru]
+  README.md: [en]
+  CONTRIBUTING.md: [en]
+  docs/INDEX.md: [en]
+  docs/PROJECT_MAP.md: [en]
+  wiki/Architecture.md: [en]
+  docs/adr/0003-context-first-project-reads.md: [en]
+  docs/mcp-docs-server.md: [en]
+  docs/testing.md: [en]
+  docs/project-docs-mcp-workflow.md: [en]
+  wiki/Supported-Sources.md: [en]
+  wiki/Commands.md: [en]
+  docs/index-cleanup.md: [en]
+  docs/modules/project-context-retrieval.md: [en]
+  docs/modules/evidence-selection.md: [en]
 documents:
   - path: docs/main-flow-logging.md
     role: runbook
