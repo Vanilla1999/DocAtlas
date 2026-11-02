@@ -37,8 +37,10 @@ jobs:
       - name: Freeze baseline selector, Context Assembly and Black corpus
         run: |
           set -euo pipefail
-          git fetch -q origin ddd59665a623408ca0ee2107affed1209e267544 --depth=1
-          git diff --exit-code ddd59665a623408ca0ee2107affed1209e267544 HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/context_assembly.py docmancer/docs/application/standalone_text_view.py eval/prepared_model_comparison40 eval/context_assembly/questions20.json
+          mkdir -p "$RUNNER_TEMP/results"
+          # Pin this fix's actual main baseline, including PR #239 delivery guards.
+          git fetch -q origin 542900e573835aa17a3a21da924a0f7ed400bece --depth=1
+          git diff --exit-code 542900e573835aa17a3a21da924a0f7ed400bece HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/context_assembly.py docmancer/docs/application/standalone_text_view.py eval/prepared_model_comparison40 eval/context_assembly/questions20.json
           python -m compileall -q docmancer eval/project_binding
           mkdir -p "$RUNNER_TEMP/results"
           git rev-parse HEAD > "$RUNNER_TEMP/results/HEAD.txt"
@@ -70,6 +72,7 @@ jobs:
       - name: Record full-agent/provider boundary honestly
         if: always()
         run: |
+          mkdir -p "$RUNNER_TEMP/results"
           printf '%s\n' '{"paid_calls":0,"provider_usage":null,"autonomous_opencode_argument_selection":"NOT_TESTED","same_original_user_workspace":"NOT_VERIFIED"}' > "$RUNNER_TEMP/results/BOUNDARIES.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

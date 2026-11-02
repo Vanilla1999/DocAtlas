@@ -101,7 +101,10 @@ def register_server(target: AgentTarget, *, project_path: Path | None = None,
                 project_path, workspace_path or target.config_path.resolve().parent), sort_keys=True)
         model = os.environ.get("DOCATLAS_MINILM_MODEL_DIR")
         if model:
-            model_path = Path(model).expanduser().resolve(strict=True)
+            try:
+                model_path = Path(model).expanduser().resolve(strict=True)
+            except OSError as exc:
+                raise ValueError("DOCATLAS_MINILM_MODEL_DIR must be an existing directory") from exc
             if not model_path.is_dir():
                 raise ValueError("DOCATLAS_MINILM_MODEL_DIR must be an existing directory")
             environment["DOCATLAS_MINILM_MODEL_DIR"] = str(model_path)
