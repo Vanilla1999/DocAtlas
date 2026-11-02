@@ -1,0 +1,22 @@
+[
+  {"id":1,"question":"Какие инструменты MCP предоставляет DocAtlas и для чего они нужны?","search_question":"Which MCP tools does DocAtlas provide and what is each used for?"},
+  {"id":2,"question":"Как установить DocAtlas и подключить его к OpenCode?","search_question":"How do I install DocAtlas and connect it to OpenCode?"},
+  {"id":3,"question":"Индексирует ли установка проектную документацию автоматически?","search_question":"Does installation automatically index project documentation?"},
+  {"id":4,"question":"Как привязать MCP к конкретному проекту?","search_question":"How do I bind MCP to a specific project?"},
+  {"id":5,"question":"Что означает статус not_prepared и как подготовить документы?","search_question":"What does not_prepared mean and how do I prepare documents?"},
+  {"id":6,"question":"Как DocAtlas выбирает конфигурационный файл?","search_question":"How does DocAtlas select its configuration file?"},
+  {"id":7,"question":"Какие источники документации поддерживаются?","search_question":"What documentation sources are supported?"},
+  {"id":8,"question":"Как задаётся каталог проектной документации и что он содержит?","search_question":"How is the project documentation catalog specified and what does it contain?"},
+  {"id":9,"question":"Какие ограничения и подтверждения нужны для изменения индекса проекта?","search_question":"What restrictions and confirmations are required to modify the project index?"},
+  {"id":10,"question":"Как получить документацию отдельной библиотеки?","search_question":"How do I retrieve documentation for an individual library?"},
+  {"id":11,"question":"Как работает выбор scope и module_path?","search_question":"How do scope and module_path selection work?"},
+  {"id":12,"question":"Как DocAtlas сохраняет сведения об источниках и координатах текста?","search_question":"How does DocAtlas preserve source information and text coordinates?"},
+  {"id":13,"question":"Что делать, если запрошенный проект не совпадает с привязкой?","search_question":"What should I do if the requested project does not match the binding?"},
+  {"id":14,"question":"Как работает подготовка документации из сети и какое согласие требуется?","search_question":"How does preparation of online documentation work and what consent is required?"},
+  {"id":15,"question":"Как проверить состояние асинхронной задачи подготовки?","search_question":"How do I check the status of an asynchronous preparation job?"},
+  {"id":16,"question":"Как устроено логирование основного потока и где выводятся логи MCP?","search_question":"How does main flow logging work and where are MCP logs written?"},
+  {"id":17,"question":"Какие уровни тестирования приняты в проекте?","search_question":"What levels of testing are used in the project?"},
+  {"id":18,"question":"Как устроен выбор фрагментов документации для ответа?","search_question":"How are documentation passages selected for the response?"},
+  {"id":19,"question":"Как удалить или очистить индекс документации безопасно?","search_question":"How can I safely delete or clear the documentation index?"},
+  {"id":20,"question":"Что делать при ограничении размера или усечении ответа MCP?","search_question":"What should I do when an MCP response exceeds the size limit or is truncated?"}
+]
