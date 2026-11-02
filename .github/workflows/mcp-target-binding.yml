@@ -2,13 +2,16 @@ name: MCP missing target binding - installed Black B01/B02/B05/B06/B08
 
 on:
   push:
-    branches: [fix/mcp-docs-target-binding-20261029]
+    branches: [fix/mcp-docs-target-binding-20261029, fix/explicit-project-binding]
     paths:
       - 'docmancer/mcp/_docs_server_tool_data.py'
       - 'docmancer/mcp/_docs_server_part01.py'
       - 'docmancer/docs/interfaces/mcp/context_tools.py'
       - 'docmancer/docs/interfaces/mcp/error_contract.py'
       - 'docmancer/mcp/agent_workflow_contract.py'
+      - 'docmancer/mcp/project_binding.py'
+      - 'docmancer/mcp/agent_config.py'
+      - 'docmancer/cli/**'
       - 'SKILL.md'
       - 'docmancer/templates/agent_contract.md'
       - 'eval/project_binding/**'
@@ -23,6 +26,10 @@ jobs:
   installed:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        layout: [unbound, black, mixed]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -30,8 +37,10 @@ jobs:
       - name: Freeze baseline selector, Context Assembly and Black corpus
         run: |
           set -euo pipefail
-          git fetch -q origin ddd59665a623408ca0ee2107affed1209e267544 --depth=1
-          git diff --exit-code ddd59665a623408ca0ee2107affed1209e267544 HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/context_assembly.py docmancer/docs/application/standalone_text_view.py eval/prepared_model_comparison40 eval/context_assembly/questions20.json
+          mkdir -p "$RUNNER_TEMP/results"
+          # Pin this fix's actual main baseline, including PR #239 delivery guards.
+          git fetch -q origin 542900e573835aa17a3a21da924a0f7ed400bece --depth=1
+          git diff --exit-code 542900e573835aa17a3a21da924a0f7ed400bece HEAD -- pyproject.toml uv.lock docmancer/docs/application/section_compression.py docmancer/docs/application/context_assembly.py docmancer/docs/application/standalone_text_view.py eval/prepared_model_comparison40 eval/context_assembly/questions20.json
           python -m compileall -q docmancer eval/project_binding
           mkdir -p "$RUNNER_TEMP/results"
           git rev-parse HEAD > "$RUNNER_TEMP/results/HEAD.txt"
@@ -48,7 +57,7 @@ jobs:
             -v "$RUNNER_TEMP/results:/results" \
             --entrypoint /bin/sh docatlas-binding -ec '
               /opt/venv/bin/python -I /repo/eval/project_binding/installed_stdio.py \
-                --repo /repo --work /results/work --out /results/verification
+                --repo /repo --work /results/work --out /results/verification --layout ${{ matrix.layout }}
               cat /sys/fs/cgroup/memory.max > /results/MEMORY_MAX
               cat /sys/fs/cgroup/memory.peak > /results/MEMORY_PEAK
               cat /sys/fs/cgroup/memory.events > /results/MEMORY_EVENTS
@@ -63,11 +72,12 @@ jobs:
       - name: Record full-agent/provider boundary honestly
         if: always()
         run: |
+          mkdir -p "$RUNNER_TEMP/results"
           printf '%s\n' '{"paid_calls":0,"provider_usage":null,"autonomous_opencode_argument_selection":"NOT_TESTED","same_original_user_workspace":"NOT_VERIFIED"}' > "$RUNNER_TEMP/results/BOUNDARIES.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: mcp-target-binding-${{ github.run_id }}
+          name: mcp-target-binding-${{ matrix.layout }}-${{ github.run_id }}
           path: ${{ runner.temp }}/results/
           retention-days: 30
           if-no-files-found: error

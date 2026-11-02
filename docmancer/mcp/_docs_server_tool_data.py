@@ -12,7 +12,7 @@ Agent workflow:
 - The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
 - Call prepare_docs only from recommended_next_action.
 - Use docs_status for explicit status/returned actions, or optional declared-language metadata only when needed for an already bound source.
-- Always bind a target: for current project docs pass the known absolute repository root in project_path; for a registered library pass library. Do not put a path into question, guess project from question or assume MCP process CWD is the active project. If the target is unknown, ask the user to choose it. Without a target the tool returns docs_context_target_missing, not evidence insufficiency.
+- Use the configured host project binding by omitting project_path. Without a binding, pass a known absolute root or registered library; ask if unknown. Never guess the project from folders, question or CWD. Conflicting roots return docs_context_target_mismatch before retrieval; missing unbound targets return docs_context_target_missing, not evidence insufficiency.
 - Preserve explicit project/library/version/scope/path bindings; never choose or widen scope from question wording. module_path implies module scope; scope="all" is repository-local without module filters. On module_ambiguous, use only an exact returned module_path.
 - Returned context and status never certify answer completeness, semantic proof or edit readiness. hard_stop=true blocks editing; hard_stop=false is not authorization. Mutation requires a separate explicit target and authorization. Diagnostic rephrases are not automatically executed lookups.
 - Optional context_format="patch_context" returns a read-only v4 patch evidence packet with full admitted source windows. It selects representation only, never mutation/workflow permission; omitted/null keeps the existing docs response. Patch representation has no internal token/byte compaction cap; retrieval scope and runtime guards remain unchanged.
@@ -575,8 +575,9 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Retrieve one unchanged user question. Set project_path=KNOWN ABSOLUTE repo root "
-        "or library=registered docs; ask if unknown. Never infer target/scope from prose/CWD. "
+        "Retrieve one unchanged user question. Omit project_path to use the configured host project binding. "
+        "Without binding set project_path=KNOWN ABSOLUTE repo root or library=registered docs; ask if unknown. "
+        "A conflicting root returns docs_context_target_mismatch before retrieval. Never infer target/scope from prose/CWD. "
         "Language mode + unknown bound language: docs_status(include_language=true) first. "
         "search_question: full translation to declared source language preserving meaning and exact literals; "
         "one of five explicit same-question lookups. No invented subquestions/answers/source names; never batch independent questions. "
@@ -594,7 +595,7 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     ),
     "docs_status": (
         "Read-only for explicit status, returned actions/job IDs, or the get_docs_context language preflight. "
-        "No discovery/preparation. action=project needs project_path; "
+        "Reports host project_binding and delivery_configuration. No discovery/preparation. action=project uses host binding or explicit project_path; "
         "action=library needs canonical_id; module is an exact path. Cache language by scope/version/snapshot; "
         "unknown/mixed/partial is not English. Omit details unless diagnostics are needed."
     ),
@@ -607,10 +608,10 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "question": {"type": "string", "minLength": 1},
             "search_question": {"type": ["string", "null"], "minLength": 1, "maxLength": 500},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
-            "project_path": {"type": ["string", "null"], "description": "Known absolute root of selected project."},
+            "project_path": {"type": ["string", "null"], "description": "Omit for configured host binding; otherwise known absolute project root, never a docs subfolder. Conflicting root is rejected."},
             "library": {"type": ["string", "null"], "description": "Explicit registered library target."},
             "version": {"type": ["string", "null"], "description": "Current project: omit unless an exact/historical version is explicitly requested; requery after lockfile changes."},
-            "module_path": {"type": ["string", "null"]},
+            "module_path": {"type": ["string", "null"], "description": "Exact catalogued module path within the bound project; not an arbitrary documentation directory."},
             "scope": {
                 "type": ["string", "null"],
                 "enum": ["project", "module", "all", None],
@@ -622,7 +623,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         # return a structured docs_context_target_missing tool error with
         # actionable hints; schema anyOf is rejected first by the SDK and
         # replaced with an unstructured generic error.
-        "description": "Missing target returns docs_context_target_missing; correct binding before retry.",
+        "description": "Uses explicit host binding when target omitted. Without binding missing target returns docs_context_target_missing. Conflicting project returns docs_context_target_mismatch.",
         "additionalProperties": False,
     },
     "prepare_docs": {

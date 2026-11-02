@@ -186,13 +186,13 @@ def _remove_managed_instruction_block(dest: Path) -> bool:
     return True
 
 
-def _register_mcp_for_agent(agent_name: str, *, project: bool) -> None:
+def _register_mcp_for_agent(agent_name: str, *, project: bool, project_path: Path | None = None) -> None:
     """Register `doc-atlas mcp docs-serve` into a known agent's MCP config (best-effort)."""
     try:
         from docmancer.cli.mcp_commands import register_docatlas_mcp_in_agent
     except Exception:
         return
-    msg = register_docatlas_mcp_in_agent(agent_name, project=project)
+    msg = register_docatlas_mcp_in_agent(agent_name, project=project, project_path=project_path)
     if msg:
         _emit_status_line(msg, indent=0)
 

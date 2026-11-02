@@ -12,6 +12,8 @@ _RETRYABLE_BY_REASON: dict[str, bool | None] = {
     "bad_request": False,
     "validation_error": False,
     "docs_context_target_missing": False,
+    "docs_context_target_mismatch": False,
+    "docs_context_binding_invalid": False,
     "context_delivery_unavailable": False,
     "unknown_tool": False,
     "config_shadowing": False,
@@ -36,6 +38,11 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
     "context_delivery_unavailable": [
         "Do not repeat the unchanged request. Check the MCP delivery configuration and reported delivery reason.",
     ],
+    "docs_context_target_mismatch": [
+        "Use the configured project root, or omit project_path to use the explicit host binding. Never replace the root with a documentation subdirectory.",
+        "Preserve explicit scope/module_path. To query another project, connect its own project integration; do not widen the query or prepare new documentation.",
+    ],
+    "docs_context_binding_invalid": ["Reinstall the project integration with the intended existing project root."],
     "empty_question": ["Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."],
     "unknown_tool": ["Use list_tools to discover available MCP tools."],
     "config_shadowing": ["Start MCP from the repo config, set DOCATLAS_HOME, or use an explicit override if available."],
@@ -58,6 +65,8 @@ _VALIDATION_REASON_CODES = {
     "bad_request",
     "validation_error",
     "docs_context_target_missing",
+    "docs_context_target_mismatch",
+    "docs_context_binding_invalid",
 }
 
 # Exact diagnostics emitted by the local ingest/sync entry guards, not prose
