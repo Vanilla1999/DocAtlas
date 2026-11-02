@@ -7,7 +7,7 @@ from math import log1p
 from ._sqlite_store_shared import *  # noqa: F401,F403
 from docmancer.retrieval.lexical_terms import (
     lexical_field_matches, lexical_field_utility, lexical_terms, lexical_tokens,
-    query_terms,
+    query_terms, explicit_source_locators, resolve_source_locators,
 )
 
 
@@ -328,6 +328,7 @@ class _SQLiteStorePart03:
                 "lexical_match": self._lexical_match_trace(
                     text, title=str(row["title"]), body=str(row["text"]),
                     description=str(metadata.get("project_doc_description") or ""),
+                    source_locator_matches=tuple(row.get("_source_locator_matches") or ()),
                     mode="or", lexical_cost=cost,
                 ),
             })
@@ -346,6 +347,7 @@ class _SQLiteStorePart03:
     @classmethod
     def _lexical_match_trace(
         cls, query: str, *, title: str, body: str, description: str = "",
+        source_locator_matches: tuple[str, ...] = (),
         mode: str, lexical_cost: float,
     ) -> dict[str, Any]:
         terms = query_terms(query)
@@ -377,8 +379,9 @@ class _SQLiteStorePart03:
             "content_lexical_cost": lexical_cost,
             "lexical_score": -lexical_cost,
             "field_matches": {key: list(value) for key, value in field_matches.items()},
-            "routing_only": not matched and bool(field_matches["description"]),
+            "routing_only": not matched and bool(field_matches["description"] or source_locator_matches),
             "routing_match_ratio": round(len(field_matches["description"]) / len(terms), 4) if terms else 0.0,
+            "source_locator_matches": list(source_locator_matches),
         }
 
     @classmethod
@@ -526,6 +529,7 @@ class _SQLiteStorePart03:
         # are phrases in unicode61, not OR searches for their separate parts.
         literal_terms = [f'"{token}"' for token in re.findall(r"\w+", query)]
         match_expression = "{title retrieval_text} : (" + " OR ".join(literal_terms) + ")"
+        locators = explicit_source_locators(query)
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         from docmancer.retrieval.experimental_acquisition import (
             ACQUISITION_CANDIDATES,
@@ -537,6 +541,37 @@ class _SQLiteStorePart03:
                 return []
             if not literal_terms:
                 return []
+
+            locator_sources = {}
+            if locators:
+                # Resolve against the complete allowed generation, not an FTS
+                # top-N. Only whole paths or unique basenames are routing;
+                # technical storage path words never become content matches.
+                catalog_rows = conn.execute(
+                    f"""
+                    SELECT DISTINCT sections.source,
+                           COALESCE(NULLIF(json_extract(sections.metadata_json, '$.project_doc_path'), ''),
+                                    NULLIF(json_extract(sections.metadata_json, '$.source_path'), ''),
+                                    sections.source) AS path
+                    FROM retrieval_children AS sections
+                    WHERE sections.generation_id = ?
+                    {filter_sql}
+                    """, (active_generation, *filter_params),
+                )
+                locator_sources = resolve_source_locators(
+                    locators, ((str(row["source"]), str(row["path"])) for row in catalog_rows),
+                )
+            locator_keys = tuple(sorted(locator_sources))
+            locator_sql = ("sections.source IN (" + ",".join("?" for _ in locator_keys) + ")"
+                           if locator_keys else "0")
+            # Exact locators also work when their spelling occurs only in the
+            # source identity. This is a separate indexed routing union, not
+            # an OR search over individual words in every absolute source path.
+            candidate_sql = (
+                "sections.id IN (SELECT rowid FROM retrieval_children_fts "
+                "WHERE retrieval_children_fts MATCH ?)"
+                + (" OR " + locator_sql if locator_keys else "")
+            )
 
             class SourceStatistics:
                 def __init__(self) -> None:
@@ -611,24 +646,27 @@ class _SQLiteStorePart03:
                            sections.title, sections.display_text,
                            json_extract(sections.metadata_json, '$.project_doc_description')
                        ) AS rank
-                FROM retrieval_children_fts
-                JOIN retrieval_children AS sections
-                  ON sections.id = retrieval_children_fts.rowid
-                WHERE retrieval_children_fts MATCH ?
+                FROM retrieval_children AS sections
+                WHERE ({candidate_sql})
                   AND sections.generation_id = ?
-                  AND docatlas_source_utility(
+                  AND (docatlas_source_utility(
                       sections.title, sections.display_text,
                       json_extract(sections.metadata_json, '$.project_doc_description')
-                  ) > 0
+                  ) > 0 OR {locator_sql})
                 {filter_sql}
-                ORDER BY rank, sections.source, sections.chunk_index,
+                ORDER BY CASE WHEN {locator_sql} THEN 1 ELSE 0 END DESC,
+                         rank, sections.source, sections.chunk_index,
                          sections.stable_chunk_id
                 LIMIT ?
                 """,
-                (match_expression, active_generation, *filter_params,
+                (match_expression, *locator_keys, active_generation, *locator_keys,
+                 *filter_params, *locator_keys,
                  min(limit, ACQUISITION_CANDIDATES)),
             ))
-            return self._mark_lexical_mode(rows, "or")
+            return self._mark_lexical_mode([
+                {**dict(row), "_source_locator_matches": locator_sources.get(str(row["source"]), ())}
+                for row in rows
+            ], "or")
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:

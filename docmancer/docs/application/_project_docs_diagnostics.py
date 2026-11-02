@@ -44,7 +44,7 @@ def _observed_candidate(chunk: Any) -> dict[str, Any]:
             "mode", "query_terms", "matched_terms", "exact_terms", "missing_exact_terms",
             "query_term_count", "matched_term_count", "match_ratio", "bm25_cost",
             "content_lexical_cost", "lexical_score", "field_matches",
-            "routing_only", "routing_match_ratio",
+            "routing_only", "routing_match_ratio", "source_locator_matches",
         )),
         "source_reference": _observed_fields(evidence, (
             "source", "member_binding", "char_start", "char_end",

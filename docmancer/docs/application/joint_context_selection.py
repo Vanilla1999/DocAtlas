@@ -4,6 +4,8 @@ The input is the merged, live-source-checked pool, not a retrieval lane. Query
 terms only come from the original question and explicit host lookups. Source
 metadata never contributes a lexical match. Selection retains whole source
 rows, including their exact citations, text, hashes and coordinates.
+An explicit document locator can route a checked source independently of body
+words; the existing source-reference verifier must bind that locator first.
 
 Coherent neighboring rows are considered together: several clauses can share
 the same query words. A large section may instead contribute complete checked
@@ -22,10 +24,11 @@ import os
 import re
 
 from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
-from docmancer.retrieval.lexical_terms import lexical_terms, query_terms
+from docmancer.retrieval.lexical_terms import lexical_terms, query_terms, explicit_source_locators
+from docmancer.docs.domain.query_reference_binding import prepare_reference_probe
 
 from .context_json import serialize_context_json
-from .context_query_probes import authoritative_queries
+from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
@@ -41,6 +44,7 @@ class _Unit:
     group: int
     indices: tuple[int, ...]
     features: frozenset[tuple[str, str]]
+    locator_queries: frozenset[str]
     terms: frozenset[str]
     cost: int
     vector_norm: float
@@ -78,6 +82,41 @@ def _groups(rows: list[dict], snapshot: dict) -> list[tuple[int, ...]]:
         if current:
             groups.append(tuple(current))
     return groups
+
+
+def _bound_locator_queries(row: dict, snapshot: dict, queries: dict) -> frozenset[str]:
+    """Recheck literal document nominations without manufacturing body credit.
+
+    Matching a path string in a selected top-N cannot prove uniqueness or
+    scope. Use the request's prepared reference plan and existing verifier,
+    whose source binding came from the complete allowed snapshot. This ranking
+    route never alters retrieval_query_matches or the query credit ceiling.
+    """
+    source = snapshot[row["evidence_id"]]["source"]
+    plans = source.get("_reference_plans") or {}
+    routed = set()
+    for query_id, query in queries.items():
+        if not explicit_source_locators(query["text"]):
+            continue
+        plan = plans.get(query["text"]) or {}
+        mentions = {
+            ref["mention"]["mention_id"] for ref in plan.get("references") or ()
+            if ref.get("role") == "source_locator" and ref.get("state") == "resolved"
+            and (ref.get("mention") or {}).get("explicit") is True
+            and (ref.get("mention") or {}).get("syntax_role") == "source_locator"
+        }
+        if not mentions:
+            continue
+        checked, reason = prepare_reference_probe(
+            literal_query_probe(query), candidate={**source, **row},
+            evidence_text=row["snippet"],
+        )
+        if reason is None and any(
+            binding.get("role") == "source_locator" and binding.get("mention_id") in mentions
+            for binding in checked.get("reference_bindings") or ()
+        ):
+            routed.add(query_id)
+    return frozenset(routed)
 
 
 def _text_fits(text: str, limit: int) -> bool:
@@ -205,12 +244,14 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
                                    for term in terms})
     row_features = [frozenset((key, term) for key, terms in terms_by_query.items()
                              for term in terms & body) for body in row_terms]
+    row_locators = [_bound_locator_queries(row, snapshot, queries) for row in rows]
     grouped = _groups(rows, snapshot)
 
     def unit(group: int, indices: tuple[int, ...]) -> _Unit:
         return _Unit(
             group, indices,
             frozenset(feature for index in indices for feature in row_features[index]),
+            frozenset(key for index in indices for key in row_locators[index]),
             frozenset(term for index in indices for term in row_terms[index]),
             max(1, sum(len(json.dumps(rows[index], ensure_ascii=False).encode("utf-8"))
                        for index in indices)),
@@ -219,7 +260,7 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
         )
 
     whole = [unit(group, indices) for group, indices in enumerate(grouped)]
-    pending = {item.indices: item for item in whole if item.features}
+    pending = {item.indices: item for item in whole if item.features or item.locator_queries}
     eligible = {index for item in pending.values() for index in item.indices}
     selected: list[int] = []
     selected_set: set[int] = set()
@@ -264,13 +305,18 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
         def priority(item: _Unit) -> tuple[float, float, int]:
             completing = item.group in selected_groups and adjacent(item)
             features = item.features or (whole[item.group].features if completing else frozenset())
-            if not features:
+            if not features and not item.locator_queries:
                 return (0.0, 0.0, -min(item.indices))
             mass = Counter()
             for feature in sorted(features):
                 mass[feature[0]] += feature_weight[feature]
-            relevance = sum(mass[key] / best_query_mass[key] for key in queries
-                            if best_query_mass[key]) / len(queries)
+            # An exact source nomination is a separate routing signal, not
+            # a match in the body. It keeps locator-only reads possible while
+            # normal attribution is independently rebuilt below.
+            relevance = sum(max(
+                mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0,
+                1.0 if key in item.locator_queries else 0.0,
+            ) for key in queries) / len(queries)
             # This is an MMR-style choice: equal scales for query relevance and
             # content redundancy, not a hard one-hit set-cover stopping rule.
             # Siblings of a partly selected coherent section are complementary

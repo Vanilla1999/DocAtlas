@@ -12,7 +12,12 @@ from __future__ import annotations
 import re
 import unicodedata
 from collections import Counter
-from typing import Mapping
+from pathlib import PurePosixPath
+from typing import Iterable, Mapping
+
+from docmancer.docs.domain.query_reference_binding import (
+    normalize_reference_path, query_mentions,
+)
 
 
 _WORDS = re.compile(r"\w+", re.UNICODE)
@@ -46,6 +51,56 @@ def lexical_terms(text: str) -> tuple[str, ...]:
 def query_terms(text: str) -> tuple[str, ...]:
     """Use the same literal terms for retrieval and merged evidence selection."""
     return lexical_terms(text)
+
+
+def explicit_source_locators(query: str) -> tuple[str, ...]:
+    """Keep complete literal filenames/paths separate from content words.
+
+    The existing occurrence parser supplies the literal spellings. A qualified
+    technical spelling can name a stored file (including YAML), but a simple
+    word, absolute machine path, URL or traversal can never open this route.
+    Matching a locator is only candidate routing, never source authorization.
+    """
+    locators = []
+    for mention in query_mentions(query):
+        value = normalize_reference_path(mention.text)
+        if (not mention.explicit or mention.syntax_role not in {"source_locator", "symbol_identity"}
+                or not value or value.startswith(("/", "~/")) or ":" in value
+                or any(part in {"", ".", ".."} for part in value.split("/"))
+                or not PurePosixPath(value).suffix):
+            continue
+        locators.append(value)
+    return tuple(dict.fromkeys(locators))
+
+
+def resolve_source_locators(
+    locators: tuple[str, ...], sources: Iterable[tuple[str, str]],
+) -> dict[str, tuple[str, ...]]:
+    """Resolve whole paths or unique basenames in the complete allowed pool.
+
+    Callers supply already filtered source identities, before candidate LIMIT.
+    Exact spelling precedes case-insensitive matching, as in the source
+    reference resolver. A supplied relative directory is never discarded to
+    rescue an unknown path through a coincidentally matching basename.
+    """
+    paths = [(identity, normalize_reference_path(path)) for identity, path in sources]
+    resolved: dict[str, list[str]] = {}
+    for locator in locators:
+        tiers = [paths]
+        if "/" not in locator:
+            tiers.append([(identity, PurePosixPath(path).name) for identity, path in paths])
+        matches: set[str] = set()
+        for folded in (False, True):
+            for tier in tiers:
+                matches = {identity for identity, path in tier
+                           if (path.casefold() == locator.casefold() if folded else path == locator)}
+                if matches:
+                    break
+            if matches:
+                break
+        if len(matches) == 1:
+            resolved.setdefault(next(iter(matches)), []).append(locator)
+    return {identity: tuple(values) for identity, values in resolved.items()}
 
 
 def lexical_field_matches(

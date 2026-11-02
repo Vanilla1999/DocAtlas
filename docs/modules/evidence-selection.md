@@ -40,6 +40,10 @@ and provenance. Attribution is recomputed for the selected text, omitted
 candidates remain visible as omissions, and coverage stays unverified. A lexical
 ranking signal is not a semantic proof or a certificate that no answer exists.
 The optional MiniLM section policy remains separate from native selection.
+Its integration audit compares delivered rows with the full checked input of
+the same call and independently verifies the frozen source corpus and facts.
+The native response is itself selected and is used only as a delivery-cost
+comparison, not as the complete candidate pool for the MiniLM audit.
 
 ## Invariants
 

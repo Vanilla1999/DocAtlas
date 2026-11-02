@@ -60,6 +60,13 @@ limits are applied.
 The original question and explicit translations/lookups share a final selection
 step after their candidates have been combined and source-checked.
 
+An explicit document filename or relative source path remains a separate
+routing signal. It is resolved against the complete allowed generation before
+the candidate limit; an ambiguous basename is not resolved from a shortened
+hit list. Final selection rechecks the source-reference binding against the
+current snapshot. Naming a document does not establish a match in its body or
+increase original-query coverage.
+
 ## MCP adapter and fidelity
 
 The adapter exposes source-attributed `docs_context` for project reads. It keeps
