@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+import subprocess
 import sys
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -125,11 +126,30 @@ async def call(env: dict, root: Path, *, prepare: dict | None,
             spec = next(x for x in (await session.list_tools()).tools if x.name == "get_docs_context")
             assert getattr(spec, "outputSchema", None) is None
             if prepare is not None:
+                # Fresh installed MCP must explain preparation without creating
+                # storage or falsely reporting an OS permission failure.
+                database = Path(prepare["storage_path"])
+                if not database.exists():
+                    target = {} if env.get("DOCATLAS_PROJECT_BINDING") else {"project_path": str(root / "project")}
+                    for tool, arguments in (
+                        ("docs_status", {"action": "project", **target}),
+                        ("get_docs_context", {"question": question, **target}),
+                    ):
+                        cold, _ = text_payload(await session.call_tool(tool, arguments))
+                        assert cold["status"] == "not_prepared", cold
+                        assert cold["reason_code"] == "member_store_uninitialized", cold
+                        assert cold["storage_path"] == str(database), cold
+                        assert cold["recommended_next_action"]["action"] == "sync_project_docs", cold
+                        assert cold["recommended_next_action"]["requires_confirmation"] is True, cold
+                        assert cold["project_path"] == str(root / "project"), cold
+                        if tool == "docs_status" and not target:
+                            assert cold["project_binding"]["project_path"] == str(root / "project"), cold
+                        assert not database.exists()
                 result, _ = text_payload(await session.call_tool("prepare_docs", {
                     "action": "sync_project_docs", "project_path": str(root / "project"), "mutation": prepare}))
                 assert result["status"] == "success", result
-            reply = await session.call_tool("get_docs_context", {
-                "project_path": str(root / "project"), "question": question})
+            target = {} if env.get("DOCATLAS_PROJECT_BINDING") else {"project_path": str(root / "project")}
+            reply = await session.call_tool("get_docs_context", {**target, "question": question})
             result, text = text_payload(reply)
             assert bool(reply.isError) is expect_delivery_error, {
                 "isError": reply.isError, "status": result.get("status"),
@@ -361,10 +381,49 @@ async def run(out: Path, *, large_packet: bool = False):
         print(json.dumps(result))
 
 
+async def first_use(out: Path):
+    """Installed project CLI -> question-only cold reads -> approved preparation -> evidence."""
+    from docmancer.docs.application.context_assembly import decode_context
+    out.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix="docatlas-first-use-") as temp:
+        root = Path(temp)
+        setup(root)
+        env = environment(root)
+        install = subprocess.run(
+            [sys.executable, "-I", "-m", "docmancer.cli", "install", "opencode", "--project"],
+            cwd=root / "project", env=env, capture_output=True, text=True,
+        )
+        (out / "install.log").write_text(install.stdout + install.stderr)
+        assert install.returncode == 0, install.stderr
+        config = json.loads((root / "project" / "opencode.json").read_text())
+        env.update(config["mcp"]["servers"]["docatlas"]["environment"])
+        mutation, database = prepared_mutation(env, root / "project")
+        assert not database.exists()
+        result, text, _ = await call(env, root, prepare=mutation, check_denial=False)
+        view = decode_context(result)
+        rows = view["sources"]
+        assert rows, result
+        combined = "\n".join(row["text"] for row in rows)
+        for fact in ("tern restore --checkpoint current", "secret store", "watermark"):
+            assert fact in combined, (fact, result)
+        for row in rows:
+            assert row["path"] in DOCS, row
+            assert row["text"] in DOCS[row["path"]], row
+        assert database.is_file()
+        assert all((root / "project" / name).read_text() == text for name, text in DOCS.items())
+        (out / "response.json").write_text(text)
+        (out / "RESULT.json").write_text(json.dumps({
+            "status": "PASS", "cold_reads": 2, "preparation_calls": 1,
+            "prepared_question_calls": 1, "source_fidelity": True,
+            "boundary": "installed stdio MCP, not autonomous model",
+        }, indent=2))
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--large-packet", action="store_true",
                         help="Also verify a real oversized Black B01 response is a typed delivery failure")
+    parser.add_argument("--first-use", action="store_true")
     args = parser.parse_args()
-    asyncio.run(run(args.out, large_packet=args.large_packet))
+    asyncio.run(first_use(args.out) if args.first_use else run(args.out, large_packet=args.large_packet))
