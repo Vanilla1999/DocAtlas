@@ -2,7 +2,7 @@
 
     python eval/blind_project_context/run.py OUT [--source-tree DIR] [--jobs N]
         [--corpus L0|L2]... [--split dev|holdout]... [--case ID]...
-        [--no-observer] [--env KEY=VALUE]...
+        [--no-observer] [--env KEY=VALUE]... [--keep-work] [--reuse-work]
 
 For each corpus and shard: rebuild the frozen corpus from git objects, start a
 fresh server process (``observed_server.py``) with isolated HOME/DOCATLAS_HOME,
@@ -131,13 +131,18 @@ def read_events(log: Path | None, offset: int) -> tuple[list[dict], int]:
     return [json.loads(line) for line in data.decode("utf-8").splitlines() if line.strip()], offset + len(data)
 
 
-async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool, extra: dict[str, str]) -> dict:
+async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool, extra: dict[str, str],
+                   reuse: bool = False) -> dict:
     root = work / unit["name"]
     project = root / "project"
-    shutil.copytree(work / "corpora" / unit["corpus"] / "project", project)
-    if unit["scan_deadline"]:
-        (project / "docatlas.yaml").write_text(
-            f"project:\n  scan_deadline_seconds: {unit['scan_deadline']}\n", encoding="utf-8")
+    if reuse:
+        if not (project / CATALOG).exists():
+            raise RuntimeError(f"--reuse-work: {project} was not prepared by an earlier --keep-work run")
+    else:
+        shutil.copytree(work / "corpora" / unit["corpus"] / "project", project)
+        if unit["scan_deadline"]:
+            (project / "docatlas.yaml").write_text(
+                f"project:\n  scan_deadline_seconds: {unit['scan_deadline']}\n", encoding="utf-8")
     log = (out / "logs" / f"{unit['name']}.observer.jsonl") if observe else None
     env = server_env(root, tree, log, extra, (work / "observer-facts.json") if observe else None)
     params = StdioServerParameters(command=sys.executable, args=[str(HERE / "observed_server.py")],
@@ -152,17 +157,19 @@ async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool,
                 tools = {tool.name for tool in (await session.list_tools()).tools}
                 if not {"get_docs_context", "prepare_docs"} <= tools:
                     raise RuntimeError(f"server tools missing: {sorted(tools)}")
-                cold, _ = payload_of(await session.call_tool("get_docs_context", {
-                    "project_path": str(project), "question": unit["cases"][0]["question"]}))
-                if cold.get("status") != "not_prepared" or not cold.get("storage_path"):
-                    raise RuntimeError(f"unexpected cold answer: {json.dumps(cold)[:600]}")
-                started = time.perf_counter()
-                prepared, _ = payload_of(await session.call_tool("prepare_docs", {
-                    "action": "sync_project_docs", "project_path": str(project),
-                    "mutation": member_grant(project, cold["storage_path"])}))
-                prepare_seconds = time.perf_counter() - started
-                if prepared.get("status") != "success":
-                    raise RuntimeError(f"prepare failed: {json.dumps(prepared)[:600]}")
+                cold, prepare_seconds = {}, None
+                if not reuse:
+                    cold, _ = payload_of(await session.call_tool("get_docs_context", {
+                        "project_path": str(project), "question": unit["cases"][0]["question"]}))
+                    if cold.get("status") != "not_prepared" or not cold.get("storage_path"):
+                        raise RuntimeError(f"unexpected cold answer: {json.dumps(cold)[:600]}")
+                    started = time.perf_counter()
+                    prepared, _ = payload_of(await session.call_tool("prepare_docs", {
+                        "action": "sync_project_docs", "project_path": str(project),
+                        "mutation": member_grant(project, cold["storage_path"])}))
+                    prepare_seconds = time.perf_counter() - started
+                    if prepared.get("status") != "success":
+                        raise RuntimeError(f"prepare failed: {json.dumps(prepared)[:600]}")
                 _, offset = read_events(log, 0)
                 for case in unit["cases"]:
                     arguments = {"project_path": str(project), "question": case["question"]}
@@ -185,14 +192,16 @@ async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool,
                             "BLIND_OBSERVER_FACTS")
              and not key.endswith("_HOME") and key != "PYTHONPATH"}
     return {"name": unit["name"], "corpus": unit["corpus"], "project_path": str(project), "server_environment": shown,
-            "prepare_seconds": round(prepare_seconds, 3), "prepared_documents": len(member_grant(project, "")["documents"]),
+            "prepare_seconds": None if prepare_seconds is None else round(prepare_seconds, 3),
+            "prepared_documents": len(member_grant(project, "")["documents"]), "reused_store": reuse,
             "cold_reason_code": cold.get("reason_code"), "records": records}
 
 
 async def run_all(units: list[dict], jobs: int, out: Path, work: Path, tree: Path, observe: bool,
-                  extra: dict) -> list[dict]:
+                  extra: dict, reuse: bool = False) -> list[dict]:
     async def worker(index: int) -> list[dict]:
-        return [await run_unit(unit, out, work, tree, observe, extra) for unit in units if unit["worker"] == index]
+        return [await run_unit(unit, out, work, tree, observe, extra, reuse)
+                for unit in units if unit["worker"] == index]
     return [result for group in await asyncio.gather(*(worker(index) for index in range(jobs))) for result in group]
 
 
@@ -206,7 +215,10 @@ def main() -> int:
     parser.add_argument("--case", action="append")
     parser.add_argument("--no-observer", action="store_true")
     parser.add_argument("--env", action="append", default=[], help="extra server variable KEY=VALUE")
-    parser.add_argument("--keep-work", action="store_true")
+    parser.add_argument("--keep-work", action="store_true", help="leave projects and prepared stores in place")
+    parser.add_argument("--reuse-work", action="store_true",
+                        help="ask again against the stores a --keep-work run left (same cases and --jobs); "
+                             "no cold call, no prepare. Refs stay equal, so answers compare byte for byte")
     parser.add_argument("--work-root", type=Path, default=WORK_ROOT,
                         help="fixed scratch root for projects and stores (default %(default)s); recreated per run")
     parser.add_argument("--scan-deadline", type=float, default=SCAN_DEADLINE_SECONDS,
@@ -238,25 +250,30 @@ def main() -> int:
         pass
     except OSError:
         parser.error(f"another run is using {work}")
-    if work.exists():
-        if not (work / MARKER).exists():
-            parser.error(f"{work} exists and was not created by this runner")
-        shutil.rmtree(work)
-    work.mkdir(parents=True)
-    (work / MARKER).write_text("scratch directory of eval/blind_project_context/run.py\n", encoding="utf-8")
-    build(work / "corpora")
+    if work.exists() and not (work / MARKER).exists():
+        parser.error(f"{work} exists and was not created by this runner")
+    if args.reuse_work:
+        if not work.exists():
+            parser.error(f"--reuse-work: {work} does not exist")
+    else:
+        if work.exists():
+            shutil.rmtree(work)
+        work.mkdir(parents=True)
+        (work / MARKER).write_text("scratch directory of eval/blind_project_context/run.py\n", encoding="utf-8")
+        build(work / "corpora")
     if not args.no_observer:
         observer_facts(work)
     started_at = datetime.now(timezone.utc)
     started = time.perf_counter()
-    results = asyncio.run(run_all(units, jobs, out, work, tree, not args.no_observer, extra))
+    results = asyncio.run(run_all(units, jobs, out, work, tree, not args.no_observer, extra, args.reuse_work))
     env_shown = results[0]["server_environment"] if results else {}
     run = {"schema_version": 1, "started_at_utc": started_at.isoformat(timespec="seconds"),
            "wall_seconds": round(time.perf_counter() - started, 1),
            "source_tree": git_state(tree), "eval_tree": git_state(ROOT),
            "questions_sha256": sha256((HERE / "questions.json").read_bytes()),
            "python": sys.version.split()[0], "platform": platform.platform(), "cpus": os.cpu_count(),
-           "jobs": jobs, "observer": not args.no_observer, "work_root": str(work), "server_environment": env_shown,
+           "jobs": jobs, "observer": not args.no_observer, "work_root": str(work), "reused_work": args.reuse_work,
+           "server_environment": env_shown,
            "observer_oracle_sha256": None if args.no_observer else sha256((HERE / "oracle.json").read_bytes()),
            "project_config": {"docatlas.yaml": {"project": {"scan_deadline_seconds": deadline}}} if deadline else None,
            "selected_cases": [case["id"] for case in cases], "corpora": corpora,

@@ -32,18 +32,13 @@ def _python(*args: str, timeout: int) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, *args], cwd=ROOT, capture_output=True, text=True, timeout=timeout)
 
 
-def _delivered(run: Path, corpus: str, case_id: str) -> dict:
+def _rows(run: Path, corpus: str, case_id: str) -> list[dict]:
     sys.path.insert(0, str(EVAL))
     try:
         from score import rows_of
     finally:
         sys.path.remove(str(EVAL))
-    payload = json.loads((run / "payloads" / corpus / f"{case_id}.json").read_text(encoding="utf-8"))
-    # Rows with equal path and lines are ordered by refs bound to the prepared
-    # generation (a fresh id per preparation), so compare the delivered rows as
-    # a multiset; everything else must match exactly.
-    return {"status": payload.get("status"), "source_selection": payload.get("source_selection"),
-            "rows": sorted((row["path"], row["line_start"], row["line_end"], row["text"]) for row in rows_of(payload))}
+    return rows_of(json.loads((run / "payloads" / corpus / f"{case_id}.json").read_text(encoding="utf-8")))
 
 
 @pytest.fixture(scope="module")
@@ -64,17 +59,24 @@ def sealed_inputs():
 
 
 def test_observer_does_not_change_delivered_context(out_dir):
+    """The observer is passive: same prepared store, same answer bytes with and without it.
+
+    The first run prepares and keeps its store; the second asks the same cases
+    against that store without the observer. Within one prepared generation the
+    refs are equal, so every payload must match byte for byte.
+    """
     cases = ("T03-ru", "T03-en")
-    runs = {}
-    for name, extra in (("observed", ()), ("plain", ("--no-observer",))):
-        runs[name] = out_dir / f"passive-{name}"
+    runs = {"observed": out_dir / "passive-observed", "plain": out_dir / "passive-plain"}
+    for name, extra in (("observed", ("--keep-work",)), ("plain", ("--reuse-work", "--no-observer"))):
         arguments = [str(EVAL / "run.py"), str(runs[name]), "--corpus", "L0", *extra]
         for case in cases:
             arguments += ["--case", case]
         result = _python(*arguments, timeout=1800)
         assert result.returncode == 0, result.stderr[-3000:]
     for case in cases:
-        assert _delivered(runs["observed"], "L0", case) == _delivered(runs["plain"], "L0", case), case
+        observed = (runs["observed"] / "payloads" / "L0" / f"{case}.json").read_bytes()
+        assert observed == (runs["plain"] / "payloads" / "L0" / f"{case}.json").read_bytes(), case
+        assert _rows(runs["observed"], "L0", case), case
 
 
 def test_no_slice_is_worse_than_the_committed_baseline(out_dir):
