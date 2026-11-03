@@ -10,6 +10,7 @@ import hashlib
 from typing import Any, Mapping
 
 from docmancer.core.structured_chunking import parse_markdown_parents
+from docmancer.docs.request_memo import request_memo
 
 
 @lru_cache(maxsize=16)
@@ -20,13 +21,27 @@ def _document_structure(raw: str, document_id: str):
             tuple(parse_markdown_parents(raw, document_id)))
 
 
+def _structure(raw: str, document_id: str):
+    # Packet trials requalify the same visible sources many times and can span
+    # more documents than the small process-wide cache holds. Within one
+    # request each body is hashed and parsed once; the checks below still run.
+    memo = request_memo('document_structure')
+    if memo is None:
+        return _document_structure(raw, document_id)
+    key = (raw, document_id)
+    found = memo.get(key)
+    if found is None:
+        found = memo[key] = _document_structure(raw, document_id)
+    return found
+
+
 def prepared_owner_rejection(evidence: Mapping[str, Any]) -> str | None:
     """Check source window and structural owner, rejecting malformed claims."""
     raw = evidence.get('raw_document')
     identity = evidence.get('source') or {}
     if not isinstance(raw, str) or not isinstance(identity, Mapping):
         return 'subject_binding_unavailable'
-    digest, parents = _document_structure(raw, str(identity.get('document_id') or ''))
+    digest, parents = _structure(raw, str(identity.get('document_id') or ''))
     if digest != identity.get('content_sha256'):
         return 'reference_raw_content_mismatch'
     start, end = evidence.get('char_start'), evidence.get('char_end')

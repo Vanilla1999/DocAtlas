@@ -12,6 +12,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from collections import Counter
+from functools import lru_cache
 from pathlib import PurePosixPath
 from typing import Iterable, Mapping
 
@@ -23,11 +24,29 @@ from docmancer.docs.domain.query_reference_binding import (
 _WORDS = re.compile(r"\w+", re.UNICODE)
 
 
+@lru_cache(maxsize=None)
+def _normalization_may_change(character: str) -> bool:
+    """Whether the Latin/combining-mark rule below can alter this character.
+
+    ASCII letters decompose to themselves and other ASCII characters are not
+    Latin letters. Every other character is copied unchanged unless it is a
+    non-ASCII Latin letter or a combining mark.
+    """
+    return (
+        (not character.isascii() and "LATIN" in unicodedata.name(character, ""))
+        or unicodedata.category(character) == "Mn"
+    )
+
+
 def lexical_tokens(text: str) -> tuple[str, ...]:
     """Return normalized words, including occurrences needed for scoring."""
+    lowered = str(text).lower()
+    if not any(map(_normalization_may_change, set(lowered))):
+        # Exactly the loop below when it would copy every character as is.
+        return tuple(_WORDS.findall(lowered))
     normalized: list[str] = []
     latin_base = False
-    for character in str(text).lower():
+    for character in lowered:
         if "LATIN" in unicodedata.name(character, ""):
             normalized.extend(
                 part for part in unicodedata.normalize("NFD", character)
@@ -131,14 +150,31 @@ def lexical_field_utility(
     if not terms:
         return 0.0
     body_tokens = lexical_tokens(body)
-    frequencies = Counter(body_tokens)
-    title_terms = frozenset(lexical_terms(title))
-    description_terms = frozenset(lexical_terms(description))
-    length = len(body_tokens) / max(1.0, average_body_length)
+    return lexical_counts_utility(
+        terms, body_length=len(body_tokens), body_frequencies=Counter(body_tokens),
+        title_terms=frozenset(lexical_terms(title)),
+        description_terms=frozenset(lexical_terms(description)),
+        term_weights=term_weights, average_body_length=average_body_length,
+    )
+
+
+def lexical_counts_utility(
+    terms: tuple[str, ...], *, body_length: int, body_frequencies: Mapping[str, int],
+    title_terms: frozenset[str], description_terms: frozenset[str],
+    term_weights: Mapping[str, float], average_body_length: float,
+) -> float:
+    """The same utility from already tokenized fields.
+
+    Only query terms are read from ``body_frequencies``, ``title_terms`` and
+    ``description_terms``, so callers may pass them restricted to the query.
+    """
+    if not terms:
+        return 0.0
+    length = body_length / max(1.0, average_body_length)
     normalization = 1.2 * (0.25 + 0.75 * length)
     weighted_content = 0.0
     for term in terms:
-        frequency = frequencies[term]
+        frequency = body_frequencies.get(term, 0)
         if frequency:
             weighted_content += term_weights[term] * (
                 frequency * 2.2 / (frequency + normalization)

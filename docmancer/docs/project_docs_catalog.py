@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 import yaml
 from yaml.constructor import ConstructorError
+
+from docmancer.docs.request_memo import request_memo
 
 
 CATALOG_FILENAME = "docatlas.project-docs.yaml"
@@ -69,6 +72,21 @@ _UniqueKeySafeLoader.add_constructor(
 )
 
 
+def _load_catalog_text(text: str) -> Any:
+    """Parse catalog text; within one request identical text is parsed once.
+
+    The file is still checked and read on every call and every entry is still
+    validated against the filesystem. Only the parse of identical text is
+    reused, and each caller receives its own deep copy.
+    """
+    memo = request_memo("project_docs_catalog_yaml")
+    if memo is None:
+        return yaml.load(text, Loader=_UniqueKeySafeLoader)
+    if text not in memo:
+        memo[text] = yaml.load(text, Loader=_UniqueKeySafeLoader)
+    return copy.deepcopy(memo[text])
+
+
 @dataclass(frozen=True)
 class ProjectDocCatalogEntry:
     path: str
@@ -117,10 +135,7 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
                 True, False, CATALOG_FILENAME,
                 warnings=[f"Project docs catalog exceeds the {MAX_CATALOG_BYTES}-byte limit."],
             )
-        data = yaml.load(
-            catalog_path.read_text(encoding="utf-8"),
-            Loader=_UniqueKeySafeLoader,
-        )
+        data = _load_catalog_text(catalog_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, yaml.YAMLError) as exc:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[f"Could not read project docs catalog: {exc}"])
     if (

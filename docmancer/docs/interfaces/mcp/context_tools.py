@@ -12,6 +12,7 @@ from dataclasses import asdict, is_dataclass
 import json
 from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
 from docmancer.docs.domain.original_body_discovery import original_body_read_scope, experimental_context_max_tokens
+from docmancer.docs.request_memo import request_memo_scope
 from docmancer.docs.documentation_language import record_translation, translated_query
 import math
 import sys
@@ -307,7 +308,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     # to acquire sources and to verify their original-read receipts; otherwise
     # a successful translated search is incorrectly rejected at admission.
     prepared_args = {**args, "lookup_queries": lookup_queries}
-    return _handle_prepared_context_tool(name, prepared_args, service)
+    # Request-local reuse of pure results only; every check still runs.
+    with request_memo_scope():
+        return _handle_prepared_context_tool(name, prepared_args, service)
 
 
 @original_body_read_scope

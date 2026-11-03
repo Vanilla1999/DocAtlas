@@ -370,11 +370,21 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             for index in item.indices for other in grouped[item.group] if other in selected_set
         )
 
+    # A unit's terms and norm are functions of its row indices, so a pair's
+    # similarity never changes during this call; every greedy step reuses it.
+    similarities: dict[tuple[tuple[int, ...], tuple[int, ...]], float] = {}
+
     def similarity(left: _Unit, right: _Unit) -> float:
-        if not left.vector_norm or not right.vector_norm:
-            return 0.0
-        return min(1.0, sum(information[term] ** 2 for term in sorted(left.terms & right.terms))
-                   / (left.vector_norm * right.vector_norm))
+        key = (left.indices, right.indices)
+        value = similarities.get(key)
+        if value is None:
+            if not left.vector_norm or not right.vector_norm:
+                value = 0.0
+            else:
+                value = min(1.0, sum(information[term] ** 2 for term in sorted(left.terms & right.terms))
+                            / (left.vector_norm * right.vector_norm))
+            similarities[key] = value
+        return value
 
     while pending:
         def priority(item: _Unit) -> tuple[float, float, int]:

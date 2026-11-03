@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_identical_speedups.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_identical_speedups.py": "a71b68d3749181e87fe3219f8162497ba3f6ea96e898fc77919e14efbbdb3467"
+  }
+}
