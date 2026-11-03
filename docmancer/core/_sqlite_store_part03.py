@@ -533,6 +533,7 @@ class _SQLiteStorePart03:
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         from docmancer.retrieval.experimental_acquisition import (
             ACQUISITION_CANDIDATES,
+            ACQUISITION_VARIANT,
         )
 
         with self._connect() as conn:
@@ -573,6 +574,20 @@ class _SQLiteStorePart03:
                 + (" OR " + locator_sql if locator_keys else "")
             )
 
+            # Experimental V5: concatenate the stored heading path once before
+            # BM25 saturation/length normalization. FTS admission stays literal
+            # and unchanged. This is not independently normalized BM25F fields.
+            score_body_sql = "sections.display_text"
+            if ACQUISITION_VARIANT == "v5":
+                def heading_body(body: str | None, metadata: str | None) -> str:
+                    path = json.loads(metadata or "{}").get("heading_path", [])
+                    if not isinstance(path, list) or not all(isinstance(p, str) for p in path):
+                        raise ValueError("V5 requires heading_path to be a list of strings")
+                    return (body or "") + "\n" + "\n".join(path)
+
+                conn.create_function("docatlas_heading_body", 2, heading_body, deterministic=True)
+                score_body_sql = "docatlas_heading_body(sections.display_text, sections.metadata_json)"
+
             class SourceStatistics:
                 def __init__(self) -> None:
                     self.windows = 0
@@ -603,7 +618,7 @@ class _SQLiteStorePart03:
             conn.create_aggregate("docatlas_source_statistics", 2, SourceStatistics)
             stats_row = conn.execute(
                 f"""
-                SELECT docatlas_source_statistics(sections.title, sections.display_text)
+                SELECT docatlas_source_statistics(sections.title, {score_body_sql})
                 FROM retrieval_children_fts
                 JOIN retrieval_children AS sections
                   ON sections.id = retrieval_children_fts.rowid
@@ -624,7 +639,7 @@ class _SQLiteStorePart03:
 
             def source_utility(title: str, body: str, description: str | None) -> float:
                 return lexical_field_utility(
-                    terms, title=title or "", body=body or "",
+                    terms, title=(title or "") if ACQUISITION_VARIANT == "v0" else "", body=body or "",
                     description=description or "", term_weights=term_weights,
                     average_body_length=average_length,
                 )
@@ -643,14 +658,14 @@ class _SQLiteStorePart03:
                        sections.display_token_estimate AS token_estimate,
                        sections.display_content_hash AS content_hash,
                        -docatlas_source_utility(
-                           sections.title, sections.display_text,
+                            sections.title, {score_body_sql},
                            json_extract(sections.metadata_json, '$.project_doc_description')
                        ) AS rank
                 FROM retrieval_children AS sections
                 WHERE ({candidate_sql})
                   AND sections.generation_id = ?
                   AND (docatlas_source_utility(
-                      sections.title, sections.display_text,
+                       sections.title, {score_body_sql},
                       json_extract(sections.metadata_json, '$.project_doc_description')
                   ) > 0 OR {locator_sql})
                 {filter_sql}

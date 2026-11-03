@@ -1,0 +1,101 @@
+[
+  {
+    "fact": "P1.size",
+    "occurrences": [
+      {
+        "path": "wiki/Configuration.md",
+        "line_start": 44,
+        "line_end": 44,
+        "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c"
+      }
+    ]
+  },
+  {
+    "fact": "P1.overlap",
+    "occurrences": [
+      {
+        "path": "wiki/Configuration.md",
+        "line_start": 45,
+        "line_end": 45,
+        "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c"
+      }
+    ]
+  },
+  {
+    "fact": "P1.format",
+    "occurrences": [
+      {
+        "path": "wiki/Configuration.md",
+        "line_start": 46,
+        "line_end": 46,
+        "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c"
+      }
+    ]
+  },
+  {
+    "fact": "P2.position",
+    "occurrences": [
+      {
+        "path": "docs/main-flow-logging.md",
+        "line_start": 12,
+        "line_end": 13,
+        "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb"
+      }
+    ]
+  },
+  {
+    "fact": "P2.command",
+    "occurrences": [
+      {
+        "path": "docs/main-flow-logging.md",
+        "line_start": 18,
+        "line_end": 18,
+        "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb"
+      }
+    ]
+  },
+  {
+    "fact": "P2.stderr",
+    "occurrences": [
+      {
+        "path": "docs/main-flow-logging.md",
+        "line_start": 23,
+        "line_end": 23,
+        "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb"
+      }
+    ]
+  },
+  {
+    "fact": "P3.dead",
+    "occurrences": [
+      {
+        "path": "docs/index-cleanup.md",
+        "line_start": 106,
+        "line_end": 106,
+        "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420"
+      }
+    ]
+  },
+  {
+    "fact": "P3.unreadable",
+    "occurrences": [
+      {
+        "path": "docs/index-cleanup.md",
+        "line_start": 106,
+        "line_end": 106,
+        "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420"
+      }
+    ]
+  },
+  {
+    "fact": "P3.duration",
+    "occurrences": [
+      {
+        "path": "docs/index-cleanup.md",
+        "line_start": 106,
+        "line_end": 106,
+        "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420"
+      }
+    ]
+  }
+]

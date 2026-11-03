@@ -1,0 +1,65 @@
+[
+  {
+    "id": "P1.size",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/wiki/Configuration.md",
+    "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c",
+    "quote_in_span": true,
+    "span_text": "| `loaders.default_chunk_size` | `800` | Default chunk size used by paragraph + sliding-window chunkers |"
+  },
+  {
+    "id": "P1.overlap",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/wiki/Configuration.md",
+    "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c",
+    "quote_in_span": true,
+    "span_text": "| `loaders.default_chunk_overlap` | `100` | Default overlap; must be smaller than `chunk_size` |"
+  },
+  {
+    "id": "P1.format",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/wiki/Configuration.md",
+    "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c",
+    "quote_in_span": true,
+    "span_text": "| `loaders.formats.<fmt>.chunk_size` | unset | Per-format override (`md`, `pdf`, `docx`, `rtf`, `html`, `txt`) |"
+  },
+  {
+    "id": "P2.position",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/docs/main-flow-logging.md",
+    "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb",
+    "quote_in_span": true,
+    "span_text": "Глобальные `--trace` / `--no-trace` указываются **перед подкомандой**.\nОни переопределяют `DOCATLAS_TRACE` на время вызова. Без флага используется\nсуществующая настройка: только `DOCATLAS_TRACE=1` включает трассу; значение\nокружения читается при загрузке модуля, поэтому задайте его до запуска процесса."
+  },
+  {
+    "id": "P2.command",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/docs/main-flow-logging.md",
+    "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb",
+    "quote_in_span": true,
+    "span_text": "DOCATLAS_TRACE=1 doc-atlas --no-trace query \"OAuth tokens\" --mode lexical"
+  },
+  {
+    "id": "P2.stderr",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/docs/main-flow-logging.md",
+    "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb",
+    "quote_in_span": true,
+    "span_text": "Обычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`."
+  },
+  {
+    "id": "P3.dead",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/docs/index-cleanup.md",
+    "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420",
+    "quote_in_span": true,
+    "span_text": "The short per-database mutation lock is used only around publication/removal, so independent fetch/staging work is not serialized for its full duration. `remove_library_docs` refuses removal while a library-refresh writer lease is active; after the barrier is clear it takes the per-index mutation lock before deleting SQLite/extracted state. Writer leases from dead processes are cleaned during the barrier check; an unreadable lease remains a blocker rather than being ignored."
+  },
+  {
+    "id": "P3.unreadable",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/docs/index-cleanup.md",
+    "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420",
+    "quote_in_span": true,
+    "span_text": "The short per-database mutation lock is used only around publication/removal, so independent fetch/staging work is not serialized for its full duration. `remove_library_docs` refuses removal while a library-refresh writer lease is active; after the barrier is clear it takes the per-index mutation lock before deleting SQLite/extracted state. Writer leases from dead processes are cleaned during the barrier check; an unreadable lease remains a blocker rather than being ignored."
+  },
+  {
+    "id": "P3.duration",
+    "path": "/tmp/opencode/semantic-signal-experiment/project/docs/index-cleanup.md",
+    "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420",
+    "quote_in_span": true,
+    "span_text": "The short per-database mutation lock is used only around publication/removal, so independent fetch/staging work is not serialized for its full duration. `remove_library_docs` refuses removal while a library-refresh writer lease is active; after the barrier is clear it takes the per-index mutation lock before deleting SQLite/extracted state. Writer leases from dead processes are cleaned during the barrier check; an unreadable lease remains a blocker rather than being ignored."
+  }
+]

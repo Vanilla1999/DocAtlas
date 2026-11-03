@@ -1,0 +1,254 @@
+{
+  "calls": [
+    {
+      "name": "L0-default-P1.metrics.json",
+      "seconds": 4.832993529002124,
+      "temperature": "cold_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 10256,
+      "bytes": 38101,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v0-P1.metrics.json",
+      "seconds": 5.047187526000926,
+      "temperature": "cold_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 10256,
+      "bytes": 38101,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v0-P2.metrics.json",
+      "seconds": 6.606692943998496,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 10435,
+      "bytes": 39389,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+        "search_question": "With tracing enabled in the environment, how do I disable it for one CLI invocation, where must the flag appear, and does it suppress ordinary errors and third-party stderr messages?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v0-P3.metrics.json",
+      "seconds": 3.411195926997607,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 9362,
+      "bytes": 35584,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+        "search_question": "During index cleanup coordination, what happens to dead-process writer leases and unreadable leases, and is independent fetch and staging serialized for its full duration?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v5-P1.metrics.json",
+      "seconds": 5.149840295998729,
+      "temperature": "cold_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 10496,
+      "bytes": 38857,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v5-P2.metrics.json",
+      "seconds": 6.445099542001117,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 10317,
+      "bytes": 38829,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+        "search_question": "With tracing enabled in the environment, how do I disable it for one CLI invocation, where must the flag appear, and does it suppress ordinary errors and third-party stderr messages?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v5-P3.metrics.json",
+      "seconds": 3.5861135680024745,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 9546,
+      "bytes": 35961,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+        "search_question": "During index cleanup coordination, what happens to dead-process writer leases and unreadable leases, and is independent fetch and staging serialized for its full duration?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L0-v5-traceoff-P1.metrics.json",
+      "seconds": 5.124295115998393,
+      "temperature": "cold_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 10496,
+      "bytes": 38857,
+      "arguments": {
+        "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+        "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L2-v0-P1.metrics.json",
+      "seconds": 56.05477100600183,
+      "temperature": "cold_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 11417,
+      "bytes": 44461,
+      "arguments": {
+        "project_path": "/tmp/opencode/acq-pilot/L2-project",
+        "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L2-v0-P2.metrics.json",
+      "seconds": 58.93022883700178,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 11180,
+      "bytes": 44681,
+      "arguments": {
+        "project_path": "/tmp/opencode/acq-pilot/L2-project",
+        "question": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+        "search_question": "With tracing enabled in the environment, how do I disable it for one CLI invocation, where must the flag appear, and does it suppress ordinary errors and third-party stderr messages?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L2-v0-P3.metrics.json",
+      "seconds": 55.790671020000445,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 11452,
+      "bytes": 43722,
+      "arguments": {
+        "project_path": "/tmp/opencode/acq-pilot/L2-project",
+        "question": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+        "search_question": "During index cleanup coordination, what happens to dead-process writer leases and unreadable leases, and is independent fetch and staging serialized for its full duration?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L2-v5-P1.metrics.json",
+      "seconds": 56.181609264000144,
+      "temperature": "cold_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 11349,
+      "bytes": 43810,
+      "arguments": {
+        "project_path": "/tmp/opencode/acq-pilot/L2-project",
+        "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L2-v5-P2.metrics.json",
+      "seconds": 61.5226885330012,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 11230,
+      "bytes": 44890,
+      "arguments": {
+        "project_path": "/tmp/opencode/acq-pilot/L2-project",
+        "question": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+        "search_question": "With tracing enabled in the environment, how do I disable it for one CLI invocation, where must the flag appear, and does it suppress ordinary errors and third-party stderr messages?",
+        "scope": "project"
+      }
+    },
+    {
+      "name": "L2-v5-P3.metrics.json",
+      "seconds": 57.03814690999934,
+      "temperature": "warm_process",
+      "isError": false,
+      "status": "truncated",
+      "raw_cl100k_tokens": 11562,
+      "bytes": 44475,
+      "arguments": {
+        "project_path": "/tmp/opencode/acq-pilot/L2-project",
+        "question": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+        "search_question": "During index cleanup coordination, what happens to dead-process writer leases and unreadable leases, and is independent fetch and staging serialized for its full duration?",
+        "scope": "project"
+      }
+    }
+  ],
+  "parity": [
+    {
+      "label": "trace_v5",
+      "byte_equal": true,
+      "json_equal": true,
+      "sha256": [
+        "15a9a35215252c8264d41aa8f33850f2383d1e115460c6813dd90a1377b623ee",
+        "15a9a35215252c8264d41aa8f33850f2383d1e115460c6813dd90a1377b623ee"
+      ]
+    },
+    {
+      "label": "default_v0",
+      "byte_equal": true,
+      "json_equal": true,
+      "sha256": [
+        "c4764292d0c80ffe66e19d30132701f8d5fd209e819c79c7719de1fe824595a3",
+        "c4764292d0c80ffe66e19d30132701f8d5fd209e819c79c7719de1fe824595a3"
+      ]
+    }
+  ],
+  "heading": {
+    "total": 409,
+    "empty_metadata_heading": 1,
+    "missing_prefix": 3,
+    "literal_mismatch": 3,
+    "title_only_terms_when_prefix_missing": 3
+  },
+  "archive": {
+    "lanes": 40,
+    "fts_vs_python_different": 8,
+    "archive_fts_count_mismatch": 0,
+    "archive_python_count_mismatch": 0,
+    "positive_mismatch": 0,
+    "gold_rank_mismatch": 0
+  },
+  "candidate_notes": [
+    "ordered_union_ids is first-seen union of raw acquisition lane rows, not postqualification union",
+    "scoped FTS counts exclude any additional locator-only admission; positive_or_locator_count is production full result count",
+    "qualification separately instrumented for L0 and L2 V0 P1 only; public stdio trace records projection only"
+  ]
+}

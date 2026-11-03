@@ -1,0 +1,20 @@
+{
+  "source_modules": 422,
+  "source_installed_mismatches": [],
+  "states": {
+    "L0": {
+      "path": "/home/viadmin/.local/share/docatlas-acq-pilot/L0/docatlas-home/mcp-members/members.db",
+      "sha256_postrun": "63a248e384aa83de343787210c5042381112987ddb5cdfd72f8f9d46869ef60e",
+      "active_generation": "gen-bce5c613b6c849a399124beed7e25fe3",
+      "total_windows": 409
+    },
+    "L2": {
+      "path": "/home/viadmin/.local/share/docatlas-acq-pilot/L2/docatlas-home/mcp-members/members.db",
+      "sha256_postrun": "632f73ea9befb863c6a115e3321277b506a68483f7021b654e966db811b2c43a",
+      "active_generation": "gen-f036718b762e4578918c6a03143b3bd9",
+      "total_windows": 11860
+    }
+  },
+  "invalid_env_exit": 1,
+  "invalid_env_stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import docmancer.retrieval.experimental_acquisition\n  File \"/tmp/opencode/acq-pilot/venv/lib/python3.13/site-packages/docmancer/retrieval/experimental_acquisition.py\", line 15, in <module>\n    raise ValueError(\"DOCATLAS_EXPERIMENT_ACQUISITION must be v0 or v5\")\nValueError: DOCATLAS_EXPERIMENT_ACQUISITION must be v0 or v5\n"
+}

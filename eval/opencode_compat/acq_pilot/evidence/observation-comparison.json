@@ -1,0 +1,254 @@
+[
+  {
+    "corpus": "L0",
+    "question": "P1",
+    "variant": "v0",
+    "lane_comparisons": [
+      {
+        "text_equal": true,
+        "ordered_ids_equal": true,
+        "actual_filters": {
+          "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+          "project_identity": "local:3f95725d861d9af1ca3f80efca3918283af468af6ac77307ba030c87f088a660",
+          "source_class": {
+            "in": [
+              "project_file"
+            ]
+          },
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": {
+            "in": [
+              "project"
+            ]
+          }
+        },
+        "diagnostic_filters": {
+          "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+          "project_identity": "local:3f95725d861d9af1ca3f80efca3918283af468af6ac77307ba030c87f088a660",
+          "source_class": "project_file",
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": "project"
+        },
+        "filter_shape_difference": "single-value IN versus scalar equality"
+      },
+      {
+        "text_equal": true,
+        "ordered_ids_equal": true,
+        "actual_filters": {
+          "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+          "project_identity": "local:3f95725d861d9af1ca3f80efca3918283af468af6ac77307ba030c87f088a660",
+          "source_class": {
+            "in": [
+              "project_file"
+            ]
+          },
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": {
+            "in": [
+              "project"
+            ]
+          },
+          "authority": "source_of_truth"
+        },
+        "diagnostic_filters": {
+          "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+          "project_identity": "local:3f95725d861d9af1ca3f80efca3918283af468af6ac77307ba030c87f088a660",
+          "source_class": "project_file",
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": "project",
+          "authority": "source_of_truth"
+        },
+        "filter_shape_difference": "single-value IN versus scalar equality"
+      },
+      {
+        "text_equal": true,
+        "ordered_ids_equal": true,
+        "actual_filters": {
+          "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+          "project_identity": "local:3f95725d861d9af1ca3f80efca3918283af468af6ac77307ba030c87f088a660",
+          "source_class": {
+            "in": [
+              "project_file"
+            ]
+          },
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": {
+            "in": [
+              "project"
+            ]
+          }
+        },
+        "diagnostic_filters": {
+          "project_path": "/tmp/opencode/semantic-signal-experiment/project",
+          "project_identity": "local:3f95725d861d9af1ca3f80efca3918283af468af6ac77307ba030c87f088a660",
+          "source_class": "project_file",
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": "project"
+        },
+        "filter_shape_difference": "single-value IN versus scalar equality"
+      }
+    ],
+    "qualification_counts": [
+      {
+        "before": 334,
+        "after": 334
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "question": "P1",
+    "variant": "v0",
+    "lane_comparisons": [
+      {
+        "text_equal": true,
+        "ordered_ids_equal": true,
+        "actual_filters": {
+          "project_path": "/tmp/opencode/acq-pilot/L2-project",
+          "project_identity": "local:63ca5334931e41b16e39d38146fa97afd648bbb3de85858dab3bdfcd956671d1",
+          "source_class": {
+            "in": [
+              "project_file"
+            ]
+          },
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": {
+            "in": [
+              "project"
+            ]
+          }
+        },
+        "diagnostic_filters": {
+          "project_path": "/tmp/opencode/acq-pilot/L2-project",
+          "project_identity": "local:63ca5334931e41b16e39d38146fa97afd648bbb3de85858dab3bdfcd956671d1",
+          "source_class": "project_file",
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": "project"
+        },
+        "filter_shape_difference": "single-value IN versus scalar equality"
+      },
+      {
+        "text_equal": true,
+        "ordered_ids_equal": true,
+        "actual_filters": {
+          "project_path": "/tmp/opencode/acq-pilot/L2-project",
+          "project_identity": "local:63ca5334931e41b16e39d38146fa97afd648bbb3de85858dab3bdfcd956671d1",
+          "source_class": {
+            "in": [
+              "project_file"
+            ]
+          },
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": {
+            "in": [
+              "project"
+            ]
+          },
+          "authority": "source_of_truth"
+        },
+        "diagnostic_filters": {
+          "project_path": "/tmp/opencode/acq-pilot/L2-project",
+          "project_identity": "local:63ca5334931e41b16e39d38146fa97afd648bbb3de85858dab3bdfcd956671d1",
+          "source_class": "project_file",
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": "project",
+          "authority": "source_of_truth"
+        },
+        "filter_shape_difference": "single-value IN versus scalar equality"
+      },
+      {
+        "text_equal": true,
+        "ordered_ids_equal": true,
+        "actual_filters": {
+          "project_path": "/tmp/opencode/acq-pilot/L2-project",
+          "project_identity": "local:63ca5334931e41b16e39d38146fa97afd648bbb3de85858dab3bdfcd956671d1",
+          "source_class": {
+            "in": [
+              "project_file"
+            ]
+          },
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": {
+            "in": [
+              "project"
+            ]
+          }
+        },
+        "diagnostic_filters": {
+          "project_path": "/tmp/opencode/acq-pilot/L2-project",
+          "project_identity": "local:63ca5334931e41b16e39d38146fa97afd648bbb3de85858dab3bdfcd956671d1",
+          "source_class": "project_file",
+          "lifecycle_status": {
+            "in": [
+              "active",
+              "current"
+            ]
+          },
+          "doc_scope": "project"
+        },
+        "filter_shape_difference": "single-value IN versus scalar equality"
+      }
+    ],
+    "qualification_counts": [
+      {
+        "before": 768,
+        "after": 768
+      }
+    ]
+  }
+]
