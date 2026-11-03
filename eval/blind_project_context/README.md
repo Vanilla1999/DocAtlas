@@ -17,7 +17,7 @@ disclosure (in Russian): [PROTOCOL_RU.md](PROTOCOL_RU.md).
 | `run.py`, `observed_server.py` | fresh isolated stdio servers, one per corpus shard; passive ceiling counters and candidate ranks of gold quotes |
 | `score.py` | per case: facts delivered, where missed facts were lost, first fact row, question/answer word overlap, limits reached |
 | `gate.py` | comparability checks, then "no slice worse" (exit 0 accept, 1 reject, 2 not comparable) |
-| `baseline/` | committed score of the current tree (`score.json`, `report.md`, `holdout-details.md`, `run.json`) |
+| `baseline/` | committed score of the current tree (`score.json`, `report.md`, `holdout-details.md`) |
 
 ```bash
 python eval/blind_project_context/run.py OUT --jobs 2
