@@ -1,0 +1,1021 @@
+{
+  "schema": "docatlas-research-evidence-v1",
+  "files": [
+    {
+      "path": "gold20.json",
+      "sha256": "9e9320fc99ff3fd0fd41d00057b6fd68e5371d43fd634e4d4ba36a22af19a8d3",
+      "original": "gold20.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "9e9320fc99ff3fd0fd41d00057b6fd68e5371d43fd634e4d4ba36a22af19a8d3",
+      "transformation": "none"
+    },
+    {
+      "path": "gold20-source-hashes.json",
+      "sha256": "2eee2a6a3a3d57039b13d41c49bbc7a906e321a3de368c7cf93b61f2dbf250f8",
+      "original": "gold20-source-hashes.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "2eee2a6a3a3d57039b13d41c49bbc7a906e321a3de368c7cf93b61f2dbf250f8",
+      "transformation": "none"
+    },
+    {
+      "path": "source-validation20.json",
+      "sha256": "9f922b873cc286311dd9647437ef4d74ac8fa66b68c7745e3d05de3aeaf55bd0",
+      "original": "source-validation20.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "9f922b873cc286311dd9647437ef4d74ac8fa66b68c7745e3d05de3aeaf55bd0",
+      "transformation": "none"
+    },
+    {
+      "path": "fact-definitions.md",
+      "sha256": "056249d953e747e04f61c9ed1150d3d713dc44262e4054d457cda73f5e7f2a39",
+      "original": "fact-definitions.md",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "056249d953e747e04f61c9ed1150d3d713dc44262e4054d457cda73f5e7f2a39",
+      "transformation": "none"
+    },
+    {
+      "path": "fact-matrix42.json",
+      "sha256": "6d64cb3f0cbce3af8b371ace5a906ae6f8c3e506c7332efc080569b73e507832",
+      "original": "fact-matrix42.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "6d64cb3f0cbce3af8b371ace5a906ae6f8c3e506c7332efc080569b73e507832",
+      "transformation": "none"
+    },
+    {
+      "path": "metrics20.json",
+      "sha256": "5fd2ddc8e6b9b808af4bf2ea36fa81209dd1efdc38456266af194776336de1f5",
+      "original": "metrics20.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "5fd2ddc8e6b9b808af4bf2ea36fa81209dd1efdc38456266af194776336de1f5",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q01.json.gz",
+      "sha256": "fb0936d80bbab438e0e485af874f191fbd6b192affde0f1b725791ab7973804a",
+      "original": "baseline/q1.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "cc788c08dd7897ae54d48faaf1af7de393cd709078fc63e9de175c767de8bbde",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q01.json",
+      "sha256": "f2788198abbec044b3cea5bcaae857154a8cd93a7ff1560e58d493c2ea1f1f25",
+      "original": "baseline/q1.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "f2788198abbec044b3cea5bcaae857154a8cd93a7ff1560e58d493c2ea1f1f25",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q02.json.gz",
+      "sha256": "0fa8c31a300b48eeefc91d7fe2a613b937da28e8b3d519aa6de8055eb11aa014",
+      "original": "baseline/q2.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "db0ba1a8eb9f999bce847250d529c15fa98c995c093e50a59e62df31884049a9",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q02.json",
+      "sha256": "11ac0e65220d7153fe6ed6a98b667ddc8c525be0d42b9c15402fb734c9f9d6eb",
+      "original": "baseline/q2.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "11ac0e65220d7153fe6ed6a98b667ddc8c525be0d42b9c15402fb734c9f9d6eb",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q03.json.gz",
+      "sha256": "4b6a5078828651b18cef5b80dfed1b2d56935a3dcd5871f2ee05941bed1de390",
+      "original": "baseline/q3.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "238e366a5e2509efa0c6c2e25ab641656adf46fc493f1943c6def51b9de90aa0",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q03.json",
+      "sha256": "fa676309fbc0202f7b9e494f2c602985489a815509f26faf6c4bf2260f4a5611",
+      "original": "baseline/q3.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "fa676309fbc0202f7b9e494f2c602985489a815509f26faf6c4bf2260f4a5611",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q04.json.gz",
+      "sha256": "86d8fe6c75e90e8060f133323e2cb0d930c68ed9e42f153c2fe8f33bf233bcd3",
+      "original": "baseline/q4.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "75bdeeaec33405d7912ba48cb7fe2e73cb6908afe66c25b54335516450df25ae",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q04.json",
+      "sha256": "9facc1b6cb6faabd8bc81b405186a8714f6c2d2507db9cf0d7f79810bf8e45b4",
+      "original": "baseline/q4.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "9facc1b6cb6faabd8bc81b405186a8714f6c2d2507db9cf0d7f79810bf8e45b4",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q05.json.gz",
+      "sha256": "c9da297653ed50893cf1c03fe3fddbaf793f308292ead4ac807aaa048e793f02",
+      "original": "baseline/q5.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "126ab2a372d58d9823d7d4cac2e20182a336e054e92abc3f88ebfdbc4c2629e4",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q05.json",
+      "sha256": "d3353a56fadf85bdc0ac419116e7c437d5af8a1fda48cd1812bcc353f0e5ec68",
+      "original": "baseline/q5.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "d3353a56fadf85bdc0ac419116e7c437d5af8a1fda48cd1812bcc353f0e5ec68",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q06.json.gz",
+      "sha256": "511c505cacb56924f11cd8793bbd44762eee93b5b812dae95e5e3244498a3bce",
+      "original": "baseline/q6.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "fe805081b06d30712b8bbfd8f862037283cee0cd08e1e20fe9ead01f4bff5cc5",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q06.json",
+      "sha256": "239037f08911d0ab30295281394b7a87ba751b4436dac428e1b96875b828b2de",
+      "original": "baseline/q6.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "239037f08911d0ab30295281394b7a87ba751b4436dac428e1b96875b828b2de",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q07.json.gz",
+      "sha256": "1003a7b8f703cc8483d5164eef67f3a7c46e3821677943b98892d0520bda8daf",
+      "original": "baseline/q7.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "c7af2abab1b4c1e3ed1a12610f40dea8a0e404d4cdb02b73b3d8e27bfd7fd98e",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q07.json",
+      "sha256": "175e13ceda012d2a542b53638061d42b5692bce9957e0f1e653838264bb2d89b",
+      "original": "baseline/q7.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "175e13ceda012d2a542b53638061d42b5692bce9957e0f1e653838264bb2d89b",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q08.json.gz",
+      "sha256": "8dcd9637ad05dc921e2646480aa3f0aec3edfe51715e98f03555fbea60cfe5c1",
+      "original": "baseline/q8.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "9dfcab6e70a176a0f09f772325cd6ed241a8f105177b8d1618b51bfe62afe013",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q08.json",
+      "sha256": "541dd1141ab91df17b0ccbfbb4e336fb737df6696050fefaaf2127c4398ae316",
+      "original": "baseline/q8.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "541dd1141ab91df17b0ccbfbb4e336fb737df6696050fefaaf2127c4398ae316",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q09.json.gz",
+      "sha256": "ba5e7556ae06d25a92c391bb6ebaab2f8e23f12d73544b29f90697e65552fa27",
+      "original": "baseline/q9.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "6f10fb7d88a1d53d0094c85256f8edff88c057a4a9e543547b4a358dcfb98987",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q09.json",
+      "sha256": "51e41ebc096b36cca65063618404932c1ffb58b1209440918fed97dd11105dc7",
+      "original": "baseline/q9.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "51e41ebc096b36cca65063618404932c1ffb58b1209440918fed97dd11105dc7",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q10.json.gz",
+      "sha256": "00b1880ef4e75b1474d005a2d23efca99e9e23e1343ce52b98a8a79ac08b7494",
+      "original": "baseline/q10.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "4da6a3f2528738b9b3cd64700bb3216bc53cf958433d550d819359359657a7ba",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q10.json",
+      "sha256": "a5b261716019cafcb803522b33048cab8b1f8d88721caa65028957e353cc6807",
+      "original": "baseline/q10.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "a5b261716019cafcb803522b33048cab8b1f8d88721caa65028957e353cc6807",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q11.json.gz",
+      "sha256": "e2baac24eeedf6687dc72e38c087bd41f109a11bc95f7079f6c0a4b6ff3ec783",
+      "original": "baseline/q11.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "bb4d598fa37e0b384fc61c305ae423e5bd09e647851ed27267b27d2b89831a00",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q11.json",
+      "sha256": "92a6d21f32882d7d06e22c76051a1c6c88cbb3da17d7593231e993bb6c000463",
+      "original": "baseline/q11.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "92a6d21f32882d7d06e22c76051a1c6c88cbb3da17d7593231e993bb6c000463",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q12.json.gz",
+      "sha256": "d824cd06c66d76acedd1a51c14f4075ffb9a729004c8eb18b5da4963c62c6ee7",
+      "original": "baseline/q12.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "e4382c89f0ae576c022ae73de963f423c9386556543a4fa6f7ed443d204ea0b5",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q12.json",
+      "sha256": "cec74750ccd3631baba9934c22767866a7182c62d39bd27fd63c6832ad755b4c",
+      "original": "baseline/q12.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "cec74750ccd3631baba9934c22767866a7182c62d39bd27fd63c6832ad755b4c",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q13.json.gz",
+      "sha256": "0d66927a909792687d1c9d4a0867d155b623bd8b465747e1b02c5982f9b6cff8",
+      "original": "baseline/q13.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "cdd4fc0193482a637ee8903017bbeb12f5a184b86669dfa77691c57c8c6d2a88",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q13.json",
+      "sha256": "fd25bc11d55b228ac38ac78af09560a3d67289dc9d5fd33a62355eda2adb085f",
+      "original": "baseline/q13.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "fd25bc11d55b228ac38ac78af09560a3d67289dc9d5fd33a62355eda2adb085f",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q14.json.gz",
+      "sha256": "f813a6596c425e5ce0b89d247602a5091415461c83723d151922e182aa01c2e5",
+      "original": "baseline/q14.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "6cb5111fd715b977ca6034e8cf8a1c7d3ecfb207ffebb2be5f56e41f333920d9",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q14.json",
+      "sha256": "164bc68907c02a2c1c9e3ce5f38a35eafb4dabd470f59b616835e83b7789ac0a",
+      "original": "baseline/q14.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "164bc68907c02a2c1c9e3ce5f38a35eafb4dabd470f59b616835e83b7789ac0a",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q15.json.gz",
+      "sha256": "59ed5c2fcfd2ec8cb7a3a7581825b67dc7cccd5b85ea0055a65b8727c876f61a",
+      "original": "baseline/q15.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "a64356fd30c0e2339b9c833b1d205286c74fe65641b1eaff0a71e3a22b756196",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q15.json",
+      "sha256": "3199e748636dc13c9e6ab04ece2f7149c26e4d80c7cac4a8a869fd45b63491f9",
+      "original": "baseline/q15.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "3199e748636dc13c9e6ab04ece2f7149c26e4d80c7cac4a8a869fd45b63491f9",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q16.json.gz",
+      "sha256": "c5c6176110919223e68fb46e67ec561afda73e4acbcdb25d528350cd2d39412a",
+      "original": "baseline/q16.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "ca378d8aecf000da78b6045a67c696c96212395c14332ea4bd1e4702a51dc3f5",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q16.json",
+      "sha256": "661d25f5697440949a255aee4b074b42f55391cd1daa1c9ae9677fa0aa05c0c9",
+      "original": "baseline/q16.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "661d25f5697440949a255aee4b074b42f55391cd1daa1c9ae9677fa0aa05c0c9",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q17.json.gz",
+      "sha256": "282d9a10aed73a8f4cf2df0f23353b3e54e454f37cc6c6286259670224129831",
+      "original": "baseline/q17.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "eca9a6a2d1eda3d8f22db91f12fd33ed9cc1b4e6135c750521f48d8ab76f5fab",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q17.json",
+      "sha256": "adf440c479f7bc214d8ad52876fd5339c8e166b12c6f9d748d36be1ea04fb226",
+      "original": "baseline/q17.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "adf440c479f7bc214d8ad52876fd5339c8e166b12c6f9d748d36be1ea04fb226",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q18.json.gz",
+      "sha256": "e8a4b87eb1a91868e48bc5881e71606251bcada3db103f84775a73989ccbdb3b",
+      "original": "baseline/q18.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "7640038c6c8a232f5337b768a5e86b21d4c959f02bf1818c280b48b0e0822303",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q18.json",
+      "sha256": "17317e8585ee3ef7ed6c407c45de6d847ca1d99e3e7c691ab386ecdceb8baa0e",
+      "original": "baseline/q18.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "17317e8585ee3ef7ed6c407c45de6d847ca1d99e3e7c691ab386ecdceb8baa0e",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q19.json.gz",
+      "sha256": "cc8b799a2c73f7429fd87bdd8f2b4d059b0b6d529bea11f0768836e55f65bef5",
+      "original": "baseline/q19.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "458051bba184a79c7683963af82a0a7eb563b2e6cc51b6a3281881f0eee42bef",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q19.json",
+      "sha256": "30d1b44e6553fb7fb6bb2b276999cba2b52b7d9d1904ffe183a123d4303abdaa",
+      "original": "baseline/q19.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "30d1b44e6553fb7fb6bb2b276999cba2b52b7d9d1904ffe183a123d4303abdaa",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/off/q20.json.gz",
+      "sha256": "e39f84518d824b0579b14f2c2491c59012c0469af5e2efb75ca3249af46da9ec",
+      "original": "baseline/q20.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "2bd36adf8dfb2b7aa465f857f51a367e09a91e027685f0197b10b3c7e9c8ddd7",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/off/q20.json",
+      "sha256": "547d3558fbb32d3ce261f01429db4bef2000cb78c6fa5692078cccaeebcc1e52",
+      "original": "baseline/q20.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "547d3558fbb32d3ce261f01429db4bef2000cb78c6fa5692078cccaeebcc1e52",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q01.json.gz",
+      "sha256": "7967dfce2e88b83fc34bd7f718b605e7b090e393f02e6de81393fb0d0b73cceb",
+      "original": "semantic/q1.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "76150b859585fe417d78b39985062e3a95729e3ef4b556bc9a2b8ab332b2d0a3",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q01.json",
+      "sha256": "c4a730dbf5e8265773bcb916005a98a7e0acb7a47d8a81187af887f5d9007850",
+      "original": "semantic/q1.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "c4a730dbf5e8265773bcb916005a98a7e0acb7a47d8a81187af887f5d9007850",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q02.json.gz",
+      "sha256": "cda8695f5e00d1a100fd7a223b4d0f3be546917199fd8c2fe6b6fbec3d5c57ea",
+      "original": "semantic/q2.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "13f8befe6a92fc2a13a14a0779f73506aa270e2633428f0364e5b98da641f376",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q02.json",
+      "sha256": "9c76ae06220d3d35ccd4ea760be1567f9f5cad692278333b52dcf3f3eb7a13d5",
+      "original": "semantic/q2.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "9c76ae06220d3d35ccd4ea760be1567f9f5cad692278333b52dcf3f3eb7a13d5",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q03.json.gz",
+      "sha256": "17363c23cfa8f9f0ecad6d4dc81e9efe177006c8550f63e6e19c578b515690d5",
+      "original": "semantic/q3.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "de011e99b1d4f41f14c034b25d9ea84f02de45d054b11400cfc43787a7d20d71",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q03.json",
+      "sha256": "8f5d38f03b2988cabcd7d604e917deb189a01c7ae87597f756f9f8bf6cfcf86d",
+      "original": "semantic/q3.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "8f5d38f03b2988cabcd7d604e917deb189a01c7ae87597f756f9f8bf6cfcf86d",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q04.json.gz",
+      "sha256": "02545ed11b2d9e85afa902fd88f469b789dffd7e6a996f21e3c470daf47db274",
+      "original": "semantic/q4.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "2c6454bee97285e347e56148823c1db211bd5897e525fdf613e201344ae3d3b0",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q04.json",
+      "sha256": "58996d2cba95ccadccd14ae17a153c7a606f723b6abeec5e055a942c3f891216",
+      "original": "semantic/q4.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "58996d2cba95ccadccd14ae17a153c7a606f723b6abeec5e055a942c3f891216",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q05.json.gz",
+      "sha256": "8a99af45ff8622666b3e8336510e05e6dfa55574069c5b1f647edb11676d270c",
+      "original": "semantic/q5.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "40a40319ceec65f73f0d6cff2eb771788193c51067fe2cebc00c1a15f83eddbf",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q05.json",
+      "sha256": "4545f21736f7fe9a24b6bef7302f7979dbd91923ad231ed0ddbe4476cd02af4a",
+      "original": "semantic/q5.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "4545f21736f7fe9a24b6bef7302f7979dbd91923ad231ed0ddbe4476cd02af4a",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q06.json.gz",
+      "sha256": "c2f42214c414c5624ddd22735c3bb6960df075acfc6f3917c160d0a1a3e5e2b3",
+      "original": "semantic/q6.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "b7ee227e0dff940962bc16cef9779be4e6b9f6f5eb0a600cda066454759e2901",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q06.json",
+      "sha256": "51d74de5bb682e3cdd4852dfc5189aa2783e52696f6e1119edb394a2426d8a74",
+      "original": "semantic/q6.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "51d74de5bb682e3cdd4852dfc5189aa2783e52696f6e1119edb394a2426d8a74",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q07.json.gz",
+      "sha256": "6fa6591752214b2d7752108278ef7e022e26993e0d405c1a5befd90cc091d044",
+      "original": "semantic/q7.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "19e683aaf878e73e3bd1747fd3e32baf605566b1a078da15e1ff2c53effd8012",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q07.json",
+      "sha256": "d7e4f41a333c658e02915eaa485cdb6eb5f2bf35f6de04f73f8951249b4417f1",
+      "original": "semantic/q7.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "d7e4f41a333c658e02915eaa485cdb6eb5f2bf35f6de04f73f8951249b4417f1",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q08.json.gz",
+      "sha256": "aed41fddc1db67d81136743c6d6daede2963411055cc003437c5cc2aad9a2e23",
+      "original": "semantic/q8.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "b902024bd6e5e9ceec9a2290eae214a3ef1a7dbf5c2676211a8e553c440ef167",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q08.json",
+      "sha256": "301243d43211cd47a1dedfc90832d6af7ae772d6e091d3cc8cd015ae6a6af008",
+      "original": "semantic/q8.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "301243d43211cd47a1dedfc90832d6af7ae772d6e091d3cc8cd015ae6a6af008",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q09.json.gz",
+      "sha256": "750ebb1a659cfe40366d59edebba5a960323eb0ee3f9219f42e48ec911ae1206",
+      "original": "semantic/q9.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "91eeeb2641c5930d73b69224bde1c3ed1844a9542314eaa182cf3abba7a05c62",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q09.json",
+      "sha256": "e37ce2027e074334b0324234dafe57f63dc6db21ddf67781a6bf8a0180bdc542",
+      "original": "semantic/q9.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "e37ce2027e074334b0324234dafe57f63dc6db21ddf67781a6bf8a0180bdc542",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q10.json.gz",
+      "sha256": "7a6d58d69538915dcd4e7fc87b24b30f4ac11d1ec5cd2efd8daa903552c9c6c6",
+      "original": "semantic/q10.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "2acb70e24f9ec5db1dc6d90fab1ce636fc8084750202b47630b6c98dda9ebbf5",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q10.json",
+      "sha256": "363d75edf30537d510348a21bad70586bb0687572cd89b1cc3c6326a08983f5d",
+      "original": "semantic/q10.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "363d75edf30537d510348a21bad70586bb0687572cd89b1cc3c6326a08983f5d",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q11.json.gz",
+      "sha256": "b40a8fa5d9321889d17035c24ecfef86c00d525f645635fe9a605233a9956075",
+      "original": "semantic/q11.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "d1f63097f6b4250a1caaee1cbe37826b469ed24894763549b04d50d7d70189a1",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q11.json",
+      "sha256": "edbe7c8f24734075f24a23e300d064188ee18fdcd0ce59c29df2a413241ad702",
+      "original": "semantic/q11.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "edbe7c8f24734075f24a23e300d064188ee18fdcd0ce59c29df2a413241ad702",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q12.json.gz",
+      "sha256": "a5379fc4017bc8eb8e6d8bcc0a3dc47238232d684f396d2acc702c1bbe6ab0eb",
+      "original": "semantic/q12.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "805b2458b3d6edcc1de996bf9c580b46a395f7c544fcb807fdea1cc9742979d4",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q12.json",
+      "sha256": "1054eb6e07775ed6ae40d8292b2f73afef34edd808fd78c9b8a0d0b1cac7f45f",
+      "original": "semantic/q12.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "1054eb6e07775ed6ae40d8292b2f73afef34edd808fd78c9b8a0d0b1cac7f45f",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q13.json.gz",
+      "sha256": "2ae7091b43072b1025e69605f32970cbc5c28a86474dd220936e730a55bd0d68",
+      "original": "semantic/q13.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "e20996c9d7a42984201144f032631341f65185bb29d4783a02df5595163cbe79",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q13.json",
+      "sha256": "4694c86072c567b0d094b9d1db42c8784975cf4aa262855fb87fb38bfd1ec5c6",
+      "original": "semantic/q13.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "4694c86072c567b0d094b9d1db42c8784975cf4aa262855fb87fb38bfd1ec5c6",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q14.json.gz",
+      "sha256": "1c4114e3da9a775b89cfb4367d06c522dc0fa90906c88f5f532fcd100941b4c9",
+      "original": "semantic/q14.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "190dd70b6967a94e76dc00bec500eedae792a5779efd6a583453591d3631c2d3",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q14.json",
+      "sha256": "13c775667d5c65119a08987722d6be4cfff5b5ecd76706262237b3e1e57d858d",
+      "original": "semantic/q14.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "13c775667d5c65119a08987722d6be4cfff5b5ecd76706262237b3e1e57d858d",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q15.json.gz",
+      "sha256": "8c38dd07d4197314ad838caa67e5b10119519fbcd086242ef1c9b700379c1b6a",
+      "original": "semantic/q15.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "349bf6a168b69fd8f3716a352fa82c08cebe076c4f3e91c0057dde2f57f72fe4",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q15.json",
+      "sha256": "f8059666e031d4466551715c9a86e1ef37cf40db3e6566f9a739335b1aa56e10",
+      "original": "semantic/q15.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "f8059666e031d4466551715c9a86e1ef37cf40db3e6566f9a739335b1aa56e10",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q16.json.gz",
+      "sha256": "0c64bf51aea9c085f7879c6ced9575662f84f018d8fdfbce99e8c9c2a84c4d12",
+      "original": "semantic/q16.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "137c16b82c33b7659c6bad1290f96f227e787c3f95d18cedd2c02c24a299b6db",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q16.json",
+      "sha256": "b62577b97e09a8a55d086dd8f3f9f4aadf496bd52a5532d3e756f702902149ff",
+      "original": "semantic/q16.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "b62577b97e09a8a55d086dd8f3f9f4aadf496bd52a5532d3e756f702902149ff",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q17.json.gz",
+      "sha256": "b06d8ee5ccafc69faca646c2bfe7d7278baf867e9a8b1b8a76f81529687aae1a",
+      "original": "semantic/q17.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "54453419948e8e687794b1fe8e9637bb62f445df895c14e1b22d96756ed22156",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q17.json",
+      "sha256": "7002bc30be393370c989c9fa264e4d32265df3c0d3d2f188b86f04708b23b994",
+      "original": "semantic/q17.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "7002bc30be393370c989c9fa264e4d32265df3c0d3d2f188b86f04708b23b994",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q18.json.gz",
+      "sha256": "3530cec9147efdc65c1663af62ab45abac0e8e41e661f2e16bf027f53b27c7f7",
+      "original": "semantic/q18.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "f87e91d103d8bf1680a353b96792433c4e9498bd1ecb9ce30fcc3fb5acaadf4f",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q18.json",
+      "sha256": "5d05e5ace0f5112ae661a9511131032d17b917618b7ce50ce56411879565bacc",
+      "original": "semantic/q18.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "5d05e5ace0f5112ae661a9511131032d17b917618b7ce50ce56411879565bacc",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q19.json.gz",
+      "sha256": "699b149677ba9d03e659531766c61a9ca4acdcf6816f5ea1130e62ee473b7e0d",
+      "original": "semantic/q19.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "53078b19e1c9ff21c664adcc5a04abadc8edd9ec7718680db52502e7d7810649",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q19.json",
+      "sha256": "25c6574d5a08244dcbb669e2ee10818e54bfb8c0237f4e05080e89943c608e7e",
+      "original": "semantic/q19.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "25c6574d5a08244dcbb669e2ee10818e54bfb8c0237f4e05080e89943c608e7e",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/mini/q20.json.gz",
+      "sha256": "886f5fd3a67063270744341c954e533cfbc87430a44c15cf0d45365efe06b734",
+      "original": "semantic/q20.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "33182ade4c75b0c83b634b6901402244620ad413798afd87d004bc7dc7d4792b",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/mini/q20.json",
+      "sha256": "f6db36c5e4812837ec1c152217edf4700b5e2bb3d7b287826d175aaf4210d08d",
+      "original": "semantic/q20.metrics.json",
+      "experiment": "semantic-signal-experiment",
+      "original_sha256": "f6db36c5e4812837ec1c152217edf4700b5e2bb3d7b287826d175aaf4210d08d",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q01.json.gz",
+      "sha256": "a5b4cf95db3cf37986c4664afb0c5e6bc8b47afa8de01b6c5833858954ac0bb1",
+      "original": "hybrid/q1.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "1a9c9d78197e042253c06db724fd01271b6380886067dd27851c8e9d0dfc8bf8",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q01.json",
+      "sha256": "12a0b68a56913e0a74faf7e99975d1760df024ce3b957c0e1e14dab6f2258f24",
+      "original": "hybrid/q1.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "12a0b68a56913e0a74faf7e99975d1760df024ce3b957c0e1e14dab6f2258f24",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q02.json.gz",
+      "sha256": "1787cca95340ec1c9ee3277dc409a35a7bb708ad129365cac38e92854c18189a",
+      "original": "hybrid/q2.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "913aa94318738c1d00016a0aeabbe4fb3735266f78fd601f250fa18ac02ba07e",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q02.json",
+      "sha256": "0059d4d047d56df5585cafda82400923a84e85d2494c8c4b5b058b5ea41a078b",
+      "original": "hybrid/q2.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "0059d4d047d56df5585cafda82400923a84e85d2494c8c4b5b058b5ea41a078b",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q03.json.gz",
+      "sha256": "1efb349ebace8eb244588e35804c52470a4ffbb0329d36dd3da64ac61697226c",
+      "original": "hybrid/q3.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "a69860d69179720a365c54cb5aa3244ab99586d6f2a990ee78df228cb6a5d163",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q03.json",
+      "sha256": "d1b082b99303cf67e85e0f8fe5fe0bac5ba438612807b993f3dd5a265bab9232",
+      "original": "hybrid/q3.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "d1b082b99303cf67e85e0f8fe5fe0bac5ba438612807b993f3dd5a265bab9232",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q04.json.gz",
+      "sha256": "c8e5ae47dd856426ecdc39c5b28cd9725e3f4b62cbc9ed8540fef842657bc37c",
+      "original": "hybrid/q4.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "2caf261a24943bec894f82de08a70d606d62bf7280d18bebce1c7b3ad4a9df65",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q04.json",
+      "sha256": "4d9be9d6d6c605347cf131250d3a049977b9eac950aaec34eba1f0760da14e1a",
+      "original": "hybrid/q4.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "4d9be9d6d6c605347cf131250d3a049977b9eac950aaec34eba1f0760da14e1a",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q05.json.gz",
+      "sha256": "686bb1d03e0c334f86dca9ad1036d05e04d21af36c153aa2d89b53ba61a1b90d",
+      "original": "hybrid/q5.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "cdb76da1f3ac5a2c0bef8ea5f79f140f2e9db69f2042e76e84cdad9aaee78241",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q05.json",
+      "sha256": "81bfd82c2e1bbf8457fa0c4aaf82ae12af6cd561ba865c9416b5e8ff0e00f374",
+      "original": "hybrid/q5.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "81bfd82c2e1bbf8457fa0c4aaf82ae12af6cd561ba865c9416b5e8ff0e00f374",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q06.json.gz",
+      "sha256": "ccf0e38c78283b18891613bd393eda7144cf795e86abaa904bafbaf110a20bc4",
+      "original": "hybrid/q6.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "1b32427faaa922b24652d216e8e308a898e7754e364bb460c4958fb24bf9f251",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q06.json",
+      "sha256": "25d2b1e6c26c9350f00388cab1f4a6bc8e0665d252b6dcfa526a6edb7644f299",
+      "original": "hybrid/q6.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "25d2b1e6c26c9350f00388cab1f4a6bc8e0665d252b6dcfa526a6edb7644f299",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q07.json.gz",
+      "sha256": "6d2d413b5ee270cf8d32fcb2ed257615e75ba0b7b840738373ca082acccababd",
+      "original": "hybrid/q7.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "22a0069317bdfc4885a87bd76dfe8170e7f797270ff94e0e6845e050192e89be",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q07.json",
+      "sha256": "d52e386acc650a5c291060f00197f5287e653a9c756a57983d10ae23d2e42026",
+      "original": "hybrid/q7.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "d52e386acc650a5c291060f00197f5287e653a9c756a57983d10ae23d2e42026",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q08.json.gz",
+      "sha256": "06134b0b27fed9ff9b896edd4c8b80d1ad6706960f03c2c55fe9ec853bcffde0",
+      "original": "hybrid/q8.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "4b260aefd6e8465135ccfe849ec0d4743625aa3818fed9932247e1296fea7d6c",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q08.json",
+      "sha256": "7cbd49aa11e1037570253a5f11ecc9142cc341b459752810476ad55667fe2633",
+      "original": "hybrid/q8.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "7cbd49aa11e1037570253a5f11ecc9142cc341b459752810476ad55667fe2633",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q09.json.gz",
+      "sha256": "96adeec1bbb75cfbf68abe0779027fb53499f6585729b1cd856aa53af7f58871",
+      "original": "hybrid/q9.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "612045b10f182d941c5cc1bcdaecc87f6c7a0aa79aea173a619e3bc8293d9025",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q09.json",
+      "sha256": "85784016e229e14b1147d940b561a968e0da692642dbc09e1dc06a5ba7e0441b",
+      "original": "hybrid/q9.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "85784016e229e14b1147d940b561a968e0da692642dbc09e1dc06a5ba7e0441b",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q10.json.gz",
+      "sha256": "59bf82f99e4319d346f28ef1cdecf773aaf2891905b8c5a006d12be933b3a2ae",
+      "original": "hybrid/q10.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "76a693443f7e5ea584e8bb650bce263884f7d875ccdb1094d236df514f6a3a77",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q10.json",
+      "sha256": "b80cc6208c29a8604b23bcb1657e473306a0626785b4e9e239e187ad4e8bc8ce",
+      "original": "hybrid/q10.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "b80cc6208c29a8604b23bcb1657e473306a0626785b4e9e239e187ad4e8bc8ce",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q11.json.gz",
+      "sha256": "bf57978a35afe84a5a35898b64357b6790d2dc024fb703bfb78d98940ff5db9b",
+      "original": "hybrid/q11.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "54458da9247a28401d4a54f0e39839ac7bc840a5807eafc8684e9b78380e7023",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q11.json",
+      "sha256": "63cc2005db7417e60bfb769041ece5c28dccdb00cfb193d7cb636f2294b671fd",
+      "original": "hybrid/q11.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "63cc2005db7417e60bfb769041ece5c28dccdb00cfb193d7cb636f2294b671fd",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q12.json.gz",
+      "sha256": "692c702cbafe3b66e3024f0d7dfb2f3b04d8c57f1553d1d6c92dc861fa22f486",
+      "original": "hybrid/q12.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "46b0e9a980edb82d5e9c1ebe7aebef78937c803bcbd8b225d957d0a67e9dc8c3",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q12.json",
+      "sha256": "a95ff8aa302e244fcfe467101c0d6487d9fddf71ca3a9e5b26e523a2c0e509b9",
+      "original": "hybrid/q12.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "a95ff8aa302e244fcfe467101c0d6487d9fddf71ca3a9e5b26e523a2c0e509b9",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q13.json.gz",
+      "sha256": "f79a28f3a16587202d2453dc18f94cd6ed0a9f7e27fdd9f549c570ad8488195f",
+      "original": "hybrid/q13.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "d582138dfdd835035587ee9156ac5d81b594e283a1feb718004f04b96aca428e",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q13.json",
+      "sha256": "c34390734f07659c0361a55197660f9c4e69d79a6086be22d49dfb1cdcc9fbb4",
+      "original": "hybrid/q13.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "c34390734f07659c0361a55197660f9c4e69d79a6086be22d49dfb1cdcc9fbb4",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q14.json.gz",
+      "sha256": "74632a4773e452ce79cf8f47ce443961afa9e1762cfb30a1ce479e3381729541",
+      "original": "hybrid/q14.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "8b810317f89bbdb6f985288a75313595c0ea574637b208975bed052f47856ca1",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q14.json",
+      "sha256": "f0ae6b96ad2f65c744d1659cb9f1138fee5b9f4f11678017c3328f9890a0391e",
+      "original": "hybrid/q14.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "f0ae6b96ad2f65c744d1659cb9f1138fee5b9f4f11678017c3328f9890a0391e",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q15.json.gz",
+      "sha256": "640db841973f8b2fd8686285a75341dea714ce16e60e4b13ed0a0499b3cf2e0b",
+      "original": "hybrid/q15.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "15673afb452ec9d15e6cabc06811cfb47e24cfe4b1eed301389d9fb15a65e6ea",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q15.json",
+      "sha256": "8a80da06ddb1a38996e02c6e35ccaff802381a3f9dfae8e022806f92e6487751",
+      "original": "hybrid/q15.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "8a80da06ddb1a38996e02c6e35ccaff802381a3f9dfae8e022806f92e6487751",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q16.json.gz",
+      "sha256": "b7277ba7226b304168af1db0a28fea7a2ffe68820d4c4c3313daf573903de03a",
+      "original": "hybrid/q16.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "9607520f4542ea09fb9d12f161d500e6e25c1deea7103a1cb2800aab050ddfa4",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q16.json",
+      "sha256": "d258738537981e8586462d9d13f1b4b810e5fcb185faaa1ce3c578d5f8ead2b5",
+      "original": "hybrid/q16.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "d258738537981e8586462d9d13f1b4b810e5fcb185faaa1ce3c578d5f8ead2b5",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q17.json.gz",
+      "sha256": "b14e236919fe7f8459041c06ace92dc6560118d2be0190ff45a07b630f7e3181",
+      "original": "hybrid/q17.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "89f1d8877a24948764b182ffe48aaa5782ee8e4c69634164fdb2966f8dc4cfb4",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q17.json",
+      "sha256": "8ac5a50800e790512382892c36049b24034a3c7317cb16aa5039c3ffbc1e8387",
+      "original": "hybrid/q17.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "8ac5a50800e790512382892c36049b24034a3c7317cb16aa5039c3ffbc1e8387",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q18.json.gz",
+      "sha256": "1179c472586b425dcc21cef6dd4f598f6bd949062df816a91fa6c217e06190fc",
+      "original": "hybrid/q18.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "b9b130939041d8d3792e10f9d5965b01647cdfaae45b40eda8dda8ccae2d5cc6",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q18.json",
+      "sha256": "1738aaa03d5dcb1e9d8e9ae8b8c857065e0394a2255767292264b73add6cc58d",
+      "original": "hybrid/q18.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "1738aaa03d5dcb1e9d8e9ae8b8c857065e0394a2255767292264b73add6cc58d",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q19.json.gz",
+      "sha256": "bfa3a037c047b8b4e05c023ffc19ee1caf7b8c27af60351f84f59c8ee21a76c4",
+      "original": "hybrid/q19.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "3cabf9a0b070b54cbc44569b365925a054606301d4ad1e19409b75c99e43965f",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q19.json",
+      "sha256": "797f81521f59dd95898b49aeddfd6f85fe0245e69856ebee8efdf842c0a76880",
+      "original": "hybrid/q19.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "797f81521f59dd95898b49aeddfd6f85fe0245e69856ebee8efdf842c0a76880",
+      "transformation": "none"
+    },
+    {
+      "path": "responses/hybrid/q20.json.gz",
+      "sha256": "b2e9ce7fe0fa068ff86c6665989c499c19fbb7cebaa925e949099155982a6f37",
+      "original": "hybrid/q20.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "c0a156a01bebc53c906230d6ca9d017ff1441a0e42b8f8f14cca880b7740e606",
+      "transformation": "gzip mtime=0, no filename; decompressed bytes unchanged"
+    },
+    {
+      "path": "metrics/hybrid/q20.json",
+      "sha256": "68c593bb6136144eef36b1f19b0aacfffa7cc661dee72234c70364ffdcfec8ad",
+      "original": "hybrid/q20.metrics.json",
+      "experiment": "hybrid-signal-experiment",
+      "original_sha256": "68c593bb6136144eef36b1f19b0aacfffa7cc661dee72234c70364ffdcfec8ad",
+      "transformation": "none"
+    },
+    {
+      "path": "README.md",
+      "sha256": "5fa52d1392fcca5faa5c59f8a0c0c6863c2b3d3bbb7f0e00ddb791aeba177fb6",
+      "original": null,
+      "experiment": null,
+      "original_sha256": null,
+      "transformation": "new explanatory documentation"
+    }
+  ]
+}

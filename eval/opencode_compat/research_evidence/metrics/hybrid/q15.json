@@ -1,0 +1,11 @@
+{
+  "question": 15,
+  "seconds": 20.85322153999732,
+  "temperature": "warm_process",
+  "isError": false,
+  "status": "truncated",
+  "rows": 55,
+  "raw_cl100k_tokens": 10096,
+  "bytes": 40003,
+  "source_fidelity": "PASS"
+}

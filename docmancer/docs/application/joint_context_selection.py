@@ -273,10 +273,10 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
     semantic_mode = os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off")
-    if semantic_mode not in {"off", "mini"}:
-        raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off or mini")
+    if semantic_mode not in {"off", "mini", "hybrid"}:
+        raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off, mini or hybrid")
     semantic_scores = None
-    if semantic_mode == "mini":
+    if semantic_mode in {"mini", "hybrid"}:
         from .experimental_selection_modes import score_joint_relevance
         semantic_scores, semantic_receipt = score_joint_relevance(
             queries, rows, os.environ.get("DOCATLAS_EXPERIMENT_MINI_PATH", ""),
@@ -393,14 +393,21 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
                     mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0,
                     1.0 if key in item.locator_queries else 0.0,
                 ) for key in queries) / len(queries)
-            else:
+            elif semantic_mode == "mini":
                 indices = whole[item.group].indices if completing else item.indices
                 relevance = sum(max(
                     max(semantic_scores[key][index] for index in indices),
                     1.0 if key in item.locator_queries else 0.0,
                 ) for key in queries) / len(queries)
-            # This is an MMR-style choice: equal scales for query relevance and
-            # content redundancy, not a hard one-hit set-cover stopping rule.
+            else:
+                indices = whole[item.group].indices if completing else item.indices
+                relevance = sum(max(
+                    0.5 * (mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0)
+                    + 0.5 * max(semantic_scores[key][index] for index in indices),
+                    1.0 if key in item.locator_queries else 0.0,
+                ) for key in queries) / len(queries)
+            # This MMR-style choice subtracts content redundancy without a hard
+            # one-hit set-cover stop. Its signals are not calibrated probabilities.
             # Siblings of a partly selected coherent section are complementary
             # continuation, so they are compared against other sections only.
             redundancy = max((similarity(item, previous) for previous in selected_units
