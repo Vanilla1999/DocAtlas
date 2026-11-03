@@ -1,0 +1,54 @@
+name: Blind project-context gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docmancer/**"
+      - "eval/blind_project_context/**"
+      - "tests/test_blind_project_context_integration.py"
+      - ".github/workflows/blind-project-context.yml"
+      - "pyproject.toml"
+      - "uv.lock"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blind-project-context-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  blind-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      DOCATLAS_BLIND_EVAL: "1"
+      DOCATLAS_BLIND_JOBS: "4"
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Sealed blind questions over real stdio MCP; no L0/L2 x RU/EN slice may get worse
+        run: |
+          export DOCATLAS_BLIND_OUT="$RUNNER_TEMP/blind"
+          python -m pytest tests/test_blind_project_context_integration.py -q --tb=short -rs
+      - name: Keep scores and reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blind-project-context
+          path: |
+            ${{ runner.temp }}/blind/full/score.json
+            ${{ runner.temp }}/blind/full/report.md
+            ${{ runner.temp }}/blind/full/holdout-details.md
+            ${{ runner.temp }}/blind/full/gate.json
+            ${{ runner.temp }}/blind/full/run.json
+          if-no-files-found: warn

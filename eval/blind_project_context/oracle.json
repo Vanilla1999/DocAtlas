@@ -2,7 +2,15 @@
   "schema_version": 1,
   "state": "GOLD_WRITTEN_AFTER_QUESTION_SEAL",
   "sealed_questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
-  "rule": "Each fact is an exact literal quote from the drawn section. A case answers a fact when one delivered source row of a catalogued document contains the quote verbatim; any verbatim occurrence counts (see witness-audit.json). All facts of a topic are required.",
+  "rule": "Each fact is an exact literal quote from the drawn section. A case answers a fact when the delivered source rows of a catalogued document cover one verbatim occurrence of the quote: the union of the rows' exact character spans contains it (long lines arrive as adjacent windows, so a quote may straddle two rows). Any verbatim occurrence counts (see witness-audit.json). All facts of a topic are required for a fully answered case.",
+  "rule_revisions": [
+    {
+      "when": "2026-11-03, before the first full baseline run",
+      "was": "one delivered source row contains the quote verbatim",
+      "reason": "smoke runs showed long lines delivered as several adjacent windows of one line, so a delivered quote can be split between rows; the one-row variant is still reported per fact as in_one_row",
+      "facts_changed": false
+    }
+  ],
   "topics": [
     {
       "topic_id": "T01",

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_blind_project_context_integration.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_blind_project_context_integration.py": "b3639f21bcb8e379211595bc7859f6490131a79547a5a47f37d64082b95d920d"
+  }
+}
