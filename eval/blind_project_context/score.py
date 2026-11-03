@@ -214,6 +214,9 @@ def score_case(case: dict, record: dict | None, out: Path, topic: dict, gold: di
     result.update(facts=facts, facts_found=found, facts_total=len(facts), all_found=found == len(facts),
                   first_fact_row=min((fact["first_row"] for fact in facts if fact["found"]), default=None),
                   rows=len(rows), paths=len({row["path"] for row in rows}),
+                  rows_sha256=hashlib.sha256(json.dumps(sorted(
+                      (row["path"], row["line_start"], row["line_end"], row["text"]) for row in rows),
+                      ensure_ascii=False).encode("utf-8")).hexdigest(),
                   drawn_section_rows=sum(1 for row in rows if row["path"] == topic["path"]
                                          and row["line_start"] <= topic["line_end"]
                                          and topic["line_start"] <= row["line_end"]),

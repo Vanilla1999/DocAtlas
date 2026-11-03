@@ -60,7 +60,11 @@ def compare(base: dict, candidate: dict) -> dict:
         if before != after:
             flips.append({"split": case["split"], "corpus": case["corpus"], "case_id": case["case_id"],
                           "lost": sorted(before - after), "gained": sorted(after - before)})
-    return {"accepted": not any(item["worse"] for item in slices.values()), "slices": slices, "flips": flips}
+    rows_changed = sorted(f"{case['corpus']}/{case['case_id']}" for case in candidate["cases"]
+                          if case.get("rows_sha256") and old_cases[(case["corpus"], case["case_id"])].get("rows_sha256")
+                          and case["rows_sha256"] != old_cases[(case["corpus"], case["case_id"])]["rows_sha256"])
+    return {"accepted": not any(item["worse"] for item in slices.values()), "slices": slices, "flips": flips,
+            "rows_changed": rows_changed}
 
 
 def main() -> int:
@@ -85,6 +89,8 @@ def main() -> int:
             print(f"dev {flip['corpus']} {flip['case_id']}: lost {flip['lost'] or '-'} gained {flip['gained'] or '-'}")
     holdout = [flip for flip in result["flips"] if flip["split"] == "holdout"]
     print(f"holdout cases changed: {len(holdout)} (lost facts in {sum(bool(f['lost']) for f in holdout)})")
+    # Border rows of the token budget vary between runs of one tree (see PROTOCOL_RU.md).
+    print(f"cases with another delivered row set: {len(result['rows_changed'])}")
     if args.details:
         args.details.write_text(json.dumps(result, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print("ACCEPTED" if result["accepted"] else "REJECTED: a slice got worse")
