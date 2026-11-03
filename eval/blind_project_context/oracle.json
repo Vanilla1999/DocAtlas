@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "state": "GOLD_WRITTEN_AFTER_QUESTION_SEAL",
+  "sealed_questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+  "rule": "Each fact is an exact literal quote from the drawn section. A case answers a fact when one delivered source row of a catalogued document contains the quote verbatim; any verbatim occurrence counts (see witness-audit.json). All facts of a topic are required.",
+  "topics": [
+    {
+      "topic_id": "T01",
+      "path": "CONTRIBUTING.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T01.F1",
+          "quote": "Branch name: `feat/<topic>` or `fix/<description>`"
+        },
+        {
+          "fact_id": "T01.F2",
+          "quote": "Run the full test suite before opening the PR"
+        },
+        {
+          "fact_id": "T01.F3",
+          "quote": "New connectors or fetchers should include tests where practical"
+        }
+      ]
+    },
+    {
+      "topic_id": "T02",
+      "path": "README.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T02.F1",
+          "quote": "`doc-atlas clear-index` previews a bounded cleanup plan before removing derived"
+        },
+        {
+          "fact_id": "T02.F2",
+          "quote": "for all local indexes while preserving configuration"
+        },
+        {
+          "fact_id": "T02.F3",
+          "quote": "can be bound to its `plan_digest`"
+        }
+      ]
+    },
+    {
+      "topic_id": "T03",
+      "path": "docs/INDEX.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T03.F1",
+          "quote": "[MCP response contract](./mcp-response-contract.md)"
+        },
+        {
+          "fact_id": "T03.F2",
+          "quote": "[MCP docs server](./mcp-docs-server.md)"
+        },
+        {
+          "fact_id": "T03.F3",
+          "quote": "[Project docs MCP workflow](./project-docs-mcp-workflow.md)"
+        }
+      ]
+    },
+    {
+      "topic_id": "T04",
+      "path": "docs/INDEX.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T04.F1",
+          "quote": "[Task-level agent benchmark](./research/task-level-agent-benchmark.md)"
+        },
+        {
+          "fact_id": "T04.F2",
+          "quote": "[Eval task-level README](../eval/task_level/README.md)"
+        },
+        {
+          "fact_id": "T04.F3",
+          "quote": "[Eval results README](../eval/results/live/README.md)"
+        }
+      ]
+    },
+    {
+      "topic_id": "T05",
+      "path": "docs/PROJECT_BINDING.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T05.F1",
+          "quote": "the installed wheel, actual project installer, stdio MCP, SQLite and MiniLM"
+        },
+        {
+          "fact_id": "T05.F2",
+          "quote": "not autonomous OpenCode/model runs or token benchmarks"
+        }
+      ]
+    },
+    {
+      "topic_id": "T06",
+      "path": "docs/PROJECT_MAP.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T06.F1",
+          "quote": "`get_docs_context(...)`\n→ follow its returned `prepare_docs(...)` action when required\n→ retry `get_docs_context(...)`"
+        }
+      ]
+    },
+    {
+      "topic_id": "T07",
+      "path": "docs/PROJECT_MAP.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T07.F1",
+          "quote": "The Docs server is read-mostly and performs explicit confirmation for network\nfetches."
+        },
+        {
+          "fact_id": "T07.F2",
+          "quote": "applies integrity, host, credential, destructive-action and executor grants"
+        }
+      ]
+    },
+    {
+      "topic_id": "T08",
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T08.F1",
+          "quote": "Accepted. Updated for the explicit-request/member contract in PR #211."
+        }
+      ]
+    },
+    {
+      "topic_id": "T09",
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T09.F1",
+          "quote": "Partial context is an additional admission for original project reads through\n`get_docs_context`, not whole-question qualification."
+        },
+        {
+          "fact_id": "T09.F2",
+          "quote": "`ordinary_body_clause_context_v1` uses a contiguous span of the unchanged\nquestion with at least two distinct literal words."
+        },
+        {
+          "fact_id": "T09.F3",
+          "quote": "Projection prefers a complete verified containing section around each admitted\nseed"
+        }
+      ]
+    },
+    {
+      "topic_id": "T10",
+      "path": "docs/main-flow-evaluation.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T10.F1",
+          "quote": "Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP"
+        },
+        {
+          "fact_id": "T10.F2",
+          "quote": "**Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний"
+        },
+        {
+          "fact_id": "T10.F3",
+          "quote": "**Два независимых PASS и паритет.**"
+        }
+      ]
+    },
+    {
+      "topic_id": "T11",
+      "path": "docs/main-flow-logging.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T11.F1",
+          "quote": "`docatlas_request_start` и `docatlas_request_end` связываются через `request_id`."
+        },
+        {
+          "fact_id": "T11.F2",
+          "quote": "Покрыты CLI `query`, `context` и публичный диспетчер Docs MCP"
+        },
+        {
+          "fact_id": "T11.F3",
+          "quote": "Существующий `docatlas_query_trace` содержит подробную диагностику проекции"
+        }
+      ]
+    },
+    {
+      "topic_id": "T12",
+      "path": "docs/mcp-docs-server.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T12.F1",
+          "quote": "Reads never reconcile\nan index or write to the repository."
+        },
+        {
+          "fact_id": "T12.F2",
+          "quote": "Project documentation must belong to a\nfinite explicit `docatlas.project-docs.yaml` catalog"
+        },
+        {
+          "fact_id": "T12.F3",
+          "quote": "`prepare_docs(action=\"sync_project_docs\", project_path=...)` without a `mutation`\nperforms no writes."
+        }
+      ]
+    },
+    {
+      "topic_id": "T13",
+      "path": "docs/mcp-docs-server.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T13.F1",
+          "quote": "call `docs_status` once\nwith `include_language=true`"
+        },
+        {
+          "fact_id": "T13.F2",
+          "quote": "Keep the user's\n`question` unchanged."
+        },
+        {
+          "fact_id": "T13.F3",
+          "quote": "Supply a full, meaning-preserving translation in\n`search_question`"
+        }
+      ]
+    },
+    {
+      "topic_id": "T14",
+      "path": "docs/modules/project-context-retrieval.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T14.F1",
+          "quote": "`ProjectContextService` builds one query plan and passes it to project retrieval."
+        },
+        {
+          "fact_id": "T14.F2",
+          "quote": "Candidate allocation gives one opportunity to each explicit query lane before\nconsuming second candidates."
+        }
+      ]
+    },
+    {
+      "topic_id": "T15",
+      "path": "docs/opencode-compact-text.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T15.F1",
+          "quote": "retains `structuredContent` and `content`, but drops response `_meta`."
+        },
+        {
+          "fact_id": "T15.F2",
+          "quote": "would lose the original `source-packet` and make its\nresponse-local short references non-resolvable."
+        }
+      ]
+    },
+    {
+      "topic_id": "T16",
+      "path": "docs/opencode-compact-text.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T16.F1",
+          "quote": "Record the executable and package path actually used by the registered MCP\ncommand"
+        },
+        {
+          "fact_id": "T16.F2",
+          "quote": "Use the saved full MCP response to inspect the first rejected transformation"
+        },
+        {
+          "fact_id": "T16.F3",
+          "quote": "verify the selected source text, public refs/URIs and line spans in\nthe actual OpenCode tool message"
+        }
+      ]
+    },
+    {
+      "topic_id": "T17",
+      "path": "wiki/Architecture.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T17.F1",
+          "quote": "select `dense`, `sparse`, or `hybrid` explicitly or set `retrieval.default_mode`"
+        },
+        {
+          "fact_id": "T17.F2",
+          "quote": "fans out across `lexical` (FTS5), `dense` (Qdrant or sqlite-vec), and `sparse` (SPLADE in Qdrant) via a thread pool"
+        },
+        {
+          "fact_id": "T17.F3",
+          "quote": "fuses the per-source ranks with Reciprocal Rank Fusion (vanilla or weighted)"
+        }
+      ]
+    },
+    {
+      "topic_id": "T18",
+      "path": "wiki/Architecture.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T18.F1",
+          "quote": "requires finite literal entries in\n`docatlas.project-docs.yaml`"
+        },
+        {
+          "fact_id": "T18.F2",
+          "quote": "It does not infer read membership from README names,\nmodule directories, recursive roots, or Markdown links."
+        }
+      ]
+    },
+    {
+      "topic_id": "T19",
+      "path": "wiki/Commands.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T19.F1",
+          "quote": "The `doc-atlas qdrant` group manages a DocAtlas-owned local Qdrant process."
+        },
+        {
+          "fact_id": "T19.F2",
+          "quote": "`doc-atlas qdrant up` | Download the pinned Qdrant binary"
+        },
+        {
+          "fact_id": "T19.F3",
+          "quote": "`doc-atlas qdrant down` | Stop a docmancer-managed process."
+        },
+        {
+          "fact_id": "T19.F4",
+          "quote": "`doc-atlas qdrant status` | Report pid, port, url, alive"
+        }
+      ]
+    },
+    {
+      "topic_id": "T20",
+      "path": "wiki/Commands.md",
+      "answerable": true,
+      "note": "The drawn section lists docatlas.yaml options, not separate commands; gold is those options.",
+      "facts": [
+        {
+          "fact_id": "T20.F1",
+          "quote": "`retrieval.hierarchical.enabled: true` switches the dispatcher to a two-stage retrieval"
+        },
+        {
+          "fact_id": "T20.F2",
+          "quote": "`retrieval.routers` is an ordered list of `{match: <regex>, filters: {...}}` entries."
+        },
+        {
+          "fact_id": "T20.F3",
+          "quote": "`retrieval.expand: adjacent` (or `page`) plumbs neighbor expansion through hybrid mode"
+        }
+      ]
+    },
+    {
+      "topic_id": "T21",
+      "path": "wiki/Configuration.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T21.F1",
+          "quote": "`web_fetch.workers` | `8` | Parallelism for web page fetching"
+        },
+        {
+          "fact_id": "T21.F2",
+          "quote": "`web_fetch.default_page_cap` | `500` | Default maximum pages for URL sources"
+        },
+        {
+          "fact_id": "T21.F3",
+          "quote": "`web_fetch.browser_fallback` | `false` | Enable Playwright browser fallback by default"
+        }
+      ]
+    },
+    {
+      "topic_id": "T22",
+      "path": "wiki/Configuration.md",
+      "answerable": true,
+      "note": "Ambiguous after sealing: other documents (for example the DOCATLAS_MCP_* settings in docs/opencode-compact-text.md) also describe MCP runtime settings; gold stays the drawn section.",
+      "facts": [
+        {
+          "fact_id": "T22.F1",
+          "quote": "does not require entries in `docatlas.yaml`. State is managed through dedicated files under `~/.docatlas/`"
+        },
+        {
+          "fact_id": "T22.F2",
+          "quote": "Override the storage root with `DOCATLAS_HOME` (defaults to `~/.docatlas`)."
+        },
+        {
+          "fact_id": "T22.F3",
+          "quote": "Override the registry source for `install-pack` with `DOCATLAS_REGISTRY_DIR`"
+        }
+      ]
+    },
+    {
+      "topic_id": "T23",
+      "path": "wiki/Supported-Sources.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T23.F1",
+          "quote": "Run `doc-atlas update` to re-fetch and re-index all existing sources."
+        },
+        {
+          "fact_id": "T23.F2",
+          "quote": "doc-atlas update https://docs.example.com"
+        }
+      ]
+    },
+    {
+      "topic_id": "T24",
+      "path": "wiki/Supported-Sources.md",
+      "answerable": true,
+      "facts": [
+        {
+          "fact_id": "T24.F1",
+          "quote": "**OpenAPI 3.0 / 3.1**"
+        },
+        {
+          "fact_id": "T24.F2",
+          "quote": "**GraphQL introspection JSON**"
+        },
+        {
+          "fact_id": "T24.F3",
+          "quote": "**TypeDoc JSON**"
+        },
+        {
+          "fact_id": "T24.F4",
+          "quote": "**Sphinx `objects.inv`**"
+        },
+        {
+          "fact_id": "T24.F5",
+          "quote": "**`python_import` (opt-in)**"
+        }
+      ]
+    }
+  ]
+}
