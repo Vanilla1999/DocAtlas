@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "written_from": "topics.json: document path and heading path only; section bodies were not read before sealing",
+  "request_contract": {
+    "arguments": [
+      "project_path",
+      "question",
+      "search_question (ru cases only)"
+    ],
+    "search_question": "full English translation of the same Russian question; the project's documentation is declared mostly English",
+    "en_cases": "no search_question"
+  },
+  "cases": [
+    {
+      "id": "T01-ru",
+      "topic_id": "T01",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+      "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+    },
+    {
+      "id": "T01-en",
+      "topic_id": "T01",
+      "split": "dev",
+      "lang": "en",
+      "question": "What is expected of me when I submit a pull request to DocAtlas?"
+    },
+    {
+      "id": "T02-ru",
+      "topic_id": "T02",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Как безопасно очистить индекс DocAtlas, не удалив данные, которые ещё нужны?",
+      "search_question": "How can I safely clean up the DocAtlas index without deleting data I still need?"
+    },
+    {
+      "id": "T02-en",
+      "topic_id": "T02",
+      "split": "dev",
+      "lang": "en",
+      "question": "How can I safely clean up the DocAtlas index without deleting data I still need?"
+    },
+    {
+      "id": "T03-ru",
+      "topic_id": "T03",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какие документы описывают работу с MCP и с документацией проекта?",
+      "search_question": "Which documents describe the MCP and project documentation workflows?"
+    },
+    {
+      "id": "T03-en",
+      "topic_id": "T03",
+      "split": "dev",
+      "lang": "en",
+      "question": "Which documents describe the MCP and project documentation workflows?"
+    },
+    {
+      "id": "T04-ru",
+      "topic_id": "T04",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Где найти документацию об оценке качества и исследованиях?",
+      "search_question": "Where can I find the documentation about evaluation and research?"
+    },
+    {
+      "id": "T04-en",
+      "topic_id": "T04",
+      "split": "dev",
+      "lang": "en",
+      "question": "Where can I find the documentation about evaluation and research?"
+    },
+    {
+      "id": "T05-ru",
+      "topic_id": "T05",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Что проверяет верификация привязанной к проекту интеграции с OpenCode и чего она не доказывает?",
+      "search_question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?"
+    },
+    {
+      "id": "T05-en",
+      "topic_id": "T05",
+      "split": "dev",
+      "lang": "en",
+      "question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?"
+    },
+    {
+      "id": "T06-ru",
+      "topic_id": "T06",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какой путь по умолчанию проходит DocAtlas, когда агент спрашивает о документации?",
+      "search_question": "What is the default flow DocAtlas follows when an agent asks about documentation?"
+    },
+    {
+      "id": "T06-en",
+      "topic_id": "T06",
+      "split": "holdout",
+      "lang": "en",
+      "question": "What is the default flow DocAtlas follows when an agent asks about documentation?"
+    },
+    {
+      "id": "T07-ru",
+      "topic_id": "T07",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какие гарантии и ограничения безопасности есть у DocAtlas?",
+      "search_question": "What security guarantees and limits does DocAtlas have?"
+    },
+    {
+      "id": "T07-en",
+      "topic_id": "T07",
+      "split": "holdout",
+      "lang": "en",
+      "question": "What security guarantees and limits does DocAtlas have?"
+    },
+    {
+      "id": "T08-ru",
+      "topic_id": "T08",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Каков текущий статус решения сначала читать контекст проекта (ADR 0003)?",
+      "search_question": "What is the current status of the decision to read project context first (ADR 0003)?"
+    },
+    {
+      "id": "T08-en",
+      "topic_id": "T08",
+      "split": "holdout",
+      "lang": "en",
+      "question": "What is the current status of the decision to read project context first (ADR 0003)?"
+    },
+    {
+      "id": "T09-ru",
+      "topic_id": "T09",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Как DocAtlas возвращает дословный фрагмент тела документа вместо всего документа?",
+      "search_question": "How does DocAtlas return a literal fragment of a document body instead of the whole document?"
+    },
+    {
+      "id": "T09-en",
+      "topic_id": "T09",
+      "split": "holdout",
+      "lang": "en",
+      "question": "How does DocAtlas return a literal fragment of a document body instead of the whole document?"
+    },
+    {
+      "id": "T10-ru",
+      "topic_id": "T10",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какой публичный сценарий предлагается для сравнения запусков с выключенным и включённым логированием?",
+      "search_question": "What public scenario is proposed for comparing runs with logging turned off and on?"
+    },
+    {
+      "id": "T10-en",
+      "topic_id": "T10",
+      "split": "dev",
+      "lang": "en",
+      "question": "What public scenario is proposed for comparing runs with logging turned off and on?"
+    },
+    {
+      "id": "T11-ru",
+      "topic_id": "T11",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какие события пишутся в лог основного потока и где проходят его границы?",
+      "search_question": "Which events are written to the main flow log, and where are its boundaries?"
+    },
+    {
+      "id": "T11-en",
+      "topic_id": "T11",
+      "split": "holdout",
+      "lang": "en",
+      "question": "Which events are written to the main flow log, and where are its boundaries?"
+    },
+    {
+      "id": "T12-ru",
+      "topic_id": "T12",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Как MCP-сервер документации работает с собственной документацией проекта?",
+      "search_question": "How does the docs MCP server handle a project's own documentation?"
+    },
+    {
+      "id": "T12-en",
+      "topic_id": "T12",
+      "split": "dev",
+      "lang": "en",
+      "question": "How does the docs MCP server handle a project's own documentation?"
+    },
+    {
+      "id": "T13-ru",
+      "topic_id": "T13",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Если мой вопрос написан не на том языке, что документация, как сделать, чтобы поиск шёл на языке документации?",
+      "search_question": "If my question is in a different language than the documentation, how can I make the search use the documentation's language?"
+    },
+    {
+      "id": "T13-en",
+      "topic_id": "T13",
+      "split": "holdout",
+      "lang": "en",
+      "question": "If my question is in a different language than the documentation, how can I make the search use the documentation's language?"
+    },
+    {
+      "id": "T14-ru",
+      "topic_id": "T14",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какая часть приложения управляет получением контекста проекта и что она делает?",
+      "search_question": "Which part of the application orchestrates project context retrieval, and what does it do?"
+    },
+    {
+      "id": "T14-en",
+      "topic_id": "T14",
+      "split": "holdout",
+      "lang": "en",
+      "question": "Which part of the application orchestrates project context retrieval, and what does it do?"
+    },
+    {
+      "id": "T15-ru",
+      "topic_id": "T15",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Почему пользователям OpenCode не стоит просто включить DOCATLAS_MCP_MODEL_VIEW=1?",
+      "search_question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?"
+    },
+    {
+      "id": "T15-en",
+      "topic_id": "T15",
+      "split": "dev",
+      "lang": "en",
+      "question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?"
+    },
+    {
+      "id": "T16-ru",
+      "topic_id": "T16",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Как проверить, что установленный маршрут OpenCode работает, не вызывая модель?",
+      "search_question": "How can I check that the installed OpenCode route works without calling a model?"
+    },
+    {
+      "id": "T16-en",
+      "topic_id": "T16",
+      "split": "holdout",
+      "lang": "en",
+      "question": "How can I check that the installed OpenCode route works without calling a model?"
+    },
+    {
+      "id": "T17-ru",
+      "topic_id": "T17",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Как гибридный поиск в DocAtlas объединяет разные методы поиска?",
+      "search_question": "How does hybrid retrieval combine search methods in DocAtlas?"
+    },
+    {
+      "id": "T17-en",
+      "topic_id": "T17",
+      "split": "holdout",
+      "lang": "en",
+      "question": "How does hybrid retrieval combine search methods in DocAtlas?"
+    },
+    {
+      "id": "T18-ru",
+      "topic_id": "T18",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Как DocAtlas находит, какие документы проекта нужно индексировать?",
+      "search_question": "How does DocAtlas discover which project documents to index?"
+    },
+    {
+      "id": "T18-en",
+      "topic_id": "T18",
+      "split": "holdout",
+      "lang": "en",
+      "question": "How does DocAtlas discover which project documents to index?"
+    },
+    {
+      "id": "T19-ru",
+      "topic_id": "T19",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какие команды DocAtlas используются для управления Qdrant?",
+      "search_question": "Which DocAtlas commands are used to manage Qdrant?"
+    },
+    {
+      "id": "T19-en",
+      "topic_id": "T19",
+      "split": "dev",
+      "lang": "en",
+      "question": "Which DocAtlas commands are used to manage Qdrant?"
+    },
+    {
+      "id": "T20-ru",
+      "topic_id": "T20",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какие команды или параметры есть для расширенного поиска?",
+      "search_question": "What commands or options are available for advanced retrieval?"
+    },
+    {
+      "id": "T20-en",
+      "topic_id": "T20",
+      "split": "dev",
+      "lang": "en",
+      "question": "What commands or options are available for advanced retrieval?"
+    },
+    {
+      "id": "T21-ru",
+      "topic_id": "T21",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какие настройки конфигурации управляют загрузкой документации из интернета?",
+      "search_question": "Which configuration settings control fetching documentation from the web?"
+    },
+    {
+      "id": "T21-en",
+      "topic_id": "T21",
+      "split": "dev",
+      "lang": "en",
+      "question": "Which configuration settings control fetching documentation from the web?"
+    },
+    {
+      "id": "T22-ru",
+      "topic_id": "T22",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какие параметры конфигурации влияют на работу MCP-сервера во время выполнения?",
+      "search_question": "Which configuration options affect the MCP server at runtime?"
+    },
+    {
+      "id": "T22-en",
+      "topic_id": "T22",
+      "split": "holdout",
+      "lang": "en",
+      "question": "Which configuration options affect the MCP server at runtime?"
+    },
+    {
+      "id": "T23-ru",
+      "topic_id": "T23",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Как обновить уже добавленные источники документации?",
+      "search_question": "How do I update documentation sources that were already added?"
+    },
+    {
+      "id": "T23-en",
+      "topic_id": "T23",
+      "split": "holdout",
+      "lang": "en",
+      "question": "How do I update documentation sources that were already added?"
+    },
+    {
+      "id": "T24-ru",
+      "topic_id": "T24",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какие расширенные типы источников поддерживают MCP-пакеты?",
+      "search_question": "What advanced source types do MCP packs support?"
+    },
+    {
+      "id": "T24-en",
+      "topic_id": "T24",
+      "split": "dev",
+      "lang": "en",
+      "question": "What advanced source types do MCP packs support?"
+    }
+  ]
+}

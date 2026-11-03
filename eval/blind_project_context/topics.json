@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "l0_commit": "3d21bfeaa5dfbfed26faa5dd85fc8a85bf9a7d90",
+  "seed_text": "docatlas-blind-project-context-v1",
+  "rules": {
+    "topics": 24,
+    "per_document": 2,
+    "min_body_nonempty_lines": 3,
+    "prior_line_sets": [
+      "eval/opencode_compat/acq_pilot/oracle.json",
+      "eval/opencode_compat/research_evidence/gold20.json"
+    ],
+    "prior_text_sets": [
+      "eval/direct_docatlas_questions_15/cases.json",
+      "eval/multilingual_retrieval_quality/corpus.json"
+    ]
+  },
+  "counts": {
+    "documents": 19,
+    "eligible_sections": 96,
+    "excluded_as_prior_cited": 21,
+    "excluded_short_body": 18
+  },
+  "topics": [
+    {
+      "topic_id": "T01",
+      "split": "dev",
+      "language": "en",
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Submitting a PR"
+      ],
+      "line_start": 59,
+      "line_end": 63,
+      "body_nonempty_lines": 3
+    },
+    {
+      "topic_id": "T02",
+      "split": "dev",
+      "language": "en",
+      "path": "README.md",
+      "heading_path": [
+        "DocAtlas",
+        "Project-docs MCP server",
+        "Safe index cleanup"
+      ],
+      "line_start": 190,
+      "line_end": 198,
+      "body_nonempty_lines": 7
+    },
+    {
+      "topic_id": "T03",
+      "split": "dev",
+      "language": "en",
+      "path": "docs/INDEX.md",
+      "heading_path": [
+        "Documentation Index",
+        "MCP and project-docs workflows"
+      ],
+      "line_start": 11,
+      "line_end": 17,
+      "body_nonempty_lines": 4
+    },
+    {
+      "topic_id": "T04",
+      "split": "dev",
+      "language": "en",
+      "path": "docs/INDEX.md",
+      "heading_path": [
+        "Documentation Index",
+        "Evaluation and research"
+      ],
+      "line_start": 43,
+      "line_end": 47,
+      "body_nonempty_lines": 3
+    },
+    {
+      "topic_id": "T05",
+      "split": "dev",
+      "language": "en",
+      "path": "docs/PROJECT_BINDING.md",
+      "heading_path": [
+        "Project-bound OpenCode integration",
+        "Verification boundary"
+      ],
+      "line_start": 72,
+      "line_end": 79,
+      "body_nonempty_lines": 6
+    },
+    {
+      "topic_id": "T06",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/PROJECT_MAP.md",
+      "heading_path": [
+        "Project map",
+        "Default documentation flow"
+      ],
+      "line_start": 23,
+      "line_end": 37,
+      "body_nonempty_lines": 11
+    },
+    {
+      "topic_id": "T07",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/PROJECT_MAP.md",
+      "heading_path": [
+        "Project map",
+        "Security boundary"
+      ],
+      "line_start": 39,
+      "line_end": 44,
+      "body_nonempty_lines": 4
+    },
+    {
+      "topic_id": "T08",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "heading_path": [
+        "ADR 0003: Context-first project reads",
+        "Status"
+      ],
+      "line_start": 3,
+      "line_end": 7,
+      "body_nonempty_lines": 3
+    },
+    {
+      "topic_id": "T09",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "heading_path": [
+        "ADR 0003: Context-first project reads",
+        "Literal partial body context"
+      ],
+      "line_start": 37,
+      "line_end": 99,
+      "body_nonempty_lines": 56
+    },
+    {
+      "topic_id": "T10",
+      "split": "dev",
+      "language": "ru",
+      "path": "docs/main-flow-evaluation.md",
+      "heading_path": [
+        "Оценка основного потока: результат, источники и трасса",
+        "Предлагаемый публичный сценарий logging off/on"
+      ],
+      "line_start": 17,
+      "line_end": 26,
+      "body_nonempty_lines": 6
+    },
+    {
+      "topic_id": "T11",
+      "split": "holdout",
+      "language": "ru",
+      "path": "docs/main-flow-logging.md",
+      "heading_path": [
+        "Логи основного потока",
+        "События и границы"
+      ],
+      "line_start": 25,
+      "line_end": 42,
+      "body_nonempty_lines": 16
+    },
+    {
+      "topic_id": "T12",
+      "split": "dev",
+      "language": "en",
+      "path": "docs/mcp-docs-server.md",
+      "heading_path": [
+        "Docs MCP server",
+        "Project documentation"
+      ],
+      "line_start": 82,
+      "line_end": 109,
+      "body_nonempty_lines": 22
+    },
+    {
+      "topic_id": "T13",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/mcp-docs-server.md",
+      "heading_path": [
+        "Docs MCP server",
+        "Optional documentation-language lookup"
+      ],
+      "line_start": 163,
+      "line_end": 180,
+      "body_nonempty_lines": 15
+    },
+    {
+      "topic_id": "T14",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/modules/project-context-retrieval.md",
+      "heading_path": [
+        "Project context retrieval module",
+        "Application orchestration"
+      ],
+      "line_start": 28,
+      "line_end": 39,
+      "body_nonempty_lines": 9
+    },
+    {
+      "topic_id": "T15",
+      "split": "dev",
+      "language": "en",
+      "path": "docs/opencode-compact-text.md",
+      "heading_path": [
+        "OpenCode: concise instructions and self-contained MCP text",
+        "Why not just set `DOCATLAS_MCP_MODEL_VIEW=1`?"
+      ],
+      "line_start": 36,
+      "line_end": 70,
+      "body_nonempty_lines": 31
+    },
+    {
+      "topic_id": "T16",
+      "split": "holdout",
+      "language": "en",
+      "path": "docs/opencode-compact-text.md",
+      "heading_path": [
+        "OpenCode: concise instructions and self-contained MCP text",
+        "Diagnose the installed route without a model call"
+      ],
+      "line_start": 95,
+      "line_end": 126,
+      "body_nonempty_lines": 26
+    },
+    {
+      "topic_id": "T17",
+      "split": "holdout",
+      "language": "en",
+      "path": "wiki/Architecture.md",
+      "heading_path": [
+        "Architecture",
+        "Hybrid retrieval"
+      ],
+      "line_start": 42,
+      "line_end": 57,
+      "body_nonempty_lines": 11
+    },
+    {
+      "topic_id": "T18",
+      "split": "holdout",
+      "language": "en",
+      "path": "wiki/Architecture.md",
+      "heading_path": [
+        "Architecture",
+        "Project Docs pipeline",
+        "Discovery"
+      ],
+      "line_start": 223,
+      "line_end": 240,
+      "body_nonempty_lines": 14
+    },
+    {
+      "topic_id": "T19",
+      "split": "dev",
+      "language": "en",
+      "path": "wiki/Commands.md",
+      "heading_path": [
+        "Commands",
+        "Qdrant lifecycle"
+      ],
+      "line_start": 104,
+      "line_end": 123,
+      "body_nonempty_lines": 14
+    },
+    {
+      "topic_id": "T20",
+      "split": "dev",
+      "language": "en",
+      "path": "wiki/Commands.md",
+      "heading_path": [
+        "Commands",
+        "Advanced retrieval"
+      ],
+      "line_start": 125,
+      "line_end": 133,
+      "body_nonempty_lines": 5
+    },
+    {
+      "topic_id": "T21",
+      "split": "dev",
+      "language": "en",
+      "path": "wiki/Configuration.md",
+      "heading_path": [
+        "Configuration",
+        "Configuration Reference",
+        "Web fetch"
+      ],
+      "line_start": 32,
+      "line_end": 38,
+      "body_nonempty_lines": 5
+    },
+    {
+      "topic_id": "T22",
+      "split": "holdout",
+      "language": "en",
+      "path": "wiki/Configuration.md",
+      "heading_path": [
+        "Configuration",
+        "Configuration Reference",
+        "MCP runtime"
+      ],
+      "line_start": 93,
+      "line_end": 107,
+      "body_nonempty_lines": 10
+    },
+    {
+      "topic_id": "T23",
+      "split": "holdout",
+      "language": "en",
+      "path": "wiki/Supported-Sources.md",
+      "heading_path": [
+        "Supported Sources",
+        "Updating sources"
+      ],
+      "line_start": 54,
+      "line_end": 62,
+      "body_nonempty_lines": 5
+    },
+    {
+      "topic_id": "T24",
+      "split": "dev",
+      "language": "en",
+      "path": "wiki/Supported-Sources.md",
+      "heading_path": [
+        "Supported Sources",
+        "Advanced MCP Pack Source Types"
+      ],
+      "line_start": 76,
+      "line_end": 88,
+      "body_nonempty_lines": 9
+    }
+  ]
+}
