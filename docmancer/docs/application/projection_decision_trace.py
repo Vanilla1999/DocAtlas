@@ -436,7 +436,29 @@ def _attempt_observation(value: Any) -> dict[str, Any]:
         "experimental_native_restore": _work_observation(value.get("experimental_native_restore", _MISSING), (
             "checked", "restored", "already_covered", "rejected")),
         "context_flow": _context_flow_observation(value.get("context_flow", _MISSING)),
+        "joint_selection_observation": _selection_observation(value.get("joint_selection_observation", _MISSING)),
     }
+
+
+def _selection_observation(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return _preview(value)
+    rows = value.get("rows")
+    if not isinstance(rows, list):
+        return {"observation": "malformed"}
+    result = {"observation": "recorded", **_fields(value, (
+        "row_count", "row_limit", "omitted_rows", "diagnostic_error")), "rows": []}
+    for row in rows[:512]:
+        item = _fields(row, ("evidence_id", "line_start", "line_end", "decision",
+                             "unit_rows", "joint_output", "selected_before", "trial_text_bytes", "fit_check",
+                             "first_decision", "first_unit_rows", "first_selected_before", "cost_bytes", "first_cost_bytes"))
+        for name in ("gain_per_cost", "relevance", "redundancy", "first_gain_per_cost", "first_relevance", "first_redundancy"):
+            number = row.get(name) if isinstance(row, dict) else None
+            if type(number) is float and math.isfinite(number):
+                item[name] = number
+        result["rows"].append(item)
+    result["serialization_omitted_rows"] = max(0, len(rows) - 512)
+    return result
 
 
 def same_call_projection_observation(
@@ -446,7 +468,7 @@ def same_call_projection_observation(
     service_trace = _child(_child(_child(raw, "ingestion_diagnostics"), "project"), "same_call_pipeline")
     projection_trace = _child(_child(raw, "retrieval_diagnostics"), "docs_context_projection")
     sources = projection.get("sources", _MISSING)
-    return {
+    observation = {
         "schema_version": 1, "callback_stage": "after_model_visible_validation",
         "delivery_blocked": delivery_blocked,
         "final_callback": {
@@ -473,3 +495,9 @@ def same_call_projection_observation(
             "stay unknown; previews and decision-log omissions cannot prove an absent first loss."
         ),
     }
+    selection = observation["returned_core_diagnostics"].get("joint_selection_observation")
+    if isinstance(selection, dict) and selection.get("observation") == "recorded":
+        final_ids = {row.get("evidence_id") for row in sources if isinstance(row, dict)} if isinstance(sources, list) else None
+        for row in selection["rows"]:
+            row["final_output"] = row.get("evidence_id") in final_ids if final_ids is not None else None
+    return observation

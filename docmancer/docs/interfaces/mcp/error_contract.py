@@ -15,6 +15,7 @@ _RETRYABLE_BY_REASON: dict[str, bool | None] = {
     "docs_context_target_mismatch": False,
     "docs_context_binding_invalid": False,
     "context_delivery_unavailable": False,
+    "joint_semantic_relevance_failed": False,
     "unknown_tool": False,
     "config_shadowing": False,
     "project_local_config_shadowed": False,
@@ -37,6 +38,9 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
     ],
     "context_delivery_unavailable": [
         "Do not repeat the unchanged request. Check the MCP delivery configuration and reported delivery reason.",
+    ],
+    "joint_semantic_relevance_failed": [
+        "Check the opt-in joint relevance model path, pinned local assets and optional dependencies; retry only after fixing them.",
     ],
     "docs_context_target_mismatch": [
         "Use the configured project root, or omit project_path to use the explicit host binding. Never replace the root with a documentation subdirectory.",
