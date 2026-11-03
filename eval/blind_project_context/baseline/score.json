@@ -1,0 +1,8538 @@
+{
+ "schema_version": 2,
+ "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+ "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+ "source_tree": {
+  "commit": "5e4ded1da29d0385efc26ff9202b9de6f595710e",
+  "dirty_paths": [
+   "val/blind_project_context/oracle.json",
+   "eval/blind_project_context/witness-audit.json",
+   ".github/workflows/blind-project-context.yml",
+   "eval/blind_project_context/PROTOCOL_RU.md",
+   "eval/blind_project_context/README.md",
+   "eval/blind_project_context/gate.py",
+   "eval/blind_project_context/observed_server.py",
+   "eval/blind_project_context/run.py",
+   "eval/blind_project_context/score.py",
+   "tests/diagnostic_labels.blind_project_context_integration.json",
+   "tests/test_blind_project_context_integration.py"
+  ]
+ },
+ "server_environment": {
+  "HOME": "/tmp/docatlas-blind-project-context/L0-0/home",
+  "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+  "DOCATLAS_MCP_COMPACT_TEXT": "1",
+  "DOCATLAS_OFFLINE": "1",
+  "DOCATLAS_AUTO_VECTORS": "0",
+  "PYTHONNOUSERSITE": "1",
+  "NO_PROXY": "*",
+  "HF_HUB_OFFLINE": "1"
+ },
+ "observer": true,
+ "candidate_ranks": false,
+ "wall_seconds": 1549.0,
+ "run": {
+  "started_at_utc": "2026-11-03T19:06:46+00:00",
+  "eval_tree": {
+   "commit": "5e4ded1da29d0385efc26ff9202b9de6f595710e",
+   "dirty_paths": [
+    "val/blind_project_context/oracle.json",
+    "eval/blind_project_context/witness-audit.json",
+    ".github/workflows/blind-project-context.yml",
+    "eval/blind_project_context/PROTOCOL_RU.md",
+    "eval/blind_project_context/README.md",
+    "eval/blind_project_context/gate.py",
+    "eval/blind_project_context/observed_server.py",
+    "eval/blind_project_context/run.py",
+    "eval/blind_project_context/score.py",
+    "tests/diagnostic_labels.blind_project_context_integration.json",
+    "tests/test_blind_project_context_integration.py"
+   ]
+  },
+  "python": "3.13.15",
+  "platform": "Linux-6.18.56-x86_64-with-glibc2.34",
+  "cpus": 2,
+  "jobs": 2,
+  "work_root": "/tmp/docatlas-blind-project-context",
+  "project_config": {
+   "docatlas.yaml": {
+    "project": {
+     "scan_deadline_seconds": 300
+    }
+   }
+  },
+  "units": [
+   {
+    "name": "L0-0",
+    "corpus": "L0",
+    "project_path": "/tmp/docatlas-blind-project-context/L0-0/project",
+    "prepare_seconds": 0.634,
+    "prepared_documents": 19,
+    "cold_reason_code": "member_store_uninitialized"
+   },
+   {
+    "name": "L2-0",
+    "corpus": "L2",
+    "project_path": "/tmp/docatlas-blind-project-context/L2-0/project",
+    "prepare_seconds": 28.498,
+    "prepared_documents": 489,
+    "cold_reason_code": "member_store_uninitialized"
+   },
+   {
+    "name": "L0-1",
+    "corpus": "L0",
+    "project_path": "/tmp/docatlas-blind-project-context/L0-1/project",
+    "prepare_seconds": 0.639,
+    "prepared_documents": 19,
+    "cold_reason_code": "member_store_uninitialized"
+   },
+   {
+    "name": "L2-1",
+    "corpus": "L2",
+    "project_path": "/tmp/docatlas-blind-project-context/L2-1/project",
+    "prepare_seconds": 28.392,
+    "prepared_documents": 489,
+    "cold_reason_code": "member_store_uninitialized"
+   }
+  ]
+ },
+ "anomalies": [],
+ "slices": {
+  "dev/L0/en": {
+   "cases": 12,
+   "facts_found": 26,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 37,
+   "all_found": 8,
+   "limit_reached": 11,
+   "output_budget": 11,
+   "candidate_ceiling": 9,
+   "seconds": 188.6
+  },
+  "dev/L0/ru": {
+   "cases": 12,
+   "facts_found": 28,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 37,
+   "all_found": 9,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 9,
+   "seconds": 168.5
+  },
+  "dev/L2/en": {
+   "cases": 12,
+   "facts_found": 24,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 37,
+   "all_found": 8,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 12,
+   "seconds": 395.8
+  },
+  "dev/L2/ru": {
+   "cases": 12,
+   "facts_found": 16,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 37,
+   "all_found": 5,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 12,
+   "seconds": 677.0
+  },
+  "holdout/L0/en": {
+   "cases": 12,
+   "facts_found": 18,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 28,
+   "all_found": 8,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 10,
+   "seconds": 189.0
+  },
+  "holdout/L0/ru": {
+   "cases": 12,
+   "facts_found": 19,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 28,
+   "all_found": 8,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 10,
+   "seconds": 158.6
+  },
+  "holdout/L2/en": {
+   "cases": 12,
+   "facts_found": 10,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 28,
+   "all_found": 4,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 12,
+   "seconds": 444.3
+  },
+  "holdout/L2/ru": {
+   "cases": 12,
+   "facts_found": 4,
+   "lost_not_acquired": null,
+   "lost_after_acquisition": null,
+   "facts_total": 28,
+   "all_found": 1,
+   "limit_reached": 12,
+   "output_budget": 12,
+   "candidate_ceiling": 12,
+   "seconds": 771.3
+  }
+ },
+ "cases": [
+  {
+   "corpus": "L0",
+   "case_id": "T01-ru",
+   "topic_id": "T01",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+   "search_question": "What is expected of me when I submit a pull request to DocAtlas?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T01.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 68,
+   "paths": 13,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 38820,
+   "seconds": 19.509,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 282,
+     "eligible_rows": 282,
+     "selected_rows": 68,
+     "omitted_rows": 214,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      143,
+      143,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T01-en",
+   "topic_id": "T01",
+   "split": "dev",
+   "lang": "en",
+   "question": "What is expected of me when I submit a pull request to DocAtlas?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T01.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 65,
+   "paths": 11,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 40656,
+   "seconds": 21.522,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 65,
+     "omitted_rows": 191,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T02-ru",
+   "topic_id": "T02",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Как безопасно очистить индекс DocAtlas, не удалив данные, которые ещё нужны?",
+   "search_question": "How can I safely clean up the DocAtlas index without deleting data I still need?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "can",
+      "index"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T02.F1",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F2",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F3",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 4,
+   "rows": 65,
+   "paths": 13,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 39804,
+   "seconds": 14.982,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 283,
+     "eligible_rows": 283,
+     "selected_rows": 65,
+     "omitted_rows": 218,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      128,
+      128,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T02-en",
+   "topic_id": "T02",
+   "split": "dev",
+   "lang": "en",
+   "question": "How can I safely clean up the DocAtlas index without deleting data I still need?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "can",
+      "index"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T02.F1",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F2",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F3",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 4,
+   "rows": 63,
+   "paths": 12,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41652,
+   "seconds": 13.329,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 63,
+     "omitted_rows": 193,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T03-ru",
+   "topic_id": "T03",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие документы описывают работу с MCP и с документацией проекта?",
+   "search_question": "Which documents describe the MCP and project documentation workflows?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 1,
+     "answer_words": [
+      "mcp"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "mcp",
+      "project"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T03.F1",
+     "found": true,
+     "first_row": 9,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F2",
+     "found": true,
+     "first_row": 10,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F3",
+     "found": true,
+     "first_row": 10,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 9,
+   "rows": 66,
+   "paths": 12,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41175,
+   "seconds": 16.458,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 295,
+     "eligible_rows": 295,
+     "selected_rows": 66,
+     "omitted_rows": 229,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      158,
+      158,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T03-en",
+   "topic_id": "T03",
+   "split": "dev",
+   "lang": "en",
+   "question": "Which documents describe the MCP and project documentation workflows?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "mcp",
+      "project"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T03.F1",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F2",
+     "found": true,
+     "first_row": 9,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F3",
+     "found": true,
+     "first_row": 9,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 8,
+   "rows": 70,
+   "paths": 15,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41411,
+   "seconds": 19.92,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 70,
+     "omitted_rows": 186,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T04-ru",
+   "topic_id": "T04",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Где найти документацию об оценке качества и исследованиях?",
+   "search_question": "Where can I find the documentation about evaluation and research?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 10,
+     "answer_overlap": 1,
+     "answer_words": [
+      "research"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T04.F1",
+     "found": true,
+     "first_row": 1,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F2",
+     "found": true,
+     "first_row": 1,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F3",
+     "found": true,
+     "first_row": 1,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 1,
+   "rows": 65,
+   "paths": 11,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 40347,
+   "seconds": 9.273,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 289,
+     "eligible_rows": 289,
+     "selected_rows": 65,
+     "omitted_rows": 224,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      35,
+      35,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T04-en",
+   "topic_id": "T04",
+   "split": "dev",
+   "lang": "en",
+   "question": "Where can I find the documentation about evaluation and research?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 1,
+     "answer_words": [
+      "research"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T04.F1",
+     "found": true,
+     "first_row": 1,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F2",
+     "found": true,
+     "first_row": 1,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F3",
+     "found": true,
+     "first_row": 1,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 1,
+   "rows": 66,
+   "paths": 14,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 41746,
+   "seconds": 11.499,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 66,
+     "omitted_rows": 190,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T05-ru",
+   "topic_id": "T05",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Что проверяет верификация привязанной к проекту интеграции с OpenCode и чего она не доказывает?",
+   "search_question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?",
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 1,
+     "answer_words": [
+      "opencode"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 5,
+     "answer_words": [
+      "and",
+      "not",
+      "opencode",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T05.F1",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T05.F2",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 2,
+   "rows": 63,
+   "paths": 11,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 38690,
+   "seconds": 14.092,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 299,
+     "eligible_rows": 299,
+     "selected_rows": 63,
+     "omitted_rows": 236,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      83,
+      83,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T05-en",
+   "topic_id": "T05",
+   "split": "dev",
+   "lang": "en",
+   "question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 5,
+     "answer_words": [
+      "and",
+      "not",
+      "opencode",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T05.F1",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T05.F2",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 2,
+   "rows": 62,
+   "paths": 11,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41451,
+   "seconds": 14.871,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 62,
+     "omitted_rows": 194,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T06-ru",
+   "topic_id": "T06",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какой путь по умолчанию проходит DocAtlas, когда агент спрашивает о документации?",
+   "search_question": "What is the default flow DocAtlas follows when an agent asks about documentation?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 1,
+     "answer_words": [
+      "when"
+     ],
+     "section_overlap": 6
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T06.F1",
+     "found": true,
+     "first_row": 60,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 1,
+   "facts_total": 1,
+   "all_found": true,
+   "first_fact_row": 60,
+   "rows": 62,
+   "paths": 12,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41638,
+   "seconds": 15.683,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 270,
+     "eligible_rows": 270,
+     "selected_rows": 62,
+     "omitted_rows": 208,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      113,
+      113,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T06-en",
+   "topic_id": "T06",
+   "split": "holdout",
+   "lang": "en",
+   "question": "What is the default flow DocAtlas follows when an agent asks about documentation?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 1,
+     "answer_words": [
+      "when"
+     ],
+     "section_overlap": 6
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T06.F1",
+     "found": true,
+     "first_row": 22,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 1,
+   "facts_total": 1,
+   "all_found": true,
+   "first_fact_row": 22,
+   "rows": 67,
+   "paths": 12,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41609,
+   "seconds": 18.318,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 67,
+     "omitted_rows": 189,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T07-ru",
+   "topic_id": "T07",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какие гарантии и ограничения безопасности есть у DocAtlas?",
+   "search_question": "What security guarantees and limits does DocAtlas have?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 8,
+     "answer_overlap": 1,
+     "answer_words": [
+      "and"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T07.F1",
+     "found": true,
+     "first_row": 7,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T07.F2",
+     "found": true,
+     "first_row": 7,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 7,
+   "rows": 62,
+   "paths": 13,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 39903,
+   "seconds": 13.73,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 288,
+     "eligible_rows": 288,
+     "selected_rows": 62,
+     "omitted_rows": 226,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      133,
+      133,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T07-en",
+   "topic_id": "T07",
+   "split": "holdout",
+   "lang": "en",
+   "question": "What security guarantees and limits does DocAtlas have?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 1,
+     "answer_words": [
+      "and"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T07.F1",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T07.F2",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 6,
+   "rows": 59,
+   "paths": 14,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 42054,
+   "seconds": 12.486,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 59,
+     "omitted_rows": 197,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T08-ru",
+   "topic_id": "T08",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Каков текущий статус решения сначала читать контекст проекта (ADR 0003)?",
+   "search_question": "What is the current status of the decision to read project context first (ADR 0003)?",
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T08.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 1,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 66,
+   "paths": 13,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 41400,
+   "seconds": 11.606,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 260,
+     "eligible_rows": 260,
+     "selected_rows": 66,
+     "omitted_rows": 194,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      6,
+      6,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T08-en",
+   "topic_id": "T08",
+   "split": "holdout",
+   "lang": "en",
+   "question": "What is the current status of the decision to read project context first (ADR 0003)?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T08.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 1,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 66,
+   "paths": 11,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 41586,
+   "seconds": 17.119,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 66,
+     "omitted_rows": 190,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T09-ru",
+   "topic_id": "T09",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как DocAtlas возвращает дословный фрагмент тела документа вместо всего документа?",
+   "search_question": "How does DocAtlas return a literal fragment of a document body instead of the whole document?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "literal",
+      "of",
+      "the",
+      "whole"
+     ],
+     "section_overlap": 8
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T09.F1",
+     "found": true,
+     "first_row": 24,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F2",
+     "found": true,
+     "first_row": 25,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F3",
+     "found": true,
+     "first_row": 29,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 24,
+   "rows": 60,
+   "paths": 14,
+   "drawn_section_rows": 6,
+   "utf8_bytes": 41297,
+   "seconds": 11.922,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 265,
+     "eligible_rows": 265,
+     "selected_rows": 60,
+     "omitted_rows": 205,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      110,
+      110,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T09-en",
+   "topic_id": "T09",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How does DocAtlas return a literal fragment of a document body instead of the whole document?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "literal",
+      "of",
+      "the",
+      "whole"
+     ],
+     "section_overlap": 8
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T09.F1",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F2",
+     "found": true,
+     "first_row": 20,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F3",
+     "found": true,
+     "first_row": 24,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 19,
+   "rows": 64,
+   "paths": 13,
+   "drawn_section_rows": 6,
+   "utf8_bytes": 41058,
+   "seconds": 12.37,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 64,
+     "omitted_rows": 192,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T10-ru",
+   "topic_id": "T10",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какой публичный сценарий предлагается для сравнения запусков с выключенным и включённым логированием?",
+   "search_question": "What public scenario is proposed for comparing runs with logging turned off and on?",
+   "overlap": {
+    "question": {
+     "question_words": 12,
+     "answer_overlap": 3,
+     "answer_words": [
+      "и",
+      "публичный",
+      "с"
+     ],
+     "section_overlap": 6
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "off",
+      "on"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T10.F1",
+     "found": true,
+     "first_row": 3,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F2",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F3",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 3,
+   "rows": 68,
+   "paths": 12,
+   "drawn_section_rows": 12,
+   "utf8_bytes": 39311,
+   "seconds": 13.31,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 279,
+     "eligible_rows": 279,
+     "selected_rows": 68,
+     "omitted_rows": 211,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      38,
+      38,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T10-en",
+   "topic_id": "T10",
+   "split": "dev",
+   "lang": "en",
+   "question": "What public scenario is proposed for comparing runs with logging turned off and on?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "off",
+      "on"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T10.F1",
+     "found": true,
+     "first_row": 57,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F3",
+     "found": true,
+     "first_row": 60,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": 57,
+   "rows": 67,
+   "paths": 12,
+   "drawn_section_rows": 11,
+   "utf8_bytes": 39523,
+   "seconds": 19.377,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 67,
+     "omitted_rows": 189,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T11-ru",
+   "topic_id": "T11",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какие события пишутся в лог основного потока и где проходят его границы?",
+   "search_question": "Which events are written to the main flow log, and where are its boundaries?",
+   "overlap": {
+    "question": {
+     "question_words": 12,
+     "answer_overlap": 1,
+     "answer_words": [
+      "и"
+     ],
+     "section_overlap": 5
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T11.F1",
+     "found": true,
+     "first_row": 11,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F2",
+     "found": true,
+     "first_row": 11,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F3",
+     "found": true,
+     "first_row": 11,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 11,
+   "rows": 62,
+   "paths": 16,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 41260,
+   "seconds": 12.884,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 294,
+     "eligible_rows": 294,
+     "selected_rows": 62,
+     "omitted_rows": 232,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      39,
+      39,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T11-en",
+   "topic_id": "T11",
+   "split": "holdout",
+   "lang": "en",
+   "question": "Which events are written to the main flow log, and where are its boundaries?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T11.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 64,
+   "paths": 15,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 41374,
+   "seconds": 13.693,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 64,
+     "omitted_rows": 192,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T12-ru",
+   "topic_id": "T12",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Как MCP-сервер документации работает с собственной документацией проекта?",
+   "search_question": "How does the docs MCP server handle a project's own documentation?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 12,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "docs",
+      "documentation",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T12.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 66,
+   "paths": 15,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 40646,
+   "seconds": 17.707,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 283,
+     "eligible_rows": 283,
+     "selected_rows": 66,
+     "omitted_rows": 217,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      141,
+      141,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T12-en",
+   "topic_id": "T12",
+   "split": "dev",
+   "lang": "en",
+   "question": "How does the docs MCP server handle a project's own documentation?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 12,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "docs",
+      "documentation",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T12.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 73,
+   "paths": 14,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 40440,
+   "seconds": 20.314,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 73,
+     "omitted_rows": 183,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T13-ru",
+   "topic_id": "T13",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Если мой вопрос написан не на том языке, что документация, как сделать, чтобы поиск шёл на языке документации?",
+   "search_question": "If my question is in a different language than the documentation, how can I make the search use the documentation's language?",
+   "overlap": {
+    "question": {
+     "question_words": 16,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 18,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "in",
+      "question",
+      "s",
+      "the"
+     ],
+     "section_overlap": 9
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T13.F1",
+     "found": true,
+     "first_row": 23,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F2",
+     "found": true,
+     "first_row": 24,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F3",
+     "found": true,
+     "first_row": 24,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 23,
+   "rows": 63,
+   "paths": 9,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 38992,
+   "seconds": 13.588,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 293,
+     "eligible_rows": 293,
+     "selected_rows": 63,
+     "omitted_rows": 230,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      38,
+      38,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T13-en",
+   "topic_id": "T13",
+   "split": "holdout",
+   "lang": "en",
+   "question": "If my question is in a different language than the documentation, how can I make the search use the documentation's language?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 18,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "in",
+      "question",
+      "s",
+      "the"
+     ],
+     "section_overlap": 9
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T13.F1",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F2",
+     "found": true,
+     "first_row": 20,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F3",
+     "found": true,
+     "first_row": 20,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 19,
+   "rows": 66,
+   "paths": 10,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 40190,
+   "seconds": 18.362,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 66,
+     "omitted_rows": 190,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T14-ru",
+   "topic_id": "T14",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какая часть приложения управляет получением контекста проекта и что она делает?",
+   "search_question": "Which part of the application orchestrates project context retrieval, and what does it do?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 4,
+     "answer_words": [
+      "and",
+      "it",
+      "project",
+      "retrieval"
+     ],
+     "section_overlap": 6
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T14.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T14.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 13,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 39283,
+   "seconds": 12.699,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 293,
+     "eligible_rows": 293,
+     "selected_rows": 60,
+     "omitted_rows": 233,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      39,
+      39,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T14-en",
+   "topic_id": "T14",
+   "split": "holdout",
+   "lang": "en",
+   "question": "Which part of the application orchestrates project context retrieval, and what does it do?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 4,
+     "answer_words": [
+      "and",
+      "it",
+      "project",
+      "retrieval"
+     ],
+     "section_overlap": 6
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T14.F1",
+     "found": true,
+     "first_row": 36,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T14.F2",
+     "found": true,
+     "first_row": 36,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 36,
+   "rows": 60,
+   "paths": 14,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 41840,
+   "seconds": 18.639,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 60,
+     "omitted_rows": 196,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T15-ru",
+   "topic_id": "T15",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Почему пользователям OpenCode не стоит просто включить DOCATLAS_MCP_MODEL_VIEW=1?",
+   "search_question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 3
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T15.F1",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T15.F2",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 4,
+   "rows": 67,
+   "paths": 13,
+   "drawn_section_rows": 4,
+   "utf8_bytes": 39377,
+   "seconds": 8.29,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 96,
+     "eligible_rows": 94,
+     "selected_rows": 67,
+     "omitted_rows": 29,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      92,
+      92,
+      71
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T15-en",
+   "topic_id": "T15",
+   "split": "dev",
+   "lang": "en",
+   "question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T15.F1",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T15.F2",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 4,
+   "rows": 48,
+   "paths": 13,
+   "drawn_section_rows": 4,
+   "utf8_bytes": 29632,
+   "seconds": 4.269,
+   "limits": {
+    "reached": [],
+    "delivery": {
+     "budget_limited": false,
+     "reference_limited": false,
+     "candidate_rows": 71,
+     "eligible_rows": 69,
+     "selected_rows": 48,
+     "omitted_rows": 23,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      71,
+      71
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T16-ru",
+   "topic_id": "T16",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как проверить, что установленный маршрут OpenCode работает, не вызывая модель?",
+   "search_question": "How can I check that the installed OpenCode route works without calling a model?",
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 1,
+     "answer_words": [
+      "opencode"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "opencode",
+      "the"
+     ],
+     "section_overlap": 10
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T16.F1",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F2",
+     "found": true,
+     "first_row": 7,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F3",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 4,
+   "rows": 66,
+   "paths": 10,
+   "drawn_section_rows": 5,
+   "utf8_bytes": 38110,
+   "seconds": 12.872,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 295,
+     "eligible_rows": 295,
+     "selected_rows": 66,
+     "omitted_rows": 229,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      77,
+      77,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T16-en",
+   "topic_id": "T16",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How can I check that the installed OpenCode route works without calling a model?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "opencode",
+      "the"
+     ],
+     "section_overlap": 10
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T16.F1",
+     "found": true,
+     "first_row": 5,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F2",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F3",
+     "found": true,
+     "first_row": 9,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 5,
+   "rows": 59,
+   "paths": 12,
+   "drawn_section_rows": 5,
+   "utf8_bytes": 41163,
+   "seconds": 13.229,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 59,
+     "omitted_rows": 197,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T17-ru",
+   "topic_id": "T17",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как гибридный поиск в DocAtlas объединяет разные методы поиска?",
+   "search_question": "How does hybrid retrieval combine search methods in DocAtlas?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "hybrid",
+      "in",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T17.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 61,
+   "paths": 14,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 41109,
+   "seconds": 12.009,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 253,
+     "eligible_rows": 245,
+     "selected_rows": 61,
+     "omitted_rows": 192,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      115,
+      115,
+      239
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T17-en",
+   "topic_id": "T17",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How does hybrid retrieval combine search methods in DocAtlas?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "hybrid",
+      "in",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T17.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 62,
+   "paths": 13,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 40814,
+   "seconds": 17.518,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 239,
+     "eligible_rows": 231,
+     "selected_rows": 62,
+     "omitted_rows": 177,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      239,
+      239
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T18-ru",
+   "topic_id": "T18",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как DocAtlas находит, какие документы проекта нужно индексировать?",
+   "search_question": "How does DocAtlas discover which project documents to index?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 1,
+     "answer_words": [
+      "docatlas"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "docatlas",
+      "does",
+      "project"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T18.F1",
+     "found": true,
+     "first_row": 52,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T18.F2",
+     "found": true,
+     "first_row": 52,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 52,
+   "rows": 68,
+   "paths": 13,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 42108,
+   "seconds": 16.042,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 262,
+     "eligible_rows": 259,
+     "selected_rows": 68,
+     "omitted_rows": 194,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      107,
+      107,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T18-en",
+   "topic_id": "T18",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How does DocAtlas discover which project documents to index?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "docatlas",
+      "does",
+      "project"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T18.F1",
+     "found": true,
+     "first_row": 65,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T18.F2",
+     "found": true,
+     "first_row": 65,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 65,
+   "rows": 67,
+   "paths": 13,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 41198,
+   "seconds": 21.507,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 253,
+     "selected_rows": 67,
+     "omitted_rows": 189,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T19-ru",
+   "topic_id": "T19",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие команды DocAtlas используются для управления Qdrant?",
+   "search_question": "Which DocAtlas commands are used to manage Qdrant?",
+   "overlap": {
+    "question": {
+     "question_words": 7,
+     "answer_overlap": 2,
+     "answer_words": [
+      "docatlas",
+      "qdrant"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": {
+     "question_words": 8,
+     "answer_overlap": 2,
+     "answer_words": [
+      "docatlas",
+      "qdrant"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T19.F1",
+     "found": true,
+     "first_row": 48,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F2",
+     "found": true,
+     "first_row": 49,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F3",
+     "found": true,
+     "first_row": 49,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F4",
+     "found": true,
+     "first_row": 49,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 4,
+   "facts_total": 4,
+   "all_found": true,
+   "first_fact_row": 48,
+   "rows": 68,
+   "paths": 12,
+   "drawn_section_rows": 4,
+   "utf8_bytes": 40683,
+   "seconds": 18.35,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 241,
+     "eligible_rows": 237,
+     "selected_rows": 68,
+     "omitted_rows": 173,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      121,
+      121,
+      234
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T19-en",
+   "topic_id": "T19",
+   "split": "dev",
+   "lang": "en",
+   "question": "Which DocAtlas commands are used to manage Qdrant?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 2,
+     "answer_words": [
+      "docatlas",
+      "qdrant"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T19.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F4",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 4,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 63,
+   "paths": 13,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 41121,
+   "seconds": 13.004,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 234,
+     "eligible_rows": 230,
+     "selected_rows": 63,
+     "omitted_rows": 171,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      234,
+      234
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T20-ru",
+   "topic_id": "T20",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие команды или параметры есть для расширенного поиска?",
+   "search_question": "What commands or options are available for advanced retrieval?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "or",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T20.F1",
+     "found": true,
+     "first_row": 63,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F2",
+     "found": true,
+     "first_row": 63,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F3",
+     "found": true,
+     "first_row": 63,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 63,
+   "rows": 66,
+   "paths": 15,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 40929,
+   "seconds": 14.733,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 275,
+     "eligible_rows": 275,
+     "selected_rows": 66,
+     "omitted_rows": 209,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      19,
+      19,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T20-en",
+   "topic_id": "T20",
+   "split": "dev",
+   "lang": "en",
+   "question": "What commands or options are available for advanced retrieval?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "or",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T20.F1",
+     "found": true,
+     "first_row": 48,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F2",
+     "found": true,
+     "first_row": 48,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F3",
+     "found": true,
+     "first_row": 48,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 48,
+   "rows": 67,
+   "paths": 15,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 41565,
+   "seconds": 22.541,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 67,
+     "omitted_rows": 189,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T21-ru",
+   "topic_id": "T21",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие настройки конфигурации управляют загрузкой документации из интернета?",
+   "search_question": "Which configuration settings control fetching documentation from the web?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "fetching",
+      "web"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T21.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 66,
+   "paths": 14,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 40316,
+   "seconds": 9.079,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 260,
+     "eligible_rows": 260,
+     "selected_rows": 66,
+     "omitted_rows": 194,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      4,
+      4,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T21-en",
+   "topic_id": "T21",
+   "split": "dev",
+   "lang": "en",
+   "question": "Which configuration settings control fetching documentation from the web?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "fetching",
+      "web"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T21.F1",
+     "found": true,
+     "first_row": 11,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F2",
+     "found": true,
+     "first_row": 11,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F3",
+     "found": true,
+     "first_row": 11,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 11,
+   "rows": 67,
+   "paths": 12,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 40581,
+   "seconds": 14.411,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 67,
+     "omitted_rows": 189,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T22-ru",
+   "topic_id": "T22",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какие параметры конфигурации влияют на работу MCP-сервера во время выполнения?",
+   "search_question": "Which configuration options affect the MCP server at runtime?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T22.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 69,
+   "paths": 15,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 41621,
+   "seconds": 16.276,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 286,
+     "eligible_rows": 285,
+     "selected_rows": 69,
+     "omitted_rows": 217,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      140,
+      140,
+      256
+     ],
+     "ceiling_lanes": 1,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T22-en",
+   "topic_id": "T22",
+   "split": "holdout",
+   "lang": "en",
+   "question": "Which configuration options affect the MCP server at runtime?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T22.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 69,
+   "paths": 13,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 39759,
+   "seconds": 15.301,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 256,
+     "eligible_rows": 256,
+     "selected_rows": 69,
+     "omitted_rows": 187,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T23-ru",
+   "topic_id": "T23",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как обновить уже добавленные источники документации?",
+   "search_question": "How do I update documentation sources that were already added?",
+   "overlap": {
+    "question": {
+     "question_words": 6,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 10,
+     "answer_overlap": 2,
+     "answer_words": [
+      "sources",
+      "update"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T23.F1",
+     "found": true,
+     "first_row": 51,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T23.F2",
+     "found": true,
+     "first_row": 51,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 51,
+   "rows": 64,
+   "paths": 12,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 39642,
+   "seconds": 9.31,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 233,
+     "eligible_rows": 206,
+     "selected_rows": 64,
+     "omitted_rows": 169,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      25,
+      25,
+      209
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T23-en",
+   "topic_id": "T23",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How do I update documentation sources that were already added?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 2,
+     "answer_words": [
+      "sources",
+      "update"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T23.F1",
+     "found": true,
+     "first_row": 12,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T23.F2",
+     "found": true,
+     "first_row": 12,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 12,
+   "rows": 64,
+   "paths": 14,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 41666,
+   "seconds": 10.491,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 209,
+     "eligible_rows": 182,
+     "selected_rows": 64,
+     "omitted_rows": 145,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      209,
+      209
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T24-ru",
+   "topic_id": "T24",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие расширенные типы источников поддерживают MCP-пакеты?",
+   "search_question": "What advanced source types do MCP packs support?",
+   "overlap": {
+    "question": {
+     "question_words": 7,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 6
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T24.F1",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F2",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F3",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F4",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F5",
+     "found": true,
+     "first_row": 6,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 5,
+   "facts_total": 5,
+   "all_found": true,
+   "first_fact_row": 6,
+   "rows": 62,
+   "paths": 15,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 40935,
+   "seconds": 12.7,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 254,
+     "eligible_rows": 243,
+     "selected_rows": 62,
+     "omitted_rows": 192,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      139,
+      139,
+      251
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L0",
+   "case_id": "T24-en",
+   "topic_id": "T24",
+   "split": "dev",
+   "lang": "en",
+   "question": "What advanced source types do MCP packs support?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 6
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T24.F1",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F2",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F3",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F4",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F5",
+     "found": true,
+     "first_row": 2,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 5,
+   "facts_total": 5,
+   "all_found": true,
+   "first_fact_row": 2,
+   "rows": 66,
+   "paths": 14,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 41113,
+   "seconds": 13.528,
+   "limits": {
+    "reached": [
+     "output_budget"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 251,
+     "eligible_rows": 240,
+     "selected_rows": 66,
+     "omitted_rows": 185,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      251,
+      251
+     ],
+     "ceiling_lanes": 0,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T01-ru",
+   "topic_id": "T01",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+   "search_question": "What is expected of me when I submit a pull request to DocAtlas?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T01.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 48,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44109,
+   "seconds": 64.69,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 468,
+     "eligible_rows": 468,
+     "selected_rows": 60,
+     "omitted_rows": 408,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T01-en",
+   "topic_id": "T01",
+   "split": "dev",
+   "lang": "en",
+   "question": "What is expected of me when I submit a pull request to DocAtlas?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T01.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T01.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 61,
+   "paths": 47,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44084,
+   "seconds": 33.896,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 243,
+     "eligible_rows": 243,
+     "selected_rows": 61,
+     "omitted_rows": 182,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T02-ru",
+   "topic_id": "T02",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Как безопасно очистить индекс DocAtlas, не удалив данные, которые ещё нужны?",
+   "search_question": "How can I safely clean up the DocAtlas index without deleting data I still need?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "can",
+      "index"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T02.F1",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F2",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F3",
+     "found": true,
+     "first_row": 8,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 8,
+   "rows": 56,
+   "paths": 43,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 44377,
+   "seconds": 59.454,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 490,
+     "eligible_rows": 490,
+     "selected_rows": 56,
+     "omitted_rows": 434,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T02-en",
+   "topic_id": "T02",
+   "split": "dev",
+   "lang": "en",
+   "question": "How can I safely clean up the DocAtlas index without deleting data I still need?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "can",
+      "index"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T02.F1",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F2",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T02.F3",
+     "found": true,
+     "first_row": 4,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 4,
+   "rows": 58,
+   "paths": 43,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 44263,
+   "seconds": 31.756,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 237,
+     "eligible_rows": 237,
+     "selected_rows": 58,
+     "omitted_rows": 179,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T03-ru",
+   "topic_id": "T03",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие документы описывают работу с MCP и с документацией проекта?",
+   "search_question": "Which documents describe the MCP and project documentation workflows?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 1,
+     "answer_words": [
+      "mcp"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "mcp",
+      "project"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T03.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 54,
+   "paths": 43,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44491,
+   "seconds": 58.058,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 485,
+     "eligible_rows": 485,
+     "selected_rows": 54,
+     "omitted_rows": 431,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T03-en",
+   "topic_id": "T03",
+   "split": "dev",
+   "lang": "en",
+   "question": "Which documents describe the MCP and project documentation workflows?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "mcp",
+      "project"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T03.F1",
+     "found": true,
+     "first_row": 36,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F2",
+     "found": true,
+     "first_row": 37,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T03.F3",
+     "found": true,
+     "first_row": 37,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 36,
+   "rows": 63,
+   "paths": 45,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 43875,
+   "seconds": 34.739,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 250,
+     "eligible_rows": 250,
+     "selected_rows": 63,
+     "omitted_rows": 187,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T04-ru",
+   "topic_id": "T04",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Где найти документацию об оценке качества и исследованиях?",
+   "search_question": "Where can I find the documentation about evaluation and research?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 10,
+     "answer_overlap": 1,
+     "answer_words": [
+      "research"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T04.F1",
+     "found": true,
+     "first_row": 33,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F2",
+     "found": true,
+     "first_row": 33,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F3",
+     "found": true,
+     "first_row": 33,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 33,
+   "rows": 58,
+   "paths": 44,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 44190,
+   "seconds": 53.224,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 487,
+     "eligible_rows": 487,
+     "selected_rows": 58,
+     "omitted_rows": 429,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T04-en",
+   "topic_id": "T04",
+   "split": "dev",
+   "lang": "en",
+   "question": "Where can I find the documentation about evaluation and research?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 1,
+     "answer_words": [
+      "research"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T04.F1",
+     "found": true,
+     "first_row": 7,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F2",
+     "found": true,
+     "first_row": 7,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T04.F3",
+     "found": true,
+     "first_row": 7,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 7,
+   "rows": 59,
+   "paths": 40,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 44038,
+   "seconds": 32.598,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 231,
+     "eligible_rows": 231,
+     "selected_rows": 59,
+     "omitted_rows": 172,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T05-ru",
+   "topic_id": "T05",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Что проверяет верификация привязанной к проекту интеграции с OpenCode и чего она не доказывает?",
+   "search_question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?",
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 1,
+     "answer_words": [
+      "opencode"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 5,
+     "answer_words": [
+      "and",
+      "not",
+      "opencode",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T05.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T05.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 55,
+   "paths": 41,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43651,
+   "seconds": 60.399,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 494,
+     "eligible_rows": 494,
+     "selected_rows": 55,
+     "omitted_rows": 439,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T05-en",
+   "topic_id": "T05",
+   "split": "dev",
+   "lang": "en",
+   "question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 5,
+     "answer_words": [
+      "and",
+      "not",
+      "opencode",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T05.F1",
+     "found": true,
+     "first_row": 16,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T05.F2",
+     "found": true,
+     "first_row": 16,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 16,
+   "rows": 68,
+   "paths": 42,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 43529,
+   "seconds": 34.152,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 241,
+     "eligible_rows": 241,
+     "selected_rows": 68,
+     "omitted_rows": 173,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T06-ru",
+   "topic_id": "T06",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какой путь по умолчанию проходит DocAtlas, когда агент спрашивает о документации?",
+   "search_question": "What is the default flow DocAtlas follows when an agent asks about documentation?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 1,
+     "answer_words": [
+      "when"
+     ],
+     "section_overlap": 6
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T06.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 1,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 61,
+   "paths": 43,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43523,
+   "seconds": 63.298,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 499,
+     "eligible_rows": 499,
+     "selected_rows": 61,
+     "omitted_rows": 438,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T06-en",
+   "topic_id": "T06",
+   "split": "holdout",
+   "lang": "en",
+   "question": "What is the default flow DocAtlas follows when an agent asks about documentation?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 1,
+     "answer_words": [
+      "when"
+     ],
+     "section_overlap": 6
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T06.F1",
+     "found": true,
+     "first_row": 41,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 1,
+   "facts_total": 1,
+   "all_found": true,
+   "first_fact_row": 41,
+   "rows": 66,
+   "paths": 37,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 42765,
+   "seconds": 34.759,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 243,
+     "eligible_rows": 243,
+     "selected_rows": 66,
+     "omitted_rows": 177,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T07-ru",
+   "topic_id": "T07",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какие гарантии и ограничения безопасности есть у DocAtlas?",
+   "search_question": "What security guarantees and limits does DocAtlas have?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 8,
+     "answer_overlap": 1,
+     "answer_words": [
+      "and"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T07.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T07.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 43,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43601,
+   "seconds": 63.021,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 482,
+     "eligible_rows": 482,
+     "selected_rows": 60,
+     "omitted_rows": 422,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T07-en",
+   "topic_id": "T07",
+   "split": "holdout",
+   "lang": "en",
+   "question": "What security guarantees and limits does DocAtlas have?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 1,
+     "answer_words": [
+      "and"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T07.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T07.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 63,
+   "paths": 46,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43297,
+   "seconds": 45.73,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 233,
+     "eligible_rows": 233,
+     "selected_rows": 63,
+     "omitted_rows": 170,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T08-ru",
+   "topic_id": "T08",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Каков текущий статус решения сначала читать контекст проекта (ADR 0003)?",
+   "search_question": "What is the current status of the decision to read project context first (ADR 0003)?",
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T08.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 1,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 54,
+   "paths": 32,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43195,
+   "seconds": 63.477,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 470,
+     "eligible_rows": 470,
+     "selected_rows": 54,
+     "omitted_rows": 416,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T08-en",
+   "topic_id": "T08",
+   "split": "holdout",
+   "lang": "en",
+   "question": "What is the current status of the decision to read project context first (ADR 0003)?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T08.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 1,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 41,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43382,
+   "seconds": 45.576,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 243,
+     "eligible_rows": 243,
+     "selected_rows": 60,
+     "omitted_rows": 183,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T09-ru",
+   "topic_id": "T09",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как DocAtlas возвращает дословный фрагмент тела документа вместо всего документа?",
+   "search_question": "How does DocAtlas return a literal fragment of a document body instead of the whole document?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "literal",
+      "of",
+      "the",
+      "whole"
+     ],
+     "section_overlap": 8
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T09.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 62,
+   "paths": 43,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43272,
+   "seconds": 84.178,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 504,
+     "eligible_rows": 504,
+     "selected_rows": 62,
+     "omitted_rows": 442,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T09-en",
+   "topic_id": "T09",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How does DocAtlas return a literal fragment of a document body instead of the whole document?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "literal",
+      "of",
+      "the",
+      "whole"
+     ],
+     "section_overlap": 8
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T09.F1",
+     "found": true,
+     "first_row": 35,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F2",
+     "found": true,
+     "first_row": 36,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T09.F3",
+     "found": true,
+     "first_row": 16,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 16,
+   "rows": 56,
+   "paths": 37,
+   "drawn_section_rows": 5,
+   "utf8_bytes": 43498,
+   "seconds": 29.93,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 250,
+     "eligible_rows": 250,
+     "selected_rows": 56,
+     "omitted_rows": 194,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T10-ru",
+   "topic_id": "T10",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какой публичный сценарий предлагается для сравнения запусков с выключенным и включённым логированием?",
+   "search_question": "What public scenario is proposed for comparing runs with logging turned off and on?",
+   "overlap": {
+    "question": {
+     "question_words": 12,
+     "answer_overlap": 3,
+     "answer_words": [
+      "и",
+      "публичный",
+      "с"
+     ],
+     "section_overlap": 6
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "off",
+      "on"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T10.F1",
+     "found": true,
+     "first_row": 44,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F2",
+     "found": true,
+     "first_row": 47,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F3",
+     "found": true,
+     "first_row": 49,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 44,
+   "rows": 57,
+   "paths": 32,
+   "drawn_section_rows": 12,
+   "utf8_bytes": 42069,
+   "seconds": 62.755,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 487,
+     "eligible_rows": 487,
+     "selected_rows": 57,
+     "omitted_rows": 430,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T10-en",
+   "topic_id": "T10",
+   "split": "dev",
+   "lang": "en",
+   "question": "What public scenario is proposed for comparing runs with logging turned off and on?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "off",
+      "on"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T10.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T10.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 56,
+   "paths": 31,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43247,
+   "seconds": 31.541,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 247,
+     "eligible_rows": 247,
+     "selected_rows": 56,
+     "omitted_rows": 191,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T11-ru",
+   "topic_id": "T11",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какие события пишутся в лог основного потока и где проходят его границы?",
+   "search_question": "Which events are written to the main flow log, and where are its boundaries?",
+   "overlap": {
+    "question": {
+     "question_words": 12,
+     "answer_overlap": 1,
+     "answer_words": [
+      "и"
+     ],
+     "section_overlap": 5
+    },
+    "search_question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T11.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 61,
+   "paths": 45,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 44090,
+   "seconds": 57.331,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 501,
+     "eligible_rows": 501,
+     "selected_rows": 61,
+     "omitted_rows": 440,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T11-en",
+   "topic_id": "T11",
+   "split": "holdout",
+   "lang": "en",
+   "question": "Which events are written to the main flow log, and where are its boundaries?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 13,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T11.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T11.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 62,
+   "paths": 44,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44000,
+   "seconds": 31.835,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 249,
+     "eligible_rows": 249,
+     "selected_rows": 62,
+     "omitted_rows": 187,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T12-ru",
+   "topic_id": "T12",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Как MCP-сервер документации работает с собственной документацией проекта?",
+   "search_question": "How does the docs MCP server handle a project's own documentation?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 12,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "docs",
+      "documentation",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T12.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 58,
+   "paths": 44,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44204,
+   "seconds": 59.09,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 508,
+     "eligible_rows": 508,
+     "selected_rows": 58,
+     "omitted_rows": 450,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T12-en",
+   "topic_id": "T12",
+   "split": "dev",
+   "lang": "en",
+   "question": "How does the docs MCP server handle a project's own documentation?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 12,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "docs",
+      "documentation",
+      "project",
+      "the"
+     ],
+     "section_overlap": 7
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T12.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T12.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 67,
+   "paths": 40,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 42518,
+   "seconds": 32.051,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 255,
+     "eligible_rows": 255,
+     "selected_rows": 67,
+     "omitted_rows": 188,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T13-ru",
+   "topic_id": "T13",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Если мой вопрос написан не на том языке, что документация, как сделать, чтобы поиск шёл на языке документации?",
+   "search_question": "If my question is in a different language than the documentation, how can I make the search use the documentation's language?",
+   "overlap": {
+    "question": {
+     "question_words": 16,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 18,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "in",
+      "question",
+      "s",
+      "the"
+     ],
+     "section_overlap": 9
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T13.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 59,
+   "paths": 40,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43362,
+   "seconds": 54.158,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 502,
+     "eligible_rows": 502,
+     "selected_rows": 59,
+     "omitted_rows": 443,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T13-en",
+   "topic_id": "T13",
+   "split": "holdout",
+   "lang": "en",
+   "question": "If my question is in a different language than the documentation, how can I make the search use the documentation's language?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 18,
+     "answer_overlap": 5,
+     "answer_words": [
+      "a",
+      "in",
+      "question",
+      "s",
+      "the"
+     ],
+     "section_overlap": 9
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T13.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T13.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 32,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43156,
+   "seconds": 31.22,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 246,
+     "eligible_rows": 246,
+     "selected_rows": 60,
+     "omitted_rows": 186,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T14-ru",
+   "topic_id": "T14",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какая часть приложения управляет получением контекста проекта и что она делает?",
+   "search_question": "Which part of the application orchestrates project context retrieval, and what does it do?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 4,
+     "answer_words": [
+      "and",
+      "it",
+      "project",
+      "retrieval"
+     ],
+     "section_overlap": 6
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T14.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T14.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 57,
+   "paths": 47,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43869,
+   "seconds": 58.116,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 496,
+     "eligible_rows": 496,
+     "selected_rows": 57,
+     "omitted_rows": 439,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T14-en",
+   "topic_id": "T14",
+   "split": "holdout",
+   "lang": "en",
+   "question": "Which part of the application orchestrates project context retrieval, and what does it do?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 4,
+     "answer_words": [
+      "and",
+      "it",
+      "project",
+      "retrieval"
+     ],
+     "section_overlap": 6
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T14.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T14.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 41,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43683,
+   "seconds": 30.6,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 242,
+     "eligible_rows": 242,
+     "selected_rows": 60,
+     "omitted_rows": 182,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T15-ru",
+   "topic_id": "T15",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Почему пользователям OpenCode не стоит просто включить DOCATLAS_MCP_MODEL_VIEW=1?",
+   "search_question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 3
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T15.F1",
+     "found": true,
+     "first_row": 17,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T15.F2",
+     "found": true,
+     "first_row": 17,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 17,
+   "rows": 56,
+   "paths": 42,
+   "drawn_section_rows": 4,
+   "utf8_bytes": 43851,
+   "seconds": 39.729,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 328,
+     "eligible_rows": 328,
+     "selected_rows": 56,
+     "omitted_rows": 272,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T15-en",
+   "topic_id": "T15",
+   "split": "dev",
+   "lang": "en",
+   "question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T15.F1",
+     "found": true,
+     "first_row": 24,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T15.F2",
+     "found": true,
+     "first_row": 24,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 24,
+   "rows": 66,
+   "paths": 44,
+   "drawn_section_rows": 4,
+   "utf8_bytes": 42703,
+   "seconds": 32.925,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 247,
+     "eligible_rows": 247,
+     "selected_rows": 66,
+     "omitted_rows": 181,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T16-ru",
+   "topic_id": "T16",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как проверить, что установленный маршрут OpenCode работает, не вызывая модель?",
+   "search_question": "How can I check that the installed OpenCode route works without calling a model?",
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 1,
+     "answer_words": [
+      "opencode"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "opencode",
+      "the"
+     ],
+     "section_overlap": 10
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T16.F1",
+     "found": true,
+     "first_row": 43,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F2",
+     "found": true,
+     "first_row": 46,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F3",
+     "found": true,
+     "first_row": 47,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 43,
+   "rows": 51,
+   "paths": 42,
+   "drawn_section_rows": 5,
+   "utf8_bytes": 44539,
+   "seconds": 58.687,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 485,
+     "eligible_rows": 485,
+     "selected_rows": 51,
+     "omitted_rows": 434,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T16-en",
+   "topic_id": "T16",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How can I check that the installed OpenCode route works without calling a model?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 14,
+     "answer_overlap": 2,
+     "answer_words": [
+      "opencode",
+      "the"
+     ],
+     "section_overlap": 10
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T16.F1",
+     "found": true,
+     "first_row": 9,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F2",
+     "found": true,
+     "first_row": 12,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T16.F3",
+     "found": true,
+     "first_row": 13,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 9,
+   "rows": 65,
+   "paths": 40,
+   "drawn_section_rows": 5,
+   "utf8_bytes": 42831,
+   "seconds": 40.455,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 246,
+     "eligible_rows": 246,
+     "selected_rows": 65,
+     "omitted_rows": 181,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T17-ru",
+   "topic_id": "T17",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как гибридный поиск в DocAtlas объединяет разные методы поиска?",
+   "search_question": "How does hybrid retrieval combine search methods in DocAtlas?",
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "hybrid",
+      "in",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T17.F1",
+     "found": true,
+     "first_row": 49,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 1,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": 49,
+   "rows": 57,
+   "paths": 41,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 43990,
+   "seconds": 69.904,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 495,
+     "eligible_rows": 495,
+     "selected_rows": 57,
+     "omitted_rows": 438,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T17-en",
+   "topic_id": "T17",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How does hybrid retrieval combine search methods in DocAtlas?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "hybrid",
+      "in",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T17.F1",
+     "found": true,
+     "first_row": 14,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T17.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 1,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": 14,
+   "rows": 60,
+   "paths": 38,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 44016,
+   "seconds": 35.61,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 245,
+     "eligible_rows": 245,
+     "selected_rows": 60,
+     "omitted_rows": 185,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T18-ru",
+   "topic_id": "T18",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как DocAtlas находит, какие документы проекта нужно индексировать?",
+   "search_question": "How does DocAtlas discover which project documents to index?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 1,
+     "answer_words": [
+      "docatlas"
+     ],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "docatlas",
+      "does",
+      "project"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T18.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T18.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 64,
+   "paths": 44,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43226,
+   "seconds": 68.666,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 495,
+     "eligible_rows": 495,
+     "selected_rows": 64,
+     "omitted_rows": 431,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T18-en",
+   "topic_id": "T18",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How does DocAtlas discover which project documents to index?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 3,
+     "answer_words": [
+      "docatlas",
+      "does",
+      "project"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T18.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T18.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 66,
+   "paths": 43,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43217,
+   "seconds": 43.735,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 243,
+     "eligible_rows": 243,
+     "selected_rows": 66,
+     "omitted_rows": 177,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T19-ru",
+   "topic_id": "T19",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие команды DocAtlas используются для управления Qdrant?",
+   "search_question": "Which DocAtlas commands are used to manage Qdrant?",
+   "overlap": {
+    "question": {
+     "question_words": 7,
+     "answer_overlap": 2,
+     "answer_words": [
+      "docatlas",
+      "qdrant"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": {
+     "question_words": 8,
+     "answer_overlap": 2,
+     "answer_words": [
+      "docatlas",
+      "qdrant"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T19.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F4",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 4,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 56,
+   "paths": 44,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44413,
+   "seconds": 59.06,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 429,
+     "eligible_rows": 429,
+     "selected_rows": 56,
+     "omitted_rows": 373,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T19-en",
+   "topic_id": "T19",
+   "split": "dev",
+   "lang": "en",
+   "question": "Which DocAtlas commands are used to manage Qdrant?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 2,
+     "answer_words": [
+      "docatlas",
+      "qdrant"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T19.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T19.F4",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 4,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 61,
+   "paths": 41,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 42445,
+   "seconds": 35.183,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 246,
+     "eligible_rows": 246,
+     "selected_rows": 61,
+     "omitted_rows": 185,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T20-ru",
+   "topic_id": "T20",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие команды или параметры есть для расширенного поиска?",
+   "search_question": "What commands or options are available for advanced retrieval?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "or",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T20.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 47,
+   "paths": 39,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44866,
+   "seconds": 55.642,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 491,
+     "eligible_rows": 491,
+     "selected_rows": 47,
+     "omitted_rows": 444,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T20-en",
+   "topic_id": "T20",
+   "split": "dev",
+   "lang": "en",
+   "question": "What commands or options are available for advanced retrieval?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "or",
+      "retrieval"
+     ],
+     "section_overlap": 4
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T20.F1",
+     "found": true,
+     "first_row": 62,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F2",
+     "found": true,
+     "first_row": 62,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T20.F3",
+     "found": true,
+     "first_row": 62,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 62,
+   "rows": 63,
+   "paths": 41,
+   "drawn_section_rows": 2,
+   "utf8_bytes": 43920,
+   "seconds": 31.666,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 237,
+     "eligible_rows": 237,
+     "selected_rows": 63,
+     "omitted_rows": 174,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T21-ru",
+   "topic_id": "T21",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие настройки конфигурации управляют загрузкой документации из интернета?",
+   "search_question": "Which configuration settings control fetching documentation from the web?",
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "fetching",
+      "web"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T21.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 59,
+   "paths": 47,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43575,
+   "seconds": 56.344,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 506,
+     "eligible_rows": 506,
+     "selected_rows": 59,
+     "omitted_rows": 447,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T21-en",
+   "topic_id": "T21",
+   "split": "dev",
+   "lang": "en",
+   "question": "Which configuration settings control fetching documentation from the web?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 2,
+     "answer_words": [
+      "fetching",
+      "web"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T21.F1",
+     "found": true,
+     "first_row": 29,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F2",
+     "found": true,
+     "first_row": 29,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T21.F3",
+     "found": true,
+     "first_row": 29,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 3,
+   "facts_total": 3,
+   "all_found": true,
+   "first_fact_row": 29,
+   "rows": 66,
+   "paths": 45,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 43640,
+   "seconds": 34.992,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 251,
+     "eligible_rows": 251,
+     "selected_rows": 66,
+     "omitted_rows": 185,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T22-ru",
+   "topic_id": "T22",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Какие параметры конфигурации влияют на работу MCP-сервера во время выполнения?",
+   "search_question": "Which configuration options affect the MCP server at runtime?",
+   "overlap": {
+    "question": {
+     "question_words": 11,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 9,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 3
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T22.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 60,
+   "paths": 48,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44053,
+   "seconds": 66.711,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 485,
+     "eligible_rows": 485,
+     "selected_rows": 60,
+     "omitted_rows": 425,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T22-en",
+   "topic_id": "T22",
+   "split": "holdout",
+   "lang": "en",
+   "question": "Which configuration options affect the MCP server at runtime?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 9,
+     "answer_overlap": 1,
+     "answer_words": [
+      "the"
+     ],
+     "section_overlap": 3
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T22.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T22.F3",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 3,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 66,
+   "paths": 47,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 43750,
+   "seconds": 41.737,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 253,
+     "eligible_rows": 253,
+     "selected_rows": 66,
+     "omitted_rows": 187,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T23-ru",
+   "topic_id": "T23",
+   "split": "holdout",
+   "lang": "ru",
+   "question": "Как обновить уже добавленные источники документации?",
+   "search_question": "How do I update documentation sources that were already added?",
+   "overlap": {
+    "question": {
+     "question_words": 6,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 0
+    },
+    "search_question": {
+     "question_words": 10,
+     "answer_overlap": 2,
+     "answer_words": [
+      "sources",
+      "update"
+     ],
+     "section_overlap": 2
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T23.F1",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T23.F2",
+     "found": false,
+     "first_row": null,
+     "in_one_row": null,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 0,
+   "facts_total": 2,
+   "all_found": false,
+   "first_fact_row": null,
+   "rows": 61,
+   "paths": 47,
+   "drawn_section_rows": 0,
+   "utf8_bytes": 44011,
+   "seconds": 63.731,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 500,
+     "eligible_rows": 500,
+     "selected_rows": 61,
+     "omitted_rows": 439,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T23-en",
+   "topic_id": "T23",
+   "split": "holdout",
+   "lang": "en",
+   "question": "How do I update documentation sources that were already added?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 10,
+     "answer_overlap": 2,
+     "answer_words": [
+      "sources",
+      "update"
+     ],
+     "section_overlap": 2
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T23.F1",
+     "found": true,
+     "first_row": 45,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T23.F2",
+     "found": true,
+     "first_row": 45,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 2,
+   "facts_total": 2,
+   "all_found": true,
+   "first_fact_row": 45,
+   "rows": 63,
+   "paths": 44,
+   "drawn_section_rows": 1,
+   "utf8_bytes": 43551,
+   "seconds": 33.118,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 246,
+     "eligible_rows": 246,
+     "selected_rows": 63,
+     "omitted_rows": 183,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T24-ru",
+   "topic_id": "T24",
+   "split": "dev",
+   "lang": "ru",
+   "question": "Какие расширенные типы источников поддерживают MCP-пакеты?",
+   "search_question": "What advanced source types do MCP packs support?",
+   "overlap": {
+    "question": {
+     "question_words": 7,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 1
+    },
+    "search_question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 6
+    }
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T24.F1",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F2",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F3",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F4",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F5",
+     "found": true,
+     "first_row": 19,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 5,
+   "facts_total": 5,
+   "all_found": true,
+   "first_fact_row": 19,
+   "rows": 53,
+   "paths": 38,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 43985,
+   "seconds": 48.517,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 453,
+     "eligible_rows": 453,
+     "selected_rows": 53,
+     "omitted_rows": 400,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 3,
+     "sql_rows": [
+      256,
+      256,
+      256
+     ],
+     "ceiling_lanes": 3,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  },
+  {
+   "corpus": "L2",
+   "case_id": "T24-en",
+   "topic_id": "T24",
+   "split": "dev",
+   "lang": "en",
+   "question": "What advanced source types do MCP packs support?",
+   "search_question": null,
+   "overlap": {
+    "question": {
+     "question_words": 8,
+     "answer_overlap": 0,
+     "answer_words": [],
+     "section_overlap": 6
+    },
+    "search_question": null
+   },
+   "anomalies": [],
+   "lost": null,
+   "facts": [
+    {
+     "fact_id": "T24.F1",
+     "found": true,
+     "first_row": 5,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F2",
+     "found": true,
+     "first_row": 5,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F3",
+     "found": true,
+     "first_row": 5,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F4",
+     "found": true,
+     "first_row": 5,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    },
+    {
+     "fact_id": "T24.F5",
+     "found": true,
+     "first_row": 5,
+     "in_one_row": true,
+     "candidate_rank": null,
+     "in_candidates": null
+    }
+   ],
+   "facts_found": 5,
+   "facts_total": 5,
+   "all_found": true,
+   "first_fact_row": 5,
+   "rows": 55,
+   "paths": 44,
+   "drawn_section_rows": 3,
+   "utf8_bytes": 43924,
+   "seconds": 30.294,
+   "limits": {
+    "reached": [
+     "output_budget",
+     "candidate_ceiling"
+    ],
+    "delivery": {
+     "budget_limited": true,
+     "reference_limited": false,
+     "candidate_rows": 242,
+     "eligible_rows": 242,
+     "selected_rows": 55,
+     "omitted_rows": 187,
+     "status": "truncated"
+    },
+    "acquisition": {
+     "lanes": 2,
+     "sql_rows": [
+      256,
+      256
+     ],
+     "ceiling_lanes": 2,
+     "resource_skipped_rows": 0
+    },
+    "discovery": {
+     "catalog_reads": 3,
+     "truncated": false
+    }
+   }
+  }
+ ]
+}
