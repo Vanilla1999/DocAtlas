@@ -1,0 +1,11 @@
+{
+  "sable/docs/switches.md": "# SableMirror\n\n## Capture\n\nSet body.capture=false on a sandbox mirror to omit payload bodies.\nMessage identifiers remain in the audit log.\n\n## Defaults\n\nThe default batch size is 23 records.\n",
+  "sable/docs/production.md": "# Production rules\n\n## Capture restriction\n\nProduction mirrors must keep body.capture=true.\nThe sandbox switch is not an exception to the production requirement.\n\n## Restore prerequisites\n\nSuspend ingress before restoring a production checkpoint.\nConfirm that the retained journal reaches the checkpoint sequence.\n",
+  "sable/docs/restore.md": "# Checkpoint restore\n\n## Procedure\n\nRun sable load CHECKPOINT to restore its state.\nAfter loading, run sable replay before enabling ingress again.\n",
+  "nacre/docs/cache.md": "# Nacre cache\n\n## Shared mode\n\nConfigure cache.endpoint with the shared service address.\nThe access credential must belong to the configured workspace.\n",
+  "nacre/docs/security.md": "# Security\n\n## Shared cache signing\n\nA shared-cache write requires an active signing key.\nStore signing keys only in the OS credential vault, never in nacre.toml.\n",
+  "nacre/docs/config.md": "# Configuration\n\n## Priority\n\nCommand-line flags override environment values, which override nacre.toml, which overrides machine defaults.\n\n## Secret storage\n\nPrivate file permissions do not allow a signing key in nacre.toml; use the OS credential vault.\n",
+  "moss/docs/v1.md": "# Moss version 1\n\nThe default retry count in version 1 is 3.\n",
+  "moss/docs/v2.md": "# Moss version 2\n\nThe default retry count in version 2 is 6.\n",
+  "misc/docs/colors.md": "# Console colors\n\nThe preview theme supports teal and amber.\nDisabling color does not disable security logging.\n"
+}

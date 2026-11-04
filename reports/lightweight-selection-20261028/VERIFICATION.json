@@ -1,0 +1,26 @@
+{
+  "base_main": "439815771b96edc77a12f42f90f1fecb35f5e5d7",
+  "tested_model_head": "9f838b13205f93ca503680bd5aaa0bb684072de0",
+  "tested_baseline_head": "00351b813bd0099b2fe70f606b7eca81fe272921",
+  "same_product_hashes": true,
+  "product_sha256": {
+    "docs/application/section_compression.py": "6627e2bafb490a355c1d22b62dada812d786edf2e360855e19a741c135c8d249",
+    "docs/application/lightweight_selection.py": "54821f90deb46f8a57bda60104a1d367f81f960b93a3c5b920e257c2c7ed5b4e"
+  },
+  "archives": [
+    {"artifact_id":12830841320,"file":"lightweight-baseline-40715953536.zip","sha256":"eadda52d070ae9612df51ef4d04dba56b216c0ce947b336dab15504cea72c870"},
+    {"artifact_id":12832485963,"file":"lightweight-qwen-select-40717353891.zip","sha256":"df84e7de53bf38067c2a06f2665fdd91f2df0a17c2ab6e7fc1028bf1d75547b8"},
+    {"artifact_id":12833035353,"file":"lightweight-qwen-rerank-40717353891.zip","sha256":"31c48062ea22d254a4f97691f9d90323ae831e9d110c3927dd3a537cce352628"}
+  ],
+  "public_context_calls":470,
+  "independent_audit_replies":470,
+  "live_checks":"installed wheel, actual stdio MCP / SQLite / real inference; unchanged source and logical DB state asserted live",
+  "offline_checks":"ZIP digest, exact product and fixture hashes, original quotes / V40 spans, provenance subset, independent o200k BPE recount, paired comparison and saved fallback/OFF controls",
+  "not_reexecuted_offline":"MCP, model inference and SQLite mutation checks",
+  "paid_calls":0,
+  "provider_usage":null,
+  "paid_access":"BLOCKED_NOT_CONFIGURED",
+  "generalization":"known V40/L10 plus same-author exploratory fresh set, not blind human-independent acceptance",
+  "peak_memory_policy":"raw memory.peak reported without tolerance; no OOM reported separately; temporary kernel overshoot is not an OOM event",
+  "kernel_memory_reference":"https://docs.kernel.org/admin-guide/cgroup-v2.html#memory"
+}

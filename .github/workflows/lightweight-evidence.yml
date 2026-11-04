@@ -1,0 +1,100 @@
+name: Main-based lightweight selectors under hard 1.5 GB (measurement)
+on:
+  push:
+    branches: [experiment/lightweight-main-20261028]
+    paths:
+      - 'docmancer/docs/application/lightweight_selection.py'
+      - 'docmancer/docs/application/section_compression.py'
+      - 'eval/lightweight_evidence/**'
+      - '.github/workflows/lightweight-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: lightweight-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        # Runtime-only fixes reuse an unchanged already-running baseline.
+        # Manual dispatch and all ordinary product commits run every arm.
+        group: ${{ contains(github.event.head_commit.message, '[runtime-only]') && fromJSON('["qwen-rerank","qwen-select"]') || fromJSON('["baseline","qwen-rerank","qwen-select"]') }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Freeze main contract and evaluation input before inference
+        run: |
+          set -euo pipefail
+          git fetch -q origin 439815771b96edc77a12f42f90f1fecb35f5e5d7 --depth=1
+          git diff --exit-code 439815771b96edc77a12f42f90f1fecb35f5e5d7 HEAD -- pyproject.toml uv.lock eval/prepared_model_comparison40
+          mkdir -p "$RUNNER_TEMP/evidence" "$RUNNER_TEMP/model" "$RUNNER_TEMP/runtime"
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence/head.txt"
+          git archive HEAD docmancer eval/lightweight_evidence .github/workflows/lightweight-evidence.yml | gzip > "$RUNNER_TEMP/evidence/tested-source.tar.gz"
+          python3 -m compileall -q docmancer eval/lightweight_evidence
+      - name: Provision at most one small model, not during requests
+        if: matrix.group != 'baseline'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GROUP: ${{ matrix.group }}
+        run: |
+          set -euo pipefail
+          # Static CPU binary from pinned llama.cpp 8642541, verified as original ZIP.
+          if gh api repos/Vanilla1999/DocAtlas/actions/artifacts/12815037279/zip > "$RUNNER_TEMP/runtime.zip"; then
+            echo "49743488e03250fc46c8fef3af2692bad250ea521e3dc162a285e558a5df32c4  $RUNNER_TEMP/runtime.zip" | sha256sum -c -
+            unzip -q "$RUNNER_TEMP/runtime.zip" -d "$RUNNER_TEMP/runtime"
+          else
+            # Expired artifact: rebuild the SAME immutable source, never latest.
+            git init "$RUNNER_TEMP/llama"
+            git -C "$RUNNER_TEMP/llama" fetch --depth=1 https://github.com/ggml-org/llama.cpp.git 8642541b255bfb5dc39cd351a178be09013a55d6
+            git -C "$RUNNER_TEMP/llama" checkout --detach FETCH_HEAD
+            cmake -S "$RUNNER_TEMP/llama" -B "$RUNNER_TEMP/llama/build" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+            cmake --build "$RUNNER_TEMP/llama/build" --parallel 4 --target llama-server
+            cp "$RUNNER_TEMP/llama/build/bin/llama-server" "$RUNNER_TEMP/runtime/"
+          fi
+          chmod +x "$RUNNER_TEMP/runtime/llama-server"
+          "$RUNNER_TEMP/runtime/llama-server" --version > "$RUNNER_TEMP/evidence/runtime.txt" 2>&1
+          python3 eval/lightweight_evidence/provision.py --group "$GROUP" --output "$RUNNER_TEMP/model/model.gguf" > "$RUNNER_TEMP/evidence/model.json"
+      - name: Build exact installed wheel (setup not part of request memory budget)
+        run: |
+          docker build -f eval/lightweight_evidence/Dockerfile -t docatlas-light .
+          docker image inspect docatlas-light > "$RUNNER_TEMP/evidence/image.json"
+      - name: Entire process group limited to 1.5 decimal GB, two CPUs, no swap/network
+        env:
+          GROUP: ${{ matrix.group }}
+        run: |
+          set +e
+          docker run --name light-run --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            -e TESTED_SHA="${{ github.sha }}" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/evidence:/evidence" \
+            -v "$RUNNER_TEMP/model:/llm:ro" -v "$RUNNER_TEMP/runtime:/runtime:ro" \
+            docatlas-light --group "$GROUP"
+          rc=$?
+          docker inspect light-run > "$RUNNER_TEMP/evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/evidence/exit-code.txt"
+          exit "$rc"
+      - name: Paid access status only; never call an unnamed paid model
+        if: always()
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DOCATLAS_STRONG_MODEL: ${{ vars.DOCATLAS_STRONG_MODEL }}
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          configured=bool(os.environ.get('OPENAI_API_KEY','').strip() and os.environ.get('DOCATLAS_STRONG_MODEL','').strip())
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'evidence'/'PAID_ACCESS.json'
+          p.write_text(json.dumps({'status':'AVAILABLE_NOT_EXERCISED' if configured else 'BLOCKED_NOT_CONFIGURED','paid_calls':0,'provider_usage':None,'actual_paid_savings':'NOT_TESTED'}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: lightweight-${{ matrix.group }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/evidence/
+          retention-days: 30
+          if-no-files-found: error
