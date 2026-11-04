@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_step4_pool_pruning.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_step4_pool_pruning.py": "e3331aeeee1203f4f32aecee2cd23d58789ddd3124e160017896635fc8625287"
+  }
+}

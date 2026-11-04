@@ -33,6 +33,7 @@ from docmancer.docs.domain.query_reference_binding import prepare_reference_prob
 from .context_json import serialize_context_json
 from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
+from .experimental_pool_pruning import MODES as POOL_PRUNE_MODES, prune_rows
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
 from .query_trace import query_trace_enabled
@@ -48,10 +49,14 @@ POLICY = "joint_checked_body_mmr_v1"
 #       alone (MMR); the default divides it by sqrt(row bytes).
 #   DOCATLAS_EXPERIMENT_JOINT_FUSION=max_shared_scale  CombMAX over explicit
 #       queries on one pool-wide scale; the default averages per-query scales.
+#   DOCATLAS_EXPERIMENT_POOL_PRUNE=heading|body|heading_or_body|vote  keep only
+#       whole sections that dictionary-free views keep before selecting
+#       (experimental_pool_pruning.py; STEP4_POOL_PRUNING_RU.md).
 _EXPERIMENT_CHOICES = {
     "DOCATLAS_EXPERIMENT_JOINT_TERMS": ("word", "char4"),
     "DOCATLAS_EXPERIMENT_JOINT_PRIORITY": ("cost_sqrt", "gain"),
     "DOCATLAS_EXPERIMENT_JOINT_FUSION": ("mean", "max_shared_scale"),
+    "DOCATLAS_EXPERIMENT_POOL_PRUNE": POOL_PRUNE_MODES,
 }
 
 
@@ -299,13 +304,28 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     terms_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_TERMS")
     priority_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_PRIORITY")
     fusion_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_FUSION")
-    observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
+    prune_mode = _experiment("DOCATLAS_EXPERIMENT_POOL_PRUNE")
     limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
     # to reconstruct a question from retrieved text or generated probes.
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
+    prune_receipt = None
+    statistic_rows = rows
+    if prune_mode != "off":
+        # Research flag: the selector then considers only the kept whole
+        # sections, in pool order; term rarity below still counts every row.
+        lexical = {key: [float(((snapshot[row["evidence_id"]]["source"].get("retrieval_query_matches") or {})
+                                .get(key) or {}).get("lexical_score") or 0.0) for row in rows]
+                   for key in queries}
+        kept, prune_receipt = prune_rows(prune_mode, rows, lexical, queries)
+        if len(kept) < len(rows):
+            rows = [rows[index] for index in kept]
+            payload = {**payload, "sources": rows}
+    observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
+    if observation.state is not None and prune_receipt is not None:
+        observation.state["pool_pruning"] = prune_receipt
     semantic_mode = os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off")
     if semantic_mode not in {"off", "mini", "hybrid"}:
         raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off, mini or hybrid")
@@ -342,13 +362,18 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             "literal:" + match.group().casefold() for match in _CLI_LITERAL.finditer(value["text"])
         ))) for key, value in queries.items()}
     row_terms = [body_terms(row["snippet"]) for row in rows]
-    frequency = Counter(term for terms in row_terms for term in terms)
+    # After pool pruning, word rarity stays a statistic of the whole checked
+    # pool: pruning removes candidates, not evidence about how common a term is.
+    statistic_terms = row_terms if statistic_rows is rows else [
+        body_terms(row["snippet"]) for row in statistic_rows]
+    frequency = Counter(term for terms in statistic_terms for term in terms)
+    pool_size = len(statistic_rows)
     # Smoothed information content needs no language-specific stopword list.
     # These weights are ranking features only. Even the best relative body
     # match cannot claim coverage of an absent requested identifier or relation.
-    information = {term: math.log1p((len(rows) - count + 0.5) / (count + 0.5))
+    information = {term: math.log1p((pool_size - count + 0.5) / (count + 0.5))
                    for term, count in frequency.items()}
-    absent_information = math.log1p((len(rows) + 0.5) / 0.5)
+    absent_information = math.log1p((pool_size + 0.5) / 0.5)
     feature_weight: dict[tuple[str, str], float] = {}
     for key, terms in terms_by_query.items():
         total = sum(information.get(term, absent_information) for term in sorted(terms))
@@ -364,9 +389,11 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
         similarity_terms, similarity_information = row_terms, information
     else:
         similarity_terms = [frozenset(lexical_terms(row["snippet"])) for row in rows]
+        similarity_statistics = similarity_terms if statistic_rows is rows else [
+            frozenset(lexical_terms(row["snippet"])) for row in statistic_rows]
         similarity_information = {
-            term: math.log1p((len(rows) - count + 0.5) / (count + 0.5))
-            for term, count in Counter(term for terms in similarity_terms for term in terms).items()
+            term: math.log1p((pool_size - count + 0.5) / (count + 0.5))
+            for term, count in Counter(term for terms in similarity_statistics for term in terms).items()
         }
     grouped = _groups(rows, snapshot)
 
