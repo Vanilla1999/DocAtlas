@@ -33,7 +33,7 @@ from docmancer.docs.domain.query_reference_binding import prepare_reference_prob
 from .context_json import serialize_context_json
 from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
-from .experimental_pool_pruning import MODES as POOL_PRUNE_MODES, prune_rows
+from .experimental_pool_pruning import MODES as POOL_PRUNE_MODES, prune_checked_pool
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
 from .query_trace import query_trace_enabled
@@ -49,9 +49,11 @@ POLICY = "joint_checked_body_mmr_v1"
 #       alone (MMR); the default divides it by sqrt(row bytes).
 #   DOCATLAS_EXPERIMENT_JOINT_FUSION=max_shared_scale  CombMAX over explicit
 #       queries on one pool-wide scale; the default averages per-query scales.
-#   DOCATLAS_EXPERIMENT_POOL_PRUNE=heading|body|heading_or_body|vote  keep only
-#       whole sections that dictionary-free views keep before selecting
-#       (experimental_pool_pruning.py; STEP4_POOL_PRUNING_RU.md).
+#   DOCATLAS_EXPERIMENT_POOL_PRUNE=heading|body|heading_or_body|vote|
+#       own_heading_or_body  keep only whole sections that dictionary-free
+#       views keep before selecting; the MiniLM section selector applies the
+#       same filter first (experimental_pool_pruning.py;
+#       STEP4_POOL_PRUNING_RU.md, STEP5_PRE_SELECTION_FILTER_RU.md).
 _EXPERIMENT_CHOICES = {
     "DOCATLAS_EXPERIMENT_JOINT_TERMS": ("word", "char4"),
     "DOCATLAS_EXPERIMENT_JOINT_PRIORITY": ("cost_sqrt", "gain"),
@@ -304,25 +306,18 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     terms_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_TERMS")
     priority_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_PRIORITY")
     fusion_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_FUSION")
-    prune_mode = _experiment("DOCATLAS_EXPERIMENT_POOL_PRUNE")
     limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
     # to reconstruct a question from retrieved text or generated probes.
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
-    prune_receipt = None
     statistic_rows = rows
-    if prune_mode != "off":
-        # Research flag: the selector then considers only the kept whole
-        # sections, in pool order; term rarity below still counts every row.
-        lexical = {key: [float(((snapshot[row["evidence_id"]]["source"].get("retrieval_query_matches") or {})
-                                .get(key) or {}).get("lexical_score") or 0.0) for row in rows]
-                   for key in queries}
-        kept, prune_receipt = prune_rows(prune_mode, rows, lexical, queries)
-        if len(kept) < len(rows):
-            rows = [rows[index] for index in kept]
-            payload = {**payload, "sources": rows}
+    # Research flag: the same whole-section filter that runs in front of the
+    # MiniLM section selector. The selector then considers only the kept
+    # sections, in pool order; term rarity below still counts every row.
+    payload, prune_receipt = prune_checked_pool(payload, snapshot, queries)
+    rows = payload.get("sources") or []
     observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
     if observation.state is not None and prune_receipt is not None:
         observation.state["pool_pruning"] = prune_receipt

@@ -51,9 +51,14 @@ to whole source sections that dictionary-free views keep, each view cut by
 Otsu's split of its own scores: `body` keeps sections that both the retrieval
 BM25 score and the character 4-gram body match keep; `vote` keeps a section
 that at least two of three views keep, the third being the heading-path match;
-`heading` and `heading_or_body` exist for comparison. Word rarity stays a
+`heading` and `heading_or_body` exist for comparison; `own_heading_or_body`
+is `heading_or_body` with the heading view reading only a section's own
+heading, not the parent titles its sibling sections share. Word rarity stays a
 statistic of the whole checked pool. Results and the blind gate outcome are in
-`eval/blind_project_context/STEP4_POOL_PRUNING_RU.md`.
+`eval/blind_project_context/STEP4_POOL_PRUNING_RU.md`. The same filter runs in
+front of the optional MiniLM section policy, so the model scores only the kept
+sections; its receipt is `retrieval_diagnostics.pool_pruning`
+(`eval/blind_project_context/STEP5_PRE_SELECTION_FILTER_RU.md`).
 The optional MiniLM section policy remains separate from native selection.
 Its integration audit compares delivered rows with the full checked input of
 the same call and independently verifies the frozen source corpus and facts.

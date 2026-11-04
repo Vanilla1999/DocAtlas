@@ -19,16 +19,26 @@ its positive scores: no top-k, margin or tuned constant.
               to the pool's rows).
 
 A section is kept by a view when one query's cut keeps it. Modes combine the
-views; the pool order is kept and no row is edited.
+views; the pool order is kept and no row is edited. ``own_heading_or_body``
+is ``heading_or_body`` with the heading view reading only the section's own
+heading: the titles of its parent sections are shared by all its sibling
+sections and so cannot tell them apart.
+
+``prune_checked_pool`` is the one entry point: the joint selector and the
+MiniLM section selector both call it before they see the pool, so the same
+whole sections reach whichever selector the host configured (results in
+eval/blind_project_context/STEP5_PRE_SELECTION_FILTER_RU.md).
 """
 from __future__ import annotations
 
 import math
+import os
 from collections import Counter
 
 from docmancer.retrieval.lexical_terms import character_ngrams
 
-MODES = ("off", "heading", "body", "heading_or_body", "vote")
+MODES = ("off", "heading", "body", "heading_or_body", "vote", "own_heading_or_body")
+ENVIRONMENT = "DOCATLAS_EXPERIMENT_POOL_PRUNE"
 
 
 def otsu_upper(scores: list[float]) -> int:
@@ -76,12 +86,18 @@ def section_units(rows: list[dict]) -> list[int]:
             for row in rows]
 
 
-def views(rows: list[dict], lexical: dict[str, list[float]], queries: dict[str, dict]) -> dict[str, set[int]]:
-    """Section numbers kept by each view (union over explicit queries)."""
+def views(rows: list[dict], lexical: dict[str, list[float]], queries: dict[str, dict], *,
+          own_heading: bool = False) -> dict[str, set[int]]:
+    """Section numbers kept by each view (union over explicit queries).
+
+    With ``own_heading`` the heading view reads the last part of the heading
+    path (the section's own heading) instead of the whole path.
+    """
     units = section_units(rows)
     headings: dict[int, str] = {}
     for row, unit in zip(rows, units):
-        headings.setdefault(unit, str(row.get("section") or ""))
+        heading = str(row.get("section") or "")
+        headings.setdefault(unit, heading.rsplit(" > ", 1)[-1] if own_heading else heading)
     heading_features = {unit: frozenset(character_ngrams(text)) for unit, text in headings.items()}
     heading_info, heading_absent = _information(list(heading_features.values()))
     body_features = [frozenset(character_ngrams(str(row.get("snippet") or ""))) for row in rows]
@@ -108,7 +124,7 @@ def kept_sections(mode: str, kept: dict[str, set[int]]) -> set[int]:
         return heading
     if mode == "body":
         return words & chars
-    if mode == "heading_or_body":
+    if mode in ("heading_or_body", "own_heading_or_body"):
         return heading | (words & chars)
     if mode == "vote":
         return (heading & words) | (heading & chars) | (words & chars)
@@ -119,7 +135,7 @@ def prune_rows(mode: str, rows: list[dict], lexical: dict[str, list[float]],
                queries: dict[str, dict]) -> tuple[list[int], dict]:
     """Indices of the rows to keep, in pool order, and a bounded receipt."""
     units = section_units(rows)
-    kept = views(rows, lexical, queries)
+    kept = views(rows, lexical, queries, own_heading=mode == "own_heading_or_body")
     chosen = kept_sections(mode, kept)
     indices = [index for index, unit in enumerate(units) if unit in chosen]
     receipt = {"mode": mode, "candidate_rows": len(rows), "kept_rows": len(indices),
@@ -129,3 +145,33 @@ def prune_rows(mode: str, rows: list[dict], lexical: dict[str, list[float]],
         receipt["fallback"] = "no_section_kept"
         return list(range(len(rows))), receipt
     return indices, receipt
+
+
+def pool_prune_mode() -> str:
+    """The configured mode; an unknown value is a configuration error."""
+    value = os.environ.get(ENVIRONMENT, MODES[0]).strip().lower()
+    if value not in MODES:
+        raise ValueError(f"{ENVIRONMENT} must be one of: {', '.join(MODES)}")
+    return value
+
+
+def prune_checked_pool(payload: dict, snapshot: dict, queries: dict[str, dict]) -> tuple[dict, dict | None]:
+    """Keep the chosen whole sections of a checked pool before any selector.
+
+    ``queries`` are the authoritative explicit queries of the read. The
+    retrieval BM25 score of every row comes from its bound snapshot entry.
+    Returns the payload (a shallow copy with fewer rows, or the same object)
+    and a receipt, or ``None`` when the flag is off or nothing can be scored.
+    """
+    rows = payload.get("sources") or []
+    mode = pool_prune_mode()
+    if mode == "off" or not rows or not queries:
+        return payload, None
+    matches = [(((snapshot.get(row.get("evidence_id")) or {}).get("source") or {})
+                .get("retrieval_query_matches") or {}) for row in rows]
+    lexical = {key: [float((match.get(key) or {}).get("lexical_score") or 0.0) for match in matches]
+               for key in queries}
+    kept, receipt = prune_rows(mode, rows, lexical, queries)
+    if len(kept) < len(rows):
+        payload = {**payload, "sources": [rows[index] for index in kept]}
+    return payload, receipt

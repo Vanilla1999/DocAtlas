@@ -343,6 +343,16 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
+    # Research flag DOCATLAS_EXPERIMENT_POOL_PRUNE, off by default: the same
+    # whole-section filter as in front of the joint selector, so MiniLM scores
+    # only the kept sections (STEP5_PRE_SELECTION_FILTER_RU.md).
+    from .context_query_probes import authoritative_queries
+    from .experimental_pool_pruning import prune_checked_pool
+    payload, prune_receipt = prune_checked_pool(
+        payload, snapshot, authoritative_queries(retrieval.get("documentation_query_plan") or {}))
+    if prune_receipt is not None:
+        retrieval.setdefault("retrieval_diagnostics", {})["pool_pruning"] = deepcopy(prune_receipt)
+        rows = payload.get("sources") or []
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "facet-guarded-lexical-v2")
     from .facet_selection import POLICIES as FACET_POLICIES
     from .semantic_local_sufficiency import POLICIES as SEMANTIC_POLICIES
