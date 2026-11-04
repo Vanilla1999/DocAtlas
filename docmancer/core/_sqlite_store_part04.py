@@ -48,6 +48,30 @@ class _SQLiteStorePart04:
                 ][:7]
         return [row]
 
+    def _section_rows(self, row: sqlite3.Row, *, filters: dict | None = None) -> list[sqlite3.Row]:
+        """Every window under the same author heading, in document order."""
+        from docmancer.retrieval.experimental_acquisition import ACQUISITION_CANDIDATES
+        generation_id = row["generation_id"] if "generation_id" in row.keys() else None
+        if not generation_id:
+            return []
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        filter_sql = filter_sql.replace("sections.", "c.")
+        with self._connect() as conn:
+            return list(conn.execute(
+                f"""
+                SELECT c.hydration_id AS id, c.*, c.display_text AS text,
+                       c.display_token_estimate AS token_estimate,
+                       c.display_content_hash AS content_hash
+                FROM retrieval_children c
+                 WHERE c.generation_id = ? AND c.source = ? AND c.parent_logical_id = ?
+                   {filter_sql}
+                ORDER BY c.chunk_index
+                LIMIT ?
+                """,
+                (generation_id, row["source"], row["parent_logical_id"], *filter_params,
+                 ACQUISITION_CANDIDATES),
+            ))
+
     def _raw_token_total(self, sources: list[str]) -> int:
         if not sources:
             return 0

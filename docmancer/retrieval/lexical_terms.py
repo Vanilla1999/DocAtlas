@@ -62,6 +62,16 @@ def lexical_tokens(text: str) -> tuple[str, ...]:
     return tuple(_WORDS.findall("".join(normalized)))
 
 
+def character_ngrams(text: str, n: int = 4) -> tuple[str, ...]:
+    """Overlapping character n-grams of the normalized words, spanning word gaps.
+
+    McNamee & Mayfield (2004): words joined by single spaces, with a space at
+    both ends; no stemming or stopword list. Occurrences repeat for counting.
+    """
+    joined = " " + " ".join(lexical_tokens(text)) + " "
+    return tuple(joined[index:index + n] for index in range(len(joined) - n + 1))
+
+
 def lexical_terms(text: str) -> tuple[str, ...]:
     """Return distinct normalized words in their original occurrence order."""
     return tuple(dict.fromkeys(lexical_tokens(text)))

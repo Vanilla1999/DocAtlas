@@ -10,8 +10,8 @@ from docmancer.retrieval.acquisition_reuse import (
     active_acquisition_entries, effective_filters, extends_filters,
 )
 from docmancer.retrieval.lexical_terms import (
-    lexical_counts_utility, lexical_field_matches, lexical_field_utility, lexical_terms, lexical_tokens,
-    query_terms, explicit_source_locators, resolve_source_locators,
+    character_ngrams, lexical_counts_utility, lexical_field_matches, lexical_field_utility, lexical_terms,
+    lexical_tokens, query_terms, explicit_source_locators, resolve_source_locators,
 )
 
 
@@ -279,13 +279,35 @@ class _SQLiteStorePart03:
         """Acquire bounded native children independently of the delivery budget."""
         from docmancer.retrieval.experimental_acquisition import (
             ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
-            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+            ACQUISITION_METHOD, ACQUISITION_SECTIONS, ACQUISITION_TEXT_BYTES,
         )
 
         if expand not in {"none", "adjacent", "page"}:
             raise ValueError("expand must be none, adjacent or page")
         rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
         native_count = len(rows)
+        # Research flag, off by default: fill the same ceiling in rank order,
+        # each ranked hit followed by every window under its author heading.
+        # Section boundaries come from the document; no new count is added.
+        if ACQUISITION_SECTIONS and expand == "none":
+            ordered: list[dict[str, Any]] = []
+            seen: set[int] = set()
+            for rank, row in enumerate(rows, start=1):
+                if len(ordered) >= ACQUISITION_CANDIDATES:
+                    break
+                if int(row["id"]) not in seen:
+                    seen.add(int(row["id"]))
+                    ordered.append(row)
+                for sibling in self._section_rows(row, filters=filters):
+                    if len(ordered) >= ACQUISITION_CANDIDATES:
+                        break
+                    if int(sibling["id"]) in seen:
+                        continue
+                    seen.add(int(sibling["id"]))
+                    ordered.append({**dict(sibling), "rank": 0.0,
+                                    "_expansion_anchor_id": int(row["id"]),
+                                    "_expansion_anchor_rank": rank})
+            rows = ordered
         # Keep all native hits first. Expansion appends existing source windows,
         # never synthetic scores or a second semantic retrieval.
         if expand != "none":
@@ -559,7 +581,13 @@ class _SQLiteStorePart03:
         *,
         filters: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        terms = query_terms(query)
+        from docmancer.retrieval.experimental_acquisition import ACQUISITION_TERMS
+        # Research flag, off by default: BM25 counts overlapping character
+        # 4-grams instead of words (McNamee & Mayfield 2004). The FTS word
+        # admission below stays unchanged; only scoring reads the n-grams.
+        tokens_of = character_ngrams if ACQUISITION_TERMS == "char4" else lexical_tokens
+        terms = (tuple(dict.fromkeys(character_ngrams(query))) if ACQUISITION_TERMS == "char4"
+                 else query_terms(query))
         # These are literal query words, never an FTS expression. Quote every
         # token so uppercase AND/OR/NOT remain data in both backend lanes.
         # Preserve the original FTS grouping: quoted snake_case identifiers
@@ -636,7 +664,7 @@ class _SQLiteStorePart03:
             def body_profile(body: str) -> tuple[int, Counter[str]]:
                 profile = body_profiles.get(body)
                 if profile is None:
-                    tokens = lexical_tokens(body)
+                    tokens = tokens_of(body)
                     profile = (len(tokens), Counter(token for token in tokens if token in term_set))
                     body_profiles[body] = profile
                 return profile
@@ -644,7 +672,7 @@ class _SQLiteStorePart03:
             def query_words(text: str) -> frozenset[str]:
                 words = query_word_sets.get(text)
                 if words is None:
-                    words = term_set.intersection(lexical_tokens(text))
+                    words = term_set.intersection(tokens_of(text))
                     query_word_sets[text] = words
                 return words
 

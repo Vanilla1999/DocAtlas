@@ -25,7 +25,9 @@ import os
 import re
 
 from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
-from docmancer.retrieval.lexical_terms import lexical_terms, query_terms, explicit_source_locators
+from docmancer.retrieval.lexical_terms import (
+    character_ngrams, explicit_source_locators, lexical_terms, query_terms,
+)
 from docmancer.docs.domain.query_reference_binding import prepare_reference_probe
 
 from .context_json import serialize_context_json
@@ -38,6 +40,33 @@ from .standalone_text_view import COMPACT_TEXT_MAX_TOKENS, render_standalone_tex
 
 
 POLICY = "joint_checked_body_mmr_v1"
+# Research flags, read per call and off by default; results in
+# eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.md.
+#   DOCATLAS_EXPERIMENT_JOINT_TERMS=char4  query/body match on overlapping
+#       character 4-grams (McNamee & Mayfield 2004); redundancy stays on words.
+#   DOCATLAS_EXPERIMENT_JOINT_PRIORITY=gain  greedy order by marginal gain
+#       alone (MMR); the default divides it by sqrt(row bytes).
+#   DOCATLAS_EXPERIMENT_JOINT_FUSION=max_shared_scale  CombMAX over explicit
+#       queries on one pool-wide scale; the default averages per-query scales.
+_EXPERIMENT_CHOICES = {
+    "DOCATLAS_EXPERIMENT_JOINT_TERMS": ("word", "char4"),
+    "DOCATLAS_EXPERIMENT_JOINT_PRIORITY": ("cost_sqrt", "gain"),
+    "DOCATLAS_EXPERIMENT_JOINT_FUSION": ("mean", "max_shared_scale"),
+}
+
+
+def _experiment(name: str) -> str:
+    choices = _EXPERIMENT_CHOICES[name]
+    value = os.environ.get(name, choices[0]).strip().lower()
+    if value not in choices:
+        raise ValueError(f"{name} must be one of: {', '.join(choices)}")
+    return value
+
+
+def _cost_scale(cost: int, priority_mode: str) -> float:
+    return 1.0 if priority_mode == "gain" else math.sqrt(cost)
+
+
 _CLI_LITERAL = re.compile(r"(?<!\w)--[A-Za-z][A-Za-z0-9_-]*(?!\w)")
 _TRACE_ROW_LIMIT = 512
 
@@ -45,9 +74,11 @@ _TRACE_ROW_LIMIT = 512
 class _SelectionObservation:
     """Bounded independent ledger, never consulted by the selector."""
 
-    def __init__(self, retrieval: dict, rows: list[dict]) -> None:
+    def __init__(self, retrieval: dict, rows: list[dict],
+                 cost_scale: Callable[[int], float] = math.sqrt) -> None:
         self.state = None
         self.rows = []
+        self.cost_scale = cost_scale
         if not query_trace_enabled():
             return
         try:
@@ -79,10 +110,10 @@ class _SelectionObservation:
                                    first_selected_before=details.get("selected_before"),
                                    first_gain_per_cost=score[0], first_relevance=score[1],
                                    first_cost_bytes=item.cost,
-                                   first_redundancy=score[1] - score[0] * math.sqrt(item.cost))
+                                   first_redundancy=score[1] - score[0] * self.cost_scale(item.cost))
                     row.update(decision=decision, gain_per_cost=score[0],
                                relevance=score[1], cost_bytes=item.cost,
-                               redundancy=score[1] - score[0] * math.sqrt(item.cost),
+                               redundancy=score[1] - score[0] * self.cost_scale(item.cost),
                                unit_rows=len(indices), **details)
         except Exception:
             self.state["diagnostic_error"] = True
@@ -265,7 +296,10 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     cap = experimental_context_max_tokens()
     if not rows or cap is None:
         return payload, snapshot
-    observation = _SelectionObservation(retrieval, rows)
+    terms_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_TERMS")
+    priority_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_PRIORITY")
+    fusion_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_FUSION")
+    observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
     limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
@@ -275,6 +309,8 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     semantic_mode = os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off")
     if semantic_mode not in {"off", "mini", "hybrid"}:
         raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off, mini or hybrid")
+    if semantic_mode != "off" and (terms_mode, fusion_mode) != ("word", "mean"):
+        raise ValueError("DOCATLAS_EXPERIMENT_JOINT_TERMS/FUSION apply to lexical relevance only")
     semantic_scores = None
     if semantic_mode in {"mini", "hybrid"}:
         from .experimental_selection_modes import score_joint_relevance
@@ -297,12 +333,14 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
         # The shared tokenizer already preserves whole underscore identifiers.
         # Only punctuation-bearing CLI options need an extra exact feature;
         # an identifier must not gain a second copy of the same lexical credit.
-        return frozenset((*lexical_terms(text), *(key for key, pattern in literal_patterns.items()
-                                                if pattern.search(text))))
+        words = lexical_terms(text) if terms_mode == "word" else character_ngrams(text)
+        return frozenset((*words, *(key for key, pattern in literal_patterns.items()
+                                    if pattern.search(text))))
 
-    terms_by_query = {key: frozenset((*query_terms(value["text"]), *(
-        "literal:" + match.group().casefold() for match in _CLI_LITERAL.finditer(value["text"])
-    ))) for key, value in queries.items()}
+    terms_by_query = {key: frozenset((
+        *(query_terms(value["text"]) if terms_mode == "word" else character_ngrams(value["text"])), *(
+            "literal:" + match.group().casefold() for match in _CLI_LITERAL.finditer(value["text"])
+        ))) for key, value in queries.items()}
     row_terms = [body_terms(row["snippet"]) for row in rows]
     frequency = Counter(term for terms in row_terms for term in terms)
     # Smoothed information content needs no language-specific stopword list.
@@ -320,6 +358,16 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     row_features = [frozenset((key, term) for key, terms in terms_by_query.items()
                              for term in terms & body) for body in row_terms]
     row_locators = [_bound_locator_queries(row, snapshot, queries) for row in rows]
+    # Content redundancy compares whole words in both modes. Shared character
+    # n-grams of unrelated words would otherwise read as duplicated content.
+    if terms_mode == "word":
+        similarity_terms, similarity_information = row_terms, information
+    else:
+        similarity_terms = [frozenset(lexical_terms(row["snippet"])) for row in rows]
+        similarity_information = {
+            term: math.log1p((len(rows) - count + 0.5) / (count + 0.5))
+            for term, count in Counter(term for terms in similarity_terms for term in terms).items()
+        }
     grouped = _groups(rows, snapshot)
 
     def unit(group: int, indices: tuple[int, ...]) -> _Unit:
@@ -327,11 +375,11 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             group, indices,
             frozenset(feature for index in indices for feature in row_features[index]),
             frozenset(key for index in indices for key in row_locators[index]),
-            frozenset(term for index in indices for term in row_terms[index]),
+            frozenset(term for index in indices for term in similarity_terms[index]),
             max(1, sum(len(json.dumps(rows[index], ensure_ascii=False).encode("utf-8"))
                        for index in indices)),
-            math.sqrt(sum(information[term] ** 2 for term in sorted(
-                {term for index in indices for term in row_terms[index]}))),
+            math.sqrt(sum(similarity_information[term] ** 2 for term in sorted(
+                {term for index in indices for term in similarity_terms[index]}))),
         )
 
     whole = [unit(group, indices) for group, indices in enumerate(grouped)]
@@ -354,6 +402,9 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
                       if feature[0] == key) for item in whole), default=0.0)
         for key in queries
     }
+    # Each query's mass is already a share of that query's own information,
+    # so one pool-wide scale keeps the queries comparable (research flag).
+    shared_scale = max(best_query_mass.values(), default=0.0)
 
     def packet(indices: list[int], *, budget_limited: bool) -> tuple[dict, dict]:
         return _selected_packet(payload, snapshot, retrieval, [rows[index] for index in indices], selection={
@@ -381,7 +432,8 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             if not left.vector_norm or not right.vector_norm:
                 value = 0.0
             else:
-                value = min(1.0, sum(information[term] ** 2 for term in sorted(left.terms & right.terms))
+                value = min(1.0, sum(similarity_information[term] ** 2
+                                     for term in sorted(left.terms & right.terms))
                             / (left.vector_norm * right.vector_norm))
             similarities[key] = value
         return value
@@ -398,7 +450,12 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             # An exact source nomination is a separate routing signal, not
             # a match in the body. It keeps locator-only reads possible while
             # normal attribution is independently rebuilt below.
-            if semantic_scores is None:
+            if semantic_scores is None and fusion_mode == "max_shared_scale":
+                relevance = max(max(
+                    mass[key] / shared_scale if shared_scale else 0.0,
+                    1.0 if key in item.locator_queries else 0.0,
+                ) for key in queries)
+            elif semantic_scores is None:
                 relevance = sum(max(
                     mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0,
                     1.0 if key in item.locator_queries else 0.0,
@@ -423,7 +480,7 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             redundancy = max((similarity(item, previous) for previous in selected_units
                               if previous.group != item.group), default=0.0)
             gain = relevance - redundancy
-            return (gain / math.sqrt(item.cost), relevance, -min(item.indices))
+            return (gain / _cost_scale(item.cost, priority_mode), relevance, -min(item.indices))
 
         candidate = max(pending.values(), key=priority)
         if priority(candidate)[0] <= 0:
