@@ -39,6 +39,13 @@ Budget checks price the actual delivery representation with source references
 and provenance. Attribution is recomputed for the selected text, omitted
 candidates remain visible as omissions, and coverage stays unverified. A lexical
 ranking signal is not a semantic proof or a certificate that no answer exists.
+Research flags, off by default, vary native selection without a dictionary:
+`DOCATLAS_EXPERIMENT_JOINT_TERMS=char4` (character 4-gram query matches, word
+redundancy), `DOCATLAS_EXPERIMENT_JOINT_PRIORITY=gain` (greedy order by marginal
+gain instead of gain per square root of row bytes) and
+`DOCATLAS_EXPERIMENT_JOINT_FUSION=max_shared_scale` (the best explicit query on
+one pool-wide scale instead of the mean of per-query scales). Results and the
+blind gate outcome are in `eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.md`.
 The optional MiniLM section policy remains separate from native selection.
 Its integration audit compares delivered rows with the full checked input of
 the same call and independently verifies the frozen source corpus and facts.

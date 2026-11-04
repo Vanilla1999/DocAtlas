@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_step3_research_flags.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_step3_research_flags.py": "90a401ddf452ee3f0c172af320ddd6e207db065efb159c9807f174521a463789"
+  }
+}

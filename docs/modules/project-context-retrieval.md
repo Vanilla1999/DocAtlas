@@ -60,6 +60,14 @@ limits are applied.
 The original question and explicit translations/lookups share a final selection
 step after their candidates have been combined and source-checked.
 
+Two research flags, off by default, change acquisition without a dictionary:
+`DOCATLAS_EXPERIMENT_ACQUISITION_SECTIONS=1` fills the same candidate ceiling,
+in rank order, with each hit followed by every window under its author heading;
+`DOCATLAS_EXPERIMENT_ACQUISITION_TERMS=char4` scores BM25 over overlapping
+character 4-grams while FTS admission stays word-based. Neither passed the blind
+project-context gate; see
+`eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.md`.
+
 An explicit document filename or relative source path remains a separate
 routing signal. It is resolved against the complete allowed generation before
 the candidate limit; an ambiguous basename is not resolved from a shortened
