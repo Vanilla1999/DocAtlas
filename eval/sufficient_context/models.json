@@ -1,0 +1,25 @@
+{
+  "llama_cpp_commit": "8642541b255bfb5dc39cd351a178be09013a55d6",
+  "models": {
+    "qwen3-1.7b-q8": {
+      "repository": "Qwen/Qwen3-1.7B-GGUF",
+      "revision": "90862c4b9d2787eaed51d12237eafdfe7c5f6077",
+      "filename": "Qwen3-1.7B-Q8_0.gguf",
+      "sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a"
+    },
+    "qwen3-4b-q4": {
+      "repository": "Qwen/Qwen3-4B-GGUF",
+      "revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+      "filename": "Qwen3-4B-Q4_K_M.gguf",
+      "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5"
+    },
+    "phi4-mini-q4": {
+      "repository": "bartowski/microsoft_Phi-4-mini-instruct-GGUF",
+      "revision": "7ff82c2aaa4dde30121698a973765f39be5288c0",
+      "filename": "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+      "sha256": "01999f17c39cc3074afae5e9c539bc82d45f2dd7faa3917c66cbef76fce8c0c2",
+      "upstream": "microsoft/Phi-4-mini-instruct",
+      "quantization_publisher": "bartowski"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "design": "exploratory synthetic integration pilot; not blind or independently authored",
+  "cases": 10,
+  "documents": 8,
+  "documented_claims": 21,
+  "freeze": "before any model execution; do not tune prompts or gold after results",
+  "sha256": {
+    "sources.json": "e82ce4d11ac722487ac97d7a390450bca66bdf4814db87ae6b2db95483be9dcb",
+    "questions.json": "b10eb0774e6d881115e54b08c70b450836251b61243b395fbe0393bcfb2e00de",
+    "gold.json": "ea318defafab5ce8e562d0440e27b29e71df7039f93c0700eb08f47fe0ece9cd"
+  }
+}

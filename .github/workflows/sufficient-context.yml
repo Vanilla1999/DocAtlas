@@ -1,0 +1,97 @@
+name: Distinct-model sufficiency and bounded recovery (experimental)
+on:
+  push:
+    branches: [experiment/llm-evidence-main-20261028]
+    paths:
+      - 'docmancer/docs/application/final_context_autorater.py'
+      - 'docmancer/docs/interfaces/sufficient_context_session.py'
+      - 'docmancer/docs/interfaces/paid_answer_provider.py'
+      - 'docmancer/docs/interfaces/sufficient_context_cli.py'
+      - 'eval/sufficient_context/**'
+      - '.github/workflows/sufficient-context.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: sufficient-context-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Reuse exact pinned llama.cpp build from the completed pilot
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        with:
+          name: pinned-llama-server
+          run-id: 40686090024
+          github-token: ${{ github.token }}
+          path: local-runtime
+      - name: Install exact wheel and preserve original pilot and dependency lock
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/results"
+          git fetch -q origin 5a550df9c7d77c230322329c784b6a85dac3730b --depth=1
+          git diff --exit-code 5a550df9c7d77c230322329c784b6a85dac3730b HEAD -- pyproject.toml uv.lock eval/llm_evidence eval/prepared_model_comparison40
+          git rev-parse HEAD > "$RUNNER_TEMP/results/head.txt"
+          git archive HEAD docmancer eval .github/workflows/sufficient-context.yml | gzip > "$RUNNER_TEMP/results/tested-source.tar.gz"
+          python -m compileall -q docmancer eval/sufficient_context
+          python -m pip install uv==0.9.25
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/venv" uv sync --frozen --no-dev --no-install-project
+          uv build --wheel --out-dir "$RUNNER_TEMP/wheel"
+          uv pip install --python "$RUNNER_TEMP/venv/bin/python" --no-deps "$RUNNER_TEMP"/wheel/*.whl
+      - name: Explicit provisioning, SHA-pinned selector and different-family checker
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/venv/bin/python" -m docmancer.docs.application.section_model "$RUNNER_TEMP/minilm"
+          cp eval/llm_evidence/provision.py "$RUNNER_TEMP/provision.py"
+          cp eval/sufficient_context/models.json "$RUNNER_TEMP/models.json"
+          python "$RUNNER_TEMP/provision.py" --model qwen3-4b-q4 --output "$RUNNER_TEMP/selector.gguf" > "$RUNNER_TEMP/results/selector-model.json"
+          python "$RUNNER_TEMP/provision.py" --model phi4-mini-q4 --output "$RUNNER_TEMP/critic.gguf" > "$RUNNER_TEMP/results/critic-model.json"
+          chmod +x local-runtime/llama-server
+          local-runtime/llama-server --version > "$RUNNER_TEMP/results/runtime.txt" 2>&1
+      - name: Launch loopback models without provider credentials
+        run: |
+          set -euo pipefail
+          local-runtime/llama-server -m "$RUNNER_TEMP/selector.gguf" --host 127.0.0.1 --port 8099 --alias docatlas-local --ctx-size 16384 --parallel 1 --threads 4 --jinja --chat-template-kwargs '{"enable_thinking": false}' --no-context-shift > "$RUNNER_TEMP/results/selector.log" 2>&1 &
+          echo "SELECTOR_PID=$!" >> "$GITHUB_ENV"
+          local-runtime/llama-server -m "$RUNNER_TEMP/critic.gguf" --host 127.0.0.1 --port 8100 --alias docatlas-critic --ctx-size 16384 --parallel 1 --threads 4 --jinja --no-context-shift > "$RUNNER_TEMP/results/critic.log" 2>&1 &
+          echo "CRITIC_PID=$!" >> "$GITHUB_ENV"
+          for port in 8099 8100; do
+            for i in $(seq 1 120); do
+              if curl -fsS "http://127.0.0.1:$port/health"; then break; fi
+              sleep 1
+            done
+            curl -fsS "http://127.0.0.1:$port/health"
+          done
+      - name: Real MCP scenarios, independent rater score and optional paid responses
+        env:
+          TESTED_SHA: ${{ github.sha }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DOCATLAS_STRONG_MODEL: ${{ vars.DOCATLAS_STRONG_MODEL }}
+          HF_HUB_OFFLINE: '1'
+        run: |
+          "$RUNNER_TEMP/venv/bin/python" -I -u eval/sufficient_context/run.py \
+            --repo "$GITHUB_WORKSPACE" --out "$RUNNER_TEMP/results/run" \
+            --work "$RUNNER_TEMP/work" --minilm "$RUNNER_TEMP/minilm" --shard '${{ matrix.shard }}'
+      - name: Stop serving processes
+        if: always()
+        run: |
+          for pid in "${SELECTOR_PID:-}" "${CRITIC_PID:-}"; do
+            if [ -n "$pid" ]; then kill "$pid" 2>/dev/null || true; fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: sufficient-context-${{ matrix.shard }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/results/
+          retention-days: 30
+          if-no-files-found: error

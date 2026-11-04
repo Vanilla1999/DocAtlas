@@ -1,0 +1,98 @@
+name: Local generative evidence pilot (not production acceptance)
+on:
+  push:
+    branches: [experiment/llm-evidence-main-20261028]
+    paths:
+      - 'docmancer/docs/application/llm_evidence.py'
+      - 'docmancer/docs/application/section_compression.py'
+      - 'eval/llm_evidence/**'
+      - '.github/workflows/llm-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: local-llm-evidence-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          repository: ggml-org/llama.cpp
+          ref: 8642541b255bfb5dc39cd351a178be09013a55d6
+          persist-credentials: false
+      - name: Build pinned CPU runtime, no GPU or paid provider
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          cmake --build build --parallel 4 --target llama-server
+          build/bin/llama-server --version
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pinned-llama-server
+          path: build/bin/llama-server
+          retention-days: 7
+  installed-pilot:
+    needs: build-runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [qwen3-1.7b-q8, qwen3-4b-q4]
+        shard: [0, 1]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        with:
+          name: pinned-llama-server
+          path: local-runtime
+      - name: Build and install exact product; keep main dependencies and V40 unchanged
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/results"
+          git fetch -q origin 439815771b96edc77a12f42f90f1fecb35f5e5d7 --depth=1
+          git diff --exit-code 439815771b96edc77a12f42f90f1fecb35f5e5d7 HEAD -- pyproject.toml uv.lock eval/prepared_model_comparison40
+          git rev-parse HEAD > "$RUNNER_TEMP/results/head.txt"
+          git archive HEAD docmancer eval/llm_evidence .github/workflows/llm-evidence.yml | gzip > "$RUNNER_TEMP/results/tested-source.tar.gz"
+          python -m compileall -q docmancer eval/llm_evidence
+          python -m pip install uv==0.9.25
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/venv" uv sync --frozen --no-dev --no-install-project
+          uv build --wheel --out-dir "$RUNNER_TEMP/wheel"
+          uv pip install --python "$RUNNER_TEMP/venv/bin/python" --no-deps "$RUNNER_TEMP"/wheel/*.whl
+      - name: Explicitly provision pinned local models before requests
+        env:
+          PILOT_MODEL: ${{ matrix.model }}
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/venv/bin/python" -m docmancer.docs.application.section_model "$RUNNER_TEMP/minilm"
+          python eval/llm_evidence/provision.py --model "$PILOT_MODEL" --output "$RUNNER_TEMP/model.gguf" | tee "$RUNNER_TEMP/results/model.json"
+          chmod +x local-runtime/llama-server
+          local-runtime/llama-server --version > "$RUNNER_TEMP/results/runtime.txt" 2>&1
+      - name: Real local LLM, installed public stdio MCP and source coverage
+        env:
+          TESTED_SHA: ${{ github.sha }}
+          PILOT_SHARD: ${{ matrix.shard }}
+          HF_HUB_OFFLINE: '1'
+        run: |
+          set -euo pipefail
+          local-runtime/llama-server -m "$RUNNER_TEMP/model.gguf" --host 127.0.0.1 --port 8099 --alias docatlas-local --ctx-size 16384 --parallel 1 --threads 4 --jinja --chat-template-kwargs '{"enable_thinking": false}' --no-context-shift > "$RUNNER_TEMP/results/server.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 120); do
+            if curl -fsS http://127.0.0.1:8099/health; then break; fi
+            kill -0 "$SERVER_PID"
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8099/health
+          "$RUNNER_TEMP/venv/bin/python" -I -u eval/llm_evidence/run.py --repo "$GITHUB_WORKSPACE" --work "$RUNNER_TEMP/work" --out "$RUNNER_TEMP/results/pilot" --minilm "$RUNNER_TEMP/minilm" --shard "$PILOT_SHARD"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: llm-evidence-${{ matrix.model }}-shard-${{ matrix.shard }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/results/
+          retention-days: 30
+          if-no-files-found: error

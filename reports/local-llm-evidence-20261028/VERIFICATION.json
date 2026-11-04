@@ -1,0 +1,21 @@
+{
+  "run_id": 40686090024,
+  "product_sha": "527f0b0d23e61b1277f71bf3442ff65e1eee6ea0",
+  "artifacts": [
+    {"id": 12816805756, "model": "Qwen3-1.7B-Q8_0", "shard": 0, "bytes": 2796853, "sha256": "0bebcd5dd9af6b026dd60631e0ee697ffc5a7b4fe6d0e7b20d4c37642a138ca4"},
+    {"id": 12815098578, "model": "Qwen3-1.7B-Q8_0", "shard": 1, "bytes": 2764257, "sha256": "e22a9b05843ef485cc6f9874ee1f2b4ddd421d891e972f9f3cf043b364c1ecb4"},
+    {"id": 12815574548, "model": "Qwen3-4B-Q4_K_M", "shard": 0, "bytes": 2792644, "sha256": "48a1bb57b027a67559f11b77ac56d14237a71a18f4f40ff58f2b7fa90cc329a7"},
+    {"id": 12815709580, "model": "Qwen3-4B-Q4_K_M", "shard": 1, "bytes": 2764083, "sha256": "e6d668c7bd1f3d43a3db7cd299d5f0d3b79ae2dd8f1d3d329a94cea5fcbb9612"}
+  ],
+  "fixture_sha256": {
+    "sources.json": "e82ce4d11ac722487ac97d7a390450bca66bdf4814db87ae6b2db95483be9dcb",
+    "questions.json": "b10eb0774e6d881115e54b08c70b450836251b61243b395fbe0393bcfb2e00de",
+    "gold.json": "ea318defafab5ce8e562d0440e27b29e71df7039f93c0700eb08f47fe0ece9cd"
+  },
+  "offline_actions": ["SHA-256 authentication of four ZIPs", "exact tested product/source checkpoint verification", "frozen fixture byte verification", "independent BPE recount of 100 public MCP replies including errors", "independent public DTO decoding", "source byte/span/scope/version/authority/trust/evidence-id comparison with recorded admitted pool", "independent required-quote scoring with alternative witnesses", "re-summing all recorded local inference usage", "source equivalence of four recorded main/fallback pairs"],
+  "offline_did_not_repeat": ["model inference", "MCP execution", "SQLite execution", "installed-wheel setup"],
+  "provider_or_gpt_calls": 0,
+  "actual_local_llm_calls": 84,
+  "actual_public_mcp_calls": 104,
+  "usage_unknown_calls": 0
+}

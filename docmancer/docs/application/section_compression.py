@@ -58,6 +58,9 @@ class SectionCompressionError(ValueError):
 
 
 def enabled() -> bool:
+    from .llm_evidence import mode as llm_mode
+    if llm_mode() != "off":
+        return True  # Explicit host opt-in; never enabled by source/wire data.
     # If a trusted host explicitly provisioned a MiniLM model directory, use
     # the new efficient selection without requiring a second opt-in switch.
     # No model path -> no network, download, or surprise inference.
@@ -343,6 +346,14 @@ def select_sections(payload: dict, snapshot: dict, retrieval: dict, question: st
     from .experimental_candidate_selection import native_rank_selection_active
     if not native_rank_selection_active():
         raise SectionCompressionError("section_compression_requires_native_read")
+    from .llm_evidence import try_select as try_llm_selection, mode as llm_mode
+    plan = retrieval.get("documentation_query_plan") or {}
+    original_question = str(plan.get("original_question") or retrieval.get("question") or question)
+    llm_selected = try_llm_selection(payload, snapshot, retrieval, original_question)
+    if llm_selected is not None:
+        return llm_selected  # Replacement: no later lexical/top-k veto.
+    if llm_mode() != "off" and not os.environ.get("DOCATLAS_MINILM_MODEL_DIR"):
+        return payload, snapshot  # No model failure can authorize source removal.
     policy = os.environ.get("DOCATLAS_SECTION_SELECTION", "facet-guarded-lexical-v2")
     from .facet_selection import POLICIES as FACET_POLICIES
     from .semantic_local_sufficiency import POLICIES as SEMANTIC_POLICIES

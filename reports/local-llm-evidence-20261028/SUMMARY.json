@@ -1,0 +1,58 @@
+{
+  "tested_product": "527f0b0d23e61b1277f71bf3442ff65e1eee6ea0",
+  "base_main": "439815771b96edc77a12f42f90f1fecb35f5e5d7",
+  "run_id": 40686090024,
+  "design": "same-author frozen synthetic pilot, not blind or independent acceptance",
+  "questions": 10,
+  "documents": 8,
+  "documented_requirements": 21,
+  "positive_or_partial_questions": 9,
+  "fully_unsupported_questions": 1,
+  "public_mcp_calls": 104,
+  "generative_calls": {"select": 40, "audit_full_pool": 20, "answer": 24, "completed": 83, "failed_with_known_usage": 1},
+  "all_known_generative_tokens_experiment": 140761,
+  "answer_subset": ["L10-03", "L10-04", "L10-07"],
+  "token_boundaries": {
+    "mcp": "complete public text, o200k; includes 81-token errors in corrected audit totals",
+    "episode": "Qwen prompt plus completion, including selector/audit/answer, on three predeclared cases only",
+    "gpt_billing_and_autonomous_agent": "NOT_TESTED"
+  },
+  "models": {
+    "Qwen3-1.7B-Q8_0": {
+      "weight_bytes": 1834426016,
+      "main": {"requirements_delivered": 16, "complete_documented_cases": 7, "tool_errors": ["L10-08"], "mcp_tokens_including_errors": 10236, "episode_tokens": 5567, "median_tool_seconds": 0.806313},
+      "fixed-five": {"requirements_delivered": 14, "complete_documented_cases": 6, "tool_errors": ["L10-08"], "mcp_tokens_including_errors": 9363, "new_fact_losses_vs_main": 4, "paired_mcp_saving_pct": 8.59675, "episode_tokens": 5121},
+      "select": {"requirements_delivered": 19, "complete_documented_cases": 8, "tool_errors": [], "applied_cases": 10, "mcp_tokens_including_errors": 8506, "paired_main_mcp_tokens": 10155, "paired_candidate_mcp_tokens": 7638, "paired_successful_cases": 9, "paired_mcp_saving_pct": 24.78582, "new_fact_losses_vs_main": [{"case": "L10-03", "fact": "pause_ingress"}, {"case": "L10-03", "fact": "watermark_check"}], "selector_tokens_all_questions": 16302, "episode_tokens": 9190, "episode_token_increase_pct": 65.07994, "median_tool_seconds": 28.277977, "tool_seconds_range": [17.930682, 55.721145]},
+      "select-audit": {"requirements_delivered": 16, "complete_documented_cases": 7, "tool_errors": ["L10-08"], "applied_cases": 1, "mcp_tokens_including_errors": 9920, "new_fact_losses_vs_main": [], "paired_mcp_saving_pct": 3.111768, "selector_tokens_all_questions": 33735, "episode_tokens": 14534, "episode_token_increase_pct": 161.07419, "median_tool_seconds": 56.297839}
+    },
+    "Qwen3-4B-Q4_K_M": {
+      "weight_bytes": 2497280256,
+      "main": {"requirements_delivered": 16, "complete_documented_cases": 7, "tool_errors": ["L10-08"], "mcp_tokens_including_errors": 10213, "episode_tokens": 5389, "median_tool_seconds": 0.60652},
+      "fixed-five": {"requirements_delivered": 14, "complete_documented_cases": 6, "tool_errors": ["L10-08"], "mcp_tokens_including_errors": 9346, "new_fact_losses_vs_main": 4, "paired_mcp_saving_pct": 8.557047, "episode_tokens": 4948},
+      "select": {"requirements_delivered": 21, "complete_documented_cases": 9, "tool_errors": [], "applied_cases": 9, "fallback_cases": ["L10-07"], "mcp_tokens_including_errors": 8914, "paired_main_mcp_tokens": 10132, "paired_candidate_mcp_tokens": 8049, "paired_successful_cases": 9, "paired_mcp_saving_pct": 20.558626, "new_fact_losses_vs_main": [], "selector_tokens_all_questions": 16335, "answer_only_tokens_subset": 5845, "episode_tokens": 10510, "episode_token_increase_pct": 95.026907, "median_tool_seconds": 64.039829, "tool_seconds_range": [37.996204, 86.876311]},
+      "select-audit": {"requirements_delivered": 16, "complete_documented_cases": 7, "tool_errors": ["L10-08"], "applied_cases": 3, "mcp_tokens_including_errors": 9110, "new_fact_losses_vs_main": [], "paired_mcp_saving_pct": 10.886301, "selector_tokens_all_questions": 31943, "episode_tokens": 14421, "episode_token_increase_pct": 167.600668, "median_tool_seconds": 124.224578}
+    }
+  },
+  "fact_localization": {
+    "main_missing": {"L10-03": ["restore_command", "replay_before_ingress"], "L10-08": ["priority", "secret_store", "no_file_exception"]},
+    "qwen_1_7_select_missing": {"L10-03": ["pause_ingress", "watermark_check"]},
+    "qwen_4_select_missing": {},
+    "all_required_facts_in_admitted_pool": true
+  },
+  "answer_review": {
+    "reviewer": "implementing assistant; not independent or blind",
+    "actual_records_reviewed": 24,
+    "source_coverage_not_answer_accuracy": true,
+    "L10-03_qwen_1_7_main": "Invented aws s3 cp and incorrect sequence.",
+    "L10-03_qwen_4_select": "All four facts in evidence. Answer text omits pause-ingress, but citations quote it; unanswered contradicts the already supplied restore command.",
+    "L10-04_qwen_4_main": "All three facts in answer, but unanswered repeats an answered part.",
+    "L10-04_qwen_4_select": "Answer text omits namespace credential despite its presence in context.",
+    "L10-07_qwen_4_all_four_arms": "Bounded no-number answer supported by supplied documents, with correct source lines.",
+    "L10-07_qwen_1_7": "No fabricated numeric guarantee, but overstrong unqualified product-absence opening. Not a certified correct unknown.",
+    "automatic_status_disagreements": "Not equated with answer errors; explicit documentation absence can support a negative answer without establishing the requested value."
+  },
+  "offline_audit": {"zip_digests_match_github": true, "main_text_responses_recounted": 100, "fallback_source_pairs_rechecked": 4, "independent_public_dto_decoder": true, "independent_bpe_counter": true, "original_quote_alternatives_rescored": true, "source_provenance_matches_public_pool": true},
+  "runtime_integrity": {"recorded_ci_source_state_unchanged": true, "recorded_ci_sqlite_state_unchanged": true, "unavailable_endpoint_preserves_main": true, "no_mocked_retrieval_selection_storage_or_inference": true},
+  "unproven": ["general semantic sufficiency", "minimal context", "correct unknowns on a broad set", "V40 non-regression", "blind generalization", "production latency", "peak RAM", "GPU performance", "autonomous OpenCode/GPT answer quality", "provider-billed savings"],
+  "decision": "Keep Draft/default OFF. Qwen3-4B select is the best source-retention candidate in this pilot, not accepted for default. Do not recommend select-audit as tested."
+}

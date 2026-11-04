@@ -1,0 +1,31 @@
+{
+  "tested_commit": "92dbbf0a818d3b4f94df3a7b931dccc673d64c4a",
+  "all_four_artifacts_match_GitHub_digests": true,
+  "artifacts": [
+    {
+      "shard": 0,
+      "sha256": "10d2c3983a89284805ad390b0e18f0a434388c4cfb15eb80271e87c88b4d3eed",
+      "artifact_id": 12824343995
+    },
+    {
+      "shard": 1,
+      "sha256": "ebcd6de0f7ef0982242aae07089c9682adc06829ec4860fa4b03f36bd97398a4",
+      "artifact_id": 12822894908
+    },
+    {
+      "shard": 2,
+      "sha256": "c212c56ef6c704dcf5a0c653cc55ef7c741a4f63e19e6e30c1fb073bd8e594a1",
+      "artifact_id": 12822884427
+    },
+    {
+      "shard": 3,
+      "sha256": "3c69c5954546c1bcaa8cdae7eea72cf26a594d36616b095469e81dae66fa3366",
+      "artifact_id": 12824852073
+    }
+  ],
+  "offline_scope": "35 actual public MCP replies, final source provenance, original quote alternatives and managed input token counts rechecked; no new inference; SQLite assertions from CI, not reexecuted",
+  "audit_scripts_sha256": {
+    "audit_sufficient_context.py": "278fb24df30650eb39acb4a6a92712b8ff9648c6f0e5cae4b203ab43f490952e",
+    "audit_llm_evidence_previous.py": "49e5cd3b540770a711613cb81c60b73645412c0a726cdc7c84b46e53df6a8748"
+  }
+}
