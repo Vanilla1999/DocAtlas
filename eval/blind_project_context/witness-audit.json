@@ -1,0 +1,1661 @@
+{
+  "schema_version": 1,
+  "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+  "facts": [
+    {
+      "fact_id": "T01.F1",
+      "topic_id": "T01",
+      "drawn_section_occurrence": {
+        "path": "CONTRIBUTING.md",
+        "line_start": 61,
+        "line_end": 61
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "CONTRIBUTING.md",
+            "line_start": 61,
+            "line_end": 61
+          }
+        ],
+        "L2": [
+          {
+            "path": "CONTRIBUTING.md",
+            "line_start": 61,
+            "line_end": 61
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T01.F2",
+      "topic_id": "T01",
+      "drawn_section_occurrence": {
+        "path": "CONTRIBUTING.md",
+        "line_start": 62,
+        "line_end": 62
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "CONTRIBUTING.md",
+            "line_start": 62,
+            "line_end": 62
+          }
+        ],
+        "L2": [
+          {
+            "path": "CONTRIBUTING.md",
+            "line_start": 62,
+            "line_end": 62
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T01.F3",
+      "topic_id": "T01",
+      "drawn_section_occurrence": {
+        "path": "CONTRIBUTING.md",
+        "line_start": 63,
+        "line_end": 63
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "CONTRIBUTING.md",
+            "line_start": 63,
+            "line_end": 63
+          }
+        ],
+        "L2": [
+          {
+            "path": "CONTRIBUTING.md",
+            "line_start": 63,
+            "line_end": 63
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T02.F1",
+      "topic_id": "T02",
+      "drawn_section_occurrence": {
+        "path": "README.md",
+        "line_start": 192,
+        "line_end": 192
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "README.md",
+            "line_start": 192,
+            "line_end": 192
+          }
+        ],
+        "L2": [
+          {
+            "path": "README.md",
+            "line_start": 192,
+            "line_end": 192
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T02.F2",
+      "topic_id": "T02",
+      "drawn_section_occurrence": {
+        "path": "README.md",
+        "line_start": 195,
+        "line_end": 195
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "README.md",
+            "line_start": 195,
+            "line_end": 195
+          }
+        ],
+        "L2": [
+          {
+            "path": "README.md",
+            "line_start": 195,
+            "line_end": 195
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T02.F3",
+      "topic_id": "T02",
+      "drawn_section_occurrence": {
+        "path": "README.md",
+        "line_start": 196,
+        "line_end": 196
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "README.md",
+            "line_start": 196,
+            "line_end": 196
+          }
+        ],
+        "L2": [
+          {
+            "path": "README.md",
+            "line_start": 196,
+            "line_end": 196
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T03.F1",
+      "topic_id": "T03",
+      "drawn_section_occurrence": {
+        "path": "docs/INDEX.md",
+        "line_start": 13,
+        "line_end": 13
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 13,
+            "line_end": 13
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 13,
+            "line_end": 13
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T03.F2",
+      "topic_id": "T03",
+      "drawn_section_occurrence": {
+        "path": "docs/INDEX.md",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 15,
+            "line_end": 15
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 15,
+            "line_end": 15
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T03.F3",
+      "topic_id": "T03",
+      "drawn_section_occurrence": {
+        "path": "docs/INDEX.md",
+        "line_start": 16,
+        "line_end": 16
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 16,
+            "line_end": 16
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 16,
+            "line_end": 16
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T04.F1",
+      "topic_id": "T04",
+      "drawn_section_occurrence": {
+        "path": "docs/INDEX.md",
+        "line_start": 45,
+        "line_end": 45
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 45,
+            "line_end": 45
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 45,
+            "line_end": 45
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T04.F2",
+      "topic_id": "T04",
+      "drawn_section_occurrence": {
+        "path": "docs/INDEX.md",
+        "line_start": 46,
+        "line_end": 46
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 46,
+            "line_end": 46
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 46,
+            "line_end": 46
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T04.F3",
+      "topic_id": "T04",
+      "drawn_section_occurrence": {
+        "path": "docs/INDEX.md",
+        "line_start": 47,
+        "line_end": 47
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 47,
+            "line_end": 47
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/INDEX.md",
+            "line_start": 47,
+            "line_end": 47
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T05.F1",
+      "topic_id": "T05",
+      "drawn_section_occurrence": {
+        "path": "docs/PROJECT_BINDING.md",
+        "line_start": 75,
+        "line_end": 75
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/PROJECT_BINDING.md",
+            "line_start": 75,
+            "line_end": 75
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/PROJECT_BINDING.md",
+            "line_start": 75,
+            "line_end": 75
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T05.F2",
+      "topic_id": "T05",
+      "drawn_section_occurrence": {
+        "path": "docs/PROJECT_BINDING.md",
+        "line_start": 79,
+        "line_end": 79
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/PROJECT_BINDING.md",
+            "line_start": 79,
+            "line_end": 79
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/PROJECT_BINDING.md",
+            "line_start": 79,
+            "line_end": 79
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T06.F1",
+      "topic_id": "T06",
+      "drawn_section_occurrence": {
+        "path": "docs/PROJECT_MAP.md",
+        "line_start": 25,
+        "line_end": 27
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/PROJECT_MAP.md",
+            "line_start": 25,
+            "line_end": 27
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/PROJECT_MAP.md",
+            "line_start": 25,
+            "line_end": 27
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T07.F1",
+      "topic_id": "T07",
+      "drawn_section_occurrence": {
+        "path": "docs/PROJECT_MAP.md",
+        "line_start": 41,
+        "line_end": 42
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/PROJECT_MAP.md",
+            "line_start": 41,
+            "line_end": 42
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/PROJECT_MAP.md",
+            "line_start": 41,
+            "line_end": 42
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T07.F2",
+      "topic_id": "T07",
+      "drawn_section_occurrence": {
+        "path": "docs/PROJECT_MAP.md",
+        "line_start": 43,
+        "line_end": 43
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/PROJECT_MAP.md",
+            "line_start": 43,
+            "line_end": 43
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/PROJECT_MAP.md",
+            "line_start": 43,
+            "line_end": 43
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T08.F1",
+      "topic_id": "T08",
+      "drawn_section_occurrence": {
+        "path": "docs/adr/0003-context-first-project-reads.md",
+        "line_start": 5,
+        "line_end": 5
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 5,
+            "line_end": 5
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 5,
+            "line_end": 5
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T09.F1",
+      "topic_id": "T09",
+      "drawn_section_occurrence": {
+        "path": "docs/adr/0003-context-first-project-reads.md",
+        "line_start": 39,
+        "line_end": 40
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 39,
+            "line_end": 40
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 39,
+            "line_end": 40
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T09.F2",
+      "topic_id": "T09",
+      "drawn_section_occurrence": {
+        "path": "docs/adr/0003-context-first-project-reads.md",
+        "line_start": 44,
+        "line_end": 45
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 44,
+            "line_end": 45
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 44,
+            "line_end": 45
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T09.F3",
+      "topic_id": "T09",
+      "drawn_section_occurrence": {
+        "path": "docs/adr/0003-context-first-project-reads.md",
+        "line_start": 80,
+        "line_end": 81
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 80,
+            "line_end": 81
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/adr/0003-context-first-project-reads.md",
+            "line_start": 80,
+            "line_end": 81
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T10.F1",
+      "topic_id": "T10",
+      "drawn_section_occurrence": {
+        "path": "docs/main-flow-evaluation.md",
+        "line_start": 19,
+        "line_end": 19
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/main-flow-evaluation.md",
+            "line_start": 19,
+            "line_end": 19
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/main-flow-evaluation.md",
+            "line_start": 19,
+            "line_end": 19
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T10.F2",
+      "topic_id": "T10",
+      "drawn_section_occurrence": {
+        "path": "docs/main-flow-evaluation.md",
+        "line_start": 22,
+        "line_end": 22
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/main-flow-evaluation.md",
+            "line_start": 22,
+            "line_end": 22
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/main-flow-evaluation.md",
+            "line_start": 22,
+            "line_end": 22
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T10.F3",
+      "topic_id": "T10",
+      "drawn_section_occurrence": {
+        "path": "docs/main-flow-evaluation.md",
+        "line_start": 23,
+        "line_end": 23
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/main-flow-evaluation.md",
+            "line_start": 23,
+            "line_end": 23
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/main-flow-evaluation.md",
+            "line_start": 23,
+            "line_end": 23
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T11.F1",
+      "topic_id": "T11",
+      "drawn_section_occurrence": {
+        "path": "docs/main-flow-logging.md",
+        "line_start": 27,
+        "line_end": 27
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/main-flow-logging.md",
+            "line_start": 27,
+            "line_end": 27
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/main-flow-logging.md",
+            "line_start": 27,
+            "line_end": 27
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T11.F2",
+      "topic_id": "T11",
+      "drawn_section_occurrence": {
+        "path": "docs/main-flow-logging.md",
+        "line_start": 30,
+        "line_end": 30
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/main-flow-logging.md",
+            "line_start": 30,
+            "line_end": 30
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/main-flow-logging.md",
+            "line_start": 30,
+            "line_end": 30
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T11.F3",
+      "topic_id": "T11",
+      "drawn_section_occurrence": {
+        "path": "docs/main-flow-logging.md",
+        "line_start": 33,
+        "line_end": 33
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/main-flow-logging.md",
+            "line_start": 33,
+            "line_end": 33
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/main-flow-logging.md",
+            "line_start": 33,
+            "line_end": 33
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T12.F1",
+      "topic_id": "T12",
+      "drawn_section_occurrence": {
+        "path": "docs/mcp-docs-server.md",
+        "line_start": 84,
+        "line_end": 85
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 84,
+            "line_end": 85
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 84,
+            "line_end": 85
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T12.F2",
+      "topic_id": "T12",
+      "drawn_section_occurrence": {
+        "path": "docs/mcp-docs-server.md",
+        "line_start": 85,
+        "line_end": 86
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 85,
+            "line_end": 86
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 85,
+            "line_end": 86
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T12.F3",
+      "topic_id": "T12",
+      "drawn_section_occurrence": {
+        "path": "docs/mcp-docs-server.md",
+        "line_start": 89,
+        "line_end": 90
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 89,
+            "line_end": 90
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 89,
+            "line_end": 90
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T13.F1",
+      "topic_id": "T13",
+      "drawn_section_occurrence": {
+        "path": "docs/mcp-docs-server.md",
+        "line_start": 166,
+        "line_end": 167
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 166,
+            "line_end": 167
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/AGENT_DOCS_WORKFLOW.md",
+            "line_start": 56,
+            "line_end": 57
+          },
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 166,
+            "line_end": 167
+          },
+          {
+            "path": "docs/modules/question-planning.md",
+            "line_start": 74,
+            "line_end": 75
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T13.F2",
+      "topic_id": "T13",
+      "drawn_section_occurrence": {
+        "path": "docs/mcp-docs-server.md",
+        "line_start": 173,
+        "line_end": 174
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 173,
+            "line_end": 174
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/AGENT_DOCS_WORKFLOW.md",
+            "line_start": 63,
+            "line_end": 64
+          },
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 173,
+            "line_end": 174
+          },
+          {
+            "path": "docs/modules/question-planning.md",
+            "line_start": 81,
+            "line_end": 82
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T13.F3",
+      "topic_id": "T13",
+      "drawn_section_occurrence": {
+        "path": "docs/mcp-docs-server.md",
+        "line_start": 174,
+        "line_end": 175
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 174,
+            "line_end": 175
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/AGENT_DOCS_WORKFLOW.md",
+            "line_start": 64,
+            "line_end": 65
+          },
+          {
+            "path": "docs/mcp-docs-server.md",
+            "line_start": 174,
+            "line_end": 175
+          },
+          {
+            "path": "docs/modules/question-planning.md",
+            "line_start": 82,
+            "line_end": 83
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T14.F1",
+      "topic_id": "T14",
+      "drawn_section_occurrence": {
+        "path": "docs/modules/project-context-retrieval.md",
+        "line_start": 30,
+        "line_end": 30
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 30,
+            "line_end": 30
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 30,
+            "line_end": 30
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T14.F2",
+      "topic_id": "T14",
+      "drawn_section_occurrence": {
+        "path": "docs/modules/project-context-retrieval.md",
+        "line_start": 31,
+        "line_end": 32
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 31,
+            "line_end": 32
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 31,
+            "line_end": 32
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T15.F1",
+      "topic_id": "T15",
+      "drawn_section_occurrence": {
+        "path": "docs/opencode-compact-text.md",
+        "line_start": 41,
+        "line_end": 41
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 41,
+            "line_end": 41
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 41,
+            "line_end": 41
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T15.F2",
+      "topic_id": "T15",
+      "drawn_section_occurrence": {
+        "path": "docs/opencode-compact-text.md",
+        "line_start": 44,
+        "line_end": 45
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 44,
+            "line_end": 45
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 44,
+            "line_end": 45
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T16.F1",
+      "topic_id": "T16",
+      "drawn_section_occurrence": {
+        "path": "docs/opencode-compact-text.md",
+        "line_start": 97,
+        "line_end": 98
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 97,
+            "line_end": 98
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 97,
+            "line_end": 98
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T16.F2",
+      "topic_id": "T16",
+      "drawn_section_occurrence": {
+        "path": "docs/opencode-compact-text.md",
+        "line_start": 115,
+        "line_end": 115
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 115,
+            "line_end": 115
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 115,
+            "line_end": 115
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T16.F3",
+      "topic_id": "T16",
+      "drawn_section_occurrence": {
+        "path": "docs/opencode-compact-text.md",
+        "line_start": 123,
+        "line_end": 124
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 123,
+            "line_end": 124
+          }
+        ],
+        "L2": [
+          {
+            "path": "docs/opencode-compact-text.md",
+            "line_start": 123,
+            "line_end": 124
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T17.F1",
+      "topic_id": "T17",
+      "drawn_section_occurrence": {
+        "path": "wiki/Architecture.md",
+        "line_start": 44,
+        "line_end": 44
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 44,
+            "line_end": 44
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 44,
+            "line_end": 44
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T17.F2",
+      "topic_id": "T17",
+      "drawn_section_occurrence": {
+        "path": "wiki/Architecture.md",
+        "line_start": 52,
+        "line_end": 52
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 52,
+            "line_end": 52
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 52,
+            "line_end": 52
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T17.F3",
+      "topic_id": "T17",
+      "drawn_section_occurrence": {
+        "path": "wiki/Architecture.md",
+        "line_start": 52,
+        "line_end": 52
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 52,
+            "line_end": 52
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 52,
+            "line_end": 52
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T18.F1",
+      "topic_id": "T18",
+      "drawn_section_occurrence": {
+        "path": "wiki/Architecture.md",
+        "line_start": 225,
+        "line_end": 226
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 225,
+            "line_end": 226
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 225,
+            "line_end": 226
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T18.F2",
+      "topic_id": "T18",
+      "drawn_section_occurrence": {
+        "path": "wiki/Architecture.md",
+        "line_start": 226,
+        "line_end": 227
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 226,
+            "line_end": 227
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 226,
+            "line_end": 227
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T19.F1",
+      "topic_id": "T19",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 106,
+        "line_end": 106
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 106,
+            "line_end": 106
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 106,
+            "line_end": 106
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T19.F2",
+      "topic_id": "T19",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 110,
+        "line_end": 110
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 110,
+            "line_end": 110
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 110,
+            "line_end": 110
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T19.F3",
+      "topic_id": "T19",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 111,
+        "line_end": 111
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 111,
+            "line_end": 111
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 111,
+            "line_end": 111
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T19.F4",
+      "topic_id": "T19",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 112,
+        "line_end": 112
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 112,
+            "line_end": 112
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 112,
+            "line_end": 112
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T20.F1",
+      "topic_id": "T20",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 129,
+        "line_end": 129
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 129,
+            "line_end": 129
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 129,
+            "line_end": 129
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T20.F2",
+      "topic_id": "T20",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 130,
+        "line_end": 130
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 130,
+            "line_end": 130
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 130,
+            "line_end": 130
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T20.F3",
+      "topic_id": "T20",
+      "drawn_section_occurrence": {
+        "path": "wiki/Commands.md",
+        "line_start": 131,
+        "line_end": 131
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 131,
+            "line_end": 131
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 131,
+            "line_end": 131
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T21.F1",
+      "topic_id": "T21",
+      "drawn_section_occurrence": {
+        "path": "wiki/Configuration.md",
+        "line_start": 36,
+        "line_end": 36
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 36,
+            "line_end": 36
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 36,
+            "line_end": 36
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T21.F2",
+      "topic_id": "T21",
+      "drawn_section_occurrence": {
+        "path": "wiki/Configuration.md",
+        "line_start": 37,
+        "line_end": 37
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 37,
+            "line_end": 37
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 37,
+            "line_end": 37
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T21.F3",
+      "topic_id": "T21",
+      "drawn_section_occurrence": {
+        "path": "wiki/Configuration.md",
+        "line_start": 38,
+        "line_end": 38
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 38,
+            "line_end": 38
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 38,
+            "line_end": 38
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T22.F1",
+      "topic_id": "T22",
+      "drawn_section_occurrence": {
+        "path": "wiki/Configuration.md",
+        "line_start": 95,
+        "line_end": 95
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 95,
+            "line_end": 95
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 95,
+            "line_end": 95
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T22.F2",
+      "topic_id": "T22",
+      "drawn_section_occurrence": {
+        "path": "wiki/Configuration.md",
+        "line_start": 105,
+        "line_end": 105
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 105,
+            "line_end": 105
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 105,
+            "line_end": 105
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T22.F3",
+      "topic_id": "T22",
+      "drawn_section_occurrence": {
+        "path": "wiki/Configuration.md",
+        "line_start": 105,
+        "line_end": 105
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 105,
+            "line_end": 105
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Configuration.md",
+            "line_start": 105,
+            "line_end": 105
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T23.F1",
+      "topic_id": "T23",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 56,
+        "line_end": 56
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 56,
+            "line_end": 56
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 56,
+            "line_end": 56
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T23.F2",
+      "topic_id": "T23",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 59,
+        "line_end": 59
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 59,
+            "line_end": 59
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 59,
+            "line_end": 59
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T24.F1",
+      "topic_id": "T24",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 82,
+        "line_end": 82
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 82,
+            "line_end": 82
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 82,
+            "line_end": 82
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T24.F2",
+      "topic_id": "T24",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 83,
+        "line_end": 83
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 83,
+            "line_end": 83
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 83,
+            "line_end": 83
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T24.F3",
+      "topic_id": "T24",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 84,
+        "line_end": 84
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 84,
+            "line_end": 84
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 84,
+            "line_end": 84
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T24.F4",
+      "topic_id": "T24",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 85,
+        "line_end": 85
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 85,
+            "line_end": 85
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 85,
+            "line_end": 85
+          }
+        ]
+      }
+    },
+    {
+      "fact_id": "T24.F5",
+      "topic_id": "T24",
+      "drawn_section_occurrence": {
+        "path": "wiki/Supported-Sources.md",
+        "line_start": 86,
+        "line_end": 86
+      },
+      "occurrences": {
+        "L0": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 86,
+            "line_end": 86
+          }
+        ],
+        "L2": [
+          {
+            "path": "wiki/Supported-Sources.md",
+            "line_start": 86,
+            "line_end": 86
+          }
+        ]
+      }
+    }
+  ]
+}

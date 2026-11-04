@@ -422,7 +422,7 @@ def _attempt_observation(value: Any) -> dict[str, Any]:
             value.get("considered_variants", _MISSING), names=("candidate_id", "evidence_id"),
             producer_count=value.get("qualified_variants", _MISSING)),
         "literal_context_admissions": _preview(value.get("literal_context_admissions", _MISSING),
-            names=("reason", "query_id", "source_id", "coverage_credit", "qualification_reason")),
+            names=("reason", "query_id", "coverage_credit", "qualification_reason")),
         "core_payload_sources": _recorded_ids(value.get("core_source_observation", _MISSING)),
         "decision_trace": _decision_observation(value.get("decision_trace", _MISSING)),
         "joint_work": _work_observation(value.get("joint_work", _MISSING), (
@@ -436,7 +436,50 @@ def _attempt_observation(value: Any) -> dict[str, Any]:
         "experimental_native_restore": _work_observation(value.get("experimental_native_restore", _MISSING), (
             "checked", "restored", "already_covered", "rejected")),
         "context_flow": _context_flow_observation(value.get("context_flow", _MISSING)),
+        "joint_selection_observation": _selection_observation(value.get("joint_selection_observation", _MISSING)),
     }
+
+
+def _selection_observation(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return _preview(value)
+    rows = value.get("rows")
+    if not isinstance(rows, list):
+        return {"observation": "malformed"}
+    result = {"observation": "recorded", **_fields(value, (
+        "row_count", "row_limit", "omitted_rows", "diagnostic_error")), "rows": []}
+    receipt = value.get("semantic_relevance")
+    if isinstance(receipt, dict):
+        result["semantic_relevance"] = _fields(receipt, (
+            "model_load_attempts", "model_loads", "model_forwards"))
+        for name in ("inference_seconds", "model_load_seconds", "asset_verification_seconds", "model_import_seconds"):
+            number = receipt.get(name)
+            if type(number) is float and math.isfinite(number) and number >= 0:
+                result["semantic_relevance"][name] = number
+        model = receipt.get("model")
+        if isinstance(model, dict):
+            result["semantic_relevance"]["model"] = _fields(model, (
+                "revision", "device", "dtype", "torch", "transformers", "threads", "interop_threads",
+                "max_length", "truncation", "score"))
+            if model.get("model_id") == "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1":
+                result["semantic_relevance"]["model"]["model_kind"] = "mmarco-mMiniLMv2-L12-H384-v1"
+    for row in rows[:512]:
+        item = _fields(row, ("evidence_id", "line_start", "line_end", "decision",
+                             "unit_rows", "joint_output", "selected_before", "trial_text_bytes", "fit_check",
+                             "first_decision", "first_unit_rows", "first_selected_before", "cost_bytes", "first_cost_bytes"))
+        for name in ("gain_per_cost", "relevance", "redundancy", "first_gain_per_cost", "first_relevance", "first_redundancy"):
+            number = row.get(name) if isinstance(row, dict) else None
+            if type(number) is float and math.isfinite(number):
+                item[name] = number
+        scores = row.get("semantic_lane_scores") if isinstance(row, dict) else None
+        if isinstance(scores, dict):
+            item["semantic_lane_scores"] = {
+                key: scores[key] for key in ("query-original", *(f"query-lookup-{i}" for i in range(1, 6)))
+                if type(scores.get(key)) is float and math.isfinite(scores[key]) and 0 <= scores[key] <= 1
+            }
+        result["rows"].append(item)
+    result["serialization_omitted_rows"] = max(0, len(rows) - 512)
+    return result
 
 
 def same_call_projection_observation(
@@ -446,7 +489,7 @@ def same_call_projection_observation(
     service_trace = _child(_child(_child(raw, "ingestion_diagnostics"), "project"), "same_call_pipeline")
     projection_trace = _child(_child(raw, "retrieval_diagnostics"), "docs_context_projection")
     sources = projection.get("sources", _MISSING)
-    return {
+    observation = {
         "schema_version": 1, "callback_stage": "after_model_visible_validation",
         "delivery_blocked": delivery_blocked,
         "final_callback": {
@@ -460,9 +503,9 @@ def same_call_projection_observation(
                 "parent_rows", "parent_selects", "prepared_read_ms", "prepared_verification_ms"),
                 counts=("miss_reasons",)),
             "retrieved_candidates": _preview(_child(service_trace, "retrieved_candidates"),
-                names=("stable_chunk_id", "document_id", "source_id", "query_id")),
+                names=("stable_chunk_id", "query_id")),
             "qualification_outcomes": _preview(_child(service_trace, "qualification_outcomes"),
-                names=("stable_chunk_id", "document_id", "source_id", "query_id", "outcome", "reason")),
+                names=("stable_chunk_id", "query_id", "outcome", "reason")),
         },
         "returned_core_diagnostics": _attempt_observation(projection_trace),
         "primary_attempt": _attempt_observation(_child(projection_trace, "primary_attempt")),
@@ -473,3 +516,9 @@ def same_call_projection_observation(
             "stay unknown; previews and decision-log omissions cannot prove an absent first loss."
         ),
     }
+    selection = observation["returned_core_diagnostics"].get("joint_selection_observation")
+    if isinstance(selection, dict) and selection.get("observation") == "recorded":
+        final_ids = {row.get("evidence_id") for row in sources if isinstance(row, dict)} if isinstance(sources, list) else None
+        for row in selection["rows"]:
+            row["final_output"] = row.get("evidence_id") in final_ids if final_ids is not None else None
+    return observation

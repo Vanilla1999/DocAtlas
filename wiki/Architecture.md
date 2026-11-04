@@ -118,13 +118,11 @@ If the user asks broadly about "the MCP server", distinguish the two surfaces ex
 - **MCP Packs runtime:** `doc-atlas mcp packs-serve` exposes installed API action packs through `docmancer_search_tools` and `docmancer_call_tool`. These tool names follow the Python/runtime namespace; the MCP server identity is `docatlas`.
 
 Legacy direct library/project tools remain internal compatibility paths. They are not a public routing contract for agents; see [Docs MCP server](../docs/mcp-docs-server.md) for the current tool contract.
-- **`prefetch_docs_manifest`** — Validate and prefetch all targets declared in a `docatlas.docs.yaml`.
-
 ### Prefetch and job tools
-- **`prefetch_docs_targets`** — Download and index one or more explicit documentation targets with full control over seed URLs, allowed domains, path prefixes, max pages, browser rendering, doc format, and per-target warnings.
-- **`get_docs_job_status`** — Return persistent progress for one docs indexing/prefetch job.
-- **`list_docs_jobs`** — List docs indexing/prefetch jobs, optionally filtered by status.
-- **`cancel_docs_job`** — Request cancellation for a docs indexing/prefetch job.
+- **`prepare_docs(action="prefetch_docs_manifest", ...)`** — Validate and prefetch targets declared in a `docatlas.docs.yaml`, subject to the applicable authorization and consent.
+- **`docs_status(action="job", job_id=...)`** — Return progress for one docs indexing/prefetch job.
+- **`docs_status(action="jobs", ...)`** — List docs indexing/prefetch jobs, optionally filtered by status.
+- **`prepare_docs(action="cancel_docs_job", job_id=...)`** — Request cancellation for a docs indexing/prefetch job.
 
 ### docs_url template
 
@@ -147,7 +145,7 @@ The `DocsJobTracker` maintains an in-memory dictionary of jobs (trimmed to `MAX_
 - **Page tracking**: `discovered_pages`, `fetched_pages`, `indexed_pages`, `total_pages`, `completed_pages`, `failed_pages`, `total_chunks`, `completed_chunks`
 - **Events**: ordered event log with phase, URL, and message per target/page
 
-Call `get_docs_job_status(job_id)` to poll progress. Jobs can be cancelled via `cancel_docs_job(job_id)`; the cancellation flag is checked between targets and between seed URLs during a target.
+Call `docs_status(action="job", job_id=...)` to poll progress. Jobs can be cancelled via `prepare_docs(action="cancel_docs_job", job_id=...)`; the cancellation flag is checked between targets and between seed URLs during a target.
 
 ### docatlas.docs.yaml manifest
 

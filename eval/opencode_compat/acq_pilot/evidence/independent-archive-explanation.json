@@ -1,0 +1,3283 @@
+{
+  "unexplained": [],
+  "lanes": [
+    {
+      "question": 1,
+      "lane": 0,
+      "fts_count": 303,
+      "python_count": 299,
+      "cases": [
+        {
+          "window_id": 9,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MINILM_MODEL_DIR"
+            }
+          ]
+        },
+        {
+          "window_id": 21,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        },
+        {
+          "window_id": 303,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_OFFLINE"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_RUN_LIVE_TESTS"
+            }
+          ]
+        },
+        {
+          "window_id": 359,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_API_KEY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_BINARY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 2,
+      "lane": 0,
+      "fts_count": 218,
+      "python_count": 212,
+      "cases": [
+        {
+          "window_id": 21,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        },
+        {
+          "window_id": 68,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 255,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_SEARCH"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_EMBEDDING_MODEL"
+            }
+          ]
+        },
+        {
+          "window_id": 296,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_MODEL_CACHE"
+            }
+          ]
+        },
+        {
+          "window_id": 303,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_OFFLINE"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_RUN_LIVE_TESTS"
+            }
+          ]
+        },
+        {
+          "window_id": 359,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_API_KEY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_BINARY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 6,
+      "lane": 0,
+      "fts_count": 159,
+      "python_count": 143,
+      "cases": [
+        {
+          "window_id": 9,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MINILM_MODEL_DIR"
+            }
+          ]
+        },
+        {
+          "window_id": 21,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        },
+        {
+          "window_id": 50,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            }
+          ]
+        },
+        {
+          "window_id": 51,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            }
+          ]
+        },
+        {
+          "window_id": 59,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_TEXT_FALLBACK"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_COMPACT_TEXT"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_CONTEXT_ASSEMBLY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_CONTEXT_COMPRESSION"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MINILM_MODEL_DIR"
+            }
+          ]
+        },
+        {
+          "window_id": 67,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 68,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 69,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 73,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "docatlas_query_trace"
+            }
+          ]
+        },
+        {
+          "window_id": 77,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EXPERIMENT_ADMISSION"
+            }
+          ]
+        },
+        {
+          "window_id": 255,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_SEARCH"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_EMBEDDING_MODEL"
+            }
+          ]
+        },
+        {
+          "window_id": 293,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_TEXT_FALLBACK"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_COMPACT_TEXT"
+            }
+          ]
+        },
+        {
+          "window_id": 294,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            }
+          ]
+        },
+        {
+          "window_id": 296,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_MODEL_CACHE"
+            }
+          ]
+        },
+        {
+          "window_id": 303,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_OFFLINE"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_RUN_LIVE_TESTS"
+            }
+          ]
+        },
+        {
+          "window_id": 359,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_API_KEY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_BINARY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 6,
+      "lane": 1,
+      "fts_count": 409,
+      "python_count": 236,
+      "cases": [
+        {
+          "window_id": 4,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 6,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 10,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 11,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 44,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 45,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 50,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            },
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 54,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 59,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_TEXT_FALLBACK"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_COMPACT_TEXT"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_CONTEXT_ASSEMBLY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_CONTEXT_COMPRESSION"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MINILM_MODEL_DIR"
+            }
+          ]
+        },
+        {
+          "window_id": 63,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 64,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 65,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 66,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 67,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 68,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 69,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 70,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 71,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "docatlas_request_start"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "docatlas_request_end"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "docatlas_query_trace"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "docatlas_trace_gap"
+            }
+          ]
+        },
+        {
+          "window_id": 72,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 73,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "docatlas_query_trace"
+            }
+          ]
+        },
+        {
+          "window_id": 74,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 75,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 76,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 77,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EXPERIMENT_ADMISSION"
+            }
+          ]
+        },
+        {
+          "window_id": 78,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 79,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 80,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 81,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 83,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 84,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 85,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 86,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 87,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 88,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 89,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 90,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 91,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 92,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 94,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 96,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 97,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 98,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 99,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 100,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 101,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 102,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 103,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 104,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 105,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 106,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 107,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 108,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 109,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 110,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 111,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 112,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 113,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 114,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 115,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 179,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 180,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 181,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 182,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 183,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 185,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 188,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 191,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 192,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 194,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 195,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 200,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 201,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 205,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 206,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 207,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 210,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 212,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 213,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 214,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 215,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 217,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 219,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 220,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 221,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 222,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 223,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 224,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 225,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 226,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 227,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 229,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 231,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 232,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 234,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 235,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 236,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 237,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 241,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 242,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 243,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 244,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 246,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 248,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 249,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 252,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 253,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 259,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 262,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 263,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 264,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 266,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 268,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 271,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 275,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 278,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 281,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 282,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 284,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 288,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 289,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 290,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 292,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 293,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_TEXT_FALLBACK"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_COMPACT_TEXT"
+            }
+          ]
+        },
+        {
+          "window_id": 296,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_MODEL_CACHE"
+            }
+          ]
+        },
+        {
+          "window_id": 297,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 298,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 299,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 302,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 303,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_OFFLINE"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_RUN_LIVE_TESTS"
+            }
+          ]
+        },
+        {
+          "window_id": 305,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 308,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 310,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 311,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 312,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 314,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 316,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 317,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 341,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 343,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 345,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 346,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 347,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 348,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 350,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 351,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 353,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 354,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 355,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 359,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_API_KEY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_BINARY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        },
+        {
+          "window_id": 361,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 364,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 365,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 366,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 381,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 383,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 384,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 385,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 386,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 387,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 389,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 390,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 393,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 396,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 398,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 399,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 400,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 402,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 403,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 404,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 405,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 407,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 408,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        },
+        {
+          "window_id": 409,
+          "examples": [
+            {
+              "query_term": "file",
+              "stored_word": "project_file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 10,
+      "lane": 1,
+      "fts_count": 266,
+      "python_count": 265,
+      "cases": [
+        {
+          "window_id": 223,
+          "examples": [
+            {
+              "query_term": "library",
+              "stored_word": "migrate_library_id"
+            },
+            {
+              "query_term": "library",
+              "stored_word": "library_id"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 12,
+      "lane": 0,
+      "fts_count": 196,
+      "python_count": 183,
+      "cases": [
+        {
+          "window_id": 9,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MINILM_MODEL_DIR"
+            }
+          ]
+        },
+        {
+          "window_id": 21,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        },
+        {
+          "window_id": 50,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            }
+          ]
+        },
+        {
+          "window_id": 51,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            }
+          ]
+        },
+        {
+          "window_id": 59,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_TEXT_FALLBACK"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_COMPACT_TEXT"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_CONTEXT_ASSEMBLY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_CONTEXT_COMPRESSION"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MINILM_MODEL_DIR"
+            }
+          ]
+        },
+        {
+          "window_id": 67,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 68,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_TRACE"
+            }
+          ]
+        },
+        {
+          "window_id": 255,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_SEARCH"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_EMBEDDING_MODEL"
+            }
+          ]
+        },
+        {
+          "window_id": 293,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_TEXT_FALLBACK"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_COMPACT_TEXT"
+            }
+          ]
+        },
+        {
+          "window_id": 294,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_MCP_MODEL_VIEW"
+            }
+          ]
+        },
+        {
+          "window_id": 296,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_EVAL_MODEL_CACHE"
+            }
+          ]
+        },
+        {
+          "window_id": 303,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_OFFLINE"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_RUN_LIVE_TESTS"
+            }
+          ]
+        },
+        {
+          "window_id": 359,
+          "examples": [
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_URL"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_API_KEY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_QDRANT_BINARY"
+            },
+            {
+              "query_term": "DocAtlas",
+              "stored_word": "DOCATLAS_AUTO_VECTORS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 15,
+      "lane": 1,
+      "fts_count": 409,
+      "python_count": 294,
+      "cases": [
+        {
+          "window_id": 14,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 16,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 17,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 18,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 19,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 20,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 23,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 25,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 31,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 33,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 34,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 41,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 44,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 45,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 50,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 54,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 63,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 66,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 67,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 68,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 69,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 70,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 72,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 73,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 74,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 75,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 76,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 77,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 78,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 79,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 80,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 81,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 82,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 83,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 84,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 85,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 86,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 87,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 88,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 89,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 90,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 91,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 92,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 94,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 95,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 96,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 97,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 98,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 99,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 100,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 101,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 102,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 103,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 104,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 105,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 106,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 107,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 108,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 109,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 110,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 111,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 112,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 113,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 114,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 115,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 116,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 123,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 124,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 136,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 143,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 149,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 151,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 157,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 158,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 164,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 167,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 170,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 175,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 191,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 192,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 194,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 196,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 200,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 205,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 219,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 224,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 239,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 240,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 241,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 246,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 253,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 259,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 261,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 290,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 292,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 298,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 304,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 311,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 325,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 326,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 331,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 341,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 343,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 345,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 348,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 353,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 355,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 361,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 364,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 365,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 381,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 386,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 389,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 393,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        },
+        {
+          "window_id": 396,
+          "examples": [
+            {
+              "query_term": "of",
+              "stored_word": "source_of_truth"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "question": 20,
+      "lane": 1,
+      "fts_count": 330,
+      "python_count": 328,
+      "cases": [
+        {
+          "window_id": 33,
+          "examples": [
+            {
+              "query_term": "limit",
+              "stored_word": "default_limit"
+            }
+          ]
+        },
+        {
+          "window_id": 41,
+          "examples": [
+            {
+              "query_term": "size",
+              "stored_word": "batch_size"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

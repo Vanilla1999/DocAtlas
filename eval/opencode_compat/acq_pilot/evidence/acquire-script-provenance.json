@@ -1,0 +1,58 @@
+{
+  "note": "Reconstructed initial scalar version from the recorded tool patch in this session by reversing the sole subsequent edit; no independent initial file hash was recorded before SQL results, so exact byte identity cannot be independently established. Existing raw outputs were collected before scalar-to-IN edit. The modified script was not the version used for collection.",
+  "initial_reconstructed_path": "/tmp/opencode/acq-pilot/acquire-stage/candidates-original-reconstructed.py",
+  "initial_reconstructed_sha256": "45d0f91fea36b6dfb0233640e2a98d7d04456f2a5dc269e7c48818eb33b3f7e6",
+  "modified_path": "/tmp/opencode/acq-pilot/candidates.py",
+  "modified_sha256": "4a317c1020c52f3bc6be527da679938ea5c26f0d2f3e4cf548ff49b766432775",
+  "patch": "/tmp/opencode/acq-pilot/acquire-stage/candidates-original-to-modified.patch",
+  "raw_artifacts": [
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L0-v0-P1.json",
+      "sha256": "af149a7b6a8cf1e7a13ef86dc87adcdc375e0219d544fb1cf17bc5a32d40abfc"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L0-v0-P2.json",
+      "sha256": "f804b9715fe6cc77a1d65f4877d32c4dec74cba5e9c16b0225dfaa005046bb48"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L0-v0-P3.json",
+      "sha256": "e02741ed35deabc21f10633811f8d23eab500c3737369667e5887a5e3a0e5678"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L0-v5-P1.json",
+      "sha256": "dc73902cef244287c3f201755a72673390aa7f83ef99ccac4cd0311070a05e4b"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L0-v5-P2.json",
+      "sha256": "9fc50717ee452022ea30d6e8c4c2917ac34720abe442f440e6bdc75af290862c"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L0-v5-P3.json",
+      "sha256": "b36bf59060651ca536a35b50700d5defba209cff74a98d0d230a23e566dcad20"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L2-v0-P1.json",
+      "sha256": "bc1d36fcc270adb256fd956bf91fdc54e84f9357e3e3b41d8789b3a482c959b0"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L2-v0-P2.json",
+      "sha256": "833c867918fc7061068c985a90e48ac7f36cb7b8543ed7b76c4a937faa52ec28"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L2-v0-P3.json",
+      "sha256": "b5b60f7dd7cd4592bddf2015c5f58828bbb88d0ef6c27648b6839219d61082de"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L2-v5-P1.json",
+      "sha256": "b41230570465a954b6d7b1f454fdff545545b65335c206b5669e54631e2ee014"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L2-v5-P2.json",
+      "sha256": "7484e05d391d474c347b10b68be9c711f17462b882c00a21c5628d10665c489a"
+    },
+    {
+      "path": "/tmp/opencode/acq-pilot/candidates-L2-v5-P3.json",
+      "sha256": "dc0ad04b66ec2156f9b79b8d9dfe4519505844877225540eba7efa03c90496cf"
+    }
+  ]
+}

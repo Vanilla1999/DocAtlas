@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from ._project_docs_service_shared import *  # noqa: F401,F403
 from docmancer.core.models import RetrievedChunk
+from docmancer.retrieval.acquisition_reuse import acquisition_reuse_scope
 from ._project_docs_exact_document import (
     _EXACT_DOCUMENT_FALLBACK_LIMIT,
     _exact_document_index_chunks,
@@ -203,8 +204,14 @@ class _ProjectDocsServicePart03:
 
         _retrieve = _run
         discovery_records: dict[str, dict[str, dict[str, Any]]] = {}
+        # One request: an authority read that removes no window reuses the
+        # identical original pool instead of searching it again.
+        acquisition_entries: list[Any] = []
+
         def _run(text, **kwargs):
-            prepared = reference_context.prepare(_retrieve(text, **kwargs), text)
+            with acquisition_reuse_scope(acquisition_entries):
+                retrieved = _retrieve(text, **kwargs)
+            prepared = reference_context.prepare(retrieved, text)
             for lookup in documentation_query_plan.queries:
                 if lookup.text == text and lookup.origin in {"original", "host_lookup"}:
                     _record_query_discovery(discovery_records, prepared, lookup, reference_context=reference_context)

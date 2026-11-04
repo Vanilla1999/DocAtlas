@@ -18,7 +18,34 @@ documentation_languages:
   docs/index-cleanup.md: [en]
   docs/modules/project-context-retrieval.md: [en]
   docs/modules/evidence-selection.md: [en]
+  docs/PROJECT_BINDING.md: [en]
+  wiki/Configuration.md: [en]
+  docs/opencode-compact-text.md: [en]
 documents:
+  - path: docs/PROJECT_BINDING.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: OpenCode project binding, preparation, mismatch recovery, and scope.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: wiki/Configuration.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: Configuration file precedence and runtime settings.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/opencode-compact-text.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: OpenCode compact delivery, size limits, and delivery failure diagnosis.
+    authority: source_of_truth
+    status: active
+    impact: track
   - path: docs/main-flow-logging.md
     role: runbook
     scope: project

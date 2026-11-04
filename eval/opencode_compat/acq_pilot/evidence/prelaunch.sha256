@@ -1,0 +1,5 @@
+1d611b045080f0ecb051bb07c3c4d7102e0fa38fb1a10f2472c9b8e97bcb1c47  /tmp/opencode/acq-pilot/corpus-manifest.json
+07b684aa6baf4f55b304146ff703b95e931cac5da60352a6acfca8250c593f54  /tmp/opencode/acq-pilot/quote-occurrences.json
+ff8c5d154449bbf43a839d1eb1840a86d9530a51bac864d0a15bd42f486a8426  /tmp/opencode/acq-pilot/oracle-source-verification.json
+9d2ef7c76749ec0dfc21b08603e7d536e772c12a61105b19f11f9f989d826011  /tmp/opencode/acq-pilot/prepare_corpus.py
+4b680cc6844778b8dba777b89812e11c53719772d61ea06c8421aa902bf87cab  /tmp/opencode/acq-pilot/run_pilot.py

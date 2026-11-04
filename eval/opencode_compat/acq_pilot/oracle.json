@@ -1,0 +1,37 @@
+{
+  "schema": "acq-pilot-facts-v1",
+  "purpose": "Three new development-pilot questions; not an independent statistical holdout. Written from primary sources before either variant's outputs. Prior 20-question diagnostics were known to the author.",
+  "corpus_base": "3d21bfea",
+  "questions": [
+    {
+      "id": "P1",
+      "question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+      "search_question": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+      "facts": [
+        {"id": "P1.size", "path": "wiki/Configuration.md", "start": 44, "end": 44, "quote": "| `loaders.default_chunk_size` | `800` | Default chunk size used by paragraph + sliding-window chunkers |"},
+        {"id": "P1.overlap", "path": "wiki/Configuration.md", "start": 45, "end": 45, "quote": "| `loaders.default_chunk_overlap` | `100` | Default overlap; must be smaller than `chunk_size` |"},
+        {"id": "P1.format", "path": "wiki/Configuration.md", "start": 46, "end": 46, "quote": "| `loaders.formats.<fmt>.chunk_size` | unset | Per-format override (`md`, `pdf`, `docx`, `rtf`, `html`, `txt`) |"}
+      ]
+    },
+    {
+      "id": "P2",
+      "question": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+      "search_question": "With tracing enabled in the environment, how do I disable it for one CLI invocation, where must the flag appear, and does it suppress ordinary errors and third-party stderr messages?",
+      "facts": [
+        {"id": "P2.position", "path": "docs/main-flow-logging.md", "start": 12, "end": 15, "quote": "Глобальные `--trace` / `--no-trace` указываются **перед подкомандой**.\nОни переопределяют `DOCATLAS_TRACE` на время вызова."},
+        {"id": "P2.command", "path": "docs/main-flow-logging.md", "start": 18, "end": 18, "quote": "DOCATLAS_TRACE=1 doc-atlas --no-trace query \"OAuth tokens\" --mode lexical"},
+        {"id": "P2.stderr", "path": "docs/main-flow-logging.md", "start": 23, "end": 23, "quote": "Обычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`."}
+      ]
+    },
+    {
+      "id": "P3",
+      "question": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+      "search_question": "During index cleanup coordination, what happens to dead-process writer leases and unreadable leases, and is independent fetch and staging serialized for its full duration?",
+      "facts": [
+        {"id": "P3.dead", "path": "docs/index-cleanup.md", "start": 106, "end": 106, "quote": "Writer leases from dead processes are cleaned during the barrier check;"},
+        {"id": "P3.unreadable", "path": "docs/index-cleanup.md", "start": 106, "end": 106, "quote": "an unreadable lease remains a blocker rather than being ignored."},
+        {"id": "P3.duration", "path": "docs/index-cleanup.md", "start": 106, "end": 106, "quote": "The short per-database mutation lock is used only around publication/removal, so independent fetch/staging work is not serialized for its full duration."}
+      ]
+    }
+  ]
+}

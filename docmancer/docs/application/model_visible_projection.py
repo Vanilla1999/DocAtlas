@@ -37,6 +37,7 @@ from docmancer.docs.application.model_visible_projection_helpers import (
     canonical_projection_bytes,
     estimate_projection_tokens,
     docs_context_budget_tokens,
+    projection_tokens_for_size,
 )
 from ._model_visible_patch_projection import _validate_patch_projection, _patch_recovery_errors
 from ._model_visible_docs_support import (
@@ -895,8 +896,11 @@ def _find_forbidden_keys(value: Any) -> set[str]:
 
 def _refresh_estimate(payload: dict[str, Any]) -> None:
     payload["estimated_tokens"] = 0
+    # Only this top-level integer changes below, so the canonical size changes
+    # by its decimal digits alone. Serialize once, not once per iteration.
+    other_bytes = len(canonical_projection_bytes(payload)) - len(str(0))
     for _ in range(3):
-        actual = estimate_projection_tokens(payload)
+        actual = projection_tokens_for_size(other_bytes + len(str(payload["estimated_tokens"])))
         if payload["estimated_tokens"] == actual:
             break
         payload["estimated_tokens"] = actual

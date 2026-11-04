@@ -1,0 +1,192 @@
+{
+  "source_path": "docmancer/docs/application/_project_context_service_part01.py:58-84,93-100; _project_docs_service_part03.py:107-130,213-218,239-246,268-279; retrieval/_dispatch_part01.py:105-110,156-160",
+  "observation": "P1 actual input expand, filters and row order recorded in ../acquire-observed-L0-v0-P1.json; this file is production-function replay, not a claim of original trace capture",
+  "questions": [
+    {
+      "question_id": "P1",
+      "locator": null,
+      "production_requirement_lifecycle": "current",
+      "diagnostic_lifecycle": "current",
+      "requirements_aware_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1"
+        ],
+        "required_query_ids": [
+          "query-original"
+        ],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Какие значения по умолчанию заданы для размера и перекрытия чанков загрузчиков, какое между ними ограничение и можно ли переопределить размер отдельно для формата?",
+            "origin": "original",
+            "coverage_required": true,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "What are the default loader chunk size and overlap, their constraint, and can chunk size be overridden per format?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [],
+        "_component_contract": [],
+        "component_scope_complete": false
+      },
+      "saved_plan_equal": true
+    },
+    {
+      "question_id": "P2",
+      "locator": null,
+      "production_requirement_lifecycle": "current",
+      "diagnostic_lifecycle": "current",
+      "requirements_aware_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1"
+        ],
+        "required_query_ids": [
+          "query-original"
+        ],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Если в окружении включена трассировка, как отключить её для одного запуска CLI, куда поставить флаг и подавит ли он обычные ошибки и сторонние сообщения stderr?",
+            "origin": "original",
+            "coverage_required": true,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "With tracing enabled in the environment, how do I disable it for one CLI invocation, where must the flag appear, and does it suppress ordinary errors and third-party stderr messages?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [],
+        "_component_contract": [],
+        "component_scope_complete": false
+      },
+      "saved_plan_equal": true
+    },
+    {
+      "question_id": "P3",
+      "locator": null,
+      "production_requirement_lifecycle": "current",
+      "diagnostic_lifecycle": "current",
+      "requirements_aware_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1"
+        ],
+        "required_query_ids": [
+          "query-original"
+        ],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "При координации очистки индекса что происходит с writer lease умершего процесса и с нечитаемым lease, и сериализуется ли независимая загрузка и подготовка данных на всё время работы?",
+            "origin": "original",
+            "coverage_required": true,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "During index cleanup coordination, what happens to dead-process writer leases and unreadable leases, and is independent fetch and staging serialized for its full duration?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [],
+        "_component_contract": [],
+        "component_scope_complete": false
+      },
+      "saved_plan_equal": true
+    }
+  ]
+}

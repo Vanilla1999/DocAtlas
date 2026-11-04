@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "state": "QUESTIONS_SEALED_PRE_GOLD",
+  "frozen_at_utc": "2026-11-03T18:28:34Z",
+  "files": {
+    "corpus.py": "c6e10fbea41e29c8d1df7e8ad367377b4eabcec02f0abd9d3184d40aa7ef3a63",
+    "corpus-lock.json": "19d035ef988aaff5e70366269039dae2e6525fcbd9b9b5021236ac9806579375",
+    "topics.py": "b837dcdfc085a1b4c9b65aebd00fcd1554c7f8966cf8f3a0870b7a48b7fd789b",
+    "topics.json": "b3b9f5523f12cda5b8b9ec84bf6aaafecb0fcbcb452a20a29cbce5fef463abef",
+    "questions.json": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27"
+  },
+  "procedure": [
+    "topics.py drew 24 leaf sections with a published seed and printed only path, heading path and line range",
+    "questions.json was written from those headings before any section body of the drawn topics was read",
+    "oracle.json (gold quotes) is written only after this manifest is committed; questions are never edited afterwards",
+    "holdout cases are not used to tune anything; changes are tuned on dev only"
+  ],
+  "disclosure": "The questions were written by the same AI agent that later writes the gold. Earlier in the same working session it read DocAtlas code and some delivered payloads, so incidental exposure to parts of these documents cannot be ruled out; it did not open the drawn sections before sealing."
+}

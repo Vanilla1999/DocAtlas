@@ -45,6 +45,12 @@ class SelectorExecutionError(RuntimeError):
         self.receipt = receipt
 
 
+class JointSemanticRelevanceError(SelectorExecutionError):
+    """Explicit public failure for the opt-in joint semantic ranker."""
+
+    reason_code = "joint_semantic_relevance_failed"
+
+
 def configured_selector(settings: tuple[str | None, str | None, str | None] | None) -> SelectorConfig | None:
     if settings is None or settings[0] is None:
         return None
@@ -159,6 +165,40 @@ def preload_mini_runtime(model_path: str) -> dict[str, Any]:
         raise SelectorExecutionError("Mini preparation failed: " + str(exc), receipt) from exc
     finally:
         receipt["total_seconds"] = perf_counter() - started
+
+
+def score_joint_relevance(queries: dict, rows: list[dict], model_path: str) -> tuple[dict[str, list[float]], dict]:
+    """Score checked query/window pairs locally for the opt-in joint selector."""
+    config = configured_selector(("mini", "2", model_path))
+    receipt: dict[str, Any] = {"model_load_attempts": 0, "model_loads": 0,
+                               "model_forwards": 0, "inference_seconds": 0.0}
+    scores: dict[str, list[float]] = {}
+    try:
+        with _RUNTIME_LOCK:
+            runtime = _load_mini(config.model_path, receipt)
+            for key, query in queries.items():
+                values = []
+                for start in range(0, len(rows), 16):
+                    batch = rows[start:start + 16]
+                    inputs = runtime.tokenizer(
+                        [query["text"]] * len(batch), [row["snippet"] for row in batch],
+                        truncation=True, max_length=MINI_MAX_LENGTH, padding=True, return_tensors="pt",
+                    )
+                    started = perf_counter()
+                    with runtime.torch.inference_mode():
+                        logits = runtime.model(**inputs).logits[:, 0].float()
+                        batch_scores = runtime.torch.sigmoid(logits).tolist()
+                    receipt["inference_seconds"] += perf_counter() - started
+                    receipt["model_forwards"] += 1
+                    if not all(math.isfinite(value) for value in batch_scores):
+                        raise ValueError("Mini produced a nonfinite score")
+                    values.extend(batch_scores)
+                scores[key] = values
+        receipt["model"].update(truncation=True, score="sigmoid(logits[:,0])")
+        return scores, receipt
+    except Exception as exc:
+        receipt.update(status="error", error_type=type(exc).__name__, error=str(exc))
+        raise JointSemanticRelevanceError("Joint semantic relevance failed: " + str(exc), receipt) from exc
 
 
 def choose_configured_candidates(question: str, pool: tuple[Any, ...], config: SelectorConfig) -> tuple[tuple[int, ...], dict[str, Any]]:

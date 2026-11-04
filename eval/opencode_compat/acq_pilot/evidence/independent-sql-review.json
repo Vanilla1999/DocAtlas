@@ -1,0 +1,446 @@
+[
+  {
+    "corpus": "L0",
+    "variant": "v0",
+    "question": "P1",
+    "fts": [
+      46,
+      46,
+      378
+    ],
+    "sql_pool": 294,
+    "facts": [
+      {
+        "id": "P1.size",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.format",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L0",
+    "variant": "v0",
+    "question": "P2",
+    "fts": [
+      94,
+      94,
+      378
+    ],
+    "sql_pool": 297,
+    "facts": [
+      {
+        "id": "P2.position",
+        "ranks": [
+          16,
+          16,
+          298
+        ]
+      },
+      {
+        "id": "P2.command",
+        "ranks": [
+          57,
+          57,
+          299
+        ]
+      },
+      {
+        "id": "P2.stderr",
+        "ranks": [
+          1,
+          1,
+          8
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L0",
+    "variant": "v0",
+    "question": "P3",
+    "fts": [
+      48,
+      48,
+      380
+    ],
+    "sql_pool": 295,
+    "facts": [
+      {
+        "id": "P3.dead",
+        "ranks": [
+          4,
+          4,
+          1
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "ranks": [
+          4,
+          4,
+          1
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "ranks": [
+          4,
+          4,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L0",
+    "variant": "v5",
+    "question": "P1",
+    "fts": [
+      46,
+      46,
+      378
+    ],
+    "sql_pool": 301,
+    "facts": [
+      {
+        "id": "P1.size",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.format",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L0",
+    "variant": "v5",
+    "question": "P2",
+    "fts": [
+      94,
+      94,
+      378
+    ],
+    "sql_pool": 306,
+    "facts": [
+      {
+        "id": "P2.position",
+        "ranks": [
+          14,
+          14,
+          301
+        ]
+      },
+      {
+        "id": "P2.command",
+        "ranks": [
+          66,
+          66,
+          302
+        ]
+      },
+      {
+        "id": "P2.stderr",
+        "ranks": [
+          1,
+          1,
+          9
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L0",
+    "variant": "v5",
+    "question": "P3",
+    "fts": [
+      48,
+      48,
+      380
+    ],
+    "sql_pool": 301,
+    "facts": [
+      {
+        "id": "P3.dead",
+        "ranks": [
+          4,
+          4,
+          1
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "ranks": [
+          4,
+          4,
+          1
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "ranks": [
+          4,
+          4,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "variant": "v0",
+    "question": "P1",
+    "fts": [
+      6324,
+      6324,
+      4004
+    ],
+    "sql_pool": 512,
+    "facts": [
+      {
+        "id": "P1.size",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.format",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "variant": "v0",
+    "question": "P2",
+    "fts": [
+      6715,
+      6715,
+      4136
+    ],
+    "sql_pool": 508,
+    "facts": [
+      {
+        "id": "P2.position",
+        "ranks": [
+          301,
+          301,
+          3245
+        ]
+      },
+      {
+        "id": "P2.command",
+        "ranks": [
+          6081,
+          6081,
+          3246
+        ]
+      },
+      {
+        "id": "P2.stderr",
+        "ranks": [
+          1,
+          1,
+          75
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "variant": "v0",
+    "question": "P3",
+    "fts": [
+      6577,
+      6577,
+      5189
+    ],
+    "sql_pool": 498,
+    "facts": [
+      {
+        "id": "P3.dead",
+        "ranks": [
+          8,
+          8,
+          1
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "ranks": [
+          8,
+          8,
+          1
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "ranks": [
+          8,
+          8,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "variant": "v5",
+    "question": "P1",
+    "fts": [
+      6324,
+      6324,
+      4004
+    ],
+    "sql_pool": 512,
+    "facts": [
+      {
+        "id": "P1.size",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      },
+      {
+        "id": "P1.format",
+        "ranks": [
+          null,
+          null,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "variant": "v5",
+    "question": "P2",
+    "fts": [
+      6715,
+      6715,
+      4136
+    ],
+    "sql_pool": 509,
+    "facts": [
+      {
+        "id": "P2.position",
+        "ranks": [
+          279,
+          279,
+          3531
+        ]
+      },
+      {
+        "id": "P2.command",
+        "ranks": [
+          6676,
+          6676,
+          3532
+        ]
+      },
+      {
+        "id": "P2.stderr",
+        "ranks": [
+          1,
+          1,
+          71
+        ]
+      }
+    ]
+  },
+  {
+    "corpus": "L2",
+    "variant": "v5",
+    "question": "P3",
+    "fts": [
+      6577,
+      6577,
+      5189
+    ],
+    "sql_pool": 500,
+    "facts": [
+      {
+        "id": "P3.dead",
+        "ranks": [
+          6,
+          6,
+          1
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "ranks": [
+          6,
+          6,
+          1
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "ranks": [
+          6,
+          6,
+          1
+        ]
+      }
+    ]
+  }
+]

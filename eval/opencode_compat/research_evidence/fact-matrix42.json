@@ -1,0 +1,327 @@
+{
+  "denominator": 42,
+  "counts": {
+    "off": 33,
+    "mini": 31,
+    "hybrid": 39
+  },
+  "hybrid_gains": [
+    "F04.1",
+    "F04.2",
+    "F08.1",
+    "F08.2",
+    "F09.1",
+    "F14.2"
+  ],
+  "hybrid_losses": [],
+  "mini_gains": [
+    "F04.1",
+    "F04.2",
+    "F08.1",
+    "F08.2"
+  ],
+  "mini_losses": [
+    "F09.2",
+    "F17.1",
+    "F19.1",
+    "F19.2",
+    "F20.1",
+    "F20.2"
+  ],
+  "facts": [
+    {
+      "id": "F01.1",
+      "criterion": "get_docs_context retrieves documentation",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F01.2",
+      "criterion": "prepare_docs performs authorized lifecycle",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F01.3",
+      "criterion": "docs_status reports status",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F02.1",
+      "criterion": "installer installs DocAtlas and registers OpenCode",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F02.2",
+      "criterion": "agent can be selected noninteractively",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F03.1",
+      "criterion": "installation binds but does not index documents",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F04.1",
+      "criterion": "doc-atlas install opencode --project",
+      "off": 0,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F04.2",
+      "criterion": "--project-path selects another absolute project",
+      "off": 0,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F05.1",
+      "criterion": "not_prepared and member_store_uninitialized mean unprepared store, not permission error",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F05.2",
+      "criterion": "confirmed current hashes and mutation then retry original",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F06.1",
+      "criterion": "--config then ./docatlas.yaml then ~/.docatlas/docatlas.yaml",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F06.2",
+      "criterion": "relative index paths resolved from config file",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F07.1",
+      "criterion": "GitBook, Mintlify, web, GitHub and local files",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F07.2",
+      "criterion": "local Markdown, text, HTML, PDF, DOCX, RTF",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F08.1",
+      "criterion": "docatlas.project-docs.yaml explicit literal paths, no recursive/glob discovery",
+      "off": 0,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F08.2",
+      "criterion": "role scope module path authority status impact",
+      "off": 0,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F09.1",
+      "criterion": "mutation confirm true, trusted store, current hashes and generation",
+      "off": 0,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F09.2",
+      "criterion": "no mutation means no writes; upsert neither prunes nor writes vectors",
+      "off": 1,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F10.1",
+      "criterion": "explicit library and exact version",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F10.2",
+      "criterion": "no implicit latest or unauthorized discovery",
+      "off": 0,
+      "mini": 0,
+      "hybrid": 0
+    },
+    {
+      "id": "F11.1",
+      "criterion": "project repo only",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F11.2",
+      "criterion": "module requires exact module_path",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F11.3",
+      "criterion": "module_path implies module",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F11.4",
+      "criterion": "all repo and modules without filters",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F12.1",
+      "criterion": "path identity authority scope hash verbatim snippet and local coordinates",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F12.2",
+      "criterion": "attribution does not confer permissions",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F13.1",
+      "criterion": "mismatch before retrieval; connect correct project",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F13.2",
+      "criterion": "do not use subfolder as project; preserve scope",
+      "off": 0,
+      "mini": 0,
+      "hybrid": 0
+    },
+    {
+      "id": "F14.1",
+      "criterion": "network preparation requires explicit permitted source and consent",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F14.2",
+      "criterion": "discovery is not indexing consent",
+      "off": 0,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F15.1",
+      "criterion": "poll docs_status using returned job id",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F15.2",
+      "criterion": "retry unchanged original after verified success",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F16.1",
+      "criterion": "tracing off by default; DOCATLAS_TRACE=1 or --trace enables",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F16.2",
+      "criterion": "MCP diagnostic stderr separate from stdout",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F17.1",
+      "criterion": "integration, installed stdio, real client and production smoke are distinct",
+      "off": 1,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F17.2",
+      "criterion": "new tests integration level and above",
+      "off": 0,
+      "mini": 0,
+      "hybrid": 0
+    },
+    {
+      "id": "F18.1",
+      "criterion": "source checked combined candidate selection, relevance and redundancy",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F18.2",
+      "criterion": "real delivery budget, attribution and unverified coverage",
+      "off": 1,
+      "mini": 1,
+      "hybrid": 1
+    },
+    {
+      "id": "F19.1",
+      "criterion": "preview and review plan digest, stop workers, apply exact digest",
+      "off": 1,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F19.2",
+      "criterion": "shared index not deleted by guessing ownership",
+      "off": 1,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F20.1",
+      "criterion": "delivery error not missing docs",
+      "off": 1,
+      "mini": 0,
+      "hybrid": 1
+    },
+    {
+      "id": "F20.2",
+      "criterion": "do not retry unchanged or broaden scope; fix delivery and inspect actually visible result",
+      "off": 1,
+      "mini": 0,
+      "hybrid": 1
+    }
+  ]
+}

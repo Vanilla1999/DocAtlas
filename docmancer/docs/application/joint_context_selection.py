@@ -17,6 +17,7 @@ None of this establishes answer completeness.
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 import json
 import math
@@ -32,11 +33,69 @@ from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
+from .query_trace import query_trace_enabled
 from .standalone_text_view import COMPACT_TEXT_MAX_TOKENS, render_standalone_text
 
 
 POLICY = "joint_checked_body_mmr_v1"
 _CLI_LITERAL = re.compile(r"(?<!\w)--[A-Za-z][A-Za-z0-9_-]*(?!\w)")
+_TRACE_ROW_LIMIT = 512
+
+
+class _SelectionObservation:
+    """Bounded independent ledger, never consulted by the selector."""
+
+    def __init__(self, retrieval: dict, rows: list[dict]) -> None:
+        self.state = None
+        self.rows = []
+        if not query_trace_enabled():
+            return
+        try:
+            self.rows = [{"evidence_id": row.get("evidence_id"),
+                          "line_start": row.get("line_start"), "line_end": row.get("line_end"),
+                          "decision": "not_considered"} for row in rows[:_TRACE_ROW_LIMIT]]
+            self.state = {"row_count": len(rows), "row_limit": _TRACE_ROW_LIMIT,
+                          "omitted_rows": max(0, len(rows) - len(self.rows)), "rows": self.rows}
+            retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
+                "docs_context_projection", {})["joint_selection_observation"] = self.state
+        except Exception:
+            self.state = None
+            self.rows = []
+
+    def decision(self, item: _Unit, decision: str,
+                 priority: Callable[[_Unit], tuple[float, float, int]], **details: object) -> None:
+        if self.state is None:
+            return
+        try:
+            indices = item.indices
+            if not any(index < len(self.rows) for index in indices):
+                return
+            score = priority(item)
+            for index in indices:
+                if index < len(self.rows):
+                    row = self.rows[index]
+                    if "first_decision" not in row:
+                        row.update(first_decision=decision, first_unit_rows=len(indices),
+                                   first_selected_before=details.get("selected_before"),
+                                   first_gain_per_cost=score[0], first_relevance=score[1],
+                                   first_cost_bytes=item.cost,
+                                   first_redundancy=score[1] - score[0] * math.sqrt(item.cost))
+                    row.update(decision=decision, gain_per_cost=score[0],
+                               relevance=score[1], cost_bytes=item.cost,
+                               redundancy=score[1] - score[0] * math.sqrt(item.cost),
+                               unit_rows=len(indices), **details)
+        except Exception:
+            self.state["diagnostic_error"] = True
+
+    def selected(self, rows: list[dict]) -> None:
+        if self.state is None:
+            return
+        try:
+            ids = {row.get("evidence_id") for row in rows}
+            for row in self.rows:
+                row["joint_output"] = row["evidence_id"] in ids
+        except Exception:
+            self.state["diagnostic_error"] = True
 
 
 @dataclass(frozen=True)
@@ -206,12 +265,28 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     cap = experimental_context_max_tokens()
     if not rows or cap is None:
         return payload, snapshot
+    observation = _SelectionObservation(retrieval, rows)
     limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
     # to reconstruct a question from retrieved text or generated probes.
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
+    semantic_mode = os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off")
+    if semantic_mode not in {"off", "mini", "hybrid"}:
+        raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off, mini or hybrid")
+    semantic_scores = None
+    if semantic_mode in {"mini", "hybrid"}:
+        from .experimental_selection_modes import score_joint_relevance
+        semantic_scores, semantic_receipt = score_joint_relevance(
+            queries, rows, os.environ.get("DOCATLAS_EXPERIMENT_MINI_PATH", ""),
+        )
+        if observation.state is not None:
+            observation.state["semantic_relevance"] = semantic_receipt
+            for index, row in enumerate(observation.rows):
+                row["semantic_lane_scores"] = {
+                    key: values[index] for key, values in semantic_scores.items()
+                }
     literals = sorted({value.group() for query in queries.values()
                        for value in _CLI_LITERAL.finditer(query["text"])})
     literal_patterns = {"literal:" + value.casefold(): re.compile(
@@ -295,11 +370,21 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             for index in item.indices for other in grouped[item.group] if other in selected_set
         )
 
+    # A unit's terms and norm are functions of its row indices, so a pair's
+    # similarity never changes during this call; every greedy step reuses it.
+    similarities: dict[tuple[tuple[int, ...], tuple[int, ...]], float] = {}
+
     def similarity(left: _Unit, right: _Unit) -> float:
-        if not left.vector_norm or not right.vector_norm:
-            return 0.0
-        return min(1.0, sum(information[term] ** 2 for term in sorted(left.terms & right.terms))
-                   / (left.vector_norm * right.vector_norm))
+        key = (left.indices, right.indices)
+        value = similarities.get(key)
+        if value is None:
+            if not left.vector_norm or not right.vector_norm:
+                value = 0.0
+            else:
+                value = min(1.0, sum(information[term] ** 2 for term in sorted(left.terms & right.terms))
+                            / (left.vector_norm * right.vector_norm))
+            similarities[key] = value
+        return value
 
     while pending:
         def priority(item: _Unit) -> tuple[float, float, int]:
@@ -313,12 +398,26 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             # An exact source nomination is a separate routing signal, not
             # a match in the body. It keeps locator-only reads possible while
             # normal attribution is independently rebuilt below.
-            relevance = sum(max(
-                mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0,
-                1.0 if key in item.locator_queries else 0.0,
-            ) for key in queries) / len(queries)
-            # This is an MMR-style choice: equal scales for query relevance and
-            # content redundancy, not a hard one-hit set-cover stopping rule.
+            if semantic_scores is None:
+                relevance = sum(max(
+                    mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0,
+                    1.0 if key in item.locator_queries else 0.0,
+                ) for key in queries) / len(queries)
+            elif semantic_mode == "mini":
+                indices = whole[item.group].indices if completing else item.indices
+                relevance = sum(max(
+                    max(semantic_scores[key][index] for index in indices),
+                    1.0 if key in item.locator_queries else 0.0,
+                ) for key in queries) / len(queries)
+            else:
+                indices = whole[item.group].indices if completing else item.indices
+                relevance = sum(max(
+                    0.5 * (mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0)
+                    + 0.5 * max(semantic_scores[key][index] for index in indices),
+                    1.0 if key in item.locator_queries else 0.0,
+                ) for key in queries) / len(queries)
+            # This MMR-style choice subtracts content redundancy without a hard
+            # one-hit set-cover stop. Its signals are not calibrated probabilities.
             # Siblings of a partly selected coherent section are complementary
             # continuation, so they are compared against other sections only.
             redundancy = max((similarity(item, previous) for previous in selected_units
@@ -328,6 +427,9 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
 
         candidate = max(pending.values(), key=priority)
         if priority(candidate)[0] <= 0:
+            if observation.state is not None:
+                for remaining in pending.values():
+                    observation.decision(remaining, "nonpositive_gain", priority)
             break
         del pending[candidate.indices]
         trial_indices = [*selected, *candidate.indices]
@@ -344,6 +446,11 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
             trial, receipts = packet(trial_indices, budget_limited=bool(rejected - set(trial_indices)))
             fits = _delivery_fits(trial, limit)
         if not fits:
+            if observation.state is not None:
+                observation.decision(candidate, "delivery_budget" if references_fit else "reference_limit", priority,
+                                     selected_before=len(selected), trial_text_bytes=text_bytes,
+                                     fit_check=("reference_limit" if not references_fit else
+                                                "text_lower_bound" if text_bytes > 4 * limit else "rendered_packet"))
             if references_fit:
                 rejected.update(candidate.indices)
             else:
@@ -355,6 +462,8 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
                     pending[(index,)] = unit(candidate.group, (index,))
             continue
         selected.extend(candidate.indices)
+        if observation.state is not None:
+            observation.decision(candidate, "selected", priority, selected_before=len(selected) - len(candidate.indices))
         selected_set.update(candidate.indices)
         selected_groups.add(candidate.group)
         selected_units.append(candidate)
@@ -364,4 +473,6 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     # Reprice the truthful final omissions envelope too. No URI, attribution,
     # diagnostics, or selection field is appended after this final wire check.
     result, bound = packet(selected, budget_limited=bool(rejected - selected_set))
-    return finalize_joint_context_delivery(result, bound, retrieval)
+    result, bound = finalize_joint_context_delivery(result, bound, retrieval)
+    observation.selected(result.get("sources") or [])
+    return result, bound

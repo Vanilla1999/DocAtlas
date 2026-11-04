@@ -1,0 +1,22 @@
+{
+ "1": {"source": "docs/mcp-docs-server.md:20-30", "facts": ["get_docs_context retrieves documentation", "prepare_docs performs authorized lifecycle", "docs_status reports status"]},
+ "2": {"source": "README.md:75-95", "facts": ["installer installs DocAtlas and registers OpenCode", "agent can be selected noninteractively"]},
+ "3": {"source": "docs/PROJECT_BINDING.md:16-23", "facts": ["installation binds but does not index documents"]},
+ "4": {"source": "docs/PROJECT_BINDING.md:3-14", "facts": ["doc-atlas install opencode --project", "--project-path selects another absolute project"]},
+ "5": {"source": "docs/PROJECT_BINDING.md:25-31", "facts": ["not_prepared and member_store_uninitialized mean unprepared store, not permission error", "confirmed current hashes and mutation then retry original"]},
+ "6": {"source": "wiki/Configuration.md:3-5", "facts": ["--config then ./docatlas.yaml then ~/.docatlas/docatlas.yaml", "relative index paths resolved from config file"]},
+ "7": {"source": "wiki/Supported-Sources.md:10-35", "facts": ["GitBook, Mintlify, web, GitHub and local files", "local Markdown, text, HTML, PDF, DOCX, RTF"]},
+ "8": {"source": "docs/project-docs-mcp-workflow.md:23-50", "facts": ["docatlas.project-docs.yaml explicit literal paths, no recursive/glob discovery", "role scope module path authority status impact"]},
+ "9": {"source": "docs/project-docs-mcp-workflow.md:61-87", "facts": ["mutation confirm true, trusted store, current hashes and generation", "no mutation means no writes; upsert neither prunes nor writes vectors"]},
+ "10": {"source": "docs/mcp-docs-server.md:111-119", "facts": ["explicit library and exact version", "no implicit latest or unauthorized discovery"]},
+ "11": {"source": "docs/project-docs-mcp-workflow.md:96-108", "facts": ["project repo only", "module requires exact module_path", "module_path implies module", "all repo and modules without filters"]},
+ "12": {"source": "docs/mcp-docs-server.md:63-65", "facts": ["path identity authority scope hash verbatim snippet and local coordinates", "attribution does not confer permissions"]},
+ "13": {"source": "docs/PROJECT_BINDING.md:42-58", "facts": ["mismatch before retrieval; connect correct project", "do not use subfolder as project; preserve scope"]},
+ "14": {"source": "docs/project-docs-mcp-workflow.md:143-148", "facts": ["network preparation requires explicit permitted source and consent", "discovery is not indexing consent"]},
+ "15": {"source": "docs/mcp-docs-server.md:32-40", "facts": ["poll docs_status using returned job id", "retry unchanged original after verified success"]},
+ "16": {"source": "docs/main-flow-logging.md:3-24", "facts": ["tracing off by default; DOCATLAS_TRACE=1 or --trace enables", "MCP diagnostic stderr separate from stdout"]},
+ "17": {"source": "docs/main-flow-evaluation.md:41", "facts": ["integration, installed stdio, real client and production smoke are distinct", "new tests integration level and above"]},
+ "18": {"source": "docs/modules/evidence-selection.md:28-42", "facts": ["source checked combined candidate selection, relevance and redundancy", "real delivery budget, attribution and unverified coverage"]},
+ "19": {"source": "docs/index-cleanup.md:29-62", "facts": ["preview and review plan digest, stop workers, apply exact digest", "shared index not deleted by guessing ownership"]},
+ "20": {"source": "docs/opencode-compact-text.md:72-88", "facts": ["delivery error not missing docs", "do not retry unchanged or broaden scope; fix delivery and inspect actually visible result"]}
+}

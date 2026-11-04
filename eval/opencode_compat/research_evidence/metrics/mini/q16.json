@@ -1,0 +1,14 @@
+{
+  "status": "truncated",
+  "source_rows": 9,
+  "facts": [
+    true,
+    true
+  ],
+  "bytes": 5201,
+  "raw_cl100k_tokens": 1422,
+  "question": 16,
+  "seconds": 44.136468793999484,
+  "isError": false,
+  "temperature": "warm_process"
+}

@@ -1,0 +1,11 @@
+--- candidates-original-reconstructed.py
++++ ../candidates.py
+@@ -14,7 +14,7 @@
+ allout=[]
+ for q in oracle['questions']:
+     plan=build_documentation_query_plan(q['question'],lookup_queries=(q['search_question'],)).as_payload()
+-    filters={'project_path':str(project),'project_identity':identity,'source_class':'project_file',**lifecycle_filters_for_intent(lifecycle_intent(q['question'])),'doc_scope':'project'}
++    filters={'project_path':str(project),'project_identity':identity,'source_class':{'in':['project_file']},**lifecycle_filters_for_intent(lifecycle_intent(q['question'])),'doc_scope':{'in':['project']}}
+     lanes=[('original',q['question'],filters),('authority',q['question'],{**filters,'authority':'source_of_truth'}),('host_lookup',q['search_question'],filters)]
+     result={'question_id':q['id'],'production_plan_reconstructed':plan,'plan_observation_gap':'public stdio trace records projection only; planner replay uses actual request inputs, not captured plan','lanes':[],'ordered_union_ids':[],'qualification_gap':'pre/post qualification not observed'}
+     seen=set()

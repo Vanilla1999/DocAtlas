@@ -1,0 +1,674 @@
+[
+  {
+    "corpus": "L0",
+    "variant": "v0",
+    "question": "P1",
+    "facts": [
+      {
+        "id": "P1.size",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 1072439327848174477
+          }
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 1072439327848174477
+          }
+        ]
+      },
+      {
+        "id": "P1.format",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 1072439327848174477
+          }
+        ]
+      }
+    ],
+    "union_count": 294,
+    "lane_seconds_sum": 0.3504798380017746,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L0",
+    "variant": "v0",
+    "question": "P2",
+    "facts": [
+      {
+        "id": "P2.position",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 16,
+            "section_id": 5725781585609907061
+          },
+          {
+            "lane": "authority",
+            "rank": 16,
+            "section_id": 5725781585609907061
+          }
+        ]
+      },
+      {
+        "id": "P2.command",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 57,
+            "section_id": 1591966460049041498
+          },
+          {
+            "lane": "authority",
+            "rank": 57,
+            "section_id": 1591966460049041498
+          }
+        ]
+      },
+      {
+        "id": "P2.stderr",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 1,
+            "section_id": 7481756748423945094
+          },
+          {
+            "lane": "authority",
+            "rank": 1,
+            "section_id": 7481756748423945094
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 8,
+            "section_id": 7481756748423945094
+          }
+        ]
+      }
+    ],
+    "union_count": 297,
+    "lane_seconds_sum": 0.4609843260004709,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L0",
+    "variant": "v0",
+    "question": "P3",
+    "facts": [
+      {
+        "id": "P3.dead",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "authority",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6004152562709137487
+          }
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "authority",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6004152562709137487
+          }
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "authority",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6004152562709137487
+          }
+        ]
+      }
+    ],
+    "union_count": 295,
+    "lane_seconds_sum": 0.3722880610039283,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L0",
+    "variant": "v5",
+    "question": "P1",
+    "facts": [
+      {
+        "id": "P1.size",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 1072439327848174477
+          }
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 1072439327848174477
+          }
+        ]
+      },
+      {
+        "id": "P1.format",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 1072439327848174477
+          }
+        ]
+      }
+    ],
+    "union_count": 301,
+    "lane_seconds_sum": 0.39450339899849496,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L0",
+    "variant": "v5",
+    "question": "P2",
+    "facts": [
+      {
+        "id": "P2.position",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 14,
+            "section_id": 5725781585609907061
+          },
+          {
+            "lane": "authority",
+            "rank": 14,
+            "section_id": 5725781585609907061
+          }
+        ]
+      },
+      {
+        "id": "P2.command",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 66,
+            "section_id": 1591966460049041498
+          },
+          {
+            "lane": "authority",
+            "rank": 66,
+            "section_id": 1591966460049041498
+          }
+        ]
+      },
+      {
+        "id": "P2.stderr",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 1,
+            "section_id": 7481756748423945094
+          },
+          {
+            "lane": "authority",
+            "rank": 1,
+            "section_id": 7481756748423945094
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 9,
+            "section_id": 7481756748423945094
+          }
+        ]
+      }
+    ],
+    "union_count": 306,
+    "lane_seconds_sum": 0.5011384319986973,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L0",
+    "variant": "v5",
+    "question": "P3",
+    "facts": [
+      {
+        "id": "P3.dead",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "authority",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6004152562709137487
+          }
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "authority",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6004152562709137487
+          }
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "authority",
+            "rank": 4,
+            "section_id": 6004152562709137487
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6004152562709137487
+          }
+        ]
+      }
+    ],
+    "union_count": 301,
+    "lane_seconds_sum": 0.40822324399778154,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L2",
+    "variant": "v0",
+    "question": "P1",
+    "facts": [
+      {
+        "id": "P1.size",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6570137900297696226
+          }
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6570137900297696226
+          }
+        ]
+      },
+      {
+        "id": "P1.format",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6570137900297696226
+          }
+        ]
+      }
+    ],
+    "union_count": 512,
+    "lane_seconds_sum": 20.72185452299891,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L2",
+    "variant": "v0",
+    "question": "P2",
+    "facts": [
+      {
+        "id": "P2.position",
+        "acquired": false,
+        "hits": []
+      },
+      {
+        "id": "P2.command",
+        "acquired": false,
+        "hits": []
+      },
+      {
+        "id": "P2.stderr",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 1,
+            "section_id": 5774927353842609448
+          },
+          {
+            "lane": "authority",
+            "rank": 1,
+            "section_id": 5774927353842609448
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 75,
+            "section_id": 5774927353842609448
+          }
+        ]
+      }
+    ],
+    "union_count": 508,
+    "lane_seconds_sum": 19.17807854700004,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L2",
+    "variant": "v0",
+    "question": "P3",
+    "facts": [
+      {
+        "id": "P3.dead",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 8,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "authority",
+            "rank": 8,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 3743648191207196485
+          }
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 8,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "authority",
+            "rank": 8,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 3743648191207196485
+          }
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 8,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "authority",
+            "rank": 8,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 3743648191207196485
+          }
+        ]
+      }
+    ],
+    "union_count": 498,
+    "lane_seconds_sum": 19.960289369002567,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L2",
+    "variant": "v5",
+    "question": "P1",
+    "facts": [
+      {
+        "id": "P1.size",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6570137900297696226
+          }
+        ]
+      },
+      {
+        "id": "P1.overlap",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6570137900297696226
+          }
+        ]
+      },
+      {
+        "id": "P1.format",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 6570137900297696226
+          }
+        ]
+      }
+    ],
+    "union_count": 512,
+    "lane_seconds_sum": 23.187239730999863,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L2",
+    "variant": "v5",
+    "question": "P2",
+    "facts": [
+      {
+        "id": "P2.position",
+        "acquired": false,
+        "hits": []
+      },
+      {
+        "id": "P2.command",
+        "acquired": false,
+        "hits": []
+      },
+      {
+        "id": "P2.stderr",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 1,
+            "section_id": 5774927353842609448
+          },
+          {
+            "lane": "authority",
+            "rank": 1,
+            "section_id": 5774927353842609448
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 71,
+            "section_id": 5774927353842609448
+          }
+        ]
+      }
+    ],
+    "union_count": 509,
+    "lane_seconds_sum": 21.525541923001583,
+    "resource_skipped": 0
+  },
+  {
+    "corpus": "L2",
+    "variant": "v5",
+    "question": "P3",
+    "facts": [
+      {
+        "id": "P3.dead",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 6,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "authority",
+            "rank": 6,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 3743648191207196485
+          }
+        ]
+      },
+      {
+        "id": "P3.unreadable",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 6,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "authority",
+            "rank": 6,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 3743648191207196485
+          }
+        ]
+      },
+      {
+        "id": "P3.duration",
+        "acquired": true,
+        "hits": [
+          {
+            "lane": "original",
+            "rank": 6,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "authority",
+            "rank": 6,
+            "section_id": 3743648191207196485
+          },
+          {
+            "lane": "host_lookup",
+            "rank": 1,
+            "section_id": 3743648191207196485
+          }
+        ]
+      }
+    ],
+    "union_count": 500,
+    "lane_seconds_sum": 22.607701515997178,
+    "resource_skipped": 0
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "l0_commit": "3d21bfeaa5dfbfed26faa5dd85fc8a85bf9a7d90",
+  "l2_manifest": "eval/opencode_compat/acq_pilot/evidence/corpus-manifest.json",
+  "l2_manifest_sha256": "1d611b045080f0ecb051bb07c3c4d7102e0fa38fb1a10f2472c9b8e97bcb1c47",
+  "catalog_sha256": {
+    "L0": "8fd86610d8a1fcd6ce67cb4cab4978d2f9ac2a0f0ed9862dd0e4592779c7951c",
+    "L2": "1f95172317878bbfecd334d1303150ad4d4897aa8ee2a1149a406704b6cd2d54"
+  },
+  "documents": {
+    "L0": 19,
+    "L2": 489
+  }
+}

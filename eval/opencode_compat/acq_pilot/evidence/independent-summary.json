@@ -1,0 +1,117 @@
+{
+  "summary": [
+    {
+      "corpus": "L0",
+      "variant": "v0",
+      "tokens": 30053,
+      "seconds_mean_all": 5.021692132332343,
+      "seconds_mean_warm": 5.0089444354980515,
+      "rows": 188,
+      "validation_failures": []
+    },
+    {
+      "corpus": "L0",
+      "variant": "v5",
+      "tokens": 30359,
+      "seconds_mean_all": 5.060351135334106,
+      "seconds_mean_warm": 5.015606555001796,
+      "rows": 193,
+      "validation_failures": []
+    },
+    {
+      "corpus": "L2",
+      "variant": "v0",
+      "tokens": 34049,
+      "seconds_mean_all": 56.92522362100135,
+      "seconds_mean_warm": 57.36044992850111,
+      "rows": 148,
+      "validation_failures": []
+    },
+    {
+      "corpus": "L2",
+      "variant": "v5",
+      "tokens": 34141,
+      "seconds_mean_all": 58.24748156900023,
+      "seconds_mean_warm": 59.28041772150027,
+      "rows": 148,
+      "validation_failures": []
+    }
+  ],
+  "validation": {
+    "L2_manifest_current": true,
+    "published_L0_11_source_hashes_match": true
+  },
+  "archive": {
+    "lanes": 40,
+    "counts_and_gold_match": true,
+    "differences": [
+      {
+        "question": 1,
+        "lane": 0,
+        "fts": 303,
+        "python": 299,
+        "fts_only": 4
+      },
+      {
+        "question": 2,
+        "lane": 0,
+        "fts": 218,
+        "python": 212,
+        "fts_only": 6
+      },
+      {
+        "question": 6,
+        "lane": 0,
+        "fts": 159,
+        "python": 143,
+        "fts_only": 16
+      },
+      {
+        "question": 6,
+        "lane": 1,
+        "fts": 409,
+        "python": 236,
+        "fts_only": 173
+      },
+      {
+        "question": 10,
+        "lane": 1,
+        "fts": 266,
+        "python": 265,
+        "fts_only": 1
+      },
+      {
+        "question": 12,
+        "lane": 0,
+        "fts": 196,
+        "python": 183,
+        "fts_only": 13
+      },
+      {
+        "question": 15,
+        "lane": 1,
+        "fts": 409,
+        "python": 294,
+        "fts_only": 115
+      },
+      {
+        "question": 20,
+        "lane": 1,
+        "fts": 330,
+        "python": 328,
+        "fts_only": 2
+      }
+    ]
+  },
+  "headings": {
+    "windows": 409,
+    "metadata_nonempty": 408,
+    "prefix_nonempty": 406,
+    "metadata_only": [
+      256,
+      342
+    ]
+  },
+  "L2_documents": 489,
+  "oracle_sha256": "158f4d6b93010ce6be7421e6c38567fa4b8dc46fc2940f8144a1f1a7782d6cfb"
+}

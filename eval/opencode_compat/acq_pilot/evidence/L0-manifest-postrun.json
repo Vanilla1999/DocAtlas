@@ -1,0 +1,83 @@
+{
+  "note": "L0 source manifest written after calls; preflight oracle and source hashes were frozen before calls",
+  "project": "/tmp/opencode/semantic-signal-experiment/project",
+  "catalog_sha256": "8fd86610d8a1fcd6ce67cb4cab4978d2f9ac2a0f0ed9862dd0e4592779c7951c",
+  "files": [
+    {
+      "path": "docs/PROJECT_BINDING.md",
+      "sha256": "b1823bad5e2f19f23cf826df0c6b53cf9d436008e942826bf0ea1d002d06582e"
+    },
+    {
+      "path": "wiki/Configuration.md",
+      "sha256": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c"
+    },
+    {
+      "path": "docs/opencode-compact-text.md",
+      "sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea"
+    },
+    {
+      "path": "docs/main-flow-logging.md",
+      "sha256": "e123af68df5d1dcb12be3f105b927b02dc7dab1c94b14053c266e919d5c07cfb"
+    },
+    {
+      "path": "docs/main-flow-evaluation.md",
+      "sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334"
+    },
+    {
+      "path": "README.md",
+      "sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29"
+    },
+    {
+      "path": "docs/INDEX.md",
+      "sha256": "52974c9362a9c441c4961a58f077ed0957e56f6c1e669b5391cdb08e2b29166f"
+    },
+    {
+      "path": "docs/PROJECT_MAP.md",
+      "sha256": "2345cbcb88feba7b44b257785e79cff9466d62edb45875ad1a9d3afde2967a22"
+    },
+    {
+      "path": "wiki/Architecture.md",
+      "sha256": "17bca63965c19afdb73229f4ce4f8fe157eb965352f4bb9ed665156c97be3937"
+    },
+    {
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "sha256": "6f2cef7747245c7c8520dcd4818208e804fdc17fd10fa4ff1952288b7840c96a"
+    },
+    {
+      "path": "docs/mcp-docs-server.md",
+      "sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c"
+    },
+    {
+      "path": "docs/testing.md",
+      "sha256": "06af645781e242f8b96e934c58cd91115826c77cec5d02ef8188baab54bf8ae6"
+    },
+    {
+      "path": "docs/project-docs-mcp-workflow.md",
+      "sha256": "3e4538163d069beb902a708f1b8ddfbdf0a9fc4dcaceaa685367ffeb3f905fa2"
+    },
+    {
+      "path": "wiki/Supported-Sources.md",
+      "sha256": "d3759a0f3bc9b1b336c0a966a43e6058cae210e8a1eca703204716467f6be57e"
+    },
+    {
+      "path": "wiki/Commands.md",
+      "sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b"
+    },
+    {
+      "path": "docs/index-cleanup.md",
+      "sha256": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420"
+    },
+    {
+      "path": "docs/modules/project-context-retrieval.md",
+      "sha256": "1b446e94e627e8f74acc17cb64121f924fa1fb4bb4e8a194754420fba34ff248"
+    },
+    {
+      "path": "docs/modules/evidence-selection.md",
+      "sha256": "2f07b33803834363ae7295d17505ddb55bf201bd36edb0af05a435b3dbbf46e2"
+    }
+  ]
+}

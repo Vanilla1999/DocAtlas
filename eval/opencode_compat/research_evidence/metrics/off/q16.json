@@ -1,0 +1,12 @@
+{
+  "question": 16,
+  "seconds": 7.143601610000587,
+  "bytes": 39013,
+  "status": "truncated",
+  "isError": false,
+  "facts": [
+    true,
+    true
+  ],
+  "source_rows": 67
+}

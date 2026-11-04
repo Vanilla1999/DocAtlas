@@ -198,9 +198,12 @@ def canonical_projection_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
-def estimate_projection_tokens(value: Any) -> int:
-    size = len(canonical_projection_bytes(value))
+def projection_tokens_for_size(size: int) -> int:
     return max(1, math.ceil(size / 4))
+
+
+def estimate_projection_tokens(value: Any) -> int:
+    return projection_tokens_for_size(len(canonical_projection_bytes(value)))
 
 
 def docs_context_budget_tokens(value: Any) -> int:

@@ -1,0 +1,506 @@
+{
+  "off": {
+    "total_raw_cl100k": 207856,
+    "warm_count": 17,
+    "warm_mean": 6.267235107176555,
+    "warm_median": 5.951480782000544,
+    "questions": [
+      {
+        "id": 1,
+        "tokens": 11291,
+        "seconds": 11.54602438999973,
+        "temperature": "cold_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 2,
+        "tokens": 10893,
+        "seconds": 8.518181379000453,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 3,
+        "tokens": 8953,
+        "seconds": 3.1286701709996123,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 4,
+        "tokens": 10681,
+        "seconds": null,
+        "temperature": "unknown",
+        "isError": null,
+        "status": "truncated"
+      },
+      {
+        "id": 5,
+        "tokens": 10196,
+        "seconds": 4.597433474000354,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 6,
+        "tokens": 10968,
+        "seconds": 6.027827643999444,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 7,
+        "tokens": 10428,
+        "seconds": 5.11987900800068,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 8,
+        "tokens": 10345,
+        "seconds": 8.28942482399998,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 9,
+        "tokens": 10722,
+        "seconds": 8.871050046000164,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 10,
+        "tokens": 10669,
+        "seconds": 5.737806525000451,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 11,
+        "tokens": 9829,
+        "seconds": 5.757863168999393,
+        "temperature": "cold_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 12,
+        "tokens": 10166,
+        "seconds": 7.721010614999614,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 13,
+        "tokens": 9810,
+        "seconds": 5.925753751999764,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 14,
+        "tokens": 10002,
+        "seconds": 6.584794846000477,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 15,
+        "tokens": 10364,
+        "seconds": 4.991900376999183,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 16,
+        "tokens": 10283,
+        "seconds": 7.143601610000587,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 17,
+        "tokens": 10918,
+        "seconds": 5.951480782000544,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 18,
+        "tokens": 10275,
+        "seconds": 5.473458292000032,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 19,
+        "tokens": 10710,
+        "seconds": 4.793107974000122,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 20,
+        "tokens": 10353,
+        "seconds": 7.667615502999979,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      }
+    ]
+  },
+  "mini": {
+    "total_raw_cl100k": 103466,
+    "warm_count": 18,
+    "warm_mean": 25.13080057822213,
+    "warm_median": 21.45828490849999,
+    "questions": [
+      {
+        "id": 1,
+        "tokens": 10770,
+        "seconds": 31.040537005999795,
+        "temperature": "cold_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 2,
+        "tokens": 10694,
+        "seconds": 30.594312549999813,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 3,
+        "tokens": 6756,
+        "seconds": 39.67758431599941,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 4,
+        "tokens": 4446,
+        "seconds": 27.15967534899937,
+        "temperature": "cold_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 5,
+        "tokens": 7678,
+        "seconds": 29.165041205000307,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 6,
+        "tokens": 10956,
+        "seconds": 18.833937948999846,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 7,
+        "tokens": 3062,
+        "seconds": 42.95864669000002,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 8,
+        "tokens": 3622,
+        "seconds": 21.46821265899962,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 9,
+        "tokens": 3744,
+        "seconds": 20.42800830000033,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 10,
+        "tokens": 4170,
+        "seconds": 21.448357158000363,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 11,
+        "tokens": 3654,
+        "seconds": 17.681927581999844,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 12,
+        "tokens": 10424,
+        "seconds": 22.969503233999603,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 13,
+        "tokens": 2880,
+        "seconds": 19.589501901999938,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 14,
+        "tokens": 4300,
+        "seconds": 20.683685366000645,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 15,
+        "tokens": 2124,
+        "seconds": 21.971041784999215,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 16,
+        "tokens": 1422,
+        "seconds": 44.136468793999484,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 17,
+        "tokens": 2041,
+        "seconds": 17.946502386999782,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 18,
+        "tokens": 2080,
+        "seconds": 20.65065929299999,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 19,
+        "tokens": 4720,
+        "seconds": 20.389426261000153,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 20,
+        "tokens": 3923,
+        "seconds": 21.761592976999964,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      }
+    ]
+  },
+  "hybrid": {
+    "total_raw_cl100k": 202152,
+    "warm_count": 19,
+    "warm_mean": 29.580595046210394,
+    "warm_median": 27.00948690200312,
+    "questions": [
+      {
+        "id": 1,
+        "tokens": 10958,
+        "seconds": 34.439177664000454,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 2,
+        "tokens": 10764,
+        "seconds": 32.763750203997915,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 3,
+        "tokens": 8005,
+        "seconds": 19.16360238800189,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 4,
+        "tokens": 10632,
+        "seconds": 47.06840618800197,
+        "temperature": "cold_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 5,
+        "tokens": 10064,
+        "seconds": 25.32111330400221,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 6,
+        "tokens": 11077,
+        "seconds": 23.168967492001684,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 7,
+        "tokens": 10546,
+        "seconds": 40.9417112379997,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 8,
+        "tokens": 10283,
+        "seconds": 26.36809889700089,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 9,
+        "tokens": 10446,
+        "seconds": 56.285201865997806,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 10,
+        "tokens": 9913,
+        "seconds": 31.242784897000092,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 11,
+        "tokens": 9624,
+        "seconds": 20.429599828999926,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 12,
+        "tokens": 10451,
+        "seconds": 26.33049288499751,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 13,
+        "tokens": 9792,
+        "seconds": 29.38602408799852,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 14,
+        "tokens": 9929,
+        "seconds": 28.09804932899715,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 15,
+        "tokens": 10096,
+        "seconds": 20.85322153999732,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 16,
+        "tokens": 10122,
+        "seconds": 21.399111463000736,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 17,
+        "tokens": 10859,
+        "seconds": 19.975321796999197,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 18,
+        "tokens": 8047,
+        "seconds": 28.617575830001442,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 19,
+        "tokens": 10650,
+        "seconds": 27.00948690200312,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      },
+      {
+        "id": 20,
+        "tokens": 9894,
+        "seconds": 50.23801426499995,
+        "temperature": "warm_process",
+        "isError": false,
+        "status": "truncated"
+      }
+    ]
+  }
+}

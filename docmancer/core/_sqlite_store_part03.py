@@ -1,12 +1,16 @@
 """SQLiteStore implementation shard 3."""
 from __future__ import annotations
 
+import copy
 from collections import Counter
 from math import log1p
 
 from ._sqlite_store_shared import *  # noqa: F401,F403
+from docmancer.retrieval.acquisition_reuse import (
+    active_acquisition_entries, effective_filters, extends_filters,
+)
 from docmancer.retrieval.lexical_terms import (
-    lexical_field_matches, lexical_field_utility, lexical_terms, lexical_tokens,
+    lexical_counts_utility, lexical_field_matches, lexical_field_utility, lexical_terms, lexical_tokens,
     query_terms, explicit_source_locators, resolve_source_locators,
 )
 
@@ -231,9 +235,42 @@ class _SQLiteStorePart03:
         filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
         """Internal acquisition; public delivery caps do not shrink this pool."""
-        return self._query_bm25_candidates(
-            text, expand=expand or "none", filters=filters,
-        )
+        entries = active_acquisition_entries()
+        if entries is None:
+            return self._query_bm25_candidates(
+                text, expand=expand or "none", filters=filters,
+            )
+        expand = expand or "none"
+        wanted = effective_filters(filters)
+        with self._connect() as conn:
+            generation = self._active_generation_id(conn)
+            for store, entry_generation, entry_text, entry_expand, entry_filters, pool in entries:
+                if (store is not self or entry_generation != generation or not generation
+                        or entry_text != text or entry_expand != expand):
+                    continue
+                if entry_filters == wanted or (
+                    extends_filters(entry_filters, wanted)
+                    and self._filtered_window_count(conn, generation, entry_filters)
+                    == self._filtered_window_count(conn, generation, wanted)
+                ):
+                    return copy.deepcopy(pool)
+        chunks = self._query_bm25_candidates(text, expand=expand, filters=filters)
+        entries.append((self, generation, text, expand, wanted, copy.deepcopy(chunks)))
+        return chunks
+
+    def _filtered_window_count(
+        self, conn: sqlite3.Connection, generation: str, filters: dict[str, Any],
+    ) -> int:
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        row = conn.execute(
+            f"""
+            SELECT count(*) FROM retrieval_children AS sections
+            WHERE sections.generation_id = ?
+            {filter_sql}
+            """,
+            (generation, *filter_params),
+        ).fetchone()
+        return int(row[0])
 
     def _query_bm25_candidates(
         self, text: str, *, expand: str,
@@ -533,6 +570,7 @@ class _SQLiteStorePart03:
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         from docmancer.retrieval.experimental_acquisition import (
             ACQUISITION_CANDIDATES,
+            ACQUISITION_VARIANT,
         )
 
         with self._connect() as conn:
@@ -573,6 +611,43 @@ class _SQLiteStorePart03:
                 + (" OR " + locator_sql if locator_keys else "")
             )
 
+            # Experimental V5: concatenate the stored heading path once before
+            # BM25 saturation/length normalization. FTS admission stays literal
+            # and unchanged. This is not independently normalized BM25F fields.
+            score_body_sql = "sections.display_text"
+            if ACQUISITION_VARIANT == "v5":
+                def heading_body(body: str | None, metadata: str | None) -> str:
+                    path = json.loads(metadata or "{}").get("heading_path", [])
+                    if not isinstance(path, list) or not all(isinstance(p, str) for p in path):
+                        raise ValueError("V5 requires heading_path to be a list of strings")
+                    return (body or "") + "\n" + "\n".join(path)
+
+                conn.create_function("docatlas_heading_body", 2, heading_body, deterministic=True)
+                score_body_sql = "docatlas_heading_body(sections.display_text, sections.metadata_json)"
+
+            # The statistics pass and both utility evaluations of one row (the
+            # WHERE check and the ranked column) read the same field text.
+            # Tokenize each distinct text once per call; the arithmetic below
+            # is unchanged.
+            term_set = frozenset(terms)
+            body_profiles: dict[str, tuple[int, Counter[str]]] = {}
+            query_word_sets: dict[str, frozenset[str]] = {}
+
+            def body_profile(body: str) -> tuple[int, Counter[str]]:
+                profile = body_profiles.get(body)
+                if profile is None:
+                    tokens = lexical_tokens(body)
+                    profile = (len(tokens), Counter(token for token in tokens if token in term_set))
+                    body_profiles[body] = profile
+                return profile
+
+            def query_words(text: str) -> frozenset[str]:
+                words = query_word_sets.get(text)
+                if words is None:
+                    words = term_set.intersection(lexical_tokens(text))
+                    query_word_sets[text] = words
+                return words
+
             class SourceStatistics:
                 def __init__(self) -> None:
                     self.windows = 0
@@ -580,14 +655,13 @@ class _SQLiteStorePart03:
                     self.frequencies: Counter[str] = Counter()
 
                 def step(self, title: str, body: str) -> None:
-                    body_tokens = lexical_tokens(body or "")
-                    source_terms = set(body_tokens) | set(lexical_terms(title or ""))
-                    matched = source_terms.intersection(terms)
+                    body_length, body_frequencies = body_profile(body or "")
+                    matched = set(body_frequencies) | query_words(title or "")
                     # Boilerplate/description-only hits do not change source
                     # document frequencies or average source-window length.
                     if matched:
                         self.windows += 1
-                        self.body_length += len(body_tokens)
+                        self.body_length += body_length
                         self.frequencies.update(matched)
 
                 def finalize(self) -> str:
@@ -601,13 +675,16 @@ class _SQLiteStorePart03:
             # the same scoped postings as acquisition, not unrelated sources,
             # and requires neither a new index nor a writable connection.
             conn.create_aggregate("docatlas_source_statistics", 2, SourceStatistics)
+            # The same windows as a join on the unique FTS rowid, but the MATCH
+            # runs once (as in the candidate query below). Joined, SQLite may
+            # drive the loop from the filtered windows and re-run the full-text
+            # query for each of them. The aggregate is order-independent.
             stats_row = conn.execute(
                 f"""
-                SELECT docatlas_source_statistics(sections.title, sections.display_text)
-                FROM retrieval_children_fts
-                JOIN retrieval_children AS sections
-                  ON sections.id = retrieval_children_fts.rowid
-                WHERE retrieval_children_fts MATCH ?
+                SELECT docatlas_source_statistics(sections.title, {score_body_sql})
+                FROM retrieval_children AS sections
+                WHERE sections.id IN (SELECT rowid FROM retrieval_children_fts
+                                      WHERE retrieval_children_fts MATCH ?)
                   AND sections.generation_id = ?
                 {filter_sql}
                 """,
@@ -623,10 +700,12 @@ class _SQLiteStorePart03:
             }
 
             def source_utility(title: str, body: str, description: str | None) -> float:
-                return lexical_field_utility(
-                    terms, title=title or "", body=body or "",
-                    description=description or "", term_weights=term_weights,
-                    average_body_length=average_length,
+                body_length, body_frequencies = body_profile(body or "")
+                return lexical_counts_utility(
+                    terms, body_length=body_length, body_frequencies=body_frequencies,
+                    title_terms=query_words((title or "") if ACQUISITION_VARIANT == "v0" else ""),
+                    description_terms=query_words(description or ""),
+                    term_weights=term_weights, average_body_length=average_length,
                 )
 
             # Existing immutable generations already contain display_text and
@@ -643,14 +722,14 @@ class _SQLiteStorePart03:
                        sections.display_token_estimate AS token_estimate,
                        sections.display_content_hash AS content_hash,
                        -docatlas_source_utility(
-                           sections.title, sections.display_text,
+                            sections.title, {score_body_sql},
                            json_extract(sections.metadata_json, '$.project_doc_description')
                        ) AS rank
                 FROM retrieval_children AS sections
                 WHERE ({candidate_sql})
                   AND sections.generation_id = ?
                   AND (docatlas_source_utility(
-                      sections.title, sections.display_text,
+                       sections.title, {score_body_sql},
                       json_extract(sections.metadata_json, '$.project_doc_description')
                   ) > 0 OR {locator_sql})
                 {filter_sql}
@@ -663,6 +742,10 @@ class _SQLiteStorePart03:
                  *filter_params, *locator_keys,
                  min(limit, ACQUISITION_CANDIDATES)),
             ))
+            # The registered functions may outlive this call on a reused
+            # connection; do not keep this query's field texts alive.
+            body_profiles.clear()
+            query_word_sets.clear()
             return self._mark_lexical_mode([
                 {**dict(row), "_source_locator_matches": locator_sources.get(str(row["source"]), ())}
                 for row in rows

@@ -1,0 +1,501 @@
+{
+  "schema": "acq-pilot-evidence-v1",
+  "files": [
+    {
+      "path": "raw-summary.json",
+      "sha256": "dfce68e3c90156e9f7ef74b82f0910e528127356d76933510e06491ca89fdf2c",
+      "bytes": 13472,
+      "source_path": "/tmp/opencode/acq-pilot/raw-summary.json",
+      "source_sha256": "dfce68e3c90156e9f7ef74b82f0910e528127356d76933510e06491ca89fdf2c",
+      "transformation": "none"
+    },
+    {
+      "path": "independent-summary.json",
+      "sha256": "aac33e89e4674d984ee25c06bc2f1ad03f4e3fd444d7b84fd30f6218e4159329",
+      "bytes": 2377,
+      "source_path": "/tmp/opencode/acq-pilot/independent-summary.json",
+      "source_sha256": "aac33e89e4674d984ee25c06bc2f1ad03f4e3fd444d7b84fd30f6218e4159329",
+      "transformation": "none"
+    },
+    {
+      "path": "independent-sql-review.json",
+      "sha256": "d349bcd18d1f699ae88ecb5e22fb00dc2306e11a49d49b11a7d8813571032530",
+      "bytes": 6130,
+      "source_path": "/tmp/opencode/acq-pilot/independent-sql-review.json",
+      "source_sha256": "d349bcd18d1f699ae88ecb5e22fb00dc2306e11a49d49b11a7d8813571032530",
+      "transformation": "none"
+    },
+    {
+      "path": "independent-acquisition-review.json",
+      "sha256": "71b5914e67180c4c6491119b456706cf3675e8357be8381ac56478ce201904b4",
+      "bytes": 14416,
+      "source_path": "/tmp/opencode/acq-pilot/independent-acquisition-review.json",
+      "source_sha256": "71b5914e67180c4c6491119b456706cf3675e8357be8381ac56478ce201904b4",
+      "transformation": "none"
+    },
+    {
+      "path": "independent-archive-explanation.json",
+      "sha256": "49237cfca57648c7d97c123446c250e3e010d843213bcb8f11141b6df7cc235b",
+      "bytes": 72794,
+      "source_path": "/tmp/opencode/acq-pilot/independent-archive-explanation.json",
+      "source_sha256": "49237cfca57648c7d97c123446c250e3e010d843213bcb8f11141b6df7cc235b",
+      "transformation": "none"
+    },
+    {
+      "path": "corpus-manifest.json",
+      "sha256": "1d611b045080f0ecb051bb07c3c4d7102e0fa38fb1a10f2472c9b8e97bcb1c47",
+      "bytes": 95095,
+      "source_path": "/tmp/opencode/acq-pilot/corpus-manifest.json",
+      "source_sha256": "1d611b045080f0ecb051bb07c3c4d7102e0fa38fb1a10f2472c9b8e97bcb1c47",
+      "transformation": "none"
+    },
+    {
+      "path": "quote-occurrences.json",
+      "sha256": "07b684aa6baf4f55b304146ff703b95e931cac5da60352a6acfca8250c593f54",
+      "bytes": 2304,
+      "source_path": "/tmp/opencode/acq-pilot/quote-occurrences.json",
+      "source_sha256": "07b684aa6baf4f55b304146ff703b95e931cac5da60352a6acfca8250c593f54",
+      "transformation": "none"
+    },
+    {
+      "path": "oracle-source-verification.json",
+      "sha256": "ff8c5d154449bbf43a839d1eb1840a86d9530a51bac864d0a15bd42f486a8426",
+      "bytes": 4709,
+      "source_path": "/tmp/opencode/acq-pilot/oracle-source-verification.json",
+      "source_sha256": "ff8c5d154449bbf43a839d1eb1840a86d9530a51bac864d0a15bd42f486a8426",
+      "transformation": "none"
+    },
+    {
+      "path": "L0-manifest-postrun.json",
+      "sha256": "58800f0c8a2e49177be0ab2e67998167ffafda018573f8b8815013d8f04c4ab7",
+      "bytes": 2905,
+      "source_path": "/tmp/opencode/acq-pilot/L0-manifest-postrun.json",
+      "source_sha256": "58800f0c8a2e49177be0ab2e67998167ffafda018573f8b8815013d8f04c4ab7",
+      "transformation": "none"
+    },
+    {
+      "path": "final-checks.json",
+      "sha256": "06dd32c89432998361290e3f4fefbfea71c3d492d35f710955b38d59c7775936",
+      "bytes": 1166,
+      "source_path": "/tmp/opencode/acq-pilot/final-checks.json",
+      "source_sha256": "06dd32c89432998361290e3f4fefbfea71c3d492d35f710955b38d59c7775936",
+      "transformation": "none"
+    },
+    {
+      "path": "preflight.sha256",
+      "sha256": "2a3bf012a2f5ef9bf237fa9e5bea605343dfc3a0216046bc07b3b3d04ba0e73e",
+      "bytes": 440,
+      "source_path": "/tmp/opencode/acq-pilot/preflight.sha256",
+      "source_sha256": "2a3bf012a2f5ef9bf237fa9e5bea605343dfc3a0216046bc07b3b3d04ba0e73e",
+      "transformation": "none"
+    },
+    {
+      "path": "prelaunch.sha256",
+      "sha256": "0fb4a2b08ddf8a54066cfbafe1098e789a80d0fcd954d45555d87ca4f8369789",
+      "bytes": 557,
+      "source_path": "/tmp/opencode/acq-pilot/prelaunch.sha256",
+      "source_sha256": "0fb4a2b08ddf8a54066cfbafe1098e789a80d0fcd954d45555d87ca4f8369789",
+      "transformation": "none"
+    },
+    {
+      "path": "observation-comparison.json",
+      "sha256": "83f4d8f7bb0d2334623099bd8728017d8a12d845560d8687d08bfc84f6619496",
+      "bytes": 7266,
+      "source_path": "/tmp/opencode/acq-pilot/observation-comparison.json",
+      "source_sha256": "83f4d8f7bb0d2334623099bd8728017d8a12d845560d8687d08bfc84f6619496",
+      "transformation": "none"
+    },
+    {
+      "path": "review-report.json.gz",
+      "sha256": "052d9e0dfd6f2681446bd15c1c39920cb17db13b20cdba8d7027e3b40614d740",
+      "bytes": 30602,
+      "source_path": "/tmp/opencode/acq-pilot/review-report.json",
+      "source_sha256": "57425b55de4ddb1232108ac7769e5c8b33d6a6a0f500eef735dfb7eb24bd9005",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "heading-comparison.json.gz",
+      "sha256": "a51a3b9b044be6140030a8631cde970b9ae8e6ee8689852e09065edc7353c050",
+      "bytes": 20642,
+      "source_path": "/tmp/opencode/acq-pilot/heading-comparison.json",
+      "source_sha256": "8cfeafae6488e420e7f4cd0b91fefe9c60656adbb48133188757a569ec2202f7",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "installed-module-hashes.json.gz",
+      "sha256": "f47df8baec9e1224d2f2b9d3410b90753fb1d9018970fa13757816674a4a8b8f",
+      "bytes": 23908,
+      "source_path": "/tmp/opencode/acq-pilot/installed-module-hashes.json",
+      "source_sha256": "f9f638fb77a71205fb7bbcd1f3521e478d12614219615d63c33745b746e8f818",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "archive-40-lanes-vocab.json.gz",
+      "sha256": "1a3c1c858a4e95e4520275d85136449c89f7966f5630cc1030fef7d23c51eef7",
+      "bytes": 245436,
+      "source_path": "/tmp/opencode/acq-pilot/archive-40-lanes-vocab.json",
+      "source_sha256": "cf342cc329a075094d4a73d5684b20e576010826cbfe64d0d2b70c361c57cbe1",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "archive-difference-spellings.json.gz",
+      "sha256": "1aab72d742a382100c81f12aa3887b52d5cfc2e87b54d3b7e21e3baca1cc82b2",
+      "bytes": 7183,
+      "source_path": "/tmp/opencode/acq-pilot/archive-difference-spellings.json",
+      "source_sha256": "7a21751589fd2e610937aacb6a00c2b586eb7913e2c4b9223ec8fb0cd4b26eea",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "acquire-summary.json",
+      "sha256": "43e42f25d0ffa57303aa14b4f658d3dc61b537beda975c794c7ed0232a9faa95",
+      "bytes": 41042,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/summary.json",
+      "source_sha256": "43e42f25d0ffa57303aa14b4f658d3dc61b537beda975c794c7ed0232a9faa95",
+      "transformation": "none"
+    },
+    {
+      "path": "acquire-script-provenance.json",
+      "sha256": "d4029207c684137314813175cd21d660f33b6d7deb03cd813bbcaccdb5b6c1f7",
+      "bytes": 2805,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/script-provenance.json",
+      "source_sha256": "d4029207c684137314813175cd21d660f33b6d7deb03cd813bbcaccdb5b6c1f7",
+      "transformation": "none"
+    },
+    {
+      "path": "acquire-plan-replay-verification.json",
+      "sha256": "3e6675dd6c2847816207016c96d53b5470402878885271806a8a2b2ee67a9cc9",
+      "bytes": 8437,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/plan-replay-verification.json",
+      "source_sha256": "3e6675dd6c2847816207016c96d53b5470402878885271806a8a2b2ee67a9cc9",
+      "transformation": "none"
+    },
+    {
+      "path": "acquire-candidates-original-to-modified.patch",
+      "sha256": "55df0cc8404fc5243e72edabeb970ad4169d56290ad804b667ad773004a4ad55",
+      "bytes": 1096,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/candidates-original-to-modified.patch",
+      "source_sha256": "55df0cc8404fc5243e72edabeb970ad4169d56290ad804b667ad773004a4ad55",
+      "transformation": "none"
+    },
+    {
+      "path": "L0-default-P1.payload.json.gz",
+      "sha256": "821150c0ede2e06f50aca5be50c181c864cdc2e6354a739555a4f53d5c6e536f",
+      "bytes": 15419,
+      "source_path": "/tmp/opencode/acq-pilot/L0-default-P1.payload.json",
+      "source_sha256": "c4764292d0c80ffe66e19d30132701f8d5fd209e819c79c7719de1fe824595a3",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v0-P1.payload.json.gz",
+      "sha256": "821150c0ede2e06f50aca5be50c181c864cdc2e6354a739555a4f53d5c6e536f",
+      "bytes": 15419,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v0-P1.payload.json",
+      "source_sha256": "c4764292d0c80ffe66e19d30132701f8d5fd209e819c79c7719de1fe824595a3",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v0-P2.payload.json.gz",
+      "sha256": "e3e2b1c9cce30afe4834cd1d462dae610521cb0f135286ba4a5a07a22db4ca5c",
+      "bytes": 16521,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v0-P2.payload.json",
+      "source_sha256": "3ea5d19fe56e3118fb696eac0523bd35aab19fdf299658bcdc07a3c391011b06",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v0-P3.payload.json.gz",
+      "sha256": "b4af5bc4f5ad1ada23a1a08d76166411fcff003ce5ff42d40f411abe0e09eed4",
+      "bytes": 14085,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v0-P3.payload.json",
+      "source_sha256": "13f0e989a5ed03800e180d40b28b610a77f16960ac81acec55fbcc2c22d467e9",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-P1.payload.json.gz",
+      "sha256": "c0faad49f5017b8501c48e7ee03a407e62c6e53b8468954b839dc6a3ee5fc5af",
+      "bytes": 15830,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-P1.payload.json",
+      "source_sha256": "15a9a35215252c8264d41aa8f33850f2383d1e115460c6813dd90a1377b623ee",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-P2.payload.json.gz",
+      "sha256": "37e3c5fa2cc0c0de4b4b70a641f422276b5cfdf94d8e281ff3d4bad83842d867",
+      "bytes": 16309,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-P2.payload.json",
+      "source_sha256": "85f353e89807b0ba45af55fbaf8781b9c0b3640cf352be585d90259bc6f38748",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-P3.payload.json.gz",
+      "sha256": "680fc2e0bae7a46bd30a70dc35177f387c3b2ca9f57135f4b0638e286b2e30f9",
+      "bytes": 14101,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-P3.payload.json",
+      "source_sha256": "269657b056a82868e667184d74abda3353f3bac592a3500bfdf996feb99b0ee7",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-traceoff-P1.payload.json.gz",
+      "sha256": "c0faad49f5017b8501c48e7ee03a407e62c6e53b8468954b839dc6a3ee5fc5af",
+      "bytes": 15830,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-traceoff-P1.payload.json",
+      "source_sha256": "15a9a35215252c8264d41aa8f33850f2383d1e115460c6813dd90a1377b623ee",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v0-P1.payload.json.gz",
+      "sha256": "d518c7baa1ed019d558087f00f829c49d7684b427b2443bd808e1a5490604b42",
+      "bytes": 17913,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v0-P1.payload.json",
+      "source_sha256": "ffe8b105d2d3e6b77e4228ab9343b73cba71d92ce726c68845b66c14088334d9",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v0-P2.payload.json.gz",
+      "sha256": "f0e798b87cf4d7fbdd72df5ce0667a17e760256c092323372c6dddd1ff650869",
+      "bytes": 19370,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v0-P2.payload.json",
+      "source_sha256": "910184f2817b397302c66df476a169984d89ed24dab02f666a943edb604e07ab",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v0-P3.payload.json.gz",
+      "sha256": "a911bf14e000b7a1d563bd6296a556c77526d57b0792a3bc29927f9e4a60a9db",
+      "bytes": 17344,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v0-P3.payload.json",
+      "source_sha256": "ad345755c914236f7f79630302a6687eb0cb40647f9d1fa8ca167f8a1d7b704e",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v5-P1.payload.json.gz",
+      "sha256": "e8e833ffb2f62ab9ed7c86fa24471038f1073a118e07286a402d7b68c1a326ea",
+      "bytes": 17933,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v5-P1.payload.json",
+      "source_sha256": "3eb4dde15f165dc7a03a6b109a26aded521a21096c073389a7a604e040cc816c",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v5-P2.payload.json.gz",
+      "sha256": "cd3ee8c604d01558c75026f90f975df49573002c06d1f0d50304a7af81f397e8",
+      "bytes": 19413,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v5-P2.payload.json",
+      "source_sha256": "a2296dbd412837d8aa6620d62d5c48c1b61c5d1a50e88f2f6e795a75be07ab3f",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v5-P3.payload.json.gz",
+      "sha256": "54b6a69dfe9bb739219564901c729c80bf9d591f058ec4e4c4b2bdcf779c56f0",
+      "bytes": 17326,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v5-P3.payload.json",
+      "source_sha256": "24ae93531ec8eddf7f953bb1676684aeee98afb64a2423bddb68abdfa4b49240",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-default-P1.metrics.json.gz",
+      "sha256": "9b9c1e108261ac97827998f4fad5e22164dfe4ba7ab27d63192035998151de28",
+      "bytes": 19965,
+      "source_path": "/tmp/opencode/acq-pilot/L0-default-P1.metrics.json",
+      "source_sha256": "6c5204aa2c1b20a42ecf10e425c007734c42861f07f8a7bbd7c3860a7b95662b",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v0-P1.metrics.json.gz",
+      "sha256": "5a67aa68ce60895c7fdd5721a37a113fab84c0b13610c48dada6336cbd13f2de",
+      "bytes": 19964,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v0-P1.metrics.json",
+      "source_sha256": "065ef5bfb0237ad253c3e3b4b9064a0d8c565f4ad68e3ddc0ee4beeeec735386",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v0-P2.metrics.json.gz",
+      "sha256": "1ca9b6cb524f51652870b009de3d61a5a02de8be05f4a3d12a3f89e28d779739",
+      "bytes": 21023,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v0-P2.metrics.json",
+      "source_sha256": "db5b9eb76e03c8f785ec6eeebb7e6440cc935d2a40eb5726455e14ee4793583b",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v0-P3.metrics.json.gz",
+      "sha256": "8cba67a23cc66aa3398f59ad8004f45d467834554a6364bfd0aedbd401ec7c46",
+      "bytes": 17332,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v0-P3.metrics.json",
+      "source_sha256": "bf4bb2a491c7298c94ef85f7ec07161b5ed3a16fa5b83db99c67703c61428f15",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-P1.metrics.json.gz",
+      "sha256": "cde88995ce7df507ac908930b6a4d89612b4c6fcc035683f614db5ac8a036d79",
+      "bytes": 20494,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-P1.metrics.json",
+      "source_sha256": "7a3112400adc380133bb1d09f593b1a4ed858e6f8c52ede8b421ac2381654af6",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-P2.metrics.json.gz",
+      "sha256": "19b8d73a30fd13181b4df2e84ed9f0579aec8f0879414024e1dacccd2f2aadda",
+      "bytes": 20617,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-P2.metrics.json",
+      "source_sha256": "223ddb9a4cbe94cd8b779f2b4bc5097150dd407099020e8c8f902018f2d1676b",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-P3.metrics.json.gz",
+      "sha256": "42f9f790538542ec0d6f2521a7270768e009c57c3a4554335c505b337047630e",
+      "bytes": 17510,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-P3.metrics.json",
+      "source_sha256": "81ca993458e751599cc9daf54451144b68eaa0e589e462b4c57a9aba48a395d7",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L0-v5-traceoff-P1.metrics.json.gz",
+      "sha256": "38a814bd3b14651e9ba8d0342194c5ff0af4f42b35cddff54d8715a1270f09bd",
+      "bytes": 20494,
+      "source_path": "/tmp/opencode/acq-pilot/L0-v5-traceoff-P1.metrics.json",
+      "source_sha256": "2c743b1fb20ee4eccddbc9f1c3bd37957b447017f25d9784bf8e31feef66bae1",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v0-P1.metrics.json.gz",
+      "sha256": "83bcc48f51e9c541936fbd75683a336bdf40d2b35702f5560e26544b34a2e07d",
+      "bytes": 23653,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v0-P1.metrics.json",
+      "source_sha256": "e3a4ebcaaeeb7ad28ce85f220b6c95a85d16fd8bdfce859dc5e4890ce980b657",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v0-P2.metrics.json.gz",
+      "sha256": "ed97b74f29e6e0be0180e2af601a3b4bff7a2402b27e42d85e75f3135aabdbd2",
+      "bytes": 25164,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v0-P2.metrics.json",
+      "source_sha256": "013d5d6b642d155cee1d416908a9d385187fc7ecf2f1e52967cb5f7f2014722b",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v0-P3.metrics.json.gz",
+      "sha256": "09a0ca79fae02bfc204117c44b90a47a6a3a360d2426c4d364a4416acba16dcd",
+      "bytes": 22992,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v0-P3.metrics.json",
+      "source_sha256": "43d37b7f188e21b3c79ce68d9a78791ab47bea6c8d218641ecce530f3f828b25",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v5-P1.metrics.json.gz",
+      "sha256": "8b319a8dd819e0fbb3dcf1d24e26d1aa1d05bfaec8eb16aa3d150a2c58685fed",
+      "bytes": 23529,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v5-P1.metrics.json",
+      "source_sha256": "f1e511f31400a36685b56cdc6bc4cdce31325f402991882b9864901f48603496",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v5-P2.metrics.json.gz",
+      "sha256": "93cfce06524664d3cf2d20231062d16fb01e31527d2d7c848b1f399320cc3439",
+      "bytes": 25063,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v5-P2.metrics.json",
+      "source_sha256": "4b7ce7fa1098d20f8263211f898c669ce8a49265a88cf40e0652a61b4bd24d81",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "L2-v5-P3.metrics.json.gz",
+      "sha256": "d763308329c247b9ced462ffb0a8c8ee31736b94bb75c7ea0766ae5f760068e4",
+      "bytes": 23460,
+      "source_path": "/tmp/opencode/acq-pilot/L2-v5-P3.metrics.json",
+      "source_sha256": "a4db44850a596504ea2acbedb972dc86d1d341302450f2186845a209231a7d7d",
+      "transformation": "gzip only; decompressed bytes identical"
+    },
+    {
+      "path": "acquired-L0-v0-P1.compact.json.gz",
+      "sha256": "5f85e58387e7db43a1083aa940804b853c1e4cd7294d21fb3337cb3c7a7ac9d7",
+      "bytes": 117967,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L0-v0-P1.json",
+      "source_sha256": "925956f8c073ffd0256be1c5ac11792877f64fdb7f1f67be1dd16730b3f7ea07",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L0-v0-P2.compact.json.gz",
+      "sha256": "3ff2dda214aab7dbb28a586b6c82db64537fb04ba22abf41e9adc01dd3282859",
+      "bytes": 151573,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L0-v0-P2.json",
+      "source_sha256": "2d43f96950abd32e01f1c4446cb7db917bb7554a1790fbfe9194c768b53ade82",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L0-v0-P3.compact.json.gz",
+      "sha256": "638a24f7880a372fbed38be7da99125fb9e4e4f4c4b6b55dcdfb2da2ce1b0402",
+      "bytes": 119577,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L0-v0-P3.json",
+      "source_sha256": "848cd92b8e554b0f0c167a05aa608658102d22103d75879e4a5908ad377300cf",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L0-v5-P1.compact.json.gz",
+      "sha256": "01c0b766ae908e5788d8cd56ca2f33d9f3ed885199b924233e04000eb1933522",
+      "bytes": 120947,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L0-v5-P1.json",
+      "source_sha256": "80b129f7048ca5593f27823fab890b37a3d8e25719948c6c6c701514868742c0",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L0-v5-P2.compact.json.gz",
+      "sha256": "0f9e8a0fa58cc7a0ef1a5da296f0dbb669ecc050e88fb189e04606a3f5ca1a77",
+      "bytes": 155433,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L0-v5-P2.json",
+      "source_sha256": "4bc1889566a5dcf5a3181f07f3cc2faf4d58efadc2ec011544a9079decbc363a",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L0-v5-P3.compact.json.gz",
+      "sha256": "46651266e5f084189574d72ec8582fc5ff48452711d64fb815fbc69d1ca2d36a",
+      "bytes": 121807,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L0-v5-P3.json",
+      "source_sha256": "c8e8184007c7d6e81766e0eb15f7311849d2c4632d5dfce7978d845cb607e675",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L2-v0-P1.compact.json.gz",
+      "sha256": "842a5ccf4e8d007f669293c2f5f75cd6101138aa67ac6f1da282043967b5c32f",
+      "bytes": 328857,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L2-v0-P1.json",
+      "source_sha256": "83a0f5a6b8fb055b8d9d08ccbdb783eb5fecead54090f5f8483834f9028a473b",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L2-v0-P2.compact.json.gz",
+      "sha256": "b3845a769bbf8a64585926356060432bd7811551936926809ef468bea25cb3c4",
+      "bytes": 336375,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L2-v0-P2.json",
+      "source_sha256": "7491d6611be1c5954c4c8c34ac55e73d4b716c589a1677a067988e2f7ee805e1",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L2-v0-P3.compact.json.gz",
+      "sha256": "c836b99f0cc15906f66b4e4f1df0ff2e2f470624131559dd33474699297503d6",
+      "bytes": 330967,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L2-v0-P3.json",
+      "source_sha256": "6cf84120cdc96e6d88cd9663b7bddcea9227090318419eb413941f1194e000f3",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L2-v5-P1.compact.json.gz",
+      "sha256": "5c12c1fb1be615b3d87b37f0e4112a2e7c9b1c0e5aa93010f7cf151bd6b32bf1",
+      "bytes": 327001,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L2-v5-P1.json",
+      "source_sha256": "83160fda5d0ce4d2715e3bbc2e51c2ad36cae9a1ccd3b6f015225fab808e06ed",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L2-v5-P2.compact.json.gz",
+      "sha256": "e782757df18a6820bdfee65ed3bbb9236968e6f54615fa5ffd4280b0019436c6",
+      "bytes": 344870,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L2-v5-P2.json",
+      "source_sha256": "bf282d702a9d1db8c4debb66a1e8d8e21ce924deadf09bba598c05927b1b2f56",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    },
+    {
+      "path": "acquired-L2-v5-P3.compact.json.gz",
+      "sha256": "08871b2a381fd17dac0eaf5dc587df47fc82f584d1720167fcfc1bb6bf61f998",
+      "bytes": 311320,
+      "source_path": "/tmp/opencode/acq-pilot/acquire-stage/acquired-L2-v5-P3.json",
+      "source_sha256": "821a626b45383093437ac950c2230ed5680a8b4f8390131a37f5a8bf12880fa8",
+      "transformation": "Metadata narrowed to documented source/rank/acquisition fields; text, order and lane arguments unchanged; JSON reserialized then gzip"
+    }
+  ]
+}
