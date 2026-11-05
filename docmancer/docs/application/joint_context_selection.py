@@ -303,6 +303,22 @@ def finalize_joint_context_delivery(payload: dict, snapshot: dict, retrieval: di
     return result, bound
 
 
+def _whole_pool_fits(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], limit: int,
+                     query_count: int, max_source_references: int | None) -> bool:
+    """Would every checked row, unselected, already fit the delivery envelope?"""
+    references = {str(row["source_uri"]) for row in rows if row.get("source_uri")}
+    if max_source_references is not None and len(references) > max_source_references:
+        return False
+    if sum(len(row["snippet"].encode("utf-8")) for row in rows) > 4 * limit:
+        return False
+    whole, _ = _selected_packet(payload, snapshot, retrieval, rows, selection={
+        "policy": POLICY, "scope": "source_checked_merged_candidates",
+        "query_count": query_count, "candidate_rows": len(rows),
+        "eligible_rows": len(rows), "budget_limited": False, "reference_limited": False,
+    })
+    return _delivery_fits(whole, limit)
+
+
 def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
                          max_source_references: int | None = None) -> tuple[dict, dict]:
     """Choose a relevant subset of the merged pool; never trim a source row.
@@ -329,8 +345,13 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     # Whole-section pool pruning (``body`` unless the flag names another mode;
     # ``off`` keeps the whole pool). The selector then considers only the kept
     # sections, in pool order; term rarity below still counts every row.
-    payload, prune_receipt = prune_checked_pool(payload, snapshot, queries,
-                                                default_mode=JOINT_POOL_PRUNE_DEFAULT)
+    # Pruning only settles competition for the delivery budget: a checked pool
+    # that fits whole is never pruned, in any mode (STEP7_CONTEXT7_PATH_RU.md).
+    if _whole_pool_fits(payload, snapshot, retrieval, rows, limit, len(queries), max_source_references):
+        prune_receipt = None
+    else:
+        payload, prune_receipt = prune_checked_pool(payload, snapshot, queries,
+                                                    default_mode=JOINT_POOL_PRUNE_DEFAULT)
     rows = payload.get("sources") or []
     observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
     if observation.state is not None and prune_receipt is not None:

@@ -306,13 +306,16 @@ def main() -> int:
         build(work / "corpora")
     if not args.no_observer:
         observer_facts(work)
+    # Record the trees the servers start from: an edit during the run must
+    # not relabel answers produced by the earlier code.
+    source_state, eval_state = git_state(tree), git_state(ROOT)
     started_at = datetime.now(timezone.utc)
     started = time.perf_counter()
     results = asyncio.run(run_all(units, jobs, out, work, tree, not args.no_observer, extra, args.reuse_work))
     env_shown = results[0]["server_environment"] if results else {}
     run = {"schema_version": 1, "started_at_utc": started_at.isoformat(timespec="seconds"),
            "wall_seconds": round(time.perf_counter() - started, 1),
-           "source_tree": git_state(tree), "eval_tree": git_state(ROOT),
+           "source_tree": source_state, "eval_tree": eval_state,
            "questions_sha256": sha256((HERE / "questions.json").read_bytes()),
            "python": sys.version.split()[0], "platform": platform.platform(), "cpus": os.cpu_count(),
            "jobs": jobs, "observer": not args.no_observer, "work_root": str(work), "reused_work": args.reuse_work,

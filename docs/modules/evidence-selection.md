@@ -50,7 +50,9 @@ blind gate outcome are in `eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.m
 source sections that dictionary-free views keep, each view cut by Otsu's split
 of its own scores. Native selection uses `body` when the variable is unset
 (accepted by the blind gate, `eval/blind_project_context/STEP7_CONTEXT7_PATH_RU.md`);
-`off` restores the whole pool. `body` keeps sections that both the retrieval
+`off` restores the whole pool. Native pruning only settles competition for the
+delivery budget: a checked pool whose rows all fit the delivery and reference
+limits is delivered whole in every mode. `body` keeps sections that both the retrieval
 BM25 score and the character 4-gram body match keep; `vote` keeps a section
 that at least two of three views keep, the third being the heading-path match;
 `heading` and `heading_or_body` exist for comparison; `own_heading_or_body`

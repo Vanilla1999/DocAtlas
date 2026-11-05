@@ -62,3 +62,52 @@ def test_equal_dense_scores_all_count_as_the_best_match(monkeypatch, tmp_path):
 def test_dense_requires_an_absolute_model_directory():
     with pytest.raises(modes.JointSemanticRelevanceError, match="DOCATLAS_EXPERIMENT_DENSE_PATH"):
         dense.score_joint_dense({"q": {"text": "q"}}, [{"snippet": "a"}], "relative/model")
+
+
+def test_whole_pool_guard_checks_references_then_bytes_then_the_real_delivery(monkeypatch):
+    built = []
+
+    def packet(payload, snapshot, retrieval, rows, *, selection):
+        built.append((len(rows), selection))
+        return {"sources": rows}, {}
+
+    monkeypatch.setattr(selection, "_selected_packet", packet)
+    monkeypatch.setattr(selection, "_delivery_fits", lambda packet, limit: len(packet["sources"]) <= 2)
+    rows = [{"snippet": "a", "source_uri": "u1"}, {"snippet": "b", "source_uri": "u2"}]
+    # Too many distinct references or too many bytes: no packet is even built.
+    assert not selection._whole_pool_fits({}, {}, {}, rows, 100, 1, 1)
+    assert not selection._whole_pool_fits({}, {}, {}, [{"snippet": "x" * 401}], 100, 1, None)
+    assert built == []
+    # Otherwise the whole unselected pool goes through the delivery check.
+    assert selection._whole_pool_fits({}, {}, {}, rows, 100, 1, 2)
+    assert built[-1][0] == 2
+    assert built[-1][1]["candidate_rows"] == 2 and built[-1][1]["budget_limited"] is False
+    assert not selection._whole_pool_fits({}, {}, {}, rows * 2, 100, 1, None)
+
+
+class _Stop(Exception):
+    pass
+
+
+@pytest.mark.parametrize("fits", [True, False])
+def test_pool_pruning_runs_only_when_the_whole_pool_misses_the_budget(monkeypatch, fits):
+    # Pruning settles competition for the delivery budget; a pool that fits
+    # whole is delivered whole even under an explicit pruning mode.
+    monkeypatch.setenv("DOCATLAS_EXPERIMENT_POOL_PRUNE", "body")
+    monkeypatch.setattr(selection, "experimental_context_max_tokens", lambda: 4000)
+    monkeypatch.setattr(selection, "authoritative_queries", lambda plan: {"q": {"text": "q"}})
+    monkeypatch.setattr(selection, "_whole_pool_fits", lambda *args: fits)
+    pruned = []
+
+    def prune(payload, snapshot, queries, *, default_mode):
+        pruned.append(default_mode)
+        return payload, {"mode": default_mode}
+
+    def stop(*args):
+        raise _Stop
+
+    monkeypatch.setattr(selection, "prune_checked_pool", prune)
+    monkeypatch.setattr(selection, "_SelectionObservation", stop)
+    with pytest.raises(_Stop):
+        selection.select_joint_context({"sources": [{"snippet": "a"}]}, {}, {})
+    assert pruned == ([] if fits else ["body"])
