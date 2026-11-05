@@ -357,8 +357,11 @@ def _machine(run: dict) -> str:
     for unit in run.get("units") or ():
         prepare.setdefault(unit["corpus"], []).append(unit["prepare_seconds"])
     config = ((run.get("project_config") or {}).get("docatlas.yaml") or {}).get("project") or {}
+    # --reuse-work skips preparation; such a unit has no preparation time.
+    timed = {corpus: [value for value in values if value is not None] for corpus, values in prepare.items()}
     return (f"Машина: {run.get('cpus')} CPU, серверов параллельно: {run.get('jobs')}; подготовка "
-            + ", ".join(f"{corpus} {max(values):.1f} с" for corpus, values in sorted(prepare.items()))
+            + ", ".join(f"{corpus} {max(values):.1f} с" if values else f"{corpus} не выполнялась (--reuse-work)"
+                        for corpus, values in sorted(timed.items()))
             + f"; scan_deadline_seconds: {config.get('scan_deadline_seconds', 'по умолчанию')}.")
 
 

@@ -46,19 +46,29 @@ gain instead of gain per square root of row bytes) and
 `DOCATLAS_EXPERIMENT_JOINT_FUSION=max_shared_scale` (the best explicit query on
 one pool-wide scale instead of the mean of per-query scales). Results and the
 blind gate outcome are in `eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.md`.
-`DOCATLAS_EXPERIMENT_POOL_PRUNE` (off by default) first narrows the checked pool
-to whole source sections that dictionary-free views keep, each view cut by
-Otsu's split of its own scores: `body` keeps sections that both the retrieval
+`DOCATLAS_EXPERIMENT_POOL_PRUNE` first narrows the checked pool to whole
+source sections that dictionary-free views keep, each view cut by Otsu's split
+of its own scores. Native selection uses `body` when the variable is unset
+(accepted by the blind gate, `eval/blind_project_context/STEP7_CONTEXT7_PATH_RU.md`);
+`off` restores the whole pool. `body` keeps sections that both the retrieval
 BM25 score and the character 4-gram body match keep; `vote` keeps a section
 that at least two of three views keep, the third being the heading-path match;
 `heading` and `heading_or_body` exist for comparison; `own_heading_or_body`
 is `heading_or_body` with the heading view reading only a section's own
 heading, not the parent titles its sibling sections share. Word rarity stays a
 statistic of the whole checked pool. Results and the blind gate outcome are in
-`eval/blind_project_context/STEP4_POOL_PRUNING_RU.md`. The same filter runs in
-front of the optional MiniLM section policy, so the model scores only the kept
-sections; its receipt is `retrieval_diagnostics.pool_pruning`
+`eval/blind_project_context/STEP4_POOL_PRUNING_RU.md`. The same filter can run in
+front of the optional MiniLM section policy (there it stays off unless the
+variable is set), so the model scores only the kept sections; its receipt is
+`retrieval_diagnostics.pool_pruning`
 (`eval/blind_project_context/STEP5_PRE_SELECTION_FILTER_RU.md`).
+Two more research flags, off by default, are measured in
+`eval/blind_project_context/STEP7_CONTEXT7_PATH_RU.md`:
+`DOCATLAS_EXPERIMENT_JOINT_CUT=otsu_mean|otsu_union` keeps only the upper Otsu
+class of sections by relevance before the greedy loop, and
+`DOCATLAS_EXPERIMENT_JOINT_RELEVANCE=dense|dense_hybrid` ranks rows by a local
+multilingual-E5 embedding (`DOCATLAS_EXPERIMENT_DENSE_PATH`) alone or averaged
+with the lexical lane, like `mini|hybrid` do with the cross-encoder.
 The optional MiniLM section policy remains separate from native selection.
 Its integration audit compares delivered rows with the full checked input of
 the same call and independently verifies the frozen source corpus and facts.

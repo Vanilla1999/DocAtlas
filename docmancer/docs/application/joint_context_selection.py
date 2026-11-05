@@ -33,7 +33,7 @@ from docmancer.docs.domain.query_reference_binding import prepare_reference_prob
 from .context_json import serialize_context_json
 from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
-from .experimental_pool_pruning import MODES as POOL_PRUNE_MODES, prune_checked_pool
+from .experimental_pool_pruning import otsu_upper, prune_checked_pool
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
 from .query_trace import query_trace_enabled
@@ -41,7 +41,10 @@ from .standalone_text_view import COMPACT_TEXT_MAX_TOKENS, render_standalone_tex
 
 
 POLICY = "joint_checked_body_mmr_v1"
-# Research flags, read per call and off by default; results in
+# Whole-section pool pruning used when DOCATLAS_EXPERIMENT_POOL_PRUNE is unset.
+JOINT_POOL_PRUNE_DEFAULT = "body"
+# Research flags, read per call and off by default (pool pruning: see its
+# entry); results in
 # eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.md.
 #   DOCATLAS_EXPERIMENT_JOINT_TERMS=char4  query/body match on overlapping
 #       character 4-grams (McNamee & Mayfield 2004); redundancy stays on words.
@@ -49,16 +52,25 @@ POLICY = "joint_checked_body_mmr_v1"
 #       alone (MMR); the default divides it by sqrt(row bytes).
 #   DOCATLAS_EXPERIMENT_JOINT_FUSION=max_shared_scale  CombMAX over explicit
 #       queries on one pool-wide scale; the default averages per-query scales.
-#   DOCATLAS_EXPERIMENT_POOL_PRUNE=heading|body|heading_or_body|vote|
+#   DOCATLAS_EXPERIMENT_POOL_PRUNE=off|heading|body|heading_or_body|vote|
 #       own_heading_or_body  keep only whole sections that dictionary-free
-#       views keep before selecting; the MiniLM section selector applies the
-#       same filter first (experimental_pool_pruning.py;
-#       STEP4_POOL_PRUNING_RU.md, STEP5_PRE_SELECTION_FILTER_RU.md).
+#       views keep before selecting. Unset means ``body`` here (accepted by
+#       the blind gate, STEP4_POOL_PRUNING_RU.md, STEP7_CONTEXT7_PATH_RU.md)
+#       and ``off`` in the MiniLM section selector
+#       (experimental_pool_pruning.py; STEP5_PRE_SELECTION_FILTER_RU.md).
+#   DOCATLAS_EXPERIMENT_JOINT_RELEVANCE=dense|dense_hybrid  multilingual-E5
+#       row/query cosine (experimental_dense_relevance.py) instead of, or
+#       averaged with, the lexical lane exactly like mini|hybrid do with the
+#       cross-encoder; model directory in DOCATLAS_EXPERIMENT_DENSE_PATH.
+#   DOCATLAS_EXPERIMENT_JOINT_CUT=otsu_mean|otsu_union  before the greedy
+#       loop keep only the upper Otsu class of whole sections by relevance:
+#       the mean relative relevance over queries, or per query and then the
+#       union over queries (STEP7_CONTEXT7_PATH_RU.md). No number is added.
 _EXPERIMENT_CHOICES = {
     "DOCATLAS_EXPERIMENT_JOINT_TERMS": ("word", "char4"),
     "DOCATLAS_EXPERIMENT_JOINT_PRIORITY": ("cost_sqrt", "gain"),
     "DOCATLAS_EXPERIMENT_JOINT_FUSION": ("mean", "max_shared_scale"),
-    "DOCATLAS_EXPERIMENT_POOL_PRUNE": POOL_PRUNE_MODES,
+    "DOCATLAS_EXPERIMENT_JOINT_CUT": ("off", "otsu_mean", "otsu_union"),
 }
 
 
@@ -306,6 +318,7 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     terms_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_TERMS")
     priority_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_PRIORITY")
     fusion_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_FUSION")
+    cut_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_CUT")
     limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
@@ -313,17 +326,18 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
     statistic_rows = rows
-    # Research flag: the same whole-section filter that runs in front of the
-    # MiniLM section selector. The selector then considers only the kept
+    # Whole-section pool pruning (``body`` unless the flag names another mode;
+    # ``off`` keeps the whole pool). The selector then considers only the kept
     # sections, in pool order; term rarity below still counts every row.
-    payload, prune_receipt = prune_checked_pool(payload, snapshot, queries)
+    payload, prune_receipt = prune_checked_pool(payload, snapshot, queries,
+                                                default_mode=JOINT_POOL_PRUNE_DEFAULT)
     rows = payload.get("sources") or []
     observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
     if observation.state is not None and prune_receipt is not None:
         observation.state["pool_pruning"] = prune_receipt
     semantic_mode = os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off")
-    if semantic_mode not in {"off", "mini", "hybrid"}:
-        raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off, mini or hybrid")
+    if semantic_mode not in {"off", "mini", "hybrid", "dense", "dense_hybrid"}:
+        raise ValueError("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE must be off, mini, hybrid, dense or dense_hybrid")
     if semantic_mode != "off" and (terms_mode, fusion_mode) != ("word", "mean"):
         raise ValueError("DOCATLAS_EXPERIMENT_JOINT_TERMS/FUSION apply to lexical relevance only")
     semantic_scores = None
@@ -332,6 +346,12 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
         semantic_scores, semantic_receipt = score_joint_relevance(
             queries, rows, os.environ.get("DOCATLAS_EXPERIMENT_MINI_PATH", ""),
         )
+    elif semantic_mode in {"dense", "dense_hybrid"}:
+        from .experimental_dense_relevance import score_joint_dense
+        semantic_scores, semantic_receipt = score_joint_dense(
+            queries, rows, os.environ.get("DOCATLAS_EXPERIMENT_DENSE_PATH", ""),
+        )
+    if semantic_scores is not None:
         if observation.state is not None:
             observation.state["semantic_relevance"] = semantic_receipt
             for index, row in enumerate(observation.rows):
@@ -428,6 +448,32 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     # so one pool-wide scale keeps the queries comparable (research flag).
     shared_scale = max(best_query_mass.values(), default=0.0)
 
+    if cut_mode != "off" and semantic_scores is None and fusion_mode == "mean":
+        # Research flag: keep only the upper Otsu class of whole sections by
+        # the same relative relevance the greedy loop uses (no redundancy yet).
+        # Otsu's split needs no parameter; equal scores keep every section.
+        def lane(item: _Unit, key: str) -> float:
+            mass = sum(feature_weight[feature] for feature in item.features if feature[0] == key)
+            return max(mass / best_query_mass[key] if best_query_mass[key] else 0.0,
+                       1.0 if key in item.locator_queries else 0.0)
+
+        def upper(scores: dict[int, float]) -> set[int]:
+            ranked = sorted(((value, group) for group, value in scores.items() if value > 0), reverse=True)
+            return {group for _, group in ranked[:otsu_upper([value for value, _ in ranked])]}
+
+        candidates = [item for item in pending.values()]
+        if cut_mode == "otsu_mean":
+            kept_groups = upper({item.group: sum(lane(item, key) for key in queries) / len(queries)
+                                 for item in candidates})
+        else:
+            kept_groups = set().union(*(upper({item.group: lane(item, key) for item in candidates})
+                                        for key in queries))
+        if kept_groups:
+            pending = {indices: item for indices, item in pending.items() if item.group in kept_groups}
+            if observation.state is not None:
+                observation.state["relevance_cut"] = {"mode": cut_mode, "sections_before": len(candidates),
+                                                      "sections_kept": len(kept_groups)}
+
     def packet(indices: list[int], *, budget_limited: bool) -> tuple[dict, dict]:
         return _selected_packet(payload, snapshot, retrieval, [rows[index] for index in indices], selection={
             "policy": POLICY, "scope": "source_checked_merged_candidates",
@@ -482,7 +528,7 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
                     mass[key] / best_query_mass[key] if best_query_mass[key] else 0.0,
                     1.0 if key in item.locator_queries else 0.0,
                 ) for key in queries) / len(queries)
-            elif semantic_mode == "mini":
+            elif semantic_mode in {"mini", "dense"}:
                 indices = whole[item.group].indices if completing else item.indices
                 relevance = sum(max(
                     max(semantic_scores[key][index] for index in indices),

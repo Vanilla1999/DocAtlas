@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_step4_pool_pruning.py": "e3331aeeee1203f4f32aecee2cd23d58789ddd3124e160017896635fc8625287"
+    "tests/test_step4_pool_pruning.py": "a047d9e7e49becd64a90d3c53fb22ad1cbab7f5ea2f344f6542ffc1e7c576d12"
   }
 }

@@ -1,7 +1,11 @@
-"""Opt-in research pruning of the merged candidate pool before joint selection.
+"""Pruning of the merged candidate pool before joint selection.
 
-Off by default. ``DOCATLAS_EXPERIMENT_POOL_PRUNE`` selects a mode; results
-and their limits are in eval/blind_project_context/STEP4_POOL_PRUNING_RU.md.
+``DOCATLAS_EXPERIMENT_POOL_PRUNE`` selects a mode. The lexical joint selector
+uses ``body`` when the variable is unset (accepted by the blind gate in
+STEP4_POOL_PRUNING_RU.md and STEP7_CONTEXT7_PATH_RU.md); the MiniLM section
+selector stays ``off`` unless the variable asks otherwise. ``off`` restores
+the unpruned pool everywhere. Results and limits of every mode are in
+eval/blind_project_context/STEP4_POOL_PRUNING_RU.md.
 
 The unit is a whole source section (path and heading path): the selector
 groups adjacent rows of one section, so a partial section would change its
@@ -147,24 +151,26 @@ def prune_rows(mode: str, rows: list[dict], lexical: dict[str, list[float]],
     return indices, receipt
 
 
-def pool_prune_mode() -> str:
-    """The configured mode; an unknown value is a configuration error."""
-    value = os.environ.get(ENVIRONMENT, MODES[0]).strip().lower()
+def pool_prune_mode(default: str = MODES[0]) -> str:
+    """The configured mode, else the caller's default; unknown is an error."""
+    value = os.environ.get(ENVIRONMENT, default).strip().lower()
     if value not in MODES:
         raise ValueError(f"{ENVIRONMENT} must be one of: {', '.join(MODES)}")
     return value
 
 
-def prune_checked_pool(payload: dict, snapshot: dict, queries: dict[str, dict]) -> tuple[dict, dict | None]:
+def prune_checked_pool(payload: dict, snapshot: dict, queries: dict[str, dict], *,
+                       default_mode: str = MODES[0]) -> tuple[dict, dict | None]:
     """Keep the chosen whole sections of a checked pool before any selector.
 
     ``queries`` are the authoritative explicit queries of the read. The
     retrieval BM25 score of every row comes from its bound snapshot entry.
+    ``default_mode`` applies only when the environment does not name a mode.
     Returns the payload (a shallow copy with fewer rows, or the same object)
-    and a receipt, or ``None`` when the flag is off or nothing can be scored.
+    and a receipt, or ``None`` when pruning is off or nothing can be scored.
     """
     rows = payload.get("sources") or []
-    mode = pool_prune_mode()
+    mode = pool_prune_mode(default_mode)
     if mode == "off" or not rows or not queries:
         return payload, None
     matches = [(((snapshot.get(row.get("evidence_id")) or {}).get("source") or {})

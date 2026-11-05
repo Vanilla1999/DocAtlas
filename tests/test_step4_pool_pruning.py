@@ -70,15 +70,18 @@ def test_no_kept_section_falls_back_to_the_whole_pool():
     assert kept == [0, 1] and receipt["fallback"] == "no_section_kept"
 
 
-def test_pool_prune_flag_is_off_by_default_and_validated(monkeypatch):
+def test_pool_prune_defaults_to_body_only_for_the_joint_selector(monkeypatch):
     name = "DOCATLAS_EXPERIMENT_POOL_PRUNE"
     monkeypatch.delenv(name, raising=False)
-    assert selection._experiment(name) == "off"
+    assert pruning.pool_prune_mode() == "off"
+    assert selection.JOINT_POOL_PRUNE_DEFAULT == "body"
+    assert pruning.pool_prune_mode(selection.JOINT_POOL_PRUNE_DEFAULT) == "body"
     for mode in pruning.MODES:
         monkeypatch.setenv(name, mode)
-        assert selection._experiment(name) == mode
+        assert pruning.pool_prune_mode() == mode
+        assert pruning.pool_prune_mode(selection.JOINT_POOL_PRUNE_DEFAULT) == mode
     monkeypatch.setenv(name, "top50")
     with pytest.raises(ValueError, match=name):
-        selection._experiment(name)
+        pruning.pool_prune_mode(selection.JOINT_POOL_PRUNE_DEFAULT)
     with pytest.raises(ValueError, match="unknown pool pruning mode"):
         pruning.kept_sections("top50", {"heading": set(), "body_words": set(), "body_chars": set()})

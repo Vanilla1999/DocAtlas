@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_step7_context7_path.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_step7_context7_path.py": "70df8c4da2c886a91bd66fbda93f15e5dae5d27e5dee244335afe7e64eca53a1"
+  }
+}
