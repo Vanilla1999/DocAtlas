@@ -1,0 +1,41 @@
+{
+ "name": "no_translation",
+ "cases": {
+  "T01-ru": {
+   "search_question": null
+  },
+  "T02-ru": {
+   "search_question": null
+  },
+  "T03-ru": {
+   "search_question": null
+  },
+  "T04-ru": {
+   "search_question": null
+  },
+  "T05-ru": {
+   "search_question": null
+  },
+  "T10-ru": {
+   "search_question": null
+  },
+  "T12-ru": {
+   "search_question": null
+  },
+  "T15-ru": {
+   "search_question": null
+  },
+  "T19-ru": {
+   "search_question": null
+  },
+  "T20-ru": {
+   "search_question": null
+  },
+  "T21-ru": {
+   "search_question": null
+  },
+  "T24-ru": {
+   "search_question": null
+  }
+ }
+}

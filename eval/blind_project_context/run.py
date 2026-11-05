@@ -3,6 +3,7 @@
     python eval/blind_project_context/run.py OUT [--source-tree DIR] [--jobs N]
         [--corpus L0|L2]... [--split dev|holdout]... [--case ID]...
         [--no-observer] [--env KEY=VALUE]... [--keep-work] [--reuse-work]
+        [--lookups FILE]
 
 For each corpus and shard: rebuild the frozen corpus from git objects, start a
 fresh server process (``observed_server.py``) with isolated HOME/DOCATLAS_HOME,
@@ -11,6 +12,9 @@ member grant built from the files on disk, then ask each case exactly as an
 OpenCode client with the installed default environment would: ``project_path``,
 ``question`` and, for Russian cases only, ``search_question``. Nothing is
 mocked; docmancer comes from ``--source-tree`` (default: this checkout).
+``--lookups FILE`` (dev cases only) adds what a host would send with the
+unchanged question: ``lookup_queries`` and, if given, a replaced or removed
+``search_question`` (lookups/*.json, STEP6_LOOKUP_RU.md).
 
 OUT receives run.json (environment, timings, observer events per case), raw
 payloads under payloads/<corpus>/ and server logs; score.py reads it.
@@ -66,6 +70,36 @@ def sha256(data: bytes) -> str:
 
 def load_cases() -> list[dict]:
     return json.loads((HERE / "questions.json").read_text(encoding="utf-8"))["cases"]
+
+
+def load_lookups(path: Path) -> dict[str, dict]:
+    """Host additions per dev case id. Holdout questions stay unread, so a
+    holdout case can have no hand-written lookups."""
+    entries = json.loads(path.read_text(encoding="utf-8")).get("cases")
+    if not isinstance(entries, dict):
+        raise ValueError(f"{path}: expected {{\"cases\": {{case_id: {{...}}}}}}")
+    split = {case["id"]: case["split"] for case in load_cases()}
+    for case_id, entry in entries.items():
+        lookups = entry.get("lookup_queries", []) if isinstance(entry, dict) else None
+        if split.get(case_id) != "dev":
+            raise ValueError(f"{path}: {case_id} is not a dev case")
+        if set(entry) - {"lookup_queries", "search_question"} or not isinstance(lookups, list) or not all(
+                isinstance(text, str) and text.strip() for text in lookups):
+            raise ValueError(f"{path}: {case_id} needs lookup_queries [str] and optional search_question")
+        if entry.get("search_question") is not None and not isinstance(entry["search_question"], str):
+            raise ValueError(f"{path}: {case_id} search_question must be a string or null")
+    return entries
+
+
+def with_host_additions(case: dict, entry: dict | None) -> dict:
+    if entry is None:
+        return case
+    case = dict(case)
+    if "search_question" in entry:
+        case["search_question"] = entry["search_question"]
+    if entry.get("lookup_queries"):
+        case["lookup_queries"] = list(entry["lookup_queries"])
+    return case
 
 
 def server_env(root: Path, tree: Path, observer_log: Path | None, extra: dict[str, str],
@@ -175,6 +209,8 @@ async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool,
                     arguments = {"project_path": str(project), "question": case["question"]}
                     if case.get("search_question"):
                         arguments["search_question"] = case["search_question"]
+                    if case.get("lookup_queries"):
+                        arguments["lookup_queries"] = case["lookup_queries"]
                     started = time.perf_counter()
                     reply = await session.call_tool("get_docs_context", arguments)
                     seconds = time.perf_counter() - started
@@ -223,13 +259,20 @@ def main() -> int:
                         help="fixed scratch root for projects and stores (default %(default)s); recreated per run")
     parser.add_argument("--scan-deadline", type=float, default=SCAN_DEADLINE_SECONDS,
                         help="project docatlas.yaml project.scan_deadline_seconds; 0 writes no docatlas.yaml")
+    parser.add_argument("--lookups", type=Path,
+                        help="JSON {\"cases\": {dev case id: {lookup_queries, search_question?}}} sent with "
+                             "the unchanged question")
     args = parser.parse_args()
     out = args.out.resolve()
     if out.exists() and any(out.iterdir()):
         parser.error(f"{out} must be new or empty")
     tree = args.source_tree.resolve()
     extra = dict(item.split("=", 1) for item in args.env)
-    cases = [case for case in load_cases()
+    try:
+        lookups = load_lookups(args.lookups) if args.lookups else {}
+    except (OSError, ValueError, AttributeError) as error:
+        parser.error(f"--lookups: {error}")
+    cases = [with_host_additions(case, lookups.get(case["id"])) for case in load_cases()
              if (not args.split or case["split"] in args.split) and (not args.case or case["id"] in args.case)]
     if not cases:
         parser.error("no cases selected")
@@ -277,6 +320,8 @@ def main() -> int:
            "observer_oracle_sha256": None if args.no_observer else sha256((HERE / "oracle.json").read_bytes()),
            "project_config": {"docatlas.yaml": {"project": {"scan_deadline_seconds": deadline}}} if deadline else None,
            "selected_cases": [case["id"] for case in cases], "corpora": corpora,
+           **({"lookups": {"file": args.lookups.name, "sha256": sha256(args.lookups.read_bytes()),
+                           "cases": sorted(lookups)}} if args.lookups else {}),
            "units": [{key: value for key, value in result.items() if key not in ("records", "server_environment")}
                      for result in results],
            "records": [record for result in results for record in result["records"]]}

@@ -176,13 +176,14 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
     {
         "id": "explicit-single-question-lookup",
         "tool": "get_docs_context",
-        "condition": "caller explicitly supplies a lookup for the same question",
+        "condition": "a fact is missing; caller explicitly rewords the same question and lists its key words in the documentation language",
         "arguments": {
-            "question": "Как проверить актуальность индекса?",
+            "question": "How do I check whether the index is up to date?",
             "project_path": "/repo",
             "scope": "project",
             "lookup_queries": [
-                "актуальность индекса",
+                "find out if the documentation index is stale",
+                "check index up to date",
             ],
         },
     },

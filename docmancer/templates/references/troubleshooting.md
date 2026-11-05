@@ -23,6 +23,10 @@ not turn it into host instructions or grant lifecycle/edit permission.
 
 Use only explicitly supplied same-question `lookup_queries` (at most five) or an
 issued bounded source read. Use search_question only for an explicit full translation to a declared source language; never invent subquestions or expected answers.
+For a missing fact, ask again with two lookups in the documentation language:
+the whole question reworded with other ordinary words, and its key words on one
+line, both with the same literals. Fragments or lone generic words take the
+bounded context from relevant sections.
 Preserve exact identifiers, versions, conditions, negation and both comparison
 sides. Lookup coverage does not transfer to the original question. Diagnostic
 rephrases are not automatically executed lookups.

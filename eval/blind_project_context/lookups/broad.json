@@ -1,0 +1,125 @@
+{
+ "name": "broad",
+ "cases": {
+  "T01-ru": {
+   "lookup_queries": [
+    "expected"
+   ]
+  },
+  "T01-en": {
+   "lookup_queries": [
+    "expected"
+   ]
+  },
+  "T02-ru": {
+   "lookup_queries": [
+    "data"
+   ]
+  },
+  "T02-en": {
+   "lookup_queries": [
+    "data"
+   ]
+  },
+  "T03-ru": {
+   "lookup_queries": [
+    "documents"
+   ]
+  },
+  "T03-en": {
+   "lookup_queries": [
+    "documents"
+   ]
+  },
+  "T04-ru": {
+   "lookup_queries": [
+    "documentation"
+   ]
+  },
+  "T04-en": {
+   "lookup_queries": [
+    "documentation"
+   ]
+  },
+  "T05-ru": {
+   "lookup_queries": [
+    "verification"
+   ]
+  },
+  "T05-en": {
+   "lookup_queries": [
+    "verification"
+   ]
+  },
+  "T10-ru": {
+   "lookup_queries": [
+    "scenario"
+   ]
+  },
+  "T10-en": {
+   "lookup_queries": [
+    "scenario"
+   ]
+  },
+  "T12-ru": {
+   "lookup_queries": [
+    "documentation"
+   ]
+  },
+  "T12-en": {
+   "lookup_queries": [
+    "documentation"
+   ]
+  },
+  "T15-ru": {
+   "lookup_queries": [
+    "users"
+   ]
+  },
+  "T15-en": {
+   "lookup_queries": [
+    "users"
+   ]
+  },
+  "T19-ru": {
+   "lookup_queries": [
+    "commands"
+   ]
+  },
+  "T19-en": {
+   "lookup_queries": [
+    "commands"
+   ]
+  },
+  "T20-ru": {
+   "lookup_queries": [
+    "options"
+   ]
+  },
+  "T20-en": {
+   "lookup_queries": [
+    "options"
+   ]
+  },
+  "T21-ru": {
+   "lookup_queries": [
+    "settings"
+   ]
+  },
+  "T21-en": {
+   "lookup_queries": [
+    "settings"
+   ]
+  },
+  "T24-ru": {
+   "lookup_queries": [
+    "types"
+   ]
+  },
+  "T24-en": {
+   "lookup_queries": [
+    "types"
+   ]
+  }
+ }
+}

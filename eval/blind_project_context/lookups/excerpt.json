@@ -1,0 +1,149 @@
+{
+ "name": "excerpt",
+ "cases": {
+  "T01-ru": {
+   "lookup_queries": [
+    "submit a pull request",
+    "pull request to DocAtlas"
+   ]
+  },
+  "T01-en": {
+   "lookup_queries": [
+    "submit a pull request",
+    "pull request to DocAtlas"
+   ]
+  },
+  "T02-ru": {
+   "lookup_queries": [
+    "safely clean up the DocAtlas index",
+    "without deleting data I still need"
+   ]
+  },
+  "T02-en": {
+   "lookup_queries": [
+    "safely clean up the DocAtlas index",
+    "without deleting data I still need"
+   ]
+  },
+  "T03-ru": {
+   "lookup_queries": [
+    "documents describe the MCP",
+    "project documentation workflows"
+   ]
+  },
+  "T03-en": {
+   "lookup_queries": [
+    "documents describe the MCP",
+    "project documentation workflows"
+   ]
+  },
+  "T04-ru": {
+   "lookup_queries": [
+    "documentation about evaluation",
+    "evaluation and research"
+   ]
+  },
+  "T04-en": {
+   "lookup_queries": [
+    "documentation about evaluation",
+    "evaluation and research"
+   ]
+  },
+  "T05-ru": {
+   "lookup_queries": [
+    "verification of the project-bound OpenCode integration",
+    "what does it not prove"
+   ]
+  },
+  "T05-en": {
+   "lookup_queries": [
+    "verification of the project-bound OpenCode integration",
+    "what does it not prove"
+   ]
+  },
+  "T10-ru": {
+   "lookup_queries": [
+    "public scenario is proposed",
+    "comparing runs with logging turned off and on"
+   ]
+  },
+  "T10-en": {
+   "lookup_queries": [
+    "public scenario is proposed",
+    "comparing runs with logging turned off and on"
+   ]
+  },
+  "T12-ru": {
+   "lookup_queries": [
+    "docs MCP server",
+    "a project's own documentation"
+   ]
+  },
+  "T12-en": {
+   "lookup_queries": [
+    "docs MCP server",
+    "a project's own documentation"
+   ]
+  },
+  "T15-ru": {
+   "lookup_queries": [
+    "DOCATLAS_MCP_MODEL_VIEW=1",
+    "OpenCode users"
+   ]
+  },
+  "T15-en": {
+   "lookup_queries": [
+    "DOCATLAS_MCP_MODEL_VIEW=1",
+    "OpenCode users"
+   ]
+  },
+  "T19-ru": {
+   "lookup_queries": [
+    "DocAtlas commands",
+    "manage Qdrant"
+   ]
+  },
+  "T19-en": {
+   "lookup_queries": [
+    "DocAtlas commands",
+    "manage Qdrant"
+   ]
+  },
+  "T20-ru": {
+   "lookup_queries": [
+    "advanced retrieval",
+    "commands or options"
+   ]
+  },
+  "T20-en": {
+   "lookup_queries": [
+    "advanced retrieval",
+    "commands or options"
+   ]
+  },
+  "T21-ru": {
+   "lookup_queries": [
+    "configuration settings",
+    "fetching documentation from the web"
+   ]
+  },
+  "T21-en": {
+   "lookup_queries": [
+    "configuration settings",
+    "fetching documentation from the web"
+   ]
+  },
+  "T24-ru": {
+   "lookup_queries": [
+    "advanced source types",
+    "MCP packs"
+   ]
+  },
+  "T24-en": {
+   "lookup_queries": [
+    "advanced source types",
+    "MCP packs"
+   ]
+  }
+ }
+}

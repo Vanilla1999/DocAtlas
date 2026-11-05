@@ -1,0 +1,125 @@
+{
+ "name": "keywords",
+ "cases": {
+  "T01-ru": {
+   "lookup_queries": [
+    "expected submit pull request DocAtlas"
+   ]
+  },
+  "T01-en": {
+   "lookup_queries": [
+    "expected submit pull request DocAtlas"
+   ]
+  },
+  "T02-ru": {
+   "lookup_queries": [
+    "safely clean up DocAtlas index without deleting data"
+   ]
+  },
+  "T02-en": {
+   "lookup_queries": [
+    "safely clean up DocAtlas index without deleting data"
+   ]
+  },
+  "T03-ru": {
+   "lookup_queries": [
+    "documents MCP project documentation workflows"
+   ]
+  },
+  "T03-en": {
+   "lookup_queries": [
+    "documents MCP project documentation workflows"
+   ]
+  },
+  "T04-ru": {
+   "lookup_queries": [
+    "documentation evaluation research"
+   ]
+  },
+  "T04-en": {
+   "lookup_queries": [
+    "documentation evaluation research"
+   ]
+  },
+  "T05-ru": {
+   "lookup_queries": [
+    "verification project-bound OpenCode integration not prove"
+   ]
+  },
+  "T05-en": {
+   "lookup_queries": [
+    "verification project-bound OpenCode integration not prove"
+   ]
+  },
+  "T10-ru": {
+   "lookup_queries": [
+    "public scenario comparing runs logging off on"
+   ]
+  },
+  "T10-en": {
+   "lookup_queries": [
+    "public scenario comparing runs logging off on"
+   ]
+  },
+  "T12-ru": {
+   "lookup_queries": [
+    "docs MCP server project own documentation"
+   ]
+  },
+  "T12-en": {
+   "lookup_queries": [
+    "docs MCP server project own documentation"
+   ]
+  },
+  "T15-ru": {
+   "lookup_queries": [
+    "OpenCode DOCATLAS_MCP_MODEL_VIEW=1 enable"
+   ]
+  },
+  "T15-en": {
+   "lookup_queries": [
+    "OpenCode DOCATLAS_MCP_MODEL_VIEW=1 enable"
+   ]
+  },
+  "T19-ru": {
+   "lookup_queries": [
+    "DocAtlas commands manage Qdrant"
+   ]
+  },
+  "T19-en": {
+   "lookup_queries": [
+    "DocAtlas commands manage Qdrant"
+   ]
+  },
+  "T20-ru": {
+   "lookup_queries": [
+    "commands options advanced retrieval"
+   ]
+  },
+  "T20-en": {
+   "lookup_queries": [
+    "commands options advanced retrieval"
+   ]
+  },
+  "T21-ru": {
+   "lookup_queries": [
+    "configuration settings fetching documentation web"
+   ]
+  },
+  "T21-en": {
+   "lookup_queries": [
+    "configuration settings fetching documentation web"
+   ]
+  },
+  "T24-ru": {
+   "lookup_queries": [
+    "advanced source types MCP packs"
+   ]
+  },
+  "T24-en": {
+   "lookup_queries": [
+    "advanced source types MCP packs"
+   ]
+  }
+ }
+}

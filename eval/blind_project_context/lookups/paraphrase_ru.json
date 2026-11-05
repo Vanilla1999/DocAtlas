@@ -1,0 +1,66 @@
+{
+ "name": "paraphrase_ru",
+ "note": "RU cases: Russian paraphrase lookup (agent following the contract's RU example); EN translation still sent as search_question",
+ "cases": {
+  "T01-ru": {
+   "lookup_queries": [
+    "требования к участию при открытии pull request в DocAtlas"
+   ]
+  },
+  "T02-ru": {
+   "lookup_queries": [
+    "безопасная очистка индекса DocAtlas с сохранением нужных данных"
+   ]
+  },
+  "T03-ru": {
+   "lookup_queries": [
+    "руководства, объясняющие рабочий процесс MCP и рабочий процесс документации проекта"
+   ]
+  },
+  "T04-ru": {
+   "lookup_queries": [
+    "где находится документация по оценке и исследованиям"
+   ]
+  },
+  "T05-ru": {
+   "lookup_queries": [
+    "что проверяет проверка интеграции OpenCode с проектом и каковы её ограничения"
+   ]
+  },
+  "T10-ru": {
+   "lookup_queries": [
+    "предлагаемый публичный сценарий сравнения запуска с выключенным логированием и запуска с включённым логированием"
+   ]
+  },
+  "T12-ru": {
+   "lookup_queries": [
+    "как MCP-сервер документации обращается с документацией самого проекта"
+   ]
+  },
+  "T15-ru": {
+   "lookup_queries": [
+    "причины не включать DOCATLAS_MCP_MODEL_VIEW=1 для OpenCode"
+   ]
+  },
+  "T19-ru": {
+   "lookup_queries": [
+    "команды CLI DocAtlas для управления векторной базой данных Qdrant"
+   ]
+  },
+  "T20-ru": {
+   "lookup_queries": [
+    "доступные команды и параметры для расширенного поиска"
+   ]
+  },
+  "T21-ru": {
+   "lookup_queries": [
+    "настройки, управляющие загрузкой документации из интернета"
+   ]
+  },
+  "T24-ru": {
+   "lookup_queries": [
+    "типы источников, поддерживаемые MCP-паками помимо базовых"
+   ]
+  }
+ }
+}

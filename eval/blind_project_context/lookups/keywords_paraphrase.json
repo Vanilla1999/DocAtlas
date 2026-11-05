@@ -1,0 +1,149 @@
+{
+ "name": "keywords_paraphrase",
+ "cases": {
+  "T01-ru": {
+   "lookup_queries": [
+    "expected submit pull request DocAtlas",
+    "contribution requirements for opening a DocAtlas pull request"
+   ]
+  },
+  "T01-en": {
+   "lookup_queries": [
+    "expected submit pull request DocAtlas",
+    "contribution requirements for opening a DocAtlas pull request"
+   ]
+  },
+  "T02-ru": {
+   "lookup_queries": [
+    "safely clean up DocAtlas index without deleting data",
+    "safe DocAtlas index cleanup that keeps data still in use"
+   ]
+  },
+  "T02-en": {
+   "lookup_queries": [
+    "safely clean up DocAtlas index without deleting data",
+    "safe DocAtlas index cleanup that keeps data still in use"
+   ]
+  },
+  "T03-ru": {
+   "lookup_queries": [
+    "documents MCP project documentation workflows",
+    "guides that explain the MCP workflow and the project documentation workflow"
+   ]
+  },
+  "T03-en": {
+   "lookup_queries": [
+    "documents MCP project documentation workflows",
+    "guides that explain the MCP workflow and the project documentation workflow"
+   ]
+  },
+  "T04-ru": {
+   "lookup_queries": [
+    "documentation evaluation research",
+    "where evaluation and research documentation is located"
+   ]
+  },
+  "T04-en": {
+   "lookup_queries": [
+    "documentation evaluation research",
+    "where evaluation and research documentation is located"
+   ]
+  },
+  "T05-ru": {
+   "lookup_queries": [
+    "verification project-bound OpenCode integration not prove",
+    "what the OpenCode project integration verification checks and its limitations"
+   ]
+  },
+  "T05-en": {
+   "lookup_queries": [
+    "verification project-bound OpenCode integration not prove",
+    "what the OpenCode project integration verification checks and its limitations"
+   ]
+  },
+  "T10-ru": {
+   "lookup_queries": [
+    "public scenario comparing runs logging off on",
+    "proposed public scenario to compare a run with logging disabled against a run with logging enabled"
+   ]
+  },
+  "T10-en": {
+   "lookup_queries": [
+    "public scenario comparing runs logging off on",
+    "proposed public scenario to compare a run with logging disabled against a run with logging enabled"
+   ]
+  },
+  "T12-ru": {
+   "lookup_queries": [
+    "docs MCP server project own documentation",
+    "how the documentation MCP server treats documentation that belongs to the project itself"
+   ]
+  },
+  "T12-en": {
+   "lookup_queries": [
+    "docs MCP server project own documentation",
+    "how the documentation MCP server treats documentation that belongs to the project itself"
+   ]
+  },
+  "T15-ru": {
+   "lookup_queries": [
+    "OpenCode DOCATLAS_MCP_MODEL_VIEW=1 enable",
+    "reasons not to turn on DOCATLAS_MCP_MODEL_VIEW=1 for OpenCode"
+   ]
+  },
+  "T15-en": {
+   "lookup_queries": [
+    "OpenCode DOCATLAS_MCP_MODEL_VIEW=1 enable",
+    "reasons not to turn on DOCATLAS_MCP_MODEL_VIEW=1 for OpenCode"
+   ]
+  },
+  "T19-ru": {
+   "lookup_queries": [
+    "DocAtlas commands manage Qdrant",
+    "DocAtlas CLI commands for managing the Qdrant vector database"
+   ]
+  },
+  "T19-en": {
+   "lookup_queries": [
+    "DocAtlas commands manage Qdrant",
+    "DocAtlas CLI commands for managing the Qdrant vector database"
+   ]
+  },
+  "T20-ru": {
+   "lookup_queries": [
+    "commands options advanced retrieval",
+    "available commands and options for advanced search"
+   ]
+  },
+  "T20-en": {
+   "lookup_queries": [
+    "commands options advanced retrieval",
+    "available commands and options for advanced search"
+   ]
+  },
+  "T21-ru": {
+   "lookup_queries": [
+    "configuration settings fetching documentation web",
+    "settings that control web documentation fetching"
+   ]
+  },
+  "T21-en": {
+   "lookup_queries": [
+    "configuration settings fetching documentation web",
+    "settings that control web documentation fetching"
+   ]
+  },
+  "T24-ru": {
+   "lookup_queries": [
+    "advanced source types MCP packs",
+    "source types supported by MCP packs beyond the basic ones"
+   ]
+  },
+  "T24-en": {
+   "lookup_queries": [
+    "advanced source types MCP packs",
+    "source types supported by MCP packs beyond the basic ones"
+   ]
+  }
+ }
+}

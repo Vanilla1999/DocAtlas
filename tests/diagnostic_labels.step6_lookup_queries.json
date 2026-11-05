@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_step6_lookup_queries.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_step6_lookup_queries.py": "fe51623941b79610980b44d905679ee1d766a79a9b0d4f51f51c289ee483f66d"
+  }
+}
