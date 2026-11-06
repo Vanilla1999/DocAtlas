@@ -52,12 +52,29 @@ def test_context_portions_bind_snapshot_and_stop_after_exhaustion(prepared_proje
     changed_scope = call_docs_tool_payload("get_docs_context", {
         **args, "scope": "all", "portion": 2, "continuation_token": token}, service)
     assert changed_scope["error"]["reason_code"] == "stale_context_continuation"
+    focused_args = {**args, "source_path": "docs/archive.md"}
+    focused = call_docs_tool_payload("get_docs_context", focused_args, service)
+    assert focused.get("sources"), focused
+    assert all(row["path_or_url"] == "docs/archive.md" and row["snippet"] in text
+               for row in focused["sources"])
+    assert any("original timestamp" in row["snippet"] and "west region" in row["snippet"]
+               for row in focused["sources"])
+    from docmancer.docs.application.standalone_text_view import render_standalone_text
+    from docmancer.docs.application.projection_tokenizer import projection_token_count
+    assert projection_token_count(render_standalone_text(focused).text.encode("utf-8")) <= 2400
+    changed_focus = call_docs_tool_payload("get_docs_context", {
+        **focused_args, "portion": 2, "continuation_token": token}, service)
+    assert changed_focus["error"]["reason_code"] == "stale_context_continuation"
+    missing = call_docs_tool_payload("get_docs_context", {**args, "source_path": "docs/absent.md"}, service)
+    assert not missing.get("sources"), missing
     monkeypatch.setenv("DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS", "18000")
     changed_budget = call_docs_tool_payload("get_docs_context", {
         **args, "portion": 2, "continuation_token": token}, service)
     assert changed_budget["error"]["reason_code"] == "stale_context_continuation"
     monkeypatch.delenv("DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS")
     (project / "docs/archive.md").write_text(text + "Archive records also retain a checksum.\n")
+    stale_focus = call_docs_tool_payload("get_docs_context", focused_args, service)
+    assert not stale_focus.get("sources"), stale_focus
     index_project(service, config, project)
     changed_source = call_docs_tool_payload("get_docs_context", {
         **args, "portion": 2, "continuation_token": token}, service)
@@ -130,6 +147,8 @@ def test_context_portions_reject_invalid_and_unsupported_requests(prepared_proje
         assert result.get("error") and not result.get("sources"), result
     missing_token = call_docs_tool_payload("get_docs_context", {**args, "portion": 2}, service)
     assert missing_token.get("error") and not missing_token.get("sources"), missing_token
+    traversal = call_docs_tool_payload("get_docs_context", {**args, "source_path": "../outside.md"}, service)
+    assert traversal["error"]["reason_code"] == "invalid_source_path" and not traversal.get("sources")
     advanced = current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
     patch = call_docs_tool_payload("get_docs_context", {
         **args, "context_format": "patch_context", "portion": 2, "continuation_token": token},
@@ -144,3 +163,67 @@ def test_context_portions_reject_invalid_and_unsupported_requests(prepared_proje
         "library": "unprepared-library", "question": args["question"], "portion": 2,
         "continuation_token": token}, service)
     assert library["error"]["reason_code"] == "portion_unavailable"
+
+
+def test_e5_focused_context_preserves_scope_snapshot_and_read_only_state(tmp_path, monkeypatch):
+    """Optional real-model integration; no fake vectors, retrieval or admission.
+
+    Provision the pinned local assets and set DOCATLAS_TEST_E5_MODEL_DIR. This
+    covers the hybrid execution boundary, not superiority over lexical search.
+    """
+    import hashlib
+    import os
+    from pathlib import Path
+    import subprocess
+    import sys
+    import yaml
+
+    model = os.environ.get("DOCATLAS_TEST_E5_MODEL_DIR")
+    if not model:
+        pytest.skip("explicit local E5 assets required")
+    root = tmp_path / "project"
+    docs = {
+        "docs/archive.md": "# Archive policy\n\nArchive records preserve the original timestamp.\n",
+        "docs/approval.md": "# Archive approval\n\nArchive deletion needs written owner approval.\n",
+        "modules/private/docs/archive.md": "# Archive policy\n\nArchive private vault code is COBALT.\n",
+    }
+    write_project(root, docs)
+    catalog_path = root / "docatlas.project-docs.yaml"
+    catalog = yaml.safe_load(catalog_path.read_text())
+    for entry in catalog["documents"]:
+        if entry["path"].startswith("modules/"):
+            entry.update(scope="module", module_path="modules/private")
+    catalog_path.write_text(yaml.safe_dump(catalog))
+    with isolated_service(tmp_path / "state") as (service, config):
+        cold = call_docs_tool_payload("get_docs_context", {
+            "project_path": str(root), "question": "What is the archive policy?",
+            "source_path": "docs/archive.md"}, service._cold)
+        assert cold["recommended_next_action"]["requires_confirmation"] and not cold.get("sources"), cold
+        assert not Path(config.index.db_path).exists()
+        inventory = index_project(service, config, root)
+        cache = tmp_path / "e5-cache"
+        script = Path(__file__).resolve().parents[1] / "eval/blind_project_context/prepare_e5_cache.py"
+        subprocess.run([sys.executable, str(script), "--db", inventory["storage_path"],
+                        "--model-dir", model, "--out", str(cache)], check=True)
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_ACQUISITION_E5", "1")
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_E5_MODEL_DIR", model)
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_E5_CACHE", str(cache))
+        monkeypatch.setenv("DOCATLAS_CONTEXT_COMPRESSION", "off")
+        before = {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in [Path(inventory["storage_path"]), *root.rglob("*.md"), *cache.iterdir()]}
+        args = {"project_path": str(root), "scope": "project", "question": "What is the archive policy?"}
+        first = call_docs_tool_payload("get_docs_context", args, service)
+        text = "\n".join(row["snippet"] for row in first.get("sources", []))
+        assert "original timestamp" in text and "written owner approval" in text, first
+        assert "COBALT" not in json.dumps(first)
+        focused = call_docs_tool_payload("get_docs_context", {**args, "source_path": "docs/approval.md"}, service)
+        assert focused.get("sources"), focused
+        assert all(row["path_or_url"] == "docs/approval.md" and row["snippet"] in docs["docs/approval.md"]
+                   for row in focused["sources"])
+        hidden = call_docs_tool_payload("get_docs_context", {
+            **args, "source_path": "modules/private/docs/archive.md"}, service)
+        assert not hidden.get("sources") and "COBALT" not in json.dumps(hidden), hidden
+        assert all(hashlib.sha256(Path(p).read_bytes()).hexdigest() == h for p, h in before.items())
+        (root / "docs/approval.md").write_text("# Archive approval\nChanged without reindexing.\n")
+        stale = call_docs_tool_payload("get_docs_context", {**args, "source_path": "docs/approval.md"}, service)
+        assert not stale.get("sources"), stale

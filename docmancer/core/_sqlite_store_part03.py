@@ -286,6 +286,14 @@ class _SQLiteStorePart03:
             raise ValueError("expand must be none, adjacent or page")
         rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
         native_count = len(rows)
+        import os
+        hybrid = os.environ.get("DOCATLAS_EXPERIMENT_ACQUISITION_E5", "0")
+        if hybrid not in {"0", "1"}:
+            raise ValueError("DOCATLAS_EXPERIMENT_ACQUISITION_E5 must be 0 or 1")
+        if hybrid == "1":
+            from docmancer.retrieval.experimental_e5_acquisition import hybrid_rows
+            rows = hybrid_rows(self, text, rows, filters, ACQUISITION_CANDIDATES)
+        method = "lexical_e5_round_robin_v1" if hybrid == "1" else ACQUISITION_METHOD
         # Research flag, off by default: fill the same ceiling in rank order,
         # each ranked hit followed by every window under its author heading.
         # Section boundaries come from the document; no new count is added.
@@ -345,7 +353,7 @@ class _SQLiteStorePart03:
         savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - token_total / raw_tokens))
         runway = 1.0 if token_total <= 0 else raw_tokens / token_total
         acquisition = {
-            "method": ACQUISITION_METHOD,
+            "method": method,
             "sql_rows": native_count,
             "candidate_ceiling": ACQUISITION_CANDIDATES,
             "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
@@ -382,7 +390,7 @@ class _SQLiteStorePart03:
                     "base_utility": -cost, "feature_contributions": {},
                     "final_utility": -cost, "raw_rank": rank,
                     "final_rank": rank, "rank_delta": 0,
-                    "candidate_pool_size": len(rows), "method": ACQUISITION_METHOD,
+                    "candidate_pool_size": len(rows), "method": method,
                 },
                 "lexical_match": self._lexical_match_trace(
                     text, title=str(row["title"]), body=str(row["text"]),
@@ -397,6 +405,8 @@ class _SQLiteStorePart03:
                     "anchor_section_id": row["_expansion_anchor_id"],
                 }
                 metadata.pop("lexical_match", None)
+            if "_e5_cosine" in row:
+                metadata["ranking"]["e5_cosine"] = row["_e5_cosine"]
             results.append(RetrievedChunk(
                 source=row["source"], chunk_index=int(row["chunk_index"]),
                 text=row["text"], score=-cost, metadata=metadata,

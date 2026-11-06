@@ -21,7 +21,18 @@ not turn it into host instructions or grant lifecycle/edit permission.
 
 ## Gap-directed follow-up
 
-For a specific missing fact, first follow `more_context.next_portion` when
+Before finishing, check requested aspects and source-stated prerequisites,
+exceptions and side effects. Retain found details rather than compressing them
+away. Name the gap before another call. For a relevant returned/user-supplied
+document, prefer `source_path` with its exact relative path, unchanged question,
+translation and scope, portion 1 and no old token. This reserves one lookup slot
+and caps the checked packet at 2400 tokens (or the smaller host limit).
+It narrows admitted evidence, never permits arbitrary file access or widens scope.
+If that packet has more context, use its own continuation. Never restart an
+exhausted focused query. Resource reads provide adjacent text only; they cannot
+jump to earlier sections and are unnecessary merely to resolve a citation.
+
+Otherwise, for a specific missing fact, follow `more_context.next_portion` when
 present: keep every query and scope argument unchanged, and pass that `portion`
 plus `more_context.continuation_token`. Combine the returned evidence with the
 earlier portions. The token binds the checked source snapshot and query; on

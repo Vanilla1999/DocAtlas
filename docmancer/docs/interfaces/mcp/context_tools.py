@@ -305,6 +305,19 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
     search_question, lookup_queries = translated_query(question, args.get("search_question"), lookup_queries)
+    source_path = args.get("source_path")
+    if source_path is not None:
+        from pathlib import PurePosixPath
+        if (not isinstance(source_path, str) or not source_path or len(source_path) > 500
+                or "\\" in source_path or "\x00" in source_path
+                or PurePosixPath(source_path).is_absolute()
+                or any(part in {"", ".", ".."} for part in source_path.split("/"))):
+            return _bad_request("invalid_source_path", "source_path must be an exact relative document path")
+        if context_format is not None or args.get("library") or args.get("libraries") or args.get("maintenance"):
+            return _bad_request("source_path_project_docs_only", "focused reads require project documentation")
+        lookup_queries = list(dict.fromkeys([*(lookup_queries or []), source_path]))
+        if len(lookup_queries) > 5:
+            return _bad_request("invalid_lookup_queries", "source_path reserves one of five lookup slots")
     if args.get("search_question") is not None and context_format == "patch_context":
         return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
     # Freeze the validated effective query plan before opening the request-owned
@@ -324,7 +337,7 @@ def _handle_prepared_context_tool(
     question = args["question"]
     context_format = args.get("context_format")
     lookup_queries = args["lookup_queries"]
-    if args.get("portion", 1) > 1 or args.get("continuation_token") is not None:
+    if args.get("portion", 1) > 1 or args.get("continuation_token") is not None or args.get("source_path"):
         from docmancer.docs.application.section_compression import enabled as section_compression_enabled
         if (experimental_context_max_tokens() is None or args.get("maintenance")
                 or section_compression_enabled()):
@@ -395,6 +408,8 @@ def _handle_prepared_context_tool(
             str(raw.get("message") or "Invalid documentation target or arguments; fix the binding and retry."),
         )
     record_translation(raw, question, args.get("search_question"))
+    if args.get("source_path"):
+        raw["_focused_source_path"] = args["source_path"]
     # Check the original operational decision before support/recovery decoration
     # can overwrite its reason or retain a previously admitted partial quote.
     blocked_kind = (
@@ -423,6 +438,8 @@ def _handle_prepared_context_tool(
         if blocked_kind == "docs_context":
             _observe_same_call_diagnostics(service, raw, blocked, {}, delivery_blocked=True)
         return blocked
+    if args.get("source_path") and raw.get("mode_selected") != "project":
+        return _bad_request("source_path_project_docs_only", "focused reads require project documentation")
     operational_answer_available = bool(raw.get("answer_available", True))
     operational_reason_code = raw.get("reason_code")
     canonical_support = getattr(canonical_selection, "support_decision", None)

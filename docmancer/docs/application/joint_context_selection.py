@@ -45,6 +45,13 @@ from .standalone_text_view import render_standalone_text
 
 
 POLICY = "joint_checked_body_mmr_v1"
+FOCUSED_MAX_TOKENS = 2400
+
+
+def _delivery_limit(retrieval: dict, cap: int) -> int:
+    return min(cap, delivery_token_ceiling(),
+               FOCUSED_MAX_TOKENS if retrieval.get("_focused_source_path") else cap)
+
 # Whole-section pool pruning used when DOCATLAS_EXPERIMENT_POOL_PRUNE is unset.
 JOINT_POOL_PRUNE_DEFAULT = "body"
 # Research flags, read per call and off by default (pool pruning: see its
@@ -305,7 +312,7 @@ def finalize_joint_context_delivery(payload: dict, snapshot: dict, retrieval: di
     selection = payload.get("source_selection") or {}
     if cap is None or selection.get("policy") != POLICY:
         return payload, snapshot
-    limit = min(cap, delivery_token_ceiling())
+    limit = _delivery_limit(retrieval, cap)
     result, bound = payload, snapshot
     while result.get("sources") and not _delivery_fits(result, limit):
         # Retract whole rows from the last added group if the final envelope
@@ -342,6 +349,8 @@ def _continuation_settings() -> dict:
             "DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "DOCATLAS_EXPERIMENT_MINI_PATH",
             "DOCATLAS_EXPERIMENT_DENSE_PATH", "DOCATLAS_MCP_TEXT_FALLBACK",
             "DOCATLAS_MCP_COMPACT_TEXT", "DOCATLAS_MCP_MODEL_VIEW", "DOCATLAS_CONTEXT_ASSEMBLY",
+            "DOCATLAS_EXPERIMENT_ACQUISITION_E5", "DOCATLAS_EXPERIMENT_E5_MODEL_DIR",
+            "DOCATLAS_EXPERIMENT_E5_CACHE",
         )},
     }
 
@@ -377,13 +386,24 @@ def select_joint_context(
     if portion > 1 and continuation_token is None:
         raise ValueError("context_continuation_required")
     rows = payload.get("sources") or []
+    focus = retrieval.get("_focused_source_path")
+    if focus:
+        # Narrow only after live source admission; the locator lookup acquired
+        # the document through the ordinary scoped and generation-bound path.
+        rows = [row for row in rows if row.get("path_or_url") == focus]
+        payload, snapshot = _selected_packet(payload, snapshot, retrieval, rows, selection={
+            "policy": POLICY, "scope": "source_checked_merged_candidates",
+            "query_count": len(authoritative_queries(retrieval.get("documentation_query_plan") or {})),
+            "candidate_rows": len(rows), "eligible_rows": len(rows), "pruned_rows": 0,
+            "budget_limited": False, "reference_limited": False,
+        })
     if not rows and portion == 1 and continuation_token is None:
         # Keep an existing source/consent/operational refusal intact. It never
         # advertises a next portion or acquires evidence through this helper.
         return finalize_packet(payload, snapshot) if finalize_packet is not None else (payload, snapshot)
     token = continuation_fingerprint(
         payload, snapshot, retrieval, policy=POLICY, settings=_continuation_settings(),
-        limit=min(cap, delivery_token_ceiling()), max_source_references=max_source_references,
+        limit=_delivery_limit(retrieval, cap), max_source_references=max_source_references,
         request_binding=request_binding,
     )
     if continuation_token is not None and continuation_token != token:
@@ -462,7 +482,7 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
     priority_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_PRIORITY")
     fusion_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_FUSION")
     cut_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_CUT")
-    limit = min(cap, delivery_token_ceiling())
+    limit = _delivery_limit(retrieval, cap)
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
     # to reconstruct a question from retrieved text or generated probes.

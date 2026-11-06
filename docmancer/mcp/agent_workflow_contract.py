@@ -87,6 +87,13 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "inferred_semantic_equivalence": False,
     },
     "gap_resolution": {
+        "check_before_answer": "requested_aspects_and_source_stated_prerequisites_exceptions_side_effects",
+        "prefer_known_source_path": True,
+        "source_path": "exact_returned_or_user_supplied_relative_path_same_scope_new_first_portion",
+        "source_path_lookup_slots": 1,
+        "source_path_max_tokens": 2400,
+        "source_resource_reads": "adjacent_text_not_arbitrary_sections_or_citation_resolution",
+        "repeat_exhausted_focused_search": False,
         "continuation_requires": "issued_context_portion_or_explicit_lookup_or_issued_bounded_source_read",
         "context_portion_arguments": "same_query_scope_and_issued_continuation_token",
         "context_portion_stale": "restart_at_first_portion",
