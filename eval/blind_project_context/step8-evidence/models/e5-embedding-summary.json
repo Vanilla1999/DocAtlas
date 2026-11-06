@@ -1,0 +1,33 @@
+{
+  "phase": "embed",
+  "finished_at_utc": "2026-11-06T08:05:05+00:00",
+  "startup_seconds": 4.398,
+  "inference_seconds": 1207.362,
+  "inputs_encoded": 11908,
+  "batch_size": 16,
+  "input_tokens_before_truncation": 3183455,
+  "truncated_inputs": 329,
+  "truncated_tokens": 25488,
+  "max_input_tokens": 973,
+  "peak_rss_bytes": 2587561984,
+  "plan_sha256": "d16c1429def22e80dcb03f0c65cfccc76b6b32d9ee3afb586868750409f43e6e",
+  "embeddings_sha256": "5b617231e9ea81083ed3d33f1c12985bb03c1b14e36272bbb89c56df1ee314de",
+  "source_receipt_sha256": "4c0801895fe70ae3d7ca92ff0df7eba7f1d3e52957d258b4a324d348349f46f2",
+  "projection_note": "Aggregate projection of embedding-receipt.json, not its byte-identical copy. The all_input_lengths array is omitted; the original receipt hash is retained for the private provenance chain.",
+  "tokenization_by_kind": {
+    "passages": {
+      "inputs": 11860,
+      "tokens_before_truncation": 3182432,
+      "truncated_inputs": 329,
+      "truncated_tokens": 25488,
+      "max_input_tokens": 973
+    },
+    "queries": {
+      "inputs": 48,
+      "tokens_before_truncation": 1023,
+      "truncated_inputs": 0,
+      "truncated_tokens": 0,
+      "max_input_tokens": 31
+    }
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "source_tree": {
+    "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+    "dirty_paths": []
+  },
+  "eval_tree": {
+    "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+    "dirty_paths": []
+  },
+  "slices": {
+    "dev/L0/en": {
+      "cases": 12,
+      "facts_found": 26,
+      "lost_not_acquired": 3,
+      "lost_after_acquisition": 8,
+      "facts_total": 37,
+      "all_found": 8,
+      "limit_reached": 9,
+      "output_budget": 0,
+      "candidate_ceiling": 9,
+      "seconds": 76.3
+    },
+    "dev/L0/ru": {
+      "cases": 12,
+      "facts_found": 26,
+      "lost_not_acquired": 3,
+      "lost_after_acquisition": 8,
+      "facts_total": 37,
+      "all_found": 8,
+      "limit_reached": 9,
+      "output_budget": 0,
+      "candidate_ceiling": 9,
+      "seconds": 101.6
+    },
+    "dev/L2/en": {
+      "cases": 12,
+      "facts_found": 26,
+      "lost_not_acquired": 3,
+      "lost_after_acquisition": 8,
+      "facts_total": 37,
+      "all_found": 8,
+      "limit_reached": 12,
+      "output_budget": 0,
+      "candidate_ceiling": 12,
+      "seconds": 102.9
+    },
+    "dev/L2/ru": {
+      "cases": 12,
+      "facts_found": 23,
+      "lost_not_acquired": 3,
+      "lost_after_acquisition": 11,
+      "facts_total": 37,
+      "all_found": 7,
+      "limit_reached": 12,
+      "output_budget": 0,
+      "candidate_ceiling": 12,
+      "seconds": 230.1
+    },
+    "holdout/L0/en": {
+      "cases": 12,
+      "facts_found": 13,
+      "lost_not_acquired": 3,
+      "lost_after_acquisition": 12,
+      "facts_total": 28,
+      "all_found": 5,
+      "limit_reached": 10,
+      "output_budget": 0,
+      "candidate_ceiling": 10,
+      "seconds": 75.4
+    },
+    "holdout/L0/ru": {
+      "cases": 12,
+      "facts_found": 13,
+      "lost_not_acquired": 0,
+      "lost_after_acquisition": 15,
+      "facts_total": 28,
+      "all_found": 5,
+      "limit_reached": 10,
+      "output_budget": 0,
+      "candidate_ceiling": 10,
+      "seconds": 92.0
+    },
+    "holdout/L2/en": {
+      "cases": 12,
+      "facts_found": 11,
+      "lost_not_acquired": 6,
+      "lost_after_acquisition": 11,
+      "facts_total": 28,
+      "all_found": 4,
+      "limit_reached": 12,
+      "output_budget": 0,
+      "candidate_ceiling": 12,
+      "seconds": 99.7
+    },
+    "holdout/L2/ru": {
+      "cases": 12,
+      "facts_found": 11,
+      "lost_not_acquired": 3,
+      "lost_after_acquisition": 14,
+      "facts_total": 28,
+      "all_found": 4,
+      "limit_reached": 12,
+      "output_budget": 0,
+      "candidate_ceiling": 12,
+      "seconds": 202.6
+    }
+  },
+  "facts_found": 149,
+  "facts_total": 260,
+  "all_found": 49,
+  "cases": 96,
+  "anomaly_count": 0,
+  "tool_errors": 0,
+  "statuses": {
+    "ok": 96
+  },
+  "reason_codes": {},
+  "tokens_o200k": {
+    "all": {
+      "mean": 1499.01,
+      "median": 1443.0,
+      "min": 256,
+      "max": 3551,
+      "total": 143905,
+      "calls": 96
+    },
+    "dev/L0/en": {
+      "mean": 1892.5,
+      "median": 1677.0,
+      "min": 1192,
+      "max": 3551,
+      "total": 22710,
+      "calls": 12
+    },
+    "dev/L0/ru": {
+      "mean": 1891,
+      "median": 1676.5,
+      "min": 1062,
+      "max": 3551,
+      "total": 22692,
+      "calls": 12
+    },
+    "dev/L2/en": {
+      "mean": 1441.25,
+      "median": 1341.5,
+      "min": 499,
+      "max": 2603,
+      "total": 17295,
+      "calls": 12
+    },
+    "dev/L2/ru": {
+      "mean": 1213,
+      "median": 1257.5,
+      "min": 342,
+      "max": 1861,
+      "total": 14556,
+      "calls": 12
+    },
+    "holdout/L0/en": {
+      "mean": 1525.25,
+      "median": 1507.0,
+      "min": 522,
+      "max": 3161,
+      "total": 18303,
+      "calls": 12
+    },
+    "holdout/L0/ru": {
+      "mean": 1359.92,
+      "median": 1450.0,
+      "min": 256,
+      "max": 3174,
+      "total": 16319,
+      "calls": 12
+    },
+    "holdout/L2/en": {
+      "mean": 1462.92,
+      "median": 1320.0,
+      "min": 682,
+      "max": 2887,
+      "total": 17555,
+      "calls": 12
+    },
+    "holdout/L2/ru": {
+      "mean": 1206.25,
+      "median": 1150.5,
+      "min": 287,
+      "max": 2885,
+      "total": 14475,
+      "calls": 12
+    }
+  },
+  "timing_caveat": "Concurrent workload; not a controlled latency comparison."
+}

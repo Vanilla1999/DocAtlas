@@ -1,0 +1,10 @@
+{
+  "finished_at_utc": "2026-11-06T08:05:06+00:00",
+  "plan_sha256": "d16c1429def22e80dcb03f0c65cfccc76b6b32d9ee3afb586868750409f43e6e",
+  "rankings_sha256": "54078f3e4a5eab347da27e4a0dab51edc33a6f4e2901921ba4165af72be7e5d8",
+  "embedding_receipt_sha256": "4c0801895fe70ae3d7ca92ff0df7eba7f1d3e52957d258b4a324d348349f46f2",
+  "embeddings_sha256": "5b617231e9ea81083ed3d33f1c12985bb03c1b14e36272bbb89c56df1ee314de",
+  "oracle_loaded": false,
+  "ranked_cases": 96,
+  "resource_skipped": 0
+}

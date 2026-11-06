@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from copy import copy
 from dataclasses import dataclass
 import hashlib
 import json
@@ -65,6 +66,20 @@ class SourceContinuationReader:
         self.clock = clock
         self._cursors: OrderedDict[str, _Cursor] = OrderedDict()
         self._lock = threading.RLock()
+
+    def registration_snapshot(self) -> SourceContinuationReader:
+        """Replay issuance with live authorization but no session mutations.
+
+        The clock, gateway and host limits stay the same. Immutable cursors can
+        be shared, while the registry and its lock must be independent: replay
+        must neither revive consumed references nor evict the client's cursors.
+        This copy is only for binding replayed packets, never resource reads.
+        """
+        with self._lock:
+            snapshot = copy(self)
+            snapshot._cursors = OrderedDict(self._cursors)
+            snapshot._lock = threading.RLock()
+        return snapshot
 
     def issue(self, reference: SourceReference, *, uri: str | None = None) -> str | None:
         if type(reference.line_end) is not int or reference.line_end < 1 or self.gateway.authorize(reference):

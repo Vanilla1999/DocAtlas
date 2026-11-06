@@ -1,0 +1,405 @@
+{
+  "status": "PASS",
+  "installed_stdio": true,
+  "installed_package": "/workspace/scratch/66f7674793b8/bilingual-wheel-venv/lib/python3.12/site-packages/docmancer/__init__.py",
+  "preparation_calls": 2,
+  "retrieval_calls": 11,
+  "source_resource_reads": 3,
+  "file_snapshot_hashes_verified": 3,
+  "strict_public_schema": true,
+  "metadata_only_matching_windows": 328,
+  "retained_reference": {
+    "status": "PASS",
+    "preparation_calls": 1,
+    "retrieval_calls": 3,
+    "source_resource_reads": 1,
+    "previously_issued_references": 128,
+    "retained_reference_readable": true,
+    "source_fidelity": true,
+    "files_and_sqlite_unchanged": true,
+    "responses": {
+      "retained": {
+        "utf8_bytes": 1128,
+        "o200k_tokens": 339,
+        "source_rows": 1,
+        "source_uris": [
+          "docatlas://source/f863d803a0ed828e54729d7f"
+        ]
+      },
+      "fill": {
+        "utf8_bytes": 19773,
+        "o200k_tokens": 8042,
+        "source_rows": 127,
+        "source_uris": [
+          "docatlas://source/006d4a4324b938f13af5ba4b",
+          "docatlas://source/01f72a0326689297ce98deff",
+          "docatlas://source/02d692707f846c331e9a9642",
+          "docatlas://source/039d664f866af5f718e456d5",
+          "docatlas://source/03c58492182d35449893e228",
+          "docatlas://source/07e1209ccd3ed7d8b1d7db90",
+          "docatlas://source/0b89940918ae45246ed08cbb",
+          "docatlas://source/0be74f6b72be99dcdd50dbed",
+          "docatlas://source/0c13b7b3c0bc62c89e5e4f04",
+          "docatlas://source/0dc56b96968d4b9ac26173b3",
+          "docatlas://source/1027d32d1567ef449d35fa7b",
+          "docatlas://source/11a8c8dfe0fd35aaca2bb775",
+          "docatlas://source/151d02393dbb68ae2527b38c",
+          "docatlas://source/160ef3eaa63bc21bb1d931f2",
+          "docatlas://source/167ad023ba07e2e1196aae44",
+          "docatlas://source/1bc48961e66aea69ba4b2be7",
+          "docatlas://source/1e92aa618c3f35aef1bac403",
+          "docatlas://source/1fbb1a5c899657fb052bd0ad",
+          "docatlas://source/2065b9263b2f239fd5dce0d6",
+          "docatlas://source/21cf3bd38ca4b603518c7853",
+          "docatlas://source/23ca6df670e9e9dbb652dc43",
+          "docatlas://source/2615be77e338b8268dfb2092",
+          "docatlas://source/267fdb7cd2de23133e479adc",
+          "docatlas://source/29e3aa0bc84f2e84652f7078",
+          "docatlas://source/29fcc5dcc83ec6d525bc88b7",
+          "docatlas://source/2c0adca5f8c1af20fd73292c",
+          "docatlas://source/2fcbdb5be640e4c607c54d9b",
+          "docatlas://source/316d3a2b7b6646e16269fc27",
+          "docatlas://source/32dbe3349a7f8189457db944",
+          "docatlas://source/359bbcf4aba71e4230bcc59c",
+          "docatlas://source/3b1d8aa596921a0376e35c61",
+          "docatlas://source/3c8c152f68938745ff5f9e22",
+          "docatlas://source/3e13d2b2599d6da2fdaa602a",
+          "docatlas://source/4036fb8982efb8823c64aebd",
+          "docatlas://source/4198b719082fe2b0cf7e204d",
+          "docatlas://source/46ee5f6df6a965a3b99600b3",
+          "docatlas://source/514fd53e3936930bbbb5a270",
+          "docatlas://source/52c21f3277f3c277f2078320",
+          "docatlas://source/530b324706b445268cf9bcd2",
+          "docatlas://source/549b494f2583e0105b77aaef",
+          "docatlas://source/5637b8ddc57efcbee70ad024",
+          "docatlas://source/57fd3de6c9f3bb3c1d17f094",
+          "docatlas://source/59f7503afaffe0d299aed256",
+          "docatlas://source/5b3255b5e9d05b19f76eb149",
+          "docatlas://source/5b7893c584ea81ada1a83008",
+          "docatlas://source/5ce1b81f503876e8453cc167",
+          "docatlas://source/5d23289a2d61230701c1fccd",
+          "docatlas://source/6274bbbda6d6fcb04ae1b1b4",
+          "docatlas://source/64c55197a7e6b886892588c8",
+          "docatlas://source/65c604ffc34b19776d788417",
+          "docatlas://source/668bf196aeb3b6a4798193d1",
+          "docatlas://source/6808407c8134942cf7b5ac3f",
+          "docatlas://source/683b1f029823abd0d41f520a",
+          "docatlas://source/6ac5552acb9ab6bcfc09bf4f",
+          "docatlas://source/6aea1e9b1cb5286e061f4638",
+          "docatlas://source/6b8862345f3300eae2ee01ef",
+          "docatlas://source/6db710b41b92cda42fe777b5",
+          "docatlas://source/711a0f31967c27272e407d3e",
+          "docatlas://source/74a707ea0fc5b3e139598488",
+          "docatlas://source/76cc0232b382cf8dd85972b9",
+          "docatlas://source/795906118bffd07c03b3a749",
+          "docatlas://source/7b952644d0cd52d082670a34",
+          "docatlas://source/807df0942a329666d864be70",
+          "docatlas://source/815925cd95258e251a35d2a7",
+          "docatlas://source/81f3a2d7c0849da338efb4a0",
+          "docatlas://source/84cc3fdfda7760409a679f56",
+          "docatlas://source/85cb3d42194541aa2070fd51",
+          "docatlas://source/87be38fedf450ebefdde38ba",
+          "docatlas://source/8972db37c2cc43c3f0eb69fa",
+          "docatlas://source/8b8907d16b60f1b4f455f5ef",
+          "docatlas://source/91fbd27e2d16aa2dce6457bd",
+          "docatlas://source/92ad6bd29ccfca9bc2454e38",
+          "docatlas://source/92e20c3e879a75f861f6e83c",
+          "docatlas://source/945837d997cbe134c95ef9f3",
+          "docatlas://source/975b4665af6e8fba5fe388c8",
+          "docatlas://source/982d2a125df32911da9373fe",
+          "docatlas://source/98ca9d9d8d36fda5cf26c7aa",
+          "docatlas://source/991be279f80a7d9a01d43173",
+          "docatlas://source/9da4df9b9f65095e17289b15",
+          "docatlas://source/9f592ec1202cf879cc77a03e",
+          "docatlas://source/a0e17635e47a202aa9fcf66b",
+          "docatlas://source/a2236845202d5313dfe7f803",
+          "docatlas://source/a30df3b5191ab70eadb1316a",
+          "docatlas://source/a3bdb6478d4dd0686e983803",
+          "docatlas://source/a6ac6b12505c4a2bd5172b42",
+          "docatlas://source/a791aedaa50710f5a3fbbf88",
+          "docatlas://source/aa4aeb03a25abee871ad9a99",
+          "docatlas://source/abd8c6dd54c10a8a2c4e3223",
+          "docatlas://source/ac98d9346204914f3106d088",
+          "docatlas://source/ad27cdf4f190e16c1fb9cff5",
+          "docatlas://source/ad2a3d80edc3b1606bfb5597",
+          "docatlas://source/af4c1e303883bc2b0aba1af3",
+          "docatlas://source/b003d7546ece7c10abbe505f",
+          "docatlas://source/b4a19ce8b1979489da42fd12",
+          "docatlas://source/b5f1bf767e4935ee0411a7f3",
+          "docatlas://source/b9caa02d0e7faf4c4bcfd483",
+          "docatlas://source/bc8db3dc9df406d5d7d9cf0e",
+          "docatlas://source/becccdb76227b5a3db8f296a",
+          "docatlas://source/bfd085bc6c468bd58c4d02ba",
+          "docatlas://source/c045ebacea0a03122366d9d8",
+          "docatlas://source/c0cc973339dd9bb7b837e749",
+          "docatlas://source/c25ad5d14771d2a335cc71d5",
+          "docatlas://source/c383d809aed9bd18555b5ec8",
+          "docatlas://source/c3b4015b33b72a21fb44062c",
+          "docatlas://source/c3d41b7fa744faff93273032",
+          "docatlas://source/c4c043577bb1dfa43c687e56",
+          "docatlas://source/c5f58e9f3759aa4911af571c",
+          "docatlas://source/c83a920eb5a5f29a63705813",
+          "docatlas://source/c8cb5b880ca42e84ec24e3a5",
+          "docatlas://source/c9a5016eb12ae9a1973337f1",
+          "docatlas://source/c9add51b85dcaadee6794fde",
+          "docatlas://source/ccc979bcd7d14ef1189cedb8",
+          "docatlas://source/d2a074d99d12ecb8274d7496",
+          "docatlas://source/d7cf27520089987f1a42a927",
+          "docatlas://source/d9a445d52065307ad227f906",
+          "docatlas://source/daafc77e5925d3de604f8496",
+          "docatlas://source/db812fd844edf6047498f6fd",
+          "docatlas://source/dc262e61038a87988c1a6750",
+          "docatlas://source/df6cfcc3db60070e0300efb9",
+          "docatlas://source/e09b2facf5026206229ba328",
+          "docatlas://source/e3125ad69a70419419a8b354",
+          "docatlas://source/e7e87b6aac437ebec2b2be2e",
+          "docatlas://source/ea36ea08ffc4d376c7c6f51f",
+          "docatlas://source/ebeaad8dfd564a2d0b2ee5f6",
+          "docatlas://source/ec95851aad6dcc35f849531c",
+          "docatlas://source/f4cc8472f6a083eb6eeedb11",
+          "docatlas://source/f5161e00f546b7bc7c77c3e2"
+        ]
+      },
+      "mixed": {
+        "utf8_bytes": 1384,
+        "o200k_tokens": 414,
+        "source_rows": 2,
+        "source_uris": [
+          "docatlas://source/06857442548a46defa06f24c",
+          "docatlas://source/f863d803a0ed828e54729d7f"
+        ]
+      }
+    }
+  },
+  "responses": {
+    "ru": {
+      "utf8_bytes": 2092,
+      "o200k_tokens": 596,
+      "source_rows": 1,
+      "source_paths": [
+        "docs/a-recovery.md"
+      ],
+      "required_facts": 1,
+      "status": "truncated",
+      "source_selection": {
+        "policy": "joint_checked_body_mmr_v1",
+        "scope": "source_checked_merged_candidates",
+        "query_count": 1,
+        "candidate_rows": 256,
+        "pruned_rows": 255,
+        "eligible_rows": 1,
+        "budget_limited": false,
+        "reference_limited": false,
+        "selected_rows": 1,
+        "omitted_rows": 255
+      },
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified",
+          "joint_selection_partial"
+        ]
+      }
+    },
+    "en": {
+      "utf8_bytes": 1792,
+      "o200k_tokens": 567,
+      "source_rows": 1,
+      "source_paths": [
+        "docs/z-custody.md"
+      ],
+      "required_facts": 1,
+      "status": "truncated",
+      "source_selection": {
+        "policy": "joint_checked_body_mmr_v1",
+        "scope": "source_checked_merged_candidates",
+        "query_count": 1,
+        "candidate_rows": 256,
+        "pruned_rows": 255,
+        "eligible_rows": 1,
+        "budget_limited": false,
+        "reference_limited": false,
+        "selected_rows": 1,
+        "omitted_rows": 255
+      },
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified",
+          "joint_selection_partial"
+        ]
+      }
+    },
+    "merged": {
+      "utf8_bytes": 1816,
+      "o200k_tokens": 467,
+      "source_rows": 2,
+      "source_paths": [
+        "docs/a-recovery.md",
+        "docs/z-custody.md"
+      ],
+      "required_facts": 2,
+      "status": "truncated",
+      "source_selection": {
+        "budget_limited": false,
+        "candidate_rows": 449,
+        "eligible_rows": 2,
+        "omitted_rows": 447,
+        "policy": "joint_checked_body_mmr_v1",
+        "pruned_rows": 447,
+        "query_count": 2,
+        "reference_limited": false,
+        "scope": "source_checked_merged_candidates",
+        "selected_rows": 2
+      },
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified",
+          "joint_selection_partial"
+        ],
+        "status": "unverified"
+      }
+    },
+    "unsupported": {
+      "utf8_bytes": 2825,
+      "o200k_tokens": 640,
+      "source_rows": 1,
+      "source_paths": [
+        "docs/m-herbarium-0.md"
+      ],
+      "required_facts": 0,
+      "status": "truncated",
+      "source_selection": {
+        "budget_limited": false,
+        "candidate_rows": 352,
+        "eligible_rows": 95,
+        "omitted_rows": 351,
+        "policy": "joint_checked_body_mmr_v1",
+        "pruned_rows": 257,
+        "query_count": 2,
+        "reference_limited": false,
+        "scope": "source_checked_merged_candidates",
+        "selected_rows": 1
+      },
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified",
+          "joint_selection_partial"
+        ],
+        "status": "unverified"
+      }
+    },
+    "identifier": {
+      "utf8_bytes": 1222,
+      "o200k_tokens": 359,
+      "source_rows": 1,
+      "source_paths": [
+        "docs/z-custody.md"
+      ],
+      "required_facts": 1,
+      "status": "truncated",
+      "source_selection": {
+        "budget_limited": false,
+        "candidate_rows": 256,
+        "eligible_rows": 1,
+        "omitted_rows": 255,
+        "policy": "joint_checked_body_mmr_v1",
+        "pruned_rows": 255,
+        "query_count": 1,
+        "reference_limited": false,
+        "scope": "source_checked_merged_candidates",
+        "selected_rows": 1
+      },
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified",
+          "joint_selection_partial"
+        ],
+        "status": "unverified"
+      }
+    },
+    "locator": {
+      "utf8_bytes": 1718,
+      "o200k_tokens": 551,
+      "source_rows": 1,
+      "source_paths": [
+        "docs/deploy-policy.md"
+      ],
+      "required_facts": 1,
+      "status": "ok",
+      "source_selection": {
+        "policy": "joint_checked_body_mmr_v1",
+        "scope": "source_checked_merged_candidates",
+        "query_count": 1,
+        "candidate_rows": 1,
+        "pruned_rows": 0,
+        "eligible_rows": 1,
+        "budget_limited": false,
+        "reference_limited": false,
+        "selected_rows": 1,
+        "omitted_rows": 0
+      },
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      }
+    },
+    "unknown-locator": {
+      "utf8_bytes": 555,
+      "o200k_tokens": 138,
+      "source_rows": 0,
+      "source_paths": [],
+      "required_facts": 0,
+      "status": "insufficient_evidence",
+      "source_selection": null,
+      "context_quality": {
+        "status": "unavailable",
+        "reasons": [
+          "source_unavailable"
+        ]
+      }
+    },
+    "ambiguous-locator": {
+      "utf8_bytes": 573,
+      "o200k_tokens": 138,
+      "source_rows": 0,
+      "source_paths": [],
+      "required_facts": 0,
+      "status": "insufficient_evidence",
+      "source_selection": null,
+      "context_quality": {
+        "status": "unavailable",
+        "reasons": [
+          "source_unavailable"
+        ]
+      }
+    }
+  },
+  "source_fidelity": true,
+  "metadata_only_evidence": false,
+  "existing_store_unchanged": true,
+  "files_and_sqlite_unchanged": true,
+  "boundary": "Real offline installed MCP; no model answers, semantic absence or real-client claim",
+  "large_packet": {
+    "id": "B01",
+    "question": "What is Black's default line length?",
+    "retrieval_calls": 3,
+    "preparation_calls": 1,
+    "compression": "off",
+    "source_rows": 18,
+    "legacy_utf8_bytes": 17470,
+    "legacy_o200k": 5748,
+    "compact_source_rows": 18,
+    "compact": {
+      "utf8_bytes": 9965,
+      "o200k_tokens": 2927
+    },
+    "required_fact_delivered": true,
+    "source_fidelity": true,
+    "files_and_sqlite_unchanged": true,
+    "trace_does_not_change_result": true,
+    "note": "Real installed MCP evidence delivery; no OpenCode/model answer or corpus-completeness claim"
+  }
+}

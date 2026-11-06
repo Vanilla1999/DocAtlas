@@ -52,7 +52,8 @@ of its own scores. Native selection uses `body` when the variable is unset
 (accepted by the blind gate, `eval/blind_project_context/STEP7_CONTEXT7_PATH_RU.md`);
 `off` restores the whole pool. Native pruning only settles competition for the
 delivery budget: a checked pool whose rows all fit the delivery and reference
-limits is delivered whole in every mode. `body` keeps sections that both the retrieval
+limits is not pruned in any mode; later eligibility and gain checks still apply.
+`body` keeps sections that both the retrieval
 BM25 score and the character 4-gram body match keep; `vote` keeps a section
 that at least two of three views keep, the third being the heading-path match;
 `heading` and `heading_or_body` exist for comparison; `own_heading_or_body`
@@ -72,6 +73,10 @@ class of sections by relevance before the greedy loop, and
 multilingual-E5 embedding (`DOCATLAS_EXPERIMENT_DENSE_PATH`) alone or averaged
 with the lexical lane, like `mini|hybrid` do with the cross-encoder.
 The optional MiniLM section policy remains separate from native selection.
+Its integration audit compares delivered rows with the full checked input of
+the same call and independently verifies the frozen source corpus and facts.
+The native response is itself selected and is used only as a delivery-cost
+comparison, not as the complete candidate pool for the MiniLM audit.
 
 ## Checked context portions
 
@@ -83,7 +88,8 @@ rows removed by pruning. Each later portion replays full earlier selections
 and their source-binding/finalization steps, excludes actually delivered
 evidence IDs, then selects from the remaining checked pool. The source checks
 still run on every request. A changed request or snapshot returns
-`stale_context_continuation`; start a new sequence at portion 1.
+`stale_context_continuation`; start a new sequence at portion 1 and revalidate
+earlier evidence before treating it as current.
 
 `candidate_rows` counts the current checked pool before pruning, `pruned_rows`
 records the filter's removals, and `omitted_rows` includes every checked row
@@ -109,10 +115,6 @@ UTF-8 bytes divided by four; neither is a guarantee about another model's
 tokenizer. This flag does not remove relevance, source-reference or acquisition
 limits. The separate opt-in host `model_context_packing` API is outside this
 experiment. Normal calls never download a model or enlarge the ceiling.
-Its integration audit compares delivered rows with the full checked input of
-the same call and independently verifies the frozen source corpus and facts.
-The native response is itself selected and is used only as a delivery-cost
-comparison, not as the complete candidate pool for the MiniLM audit.
 
 ## Invariants
 

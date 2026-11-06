@@ -1,0 +1,98 @@
+{
+  "interpretation": "Offline union only: these are two different server model configurations, not an implemented two-call public agent flow.",
+  "baseline_file": "/workspace/scratch/66f7674793b8/step8-evidence/baseline/score.json",
+  "baseline_changed_fact_sets_vs_committed": 0,
+  "slices": {
+    "dev/L0/en": {
+      "cases": 12,
+      "default_facts": 31,
+      "minilm_facts": 26,
+      "union_facts": 31,
+      "facts_total": 37,
+      "union_all_found": 10,
+      "gained_by_minilm": 0,
+      "default_only": 5
+    },
+    "dev/L0/ru": {
+      "cases": 12,
+      "default_facts": 31,
+      "minilm_facts": 26,
+      "union_facts": 34,
+      "facts_total": 37,
+      "union_all_found": 11,
+      "gained_by_minilm": 3,
+      "default_only": 8
+    },
+    "dev/L2/en": {
+      "cases": 12,
+      "default_facts": 25,
+      "minilm_facts": 26,
+      "union_facts": 31,
+      "facts_total": 37,
+      "union_all_found": 10,
+      "gained_by_minilm": 6,
+      "default_only": 5
+    },
+    "dev/L2/ru": {
+      "cases": 12,
+      "default_facts": 18,
+      "minilm_facts": 23,
+      "union_facts": 28,
+      "facts_total": 37,
+      "union_all_found": 9,
+      "gained_by_minilm": 10,
+      "default_only": 5
+    },
+    "holdout/L0/en": {
+      "cases": 12,
+      "default_facts": 21,
+      "minilm_facts": 13,
+      "union_facts": 21,
+      "facts_total": 28,
+      "union_all_found": 9,
+      "gained_by_minilm": 0,
+      "default_only": 8
+    },
+    "holdout/L0/ru": {
+      "cases": 12,
+      "default_facts": 24,
+      "minilm_facts": 13,
+      "union_facts": 24,
+      "facts_total": 28,
+      "union_all_found": 10,
+      "gained_by_minilm": 0,
+      "default_only": 11
+    },
+    "holdout/L2/en": {
+      "cases": 12,
+      "default_facts": 15,
+      "minilm_facts": 11,
+      "union_facts": 17,
+      "facts_total": 28,
+      "union_all_found": 7,
+      "gained_by_minilm": 2,
+      "default_only": 6
+    },
+    "holdout/L2/ru": {
+      "cases": 12,
+      "default_facts": 11,
+      "minilm_facts": 11,
+      "union_facts": 15,
+      "facts_total": 28,
+      "union_all_found": 5,
+      "gained_by_minilm": 4,
+      "default_only": 4
+    }
+  },
+  "totals": {
+    "cases": 96,
+    "default_facts": 176,
+    "minilm_facts": 149,
+    "union_facts": 201,
+    "facts_total": 260,
+    "union_all_found": 71,
+    "gained_by_minilm": 25,
+    "default_only": 52
+  },
+  "default_mean_tokens": 8590.166666666666
+}

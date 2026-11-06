@@ -588,7 +588,7 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "Answer in user's language; cite ref/path/lines, retain partials/gaps. "
         "For a missing fact, follow more_context.next_portion with identical arguments plus portion and its "
         "continuation_token; preserve earlier evidence. Stop when answered, no next portion, no useful new evidence, "
-        "or host budget reached; stale token requires a new first portion. Remaining rows do not promise answers. "
+        "or host budget reached; stale token requires a new first portion and revalidation of earlier evidence. Remaining rows do not promise answers. "
         "Further missing-fact followups start at portion 1: lookups = whole question reworded + its key words, in source language with exact "
         "literals (not fragments/generic words), or issued bounded reads; coverage/selection alone needs no retry. "
         "Client truncation=delivery failure, not missing docs: follow recovery; retry only after input/state changes. "

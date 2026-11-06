@@ -59,3 +59,14 @@ trees frozen for each run, use dependencies from `uv.lock`, and do not compare
 latency across runs sharing CPUs with other work. `score.py` records actual
 o200k output tokens as well as bytes. Set `ORT_DISABLE_TELEMETRY=1` before
 loading any third-party local-model runtime.
+
+Measured results and current decisions are in
+[STEP8_COMPLETION_RU.md](STEP8_COMPLETION_RU.md): one/two/three portions deliver
+176/205/218 of 260 fact checks; the ordinary first-portion gate is unchanged.
+[STEP8_MODELS_RU.md](STEP8_MODELS_RU.md) separates the fresh MiniLM delivery
+comparison from the frozen E5 candidate-acquisition study. E5 plus lexical
+retrieval reaches 260/260 **candidate** fact checks with extra candidate
+capacity; this is not an implemented runtime hybrid or a final-delivery result.
+Aggregate evidence and hashes are in `step8-evidence/`; raw held-out inputs and
+rankings are not included there. Limit flags in cumulative summaries describe
+the first portion; facts, output sizes and calls are cumulative.

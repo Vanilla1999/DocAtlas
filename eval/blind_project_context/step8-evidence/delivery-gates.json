@@ -1,0 +1,790 @@
+{
+  "baseline_git_commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+  "baseline_score_sha256": "f18090c19c619049dbdac4481b36f9cb16b0437a5022d5dc5535852d811055fc",
+  "gates": {
+    "baseline": {
+      "accepted": true,
+      "score_sha256": "9dd741ad4c4986d0e107779c4c659ee623a5e8e9e095a1dbd5920351b1d5e21d",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 18,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 25,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 8,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 24,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 21,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 9,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 11,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 3,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 15,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        }
+      },
+      "fact_changed_cases": 0,
+      "row_changed_cases": 2
+    },
+    "portions": {
+      "accepted": true,
+      "score_sha256": "6367aa545904700e1aea79faa744c520871f25b7d88270f71c5b0da652441d31",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 18,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 25,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 8,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 24,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 21,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 9,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 11,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 3,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 15,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        }
+      },
+      "fact_changed_cases": 0,
+      "row_changed_cases": 27
+    },
+    "cap6000": {
+      "accepted": false,
+      "score_sha256": "ccb8f4c94c80b88b3909f78baa712fd2bfb67d7d3965b3d1fec31056cd47e9e6",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 21,
+            "delta": -10
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 7,
+            "delta": -3
+          },
+          "worse": true
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 21,
+            "delta": -10
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 7,
+            "delta": -3
+          },
+          "worse": true
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 13,
+            "delta": -5
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 4,
+            "delta": -2
+          },
+          "worse": true
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 21,
+            "delta": -4
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 7,
+            "delta": -1
+          },
+          "worse": true
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 16,
+            "delta": -8
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 6,
+            "delta": -4
+          },
+          "worse": true
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 14,
+            "delta": -7
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 6,
+            "delta": -3
+          },
+          "worse": true
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 3,
+            "delta": -8
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 1,
+            "delta": -2
+          },
+          "worse": true
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 10,
+            "delta": -5
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 4,
+            "delta": -2
+          },
+          "worse": true
+        }
+      },
+      "fact_changed_cases": 22,
+      "row_changed_cases": 86
+    },
+    "cap18000": {
+      "accepted": true,
+      "score_sha256": "f5626aabbae0fccb83fbad56e10ac18d7d249796807e63988f96495c80d23791",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 34,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 11,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 25,
+            "delta": 7
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 8,
+            "delta": 2
+          },
+          "worse": false
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 25,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 8,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 24,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 24,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 10,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 15,
+            "delta": 4
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 5,
+            "delta": 2
+          },
+          "worse": false
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 15,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        }
+      },
+      "fact_changed_cases": 6,
+      "row_changed_cases": 50
+    },
+    "cap24000": {
+      "accepted": true,
+      "score_sha256": "d1e0ddf2489717e212bae5e2337a6a8c7eb47c66e657320a45d73bf7271b56e4",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 34,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 11,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 25,
+            "delta": 7
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 8,
+            "delta": 2
+          },
+          "worse": false
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 25,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 8,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 27,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 11,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 24,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 10,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 15,
+            "delta": 4
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 5,
+            "delta": 2
+          },
+          "worse": false
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 15,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        }
+      },
+      "fact_changed_cases": 7,
+      "row_changed_cases": 51
+    },
+    "cap1000000": {
+      "accepted": true,
+      "score_sha256": "161a2bfa69db9f85400c20d9f7a7f6ee3261f752646a9c2dafa8940e5f89814a",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 31,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 10,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 34,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 11,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 25,
+            "delta": 7
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 8,
+            "delta": 2
+          },
+          "worse": false
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 25,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 8,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 27,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 11,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 24,
+            "delta": 3
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 10,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 17,
+            "delta": 6
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 6,
+            "delta": 3
+          },
+          "worse": false
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 15,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 6,
+            "delta": 0
+          },
+          "worse": false
+        }
+      },
+      "fact_changed_cases": 8,
+      "row_changed_cases": 51
+    },
+    "minilm": {
+      "accepted": false,
+      "score_sha256": "1271f127d6649377696d998900e3579d56e04d947190cccf5e508da2fb24d264",
+      "slices": {
+        "dev/L0/ru": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 26,
+            "delta": -5
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 8,
+            "delta": -2
+          },
+          "worse": true
+        },
+        "dev/L0/en": {
+          "facts_found": {
+            "baseline": 31,
+            "candidate": 26,
+            "delta": -5
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 8,
+            "delta": -2
+          },
+          "worse": true
+        },
+        "dev/L2/ru": {
+          "facts_found": {
+            "baseline": 18,
+            "candidate": 23,
+            "delta": 5
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 7,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "dev/L2/en": {
+          "facts_found": {
+            "baseline": 25,
+            "candidate": 26,
+            "delta": 1
+          },
+          "all_found": {
+            "baseline": 8,
+            "candidate": 8,
+            "delta": 0
+          },
+          "worse": false
+        },
+        "holdout/L0/ru": {
+          "facts_found": {
+            "baseline": 24,
+            "candidate": 13,
+            "delta": -11
+          },
+          "all_found": {
+            "baseline": 10,
+            "candidate": 5,
+            "delta": -5
+          },
+          "worse": true
+        },
+        "holdout/L0/en": {
+          "facts_found": {
+            "baseline": 21,
+            "candidate": 13,
+            "delta": -8
+          },
+          "all_found": {
+            "baseline": 9,
+            "candidate": 5,
+            "delta": -4
+          },
+          "worse": true
+        },
+        "holdout/L2/ru": {
+          "facts_found": {
+            "baseline": 11,
+            "candidate": 11,
+            "delta": 0
+          },
+          "all_found": {
+            "baseline": 3,
+            "candidate": 4,
+            "delta": 1
+          },
+          "worse": false
+        },
+        "holdout/L2/en": {
+          "facts_found": {
+            "baseline": 15,
+            "candidate": 11,
+            "delta": -4
+          },
+          "all_found": {
+            "baseline": 6,
+            "candidate": 4,
+            "delta": -2
+          },
+          "worse": true
+        }
+      },
+      "fact_changed_cases": 32,
+      "row_changed_cases": 96
+    }
+  }
+}

@@ -422,7 +422,8 @@ def write_reports(result: dict, out: Path) -> None:
     report = head + ["## Срезы", ""] + _slice_table(result["slices"]) + ["", "## Dev: по вопросам", ""] + _case_table(dev)
     for portion, cumulative in result.get("cumulative_portions", {}).items():
         report += ["", f"## Накопительно: до {portion} порций", "",
-                   "Принудительное продолжение до указанного числа; это не оценка решения агента, когда остановиться.", ""]
+                   "Принудительное продолжение до указанного числа; это не оценка решения агента, когда остановиться.",
+                   "Факты оценены накопительно; счётчики лимитов в таблице относятся к первой порции.", ""]
         report += _slice_table(cumulative["slices"])
     report += ["", "Подробности holdout — в `holdout-details.md`; их не используют для подбора изменений."]
     (out / "report.md").write_text("\n".join(report) + "\n", encoding="utf-8")

@@ -112,6 +112,7 @@ def main() -> int:
                 raise ValueError(f"{label}: anomalous cumulative portion {number}")
             outputs[label]["cumulative_portions"][number] = {
                 "aggregate": aggregate(cumulative["cases"]), "slices": cumulative["slices"],
+                "limit_counters_scope": "first portion; facts, calls and output sizes are cumulative",
             }
             scores[f"{label}:{number}"] = {**score, "cases": cumulative["cases"]}
     if len({(score["questions_sha256"], score["oracle_sha256"]) for score in scores.values()}) != 1:

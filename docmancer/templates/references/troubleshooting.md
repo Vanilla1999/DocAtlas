@@ -25,7 +25,8 @@ For a specific missing fact, first follow `more_context.next_portion` when
 present: keep every query and scope argument unchanged, and pass that `portion`
 plus `more_context.continuation_token`. Combine the returned evidence with the
 earlier portions. The token binds the checked source snapshot and query; on
-`stale_context_continuation`, restart at portion 1 with no token. Changing the
+`stale_context_continuation`, restart at portion 1 with no token and revalidate
+earlier evidence before treating it as current. Changing the
 question, translation, lookups, documents or selection settings starts a new
 sequence. `remaining_rows` counts candidates, not missing facts or guaranteed
 useful answers. Stop when the gap is answered, no next portion remains, a

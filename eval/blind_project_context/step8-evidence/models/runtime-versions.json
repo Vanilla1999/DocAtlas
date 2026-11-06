@@ -1,0 +1,17 @@
+{
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "packages": {
+    "onnxruntime": "1.31.1",
+    "tokenizers": "0.23.3",
+    "numpy": "2.5.4"
+  },
+  "captured_after_run": true,
+  "note": "Versions observed in the shared interpreter used by the study; no package was imported to collect this metadata.",
+  "interpreter": "/workspace/scratch/66f7674793b8/DocAtlas/.venv/bin/python",
+  "uv_lock_exact_environment": false,
+  "run_scope": {
+    "e5": "Snapshot collected immediately after the completed E5 process from its interpreter.",
+    "minilm": "Same interpreter path; its original manifest records Python 3.12.14, but no separate contemporaneous package-version snapshot was captured. Do not infer independently verified start-time package versions from this later snapshot."
+  }
+}

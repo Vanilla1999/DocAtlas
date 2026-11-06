@@ -565,9 +565,20 @@ def _handle_prepared_context_tool(
                     # One joint choice after lookup merge and live source checks.
                     # Price already attached URI strings before issuing cursors;
                     # the explicit MiniLM section policy is not selected twice.
+                    replay_reader = None
+
                     def finalize_portion(packet, receipts):
+                        nonlocal replay_reader
                         if experimental_context_max_tokens() is not None and reader is not None and source_root:
-                            bind_project_source_continuations(reader, source_root, packet, receipts)
+                            binding_reader = reader
+                            if (packet.get("more_context") or {}).get("portion", 1) != args.get("portion", 1):
+                                # Earlier portions still need live authorization
+                                # and exact final pricing, but replay must not
+                                # reissue spent URIs or evict session references.
+                                if replay_reader is None:
+                                    replay_reader = reader.registration_snapshot()
+                                binding_reader = replay_reader
+                            bind_project_source_continuations(binding_reader, source_root, packet, receipts)
                             _refresh_projection_estimate(packet)
                         return finalize_joint_context_delivery(packet, receipts, raw)
 
