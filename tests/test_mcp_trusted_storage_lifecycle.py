@@ -173,12 +173,17 @@ def test_project_config_cannot_redirect_prepare_or_retrieval(cold):
     before = member_state(service.member_storage_policy)
     foreign = root.parent / "foreign.db"
     (root / "docatlas.yaml").write_text(f"index:\n  db_path: {foreign}\n")
+    config_bytes = (root / "docatlas.yaml").read_bytes()
     result = call_docs_tool_payload("prepare_docs", request(cold, generation=generation), service)
-    assert result.get("status") != "success"
+    # The host chooses storage; project configuration cannot redirect or veto it.
+    assert result.get("status") == "success", result
+    assert result["metrics"]["generation_id"] == generation
+    assert service.member_storage_policy.generation() == generation
     assert retrieve(cold).get("sources")
     assert retrieve((root, service.materialize())).get("sources")
     assert member_state(service.member_storage_policy) == before
     assert not foreign.exists()
+    assert (root / "docatlas.yaml").read_bytes() == config_bytes
 
 
 def test_unchanged_repeat_stale_cas_and_unrelated_member_preservation(cold):

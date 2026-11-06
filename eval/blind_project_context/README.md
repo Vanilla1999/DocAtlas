@@ -27,3 +27,35 @@ DOCATLAS_BLIND_EVAL=1 python -m pytest tests/test_blind_project_context_integrat
 ```
 
 Holdout cases are never used for tuning; `report.md` lists dev cases only.
+
+## Continuation and delivery-size studies
+
+```bash
+# First-call facts remain the normal gate; cumulative portions are separate.
+python eval/blind_project_context/run.py OUT --jobs 2 --portions 3 \
+  --env BLIND_OBSERVER_SELECTION=1
+python eval/blind_project_context/score.py OUT
+
+# Measurement only; ordinary runtime remains at 12,000.
+python eval/blind_project_context/run.py OUT --jobs 2 \
+  --env DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS=18000
+```
+
+`--portions` follows only the server-issued next portion and snapshot token.
+The scorer validates every returned source span, rejects repeated source
+windows between portions, and re-scores the union of character intervals
+after each cumulative portion. The ordinary `facts_found` and gate still
+refer to the first answer. Cumulative results measure forced reading up to N
+portions, not a model's ability to decide when more evidence is useful.
+
+`BLIND_OBSERVER_SELECTION=1` adds first-portion checked-pool/pruning/final
+selection observations. Gold quotes are used only by passive wrappers, never
+by ranking. The passivity integration checks byte equality with and without
+these observations over three portions. Missing trace rows remain explicitly
+unobserved. A finalizer retraction is distinct from a pruning decision.
+
+Use distinct `--work-root` paths for concurrent studies. Keep source and eval
+trees frozen for each run, use dependencies from `uv.lock`, and do not compare
+latency across runs sharing CPUs with other work. `score.py` records actual
+o200k output tokens as well as bytes. Set `ORT_DISABLE_TELEMETRY=1` before
+loading any third-party local-model runtime.

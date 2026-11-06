@@ -12,6 +12,8 @@ import json
 import math
 import os
 
+from docmancer.docs.domain.delivery_limits import delivery_token_ceiling
+
 BASE = "docatlas.standalone-text.v1"
 POLICIES = ("literal", "grouped", "table", "grouped-table", "adaptive")
 _FORMATS = {p: f"docatlas.assembled-{p}.v1" for p in POLICIES[1:4]}
@@ -116,7 +118,8 @@ def decode_context(view: dict) -> dict:
 def render_layouts(text: str) -> dict[str, str]:
     """Offer reversible candidates with the old representation always present."""
     candidates = {"literal": text}
-    if len(text.encode("utf-8")) > 48_000:
+    limit = delivery_token_ceiling()
+    if len(text.encode("utf-8")) > 4 * limit:
         return candidates  # existing full-packet safety boundary, not a new cap
     view = json.loads(text)
     if (not isinstance(view, dict) or view.get("context_format") != BASE or
@@ -137,7 +140,7 @@ def render_layouts(text: str) -> dict[str, str]:
         trial["context_format"] = _FORMATS[name]
         trial["notice"] += _LEGENDS[name]
         serialized = _json(trial)
-        if max(_cost(serialized), math.ceil(len(serialized.encode("utf-8")) / 4)) > 12000:
+        if max(_cost(serialized), math.ceil(len(serialized.encode("utf-8")) / 4)) > limit:
             continue
         # Compare canonical bytes, not Python's loose bool/int equality.
         if _json(decode_context(trial)) != original:

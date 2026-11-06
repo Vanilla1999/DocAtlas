@@ -276,6 +276,7 @@ def test_conflicting_owner_denied_inside_transaction(local, lane):
 def test_source_and_storage_boundaries(local, kind):
     root, store, _app = local
     mutation = request(local)
+    foreign = root.parent / "foreign.db"
     if kind == "symlink":
         target = root.parent / "outside.md"
         target.write_text("Outside")
@@ -286,7 +287,7 @@ def test_source_and_storage_boundaries(local, kind):
                    "generated": "project:\n  generated_paths: [README.md]\n",
                    "budget": "project:\n  max_file_bytes: 1\n",
                    "vector": "retrieval:\n  default_mode: dense\n",
-                   "config_shadow": "index:\n  db_path: /different/user.db\n"}
+                   "config_shadow": f"index:\n  db_path: {foreign}\n"}
         (root / "docatlas.yaml").write_text(configs[kind] if kind == "config_shadow" else
                                             f"index:\n  db_path: {store.db_path}\n" + configs[kind])
     elif kind == "utf8":
@@ -300,6 +301,17 @@ def test_source_and_storage_boundaries(local, kind):
         (root / "docatlas.project-docs.yaml").write_text(yaml.safe_dump(catalog))
         mutation["catalog_sha256"] = hashlib.sha256((root / "docatlas.project-docs.yaml").read_bytes()).hexdigest()
     before = state(store)
+    if kind == "config_shadow":
+        # Local MCP storage is host-selected; this project path has no authority.
+        config_bytes = (root / "docatlas.yaml").read_bytes()
+        result = sync(local, mutation)
+        assert result.status == "success"
+        after = state(store)
+        assert len(after["sources"]) == len(before["sources"]) + 1
+        assert any(row[1] == str(root / "README.md") for row in after["sources"])
+        assert not foreign.exists()
+        assert (root / "docatlas.yaml").read_bytes() == config_bytes
+        return
     with pytest.raises((PermissionError, ValueError, OSError)):
         sync(local, mutation)
     assert state(store) == before

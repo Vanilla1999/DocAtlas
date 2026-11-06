@@ -243,13 +243,16 @@ class SelfHostFixture:
     def verify_cold_read(self, payload: Any) -> bool:
         cold = self.service._cold
         policy = cold.member_storage_policy
-        error = payload.get("error") if isinstance(payload, Mapping) else None
+        action = payload.get("recommended_next_action") if isinstance(payload, Mapping) else None
         self.cold_read_verified = bool(
-            isinstance(error, Mapping) and payload.get("status") == "failed"
-            and error.get("reason_code") == "permission_denied"
-            and error.get("exception_type") == "PermissionError"
-            and error.get("retryable") is False
-            and error.get("where") == {"tool": "get_docs_context", "handler": None, "phase": "execution"}
+            isinstance(action, Mapping) and payload.get("status") == "not_prepared"
+            and payload.get("reason_code") == "member_store_uninitialized"
+            and payload.get("project_path") == str(self.root)
+            and payload.get("storage_path") == self.config.index.db_path
+            and action.get("tool") == "prepare_docs"
+            and action.get("action") == "sync_project_docs"
+            and action.get("requires_confirmation") is True
+            and not action.get("auto_execute")
             and not payload.get("sources")
             and payload.get("kind") is None
             and all(payload.get(key) is None or payload.get(key) is False for key in (
@@ -306,7 +309,7 @@ def self_host_fixture(origin: Path, *, catalog_path: Path | None = None):
     origin = Path(origin)
     if not origin.is_absolute() or origin.resolve() != origin:
         raise ValueError("self-host origin must be an absolute non-symlinked checkout")
-    with _ENV_LOCK, TemporaryDirectory(prefix="docatlas-self-host-", dir="/tmp") as raw_tmp:
+    with _ENV_LOCK, TemporaryDirectory(prefix="docatlas-self-host-") as raw_tmp:
         temporary = Path(raw_tmp).resolve()
         root = temporary / "project"
         env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}

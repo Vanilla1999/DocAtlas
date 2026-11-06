@@ -203,6 +203,10 @@ class CompositeRegistry(RegistryClient):
 
 
 def default_registry() -> RegistryClient:
+    # Optional local artifacts must remain local misses in an offline run.
+    # Constructing a hosted client can already depend on proxy configuration.
+    if os.environ.get("DOCATLAS_OFFLINE") == "1":
+        return LocalRegistry()
     registries: list[RegistryClient] = [
         LocalRegistry(),
         HostedRegistry(),

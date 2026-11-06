@@ -39,7 +39,9 @@ def test_unique_owned_name_and_state_preserved(tmp_path, writer, legacy):
     assert updated["mcp"]["timeout"] == config["mcp"]["timeout"]
     servers = updated["mcp"]["servers"]
     assert set(servers) == {"other", "my-docs"}
-    assert servers["my-docs"] == {**entry, "environment": {"CUSTOM": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1"}}
+    assert servers["my-docs"] == {**entry, "environment": {
+        "CUSTOM": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1",
+    }}
     original = path.read_bytes()
     if writer == "python":
         assert register_server(target)[0] is False
@@ -122,7 +124,7 @@ def test_shell_jsonc_noop_preserves_comments_and_update_refuses(tmp_path):
     path = tmp_path / "opencode.jsonc"
     path.write_text('// keep comment\n' + json.dumps({"mcp": {"servers": {"custom": {
         "type": "local", "command": COMMAND,
-        "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"}}}}}))
+        "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"}}}}}))
     original = path.read_bytes()
     assert shell_writer(path).returncode == 0
     assert path.read_bytes() == original

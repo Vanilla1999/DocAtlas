@@ -78,6 +78,8 @@ def test_build_openapi_pack_emits_installable_open_meteo_artifacts(tmp_path, mon
 
 def test_default_install_falls_back_to_known_open_meteo_openapi(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    # This arm explicitly exercises online fallback with substituted HTTP only.
+    monkeypatch.setenv("DOCATLAS_OFFLINE", "0")
     paths.ensure_dirs()
 
     class FakeResponse:

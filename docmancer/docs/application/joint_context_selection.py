@@ -24,20 +24,24 @@ import math
 import os
 import re
 
-from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
+from docmancer.docs.domain.delivery_limits import delivery_token_ceiling
+from docmancer.docs.domain.original_body_discovery import (
+    experimental_context_max_tokens, experimental_selector_settings,
+)
 from docmancer.retrieval.lexical_terms import (
     character_ngrams, explicit_source_locators, lexical_terms, query_terms,
 )
 from docmancer.docs.domain.query_reference_binding import prepare_reference_probe
 
 from .context_json import serialize_context_json
+from .context_continuation import continuation_fingerprint, continuation_metadata
 from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
-from .experimental_pool_pruning import otsu_upper, prune_checked_pool
+from .experimental_pool_pruning import otsu_upper, pool_prune_mode, prune_checked_pool
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
 from .query_trace import query_trace_enabled
-from .standalone_text_view import COMPACT_TEXT_MAX_TOKENS, render_standalone_text
+from .standalone_text_view import render_standalone_text
 
 
 POLICY = "joint_checked_body_mmr_v1"
@@ -269,6 +273,14 @@ def _selected_packet(payload: dict, snapshot: dict, retrieval: dict, rows: list[
     projected["source_selection"] = {
         **selection, "selected_rows": len(rows), "omitted_rows": omitted,
     }
+    continuation = payload.get("more_context")
+    if continuation is not None:
+        # Price the continuation envelope on every trial and every retraction,
+        # not after the last fit check. Rebuild does not preserve extra fields.
+        projected["more_context"] = continuation_metadata(
+            continuation["portion"], continuation["continuation_token"],
+            selection["candidate_rows"], len(rows),
+        )
     projected["context_quality"] = {
         "status": "unverified" if rows else "unavailable", "reasons": reasons,
     }
@@ -293,7 +305,7 @@ def finalize_joint_context_delivery(payload: dict, snapshot: dict, retrieval: di
     selection = payload.get("source_selection") or {}
     if cap is None or selection.get("policy") != POLICY:
         return payload, snapshot
-    limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
+    limit = min(cap, delivery_token_ceiling())
     result, bound = payload, snapshot
     while result.get("sources") and not _delivery_fits(result, limit):
         # Retract whole rows from the last added group if the final envelope
@@ -314,13 +326,128 @@ def _whole_pool_fits(payload: dict, snapshot: dict, retrieval: dict, rows: list[
     whole, _ = _selected_packet(payload, snapshot, retrieval, rows, selection={
         "policy": POLICY, "scope": "source_checked_merged_candidates",
         "query_count": query_count, "candidate_rows": len(rows),
-        "eligible_rows": len(rows), "budget_limited": False, "reference_limited": False,
+        "eligible_rows": len(rows), "pruned_rows": 0,
+        "budget_limited": False, "reference_limited": False,
     })
     return _delivery_fits(whole, limit)
 
 
-def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
-                         max_source_references: int | None = None) -> tuple[dict, dict]:
+def _continuation_settings() -> dict:
+    """Bind stable host choices that affect selection or its wire pricing."""
+    return {
+        **{name: _experiment(name) for name in _EXPERIMENT_CHOICES},
+        "DOCATLAS_EXPERIMENT_POOL_PRUNE": pool_prune_mode(JOINT_POOL_PRUNE_DEFAULT),
+        "selector": experimental_selector_settings(),
+        **{name: os.environ.get(name) for name in (
+            "DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "DOCATLAS_EXPERIMENT_MINI_PATH",
+            "DOCATLAS_EXPERIMENT_DENSE_PATH", "DOCATLAS_MCP_TEXT_FALLBACK",
+            "DOCATLAS_MCP_COMPACT_TEXT", "DOCATLAS_MCP_MODEL_VIEW", "DOCATLAS_CONTEXT_ASSEMBLY",
+        )},
+    }
+
+
+def select_joint_context(
+    payload: dict, snapshot: dict, retrieval: dict, *,
+    max_source_references: int | None = None, portion: int = 1,
+    continuation_token: str | None = None,
+    request_binding: dict | None = None,
+    finalize_packet: Callable[[dict, dict], tuple[dict, dict]] | None = None,
+) -> tuple[dict, dict]:
+    """Select a portion from the same live checked pool, without repeated rows.
+
+    Later portions require the fingerprint issued for the unchanged question,
+    request scope/targets, source snapshot and host settings. They replay complete earlier selections,
+    including the optional host binding/finalization step, and subtract only
+    rows actually delivered. The fingerprint is not an authorization token.
+
+    ``finalize_packet`` must only bind already attached source locators and
+    finalize the packet; it must not acquire or add evidence. No unbounded
+    numeric loop is used: each replay removes rows or stops on no progress.
+    ``request_binding`` carries validated request arguments excluding the
+    portion number and continuation token, so equal pools cannot hide a change
+    of the requested scope, version or target.
+    """
+    if type(portion) is not int or portion < 1:
+        raise ValueError("invalid_context_portion")
+    cap = experimental_context_max_tokens()
+    if cap is None:
+        if portion != 1 or continuation_token is not None:
+            raise ValueError("portion_unavailable")
+        return finalize_packet(payload, snapshot) if finalize_packet is not None else (payload, snapshot)
+    if portion > 1 and continuation_token is None:
+        raise ValueError("context_continuation_required")
+    rows = payload.get("sources") or []
+    if not rows and portion == 1 and continuation_token is None:
+        # Keep an existing source/consent/operational refusal intact. It never
+        # advertises a next portion or acquires evidence through this helper.
+        return finalize_packet(payload, snapshot) if finalize_packet is not None else (payload, snapshot)
+    token = continuation_fingerprint(
+        payload, snapshot, retrieval, policy=POLICY, settings=_continuation_settings(),
+        limit=min(cap, delivery_token_ceiling()), max_source_references=max_source_references,
+        request_binding=request_binding,
+    )
+    if continuation_token is not None and continuation_token != token:
+        raise ValueError("stale_context_continuation")
+
+    def finish(result: dict, bound: dict) -> tuple[dict, dict]:
+        if finalize_packet is not None:
+            result, bound = finalize_packet(result, bound)
+        return result, bound
+
+    remaining = rows
+    current = 1
+    while remaining:
+        page_input = {
+            **payload, "sources": remaining,
+            "more_context": continuation_metadata(current, token, len(remaining), 0),
+        }
+        result, bound = _select_portion(
+            page_input, snapshot, retrieval, max_source_references=max_source_references,
+        )
+        result, bound = finish(result, bound)
+        delivered = result.get("sources") or []
+        identities = {row["evidence_id"] for row in delivered}
+        available = {row["evidence_id"] for row in remaining}
+        if len(identities) != len(delivered) or not identities <= available:
+            raise ValueError("invalid_context_continuation")
+        expected = continuation_metadata(current, token, len(remaining), len(delivered))
+        if result.get("more_context") != expected:
+            # A host finalizer may retract rows. Update the envelope before
+            # repricing; finalization can only remove more, so it cannot cycle.
+            result["more_context"] = expected
+            _refresh_estimate(result)
+            result, bound = finalize_joint_context_delivery(result, bound, retrieval)
+            identities = {row["evidence_id"] for row in result.get("sources") or ()}
+        if current == portion:
+            return result, bound
+        if not identities:
+            # Nothing was delivered, so repeating this pool cannot advance.
+            # Preserve the real budget/relevance failure and remaining count.
+            result["more_context"] = continuation_metadata(portion, token, len(remaining), 0)
+            _refresh_estimate(result)
+            return result, bound
+        remaining = [row for row in remaining if row["evidence_id"] not in identities]
+        current += 1
+
+    # Even a huge requested portion reaches here after at most len(rows)
+    # nonempty pages. Exhaustion is an empty response, never the first page.
+    result, bound = _selected_packet(
+        {**payload, "more_context": continuation_metadata(portion, token, 0, 0)},
+        snapshot, retrieval, [], selection={
+            "policy": POLICY, "scope": "source_checked_merged_candidates",
+            "query_count": len(authoritative_queries(retrieval.get("documentation_query_plan") or {})),
+            "candidate_rows": 0, "eligible_rows": 0, "pruned_rows": 0,
+            "budget_limited": False, "reference_limited": False,
+        },
+    )
+    result["reason_code"] = "context_portion_exhausted"
+    result["missing"] = ["No further checked source rows remain for this question and snapshot."]
+    _refresh_estimate(result)
+    return finish(result, bound)
+
+
+def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
+                    max_source_references: int | None = None) -> tuple[dict, dict]:
     """Choose a relevant subset of the merged pool; never trim a source row.
 
     Called only by the native, compression-off route after source continuation
@@ -335,13 +462,14 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     priority_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_PRIORITY")
     fusion_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_FUSION")
     cut_mode = _experiment("DOCATLAS_EXPERIMENT_JOINT_CUT")
-    limit = min(cap, COMPACT_TEXT_MAX_TOKENS)
+    limit = min(cap, delivery_token_ceiling())
     queries = authoritative_queries(retrieval.get("documentation_query_plan") or {})
     # A missing authoritative plan is an upstream contract failure, not license
     # to reconstruct a question from retrieved text or generated probes.
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
     statistic_rows = rows
+    candidate_count = len(rows)
     # Whole-section pool pruning (``body`` unless the flag names another mode;
     # ``off`` keeps the whole pool). The selector then considers only the kept
     # sections, in pool order; term rarity below still counts every row.
@@ -353,6 +481,7 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
         payload, prune_receipt = prune_checked_pool(payload, snapshot, queries,
                                                     default_mode=JOINT_POOL_PRUNE_DEFAULT)
     rows = payload.get("sources") or []
+    pruned_count = candidate_count - len(rows)
     observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
     if observation.state is not None and prune_receipt is not None:
         observation.state["pool_pruning"] = prune_receipt
@@ -498,7 +627,8 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *,
     def packet(indices: list[int], *, budget_limited: bool) -> tuple[dict, dict]:
         return _selected_packet(payload, snapshot, retrieval, [rows[index] for index in indices], selection={
             "policy": POLICY, "scope": "source_checked_merged_candidates",
-            "query_count": len(queries), "candidate_rows": len(rows),
+            "query_count": len(queries), "candidate_rows": candidate_count,
+            "pruned_rows": pruned_count,
             "eligible_rows": len(eligible), "budget_limited": budget_limited,
             "reference_limited": bool(reference_rejected - set(indices)),
         })

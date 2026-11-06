@@ -35,6 +35,11 @@ Public service surfaces must also be registered in `SHIPPED_SERVICE_SURFACE_IDS`
 
 Core offline CI runs `pytest tests/ -m "not advanced and not live and not live_network"` with `DOCATLAS_OFFLINE=1`. The test harness also blocks unregistered outbound DNS and sockets and redirects the hosted registry fallback to loopback. Missing optional artifacts therefore fail locally or produce typed fallback state instead of fetching a hosted registry.
 
+The default API-pack registry honors `DOCATLAS_OFFLINE=1` by using only its
+local registry. Missing optional pack artifacts do not construct a hosted HTTP
+client or trigger the known-source OpenAPI fallback. Tests of an online registry
+fallback select that mode explicitly and substitute the external HTTP transport.
+
 The `advanced-contract` job runs advanced and maintenance contract tests separately. It is still offline and preserves shared security coverage. Real provider tests require an explicit live workflow and must never be added to the core job.
 
 ## Dependency placement decision

@@ -14,12 +14,15 @@ from copy import deepcopy
 from dataclasses import dataclass
 import math
 
+from docmancer.docs.domain.delivery_limits import DEFAULT_DELIVERY_MAX_TOKENS, delivery_token_ceiling
+
 from .model_context_view import ModelViewError, canonical, encode_model_result
 from .projection_tokenizer import projection_token_count
 from .section_compression import expand_sections
 
 FORMAT = "docatlas.standalone-text.v1"
-COMPACT_TEXT_MAX_TOKENS = 12000
+# Compatibility constant for consumers describing the default, not a live cap.
+COMPACT_TEXT_MAX_TOKENS = DEFAULT_DELIVERY_MAX_TOKENS
 # Never discard a future source field silently. All recognized omitted fields
 # are either redundant with the display, or the hash verified by the server.
 _KNOWN_SOURCE_FIELDS = frozenset({
@@ -45,8 +48,9 @@ class StandaloneTextError(ValueError):
 def compact_text_fits(text: str) -> bool:
     """Apply the existing text budget without shortening a source or packet."""
     body = text.encode("utf-8")
-    return (math.ceil(len(body) / 4) <= COMPACT_TEXT_MAX_TOKENS
-            and projection_token_count(body) <= COMPACT_TEXT_MAX_TOKENS)
+    limit = delivery_token_ceiling()
+    return (math.ceil(len(body) / 4) <= limit
+            and projection_token_count(body) <= limit)
 
 
 def render_standalone_text(packet: dict) -> StandaloneTextResult:

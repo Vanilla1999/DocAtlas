@@ -26,6 +26,11 @@ def _seed_registry(root, package, version, contract, tools_curated, tools_full=N
 def test_install_writes_artifacts_and_manifest(tmp_path, monkeypatch):
     registry_dir = tmp_path / "registry"
     monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry_dir))
+    monkeypatch.setenv("DOCATLAS_OFFLINE", "1")
+    monkeypatch.setattr(
+        "docmancer.mcp.registry.httpx.Client",
+        lambda *args, **kwargs: pytest.fail("offline install constructed a network client"),
+    )
 
     contract = {
         "auth": {"schemes": [{"type": "bearer", "env": "ACME_API_KEY"}],

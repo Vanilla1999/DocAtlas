@@ -168,7 +168,7 @@ srv = d["mcp"]["servers"]["docatlas-docs"]
 assert srv == {
     "type": "local",
     "command": ["doc-atlas", "mcp", "docs-serve"],
-    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"},
 }, srv
 PY
 pass "agent 'opencode' (via env): JSON config merged"
@@ -209,7 +209,7 @@ assert d["mcp"]["servers"]["user-docs"] == {
     "command": ["doc-atlas", "mcp", "docs-serve"],
     "disabled": True,
     "timeout": 12345,
-    "environment": {"USER_SETTING": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+    "environment": {"USER_SETTING": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"},
 }, d
 PY
 cmp -s "$CFG.bak" "$STUB_ROOT/original.json" || fail "opencode: original backup not preserved"
