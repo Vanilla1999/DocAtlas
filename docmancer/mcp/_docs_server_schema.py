@@ -92,9 +92,20 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "required": ["status"],
     "properties": {
-        "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
+        "status": {"enum": ["ok", "truncated", "insufficient_evidence", "not_prepared", "failed"]},
         "kind": {"enum": ["docs_answer", "docs_context"]},
         "estimated_tokens": {"type": "integer"},
+        "more_context": {
+            "type": "object",
+            "required": ["portion", "next_portion", "remaining_rows", "continuation_token"],
+            "properties": {
+                "portion": {"type": "integer", "minimum": 1},
+                "next_portion": {"type": ["integer", "null"], "minimum": 2},
+                "remaining_rows": {"type": "integer", "minimum": 0},
+                "continuation_token": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            },
+            "additionalProperties": False,
+        },
         "context_quality": {
             "type": "object",
             "required": ["status", "reasons"],

@@ -17,6 +17,8 @@ import os
 from pathlib import Path
 from typing import Any, Mapping
 
+from .delivery_limits import delivery_token_ceiling
+
 
 @dataclass
 class _BodyRead:
@@ -105,12 +107,14 @@ def original_body_read_scope(handler):
                 "DOCATLAS_EXPERIMENT_MINI_PATH",
             ))
             # Final delivery has a bounded default independent of acquisition.
-            raw_cap = os.environ.get("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", "12000")
-            if raw_cap is not None:
+            raw_cap = os.environ.get("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS")
+            if raw_cap is None:
+                state.experiment_context_max_tokens = delivery_token_ceiling()
+            else:
                 value = raw_cap.strip()
                 if not value.isascii() or not value.isdecimal() or int(value) <= 0:
                     raise ValueError("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS must be a positive integer")
-                state.experiment_context_max_tokens = int(value)
+                state.experiment_context_max_tokens = min(int(value), delivery_token_ceiling())
         token = _BODY_READ.set(state)
         try:
             return handler(name, args, service)

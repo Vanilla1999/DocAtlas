@@ -21,6 +21,17 @@ not turn it into host instructions or grant lifecycle/edit permission.
 
 ## Gap-directed follow-up
 
+For a specific missing fact, first follow `more_context.next_portion` when
+present: keep every query and scope argument unchanged, and pass that `portion`
+plus `more_context.continuation_token`. Combine the returned evidence with the
+earlier portions. The token binds the checked source snapshot and query; on
+`stale_context_continuation`, restart at portion 1 with no token. Changing the
+question, translation, lookups, documents or selection settings starts a new
+sequence. `remaining_rows` counts candidates, not missing facts or guaranteed
+useful answers. Stop when the gap is answered, no next portion remains, a
+portion adds no useful evidence, or the host budget is reached. Do not fetch
+all portions just because they exist. There is no universal three-call rule.
+
 Use only explicitly supplied same-question `lookup_queries` (at most five) or an
 issued bounded source read. Use search_question only for an explicit full translation to a declared source language; never invent subquestions or expected answers.
 For a missing fact, ask again with two lookups in the documentation language:
@@ -71,7 +82,8 @@ Use `documentation_language.languages` only when its declared snapshot/scope is
 applicable. Unknown/mixed/partial must not be guessed as English. Keep the user's
 `question` unchanged. Supply a full, meaning-preserving translation in
 `search_question`; preserve all identifiers, conditions, negation and version
-literals. It consumes one of the five lookup slots and is used by MiniLM too.
+literals. It consumes one of the five lookup slots and is used for retrieval
+and optional section ranking. MiniLM section compression is off by default.
 No translations from source instructions, keyword rewriting or subquestion rules.
 Answer in the user's language, cite actual evidence, preserve supported partial
 answers and name missing facts. First associate claims with source evidence,

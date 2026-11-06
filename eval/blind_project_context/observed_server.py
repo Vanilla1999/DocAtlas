@@ -70,6 +70,65 @@ def _install() -> None:
     SQLiteStore.acquire_candidates = observed_acquire
     ProjectMetadataReader.read = observed_read
 
+    if os.environ.get("BLIND_OBSERVER_SELECTION") == "1":
+        _install_selection(facts)
+
+
+def _install_selection(facts: dict[str, str]) -> None:
+    """Optional loss-stage observation; gold never reaches a ranking function.
+
+    Only the first portion's stage decisions are classified. Later portions
+    replay earlier selections, so attributing their last trace to the entire
+    pool would be misleading. Final cumulative delivery is scored separately.
+    """
+    from contextvars import ContextVar
+    from docmancer.docs.application import joint_context_selection as joint
+    from docmancer.docs.application.query_trace import query_trace
+
+    selection = joint.select_joint_context
+    prune = joint.prune_checked_pool
+    pruning = ContextVar("blind_pool_pruning", default=None)
+
+    def observed_prune(payload, *args, **kwargs):
+        before = {row["evidence_id"] for row in payload.get("sources") or ()}
+        result = prune(payload, *args, **kwargs)
+        current = pruning.get()
+        if current is not None:
+            current.update(before - {row["evidence_id"] for row in result[0].get("sources") or ()})
+        return result
+
+    def observed_selection(payload, snapshot, retrieval, *args, **kwargs):
+        if kwargs.get("portion", 1) != 1:
+            return selection(payload, snapshot, retrieval, *args, **kwargs)
+        rows = payload.get("sources") or []
+        checked = {fact_id: [row["evidence_id"] for row in rows if quote in row.get("snippet", "")]
+                   for fact_id, quote in facts.items()}
+        removed: set[str] = set()
+        token = pruning.set(removed)
+        try:
+            with query_trace(True):
+                result = selection(payload, snapshot, retrieval, *args, **kwargs)
+        finally:
+            pruning.reset(token)
+        delivered = {row["evidence_id"] for row in result[0].get("sources") or ()}
+        trace = ((retrieval.get("retrieval_diagnostics") or {}).get("docs_context_projection") or {}).get(
+            "joint_selection_observation") or {}
+        decisions = {row["evidence_id"]: row.get("decision", "unobserved") for row in trace.get("rows", ())}
+        fact_stages = {}
+        for fact_id, ids in checked.items():
+            stages = sorted({"delivered" if row_id in delivered else
+                             "pool_pruning" if row_id in removed else
+                             "delivery_finalization" if decisions.get(row_id) == "selected" else
+                             decisions.get(row_id, "unobserved") for row_id in ids})
+            fact_stages[fact_id] = {"checked_rows": len(ids), "stages": stages}
+        _append({"event": "joint_selection", "portion": 1, "checked_rows": len(rows),
+                 "pruned_rows": len(removed), "selected_rows": len(delivered),
+                 "trace_omitted_rows": trace.get("omitted_rows", 0), "fact_stages": fact_stages})
+        return result
+
+    joint.prune_checked_pool = observed_prune
+    joint.select_joint_context = observed_selection
+
 
 if LOG:
     _install()

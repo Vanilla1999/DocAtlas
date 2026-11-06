@@ -3,7 +3,7 @@
     python eval/blind_project_context/run.py OUT [--source-tree DIR] [--jobs N]
         [--corpus L0|L2]... [--split dev|holdout]... [--case ID]...
         [--no-observer] [--env KEY=VALUE]... [--keep-work] [--reuse-work]
-        [--lookups FILE]
+        [--lookups FILE] [--portions N]
 
 For each corpus and shard: rebuild the frozen corpus from git objects, start a
 fresh server process (``observed_server.py``) with isolated HOME/DOCATLAS_HOME,
@@ -166,7 +166,7 @@ def read_events(log: Path | None, offset: int) -> tuple[list[dict], int]:
 
 
 async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool, extra: dict[str, str],
-                   reuse: bool = False) -> dict:
+                   reuse: bool = False, portions: int = 1) -> dict:
     root = work / unit["name"]
     project = root / "project"
     if reuse:
@@ -217,12 +217,40 @@ async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool,
                     text = reply.content[0].text if reply.content and reply.content[0].type == "text" else ""
                     (payload_dir / f"{case['id']}.json").write_text(text, encoding="utf-8")
                     events, offset = read_events(log, offset)
-                    records.append({"case_id": case["id"], "corpus": unit["corpus"], "unit": unit["name"],
+                    record = {"case_id": case["id"], "corpus": unit["corpus"], "unit": unit["name"],
                                     "seconds": round(seconds, 3), "is_error": bool(reply.isError),
                                     "payload": f"payloads/{unit['corpus']}/{case['id']}.json",
                                     "payload_sha256": sha256(text.encode("utf-8")),
-                                    "utf8_bytes": len(text.encode("utf-8")), "observer_events": events})
+                                    "utf8_bytes": len(text.encode("utf-8")), "observer_events": events}
+                    records.append(record)
                     print(f"{unit['name']} {case['id']} {seconds:.1f}s", flush=True)
+                    # Follow only server-issued continuation state. The first
+                    # record remains the original single-call gate input.
+                    previous_portion = 1
+                    for _ in range(1, portions):
+                        more = json.loads(text).get("more_context") or {}
+                        next_portion = more.get("next_portion")
+                        if next_portion is None or reply.isError:
+                            break
+                        token = more.get("continuation_token")
+                        if (type(next_portion) is not int or next_portion != previous_portion + 1
+                                or not isinstance(token, str) or not token):
+                            raise RuntimeError("invalid server-issued context continuation")
+                        started = time.perf_counter()
+                        reply = await session.call_tool("get_docs_context", {
+                            **arguments, "portion": next_portion, "continuation_token": token})
+                        seconds = time.perf_counter() - started
+                        text = reply.content[0].text if reply.content and reply.content[0].type == "text" else ""
+                        filename = f"{case['id']}.portion-{next_portion}.json"
+                        (payload_dir / filename).write_text(text, encoding="utf-8")
+                        events, offset = read_events(log, offset)
+                        record.setdefault("portions", []).append({
+                            "portion": next_portion, "seconds": round(seconds, 3), "is_error": bool(reply.isError),
+                            "payload": f"payloads/{unit['corpus']}/{filename}",
+                            "payload_sha256": sha256(text.encode("utf-8")),
+                            "utf8_bytes": len(text.encode("utf-8")), "observer_events": events})
+                        previous_portion = next_portion
+                        print(f"{unit['name']} {case['id']} portion {next_portion} {seconds:.1f}s", flush=True)
     shown = {key: value for key, value in env.items()
              if key not in ("PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "BLIND_OBSERVER_LOG",
                             "BLIND_OBSERVER_FACTS")
@@ -234,9 +262,9 @@ async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool,
 
 
 async def run_all(units: list[dict], jobs: int, out: Path, work: Path, tree: Path, observe: bool,
-                  extra: dict, reuse: bool = False) -> list[dict]:
+                  extra: dict, reuse: bool = False, portions: int = 1) -> list[dict]:
     async def worker(index: int) -> list[dict]:
-        return [await run_unit(unit, out, work, tree, observe, extra, reuse)
+        return [await run_unit(unit, out, work, tree, observe, extra, reuse, portions)
                 for unit in units if unit["worker"] == index]
     return [result for group in await asyncio.gather(*(worker(index) for index in range(jobs))) for result in group]
 
@@ -246,6 +274,8 @@ def main() -> int:
     parser.add_argument("out", type=Path)
     parser.add_argument("--source-tree", type=Path, default=ROOT)
     parser.add_argument("--jobs", type=int, default=1)
+    parser.add_argument("--portions", type=int, default=1,
+                        help="maximum server-issued context portions per case; first-call gate stays separate")
     parser.add_argument("--corpus", action="append", choices=CORPORA)
     parser.add_argument("--split", action="append", choices=("dev", "holdout"))
     parser.add_argument("--case", action="append")
@@ -263,6 +293,8 @@ def main() -> int:
                         help="JSON {\"cases\": {dev case id: {lookup_queries, search_question?}}} sent with "
                              "the unchanged question")
     args = parser.parse_args()
+    if args.portions < 1:
+        parser.error("--portions must be positive")
     out = args.out.resolve()
     if out.exists() and any(out.iterdir()):
         parser.error(f"{out} must be new or empty")
@@ -311,7 +343,8 @@ def main() -> int:
     source_state, eval_state = git_state(tree), git_state(ROOT)
     started_at = datetime.now(timezone.utc)
     started = time.perf_counter()
-    results = asyncio.run(run_all(units, jobs, out, work, tree, not args.no_observer, extra, args.reuse_work))
+    results = asyncio.run(run_all(units, jobs, out, work, tree, not args.no_observer, extra,
+                                 args.reuse_work, args.portions))
     env_shown = results[0]["server_environment"] if results else {}
     run = {"schema_version": 1, "started_at_utc": started_at.isoformat(timespec="seconds"),
            "wall_seconds": round(time.perf_counter() - started, 1),
@@ -319,6 +352,7 @@ def main() -> int:
            "questions_sha256": sha256((HERE / "questions.json").read_bytes()),
            "python": sys.version.split()[0], "platform": platform.platform(), "cpus": os.cpu_count(),
            "jobs": jobs, "observer": not args.no_observer, "work_root": str(work), "reused_work": args.reuse_work,
+           "requested_portions": args.portions,
            "server_environment": env_shown,
            "observer_oracle_sha256": None if args.no_observer else sha256((HERE / "oracle.json").read_bytes()),
            "project_config": {"docatlas.yaml": {"project": {"scan_deadline_seconds": deadline}}} if deadline else None,

@@ -376,6 +376,18 @@ def isolated_environment(root: Path) -> dict[str, str]:
     return env
 
 
+def _assert_unprepared_context(response: dict, project: Path) -> None:
+    """A cold read reports preparation work without granting it or opening a store."""
+    assert response.get("status") == "not_prepared", response
+    assert response.get("reason_code") == "member_store_uninitialized", response
+    assert response.get("project_path") == str(project), response
+    assert not response.get("sources") and not response.get("edit_ready"), response
+    assert not response.get("answer_supported") and not response.get("answer_available"), response
+    action = response.get("recommended_next_action") or {}
+    assert action.get("tool") == "prepare_docs" and action.get("action") == "sync_project_docs", response
+    assert action.get("requires_confirmation") is True and not action.get("auto_execute"), response
+
+
 async def read_only_delivery(session, project: Path, *, text_only: bool, advanced: bool = False) -> None:
     decode = text_payload if text_only else payload
     spec = await advertised_context_tool(session, advanced=advanced, text_only=text_only)
@@ -386,20 +398,16 @@ async def read_only_delivery(session, project: Path, *, text_only: bool, advance
         assert isinstance(result.structuredContent, dict), result
     docs = decode(result, allow_error=True)
     assert docs.get("kind") != "patch_context", docs
-    assert not docs.get("edit_ready") and not docs.get("answer_supported"), docs
-    assert docs.get("status") == "failed" and not docs.get("sources"), docs
-    assert docs["error"]["reason_code"] == "permission_denied", docs
+    _assert_unprepared_context(docs, project)
     format_rejections = {}
     if advanced:
         null = decode(await session.call_tool("get_docs_context", {
             **canonical_query, "context_format": None}), allow_error=True)
-        assert null.get("status") == "failed" and not null.get("sources"), null
-        assert null["error"]["reason_code"] == "permission_denied", null
+        _assert_unprepared_context(null, project)
         patch = decode(await session.call_tool("get_docs_context", {
             **canonical_query, "context_format": "patch_context"}), allow_error=True)
-        assert patch.get("status") == "failed" and not patch.get("sources"), patch
-        assert patch["error"]["reason_code"] == "permission_denied", patch
-        cold_patch = {"status": patch["status"], "reason": patch["error"]["reason_code"],
+        _assert_unprepared_context(patch, project)
+        cold_patch = {"status": patch["status"], "reason": patch["reason_code"],
                       "sources": [], "source_bytes": 0}
     else:
         format_rejections = await rejected_default_formats(session, spec, canonical_query, text_only=text_only)
@@ -409,7 +417,7 @@ async def read_only_delivery(session, project: Path, *, text_only: bool, advance
                         ("version_mismatch", {"version": "99.0.0"})):
         response = decode(await session.call_tool("get_docs_context", {
             **canonical_query, **extra, **({"context_format": "patch_context"} if advanced else {})}), allow_error=True)
-        assert response.get("status") == "failed" and not response.get("sources"), response
+        _assert_unprepared_context(response, project)
         negative_bindings[name] = {"status": response["status"],
                                    "sources": [], "source_bytes": 0}
     for extra in ({"mutation_intent": {"operation": "delete", "confirm": True}},

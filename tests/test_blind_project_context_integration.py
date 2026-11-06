@@ -67,21 +67,32 @@ def test_observer_does_not_change_delivered_context(out_dir):
     """
     cases = ("T03-ru", "T03-en")
     runs = {"observed": out_dir / "passive-observed", "plain": out_dir / "passive-plain"}
-    for name, extra in (("observed", ("--keep-work",)), ("plain", ("--reuse-work", "--no-observer"))):
-        arguments = [str(EVAL / "run.py"), str(runs[name]), "--corpus", "L0", *extra]
+    work = out_dir / "passive-work"
+    for name, extra in (("observed", ("--keep-work", "--env", "BLIND_OBSERVER_SELECTION=1")),
+                        ("plain", ("--reuse-work", "--no-observer"))):
+        arguments = [str(EVAL / "run.py"), str(runs[name]), "--corpus", "L0",
+                     "--work-root", str(work), "--portions", "3", *extra]
         for case in cases:
             arguments += ["--case", case]
         result = _python(*arguments, timeout=1800)
         assert result.returncode == 0, result.stderr[-3000:]
+    observed_files = sorted((runs["observed"] / "payloads" / "L0").glob("*.json"))
+    plain_files = sorted((runs["plain"] / "payloads" / "L0").glob("*.json"))
+    assert [path.name for path in observed_files] == [path.name for path in plain_files]
+    assert len(observed_files) > len(cases), "fixture must exercise continuation"
+    for observed, plain in zip(observed_files, plain_files):
+        assert observed.read_bytes() == plain.read_bytes(), observed.name
+    scored = _python(str(EVAL / "score.py"), str(runs["observed"]), timeout=900)
+    assert scored.returncode == 0, scored.stdout[-3000:] + scored.stderr[-3000:]
     for case in cases:
-        observed = (runs["observed"] / "payloads" / "L0" / f"{case}.json").read_bytes()
-        assert observed == (runs["plain"] / "payloads" / "L0" / f"{case}.json").read_bytes(), case
         assert _rows(runs["observed"], "L0", case), case
 
 
 def test_no_slice_is_worse_than_the_committed_baseline(out_dir):
     run = out_dir / "full"
     result = _python(str(EVAL / "run.py"), str(run), "--jobs", os.environ.get("DOCATLAS_BLIND_JOBS", "2"),
+                     "--work-root", str(out_dir / "full-work"), "--portions", "3",
+                     "--env", "BLIND_OBSERVER_SELECTION=1",
                      timeout=4 * 3600)
     assert result.returncode == 0, result.stderr[-3000:]
     scored = _python(str(EVAL / "score.py"), str(run), timeout=900)
@@ -89,3 +100,12 @@ def test_no_slice_is_worse_than_the_committed_baseline(out_dir):
     gate = _python(str(EVAL / "gate.py"), str(EVAL / "baseline" / "score.json"), str(run / "score.json"),
                    "--details", str(run / "gate.json"), timeout=300)
     assert gate.returncode == 0, gate.stdout[-4000:] + gate.stderr[-2000:]
+    result = json.loads((run / "score.json").read_text(encoding="utf-8"))
+    previous = result["slices"]
+    for portion in ("2", "3"):
+        cumulative = result["cumulative_portions"][portion]
+        assert not cumulative["anomalies"]
+        for key, value in cumulative["slices"].items():
+            assert value["facts_found"] >= previous[key]["facts_found"], (portion, key)
+            assert value["all_found"] >= previous[key]["all_found"], (portion, key)
+        previous = cumulative["slices"]

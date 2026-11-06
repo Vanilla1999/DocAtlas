@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_project_docs_self_host_fixture.py": "81691e3d34091aa1e9090591525950ef77c5b4f27c438a42e1b0553605f3c1d8"
+    "tests/test_project_docs_self_host_fixture.py": "1f0f97538ffc852becf50e4f35b62c0048fd1d072abc514cc900bab128040bd0"
   }
 }

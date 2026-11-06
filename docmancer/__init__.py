@@ -1,5 +1,14 @@
 """docmancer: Fetch docs, index sections locally, and return compact context packs."""
 
+import os as _os
+
+# ONNX Runtime's 1DS uploader can start during import, including indirectly
+# through FastEmbed/Qdrant. Its API opt-out is too late for the initial event.
+# Keep DocAtlas model execution local before any package runtime is imported.
+# https://github.com/microsoft/onnxruntime/blob/main/docs/Privacy.md
+_os.environ["ORT_DISABLE_TELEMETRY"] = "1"
+del _os
+
 from docmancer._version import __version__
 
 __all__ = [
