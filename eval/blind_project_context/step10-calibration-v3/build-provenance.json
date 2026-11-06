@@ -1,0 +1,13 @@
+{
+  "wheel_sha256": "9b95d2878c682815240221b0c03e2320b60d2e082a5880d67c458c0cfd806f11",
+  "installed_product_files_equal": 450,
+  "installed_environment": "/tmp/opencode/step10-v3-py313/lib/python3.13/site-packages",
+  "nonhermetic_shared_dependencies": [
+    "/tmp/opencode/step10-mini-py313/lib/python3.13/site-packages",
+    "/tmp/opencode/step9-gap-resolution/.venv/lib/python3.13/site-packages"
+  ],
+  "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+  "calibration_labels_equal_v2": true,
+  "product_change": "schema2 closure-aware calibration recipe validation; scoring and closure unchanged",
+  "initial_build_attempt": "pip --no-build-isolation failed: hatchling absent; uv build succeeded"
+}

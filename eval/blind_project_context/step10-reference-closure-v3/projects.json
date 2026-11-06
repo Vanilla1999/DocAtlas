@@ -1,0 +1,123 @@
+[
+  {
+    "id": "tidegauge",
+    "split": "calibration",
+    "root": "../step10-multidoc-gate/projects/calibration/tidegauge",
+    "query_scope": "project",
+    "project_documents": [
+      "overview.md",
+      "operations.md",
+      "storage.md",
+      "export.md",
+      "dashboard.md",
+      "architecture.md"
+    ],
+    "module_documents": [
+      {
+        "path": "modules/survey/private.md",
+        "scope": "module",
+        "module_path": "modules/survey"
+      }
+    ]
+  },
+  {
+    "id": "loom",
+    "split": "calibration",
+    "root": "../step10-multidoc-gate/projects/calibration/loom",
+    "query_scope": "project",
+    "project_documents": [
+      "overview.md",
+      "colour.md",
+      "recovery.md",
+      "publication.md",
+      "withdrawal.md",
+      "architecture.md"
+    ],
+    "module_documents": [
+      {
+        "path": "modules/camera/private.md",
+        "scope": "module",
+        "module_path": "modules/camera"
+      }
+    ]
+  },
+  {
+    "id": "meridian",
+    "split": "seen",
+    "root": "../step10-multidoc-gate/projects/validation/meridian",
+    "query_scope": "project",
+    "project_documents": [
+      "overview.md",
+      "reservations.md",
+      "weather.md",
+      "clock.md",
+      "calendar.md",
+      "architecture.md"
+    ],
+    "module_documents": [
+      {
+        "path": "modules/laser/private.md",
+        "scope": "module",
+        "module_path": "modules/laser"
+      }
+    ]
+  },
+  {
+    "id": "cairn",
+    "split": "seen",
+    "root": "../step10-multidoc-gate/projects/validation/cairn",
+    "query_scope": "project",
+    "project_documents": [
+      "overview.md",
+      "restore.md",
+      "recovery.md",
+      "publication.md",
+      "rollback.md",
+      "architecture.md"
+    ],
+    "module_documents": [
+      {
+        "path": "modules/tape/private.md",
+        "scope": "module",
+        "module_path": "modules/tape"
+      }
+    ]
+  },
+  {
+    "id": "otel",
+    "split": "holdout",
+    "root": "sources/opentelemetry-specification",
+    "query_scope": "project",
+    "project_documents": [
+      "specification/baggage/api.md",
+      "specification/context/README.md",
+      "specification/context/api-propagators.md",
+      "specification/document-status.md"
+    ],
+    "module_documents": [
+      {
+        "path": "specification/context/env-carriers.md",
+        "scope": "module",
+        "module_path": "specification/context"
+      }
+    ]
+  },
+  {
+    "id": "embedded",
+    "split": "holdout",
+    "root": "sources/book",
+    "query_scope": "project",
+    "project_documents": [
+      "src/start/interrupts.md",
+      "src/start/exceptions.md",
+      "src/start/panicking.md"
+    ],
+    "module_documents": [
+      {
+        "path": "src/start/semihosting.md",
+        "scope": "module",
+        "module_path": "src/start"
+      }
+    ]
+  }
+]

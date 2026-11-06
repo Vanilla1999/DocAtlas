@@ -92,7 +92,7 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "required": ["status"],
     "properties": {
-        "status": {"enum": ["ok", "truncated", "insufficient_evidence", "not_prepared", "failed"]},
+        "status": {"enum": ["ok", "truncated", "insufficient_evidence", "not_prepared", "failed", "error"]},
         "kind": {"enum": ["docs_answer", "docs_context"]},
         "estimated_tokens": {"type": "integer"},
         "more_context": {
@@ -117,6 +117,7 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
                         "coverage_unverified", "requested_part_missing", "budget_limited",
                         "source_unavailable", "source_changed", "structure_unverified",
                         "joint_selection_partial",
+                        "incomplete_structural_dependency", "scan_incomplete", "context_emergency_stop",
                     ]},
                 },
             },
@@ -131,7 +132,7 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
                     "line_start", "line_end", "reason",
                 ],
                 "properties": {
-                    "source_uri": {"type": "string", "pattern": "^docatlas://source/[0-9a-f]{24}$"},
+                    "source_uri": {"type": "string", "pattern": "^docatlas://source/(?:v2/)?[0-9a-f]{24}$"},
                     "path": {"type": "string", "minLength": 1},
                     "project_identity": {"type": "string", "minLength": 1},
                     "snapshot_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},

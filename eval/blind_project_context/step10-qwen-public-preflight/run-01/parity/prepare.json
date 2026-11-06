@@ -1,0 +1,108 @@
+{
+  "seconds": 0.11604812499717809,
+  "expected_paths": [
+    "docs/guide.md",
+    "docs/other.md"
+  ],
+  "indexed_paths": [
+    "docs/guide.md",
+    "docs/other.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-92c31baefe4104c3bc0a9dcf3eb0d8f783e67121",
+      "source_path": "docs/guide.md",
+      "display_text": "# Guide\n\nScope introduction.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-a502c8be0e0324a4dc565a1ba33ed4207aa10d6f",
+      "source_path": "docs/guide.md",
+      "display_text": "## Empty\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-1e8ecb7e9dbef1c6678c98ba6a719a17ff21c392",
+      "source_path": "docs/guide.md",
+      "display_text": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+      "line_start": 7,
+      "line_end": 14
+    },
+    {
+      "stable_chunk_id": "child-5aaafade97ccdbfa9b790d895af6f33b3a906ebe",
+      "source_path": "docs/guide.md",
+      "display_text": "#### Tail\n\nTail condition stays.\n\n",
+      "line_start": 15,
+      "line_end": 18
+    },
+    {
+      "stable_chunk_id": "child-641b1daa91dda4c5e7e5741d38c40e9abdc08c23",
+      "source_path": "docs/guide.md",
+      "display_text": "## Noise\n\nUnselected noise.\n\n",
+      "line_start": 19,
+      "line_end": 22
+    },
+    {
+      "stable_chunk_id": "child-2be74ca2aba4c4d814e4c8728c910d27480661eb",
+      "source_path": "docs/guide.md",
+      "display_text": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+      "line_start": 23,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-42f31ad9f7f51ca8a329337c24a4e45bc8efe69d",
+      "source_path": "docs/guide.md",
+      "display_text": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+      "line_start": 27,
+      "line_end": 33
+    },
+    {
+      "stable_chunk_id": "child-a35c843bd9a9aba4448114e30b412302eee0567c",
+      "source_path": "docs/other.md",
+      "display_text": "# Other\n\nOther introduction.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-ecf150f66c0f40280eec773395e6041146685ff8",
+      "source_path": "docs/other.md",
+      "display_text": "## Remote\n\nRemote condition [missing](private.md#hidden).\n",
+      "line_start": 5,
+      "line_end": 7
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "95e3492d5d99f3e2433665a3acb92e7a4d2443b83d7d7541ee355b1d4f4e6559",
+  "storage_path": "/tmp/opencode/docatlas-evidence-_wrzkmfd/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-f4f6beca9c984350a762638058341898",
+  "catalog_sha256": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+  "documents": [
+    {
+      "path": "docs/guide.md",
+      "content_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+      "catalog_entry_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f"
+    },
+    {
+      "path": "docs/other.md",
+      "content_sha256": "fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18",
+      "catalog_entry_hash": "sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-f4f6beca9c984350a762638058341898",
+    "members": 2,
+    "new_count": 2,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 9,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 9
+  }
+}

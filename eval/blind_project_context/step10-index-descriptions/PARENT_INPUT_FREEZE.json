@@ -1,0 +1,16 @@
+{
+  "status": "PRE_RUN_DEVELOPMENT_INPUTS",
+  "queries_sha256": "ebdc87730508fe47d82cdcd978dff1ac768f443f0c20667417e09e0640f7346f",
+  "source_exact_facts": 19,
+  "query_count": 4,
+  "original_questions_unchanged": true,
+  "sources": {
+    "architecture.md": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+    "calendar.md": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+    "clock.md": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+    "overview.md": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+    "reservations.md": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+    "weather.md": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  "boundary": "Public Python API, isolated lexical retrieval; no fullscan reranker, hybrid, installed-client or Terra evidence"
+}

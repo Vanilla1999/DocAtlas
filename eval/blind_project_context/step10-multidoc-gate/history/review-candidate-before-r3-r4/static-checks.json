@@ -1,0 +1,24 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "python_files": [
+    "docmancer/docs/application/context_evidence_scoring.py",
+    "docmancer/docs/application/context_evidence_structure.py",
+    "docmancer/docs/application/minimal_context_structure.py",
+    "docmancer/docs/application/minimal_context_selection.py",
+    "docmancer/docs/domain/minimal_context_config.py",
+    "eval/blind_project_context/step10-multidoc-gate/prepare_review_manifest.py",
+    "eval/blind_project_context/step10-multidoc-gate/audit_draft.py",
+    "eval/blind_project_context/step10-multidoc-gate/runner.py",
+    "eval/blind_project_context/step10-open-scorer/model_card_smoke.py"
+  ],
+  "checks": [
+    "AST/compile without execution",
+    "production module imports",
+    "runner import without run",
+    "git diff --check"
+  ],
+  "model_forwards": 0,
+  "public_prepares": 0,
+  "gate_calls": 0,
+  "does_not_prove": "runtime qualification, observer parity, semantic sufficiency or 32K feasibility"
+}

@@ -1,0 +1,442 @@
+{
+  "packet": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-37a7000af6a71795a8c451f5",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide",
+        "snippet": "# Guide\n\nScope introduction.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "fe80343a517df31bd047865e49a4be4e10eb6863675e90583d568fe94a709938",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/d17dab2758388e310c342eaf"
+      },
+      {
+        "evidence_id": "ev-24356ddc79a19cf229be7d83",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty",
+        "snippet": "## Empty\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "7b2f96edaf550c79269616a62a23c9d4cc058522b58777b6e237964caa203e87",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 5,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/152070e82eb98cac9c4ea7d8"
+      },
+      {
+        "evidence_id": "ev-56cd221e90fd373c9bcf9ff5",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty > Selected",
+        "snippet": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "2bd0ce40dbd59fc1bf159e390468f95005a2ef500a269bae38e3fe5fdc62623c",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 7,
+        "line_end": 14,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/69d8ff2ddfd544c729fe425f"
+      },
+      {
+        "evidence_id": "ev-236d1a21588adf30f06a2dc0",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty > Selected > Tail",
+        "snippet": "#### Tail\n\nTail condition stays.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "866a894fa2440b0826c1ac04700f7909e3df43159328bbefe0f0dc8430e5701b",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 15,
+        "line_end": 18,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/def2a7d6108111ca4cb2df6d"
+      },
+      {
+        "evidence_id": "ev-71d66e0cb467073ca0274ca7",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Noise",
+        "snippet": "## Noise\n\nUnselected noise.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "05b4e56d04b799470126132896631e4477413081ee91c1526de9c42436438f94",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 19,
+        "line_end": 22,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/1b13d9d5cc2d56d7e1e25968"
+      },
+      {
+        "evidence_id": "ev-b3f96170099341cc40e998ad",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Limits",
+        "snippet": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "b512f8d82c46e2ff22e5a40e93b8bf2b83123f7b5a071b7f5d113c861a34d988",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 23,
+        "line_end": 26,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/adc8fb71bcfc781713fefb0a"
+      },
+      {
+        "evidence_id": "ev-e9622accb3ad962a13a75e66",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Notes",
+        "snippet": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+        "version_binding": "unversioned",
+        "content_sha256": "c3083b07cde704d055f7c1748dfaaa6fdd3d6917f83af7baedd7b65f5cc2b033",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 27,
+        "line_end": 33,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/4759a5829b242a18e336f5cd"
+      },
+      {
+        "evidence_id": "ev-6161fa94443a307949b440f4",
+        "path_or_url": "docs/other.md",
+        "section": "Other",
+        "snippet": "# Other\n\nOther introduction.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "37fd48867cb2440f11888140c8769addac901d01a644f8266013385f34cf948f",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/e9d5055785d329f0e23a814e"
+      },
+      {
+        "evidence_id": "ev-9581f4fee77babc533d1fc45",
+        "path_or_url": "docs/other.md",
+        "section": "Other > Remote",
+        "snippet": "## Remote\n\nRemote condition [missing](private.md#hidden).\n",
+        "version_binding": "unversioned",
+        "content_sha256": "7cb397b2b7f8e40cc4aadcf100ef9d4f6373f97a7e9e4af0b009afb257507a31",
+        "project_identity": "local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9",
+        "line_start": 5,
+        "line_end": 7,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/b8d14424e25fc0dc574af4ae"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "incomplete_structural_dependency"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 1550,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "complete_calibrated_context_v1",
+      "calibration_sha256": "diagnostic-unverified",
+      "calibration_status": "diagnostic_unverified",
+      "candidate_units": 8,
+      "selected_units": 8,
+      "delivered_rows": 9,
+      "scan_complete": true,
+      "model_pairs": 8,
+      "closure": {
+        "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+        "status": "incomplete_dependency",
+        "documents": 2,
+        "incomplete_dependencies": [
+          {
+            "reason_code": "incomplete_dependency",
+            "path": "docs/other.md",
+            "char_start": 30,
+            "target": "private.md#hidden",
+            "reason": "target_not_in_checked_scope"
+          }
+        ],
+        "units": 8,
+        "hydrated_sections": 9,
+        "incoming_anchor_edges": 4,
+        "selected_units": 8,
+        "delivered_spans": 9
+      }
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": null,
+      "remaining_rows": 0,
+      "continuation_token": "ccf1e7959027d308944b21295d09fa545e6d067a378021c0ec8bf137c6100c74"
+    }
+  },
+  "observations": [
+    {
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 8,
+        "model_pairs": 8,
+        "model_forwards": 8,
+        "model_input_tokens": 3304,
+        "planned_input_tokens": 3304,
+        "preflight_units": 8,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 8,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.10551098799624015,
+        "asset_verification_seconds": 0.5949306869952125,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1217832448,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.761934629001189
+      },
+      "policy_sha256": "diagnostic-unverified",
+      "delivery_status": "returned",
+      "scores": [
+        {
+          "identity": "unit-37a7000af6a71795a8c451f5c8bc6e5879d4ec7e888723b6e6fc983e62da043e",
+          "score": 0.3208213150501251,
+          "logit_difference": -0.75,
+          "input_tokens": 351,
+          "input_tokens_sha256": "5db18fa15dc8328bd36e1e7714680e5e844a807e71d5f033b04e9a8ce34eacd9",
+          "path": "docs/guide.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"_source_snapshot_sha256\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"member\":{\"catalog_entry_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/guide.md\",\"content_sha256\":\"73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/guide.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 30,
+          "body_char_start": 8,
+          "heading_path": [
+            "Guide"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4"
+        },
+        {
+          "identity": "unit-56cd221e90fd373c9bcf9ff5c00ba0cc34ae22d7ca2ad21fa989e5043e805926",
+          "score": 0.7772998809814453,
+          "logit_difference": 1.25,
+          "input_tokens": 494,
+          "input_tokens_sha256": "eb50e32ebe02df22d97cc89b32efdccb1934972235561f4cd77e1b7e27b5d5be",
+          "path": "docs/guide.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"_source_snapshot_sha256\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"member\":{\"catalog_entry_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/guide.md\",\"content_sha256\":\"73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/guide.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 40,
+          "char_end": 159,
+          "body_char_start": 53,
+          "heading_path": [
+            "Guide",
+            "Empty",
+            "Selected"
+          ],
+          "line_start": 7,
+          "line_end": 14,
+          "source_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4"
+        },
+        {
+          "identity": "unit-236d1a21588adf30f06a2dc0e4db00aa67cbd3989c5daf6e40b1454a2f3a20a1",
+          "score": 0.851952850818634,
+          "logit_difference": 1.75,
+          "input_tokens": 463,
+          "input_tokens_sha256": "22b9e5a84e9cbec23bf8d2be15b57e6a88f96c18245147984d6b817ec51ae3b5",
+          "path": "docs/guide.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"_source_snapshot_sha256\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"member\":{\"catalog_entry_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/guide.md\",\"content_sha256\":\"73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/guide.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 159,
+          "char_end": 193,
+          "body_char_start": 169,
+          "heading_path": [
+            "Guide",
+            "Empty",
+            "Selected",
+            "Tail"
+          ],
+          "line_start": 15,
+          "line_end": 18,
+          "source_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4"
+        },
+        {
+          "identity": "unit-71d66e0cb467073ca0274ca799ae93ca7261e3b35a8bc9c9c36f7c6ccbf8ebd4",
+          "score": 0.6513549089431763,
+          "logit_difference": 0.625,
+          "input_tokens": 357,
+          "input_tokens_sha256": "4f0e302245ec2e65e8e618edb9a8515a361c8975c2d7becc5c0fe996c208f802",
+          "path": "docs/guide.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"_source_snapshot_sha256\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"member\":{\"catalog_entry_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/guide.md\",\"content_sha256\":\"73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/guide.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 193,
+          "char_end": 222,
+          "body_char_start": 202,
+          "heading_path": [
+            "Guide",
+            "Noise"
+          ],
+          "line_start": 19,
+          "line_end": 22,
+          "source_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4"
+        },
+        {
+          "identity": "unit-b3f96170099341cc40e998ad343d4b96d9a92965772c3875cefd81fdd22673cc",
+          "score": 0.957912266254425,
+          "logit_difference": 3.125,
+          "input_tokens": 494,
+          "input_tokens_sha256": "493a226d808a50d6976f493d3fd4eb6e1f56a3c95a4992e35b5aa1a3ac2ad8d6",
+          "path": "docs/guide.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"_source_snapshot_sha256\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"member\":{\"catalog_entry_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/guide.md\",\"content_sha256\":\"73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/guide.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 222,
+          "char_end": 270,
+          "body_char_start": 232,
+          "heading_path": [
+            "Guide",
+            "Limits"
+          ],
+          "line_start": 23,
+          "line_end": 26,
+          "source_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4"
+        },
+        {
+          "identity": "unit-e9622accb3ad962a13a75e66e801394cb80a00608d362be1f293f33cddb94588",
+          "score": 0.5,
+          "logit_difference": 0.0,
+          "input_tokens": 376,
+          "input_tokens_sha256": "67a430543e380bbf69b26a49dd67066a1828985c3d7635437f02df5f122dbd22",
+          "path": "docs/guide.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"_source_snapshot_sha256\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"member\":{\"catalog_entry_hash\":\"sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/guide.md\",\"content_sha256\":\"73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/guide.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 270,
+          "char_end": 359,
+          "body_char_start": 279,
+          "heading_path": [
+            "Guide",
+            "Notes"
+          ],
+          "line_start": 27,
+          "line_end": 33,
+          "source_sha256": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4"
+        },
+        {
+          "identity": "unit-6161fa94443a307949b440f4a044b1f2d01c61b5e1534c151609c307332581fd",
+          "score": 0.014957087114453316,
+          "logit_difference": -4.1875,
+          "input_tokens": 255,
+          "input_tokens_sha256": "6554a125ab5107bf60d49a35622be595de215b68e339c71bc0b7b6a78f572e87",
+          "path": "docs/other.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8\",\"_source_snapshot_sha256\":\"sha256:fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18\",\"member\":{\"catalog_entry_hash\":\"sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/other.md\",\"content_sha256\":\"fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/other.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 30,
+          "body_char_start": 8,
+          "heading_path": [
+            "Other"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18"
+        },
+        {
+          "identity": "unit-9581f4fee77babc533d1fc45d652454fd35ca584bb1864622591ec9962c37984",
+          "score": 0.957912266254425,
+          "logit_difference": 3.125,
+          "input_tokens": 514,
+          "input_tokens_sha256": "13c63d3db56558064a80863a76787179edae501ff7e7396f901a218a14222d4b",
+          "path": "docs/other.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8\",\"_source_snapshot_sha256\":\"sha256:fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f4f6beca9c984350a762638058341898\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18\",\"member\":{\"catalog_entry_hash\":\"sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"docs/other.md\",\"content_sha256\":\"fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18\",\"document_id\":\"project_file:local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9:docs/other.md\",\"scope\":{\"project_id\":\"local:c7b45addf67ef0c074aa991ef8490a0a2ffd4d72ceaf38c56fb0634f0bf49ed9\",\"snapshot_id\":\"gen-f4f6beca9c984350a762638058341898\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 30,
+          "char_end": 88,
+          "body_char_start": 40,
+          "heading_path": [
+            "Other",
+            "Remote"
+          ],
+          "line_start": 5,
+          "line_end": 7,
+          "source_sha256": "fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18"
+        }
+      ]
+    }
+  ],
+  "work_receipts": [
+    {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 8,
+      "model_pairs": 8,
+      "model_forwards": 8,
+      "model_input_tokens": 3304,
+      "planned_input_tokens": 3304,
+      "preflight_units": 8,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 8,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.10551098799624015,
+      "asset_verification_seconds": 0.5949306869952125,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1217832448,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 0.761934629001189
+    }
+  ],
+  "error": null,
+  "seconds": 0.9005280259952997,
+  "trace_status": "available"
+}

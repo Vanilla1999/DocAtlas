@@ -1,0 +1,17 @@
+schema_version: 1
+code_files: []
+documents:
+- path: docs/guide.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+- path: docs/other.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track

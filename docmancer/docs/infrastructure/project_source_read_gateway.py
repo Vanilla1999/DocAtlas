@@ -105,11 +105,13 @@ class ProjectSourceReadGateway:
             fd = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
             with os.fdopen(fd, 'rb') as source:
                 info = os.fstat(source.fileno())
-                if not stat.S_ISREG(info.st_mode) or info.st_size > self.max_source_bytes:
+                from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+                ceiling = info.st_size if minimal_context_enabled() else self.max_source_bytes
+                if not stat.S_ISREG(info.st_mode) or info.st_size > ceiling:
                     raise ValueError('source is not a bounded regular file')
-                raw = source.read(self.max_source_bytes + 1)
-                if len(raw) > self.max_source_bytes:
-                    raise ValueError('source grew beyond byte budget')
+                raw = source.read(ceiling + 1)
+                if len(raw) > ceiling:
+                    raise ValueError('source changed size during snapshot read')
                 return raw
         finally:
             os.close(parent)

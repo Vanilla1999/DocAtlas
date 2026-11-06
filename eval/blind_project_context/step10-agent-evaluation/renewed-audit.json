@@ -1,0 +1,113 @@
+{
+  "question": {
+    "id": "T01-ru",
+    "topic_id": "T01",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+    "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+  },
+  "mcp_input": {
+    "question": "\"Что от меня ожидается, когда я отправляю pull request в DocAtlas?\"",
+    "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+  },
+  "question_exactly_preserved": false,
+  "model": {
+    "id": "gpt-6.1-terra",
+    "providerID": "openai",
+    "variant": "low"
+  },
+  "baseline_artifacts_unchanged": true,
+  "frozen_artifacts_unchanged": {
+    "questions.json": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+    "oracle.json": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+    "witness-audit.json": "3fdcc246f6eca84e8c571826f7ca03a01ab0aab9d870cee9803ad845f54c1881"
+  },
+  "historical_read_sources": {
+    "CONTRIBUTING.md": {
+      "sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+      "matched_historical_lines": 63
+    },
+    "docs/testing.md": {
+      "sha256": "06af645781e242f8b96e934c58cd91115826c77cec5d02ef8188baab54bf8ae6",
+      "matched_historical_lines": 5
+    }
+  },
+  "source_rows_text_span_scope_hash_verified": 157,
+  "final_citation_refs_verified": 6,
+  "source_selection": {
+    "calibration_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+    "calibration_status": "empirical",
+    "candidate_units": 157,
+    "closure": {
+      "delivered_spans": 157,
+      "documents": 19,
+      "hydrated_sections": 162,
+      "incomplete_dependencies": [
+        {
+          "char_start": 72,
+          "path": "README.md",
+          "reason": "target_not_in_checked_scope",
+          "reason_code": "incomplete_dependency",
+          "target": "./docs/capabilities.md#end-to-end-examples-of-current-behavior"
+        },
+        {
+          "char_start": 6151,
+          "path": "wiki/Configuration.md",
+          "reason": "missing_or_ambiguous_anchor",
+          "reason_code": "incomplete_dependency",
+          "target": "./Architecture.md#mcp-runtime"
+        }
+      ],
+      "selected_units": 152,
+      "status": "incomplete_dependency",
+      "structural_recipe": "minimal-structure-v1",
+      "units": 157
+    },
+    "delivered_rows": 157,
+    "model_pairs": 1398,
+    "policy": "complete_calibrated_context_v1",
+    "scan_complete": true,
+    "selected_units": 152
+  },
+  "context_quality": {
+    "reasons": [
+      "coverage_unverified",
+      "incomplete_structural_dependency"
+    ],
+    "status": "unverified"
+  },
+  "candidate_usage": {
+    "input": 58475,
+    "output": 660,
+    "reasoning": 0,
+    "cache_read": 2944,
+    "cache_write": 0,
+    "input_with_cache": 61419,
+    "steps": 4,
+    "top_level_tool_calls": 3,
+    "top_level_tool_errors": 0,
+    "reported_nested_tool_calls": 2
+  },
+  "baseline_usage": {
+    "input": 3967,
+    "output": 402,
+    "reasoning": 0,
+    "cache_read": 1280,
+    "cache_write": 0,
+    "input_with_cache": 5247,
+    "steps": 3,
+    "top_level_tool_calls": 4,
+    "top_level_tool_errors": 0,
+    "reported_nested_tool_calls": 0
+  },
+  "input_with_cache_ratio": 11.705546026300743,
+  "candidate_seconds": 111.57,
+  "baseline_seconds": 13.77,
+  "limitations": [
+    "Historical complete corpus hash manifest unavailable: equality established for the baseline actually read documents, frozen annotations, model/settings and corpus path, not retrospective full-store immutability.",
+    "Arm-specific prompts/tools differ intentionally. Single-case observational comparison, not a causal adapter benchmark.",
+    "Exact source/hash/citation checks do not grade claim entailment; manual grades are recorded separately.",
+    "No provider HTTP payload capture; usage is reconciled step_finish and persisted session telemetry."
+  ]
+}

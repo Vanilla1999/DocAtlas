@@ -36,7 +36,9 @@ def source_range_uri(
         line_start, line_end,
     ]
     identity = hashlib.sha256(json.dumps(material, sort_keys=True).encode()).hexdigest()[:24]
-    return SourceContinuationReader.uri_prefix + identity
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    prefix = "docatlas://source/v2/" if minimal_context_enabled() else SourceContinuationReader.uri_prefix
+    return prefix + identity
 
 
 def _candidate_identity(source: dict[str, Any]) -> str:
@@ -70,6 +72,11 @@ def prepare_docs_context_read_next(
     projection: dict[str, Any], snapshot: dict[str, Any], retrieval: dict[str, Any], *, root: str,
 ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
     """Choose one bounded recovery capability without reading source text."""
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if minimal_context_enabled():
+        # Candidate delivery already contains full selected structural units.
+        # Semantic rejection is not deferred evidence and creates no read-next.
+        return None, None
     if not root or str((projection.get("context_quality") or {}).get("status") or "") == "checked":
         return None, None
 
@@ -233,8 +240,13 @@ def _mark_target_binding_failure(projection: dict[str, Any]) -> None:
 
 def bind_project_source_continuations(
     reader: Any, project_root: str, projection: dict[str, Any], snapshot: dict[str, Any],
+    *, binding_intent: str = "rebind",
 ) -> None:
     """Register legacy continuations and the one emitted bounded range."""
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if minimal_context_enabled():
+        _bind_atomic(reader, project_root, projection, snapshot, binding_intent=binding_intent)
+        return
     from .model_visible_projection import _refresh_estimate
     _core.bind_project_source_continuations(reader, project_root, projection, snapshot)
     targets = projection.get("read_next") or ()
@@ -254,6 +266,116 @@ def bind_project_source_continuations(
         projection["read_next"] = []
         _mark_target_binding_failure(projection)
         _refresh_estimate(projection)
+
+
+def _bind_atomic(reader: Any, project_root: str, projection: dict, snapshot: dict,
+                 *, binding_intent: str = "rebind") -> None:
+    """Prepare, price, revalidate and commit the complete capability batch.
+
+    Failure replaces the packet with an explicit body-free refusal. The live
+    reader remains unchanged; no part of a rejected batch becomes readable.
+    """
+    from docmancer.docs.domain.minimal_context_config import EMERGENCY_TOKENS
+    from .projection_tokenizer import projection_token_count
+    from .model_visible_projection_helpers import canonical_projection_bytes
+    from .standalone_text_view import render_standalone_text
+    from .model_visible_projection import _refresh_estimate, validate_model_visible_projection
+
+    def reject(reason: str, **details: Any) -> None:
+        projection.clear()
+        projection.update(kind="docs_context", status="error", reason_code=reason,
+                          hard_stop=True, sources=[], read_next=[], next_portion=None,
+                          context_quality={"status": "unverified", "reasons": [reason]},
+                          **details)
+        snapshot.clear()
+
+    if projection.get("hard_stop") or projection.get("reason_code") == "context_emergency_stop":
+        return
+    rendered = render_standalone_text(projection)
+    body = rendered.text.encode("utf-8") if rendered.text is not None else canonical_projection_bytes(projection)
+    measured = projection_token_count(body)
+    if measured > EMERGENCY_TOKENS:
+        reject("context_emergency_stop", measured_tokens=measured, emergency_tokens=EMERGENCY_TOKENS)
+        return
+    if not isinstance(reader, SourceContinuationReader) or not reader.minimal:
+        reject("source_reference_contract_mismatch")
+        return
+    if (binding_intent not in {"rebind", "fresh_query"} or
+            binding_intent == "fresh_query" and reader._registration_only):
+        reject("source_reference_contract_mismatch")
+        return
+    with reader._lock:
+        staged = reader.registration_snapshot()
+        packet = deepcopy(projection)
+        # Preserve native live lineage objects; copy only the mutable DTO binding.
+        bindings = {key: {**bound, "projected_source": dict(bound.get("projected_source") or {})}
+                    for key, bound in snapshot.items()}
+        references = []
+        issued_uris = []
+        try:
+            for projected in packet.get("sources") or ():
+                uri = projected.get("source_uri")
+                if not uri:
+                    continue
+                bound = bindings[projected["evidence_id"]]
+                source = bound["source"]
+                if binding_intent == "fresh_query":
+                    if uri != source_continuation_uri(project_root, source):
+                        raise ValueError("noncanonical_fresh_locator")
+                    uri = staged.fresh_locator(uri)
+                    projected["source_uri"] = uri
+                    bound["projected_source"]["source_uri"] = uri
+                    bound["source_uri"] = uri
+                reference = _reference_for_source(project_root, {**source, "line_end": projected["line_end"]})
+                if reference is None or staged.issue(reference, uri=uri) is None:
+                    raise ValueError("source_reference_rejected")
+                references.append(reference)
+                issued_uris.append(uri)
+            for target in packet.get("read_next") or ():
+                source = _target_source(target, bindings)
+                if binding_intent == "fresh_query":
+                    canonical = source_range_uri(project_root, source, line_start=target["line_start"],
+                                                 line_end=target["line_end"]) if source else None
+                    if not canonical or target["source_uri"] != canonical:
+                        raise ValueError("noncanonical_fresh_range")
+                    target["source_uri"] = staged.fresh_locator(canonical)
+                reference = _reference_for_source(project_root, source) if source else None
+                if reference is None or staged.issue_range(reference, line_start=target["line_start"],
+                        line_end=target["line_end"], uri=target["source_uri"]) is None:
+                    raise ValueError("source_reference_rejected")
+                references.append(reference)
+                issued_uris.append(target["source_uri"])
+            _refresh_estimate(packet)
+            if validate_model_visible_projection(packet, snapshot=bindings):
+                raise ValueError("source_projection_binding_mismatch")
+            rendered = render_standalone_text(packet)
+            body = rendered.text.encode("utf-8") if rendered.text is not None else canonical_projection_bytes(packet)
+            measured = projection_token_count(body)
+            if measured > EMERGENCY_TOKENS:
+                reject("context_emergency_stop", measured_tokens=measured, emergency_tokens=EMERGENCY_TOKENS)
+                return
+            # Verify source bytes too: catalog authorization alone cannot detect
+            # a filesystem edit between selection and capability publication.
+            for reference in dict.fromkeys(references):
+                if reader.gateway.authorize(reference):
+                    raise ValueError("source_reference_rejected")
+                raw = reader.gateway.read_snapshot(reference)
+                if "sha256:" + hashlib.sha256(raw).hexdigest() != reference.content_sha256:
+                    raise ValueError("source_changed")
+                if reader.gateway.authorize(reference):
+                    raise ValueError("source_reference_rejected")
+            if any(staged.clock() >= staged._cursors[uri].expires for uri in issued_uris):
+                raise ValueError("source_reference_expired")
+        except (KeyError, TypeError, ValueError, OSError):
+            reject("source_reference_batch_rejected")
+            return
+        reader._cursors = staged._cursors
+        reader._spent = staged._spent
+        reader._issuances = staged._issuances
+        projection.clear()
+        projection.update(packet)
+        snapshot.clear()
+        snapshot.update(bindings)
 
 
 __all__ = [

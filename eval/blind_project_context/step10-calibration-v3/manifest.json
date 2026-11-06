@@ -1,0 +1,15 @@
+{
+  "frozen_before_inference": true,
+  "provenance": "V2 calibration reused as development; new authored optics/seed archive validation, not an external benchmark",
+  "files": {
+    "recipe.json": "e56440bf08b3d5947058d8f82748fdcc56310d7c06cd7fed320fc87732408912",
+    "tasks.json": "f89c7ae9df1025efc0cef8fef8a5e6b94ecf70f3afc7888f4139f44dc67e2c76",
+    "labels.json": "cc56edceb3319517de53ca2c9a55b882db79f7d86a6e2b6d0be0880da0a8c466",
+    "../step10-calibration-v2/tasks.json": "d80ef419510d503607cba392428e5e98c9a5d657386d2d14c3d8955792e5abc7",
+    "../step10-calibration-v2/labels.json": "503ce8f7e45e662c31d2b9018e9c926cdcc711bd81398448af6d5b0e39f0c98f",
+    "../step10-calibration-v2/calibration/apiary.md": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b",
+    "../step10-calibration-v2/calibration/textiles.md": "859d4bc300f963177e5e379c933e86596bc41f05996770afc142218b18d02200",
+    "validation/optics.md": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39",
+    "validation/seedbank.md": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+  }
+}

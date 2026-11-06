@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "calibration_recipe": "final-closure-all-useful-breakpoints-v3",
+  "recipe": "complete-own-body-gated-maxp-v2",
+  "structural_recipe": "minimal-structure-v1",
+  "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "lanes": "original_translation_max",
+  "threshold": -3.352724552154541,
+  "calibration_sha256": "00fc5fbe8df385ba5c14a4643e0841a37d16c00de934b2b9bb9b907df3495a14"
+}

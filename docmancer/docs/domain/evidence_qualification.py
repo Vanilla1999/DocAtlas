@@ -238,9 +238,11 @@ def qualify_evidence(
     )
     if policy_reason is not None:
         return _rejected(result, policy_reason)
+    from .minimal_context_config import minimal_context_enabled
+    lookup_pattern = r"query-lookup-[1-9][0-9]*" if minimal_context_enabled() else r"query-lookup-[1-5]"
     expected_origin = (
         "original" if query_id == "query-original" else
-        "host_lookup" if re.fullmatch(r"query-lookup-[1-5]", query_id) else None
+        "host_lookup" if re.fullmatch(lookup_pattern, query_id) else None
     )
     expected_relation = "direct" if expected_origin == "original" else "host_lookup"
     if (query_id.startswith("query-need-") or

@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-06",
+  "opencode": "2.2.5",
+  "boundary": "Real OpenCode CLI/API, MCP replay, Code Mode/native formatting, captured outgoing OpenAI-compatible HTTP. Scripted localhost provider; no answering model or fresh retrieval.",
+  "packet_origin": "/tmp/opencode/terra-step9/L2/focused-compact/T12-ru.jsonl",
+  "packet_sha256": "48ffa86c21f6475216777070c18258b52987de0a4748e0dd6b1cef1925d6c20a",
+  "packet_tokens": 4854,
+  "tokenizer": "offline o200k_base",
+  "vocabulary_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+  "paid_model_calls": 0,
+  "actual_client_runs_including_probe_failures": 16,
+  "canonical_contract_followup": {
+    "contract": "docmancer.docs.domain.minimal_context_config.EMERGENCY_TOKENS",
+    "protocol": "JSON array of texts -> {emergency_tokens,counts}; startup reads canonical threshold, every subsequent count validates unchanged contract",
+    "package_boundary": "Explicit source PYTHONPATH wrapper; shared installed environment remains stale and unmodified. Not installed-candidate acceptance.",
+    "preservation": {"artifact": "/tmp/opencode/step10-spike-contract-preserved", "tokens": 4854, "bytes_equal": true},
+    "final_guard": {"artifact": "/tmp/opencode/step10-spike-contract-guard", "measured_tokens": 64854, "tokens": 46, "reason_code": "context_emergency_stop"},
+    "stale_package_protocol_rejected": true,
+    "checks": "Live adapter output is string in both runs; canonical limit 50000 in refusal; standalone subprocess returns canonical contract/counts. PASS."
+  },
+  "text_only_mcp_followup": {
+    "reason": "Server agent changed candidate MCP to one TextContent without structuredContent; verified actual installed client still parses/re-expands object",
+    "object": {"artifact": "/tmp/opencode/step10-spike-textonly-object", "tokens": 5356, "decoded_packet_equal": true},
+    "string": {"artifact": "/tmp/opencode/step10-spike-textonly-string", "tokens": 4854, "bytes_equal": true},
+    "adapter": {"artifact": "/tmp/opencode/step10-spike-textonly-adapter", "tokens": 4854, "bytes_equal": true}
+  },
+  "scripted_provider_requests_per_run": 2,
+  "results": [
+    {"artifact": "/tmp/opencode/step10-spike-object-ready", "arm": "codemode_object", "tokens": 5356, "decoded_packet_equal": true, "bytes_equal": false, "tool_schema_tokens": 3249, "system_tokens": 3855, "provider_request_2_sha256": "22706910d662a68137e64bbcb8ad1495588c0130857bb94648f9aedf2ee68954"},
+    {"artifact": "/tmp/opencode/step10-spike-string-ready", "arm": "codemode_string", "tokens": 4854, "decoded_packet_equal": true, "bytes_equal": true, "tool_schema_tokens": 3249, "system_tokens": 3855, "provider_request_2_sha256": "ebd70a3bba3f0a51123bf34e52da98de038e0b5fbc4bdc3def9230d9e98d5db6"},
+    {"artifact": "/tmp/opencode/step10-spike-native-ready", "arm": "native_raw", "tokens": 4854, "decoded_packet_equal": true, "bytes_equal": true, "tool_schema_tokens": 3286, "system_tokens": 3830, "provider_request_2_sha256": "266d1f1e253b3fff2cb7f3195c34e90b70ddca60216f5ac5e8feccea7574ea66"},
+    {"artifact": "/tmp/opencode/step10-spike-adapter", "arm": "native_adapter", "tokens": 4854, "decoded_packet_equal": true, "bytes_equal": true, "tool_schema_tokens": 3286, "system_tokens": 2532, "provider_request_2_sha256": "4700961b4d9ddc5a7636af8c051dec863155e656526ae70644aff7ca4080a5bd"},
+    {"artifact": "/tmp/opencode/step10-spike-large-supported", "arm": "native_adapter", "fixture": "synthetic 100160-byte text envelope", "tokens": 20042, "bytes_equal": true, "tail_present": true, "provider_request_2_sha256": "b8f469b50e25e2f92c2279a68f8f2e369a5516a413f3b5496f447904cbee046f"},
+    {"artifact": "/tmp/opencode/step10-spike-over", "arm": "native_adapter", "fixture": "synthetic 60042-token text envelope", "tokens": 46, "reason_code": "context_emergency_stop", "measured_tokens": 60042, "source_body_absent": true, "provider_request_2_sha256": "0d08c8f8fb241d9225aeb4f7981222d190cdc044c10b528cd452ca0f7e2ab3fc"},
+    {"artifact": "/tmp/opencode/step10-spike-truncation-detected", "arm": "native_adapter", "tokens": 45, "reason_code": "client_output_truncated", "source_body_absent": true, "provider_request_2_sha256": "99df2328cff58f7aaa773cbb2051cdb142361deeb3c01e95061ff5ca5acd63fb"},
+    {"artifact": "/tmp/opencode/step10-spike-inflated-envelope", "arm": "native_adapter", "fixture": "earlier context-hook defect injection after execution", "tokens": 46, "reason_code": "context_emergency_stop", "measured_tokens": 64854, "source_body_absent": true, "provider_request_2_sha256": "a25d3dbaf040baa82971e5698f6e54f6845ef5bf9ca290a731205a8548f17677"}
+  ],
+  "probe_failures_retained": [
+    {"artifact": "/tmp/opencode/step10-spike-object", "reason": "MCP readiness race; probe also assumed wait endpoint returned JSON"},
+    {"artifact": "/tmp/opencode/step10-spike-native", "reason": "MCP readiness race; probe also assumed wait endpoint returned JSON"},
+    {"artifact": "/tmp/opencode/step10-spike-large-under", "reason": "OpenCode default byte ceiling replaced the under-50k body with hidden-file marker; fixed explicit host config and refusal detection"}
+  ],
+  "verification": "All eight selected provider-bound artifacts independently checked: parsed value equality / exact bytes, standalone decode equality for real packet, tail, refusal reasons, no source body and actual final counts. Node syntax and Python compile checks passed.",
+  "limitations": [
+    "Historical source capabilities were replayed, not resolved; no source-authority or continuation acceptance claim.",
+    "No installed fresh DocAtlas MCP retrieval, Terra answer-quality or full-session input comparison.",
+    "System/catalog tokens differed across locations; result savings are not total savings.",
+    "Only primary context hook exercised live; auxiliary hooks share guard but were not runtime-tested.",
+    "Supported host needs explicit large output configuration and adapter installed last; later transforms or other provider-specific framing are outside measured guarantee."
+  ]
+}

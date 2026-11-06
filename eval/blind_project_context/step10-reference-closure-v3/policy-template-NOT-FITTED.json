@@ -1,0 +1,15 @@
+{
+  "status": "NOT_A_POLICY_PRE_INFERENCE_BLOCKED",
+  "schema_version": 4,
+  "recipe": "qwen3-contextual-addressed-section-closure-v3",
+  "structural_recipe": "explicit_addressed_section_closure_v3",
+  "contract_sha256": "402b53a7cedb90133d8fe5df79252363731bd078e4b9a12601c022865ec618e3",
+  "scoring_contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+  "calibration_recipe": "largest-finite-breakpoint-independent-reference-closure-v3",
+  "model_id": "Qwen/Qwen3-Reranker-0.6B",
+  "model_revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+  "lanes": "exact_original_only",
+  "threshold": null,
+  "calibration_sha256": null,
+  "manifest_sha256": null
+}

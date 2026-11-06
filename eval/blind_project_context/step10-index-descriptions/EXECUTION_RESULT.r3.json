@@ -1,0 +1,140 @@
+{
+  "status": "COMPLETED_NO_DEVELOPMENT_COVERAGE_GAIN",
+  "integration_r3": "2 passed",
+  "historical_integration_r1": "collection ERROR, zero tests",
+  "historical_integration_r2": "1 passed,1 failed; unchanged tests passed after approved wiring correction",
+  "ab_runs": 1,
+  "measurement_boundary": "all public returned acquisition candidates; not final answer",
+  "routing_recipe": "source-description-routing-v1",
+  "limit_budget_args": "5/4096 reported_not_applied; no cropping",
+  "summary": {
+    "baseline": {
+      "facts_present": 10,
+      "facts_required": 19,
+      "returned_candidate_total": 37,
+      "source_utf8_bytes": 7204,
+      "raw_packet_json_utf8_bytes": 292250,
+      "source_scope_span_hash_fidelity": true,
+      "questions": [
+        {
+          "id": "V-M1",
+          "facts_present": 0,
+          "facts_required": 8,
+          "returned_candidate_count": 0,
+          "returned_utf8_bytes": 0,
+          "utf8_bytes_div4_ceiling_estimate": 0,
+          "raw_packet_json_utf8_bytes": 364,
+          "empty_packet": true,
+          "complete": false
+        },
+        {
+          "id": "V-M2",
+          "facts_present": 5,
+          "facts_required": 6,
+          "returned_candidate_count": 20,
+          "returned_utf8_bytes": 3870,
+          "utf8_bytes_div4_ceiling_estimate": 968,
+          "raw_packet_json_utf8_bytes": 157405,
+          "empty_packet": false,
+          "complete": false
+        },
+        {
+          "id": "V-M3",
+          "facts_present": 5,
+          "facts_required": 5,
+          "returned_candidate_count": 17,
+          "returned_utf8_bytes": 3334,
+          "utf8_bytes_div4_ceiling_estimate": 834,
+          "raw_packet_json_utf8_bytes": 134117,
+          "empty_packet": false,
+          "complete": true
+        },
+        {
+          "id": "V-M4",
+          "facts_present": 0,
+          "facts_required": 0,
+          "returned_candidate_count": 0,
+          "returned_utf8_bytes": 0,
+          "utf8_bytes_div4_ceiling_estimate": 0,
+          "raw_packet_json_utf8_bytes": 364,
+          "empty_packet": true,
+          "complete": true
+        }
+      ]
+    },
+    "descriptions": {
+      "facts_present": 10,
+      "facts_required": 19,
+      "returned_candidate_total": 38,
+      "source_utf8_bytes": 7376,
+      "raw_packet_json_utf8_bytes": 336928,
+      "source_scope_span_hash_fidelity": true,
+      "questions": [
+        {
+          "id": "V-M1",
+          "facts_present": 0,
+          "facts_required": 8,
+          "returned_candidate_count": 0,
+          "returned_utf8_bytes": 0,
+          "utf8_bytes_div4_ceiling_estimate": 0,
+          "raw_packet_json_utf8_bytes": 364,
+          "empty_packet": true,
+          "complete": false
+        },
+        {
+          "id": "V-M2",
+          "facts_present": 5,
+          "facts_required": 6,
+          "returned_candidate_count": 20,
+          "returned_utf8_bytes": 3870,
+          "utf8_bytes_div4_ceiling_estimate": 968,
+          "raw_packet_json_utf8_bytes": 176930,
+          "empty_packet": false,
+          "complete": false
+        },
+        {
+          "id": "V-M3",
+          "facts_present": 5,
+          "facts_required": 5,
+          "returned_candidate_count": 18,
+          "returned_utf8_bytes": 3506,
+          "utf8_bytes_div4_ceiling_estimate": 877,
+          "raw_packet_json_utf8_bytes": 159270,
+          "empty_packet": false,
+          "complete": true
+        },
+        {
+          "id": "V-M4",
+          "facts_present": 0,
+          "facts_required": 0,
+          "returned_candidate_count": 0,
+          "returned_utf8_bytes": 0,
+          "utf8_bytes_div4_ceiling_estimate": 0,
+          "raw_packet_json_utf8_bytes": 364,
+          "empty_packet": true,
+          "complete": true
+        }
+      ]
+    }
+  },
+  "work_counts": {
+    "prepare_runs": 1,
+    "prepare_documents": 6,
+    "prepare_children": 21,
+    "exact_artifact_records": 21,
+    "appended_in_enriched_arm": 21,
+    "integration_attempts": 3,
+    "integration_tests_executed_total": 4,
+    "ab_public_queries": 8,
+    "integration_public_queries": 4,
+    "public_ingestion_attempts_including_rejected_stale": 10,
+    "successful_public_ingestions": 9,
+    "stale_artifact_rejections": 1,
+    "runner_model_calls": 0,
+    "downloads": 0,
+    "annotation_generation": "separate harness subagent; provider calls/tokens/cost unknown"
+  },
+  "no_answer_caveat": "V-M4 empty in both arms does not establish semantic no-answer behavior across the RU/EN lexical boundary",
+  "runtime_path": "/tmp/opencode/step10-index-descriptions-ab-01",
+  "historical_qwen_validation": "FAIL unchanged"
+}

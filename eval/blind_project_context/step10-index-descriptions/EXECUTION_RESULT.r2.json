@@ -1,0 +1,38 @@
+{
+  "status": "BLOCKED_PUBLIC_RETRIEVAL_CONTRACT",
+  "prepare_runs": 1,
+  "prepare_documents": 6,
+  "prepare_children": 21,
+  "adapter_exact_matches": 21,
+  "integration_attempts": 2,
+  "initial_attempt_tests": 0,
+  "second_attempt": {
+    "passed": 1,
+    "failed": 1,
+    "failure": "description-only lockout query returns no receiver chunk after successful enriched ingestion",
+    "product_ingestions": 3,
+    "public_queries": 2,
+    "stale_rollback_check": "not reached"
+  },
+  "ab_runs": 0,
+  "model_calls": 0,
+  "downloads": 0,
+  "registration_change": "only existing module_node_hashes entry; inherited behavioral label unchanged",
+  "static_findings": [
+    {
+      "path": "docmancer/core/_sqlite_store_part03.py",
+      "lines": "728, 813-845",
+      "finding": "FTS retrieval_text is only a candidate superset; source utility admission/ranking uses display_text/title/project_doc_description, not the new child description."
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_part01.py",
+      "lines": "180-195",
+      "finding": "lexical public dispatcher explicitly does not apply passed limit/budget; records delivery_limit_not_applied/delivery_budget_not_applied."
+    }
+  ],
+  "parent_decisions_needed": [
+    "Should approved opt-in description participate in lexical admission/ranking? This requires an explicit recipe beyond append-only ingestion, not changing source evidence.",
+    "Accept public returned acquisition packet with limit5/budget4096 recorded but not applied, or designate a different public delivery boundary?"
+  ],
+  "historical_evidence_preserved": true
+}

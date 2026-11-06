@@ -1,0 +1,962 @@
+[
+  {
+    "task_id": "C-T1",
+    "key": "operations.md#Station operations",
+    "quote": "These procedures apply only to authenticated live station feeds in the active harbour.",
+    "char_start": 22,
+    "char_end": 108,
+    "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+  },
+  {
+    "task_id": "C-T1",
+    "key": "operations.md#Replay",
+    "quote": "pause the receiver and obtain a journal checkpoint before requesting the missing interval",
+    "char_start": 258,
+    "char_end": 347,
+    "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+  },
+  {
+    "task_id": "C-T1",
+    "key": "operations.md#Replay",
+    "quote": "Preserve the original observation identifiers during replay.",
+    "char_start": 349,
+    "char_end": 409,
+    "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+  },
+  {
+    "task_id": "C-T1",
+    "key": "operations.md#Replay",
+    "quote": "Resume the receiver only after the exporter acknowledges the checkpoint.",
+    "char_start": 410,
+    "char_end": 482,
+    "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+  },
+  {
+    "task_id": "C-T1",
+    "key": "operations.md#Disconnected station",
+    "quote": "leave it paused until a fresh authenticated heartbeat arrives",
+    "char_start": 664,
+    "char_end": 725,
+    "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+  },
+  {
+    "task_id": "C-T1",
+    "key": "storage.md#Retention",
+    "quote": "Keep a journal file for at least seven days and until the corresponding export checksum is verified.",
+    "char_start": 190,
+    "char_end": 290,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-T1",
+    "key": "storage.md#Retention",
+    "quote": "A legal hold blocks deletion regardless of age or checksum status.",
+    "char_start": 334,
+    "char_end": 400,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-T2",
+    "key": "export.md#Bundle export",
+    "quote": "These rules govern daily bundles consumed by harbour analysts.",
+    "char_start": 17,
+    "char_end": 79,
+    "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+  },
+  {
+    "task_id": "C-T2",
+    "key": "export.md#Publication",
+    "quote": "Publish a bundle only when every included station has a verified daily checksum.",
+    "char_start": 97,
+    "char_end": 177,
+    "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+  },
+  {
+    "task_id": "C-T2",
+    "key": "export.md#Publication",
+    "quote": "Include the observation timezone in the manifest.",
+    "char_start": 178,
+    "char_end": 227,
+    "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+  },
+  {
+    "task_id": "C-T2",
+    "key": "export.md#Publication",
+    "quote": "A missing station must be listed explicitly as missing rather than represented by zero water levels.",
+    "char_start": 228,
+    "char_end": 328,
+    "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+  },
+  {
+    "task_id": "C-T2",
+    "key": "export.md#Late observations",
+    "quote": "A late observation creates a new bundle revision; never overwrite an already published bundle.",
+    "char_start": 352,
+    "char_end": 446,
+    "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+  },
+  {
+    "task_id": "C-T2",
+    "key": "export.md#Late observations",
+    "quote": "Keep the previous revision addressable for existing citations.",
+    "char_start": 447,
+    "char_end": 509,
+    "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+  },
+  {
+    "task_id": "C-T3",
+    "key": "storage.md#Journal storage",
+    "quote": "Exported bundles are derived products, not journal replacements until their checksums have been verified.",
+    "char_start": 69,
+    "char_end": 174,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-T3",
+    "key": "storage.md#Retention",
+    "quote": "Keep a journal file for at least seven days and until the corresponding export checksum is verified.",
+    "char_start": 190,
+    "char_end": 290,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-T3",
+    "key": "storage.md#Retention",
+    "quote": "Both conditions must hold before deletion.",
+    "char_start": 291,
+    "char_end": 333,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-T3",
+    "key": "storage.md#Retention",
+    "quote": "A legal hold blocks deletion regardless of age or checksum status.",
+    "char_start": 334,
+    "char_end": 400,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-T3",
+    "key": "storage.md#Capacity",
+    "quote": "A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.",
+    "char_start": 480,
+    "char_end": 586,
+    "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+  },
+  {
+    "task_id": "C-L1",
+    "key": "colour.md#Colour processing",
+    "quote": "These requirements apply to production derivatives of colour camera originals.",
+    "char_start": 21,
+    "char_end": 99,
+    "source_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60"
+  },
+  {
+    "task_id": "C-L1",
+    "key": "colour.md#Profile choice",
+    "quote": "Use the camera profile recorded in the capture manifest, not the worker's default profile.",
+    "char_start": 120,
+    "char_end": 210,
+    "source_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60"
+  },
+  {
+    "task_id": "C-L1",
+    "key": "colour.md#Profile choice",
+    "quote": "Embed the selected profile identifier in the derivative metadata.",
+    "char_start": 211,
+    "char_end": 276,
+    "source_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60"
+  },
+  {
+    "task_id": "C-L1",
+    "key": "colour.md#Profile choice",
+    "quote": "If the manifest profile is unavailable, quarantine the job instead of guessing a profile.",
+    "char_start": 277,
+    "char_end": 366,
+    "source_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60"
+  },
+  {
+    "task_id": "C-L1",
+    "key": "colour.md#Monochrome originals",
+    "quote": "skip colour conversion but retain the manifest's monochrome marker in derivative metadata",
+    "char_start": 437,
+    "char_end": 526,
+    "source_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60"
+  },
+  {
+    "task_id": "C-L1",
+    "key": "colour.md#Monochrome originals",
+    "quote": "A filename containing the word grey is not sufficient to establish that status.",
+    "char_start": 528,
+    "char_end": 607,
+    "source_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Worker recovery",
+    "quote": "This document governs recovery of production rendering workers after interrupted writes.",
+    "char_start": 19,
+    "char_end": 107,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Recovery procedure",
+    "quote": "Follow all child sections in order when recovering an interrupted worker.",
+    "char_start": 132,
+    "char_end": 205,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Isolate",
+    "quote": "Disable the worker lease before inspecting temporary outputs.",
+    "char_start": 284,
+    "char_end": 345,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Isolate",
+    "quote": "Preserve the failed job identifier in the incident record.",
+    "char_start": 346,
+    "char_end": 404,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Validate",
+    "quote": "Compare every completed derivative checksum with its job manifest.",
+    "char_start": 420,
+    "char_end": 486,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Validate",
+    "quote": "Delete only temporary outputs that have no completed manifest entry.",
+    "char_start": 487,
+    "char_end": 555,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Resume",
+    "quote": "Re-enable the worker lease after checksum validation finishes.",
+    "char_start": 569,
+    "char_end": 631,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L2",
+    "key": "recovery.md#Resume",
+    "quote": "Jobs with a checksum mismatch remain quarantined and must not be retried automatically.",
+    "char_start": 632,
+    "char_end": 719,
+    "source_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "publication.md#Derivative publication",
+    "quote": "Publication rules apply to visitor-visible derivatives, not internal previews.",
+    "char_start": 26,
+    "char_end": 104,
+    "source_sha256": "161f18f5a00e56aca0e9f4e42bbe2b5027259a0640e9c81621ccc79705d2a90f"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "publication.md#Approval",
+    "quote": "Publish only after both curator approval and checksum verification are recorded.",
+    "char_start": 119,
+    "char_end": 199,
+    "source_sha256": "161f18f5a00e56aca0e9f4e42bbe2b5027259a0640e9c81621ccc79705d2a90f"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "publication.md#Approval",
+    "quote": "Include the preserved-original identifier with every published derivative.",
+    "char_start": 200,
+    "char_end": 274,
+    "source_sha256": "161f18f5a00e56aca0e9f4e42bbe2b5027259a0640e9c81621ccc79705d2a90f"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "publication.md#Embargo",
+    "quote": "An active collection embargo prevents publication even after curator approval and checksum verification.",
+    "char_start": 381,
+    "char_end": 485,
+    "source_sha256": "161f18f5a00e56aca0e9f4e42bbe2b5027259a0640e9c81621ccc79705d2a90f"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "publication.md#Embargo",
+    "quote": "Wait for explicit embargo release; reaching a scheduled render date does not release it.",
+    "char_start": 486,
+    "char_end": 574,
+    "source_sha256": "161f18f5a00e56aca0e9f4e42bbe2b5027259a0640e9c81621ccc79705d2a90f"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "withdrawal.md#Withdrawal",
+    "quote": "Replace the public derivative with a withdrawal notice and retain its original identifier.",
+    "char_start": 116,
+    "char_end": 206,
+    "source_sha256": "a051d7addedca6831f4f58d3290369f3e33ff192cef354bbc8aac41b5114f428"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "withdrawal.md#Withdrawal",
+    "quote": "Keep the audit record and preserved camera original.",
+    "char_start": 207,
+    "char_end": 259,
+    "source_sha256": "a051d7addedca6831f4f58d3290369f3e33ff192cef354bbc8aac41b5114f428"
+  },
+  {
+    "task_id": "C-L3",
+    "key": "withdrawal.md#Withdrawal",
+    "quote": "Do not silently redirect the identifier to a different object.",
+    "char_start": 260,
+    "char_end": 322,
+    "source_sha256": "a051d7addedca6831f4f58d3290369f3e33ff192cef354bbc8aac41b5114f428"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "reservations.md#Confirmed reservations",
+    "quote": "These rules apply to confirmed night-time reservations on shared instruments.",
+    "char_start": 26,
+    "char_end": 103,
+    "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "reservations.md#Transfer",
+    "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+    "char_start": 222,
+    "char_end": 334,
+    "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "reservations.md#Transfer",
+    "quote": "Retain the original reservation identifier and record both observers in the audit trail.",
+    "char_start": 335,
+    "char_end": 423,
+    "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "reservations.md#Locked instrument",
+    "quote": "leave the transfer pending even after observer acceptance and operator approval",
+    "char_start": 572,
+    "char_end": 651,
+    "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "reservations.md#Locked instrument",
+    "quote": "The lock must be cleared by the instrument team first.",
+    "char_start": 653,
+    "char_end": 707,
+    "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "weather.md#Suspension",
+    "quote": "Suspend outdoor observations when the wind interlock opens.",
+    "char_start": 104,
+    "char_end": 163,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "weather.md#Suspension",
+    "quote": "Preserve reservation identifiers during suspension.",
+    "char_start": 164,
+    "char_end": 215,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M1",
+    "key": "weather.md#Suspension",
+    "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+    "char_start": 216,
+    "char_end": 304,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M2",
+    "key": "weather.md#Weather decisions",
+    "quote": "Weather decisions govern execution, not ownership of reservations.",
+    "char_start": 21,
+    "char_end": 87,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M2",
+    "key": "weather.md#Suspension",
+    "quote": "Suspend outdoor observations when the wind interlock opens.",
+    "char_start": 104,
+    "char_end": 163,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M2",
+    "key": "weather.md#Suspension",
+    "quote": "Preserve reservation identifiers during suspension.",
+    "char_start": 164,
+    "char_end": 215,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M2",
+    "key": "weather.md#Suspension",
+    "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+    "char_start": 216,
+    "char_end": 304,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M2",
+    "key": "weather.md#Indoor instrument",
+    "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+    "char_start": 328,
+    "char_end": 462,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M2",
+    "key": "weather.md#Indoor instrument",
+    "quote": "A roof visible as closed on the calendar does not establish indoor classification.",
+    "char_start": 463,
+    "char_end": 545,
+    "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+  },
+  {
+    "task_id": "V-M3",
+    "key": "clock.md#Time coordination",
+    "quote": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+    "char_start": 21,
+    "char_end": 117,
+    "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+  },
+  {
+    "task_id": "V-M3",
+    "key": "clock.md#Clock offset",
+    "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+    "char_start": 136,
+    "char_end": 240,
+    "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+  },
+  {
+    "task_id": "V-M3",
+    "key": "clock.md#Clock offset",
+    "quote": "Keep queued reservations unchanged.",
+    "char_start": 241,
+    "char_end": 276,
+    "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+  },
+  {
+    "task_id": "V-M3",
+    "key": "clock.md#Clock offset",
+    "quote": "Resume only after two consecutive reference checks report an offset within two seconds.",
+    "char_start": 277,
+    "char_end": 364,
+    "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+  },
+  {
+    "task_id": "V-M3",
+    "key": "clock.md#Missing reference",
+    "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+    "char_start": 388,
+    "char_end": 515,
+    "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+  },
+  {
+    "task_id": "V-C1",
+    "key": "restore.md#Collection restore",
+    "quote": "These rules govern production collections restored from immutable snapshots.",
+    "char_start": 22,
+    "char_end": 98,
+    "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+  },
+  {
+    "task_id": "V-C1",
+    "key": "restore.md#Snapshot selection",
+    "quote": "Choose a snapshot with a signed manifest and a completed integrity scan.",
+    "char_start": 123,
+    "char_end": 195,
+    "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+  },
+  {
+    "task_id": "V-C1",
+    "key": "restore.md#Snapshot selection",
+    "quote": "Record the snapshot identifier before copying any payload.",
+    "char_start": 196,
+    "char_end": 254,
+    "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+  },
+  {
+    "task_id": "V-C1",
+    "key": "restore.md#Snapshot selection",
+    "quote": "If the most recent snapshot lacks either requirement, choose an older snapshot that satisfies both.",
+    "char_start": 255,
+    "char_end": 354,
+    "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+  },
+  {
+    "task_id": "V-C1",
+    "key": "restore.md#Held collection",
+    "quote": "A collection under an investigation hold may be restored into isolated staging only.",
+    "char_start": 376,
+    "char_end": 460,
+    "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+  },
+  {
+    "task_id": "V-C1",
+    "key": "restore.md#Held collection",
+    "quote": "Do not publish it until the archive custodian explicitly releases the hold.",
+    "char_start": 461,
+    "char_end": 536,
+    "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Restore failure handling",
+    "quote": "This procedure applies to a production restore interrupted before publication.",
+    "char_start": 28,
+    "char_end": 106,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Recovery procedure",
+    "quote": "Execute every child section below in order.",
+    "char_start": 131,
+    "char_end": 174,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Preserve",
+    "quote": "Stop the worker and retain its restore journal.",
+    "char_start": 261,
+    "char_end": 308,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Preserve",
+    "quote": "Record the failed snapshot identifier before changing staging files.",
+    "char_start": 309,
+    "char_end": 377,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Reconcile",
+    "quote": "Compare staged payload checksums with the signed snapshot manifest.",
+    "char_start": 394,
+    "char_end": 461,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Reconcile",
+    "quote": "Recopy mismatching payloads from the same snapshot; do not mix snapshots within one restore.",
+    "char_start": 462,
+    "char_end": 554,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Reopen",
+    "quote": "Resume the worker only after reconciliation completes.",
+    "char_start": 568,
+    "char_end": 622,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C2",
+    "key": "recovery.md#Reopen",
+    "quote": "Keep the collection pointer on its previous published snapshot until publication approval is recorded.",
+    "char_start": 623,
+    "char_end": 725,
+    "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "publication.md#Restore publication",
+    "quote": "Publication changes the visitor-visible pointer for a production collection.",
+    "char_start": 23,
+    "char_end": 99,
+    "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "publication.md#Switch",
+    "quote": "Switch the collection pointer only after checksum reconciliation and custodian approval.",
+    "char_start": 112,
+    "char_end": 200,
+    "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "publication.md#Switch",
+    "quote": "Record both the previous and new snapshot identifiers.",
+    "char_start": 201,
+    "char_end": 255,
+    "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "publication.md#Partial collections",
+    "quote": "If any required payload is missing, leave the previous pointer active even when all present payloads pass checksums.",
+    "char_start": 364,
+    "char_end": 480,
+    "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "publication.md#Partial collections",
+    "quote": "Custodian approval alone cannot authorize a partial collection.",
+    "char_start": 481,
+    "char_end": 544,
+    "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "rollback.md#Rollback",
+    "quote": "Restore the previous snapshot pointer when publication verification fails.",
+    "char_start": 110,
+    "char_end": 184,
+    "source_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "rollback.md#Rollback",
+    "quote": "Preserve the failed publication record and its snapshot identifier for diagnosis.",
+    "char_start": 185,
+    "char_end": 266,
+    "source_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5"
+  },
+  {
+    "task_id": "V-C3",
+    "key": "rollback.md#Rollback",
+    "quote": "Do not delete the failed staging directory until the incident owner authorizes cleanup.",
+    "char_start": 267,
+    "char_end": 354,
+    "source_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/baggage/api.md#Clear Baggage in the Context",
+    "quote": "To avoid sending any name/value pairs to an untrusted process, the Baggage API\nMUST provide a way to remove all baggage entries from a context.",
+    "char_start": 6396,
+    "char_end": 6539,
+    "source_sha256": "90892a0a5d17d4c251bf3ee6d9f0f4f95c71beadfe7297cffd6ca7f5b0fd09ef"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/baggage/api.md#Context Interaction",
+    "quote": "API users SHOULD NOT have\naccess to the [Context Key](../context/README.md#create-a-key) used by the\nBaggage API implementation.",
+    "char_start": 5399,
+    "char_end": 5527,
+    "source_sha256": "90892a0a5d17d4c251bf3ee6d9f0f4f95c71beadfe7297cffd6ca7f5b0fd09ef"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/context/README.md#Optional Global operations",
+    "quote": "These operations are expected to only be implemented by languages\nusing `Context` implicitly, and thus are optional.",
+    "char_start": 3267,
+    "char_end": 3383,
+    "source_sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/context/README.md#Attach Context",
+    "quote": "Note that every call to this operation should result in a corresponding call to\n[Detach Context](#detach-context).",
+    "char_start": 3911,
+    "char_end": 4025,
+    "source_sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/context/README.md#Detach Context",
+    "quote": "A `Token` that was returned by a previous call to attach a `Context`.",
+    "char_start": 4615,
+    "char_end": 4684,
+    "source_sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/context/README.md#Overview",
+    "quote": "Users writing instrumentation in languages that use `Context` implicitly are\ndiscouraged from using the `Context` API directly.",
+    "char_start": 1466,
+    "char_end": 1593,
+    "source_sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/context/README.md#Overview",
+    "quote": "In those cases, users will\nmanipulate `Context` through cross-cutting concerns APIs instead, in order to\nperform operations such as setting trace or baggage entries for a specified\n`Context`.",
+    "char_start": 1594,
+    "char_end": 1785,
+    "source_sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/context/README.md#Overview",
+    "quote": "A `Context` MUST be immutable, and its write operations MUST\nresult in the creation of a new `Context` containing the original\nvalues and the specified values updated.",
+    "char_start": 982,
+    "char_end": 1149,
+    "source_sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/baggage/api.md#Clear Baggage in the Context",
+    "quote": "This functionality can be implemented by having the user set an empty `Baggage`\nobject/struct into the context, or by providing an API that takes a `Context` as\ninput, and returns a new `Context` with no `Baggage` associated.",
+    "char_start": 6541,
+    "char_end": 6766,
+    "source_sha256": "90892a0a5d17d4c251bf3ee6d9f0f4f95c71beadfe7297cffd6ca7f5b0fd09ef"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/baggage/api.md#Context Interaction",
+    "quote": "Get the currently active `Baggage` from the implicit context. This is\nequivalent to getting the implicit context, then extracting the `Baggage` from\nthe context.",
+    "char_start": 5716,
+    "char_end": 5877,
+    "source_sha256": "90892a0a5d17d4c251bf3ee6d9f0f4f95c71beadfe7297cffd6ca7f5b0fd09ef"
+  },
+  {
+    "task_id": "H-O1",
+    "key": "specification/baggage/api.md#Context Interaction",
+    "quote": "Set the currently active `Baggage` to the implicit context. This is equivalent\nto getting the implicit context, then inserting the `Baggage` to the context.",
+    "char_start": 5880,
+    "char_end": 6036,
+    "source_sha256": "90892a0a5d17d4c251bf3ee6d9f0f4f95c71beadfe7297cffd6ca7f5b0fd09ef"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#Extract",
+    "quote": "the implementation MUST NOT throw an exception and MUST NOT store a new value in the `Context`,\nin order to preserve any previously existing valid value.",
+    "char_start": 3663,
+    "char_end": 3816,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#Get",
+    "quote": "The Get function MUST return the first value of the given propagation key or return null if the key doesn't exist.",
+    "char_start": 8439,
+    "char_end": 8553,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#Get",
+    "quote": "If the getter is intended to work with an HTTP request object, the getter MUST be case insensitive.",
+    "char_start": 8726,
+    "char_end": 8825,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#GetAll",
+    "quote": "If explicitly implemented, the `GetAll` function MUST return all values of the given propagation key.",
+    "char_start": 9356,
+    "char_end": 9457,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#GetAll",
+    "quote": "If the key doesn't exist, it SHOULD return an empty collection.",
+    "char_start": 9529,
+    "char_end": 9592,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#GetAll",
+    "quote": "It SHOULD return them in the same order as they appear in the carrier.",
+    "char_start": 9458,
+    "char_end": 9528,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O2",
+    "key": "specification/context/api-propagators.md#GetAll",
+    "quote": "The `GetAll` function is responsible for handling case sensitivity. If the getter is intended to work with an HTTP request object, the getter MUST be case insensitive.",
+    "char_start": 9702,
+    "char_end": 9869,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Propagator",
+    "quote": "The resulting composite `Propagator` will invoke the `Propagator`s, `Injector`s, or `Extractor`s, in the order they were specified.",
+    "char_start": 10510,
+    "char_end": 10641,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Create a Composite Propagator",
+    "quote": "Returns a new composite `Propagator` with the specified `Propagator`s.",
+    "char_start": 11122,
+    "char_end": 11192,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Extract",
+    "quote": "If the `TextMapPropagator`'s `Extract` implementation accepts the optional `Getter` argument, the following arguments are REQUIRED, otherwise they are OPTIONAL:",
+    "char_start": 11299,
+    "char_end": 11459,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Inject",
+    "quote": "If the `TextMapPropagator`'s `Inject` implementation accepts the optional `Setter` argument, the following arguments are REQUIRED, otherwise they are OPTIONAL:",
+    "char_start": 11634,
+    "char_end": 11793,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Extract",
+    "quote": "- A `Context`.\n- The carrier that holds propagation fields.",
+    "char_start": 11238,
+    "char_end": 11297,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Extract",
+    "quote": "- The instance of `Getter` invoked for each propagation key to get.",
+    "char_start": 11461,
+    "char_end": 11528,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Inject",
+    "quote": "- A `Context`.\n- The carrier that holds propagation fields.",
+    "char_start": 11573,
+    "char_end": 11632,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-O3",
+    "key": "specification/context/api-propagators.md#Composite Inject",
+    "quote": "- The `Setter` to set a propagation key-value pair. Propagators MAY invoke it multiple times in order to set multiple pairs.",
+    "char_start": 11795,
+    "char_end": 11919,
+    "source_sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd"
+  },
+  {
+    "task_id": "H-R1",
+    "key": "src/start/interrupts.md#Interrupts",
+    "quote": "you should use the re-exported version of the interrupt attribute provided by the device crate",
+    "char_start": 1531,
+    "char_end": 1625,
+    "source_sha256": "abdb31368650fee20dfc2a79e012e50b249925794d8ef0204ecf63c8c143c755"
+  },
+  {
+    "task_id": "H-R1",
+    "key": "src/start/interrupts.md#Interrupts",
+    "quote": "However they can not be called directly by other\nparts of the firmware due to the special calling conventions.",
+    "char_start": 2347,
+    "char_end": 2457,
+    "source_sha256": "abdb31368650fee20dfc2a79e012e50b249925794d8ef0204ecf63c8c143c755"
+  },
+  {
+    "task_id": "H-R1",
+    "key": "src/start/exceptions.md#Exceptions",
+    "quote": "In a multicore system, where multiple processor cores are executing code concurrently, the potential for reentrancy issues becomes relevant again, even within exception handlers.",
+    "char_start": 2203,
+    "char_end": 2381,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R1",
+    "key": "src/start/exceptions.md#Exceptions",
+    "quote": "proper synchronization mechanisms need to be employed within the exception handlers to ensure that access to shared resources is properly coordinated among the cores.",
+    "char_start": 2608,
+    "char_end": 2774,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R1",
+    "key": "src/start/interrupts.md#Interrupts",
+    "quote": "It is however\npossible to generate interrupt requests in software to trigger a diversion to\nthe interrupt handler.",
+    "char_start": 2458,
+    "char_end": 2572,
+    "source_sha256": "abdb31368650fee20dfc2a79e012e50b249925794d8ef0204ecf63c8c143c755"
+  },
+  {
+    "task_id": "H-R2",
+    "key": "src/start/exceptions.md#The hard fault handler",
+    "quote": "its handler can *not* return as that could\nresult in undefined behavior.",
+    "char_start": 6448,
+    "char_end": 6520,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R2",
+    "key": "src/start/exceptions.md#The hard fault handler",
+    "quote": "The result is that the `HardFault` handler must have the following signature:\n`fn(&ExceptionFrame) -> !`.",
+    "char_start": 6646,
+    "char_end": 6751,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R2",
+    "key": "src/start/exceptions.md#The hard fault handler",
+    "quote": "These registers are\na snapshot of the processor state at the moment the exception was triggered and\nare useful to diagnose a hard fault.",
+    "char_start": 6856,
+    "char_end": 6992,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R2",
+    "key": "src/start/exceptions.md#The hard fault handler",
+    "quote": "This program won't work, i.e. it won't crash, on QEMU because\n> `qemu-system-arm -machine lm3s6965evb` doesn't check memory loads",
+    "char_start": 7102,
+    "char_end": 7231,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R2",
+    "key": "src/start/exceptions.md#The hard fault handler",
+    "quote": "The `pc` value is the value of the Program Counter at the time of the exception\nand it points to the instruction that triggered the exception.",
+    "char_start": 8146,
+    "char_end": 8288,
+    "source_sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71"
+  },
+  {
+    "task_id": "H-R3",
+    "key": "src/start/panicking.md#Panicking",
+    "quote": "This function must appear exactly *once* in the dependency graph of a program,\nand must have the following signature: `fn(&PanicInfo) -> !`",
+    "char_start": 521,
+    "char_end": 660,
+    "source_sha256": "a55e90a1ae9b7da4b9fe69c8070b12391054df56d419a0e0516820910dc3bf6b"
+  },
+  {
+    "task_id": "H-R3",
+    "key": "src/start/panicking.md#Panicking",
+    "quote": "the crate links to the `panic-halt` crate when built with the\ndev profile (`cargo build`), but links to the `panic-abort` crate when built\nwith the release profile (`cargo build --release`).",
+    "char_start": 2556,
+    "char_end": 2746,
+    "source_sha256": "a55e90a1ae9b7da4b9fe69c8070b12391054df56d419a0e0516820910dc3bf6b"
+  },
+  {
+    "task_id": "H-R3",
+    "key": "src/start/panicking.md#An example",
+    "quote": "This example chose the `panic-semihosting` behavior which prints the panic\nmessage to the host console using semihosting.",
+    "char_start": 3680,
+    "char_end": 3801,
+    "source_sha256": "a55e90a1ae9b7da4b9fe69c8070b12391054df56d419a0e0516820910dc3bf6b"
+  }
+]

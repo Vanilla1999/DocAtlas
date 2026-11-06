@@ -1,0 +1,466 @@
+{
+  "status": "PASS_OFFLINE_FINAL_PACKET_AUDIT",
+  "boundary": "public in-process fresh-prepared recovery acceptance, not exact historical replay/validation/installed/client",
+  "per_query": [
+    {
+      "id": "C-T1",
+      "required_units": [
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "delivered_units": [
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "facts": [
+        {
+          "unit": "operations.md#Station operations",
+          "quote": "These procedures apply only to authenticated live station feeds in the active harbour.",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Replay",
+          "quote": "pause the receiver and obtain a journal checkpoint before requesting the missing interval",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Replay",
+          "quote": "Preserve the original observation identifiers during replay.",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Replay",
+          "quote": "Resume the receiver only after the exporter acknowledges the checkpoint.",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Disconnected station",
+          "quote": "leave it paused until a fresh authenticated heartbeat arrives",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "Keep a journal file for at least seven days and until the corresponding export checksum is verified.",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "A legal hold blocks deletion regardless of age or checksum status.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "status": "ok",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 250,
+      "allowed_source_tokens": 742,
+      "optional_units": [
+        "operations.md#Survey imports"
+      ],
+      "unlabelled_units": [],
+      "inputs_changed": 3,
+      "inputs_equal": 18,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-T2",
+      "required_units": [
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Publication"
+      ],
+      "delivered_units": [
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication"
+      ],
+      "facts": [
+        {
+          "unit": "export.md#Bundle export",
+          "quote": "These rules govern daily bundles consumed by harbour analysts.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Publication",
+          "quote": "Publish a bundle only when every included station has a verified daily checksum.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Publication",
+          "quote": "Include the observation timezone in the manifest.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Publication",
+          "quote": "A missing station must be listed explicitly as missing rather than represented by zero water levels.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Late observations",
+          "quote": "A late observation creates a new bundle revision; never overwrite an already published bundle.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Late observations",
+          "quote": "Keep the previous revision addressable for existing citations.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "status": "ok",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 113,
+      "allowed_source_tokens": 742,
+      "optional_units": [
+        "export.md#Preview"
+      ],
+      "unlabelled_units": [],
+      "inputs_changed": 3,
+      "inputs_equal": 18,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-T3",
+      "required_units": [
+        "storage.md#Capacity",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "delivered_units": [
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "facts": [
+        {
+          "unit": "storage.md#Journal storage",
+          "quote": "Exported bundles are derived products, not journal replacements until their checksums have been verified.",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "Keep a journal file for at least seven days and until the corresponding export checksum is verified.",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "Both conditions must hold before deletion.",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "A legal hold blocks deletion regardless of age or checksum status.",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Capacity",
+          "quote": "A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "status": "ok",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 135,
+      "allowed_source_tokens": 742,
+      "optional_units": [
+        "storage.md#Historical default"
+      ],
+      "unlabelled_units": [],
+      "inputs_changed": 3,
+      "inputs_equal": 18,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-T4",
+      "required_units": [],
+      "delivered_units": [],
+      "facts": [],
+      "no_answer_expected": true,
+      "status": "insufficient_evidence",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 0,
+      "allowed_source_tokens": 742,
+      "optional_units": [],
+      "unlabelled_units": [],
+      "inputs_changed": 3,
+      "inputs_equal": 18,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-L1",
+      "required_units": [
+        "colour.md#Colour processing",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice"
+      ],
+      "delivered_units": [
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice"
+      ],
+      "facts": [
+        {
+          "unit": "colour.md#Colour processing",
+          "quote": "These requirements apply to production derivatives of colour camera originals.",
+          "delivered": true
+        },
+        {
+          "unit": "colour.md#Profile choice",
+          "quote": "Use the camera profile recorded in the capture manifest, not the worker's default profile.",
+          "delivered": true
+        },
+        {
+          "unit": "colour.md#Profile choice",
+          "quote": "Embed the selected profile identifier in the derivative metadata.",
+          "delivered": true
+        },
+        {
+          "unit": "colour.md#Profile choice",
+          "quote": "If the manifest profile is unavailable, quarantine the job instead of guessing a profile.",
+          "delivered": true
+        },
+        {
+          "unit": "colour.md#Monochrome originals",
+          "quote": "skip colour conversion but retain the manifest's monochrome marker in derivative metadata",
+          "delivered": true
+        },
+        {
+          "unit": "colour.md#Monochrome originals",
+          "quote": "A filename containing the word grey is not sufficient to establish that status.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "status": "ok",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 135,
+      "allowed_source_tokens": 682,
+      "optional_units": [
+        "colour.md#Display preference"
+      ],
+      "unlabelled_units": [],
+      "inputs_changed": 1,
+      "inputs_equal": 22,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-L2",
+      "required_units": [
+        "recovery.md#Isolate",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery"
+      ],
+      "delivered_units": [
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery"
+      ],
+      "facts": [
+        {
+          "unit": "recovery.md#Worker recovery",
+          "quote": "This document governs recovery of production rendering workers after interrupted writes.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Recovery procedure",
+          "quote": "Follow all child sections in order when recovering an interrupted worker.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Isolate",
+          "quote": "Disable the worker lease before inspecting temporary outputs.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Isolate",
+          "quote": "Preserve the failed job identifier in the incident record.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Validate",
+          "quote": "Compare every completed derivative checksum with its job manifest.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Validate",
+          "quote": "Delete only temporary outputs that have no completed manifest entry.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Resume",
+          "quote": "Re-enable the worker lease after checksum validation finishes.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Resume",
+          "quote": "Jobs with a checksum mismatch remain quarantined and must not be retried automatically.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "status": "ok",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 149,
+      "allowed_source_tokens": 682,
+      "optional_units": [
+        "recovery.md#Preview reset"
+      ],
+      "unlabelled_units": [],
+      "inputs_changed": 1,
+      "inputs_equal": 22,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-L3",
+      "required_units": [
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "delivered_units": [
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "facts": [
+        {
+          "unit": "publication.md#Derivative publication",
+          "quote": "Publication rules apply to visitor-visible derivatives, not internal previews.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Approval",
+          "quote": "Publish only after both curator approval and checksum verification are recorded.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Approval",
+          "quote": "Include the preserved-original identifier with every published derivative.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Embargo",
+          "quote": "An active collection embargo prevents publication even after curator approval and checksum verification.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Embargo",
+          "quote": "Wait for explicit embargo release; reaching a scheduled render date does not release it.",
+          "delivered": true
+        },
+        {
+          "unit": "withdrawal.md#Withdrawal",
+          "quote": "Replace the public derivative with a withdrawal notice and retain its original identifier.",
+          "delivered": true
+        },
+        {
+          "unit": "withdrawal.md#Withdrawal",
+          "quote": "Keep the audit record and preserved camera original.",
+          "delivered": true
+        },
+        {
+          "unit": "withdrawal.md#Withdrawal",
+          "quote": "Do not silently redirect the identifier to a different object.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "status": "ok",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 179,
+      "allowed_source_tokens": 682,
+      "optional_units": [
+        "publication.md#Preview links"
+      ],
+      "unlabelled_units": [],
+      "inputs_changed": 1,
+      "inputs_equal": 22,
+      "inputs_missing": 0
+    },
+    {
+      "id": "C-L4",
+      "required_units": [],
+      "delivered_units": [],
+      "facts": [],
+      "no_answer_expected": true,
+      "status": "insufficient_evidence",
+      "complete_scan": true,
+      "hard_negatives": [],
+      "delivered_source_tokens": 0,
+      "allowed_source_tokens": 682,
+      "optional_units": [],
+      "unlabelled_units": [],
+      "inputs_changed": 1,
+      "inputs_equal": 22,
+      "inputs_missing": 0
+    }
+  ],
+  "fact_quotes": 40,
+  "required_units": 24,
+  "inputs": {
+    "changed": 16,
+    "equal": 160,
+    "missing": 0,
+    "total": 176
+  },
+  "readonly_audits": [
+    {
+      "path": "recovery/loom/readonly.json",
+      "logical_db_sha256": "2219b73a7f10d45c7e07c2f48bba0e0763b2cdea99e19569674bfa54cabd699e",
+      "before_after_equal": true
+    },
+    {
+      "path": "recovery/tidegauge/readonly.json",
+      "logical_db_sha256": "f1e68bcd5cba59e81638633a0f967bc933b6204c835fe9d7125e58dec3579123",
+      "before_after_equal": true
+    }
+  ],
+  "current_bound_hashes_unchanged": 618,
+  "summary_sha256": "93f8f93787c0c4a50a424d22295c2ed85a94df6cc73d7e349ef1ccde6da08604",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "manifest_sha256": "2bcebef52ab6268e091f5e28de12acc8837988bff36c2068432e2a4b73ebe066",
+  "counts": {
+    "public_prepares": 2,
+    "public_queries": 8,
+    "resource_reads": 8,
+    "model_totals_complete": true,
+    "lost_trace_queries": 0,
+    "model_forwards": 176,
+    "model_input_tokens": 76022,
+    "score_cache_hits": 0,
+    "runtime_cache_hits": 7,
+    "model_loads": 1,
+    "inference_seconds": 2.5349889119970612,
+    "scoring_total_seconds": 10.533927946002223,
+    "peak_vram_allocated_bytes": 1221184512,
+    "peak_vram_reserved_bytes": 1245708288
+  }
+}

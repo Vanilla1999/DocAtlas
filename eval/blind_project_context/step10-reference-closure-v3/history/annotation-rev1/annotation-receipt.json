@@ -1,0 +1,17 @@
+{
+  "status": "DRAFT_PARENT_REVIEW_REQUIRED",
+  "independent_parser": "markdown-it-py",
+  "version": "4.2.0",
+  "source_projects": 6,
+  "seen_questions": 16,
+  "new_questions": 8,
+  "holdout_source_files": 9,
+  "new_fact_quotes": 25,
+  "model_calls": 0,
+  "closure_simulations": 0,
+  "limitations": [
+    "agent-selected questions/annotations, not blind external benchmark",
+    "reference graph draft requires raw-source review; no threshold evaluation",
+    "no new holdout true hard negatives claimed; excluded scope documents are adversarial witnesses"
+  ]
+}

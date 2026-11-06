@@ -1,0 +1,929 @@
+"""SQLiteStore implementation shard 3."""
+from __future__ import annotations
+
+import copy
+from collections import Counter
+from contextlib import closing
+from math import log1p
+
+from ._sqlite_store_shared import *  # noqa: F401,F403
+from docmancer.retrieval.acquisition_reuse import (
+    active_acquisition_entries, effective_filters, extends_filters,
+)
+from docmancer.retrieval.lexical_terms import (
+    character_ngrams, lexical_counts_utility, lexical_field_matches, lexical_field_utility, lexical_terms,
+    lexical_tokens, query_terms, explicit_source_locators, resolve_source_locators,
+)
+
+
+class _SQLiteStorePart03:
+    def set_generation_vector_collection(
+        self, generation_id: str, collection: str
+    ) -> None:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,254}", collection):
+            raise ValueError(f"invalid generation vector collection: {collection!r}")
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT status, vector_backend FROM index_generations WHERE generation_id = ?",
+                (generation_id,),
+            ).fetchone()
+            mutable_candidate = bool(
+                row is not None
+                and (
+                    row["status"] in {"ready", "building"}
+                    or (row["status"] == "active" and not str(row["vector_backend"] or ""))
+                )
+            )
+            if not mutable_candidate:
+                raise ValueError("only a candidate generation collection can be changed")
+            conn.execute(
+                "UPDATE index_generations SET vector_collection = ? WHERE generation_id = ?",
+                (collection, generation_id),
+            )
+
+    def set_generation_vector_backend(
+        self, generation_id: str, backend: str, backend_identity: str = ""
+    ) -> None:
+        """Bind a generation to the backend that actually received its vectors."""
+        normalized = str(backend or "").strip().lower()
+        if normalized not in {"qdrant", "sqlite-vec"}:
+            raise ValueError(f"invalid generation vector backend: {backend!r}")
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT status FROM index_generations WHERE generation_id = ?",
+                (generation_id,),
+            ).fetchone()
+            if row is None or row["status"] not in {"building", "ready", "active"}:
+                raise ValueError("vector backend can only be bound to a usable generation")
+            conn.execute(
+                "UPDATE index_generations SET vector_backend = ?, vector_backend_identity = ? WHERE generation_id = ?",
+                (normalized, str(backend_identity or ""), generation_id),
+            )
+
+    @staticmethod
+    def _chunking_config_from_generation(row: sqlite3.Row) -> ChunkingConfig:
+        try:
+            payload = json.loads(row["config_json"] or "{}")
+        except (TypeError, json.JSONDecodeError):
+            payload = {}
+        return ChunkingConfig(
+            target_tokens=int(payload.get("target_tokens") or 160),
+            hard_max_tokens=int(payload.get("hard_max_tokens") or 512),
+            overlap_tokens=int(payload.get("overlap_tokens") or 0),
+            schema_version=str(row["schema_version"]),
+            estimator_version=str(payload.get("estimator_version") or "utf8-bytes-div4-v1"),
+        )
+
+    def _build_generation_without_sources(
+        self,
+        conn: sqlite3.Connection,
+        excluded_sources: set[str],
+    ) -> str | None:
+        """Clone the active immutable generation minus deleted sources."""
+        active = self._active_generation_id(conn)
+        if not active or not excluded_sources:
+            return None
+        placeholders = ",".join("?" for _ in excluded_sources)
+        present = int(conn.execute(
+            f"""
+            SELECT COUNT(*) AS count FROM generation_sources
+            WHERE generation_id = ? AND source IN ({placeholders})
+            """,
+            (active, *sorted(excluded_sources)),
+        ).fetchone()["count"])
+        if not present:
+            return None
+        previous = conn.execute(
+            "SELECT * FROM index_generations WHERE generation_id = ?", (active,)
+        ).fetchone()
+        if previous is None:
+            raise ValueError(f"active generation {active!r} is missing")
+        if not str(previous["context_config_hash"] or "") or not str(
+            previous["retrieval_config_hash"] or ""
+        ):
+            raise ValueError("active generation does not satisfy the current context schema")
+        generation_id = "gen-" + uuid.uuid4().hex
+        now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        conn.execute(
+            """
+            INSERT INTO index_generations
+                (generation_id, schema_version, config_hash, config_json,
+                 context_schema_version, context_config_hash,
+                 retrieval_config_hash, status, vector_collection,
+                  vector_backend, vector_backend_identity,
+                  vector_parity_schema, vector_parity_digest,
+                  vector_parity_verified_at, vector_parity_count,
+                  vector_parity_backend_identity, vector_parity_collection,
+                  validation_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'building', ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?)
+            """,
+            (
+                generation_id, previous["schema_version"], previous["config_hash"],
+                previous["config_json"], previous["context_schema_version"],
+                previous["context_config_hash"], previous["retrieval_config_hash"],
+                previous["vector_collection"], previous["vector_backend"],
+                previous["vector_backend_identity"], previous["vector_parity_schema"],
+                previous["vector_parity_digest"], previous["vector_parity_verified_at"],
+                previous["vector_parity_count"], previous["vector_parity_backend_identity"],
+                previous["vector_parity_collection"], now,
+            ),
+        )
+        exclusion = f"AND source NOT IN ({placeholders})"
+        params: tuple[Any, ...] = (
+            generation_id, active, *sorted(excluded_sources)
+        )
+        conn.execute(
+            f"""
+            INSERT INTO generation_sources
+                (generation_id, source, source_identity, content, content_hash,
+                 metadata_json, raw_tokens)
+            SELECT ?, source, source_identity, content, content_hash,
+                   metadata_json, raw_tokens
+            FROM generation_sources
+            WHERE generation_id = ? {exclusion}
+            """,
+            params,
+        )
+        conn.execute(
+            f"""
+            INSERT INTO retrieval_parents
+                (generation_id, logical_id, revision_id, source_id, source,
+                 source_identity, title, level, heading_path_json,
+                 heading_levels_json, occurrence, char_start, char_end,
+                 byte_start, byte_end, line_start, line_end, display_text,
+                 source_content_hash)
+            SELECT ?, logical_id, revision_id, source_id, source,
+                   source_identity, title, level, heading_path_json,
+                   heading_levels_json, occurrence, char_start, char_end,
+                   byte_start, byte_end, line_start, line_end, display_text,
+                   source_content_hash
+            FROM retrieval_parents
+            WHERE generation_id = ? {exclusion}
+            """,
+            params,
+        )
+        rows = conn.execute(
+            f"""
+            SELECT * FROM retrieval_children
+            WHERE generation_id = ? {exclusion}
+            ORDER BY id
+            """,
+            (active, *sorted(excluded_sources)),
+        ).fetchall()
+        for row in rows:
+            child_id = self._insert_retrieval_child_copy(conn, generation_id, row)
+            conn.execute(
+                """
+                INSERT INTO retrieval_children_fts(rowid, title, retrieval_text, source)
+                VALUES (?, ?, ?, ?)
+                """,
+                (child_id, row["title"], row["retrieval_text"], row["source"]),
+            )
+        config = self._chunking_config_from_generation(previous)
+        validation = self._validate_generation(
+            conn, generation_id, config, ContextConfig()
+        )
+        conn.execute(
+            """
+            UPDATE index_generations
+            SET status = 'ready', validation_json = ?
+            WHERE generation_id = ?
+            """,
+            (json.dumps(validation, sort_keys=True), generation_id),
+        )
+        self._activate_generation(conn, generation_id)
+        return generation_id
+
+    def query(
+        self,
+        text: str,
+        *,
+        limit: int,
+        budget: int,
+        expand: str | None = None,
+        filters: dict[str, Any] | None = None,
+    ) -> list[RetrievedChunk]:
+        """Deliver whole windows under the public count and stored-token caps."""
+        if limit < 0 or budget < 0:
+            raise ValueError("limit and budget must be non-negative")
+        candidates = self.acquire_candidates(text, expand=expand, filters=filters)
+        selected: list[RetrievedChunk] = []
+        used = 0
+        for chunk in candidates:
+            if len(selected) >= limit:
+                break
+            cost = int(chunk.metadata["token_estimate"])
+            if used + cost > budget:
+                continue
+            selected.append(chunk)
+            used += cost
+        raw_tokens = self._raw_token_total([chunk.source for chunk in selected])
+        for chunk in selected:
+            chunk.metadata.update({
+                "docmancer_tokens": used, "raw_tokens": raw_tokens,
+                "savings_percent": round(0.0 if raw_tokens <= 0 else
+                                         max(0.0, 100.0 * (1 - used / raw_tokens)), 1),
+                "runway_multiplier": round(1.0 if used <= 0 else raw_tokens / used, 2),
+            })
+            chunk.metadata["delivery"] = {
+                "limit": limit, "budget": budget, "estimated_tokens": used,
+                "measure": "stored_display_token_estimate",
+            }
+        return selected
+
+    def iter_scope_candidates(
+        self, *, filters: dict[str, Any] | None = None,
+        batch_size: int = 128, receipt: dict[str, Any] | None = None,
+    ):
+        """Enumerate a complete filtered generation without lexical admission.
+
+        Keyset batches bound memory, not corpus size. This deliberately bypasses
+        the legacy acquisition memo (which deep-copies whole pools). Source
+        authorization and freshness must still be checked by the public reader.
+        Consumers must exhaust this iterator before publishing a successful
+        response; closure/cancellation and generation changes are not success.
+        """
+        if type(batch_size) is not int or batch_size <= 0:
+            raise ValueError("batch_size must be a positive integer")
+        state = receipt if receipt is not None else {}
+        state.update(status="scanning", rows=0, batches=0, exhausted=False)
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        with closing(self._connect()) as conn:
+            generation = self._active_generation_id(conn)
+        state["generation_id"] = generation
+        if not generation:
+            state["status"] = "scan_incomplete"
+            raise ValueError("scope_scan_requires_prepared_generation")
+        last_id = -1
+        try:
+            while True:
+                with closing(self._connect()) as conn:
+                    if self._active_generation_id(conn) != generation:
+                        raise ValueError("scope_scan_generation_changed")
+                    rows = conn.execute(
+                        f"""
+                        SELECT sections.hydration_id AS id, sections.*,
+                               sections.display_text AS text,
+                               sections.display_token_estimate AS token_estimate
+                        FROM retrieval_children AS sections
+                        WHERE sections.generation_id = ? AND sections.hydration_id > ?
+                        {filter_sql}
+                        ORDER BY sections.hydration_id LIMIT ?
+                        """,
+                        (generation, last_id, *filter_params, batch_size),
+                    ).fetchall()
+                if not rows:
+                    # A fresh connection observes concurrent promotion rather
+                    # than rechecking an old SQLite read transaction's snapshot.
+                    with closing(self._connect()) as conn:
+                        if self._active_generation_id(conn) != generation:
+                            raise ValueError("scope_scan_generation_changed")
+                    state.update(status="complete", exhausted=True)
+                    return
+                state["batches"] += 1
+                for row in rows:
+                    metadata = json.loads(row["metadata_json"] or "{}")
+                    metadata.update(
+                        title=row["title"], section_id=int(row["id"]),
+                        token_estimate=int(row["token_estimate"]),
+                        acquisition={"method": "complete_filtered_generation_v1",
+                                     "generation_id": generation,
+                                     "relevance_unassessed": True},
+                    )
+                    last_id = int(row["id"])
+                    state["rows"] += 1
+                    yield RetrievedChunk(
+                        source=row["source"], chunk_index=int(row["chunk_index"]),
+                        text=row["text"], score=0.0, metadata=metadata,
+                    )
+        finally:
+            if not state["exhausted"]:
+                state["status"] = "scan_incomplete"
+
+    def acquire_candidates(
+        self, text: str, *, expand: str | None = None,
+        filters: dict[str, Any] | None = None,
+    ) -> list[RetrievedChunk]:
+        """Internal acquisition; public delivery caps do not shrink this pool."""
+        from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+        if minimal_context_enabled():
+            return list(self.iter_scope_candidates(filters=filters))
+        entries = active_acquisition_entries()
+        if entries is None:
+            return self._query_bm25_candidates(
+                text, expand=expand or "none", filters=filters,
+            )
+        expand = expand or "none"
+        wanted = effective_filters(filters)
+        with self._connect() as conn:
+            generation = self._active_generation_id(conn)
+            for store, entry_generation, entry_text, entry_expand, entry_filters, pool in entries:
+                if (store is not self or entry_generation != generation or not generation
+                        or entry_text != text or entry_expand != expand):
+                    continue
+                if entry_filters == wanted or (
+                    extends_filters(entry_filters, wanted)
+                    and self._filtered_window_count(conn, generation, entry_filters)
+                    == self._filtered_window_count(conn, generation, wanted)
+                ):
+                    return copy.deepcopy(pool)
+        chunks = self._query_bm25_candidates(text, expand=expand, filters=filters)
+        entries.append((self, generation, text, expand, wanted, copy.deepcopy(chunks)))
+        return chunks
+
+    def _filtered_window_count(
+        self, conn: sqlite3.Connection, generation: str, filters: dict[str, Any],
+    ) -> int:
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        row = conn.execute(
+            f"""
+            SELECT count(*) FROM retrieval_children AS sections
+            WHERE sections.generation_id = ?
+            {filter_sql}
+            """,
+            (generation, *filter_params),
+        ).fetchone()
+        return int(row[0])
+
+    def _query_bm25_candidates(
+        self, text: str, *, expand: str,
+        filters: dict[str, Any] | None,
+    ) -> list[RetrievedChunk]:
+        """Acquire bounded native children independently of the delivery budget."""
+        from docmancer.retrieval.experimental_acquisition import (
+            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
+            ACQUISITION_METHOD, ACQUISITION_SECTIONS, ACQUISITION_TEXT_BYTES,
+        )
+
+        if expand not in {"none", "adjacent", "page"}:
+            raise ValueError("expand must be none, adjacent or page")
+        rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
+        native_count = len(rows)
+        import os
+        hybrid = os.environ.get("DOCATLAS_EXPERIMENT_ACQUISITION_E5", "0")
+        if hybrid not in {"0", "1"}:
+            raise ValueError("DOCATLAS_EXPERIMENT_ACQUISITION_E5 must be 0 or 1")
+        if hybrid == "1":
+            from docmancer.retrieval.experimental_e5_acquisition import hybrid_rows
+            rows = hybrid_rows(self, text, rows, filters, ACQUISITION_CANDIDATES)
+        method = "lexical_e5_round_robin_v1" if hybrid == "1" else ACQUISITION_METHOD
+        # Research flag, off by default: fill the same ceiling in rank order,
+        # each ranked hit followed by every window under its author heading.
+        # Section boundaries come from the document; no new count is added.
+        if ACQUISITION_SECTIONS and expand == "none":
+            ordered: list[dict[str, Any]] = []
+            seen: set[int] = set()
+            for rank, row in enumerate(rows, start=1):
+                if len(ordered) >= ACQUISITION_CANDIDATES:
+                    break
+                if int(row["id"]) not in seen:
+                    seen.add(int(row["id"]))
+                    ordered.append(row)
+                for sibling in self._section_rows(row, filters=filters):
+                    if len(ordered) >= ACQUISITION_CANDIDATES:
+                        break
+                    if int(sibling["id"]) in seen:
+                        continue
+                    seen.add(int(sibling["id"]))
+                    ordered.append({**dict(sibling), "rank": 0.0,
+                                    "_expansion_anchor_id": int(row["id"]),
+                                    "_expansion_anchor_rank": rank})
+            rows = ordered
+        # Keep all native hits first. Expansion appends existing source windows,
+        # never synthetic scores or a second semantic retrieval.
+        if expand != "none":
+            expanded = []
+            for rank, row in enumerate(rows, start=1):
+                for neighbor in self._expand_row(row, expand, filters=filters):
+                    if int(neighbor["id"]) != int(row["id"]):
+                        expanded.append({**dict(neighbor), "rank": 0.0,
+                                         "_expansion_anchor_id": int(row["id"]),
+                                         "_expansion_anchor_rank": rank})
+            rows = [*rows, *expanded]
+        selected: list[dict[str, Any]] = []
+        seen_ids: set[int] = set()
+        token_total = byte_total = skipped = 0
+        for raw_rank, row in enumerate(rows, start=1):
+            if len(selected) >= ACQUISITION_CANDIDATES:
+                break
+            row_id = int(row["id"])
+            if row_id in seen_ids:
+                continue
+            seen_ids.add(row_id)
+            tokens = max(0, int(row["token_estimate"]))
+            text_bytes = len(str(row["text"]).encode("utf-8"))
+            if (
+                token_total + tokens > ACQUISITION_ESTIMATED_TOKENS
+                or byte_total + text_bytes > ACQUISITION_TEXT_BYTES
+            ):
+                skipped += 1
+                continue
+            selected.append({**row, "_bm25_rank": raw_rank})
+            token_total += tokens
+            byte_total += text_bytes
+
+        raw_tokens = self._raw_token_total([row["source"] for row in selected])
+        savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - token_total / raw_tokens))
+        runway = 1.0 if token_total <= 0 else raw_tokens / token_total
+        acquisition = {
+            "method": method,
+            "sql_rows": native_count,
+            "candidate_ceiling": ACQUISITION_CANDIDATES,
+            "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
+            "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
+            "admitted_rows": len(selected),
+            "admitted_estimated_tokens": token_total,
+            "admitted_text_bytes": byte_total,
+            "resource_skipped_rows": skipped,
+            "expansion": expand,
+            "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+        }
+        results: list[RetrievedChunk] = []
+        for row in selected:
+            cost = float(row["rank"])
+            rank = int(row["_bm25_rank"])
+            metadata = json.loads(row["metadata_json"] or "{}")
+            if "_expansion_anchor_id" in row:
+                metadata["expansion"] = {
+                    "mode": expand, "anchor_section_id": row["_expansion_anchor_id"],
+                    "anchor_rank": row["_expansion_anchor_rank"],
+                }
+            metadata.update({
+                "title": row["title"], "section_id": int(row["id"]),
+                "token_estimate": int(row["token_estimate"]),
+                "docmancer_tokens": token_total, "raw_tokens": raw_tokens,
+                "savings_percent": round(savings, 1),
+                "runway_multiplier": round(runway, 2),
+                "acquisition": dict(acquisition),
+                "ranking": {
+                    "stable_id": self._lexical_row_identity(row),
+                    "section_id": int(row["id"]),
+                    "score_direction": "higher_is_better",
+                    "raw_component_ranks": {"content_lexical_cost": cost},
+                    "base_utility": -cost, "feature_contributions": {},
+                    "final_utility": -cost, "raw_rank": rank,
+                    "final_rank": rank, "rank_delta": 0,
+                    "candidate_pool_size": len(rows), "method": method,
+                },
+                "lexical_match": self._lexical_match_trace(
+                    text, title=str(row["title"]), body=str(row["text"]),
+                    description=str(metadata.get("project_doc_description") or ""),
+                    source_locator_matches=tuple(row.get("_source_locator_matches") or ()),
+                    mode="or", lexical_cost=cost,
+                ),
+            })
+            if "expansion" in metadata:
+                metadata["ranking"] = {
+                    "method": "source_expansion", "final_rank": rank,
+                    "anchor_section_id": row["_expansion_anchor_id"],
+                }
+                metadata.pop("lexical_match", None)
+            if "_e5_cosine" in row:
+                metadata["ranking"]["e5_cosine"] = row["_e5_cosine"]
+            results.append(RetrievedChunk(
+                source=row["source"], chunk_index=int(row["chunk_index"]),
+                text=row["text"], score=-cost, metadata=metadata,
+            ))
+        return results
+
+    @classmethod
+    def _lexical_match_trace(
+        cls, query: str, *, title: str, body: str, description: str = "",
+        source_locator_matches: tuple[str, ...] = (),
+        mode: str, lexical_cost: float,
+    ) -> dict[str, Any]:
+        terms = query_terms(query)
+        exact_terms = tuple(dict.fromkeys(
+            token.casefold()
+            for token in re.findall(r"[\w~./:+-]+", query)
+            if is_exact_technical_token(token)
+        ))
+        field_matches = lexical_field_matches(
+            terms, title=title, body=body, description=description,
+        )
+        content_terms = set(field_matches["title"]) | set(field_matches["body"])
+        matched = tuple(term for term in terms if term in content_terms)
+        haystack = f"{title}\n{body}".casefold()
+        missing_exact = tuple(
+            term for term in exact_terms
+            if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack) is None
+        )
+        ratio = len(matched) / len(terms) if terms else 0.0
+        return {
+            "mode": mode,
+            "query_terms": list(terms),
+            "matched_terms": list(matched),
+            "exact_terms": list(exact_terms),
+            "missing_exact_terms": list(missing_exact),
+            "query_term_count": len(terms),
+            "matched_term_count": len(matched),
+            "match_ratio": round(ratio, 4),
+            "content_lexical_cost": lexical_cost,
+            "lexical_score": -lexical_cost,
+            "field_matches": {key: list(value) for key, value in field_matches.items()},
+            "routing_only": not matched and bool(field_matches["description"] or source_locator_matches),
+            "routing_match_ratio": round(len(field_matches["description"]) / len(terms), 4) if terms else 0.0,
+            "source_locator_matches": list(source_locator_matches),
+        }
+
+    @classmethod
+    def _ranking_candidate(
+        cls,
+        row: dict[str, Any],
+        query: str,
+        content_terms: set[str],
+    ) -> RankingCandidate:
+        lexical_cost = float(row["rank"])
+        title_words = set(re.findall(r"\w+", str(row["title"]).lower()))
+        body_lower = str(row["text"]).lower()
+        contributions: list[tuple[str, float]] = []
+
+        tokens = int(row["token_estimate"])
+        if tokens > 600:
+            contributions.append(("long_section_penalty", -0.3 * (tokens - 600) / 600))
+
+        title_term_overlap = title_words & content_terms
+        if title_term_overlap:
+            contributions.append(("title_term_boost", 1.5 * len(title_term_overlap)))
+
+        stripped_query = cls._strip_stopwords(query).lower()
+        # Preserve the complete relation (including negation) across inline
+        # Markdown emphasis. Matching is source-local and cannot cross sentence
+        # or paragraph boundaries; no text or qualification flags are rewritten.
+        phrase_tokens = query.casefold().split()
+        inline_phrase = r"(?<!\w)" + r"[ \t*_`~]+".join(
+            re.escape(token) for token in phrase_tokens
+        ) + r"(?!\w)"
+        if (stripped_query and stripped_query in body_lower[:500]) or (
+            len(phrase_tokens) > 1 and re.search(inline_phrase, body_lower[:500])
+        ):
+            contributions.append(("leading_exact_phrase_boost", 2.0))
+
+        metadata = json.loads(str(row.get("metadata_json") or "{}"))
+        authority = str(metadata.get("authority") or "").casefold()
+        if authority in {"generated", "mirror", "stale"}:
+            contributions.append((f"{authority}_authority_penalty", -3.0))
+        elif authority == "external_generic":
+            contributions.append(("external_generic_authority_penalty", -1.5))
+        source = str(row["source"])
+        chunk_index = int(row["chunk_index"])
+        content_hash = str(row.get("content_hash") or _chunk_hash(str(row["text"])))
+        stable_id = str(row.get("stable_chunk_id") or "") or "lex-" + hashlib.sha256(
+            f"{source}\0{chunk_index}\0{content_hash}".encode("utf-8")
+        ).hexdigest()[:20]
+        base_utility = -lexical_cost
+        return RankingCandidate(
+            stable_id=stable_id,
+            section_id=int(row["id"]),
+            raw_component_ranks=(("content_lexical_cost", lexical_cost),),
+            base_utility=base_utility,
+            feature_contributions=tuple(contributions),
+            final_utility=base_utility + sum(value for _, value in contributions),
+        )
+
+    def fetch_sections_by_id(
+        self,
+        section_ids: list[int],
+        *,
+        budget: int = 2400,
+    ) -> list[RetrievedChunk]:
+        """Hydrate ``RetrievedChunk`` objects from raw section ids, preserving order."""
+        if not section_ids:
+            return []
+        placeholders = ",".join("?" * len(section_ids))
+        with self._connect() as conn:
+            active_generation = self._active_generation_id(conn)
+            if not active_generation:
+                return []
+            query = f"""
+                SELECT c.hydration_id AS id, c.source, c.chunk_index, c.title,
+                       c.display_text AS text,
+                       c.display_token_estimate AS token_estimate,
+                       c.metadata_json
+                FROM retrieval_children c
+                WHERE c.generation_id = ? AND c.hydration_id IN ({placeholders})
+            """
+            values: tuple[Any, ...] = (active_generation, *section_ids)
+            rows = {
+                int(row["id"]): row
+                for row in conn.execute(query, values)
+            }
+        selected_rows: list[tuple[int, sqlite3.Row]] = []
+        used_tokens = 0
+        for rank, sid in enumerate(section_ids):
+            row = rows.get(int(sid))
+            if row is None:
+                continue
+            tok = int(row["token_estimate"] or 0)
+            if used_tokens and used_tokens + tok > budget:
+                break
+            used_tokens += tok
+            selected_rows.append((rank, row))
+
+        # Compute pack-level token metrics so the hybrid dispatcher returns
+        # the same shape as the lexical path. Without these, the CLI prints
+        # "~0 tokens" / "~0 raw tokens" because nothing else sets them.
+        raw_tokens = self._raw_token_total([row["source"] for _, row in selected_rows])
+        token_total = used_tokens
+        savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - (token_total / raw_tokens)))
+        runway = 1.0 if token_total <= 0 else raw_tokens / token_total
+
+        results: list[RetrievedChunk] = []
+        for rank, row in selected_rows:
+            metadata = json.loads(row["metadata_json"] or "{}")
+            metadata.setdefault("title", row["title"])
+            metadata.setdefault("section_id", int(row["id"]))
+            metadata["token_estimate"] = int(row["token_estimate"] or 0)
+            metadata["docmancer_tokens"] = token_total
+            metadata["raw_tokens"] = raw_tokens
+            metadata["savings_percent"] = round(savings, 1)
+            metadata["runway_multiplier"] = round(runway, 2)
+            # Hydration is not a ranking method. Dispatch supplies the actual
+            # backend/fusion score; standalone source reads have no score.
+            score = 0.0
+            results.append(
+                RetrievedChunk(
+                    source=row["source"],
+                    chunk_index=int(row["chunk_index"]),
+                    text=row["text"],
+                    score=score,
+                    metadata=metadata,
+                )
+            )
+        return results
+
+    @staticmethod
+    def _strip_stopwords(query: str) -> str:
+        """Tokenize FTS input without a natural-language omission dictionary."""
+        return " ".join(re.findall(r"\w+", query)) or query
+
+    def _search_rows(
+        self,
+        query: str,
+        limit: int,
+        *,
+        filters: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        from docmancer.retrieval.experimental_acquisition import ACQUISITION_TERMS
+        # Research flag, off by default: BM25 counts overlapping character
+        # 4-grams instead of words (McNamee & Mayfield 2004). The FTS word
+        # admission below stays unchanged; only scoring reads the n-grams.
+        tokens_of = character_ngrams if ACQUISITION_TERMS == "char4" else lexical_tokens
+        terms = (tuple(dict.fromkeys(character_ngrams(query))) if ACQUISITION_TERMS == "char4"
+                 else query_terms(query))
+        # These are literal query words, never an FTS expression. Quote every
+        # token so uppercase AND/OR/NOT remain data in both backend lanes.
+        # Preserve the original FTS grouping: quoted snake_case identifiers
+        # are phrases in unicode61, not OR searches for their separate parts.
+        literal_terms = [f'"{token}"' for token in re.findall(r"\w+", query)]
+        match_expression = "{title retrieval_text} : (" + " OR ".join(literal_terms) + ")"
+        locators = explicit_source_locators(query)
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        from docmancer.retrieval.experimental_acquisition import (
+            ACQUISITION_CANDIDATES,
+            ACQUISITION_VARIANT,
+        )
+
+        with self._connect() as conn:
+            active_generation = self._active_generation_id(conn)
+            if not active_generation:
+                return []
+            if not literal_terms:
+                return []
+
+            locator_sources = {}
+            if locators:
+                # Resolve against the complete allowed generation, not an FTS
+                # top-N. Only whole paths or unique basenames are routing;
+                # technical storage path words never become content matches.
+                catalog_rows = conn.execute(
+                    f"""
+                    SELECT DISTINCT sections.source,
+                           COALESCE(NULLIF(json_extract(sections.metadata_json, '$.project_doc_path'), ''),
+                                    NULLIF(json_extract(sections.metadata_json, '$.source_path'), ''),
+                                    sections.source) AS path
+                    FROM retrieval_children AS sections
+                    WHERE sections.generation_id = ?
+                    {filter_sql}
+                    """, (active_generation, *filter_params),
+                )
+                locator_sources = resolve_source_locators(
+                    locators, ((str(row["source"]), str(row["path"])) for row in catalog_rows),
+                )
+            locator_keys = tuple(sorted(locator_sources))
+            locator_sql = ("sections.source IN (" + ",".join("?" for _ in locator_keys) + ")"
+                           if locator_keys else "0")
+            # Exact locators also work when their spelling occurs only in the
+            # source identity. This is a separate indexed routing union, not
+            # an OR search over individual words in every absolute source path.
+            candidate_sql = (
+                "sections.id IN (SELECT rowid FROM retrieval_children_fts "
+                "WHERE retrieval_children_fts MATCH ?)"
+                + (" OR " + locator_sql if locator_keys else "")
+            )
+
+            # Experimental V5: concatenate the stored heading path once before
+            # BM25 saturation/length normalization. FTS admission stays literal
+            # and unchanged. This is not independently normalized BM25F fields.
+            score_body_sql = "sections.display_text"
+            if ACQUISITION_VARIANT == "v5":
+                def heading_body(body: str | None, metadata: str | None) -> str:
+                    path = json.loads(metadata or "{}").get("heading_path", [])
+                    if not isinstance(path, list) or not all(isinstance(p, str) for p in path):
+                        raise ValueError("V5 requires heading_path to be a list of strings")
+                    return (body or "") + "\n" + "\n".join(path)
+
+                conn.create_function("docatlas_heading_body", 2, heading_body, deterministic=True)
+                score_body_sql = "docatlas_heading_body(sections.display_text, sections.metadata_json)"
+
+            # The statistics pass and both utility evaluations of one row (the
+            # WHERE check and the ranked column) read the same field text.
+            # Tokenize each distinct text once per call; the arithmetic below
+            # is unchanged.
+            term_set = frozenset(terms)
+            body_profiles: dict[str, tuple[int, Counter[str]]] = {}
+            query_word_sets: dict[str, frozenset[str]] = {}
+
+            def body_profile(body: str) -> tuple[int, Counter[str]]:
+                profile = body_profiles.get(body)
+                if profile is None:
+                    tokens = tokens_of(body)
+                    profile = (len(tokens), Counter(token for token in tokens if token in term_set))
+                    body_profiles[body] = profile
+                return profile
+
+            def query_words(text: str) -> frozenset[str]:
+                words = query_word_sets.get(text)
+                if words is None:
+                    words = term_set.intersection(tokens_of(text))
+                    query_word_sets[text] = words
+                return words
+
+            class SourceStatistics:
+                def __init__(self) -> None:
+                    self.windows = 0
+                    self.body_length = 0
+                    self.frequencies: Counter[str] = Counter()
+
+                def step(self, title: str, body: str) -> None:
+                    body_length, body_frequencies = body_profile(body or "")
+                    matched = set(body_frequencies) | query_words(title or "")
+                    # Boilerplate/description-only hits do not change source
+                    # document frequencies or average source-window length.
+                    if matched:
+                        self.windows += 1
+                        self.body_length += body_length
+                        self.frequencies.update(matched)
+
+                def finalize(self) -> str:
+                    return json.dumps({
+                        "windows": self.windows,
+                        "body_length": self.body_length,
+                        "frequencies": self.frequencies,
+                    })
+
+            # A streaming aggregate keeps only O(query terms) state. It reads
+            # the same scoped postings as acquisition, not unrelated sources,
+            # and requires neither a new index nor a writable connection.
+            conn.create_aggregate("docatlas_source_statistics", 2, SourceStatistics)
+            # The same windows as a join on the unique FTS rowid, but the MATCH
+            # runs once (as in the candidate query below). Joined, SQLite may
+            # drive the loop from the filtered windows and re-run the full-text
+            # query for each of them. The aggregate is order-independent.
+            stats_row = conn.execute(
+                f"""
+                SELECT docatlas_source_statistics(sections.title, {score_body_sql})
+                FROM retrieval_children AS sections
+                WHERE sections.id IN (SELECT rowid FROM retrieval_children_fts
+                                      WHERE retrieval_children_fts MATCH ?)
+                  AND sections.generation_id = ?
+                {filter_sql}
+                """,
+                (match_expression, active_generation, *filter_params),
+            ).fetchone()
+            statistics = json.loads(stats_row[0]) if stats_row and stats_row[0] else {}
+            windows = int(statistics.get("windows") or 0)
+            frequencies = statistics.get("frequencies") or {}
+            average_length = float(statistics.get("body_length") or 0) / max(1, windows)
+            term_weights = {
+                term: log1p((windows - frequencies.get(term, 0) + 0.5) / (frequencies.get(term, 0) + 0.5))
+                for term in terms
+            }
+
+            def source_utility(title: str, body: str, description: str | None) -> float:
+                body_length, body_frequencies = body_profile(body or "")
+                return lexical_counts_utility(
+                    terms, body_length=body_length, body_frequencies=body_frequencies,
+                    title_terms=query_words((title or "") if ACQUISITION_VARIANT == "v0" else ""),
+                    description_terms=query_words(description or ""),
+                    term_weights=term_weights, average_body_length=average_length,
+                )
+
+            # Existing immutable generations already contain display_text and
+            # catalog descriptions. Use their FTS postings only as a superset,
+            # then check and rank these clean fields BEFORE the acquisition
+            # LIMIT. Post-filtering the old top-N would let metadata hits crowd
+            # out valid body matches. The connection-local function performs no
+            # schema/index repair and also works on MemberReadStore's ro handle.
+            conn.create_function("docatlas_source_utility", 3, source_utility, deterministic=True)
+            rows = list(conn.execute(
+                f"""
+                SELECT sections.hydration_id AS id, sections.*,
+                       sections.display_text AS text,
+                       sections.display_token_estimate AS token_estimate,
+                       sections.display_content_hash AS content_hash,
+                       -docatlas_source_utility(
+                            sections.title, {score_body_sql},
+                           json_extract(sections.metadata_json, '$.project_doc_description')
+                       ) AS rank
+                FROM retrieval_children AS sections
+                WHERE ({candidate_sql})
+                  AND sections.generation_id = ?
+                  AND (docatlas_source_utility(
+                       sections.title, {score_body_sql},
+                      json_extract(sections.metadata_json, '$.project_doc_description')
+                  ) > 0 OR {locator_sql})
+                {filter_sql}
+                ORDER BY CASE WHEN {locator_sql} THEN 1 ELSE 0 END DESC,
+                         rank, sections.source, sections.chunk_index,
+                         sections.stable_chunk_id
+                LIMIT ?
+                """,
+                (match_expression, *locator_keys, active_generation, *locator_keys,
+                 *filter_params, *locator_keys,
+                 min(limit, ACQUISITION_CANDIDATES)),
+            ))
+            # The registered functions may outlive this call on a reused
+            # connection; do not keep this query's field texts alive.
+            body_profiles.clear()
+            query_word_sets.clear()
+            return self._mark_lexical_mode([
+                {**dict(row), "_source_locator_matches": locator_sources.get(str(row["source"]), ())}
+                for row in rows
+            ], "or")
+
+    @staticmethod
+    def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:
+        return [{**dict(row), "_lexical_query_mode": mode} for row in rows]
+
+    @staticmethod
+    def _lexical_row_identity(row: dict[str, Any]) -> str:
+        stable_id = str(row.get("stable_chunk_id") or "")
+        if stable_id:
+            return stable_id
+        return "lex-" + hashlib.sha256(
+            f"{row['source']}\0{row['chunk_index']}\0{row.get('content_hash') or _chunk_hash(str(row['text']))}".encode(
+                "utf-8"
+            )
+        ).hexdigest()[:20]
+
+    @staticmethod
+    def _metadata_filter_sql(
+        filters: dict[str, Any] | None,
+        *,
+        promoted: bool = False,
+    ) -> tuple[str, list[Any]]:
+        if not filters:
+            return "", []
+        clauses: list[str] = []
+        params: list[Any] = []
+        for key, value in filters.items():
+            if value is None:
+                continue
+            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", str(key)):
+                raise ValueError(f"Unsupported metadata filter key: {key!r}")
+            json_path = f"$.{key}"
+            column = str(key) if promoted and key in {
+                "library_id", "resolved_version", "version_family", "project_identity",
+                "project_path", "module_id", "doc_scope", "source_class", "authority",
+                "lifecycle_status", "temporal_relevance", "index_freshness",
+                "docs_snapshot_exact", "source", "source_identity",
+            } else None
+            expression = f"sections.{column}" if column else "json_extract(sections.metadata_json, ?)"
+            if not column:
+                params.append(json_path)
+            if isinstance(value, bool):
+                clauses.append(f"{expression} = ?")
+                params.append(1 if value else 0)
+            elif isinstance(value, dict) and "in" in value:
+                values = list(value["in"])
+                if not values:
+                    clauses.append("0")
+                    continue
+                placeholders = ", ".join("?" for _ in values)
+                clauses.append(f"{expression} IN ({placeholders})")
+                params.extend(values)
+            elif isinstance(value, (list, tuple, set, frozenset)):
+                values = list(value)
+                if not values:
+                    clauses.append("0")
+                    continue
+                placeholders = ", ".join("?" for _ in values)
+                clauses.append(f"{expression} IN ({placeholders})")
+                params.extend(values)
+            else:
+                clauses.append(f"{expression} = ?")
+                params.append(value)
+        if not clauses:
+            return "", []
+        return "AND " + " AND ".join(f"({clause})" for clause in clauses), params

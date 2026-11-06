@@ -1,0 +1,44 @@
+{
+  "status": "PASS_OFFLINE_RECEIPT_AUDIT",
+  "external_run": "/tmp/opencode/step10-qwen-public-preflight-01",
+  "files": {
+    "counts.json": "7a5c623e9d32184041450685294f3b71ee793fa9f333ec24138a2e6df23eb003",
+    "summary.json": "c2e485616dbdbd3b7ee0b118c3f35e97ead59569a20472fe2b7f1755f82b6caa",
+    "parity/on.json": "9ae64a221cc5a58dcddb440833e68e3ffcedb76f0d2a81842a2f1c75d8cea7cd",
+    "parity/readonly.json": "e6e9c50cca78f89f76154358a2f980e568f80d7e4b36931f6bee8d958a767fd5",
+    "parity/request.json": "7907e899c2192abfe7520a809ef5d087dda750c286c2de2654e29ea8869c4e7b",
+    "parity/off.json": "002be41d4f1474aea305d319d8dee2b998cdc3532bc9990a2fff45f37c38254c",
+    "parity/prepare.json": "95223dd5fe1bc6b3520ffa73ed0ba43131a8ec53fa4f66b859b3a1e931ab946a",
+    "overflow/overflow.json": "dd92bfb6b325db5983fbd7fde65666e24873df30685cf32626a3524f180e929d",
+    "overflow/readonly.json": "cadf3670a59c47b2605194ba3bff4d1c35378c10e036c9a00855533d5532d793",
+    "overflow/request.json": "34233cc8ba2ba645edfc2b2d381e2c4dc9aa056671a712c80f15e76e1ad7e5bd",
+    "overflow/prepare.json": "48f46214c1128bd045b49b24162f19d7bb08492472f4d689f34b2cebbe028724",
+    "overflow/project/docatlas.project-docs.yaml": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+    "overflow/project/docs/guide.md": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+    "overflow/project/docs/other.md": "e8d51a4c495dd0290fd45f78b42934a3ddbc3d15f9ffcbac8b521e2e5694ed82",
+    "parity/project/docatlas.project-docs.yaml": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+    "parity/project/docs/guide.md": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+    "parity/project/docs/other.md": "fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18"
+  },
+  "phases": {
+    "parity": {
+      "logical_db_sha256": "14ee66500ef2371b3a4cd628d77a29b0ea21bb87f83f82d8ad6584c5e6c0e9de",
+      "source_catalog_sha256": {
+        "docatlas.project-docs.yaml": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+        "docs/guide.md": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+        "docs/other.md": "fec89490b0fcf9896a3215519f19595fa4c8ac959b16d25d9a75ba35023cec18"
+      },
+      "assets_before_after": "full observed hash maps in readonly.json; equal"
+    },
+    "overflow": {
+      "logical_db_sha256": "c76ce5efd8a8ea2597fbf8df235f0cc968978aa239682bacd25aef40f01687bc",
+      "source_catalog_sha256": {
+        "docatlas.project-docs.yaml": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+        "docs/guide.md": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+        "docs/other.md": "e8d51a4c495dd0290fd45f78b42934a3ddbc3d15f9ffcbac8b521e2e5694ed82"
+      },
+      "assets_before_after": "full observed hash maps in readonly.json; equal"
+    }
+  },
+  "gate_sources_tasks_labels_unchanged": true
+}

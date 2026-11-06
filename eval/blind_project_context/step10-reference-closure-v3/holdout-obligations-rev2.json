@@ -1,0 +1,39 @@
+{
+  "status": "DRAFT_PARENT_REVIEW_REQUIRED",
+  "reason": "Parent pre-inference source review: explicit semantic checklist additions, unchanged questions/sources; no scores used.",
+  "tasks": {
+    "H-O1": {
+      "facts": [
+        ["specification/context/README.md#Overview", "In those cases, users will\nmanipulate `Context` through cross-cutting concerns APIs instead, in order to\nperform operations such as setting trace or baggage entries for a specified\n`Context`."],
+        ["specification/context/README.md#Overview", "A `Context` MUST be immutable, and its write operations MUST\nresult in the creation of a new `Context` containing the original\nvalues and the specified values updated."],
+        ["specification/baggage/api.md#Clear Baggage in the Context", "This functionality can be implemented by having the user set an empty `Baggage`\nobject/struct into the context, or by providing an API that takes a `Context` as\ninput, and returns a new `Context` with no `Baggage` associated."],
+        ["specification/baggage/api.md#Context Interaction", "Get the currently active `Baggage` from the implicit context. This is\nequivalent to getting the implicit context, then extracting the `Baggage` from\nthe context."],
+        ["specification/baggage/api.md#Context Interaction", "Set the currently active `Baggage` to the implicit context. This is equivalent\nto getting the implicit context, then inserting the `Baggage` to the context."]
+      ]
+    },
+    "H-O2": {
+      "facts": [
+        ["specification/context/api-propagators.md#GetAll", "It SHOULD return them in the same order as they appear in the carrier."],
+        ["specification/context/api-propagators.md#GetAll", "The `GetAll` function is responsible for handling case sensitivity. If the getter is intended to work with an HTTP request object, the getter MUST be case insensitive."]
+      ]
+    },
+    "H-O3": {
+      "facts": [
+        ["specification/context/api-propagators.md#Composite Extract", "- A `Context`.\n- The carrier that holds propagation fields."],
+        ["specification/context/api-propagators.md#Composite Extract", "- The instance of `Getter` invoked for each propagation key to get."],
+        ["specification/context/api-propagators.md#Composite Inject", "- A `Context`.\n- The carrier that holds propagation fields."],
+        ["specification/context/api-propagators.md#Composite Inject", "- The `Setter` to set a propagation key-value pair. Propagators MAY invoke it multiple times in order to set multiple pairs."]
+      ]
+    },
+    "H-R1": {
+      "facts": [
+        ["src/start/interrupts.md#Interrupts", "It is however\npossible to generate interrupt requests in software to trigger a diversion to\nthe interrupt handler."]
+      ]
+    },
+    "H-R2": {
+      "facts": [
+        ["src/start/exceptions.md#The hard fault handler", "The `pc` value is the value of the Program Counter at the time of the exception\nand it points to the instruction that triggered the exception."]
+      ]
+    }
+  }
+}

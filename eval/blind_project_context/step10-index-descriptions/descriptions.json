@@ -1,0 +1,221 @@
+{
+  "schema": "index-description-input-bundle-v1",
+  "source_artifact_sha256": "b9a690edba4f6186074ff4cccaddf5ed1acf1d439936e327e2c36fb8ad7f4b57",
+  "packet_sha256": "5a88dd6261e1229c50ff3621651807530be0444f27b5a45f24d4b8ad4df5a442",
+  "snapshot_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+  "documents": {
+    "architecture.md": {
+      "source_path": "architecture.md",
+      "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+      "context_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+      "recipe": "source-only-section-description-v1",
+      "version": "1",
+      "model": "openai/gpt-6-astra#low",
+      "model_revision": null,
+      "records": [
+        {
+          "char_start": 0,
+          "char_end": 121,
+          "display_sha256": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+          "description": "Meridian separates ownership, planning, execution, and display so that they can restart independently.",
+          "description_sha256": "54c08c0e4aae0d4795251a0c30f1332ffbe95d647b9d905916308ff0669731ca"
+        },
+        {
+          "char_start": 121,
+          "char_end": 360,
+          "display_sha256": "92721039461460ccff2809111f117b407d75f9ee85956e2011f0c8bd693f10f4",
+          "description": "The planner resolves interval conflicts using instrument availability and reservation priority, even while execution is suspended. A computed plan cannot bypass a weather interlock or clock check.",
+          "description_sha256": "beddfe1d52448c640d2811d63b501b5365c83fc6d0bc15890866a84a920dae8e"
+        },
+        {
+          "char_start": 360,
+          "char_end": 565,
+          "display_sha256": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+          "description": "The retired prototype cleared pending reservations on time drift and restarted on its first local clock sample. These behaviours must not be used for current gateway recovery.",
+          "description_sha256": "530a1141e213110fb4c67f355a7397d123f0fb08b3f08713b33074a853171890"
+        }
+      ]
+    },
+    "calendar.md": {
+      "source_path": "calendar.md",
+      "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+      "context_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+      "recipe": "source-only-section-description-v1",
+      "version": "1",
+      "model": "openai/gpt-6-astra#low",
+      "model_revision": null,
+      "records": [
+        {
+          "char_start": 0,
+          "char_end": 97,
+          "display_sha256": "7d60a4fa66e4609132a3693811e06c273674bb2be6f5e8f23f64afcb7cb4ec38",
+          "description": "The calendar provides a read-only projection of reservation and instrument state.",
+          "description_sha256": "332c82010574d2187b5c2c1824769f63b90b2e6ad18c02a40c237136e41c6840"
+        },
+        {
+          "char_start": 97,
+          "char_end": 340,
+          "display_sha256": "a9610a975f27b5175555e73a29dcac6f5d76ac327cb52487d83a8cb9bcf614e2",
+          "description": "Calendar colours indicate pending assignments, confirmed slots, and suspended intervals with amber, blue, and grey respectively. Browser theme changes affect colours locally without changing execution, and a visual refresh cannot clear a maintenance lock.",
+          "description_sha256": "2e204c3587ab1403e09cf852561f8f46bb8e1558c673e874c9369f5cc04841a0"
+        },
+        {
+          "char_start": 340,
+          "char_end": 538,
+          "display_sha256": "e3db38f0b8fa7571db9f7fa429783c28622ed79086cf3d9b41a55db2c3b2005f",
+          "description": "Observers can view a reservation in different timezones without changing its stored start time or identifier. Calendar export is a view rather than a gateway command.",
+          "description_sha256": "5fa0c41329278dbff70051c3038269c369ebe9caad3e1da38cefd85926009117"
+        }
+      ]
+    },
+    "clock.md": {
+      "source_path": "clock.md",
+      "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+      "context_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+      "recipe": "source-only-section-description-v1",
+      "version": "1",
+      "model": "openai/gpt-6-astra#low",
+      "model_revision": null,
+      "records": [
+        {
+          "char_start": 0,
+          "char_end": 119,
+          "display_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+          "description": "The gateway compares instrument time against the observatory reference before executing a schedule.",
+          "description_sha256": "19ec77ea9da7c8208b88b04f045bd19cc3d79c5b6be019de6ca5f6a66b64aec6"
+        },
+        {
+          "char_start": 119,
+          "char_end": 366,
+          "display_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+          "description": "An absolute clock offset exceeding two seconds requires pausing schedule execution and notifying the duty operator while leaving queued reservations unchanged. Resumption requires two consecutive reference checks with an offset within two seconds.",
+          "description_sha256": "ef67605330d6c78be2355b3e7bda837fec21bfaeced80865fef4351c0f775e42"
+        },
+        {
+          "char_start": 366,
+          "char_end": 517,
+          "display_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+          "description": "Execution remains paused when the reference clock is unavailable. A local clock reading alone cannot satisfy either recovery check.",
+          "description_sha256": "8d9e3c9a638e5769ffb16f4aeb88ac93b74796c2abde79539c87498d7c3465c7"
+        },
+        {
+          "char_start": 517,
+          "char_end": 681,
+          "display_sha256": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+          "description": "The simulator advances time manually without waiting for reference checks. Its accelerated clock is isolated from the real instrument gateway.",
+          "description_sha256": "9d6a510513a3fcab8651e2afff1fcdbf64725b39689aba8cbf84333806feb425"
+        }
+      ]
+    },
+    "overview.md": {
+      "source_path": "overview.md",
+      "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+      "context_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+      "recipe": "source-only-section-description-v1",
+      "version": "1",
+      "model": "openai/gpt-6-astra#low",
+      "model_revision": null,
+      "records": [
+        {
+          "char_start": 0,
+          "char_end": 172,
+          "display_sha256": "d9f1563ffaf17d3b5bdbbfd49a84d9ab2c48a1ed9f4c4eec76d8ddd0475f19dc",
+          "description": "Meridian schedules shared observatory instruments. The reservation rules concern confirmed night-time observations rather than daytime training sessions.",
+          "description_sha256": "87e6ffea5d12147d3199513a49998fd86a13664790cf05bf0bb2f3e7e0f8c37e"
+        },
+        {
+          "char_start": 172,
+          "char_end": 372,
+          "display_sha256": "e32523001d60708a9c296836c3272f317db34062ac237d4f27e802974c17523a",
+          "description": "The reservation service accepts requests, the planner assigns intervals, and the instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.",
+          "description_sha256": "57f73da1c9e9d5a49b95bdd9da736ff7cdc03c4e3538b3916017b33794006332"
+        },
+        {
+          "char_start": 372,
+          "char_end": 595,
+          "display_sha256": "9a4afeb6ccafba0a2361b9e1b558e90c6eadddc7b73298de1ec9169ebf7e1d77",
+          "description": "This navigation section links to transfer, weather suspension, and clock offset operational details. It also points to calendar colours as display conventions.",
+          "description_sha256": "4af0208fcc46b5a30047a69febe75335a9445f2e5f98baeb048ce8809adebae7"
+        }
+      ]
+    },
+    "reservations.md": {
+      "source_path": "reservations.md",
+      "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+      "context_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+      "recipe": "source-only-section-description-v1",
+      "version": "1",
+      "model": "openai/gpt-6-astra#low",
+      "model_revision": null,
+      "records": [
+        {
+          "char_start": 0,
+          "char_end": 209,
+          "display_sha256": "a0ce59b3d3a5fad6548716d80e96c7f49bb96c53007d0028e0209129924c66f4",
+          "description": "The reservation rules apply to confirmed night-time reservations on shared instruments. An orientation link points to the calendar colour legend from the reservation console.",
+          "description_sha256": "1b7c660cfb8c7b3f00ac2fbb0f2773ee6e1695bad2bf99f6ef03413d167df5ba"
+        },
+        {
+          "char_start": 209,
+          "char_end": 500,
+          "display_sha256": "f7d3f13974929d476081693be393eb8b846ed68354a29c4861defca5667aae73",
+          "description": "Transferring a reservation requires acceptance by the receiving observer and approval by the duty operator, retaining the original identifier and recording both observers in the audit trail. Transfer does not alter weather suspension.",
+          "description_sha256": "b3432a72b00d7b71291956db35d0609305e641b07ea9a5ee6d3a2a6ddb893a66"
+        },
+        {
+          "char_start": 500,
+          "char_end": 709,
+          "display_sha256": "6818b4616a76497f549ae45d760110948783427bc0515e1a0c276a0ca2f0a3ad",
+          "description": "An active instrument maintenance lock keeps a transfer pending even after observer acceptance and operator approval. The instrument team must clear the lock first.",
+          "description_sha256": "7de71139c9674a385e979e106a3e83f2e6b9924a56acdce1ccafbfae97e283af"
+        },
+        {
+          "char_start": 709,
+          "char_end": 884,
+          "display_sha256": "5f99a2452b1953505685e5a7051250f6683b537aa0d2ef332815dfff5ed1e2ec",
+          "description": "An instructor may reassign daytime training slots without the night-time approval workflow. This shortcut does not apply to confirmed observations.",
+          "description_sha256": "cefa81dfcfe847fea550b2497b6c4ea5b0b96659cc2912240d127e0faa0cb65c"
+        }
+      ]
+    },
+    "weather.md": {
+      "source_path": "weather.md",
+      "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+      "context_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+      "recipe": "source-only-section-description-v1",
+      "version": "1",
+      "model": "openai/gpt-6-astra#low",
+      "model_revision": null,
+      "records": [
+        {
+          "char_start": 0,
+          "char_end": 89,
+          "display_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac",
+          "description": "Weather decisions govern reservation execution rather than ownership.",
+          "description_sha256": "8adb2424d6ed2df3678fb94742493c51cea00d0b41c2350d890319f55af61d43"
+        },
+        {
+          "char_start": 89,
+          "char_end": 306,
+          "display_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+          "description": "An open wind interlock requires suspending outdoor observations while preserving reservation identifiers. Resumption requires the interlock to close and the duty operator to record restart approval.",
+          "description_sha256": "7864ecde0f2aef39a89f97c92cf42e99210455751ce8995cb6041198e5fd2b6a"
+        },
+        {
+          "char_start": 306,
+          "char_end": 547,
+          "display_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+          "description": "An explicitly indoor-classified instrument may continue during wind suspension if its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification.",
+          "description_sha256": "0a2a11be3694976d0ee8e9bf9c4ebf90c925e08babe6d881a71e1b06f8d9589f"
+        },
+        {
+          "char_start": 547,
+          "char_end": 696,
+          "display_sha256": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+          "description": "The forecast panel predicts wind for planning. A favourable forecast is neither an interlock signal nor authorization to restart.",
+          "description_sha256": "a28d96b627892e3d7bc091247b33856a968d9bd5a1e096ac2087069e15e17eb9"
+        }
+      ]
+    }
+  }
+}

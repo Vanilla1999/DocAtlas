@@ -1,0 +1,292 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-d233ed7f076b5e89efd9f78e45ba56604df3fb9ccb522e5dc083aa9788cbea8b",
+        "score": -4.179433345794678,
+        "pairs": 2,
+        "body_tokens": 32,
+        "ancestor_tokens": 5,
+        "body_token_coverage": [
+          0,
+          32
+        ],
+        "body_character_extent": [
+          1,
+          125
+        ],
+        "contextual_score": -4.179433345794678,
+        "own_body_score": -4.179433345794678,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 154,
+        "body_char_start": 27,
+        "heading_path": [
+          "Meridian mirror workshop"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-3179ad697bf60941ace26014e857abd42521bd2e20ce0683855d0e8ecf0b4e35",
+        "score": 1.7904999256134033,
+        "pairs": 2,
+        "body_tokens": 38,
+        "ancestor_tokens": 42,
+        "body_token_coverage": [
+          0,
+          38
+        ],
+        "body_character_extent": [
+          1,
+          140
+        ],
+        "contextual_score": 3.2849719524383545,
+        "own_body_score": 1.7904999256134033,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 154,
+        "char_end": 316,
+        "body_char_start": 174,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Packing a mirror"
+        ],
+        "line_start": 5,
+        "line_end": 8,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-eff60728a44196b3daa2ce0df31a817d3f4f9a0081ed0ebe8525d8e4d1ab8cb6",
+        "score": -4.528502941131592,
+        "pairs": 2,
+        "body_tokens": 34,
+        "ancestor_tokens": 84,
+        "body_token_coverage": [
+          0,
+          34
+        ],
+        "body_character_extent": [
+          1,
+          145
+        ],
+        "contextual_score": 3.6907389163970947,
+        "own_body_score": -4.528502941131592,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 316,
+        "char_end": 475,
+        "body_char_start": 328,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Packing a mirror",
+          "Cooling"
+        ],
+        "line_start": 9,
+        "line_end": 12,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-2e4c9db32bac6caddf9d79b283655014370da9c5a1243680e619b1e7a8a93f14",
+        "score": -4.800988674163818,
+        "pairs": 2,
+        "body_tokens": 32,
+        "ancestor_tokens": 85,
+        "body_token_coverage": [
+          0,
+          32
+        ],
+        "body_character_extent": [
+          1,
+          139
+        ],
+        "contextual_score": 3.6682872772216797,
+        "own_body_score": -4.800988674163818,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 3,
+        "char_start": 475,
+        "char_end": 629,
+        "body_char_start": 488,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Packing a mirror",
+          "Wrapping"
+        ],
+        "line_start": 13,
+        "line_end": 16,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-8524e2d3832b910987744bb273158f580f4709689936766c90c828a3310536ad",
+        "score": -2.8256890773773193,
+        "pairs": 2,
+        "body_tokens": 27,
+        "ancestor_tokens": 86,
+        "body_token_coverage": [
+          0,
+          27
+        ],
+        "body_character_extent": [
+          1,
+          109
+        ],
+        "contextual_score": 5.338541030883789,
+        "own_body_score": -2.8256890773773193,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 4,
+        "char_start": 629,
+        "char_end": 758,
+        "body_char_start": 647,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Packing a mirror",
+          "Crate closure"
+        ],
+        "line_start": 17,
+        "line_end": 20,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-5dffc0b0491d6483c1098cc292a9ec92b5f077d05f6fa5887c53cec268cbcabf",
+        "score": -6.828026294708252,
+        "pairs": 2,
+        "body_tokens": 32,
+        "ancestor_tokens": 86,
+        "body_token_coverage": [
+          0,
+          32
+        ],
+        "body_character_extent": [
+          1,
+          120
+        ],
+        "contextual_score": 3.2904670238494873,
+        "own_body_score": -6.828026294708252,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 5,
+        "char_start": 758,
+        "char_end": 902,
+        "body_char_start": 780,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Packing a mirror",
+          "Bench accessories"
+        ],
+        "line_start": 21,
+        "line_end": 24,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-7957567ed99e3a615cb81b70f0978c526456964d23fbaf7bdfa9adc062fab387",
+        "score": -1.2798082828521729,
+        "pairs": 2,
+        "body_tokens": 47,
+        "ancestor_tokens": 41,
+        "body_token_coverage": [
+          0,
+          47
+        ],
+        "body_character_extent": [
+          1,
+          198
+        ],
+        "contextual_score": 1.3443212509155273,
+        "own_body_score": -1.2798082828521729,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 6,
+        "char_start": 902,
+        "char_end": 1123,
+        "body_char_start": 923,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Crack restriction"
+        ],
+        "line_start": 25,
+        "line_end": 28,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      },
+      {
+        "identity": "unit-26ffbd803df92e241705b0e56125765a65b7e420d0283b643e80c259b16c5d5e",
+        "score": -8.36681079864502,
+        "pairs": 2,
+        "body_tokens": 24,
+        "ancestor_tokens": 41,
+        "body_token_coverage": [
+          0,
+          24
+        ],
+        "body_character_extent": [
+          1,
+          88
+        ],
+        "contextual_score": -4.30955696105957,
+        "own_body_score": -8.36681079864502,
+        "path": "optics.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"_source_snapshot_sha256\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"member\":{\"catalog_entry_hash\":\"sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"optics.md\",\"content_sha256\":\"cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39\",\"document_id\":\"project_file:local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685:optics.md\",\"scope\":{\"project_id\":\"local:2085e4d8de8a2ba87264a14e78f55a203b96516a8e22907b434946b684aa1685\",\"snapshot_id\":\"gen-b0c8f9322256469a98bdf1e9b4163fc5\",\"version\":\"\"}}}",
+        "section_index": 7,
+        "char_start": 1123,
+        "char_end": 1228,
+        "body_char_start": 1139,
+        "heading_path": [
+          "Meridian mirror workshop",
+          "Tea cupboard"
+        ],
+        "line_start": 29,
+        "line_end": 31,
+        "source_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-own-body-gated-maxp-v2",
+      "status": "complete",
+      "units": 8,
+      "model_pairs": 16,
+      "model_forwards": 16,
+      "model_input_tokens": 1656,
+      "inference_seconds": 0.23462635400210274,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "min_contextual_and_own_body_max_raw_logit",
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        31
+      ],
+      "total_seconds": 0.24237107500084676,
+      "own_body_gate": true
+    },
+    "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+  }
+]

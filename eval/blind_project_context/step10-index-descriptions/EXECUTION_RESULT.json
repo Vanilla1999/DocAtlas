@@ -1,0 +1,31 @@
+{
+  "status": "BLOCKED_INTEGRATION_COLLECTION_ERROR",
+  "prepare": {
+    "runs": 1,
+    "ingestion_calls": 1,
+    "documents": 6,
+    "children": 21,
+    "queries": 0,
+    "vectors": false,
+    "path": "/tmp/opencode/step10-index-descriptions-prepare-01"
+  },
+  "adapter": {
+    "runs": 1,
+    "exact_matched_records": 21,
+    "source_only_artifact_edited": false
+  },
+  "integration": {
+    "attempts": 1,
+    "returncode": 4,
+    "tests_executed": 0,
+    "error": "diagnostic_unclassified or stale tests in tests/test_contextual_indexing.py; refresh and review the diagnostic manifest"
+  },
+  "ab": {
+    "runs": 0,
+    "queries": 0
+  },
+  "model_calls": 0,
+  "downloads": 0,
+  "reruns": 0,
+  "next_decision": "Parent authorization to update diagnostic inventory, refresh code freeze/diff, and retry one scoped integration run before A/B."
+}

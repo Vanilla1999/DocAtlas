@@ -1,0 +1,53 @@
+         73980247 function calls (57653872 primitive calls) in 27.471 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1150 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   29.995   29.995 query_trace.py:100(wrapped)
+        1    0.000    0.000   29.995   29.995 _docs_server_part01.py:164(call_docs_tool_payload)
+        1    0.000    0.000   28.449   28.449 context_tools.py:288(handle_context_tool)
+        1    0.000    0.000   28.449   28.449 original_body_discovery.py:76(scoped)
+        1    0.000    0.000   28.448   28.448 context_tools.py:336(_handle_prepared_context_tool)
+      6/1    0.000    0.000   28.448   28.448 project_doc_ranking.py:320(_invoke_found_window_retention)
+        1    0.000    0.000   28.448   28.448 <string>:1(__docatlas_shard_wrapper_get_docs_context_75f8f447e200)
+      3/1    0.000    0.000   28.448   28.448 original_body_discovery.py:56(scoped)
+      6/1    0.000    0.000   28.448   28.448 project_doc_ranking.py:300(produce)
+        1    0.000    0.000   28.448   28.448 _unified_context_service_part01.py:62(get_docs_context)
+        1    0.000    0.000   28.448   28.448 service.py:370(get_project_context)
+        1    0.000    0.000   28.448   28.448 <string>:1(__docatlas_shard_wrapper_get_project_context_75f8f47eff60)
+        1    0.000    0.000   28.448   28.448 _project_context_service_part01.py:19(get_project_context)
+        1    0.000    0.000   27.854   27.854 service.py:345(get_project_docs)
+        1    0.000    0.000   27.854   27.854 <string>:1(__docatlas_shard_wrapper_get_project_docs_75f8f47abce0)
+        1    0.000    0.000   27.854   27.854 _project_docs_service_part03.py:338(get_project_docs)
+        1    0.000    0.000   27.565   27.565 <string>:1(__docatlas_shard_wrapper_query_project_docs_75f8f47abb00)
+        1    0.000    0.000   27.565   27.565 _project_docs_service_part03.py:86(query_project_docs)
+        1    0.000    0.000   27.551   27.551 _project_docs_service_part03.py:231(_run)
+        1    0.151    0.151   25.388   25.388 source_reference_evidence.py:178(prepare)
+        1    0.102    0.102   20.775   20.775 source_dependency_preparation.py:14(prepare_dependency_sets)
+     8181    0.033    0.000   16.750    0.002 evidence_set_validation.py:60(build_dependency_sets)
+     8181    0.207    0.000   16.666    0.002 evidence_set_validation.py:79(_build_source_sets)
+     7695    0.447    0.000   12.773    0.002 source_dependency_graph.py:72(source_graph)
+     8184    1.064    0.000    5.298    0.001 structured_chunking.py:175(parse_markdown_parents)
+20101181/5370091    3.086    0.000    5.164    0.000 {built-in method builtins.hash}
+    11860    0.025    0.000    3.948    0.000 source_reference_evidence.py:123(_document)
+     8115    0.385    0.000    3.781    0.000 evidence_set_validation.py:109(validate_evidence_set)
+    95061    1.246    0.000    3.098    0.000 structured_chunking.py:261(_atom_spans)
+  1014955    0.160    0.000    2.300    0.000 <string>:24(__hash__)
+      585    2.270    0.004    2.270    0.004 {method 'fetchall' of 'sqlite3.Cursor' objects}
+        1    0.000    0.000    2.163    2.163 _project_docs_service_part03.py:168(_run)
+        1    0.000    0.000    2.163    2.163 <string>:1(__docatlas_shard_wrapper_run_75f8f5c83c40)
+        1    0.020    0.020    2.163    2.163 _dispatch_part01.py:65(run)
+      592    0.012    0.000    2.096    0.004 member_read_store.py:37(_connect)
+     5920    1.704    0.000    1.704    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+      592    0.014    0.000    1.680    0.003 member_read_store.py:56(_validate_read_generation)
+  1234976    1.617    0.000    1.617    0.000 {method 'encode' of 'str' objects}
+        1    0.000    0.000    1.525    1.525 _docs_server_part01.py:96(_service_for_project_path)
+        1    0.000    0.000    1.524    1.524 _docs_server_part01.py:35(materialize)
+        1    0.000    0.000    1.524    1.524 service.py:40(__init__)
+        3    0.000    0.000    1.523    0.508 agent_index_gateway.py:105(read_agent_instance)
+        1    0.000    0.000    1.522    1.522 member_read_store.py:26(__init__)
+        1    0.015    0.015    1.520    1.520 <string>:1(__docatlas_shard_wrapper__validate_generation_75f8f41f14e0)
+     9668    0.033    0.000    1.520    0.000 evidence_set_validation.py:35(_closure)
+
+

@@ -1,0 +1,295 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-453e2bf4ae8b012c7b0238aaf7578cebbe3fcae0db78676e52cfbb87869e1c2d",
+        "score": -8.424798011779785,
+        "pairs": 2,
+        "body_tokens": 28,
+        "ancestor_tokens": 7,
+        "body_token_coverage": [
+          0,
+          28
+        ],
+        "body_character_extent": [
+          1,
+          146
+        ],
+        "contextual_score": -8.424798011779785,
+        "own_body_score": -8.424798011779785,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 178,
+        "body_char_start": 30,
+        "heading_path": [
+          "Cooperative apiary handbook"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-5a18a128e0df1e95cbb21c9b7bbf0561f841723873e50212643c3e765f2f9a22",
+        "score": -0.0017216131091117859,
+        "pairs": 2,
+        "body_tokens": 37,
+        "ancestor_tokens": 43,
+        "body_token_coverage": [
+          0,
+          37
+        ],
+        "body_character_extent": [
+          1,
+          173
+        ],
+        "contextual_score": -0.0017216131091117859,
+        "own_body_score": 0.934950053691864,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 178,
+        "char_end": 378,
+        "body_char_start": 203,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Moving occupied hives"
+        ],
+        "line_start": 5,
+        "line_end": 8,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-d79dc159fd0bbfb14b03d6dbfe4f71e962b891b198c10127cdf18695daebca0e",
+        "score": -0.49305790662765503,
+        "pairs": 2,
+        "body_tokens": 33,
+        "ancestor_tokens": 85,
+        "body_token_coverage": [
+          0,
+          33
+        ],
+        "body_character_extent": [
+          1,
+          151
+        ],
+        "contextual_score": 2.1583898067474365,
+        "own_body_score": -0.49305790662765503,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 378,
+        "char_end": 556,
+        "body_char_start": 403,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Moving occupied hives",
+          "Entrance preparation"
+        ],
+        "line_start": 9,
+        "line_end": 12,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+        "score": 0.3691515326499939,
+        "pairs": 2,
+        "body_tokens": 38,
+        "ancestor_tokens": 87,
+        "body_token_coverage": [
+          0,
+          38
+        ],
+        "body_character_extent": [
+          1,
+          156
+        ],
+        "contextual_score": 2.1927497386932373,
+        "own_body_score": 0.3691515326499939,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 3,
+        "char_start": 556,
+        "char_end": 737,
+        "body_char_start": 579,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Moving occupied hives",
+          "Securing the boxes"
+        ],
+        "line_start": 13,
+        "line_end": 16,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+        "score": 2.21944260597229,
+        "pairs": 2,
+        "body_tokens": 36,
+        "ancestor_tokens": 85,
+        "body_token_coverage": [
+          0,
+          36
+        ],
+        "body_character_extent": [
+          1,
+          153
+        ],
+        "contextual_score": 3.586317777633667,
+        "own_body_score": 2.21944260597229,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 4,
+        "char_start": 737,
+        "char_end": 906,
+        "body_char_start": 751,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Moving occupied hives",
+          "Reopening"
+        ],
+        "line_start": 17,
+        "line_end": 20,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-c060c67d3dab5afadedcd340a2e206e9798c8d5ec150ece131e38a0e6262cc18",
+        "score": -4.688724517822266,
+        "pairs": 2,
+        "body_tokens": 36,
+        "ancestor_tokens": 85,
+        "body_token_coverage": [
+          0,
+          36
+        ],
+        "body_character_extent": [
+          1,
+          149
+        ],
+        "contextual_score": 0.19730836153030396,
+        "own_body_score": -4.688724517822266,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 5,
+        "char_start": 906,
+        "char_end": 1075,
+        "body_char_start": 924,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Moving occupied hives",
+          "Trolley paint"
+        ],
+        "line_start": 21,
+        "line_end": 24,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1",
+        "score": 1.5891889333724976,
+        "pairs": 2,
+        "body_tokens": 58,
+        "ancestor_tokens": 40,
+        "body_token_coverage": [
+          0,
+          58
+        ],
+        "body_character_extent": [
+          1,
+          231
+        ],
+        "contextual_score": 1.5891889333724976,
+        "own_body_score": 2.3601150512695312,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 6,
+        "char_start": 1075,
+        "char_end": 1338,
+        "body_char_start": 1105,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Queen inspection exception"
+        ],
+        "line_start": 25,
+        "line_end": 28,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      },
+      {
+        "identity": "unit-21cb57728699963b3a5e95d0287093cd6805d674b88867a212e4de83d7c9c69e",
+        "score": -8.127436637878418,
+        "pairs": 2,
+        "body_tokens": 28,
+        "ancestor_tokens": 40,
+        "body_token_coverage": [
+          0,
+          28
+        ],
+        "body_character_extent": [
+          1,
+          139
+        ],
+        "contextual_score": -8.127436637878418,
+        "own_body_score": -8.045117378234863,
+        "path": "apiary.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"_source_snapshot_sha256\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"member\":{\"catalog_entry_hash\":\"sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"apiary.md\",\"content_sha256\":\"f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b\",\"document_id\":\"project_file:local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030:apiary.md\",\"scope\":{\"project_id\":\"local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030\",\"snapshot_id\":\"gen-1520be20ddfd4f118bf972c69ef81e70\",\"version\":\"\"}}}",
+        "section_index": 7,
+        "char_start": 1338,
+        "char_end": 1496,
+        "body_char_start": 1356,
+        "heading_path": [
+          "Cooperative apiary handbook",
+          "Visitor badges"
+        ],
+        "line_start": 29,
+        "line_end": 31,
+        "source_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-own-body-gated-maxp-v2",
+      "status": "complete",
+      "units": 8,
+      "model_pairs": 16,
+      "model_forwards": 16,
+      "model_input_tokens": 1748,
+      "inference_seconds": 0.18271459301467985,
+      "model_load_attempts": 1,
+      "model_loads": 1,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "min_contextual_and_own_body_max_raw_logit",
+      "asset_verification_seconds": 0.2565519639974809,
+      "model_import_seconds": 1.3884856069998932,
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "model_load_seconds": 2.213607580997632,
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        31
+      ],
+      "total_seconds": 2.4056059890062897,
+      "own_body_gate": true
+    },
+    "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+  }
+]

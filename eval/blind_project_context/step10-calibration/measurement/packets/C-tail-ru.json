@@ -1,0 +1,235 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original",
+    "query-lookup-1"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-18554f17109b235f46e37cc5",
+      "path_or_url": "relay.md",
+      "section": "Relay workshop",
+      "snippet": "# Relay workshop\n\nThis workshop record concerns the ceramic timing relay used in the orchard irrigation controller.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "039ebb4f8e98a934243e78ffce757b2e4f5ca6ab05b3b88d3c185cde248d29b9",
+      "project_identity": "local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/4cb56f9699c78ad58255f286"
+    },
+    {
+      "evidence_id": "ev-2899c34341eee83fde1aee22",
+      "path_or_url": "relay.md",
+      "section": "Relay workshop > Bench record",
+      "snippet": "## Bench record\n\nThe workbench has a wooden top and a steel frame. Its left drawer contains blank forms and soft pencils. The right drawer holds paper envelopes used for returning small components. A numbered stool stands beneath the bench when the room is closed. The floor is swept at the end of each shift. The wall clock is mechanical and is wound by the caretaker. The west window has a cotton curtain that reduces afternoon glare. A notice board displays the weekly cleaning rota. Visitors leave outdoor coats on hooks beside the entrance. The storage cupboard contains empty trays in three sizes. Each tray has a flat base and rounded corners. The trays are washed with plain water and dried on a rack. The rack stands beside the utility sink. The sink tap is checked for dripping on Friday afternoons. A small bin beneath the sink receives used paper towels. The caretaker empties the bin before locking the room. The room key hangs in a locked box in the reception office. Reception staff record each key loan in a ruled notebook. The notebook is replaced when its pages are full. Completed notebooks are tied with cotton string and placed in a cardboard box. The box is stored on the highest reception shelf. A stepladder is available for reaching that shelf. The ladder has rubber feet and a wooden handrail. Staff return it to the alcove after use. The alcove also contains a brush and a dustpan. The entrance mat is shaken outdoors each morning. During wet weather a second mat is placed beside it. The second mat is rolled away once the floor is dry. The ceiling has four lamps with opaque shades. Their switches are located near the entrance. A small desk lamp supplements the ceiling lamps when detailed handwriting is needed. Its cable runs behind the desk rather than across the walkway. The desk chair has a woven seat and no wheels. A cushion may be borrowed from reception. The cushion cover is washed with the curtains at the end of summer. The curtains are hung back only when completely dry. The window sill holds a wooden calendar and a glass paperweight. Neither object is used for component measurement. The paperweight prevents loose forms from blowing onto the floor. Spare forms are stored flat to prevent curling. Each new packet is opened only when the previous packet is empty. Used envelopes are recycled after their old labels have been removed. A shallow basket beside the door holds outgoing internal mail. Mail is collected after the afternoon break. The break room is located across the courtyard. Its door is closed during cleaning. Drinking cups remain in the break room and are not brought to the workbench. The courtyard path is marked with white stones. A gardener tends the plants along the path twice each month. Rainwater is collected in a barrel behind the shed. The shed stores garden tools rather than electrical components. The barrel lid stays closed to keep leaves out. These housekeeping observations are recorded for facilities staff and do not determine relay settings.\n\nThe ceramic timing relay must be configured to a delay of seventy-three seconds. After changing the delay, disconnect the orchard controller from power for twelve seconds before restoring power. A controller with a swollen relay housing must remain disconnected and be sent for replacement rather than restarted.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "13a5df0b8ff6facba1e01c6f40669a5e6022bab17bd02162b8bb0b51f652da6f",
+      "project_identity": "local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414",
+      "line_start": 5,
+      "line_end": 10,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/6594760b0a4777c6f7d69f6d"
+    },
+    {
+      "evidence_id": "ev-5ae39f0671e525ca0fdd6b23",
+      "path_or_url": "relay.md",
+      "section": "Relay workshop > Parcel collection",
+      "snippet": "## Parcel collection\n\nCourier parcels are collected at the workshop door on Tuesdays. Parcels awaiting collection are placed on the green trolley.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "94e7d24bb3c4b39bb277f84139ccb844f358db9ecbc238226e225dab3e33ac1c",
+      "project_identity": "local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414",
+      "line_start": 11,
+      "line_end": 13,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/8d9397447cb69454ff1e3055"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 3206,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "diagnostic-unverified",
+    "calibration_status": "diagnostic_unverified",
+    "candidate_units": 3,
+    "selected_units": 3,
+    "delivered_rows": 3,
+    "scan_complete": true,
+    "model_pairs": 10,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 3,
+      "delivered_spans": 3
+    },
+    "minimal_semantic": {
+      "scores": [
+        {
+          "identity": "unit-18554f17109b235f46e37cc5733a936aefd37c27a0bac6d2c31606cef8feaf23",
+          "score": -1.503471851348877,
+          "pairs": 2,
+          "body_tokens": 22,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            22
+          ],
+          "body_character_extent": [
+            1,
+            98
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-8c0d1dd73dfc434ab9b5459bf7a25bd7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414:relay.md\",\"scope\":{\"project_id\":\"local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414\",\"snapshot_id\":\"gen-8c0d1dd73dfc434ab9b5459bf7a25bd7\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 117,
+          "body_char_start": 17,
+          "heading_path": [
+            "Relay workshop"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        },
+        {
+          "identity": "unit-2899c34341eee83fde1aee22c70431a2a49849315492ed1d671202703b886590",
+          "score": 2.392071008682251,
+          "pairs": 6,
+          "body_tokens": 821,
+          "ancestor_tokens": 30,
+          "body_token_coverage": [
+            0,
+            821
+          ],
+          "body_character_extent": [
+            1,
+            3323
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-8c0d1dd73dfc434ab9b5459bf7a25bd7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414:relay.md\",\"scope\":{\"project_id\":\"local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414\",\"snapshot_id\":\"gen-8c0d1dd73dfc434ab9b5459bf7a25bd7\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 117,
+          "char_end": 3458,
+          "body_char_start": 133,
+          "heading_path": [
+            "Relay workshop",
+            "Bench record"
+          ],
+          "line_start": 5,
+          "line_end": 10,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        },
+        {
+          "identity": "unit-5ae39f0671e525ca0fdd6b232ff899dbe87a5e78e891f216b320aa6bc610bec4",
+          "score": -3.5069284439086914,
+          "pairs": 2,
+          "body_tokens": 30,
+          "ancestor_tokens": 30,
+          "body_token_coverage": [
+            0,
+            30
+          ],
+          "body_character_extent": [
+            1,
+            125
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-8c0d1dd73dfc434ab9b5459bf7a25bd7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414:relay.md\",\"scope\":{\"project_id\":\"local:61f61767fc65d2ea646aea83f7f1c3f375ab82d2dd0b5b180bbe9b318bf37414\",\"snapshot_id\":\"gen-8c0d1dd73dfc434ab9b5459bf7a25bd7\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 3458,
+          "char_end": 3605,
+          "body_char_start": 3479,
+          "heading_path": [
+            "Relay workshop",
+            "Parcel collection"
+          ],
+          "line_start": 11,
+          "line_end": 13,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 3,
+        "model_pairs": 10,
+        "model_forwards": 3,
+        "model_input_tokens": 3283,
+        "inference_seconds": 0.5326339980019839,
+        "model_load_attempts": 1,
+        "model_loads": 1,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "asset_verification_seconds": 0.26229792600133806,
+        "model_import_seconds": 1.5195277519997035,
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "model_load_seconds": 2.3765745840028103,
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          36,
+          37
+        ],
+        "total_seconds": 2.9152154970033735
+      }
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "2efe6970f9e4302aecf8c03050ed349f1aad7748abd911c8f9d2e17fa936cafb"
+  }
+}

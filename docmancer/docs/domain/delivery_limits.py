@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import os
 
+from .minimal_context_config import EMERGENCY_TOKENS, minimal_context_enabled
+
 
 DEFAULT_DELIVERY_MAX_TOKENS = 12000
 
@@ -13,6 +15,8 @@ def delivery_token_ceiling() -> int:
     This is the offline codec/UTF-8 proxy budget for one tool response, not a
     model context-window or billing limit. It is never accepted from tool input.
     """
+    if minimal_context_enabled():
+        return EMERGENCY_TOKENS
     name = "DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS"
     value = os.environ.get(name, str(DEFAULT_DELIVERY_MAX_TOKENS)).strip()
     if not value.isascii() or not value.isdecimal() or int(value) <= 0:

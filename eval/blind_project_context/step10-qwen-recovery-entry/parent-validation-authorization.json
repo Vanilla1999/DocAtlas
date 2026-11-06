@@ -1,0 +1,11 @@
+{
+  "status": "PARENT_APPROVED_VALIDATION",
+  "date": "2026-11-06",
+  "manifest_sha256": "2bcebef52ab6268e091f5e28de12acc8837988bff36c2068432e2a4b73ebe066",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "calibration_summary_sha256": "93f8f93787c0c4a50a424d22295c2ed85a94df6cc73d7e349ef1ccde6da08604",
+  "prerequisite_boundary": "parent-reviewed fresh-prepared recovery PASS, not historical calibration PASS",
+  "scope": "one validation run: two fresh prepares and eight frozen validation queries with unchanged policy and existing resource checks",
+  "on_failure": "preserve evidence and stop; no retry, refit, prompt or label change",
+  "installed_t01_terra_l2_authorized": false
+}

@@ -1,0 +1,22 @@
+{
+  "value_raw": {
+    "uri": "docatlas://source/v2/4e1097b9bca25ed859606aeb",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"end_of_source\",\"status\":\"complete\"}"
+  },
+  "value": {
+    "reason_code": "end_of_source",
+    "status": "complete"
+  },
+  "replay_raw": {
+    "uri": "docatlas://source/v2/4e1097b9bca25ed859606aeb",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "replay": {
+    "reason_code": "unknown_or_expired_reference",
+    "status": "source_unavailable"
+  }
+}

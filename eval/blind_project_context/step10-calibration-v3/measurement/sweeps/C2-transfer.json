@@ -1,0 +1,348 @@
+[
+  {
+    "threshold": -8.424798011779785,
+    "direct_units": 8,
+    "direct_ids": [
+      "unit-21cb57728699963b3a5e95d0287093cd6805d674b88867a212e4de83d7c9c69e",
+      "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+      "unit-453e2bf4ae8b012c7b0238aaf7578cebbe3fcae0db78676e52cfbb87869e1c2d",
+      "unit-5a18a128e0df1e95cbb21c9b7bbf0561f841723873e50212643c3e765f2f9a22",
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1",
+      "unit-c060c67d3dab5afadedcd340a2e206e9798c8d5ec150ece131e38a0e6262cc18",
+      "unit-d79dc159fd0bbfb14b03d6dbfe4f71e962b891b198c10127cdf18695daebca0e"
+    ],
+    "delivered_ids": [
+      "ev-21cb57728699963b3a5e95d0",
+      "ev-2e5378237232431a3cb41090",
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2",
+      "ev-c060c67d3dab5afadedcd340",
+      "ev-d79dc159fd0bbfb14b03d6db"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook",
+      "Trolley paint",
+      "Visitor badges"
+    ],
+    "source_rows": 8,
+    "characters": 1496,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 8,
+      "delivered_spans": 8
+    }
+  },
+  {
+    "threshold": -8.127436637878418,
+    "direct_units": 7,
+    "direct_ids": [
+      "unit-21cb57728699963b3a5e95d0287093cd6805d674b88867a212e4de83d7c9c69e",
+      "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+      "unit-5a18a128e0df1e95cbb21c9b7bbf0561f841723873e50212643c3e765f2f9a22",
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1",
+      "unit-c060c67d3dab5afadedcd340a2e206e9798c8d5ec150ece131e38a0e6262cc18",
+      "unit-d79dc159fd0bbfb14b03d6dbfe4f71e962b891b198c10127cdf18695daebca0e"
+    ],
+    "delivered_ids": [
+      "ev-21cb57728699963b3a5e95d0",
+      "ev-2e5378237232431a3cb41090",
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2",
+      "ev-c060c67d3dab5afadedcd340",
+      "ev-d79dc159fd0bbfb14b03d6db"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook",
+      "Trolley paint",
+      "Visitor badges"
+    ],
+    "source_rows": 8,
+    "characters": 1496,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 7,
+      "delivered_spans": 8
+    }
+  },
+  {
+    "threshold": -4.688724517822266,
+    "direct_units": 6,
+    "direct_ids": [
+      "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+      "unit-5a18a128e0df1e95cbb21c9b7bbf0561f841723873e50212643c3e765f2f9a22",
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1",
+      "unit-c060c67d3dab5afadedcd340a2e206e9798c8d5ec150ece131e38a0e6262cc18",
+      "unit-d79dc159fd0bbfb14b03d6dbfe4f71e962b891b198c10127cdf18695daebca0e"
+    ],
+    "delivered_ids": [
+      "ev-2e5378237232431a3cb41090",
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2",
+      "ev-c060c67d3dab5afadedcd340",
+      "ev-d79dc159fd0bbfb14b03d6db"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook",
+      "Trolley paint"
+    ],
+    "source_rows": 7,
+    "characters": 1338,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 6,
+      "delivered_spans": 7
+    }
+  },
+  {
+    "threshold": -0.49305790662765503,
+    "direct_units": 5,
+    "direct_ids": [
+      "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+      "unit-5a18a128e0df1e95cbb21c9b7bbf0561f841723873e50212643c3e765f2f9a22",
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1",
+      "unit-d79dc159fd0bbfb14b03d6dbfe4f71e962b891b198c10127cdf18695daebca0e"
+    ],
+    "delivered_ids": [
+      "ev-2e5378237232431a3cb41090",
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2",
+      "ev-c060c67d3dab5afadedcd340",
+      "ev-d79dc159fd0bbfb14b03d6db"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook",
+      "Trolley paint"
+    ],
+    "source_rows": 7,
+    "characters": 1338,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 5,
+      "delivered_spans": 7
+    }
+  },
+  {
+    "threshold": -0.0017216131091117859,
+    "direct_units": 4,
+    "direct_ids": [
+      "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+      "unit-5a18a128e0df1e95cbb21c9b7bbf0561f841723873e50212643c3e765f2f9a22",
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1"
+    ],
+    "delivered_ids": [
+      "ev-2e5378237232431a3cb41090",
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2",
+      "ev-c060c67d3dab5afadedcd340",
+      "ev-d79dc159fd0bbfb14b03d6db"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook",
+      "Trolley paint"
+    ],
+    "source_rows": 7,
+    "characters": 1338,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 4,
+      "delivered_spans": 7
+    }
+  },
+  {
+    "threshold": 0.3691515326499939,
+    "direct_units": 3,
+    "direct_ids": [
+      "unit-2e5378237232431a3cb41090f6e28f8be6627e7109dceaa0d67e9e6697563896",
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1"
+    ],
+    "delivered_ids": [
+      "ev-2e5378237232431a3cb41090",
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2"
+    ],
+    "missing_units": [
+      "Entrance preparation"
+    ],
+    "missing_facts": [
+      "after the last flying bees have returned"
+    ],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook"
+    ],
+    "source_rows": 5,
+    "characters": 991,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 3,
+      "delivered_spans": 5
+    }
+  },
+  {
+    "threshold": 1.5891889333724976,
+    "direct_units": 2,
+    "direct_ids": [
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac",
+      "unit-901575b9ea9ca9e92991a2c29c8f05aa5b7834f9de5e763a8f6f297f11a412d1"
+    ],
+    "delivered_ids": [
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744",
+      "ev-901575b9ea9ca9e92991a2c2"
+    ],
+    "missing_units": [
+      "Entrance preparation",
+      "Securing the boxes"
+    ],
+    "missing_facts": [
+      "after the last flying bees have returned",
+      "two ratchet straps before lifting",
+      "Lift the secured hive with two people"
+    ],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook"
+    ],
+    "source_rows": 4,
+    "characters": 810,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 2,
+      "delivered_spans": 4
+    }
+  },
+  {
+    "threshold": 2.21944260597229,
+    "direct_units": 1,
+    "direct_ids": [
+      "unit-878319bae34fc1bdcfa197447b42bb2dd25eb015b5bb5bb64e3bed7343343bac"
+    ],
+    "delivered_ids": [
+      "ev-453e2bf4ae8b012c7b0238aa",
+      "ev-5a18a128e0df1e95cbb21c9b",
+      "ev-878319bae34fc1bdcfa19744"
+    ],
+    "missing_units": [
+      "Entrance preparation",
+      "Securing the boxes",
+      "Queen inspection exception"
+    ],
+    "missing_facts": [
+      "after the last flying bees have returned",
+      "two ratchet straps before lifting",
+      "Lift the secured hive with two people",
+      "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+    ],
+    "delivered_negative_units": [
+      "Cooperative apiary handbook"
+    ],
+    "source_rows": 3,
+    "characters": 547,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 1,
+      "delivered_spans": 3
+    }
+  },
+  {
+    "threshold": 2.2194426059722905,
+    "direct_units": 0,
+    "direct_ids": [],
+    "delivered_ids": [],
+    "missing_units": [
+      "Moving occupied hives",
+      "Entrance preparation",
+      "Securing the boxes",
+      "Reopening",
+      "Queen inspection exception"
+    ],
+    "missing_facts": [
+      "only to occupied hives moved between stands inside the same apiary",
+      "after the last flying bees have returned",
+      "two ratchet straps before lifting",
+      "Lift the secured hive with two people",
+      "Place a leafy branch across the entrance",
+      "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+    ],
+    "delivered_negative_units": [],
+    "source_rows": 0,
+    "characters": 0,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 0,
+      "delivered_spans": 0
+    }
+  }
+]

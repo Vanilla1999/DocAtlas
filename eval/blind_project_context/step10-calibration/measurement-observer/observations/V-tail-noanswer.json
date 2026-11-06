@@ -1,0 +1,131 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-d5a726c445e61564581b561c5ad878178634c7da4dd91617078dcc0c5f46a15d",
+        "score": -4.995620250701904,
+        "pairs": 1,
+        "body_tokens": 19,
+        "ancestor_tokens": 5,
+        "body_token_coverage": [
+          0,
+          19
+        ],
+        "body_character_extent": [
+          1,
+          81
+        ],
+        "path": "loom.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 103,
+        "body_char_start": 20,
+        "heading_path": [
+          "Loom service hall"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+      },
+      {
+        "identity": "unit-41016caf10e62c2d9a6e9d315970dbf62ae14224f5048b0ba81097e6ff34045f",
+        "score": -5.267369270324707,
+        "pairs": 3,
+        "body_tokens": 776,
+        "ancestor_tokens": 27,
+        "body_token_coverage": [
+          0,
+          776
+        ],
+        "body_character_extent": [
+          1,
+          3258
+        ],
+        "path": "loom.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 103,
+        "char_end": 3383,
+        "body_char_start": 123,
+        "heading_path": [
+          "Loom service hall",
+          "Service notebook"
+        ],
+        "line_start": 5,
+        "line_end": 10,
+        "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+      },
+      {
+        "identity": "unit-24fee38d594a71d23be2df602388143cf4904c7ef593623411f01e2d325e32ea",
+        "score": -7.705780506134033,
+        "pairs": 1,
+        "body_tokens": 25,
+        "ancestor_tokens": 29,
+        "body_token_coverage": [
+          0,
+          25
+        ],
+        "body_character_extent": [
+          1,
+          104
+        ],
+        "path": "loom.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 3383,
+        "char_end": 3508,
+        "body_char_start": 3403,
+        "heading_path": [
+          "Loom service hall",
+          "Uniform cupboard"
+        ],
+        "line_start": 11,
+        "line_end": 13,
+        "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-maxp-token-overlap-v1",
+      "status": "complete",
+      "units": 3,
+      "model_pairs": 5,
+      "model_forwards": 3,
+      "model_input_tokens": 1493,
+      "inference_seconds": 0.19990299200071604,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "max_raw_logit",
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        14
+      ],
+      "total_seconds": 0.20351127400135738
+    },
+    "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+  }
+]

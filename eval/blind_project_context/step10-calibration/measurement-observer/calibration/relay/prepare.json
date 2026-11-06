@@ -1,0 +1,108 @@
+{
+  "seconds": 0.1305862219996925,
+  "expected_paths": [
+    "relay.md"
+  ],
+  "indexed_paths": [
+    "relay.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-658c6ec6cb428f51e94f23fd0478a0320ebc46f4",
+      "source_path": "relay.md",
+      "display_text": "# Relay workshop\n\nThis workshop record concerns the ceramic timing relay used in the orchard irrigation controller.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-25fffb5dbd8a60669303d39770ec162604014e87",
+      "source_path": "relay.md",
+      "display_text": "## Bench record\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-466336014192d0405f4de941acf79bd0dd8aa209",
+      "source_path": "relay.md",
+      "display_text": "The workbench has a wooden top and a steel frame. Its left drawer contains blank forms and soft pencils. The right drawer holds paper envelopes used for returning small components. A numbered stool stands beneath the bench when the room is closed. The floor is swept at the end of each shift. The wall clock is mechanical and is wound by the caretaker. The west window has a cotton curtain that reduces afternoon glare. A notice board displays the weekly cleaning rota. Visitors leave outdoor ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-14572b64acf932d7d33162c7cef1189518e2f390",
+      "source_path": "relay.md",
+      "display_text": "coats on hooks beside the entrance. The storage cupboard contains empty trays in three sizes. Each tray has a flat base and rounded corners. The trays are washed with plain water and dried on a rack. The rack stands beside the utility sink. The sink tap is checked for dripping on Friday afternoons. A small bin beneath the sink receives used paper towels. The caretaker empties the bin before locking the room. The room key hangs in a locked box in the reception office. Reception staff record ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-59bbe2078018f7d78ad948ef6327bee1a24e9253",
+      "source_path": "relay.md",
+      "display_text": "each key loan in a ruled notebook. The notebook is replaced when its pages are full. Completed notebooks are tied with cotton string and placed in a cardboard box. The box is stored on the highest reception shelf. A stepladder is available for reaching that shelf. The ladder has rubber feet and a wooden handrail. Staff return it to the alcove after use. The alcove also contains a brush and a dustpan. The entrance mat is shaken outdoors each morning. During wet weather a second mat is placed ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-e889041bf1db30b0f9abdab9952e8a6c2996e123",
+      "source_path": "relay.md",
+      "display_text": "beside it. The second mat is rolled away once the floor is dry. The ceiling has four lamps with opaque shades. Their switches are located near the entrance. A small desk lamp supplements the ceiling lamps when detailed handwriting is needed. Its cable runs behind the desk rather than across the walkway. The desk chair has a woven seat and no wheels. A cushion may be borrowed from reception. The cushion cover is washed with the curtains at the end of summer. The curtains are hung back only ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-a6a6fef200e8616affe59f351098ba81a1634465",
+      "source_path": "relay.md",
+      "display_text": "when completely dry. The window sill holds a wooden calendar and a glass paperweight. Neither object is used for component measurement. The paperweight prevents loose forms from blowing onto the floor. Spare forms are stored flat to prevent curling. Each new packet is opened only when the previous packet is empty. Used envelopes are recycled after their old labels have been removed. A shallow basket beside the door holds outgoing internal mail. Mail is collected after the afternoon break. ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-615bc19021c27f43ebc6cb06fa92236eecaf213a",
+      "source_path": "relay.md",
+      "display_text": "The break room is located across the courtyard. Its door is closed during cleaning. Drinking cups remain in the break room and are not brought to the workbench. The courtyard path is marked with white stones. A gardener tends the plants along the path twice each month. Rainwater is collected in a barrel behind the shed. The shed stores garden tools rather than electrical components. The barrel lid stays closed to keep leaves out. These housekeeping observations are recorded for facilities ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-42190f57fac63c009348c6719623003104a95183",
+      "source_path": "relay.md",
+      "display_text": "staff and do not determine relay settings.\n\nThe ceramic timing relay must be configured to a delay of seventy-three seconds. After changing the delay, disconnect the orchard controller from power for twelve seconds before restoring power. A controller with a swollen relay housing must remain disconnected and be sent for replacement rather than restarted.\n\n",
+      "line_start": 7,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-80c8113fa42e62d7e20cabb8379d6d7eb861e306",
+      "source_path": "relay.md",
+      "display_text": "## Parcel collection\n\nCourier parcels are collected at the workshop door on Tuesdays. Parcels awaiting collection are placed on the green trolley.\n",
+      "line_start": 11,
+      "line_end": 13
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "f07746623a01ae69461e5b8cbbe6ad2f7ec36e56a0e6017c9ce31dac942bcb48",
+  "storage_path": "/tmp/docatlas-evidence-8out3kh5/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-e9d41220626547fe9b99c831429b1bdc",
+  "catalog_sha256": "d96bd755c04309bed56b300aad72d8ce7d013ace3566a34a428d0ce2c4692980",
+  "documents": [
+    {
+      "path": "relay.md",
+      "content_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55",
+      "catalog_entry_hash": "sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-e9d41220626547fe9b99c831429b1bdc",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  }
+}

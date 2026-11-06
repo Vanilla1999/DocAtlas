@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/tmp/opencode/step9-gap-resolution/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_contextual_indexing.py",
+    "-q",
+    "--junitxml=/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/integration.r2.junit.xml"
+  ],
+  "cwd": "/tmp/opencode/step9-gap-resolution",
+  "environment_overrides": {
+    "PYTHONPATH": "/tmp/opencode/step9-gap-resolution",
+    "DOCATLAS_AUTO_VECTORS": "0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION": "v0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION_E5": "0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION_SECTIONS": "0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION_TERMS": "word",
+    "DOCATLAS_HOME": "/tmp/opencode/step10-index-descriptions-integration-02/home"
+  },
+  "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+  "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+  "freeze_sha256": "405229d36d09db6ba596f0eb2c4f5d84842cf1995aa3d384856b5339722320a8",
+  "reason": "parent-authorized diagnostic inventory registration repair; initial attempt executed zero tests"
+}

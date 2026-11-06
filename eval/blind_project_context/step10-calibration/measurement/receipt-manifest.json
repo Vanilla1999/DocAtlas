@@ -1,0 +1,32 @@
+{
+  "source_run": "/tmp/opencode/step10-calibration-run-02",
+  "files": {
+    "frozen-inputs.json": "d2248698fed8da0880fcb5e37be30971208297ba9d4d0d2a43d02a2f6c3e7760",
+    "policy.json": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+    "results.json": "cceb1443c606279ba85d0966b07bf33cc89cced6e4555894b5db66e6230d6560",
+    "summary.json": "c2bcfca6c1605b32248694647d021e9baf7cbf3b904a5427dd0e1c80dfb82b69",
+    "packets/C-child.json": "b6e7a10d0e5a777360fb3a079cfd496d413ba8316eaa7acd15a2842cd6f586ef",
+    "packets/C-noanswer.json": "ea6934d370f5d62f6c17173071dbd013576f252ba20ac48430d42590026b22e3",
+    "packets/C-restart.json": "993adaf74648822beb46c9c88c7b02ecc0da647794eabba298c05ecc01e4e45e",
+    "packets/C-subtree.json": "f8ec5a2fd48492ef8c320c1e6ea8f69f94ecb0d30870bb83eaabcd76e82b7d24",
+    "packets/C-tail-noanswer.json": "2c6dcfb5fdc612056234b7f6c0043a38f4dbbba2dca51498c13f371342d4c6a3",
+    "packets/C-tail-ru.json": "e6656cffacf86a83dbe37a521e4089f60613fa6a2eddf3bdcc74c54cee8d5e2b",
+    "packets/V-child-diagnostic.json": "286730a0925ca5ec0364fe1c9dde9fb51900c856f8695b78591a74c05dca8cbb",
+    "packets/V-child.json": "337237c8f228fe61ebeb0e0fa4da6927117c99a6fd1ef2d8ccd4397472860d1d",
+    "packets/V-dispatch-diagnostic.json": "06f6ca5195c4c2688abb148307d66102e2638d4fde0aeac990dc6b0a74f802a4",
+    "packets/V-dispatch.json": "bef3ad13d3c56acdcff351cff7172293f091eaedf857565803e669f3aba1af45",
+    "packets/V-noanswer-diagnostic.json": "a63452f4513fca46b45048a81a6049b773db8c4d586e2e2c4ce67daffe932bab",
+    "packets/V-noanswer.json": "7b470b09c510015ce25cfa3ea5a056ad35af302217660bf6c7a92aac93d5beae",
+    "packets/V-subtree-diagnostic.json": "706b3337717d8e9910ebcf4acfa5f5611831d71ff6e5620a0756c1529fcf6c91",
+    "packets/V-subtree.json": "f8b975e08ad2087c4f936d1100c593c31290d278c4c9af8ee72d141c636833dc",
+    "packets/V-tail-noanswer-diagnostic.json": "e4e820186ec6fa5553c7d45b9075375f689684d81647adee897af44372a395cc",
+    "packets/V-tail-noanswer.json": "3acef5bd65453df59c33359831f1c5909ba47da530492decc32ef0b13592a43d",
+    "packets/V-tail-ru-diagnostic.json": "db3e4d9e7fdf5c3cdb320a3647e42d57e61e3e06c74ae879434f777aecd90e73",
+    "packets/V-tail-ru.json": "b3488044d69da10e3822b9817d3bd5f17f4889a3ba73bc6bc4439d2154452076",
+    "calibration/relay/prepare.json": "a9a08234bcf498133ea93a630736bf050672c639d99c8b51df3a770c41844253",
+    "calibration/reservoir/prepare.json": "05222245f77996799f4ae61defdf3fe77d301fbe36418fb17893ca706460eabb",
+    "validation/loom/prepare.json": "ed8e1b11efe6980068ec3af5016c8b04d4589d2f8c01804d81709e9fbe45dc3d",
+    "validation/observatory/prepare.json": "d68d3e7e4bdad1f1372e67e59f2402a9b61817a9b478a58422b1fb0909727090"
+  },
+  "note": "Copied byte-for-byte from successful real public pipeline run; no inference rerun. Frozen input manifest predates inference."
+}

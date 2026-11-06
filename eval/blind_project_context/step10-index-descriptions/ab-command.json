@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/tmp/opencode/step9-gap-resolution/.venv/bin/python",
+    "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/experiment.py",
+    "run",
+    "--manifest",
+    "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/freeze.r3.json",
+    "--work",
+    "/tmp/opencode/step10-index-descriptions-ab-01"
+  ],
+  "cwd": "/tmp/opencode/step9-gap-resolution",
+  "PYTHONPATH": "/tmp/opencode/step9-gap-resolution",
+  "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+  "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+  "freeze_sha256": "5063bcb86289391453dee146601327c522ad6c01cc4ad86d7cebdc4081a4180a",
+  "boundary": "all public acquisition candidates; limit/budget args reported_not_applied; not final answer"
+}

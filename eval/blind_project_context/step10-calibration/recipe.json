@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "recipe": "complete-maxp-token-overlap-v1",
+  "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "structural_recipe": "minimal-structure-v1",
+  "lanes": "original_translation_max"
+}

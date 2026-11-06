@@ -208,6 +208,26 @@ class _ProjectDocsServicePart03:
         # identical original pool instead of searching it again.
         acquisition_entries: list[Any] = []
 
+        def _finish_candidates(candidates):
+            candidates = _qualify_candidate_lookups(
+                candidates, documentation_query_plan,
+                expected_project_identity=filters["project_identity"],
+                lifecycle_intent=answer_lifecycle_intent,
+                discovery_records=discovery_records,
+            )
+            from .experimental_candidate_selection import select_experimental_candidates
+            candidates = select_experimental_candidates(candidates, question=query)
+            if internal_diagnostics is not None:
+                internal_diagnostics.update(
+                    _retrieval_stage_diagnostics(documentation_query_plan, candidates)
+                )
+                internal_diagnostics["prepared_parents"] = dict(reference_context.structure_diagnostics)
+            selected = [chunk for chunk in candidates
+                        if lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent)]
+            if _control_chunks is not None:
+                _control_chunks.extend(selected)
+            return selected
+
         def _run(text, **kwargs):
             with acquisition_reuse_scope(acquisition_entries):
                 retrieved = _retrieve(text, **kwargs)
@@ -224,6 +244,18 @@ class _ProjectDocsServicePart03:
             query_expand=effective_expand,
             query_filters=filters,
         )
+        from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+        if minimal_context_enabled():
+            # Acquisition is independent of question text in this mode. All
+            # explicit lanes share the same exhausted, source-prepared scope.
+            # Record lane provenance, then qualify every lane on each candidate
+            # once; do not cache mutable tagged chunks or duplicate authority rows.
+            for lookup in documentation_query_plan.queries:
+                if lookup.origin == "host_lookup" and lookup.text != query:
+                    _record_query_discovery(
+                        discovery_records, chunks, lookup, reference_context=reference_context,
+                    )
+            return _finish_candidates(chunks)
         chunks = _tag_retrieval_query(
             chunks, "query-original", query, lookup_by_id.get("query-original"),
             expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
@@ -301,24 +333,7 @@ class _ProjectDocsServicePart03:
         candidates = [*chunks, *authoritative_chunks,
                       *(chunk for lane in supplemental_chunks_by_query.values() for chunk in lane)]
         # Cross-check selected candidates without extra retrieval.
-        candidates = _qualify_candidate_lookups(
-            candidates, documentation_query_plan,
-            expected_project_identity=filters["project_identity"],
-            lifecycle_intent=answer_lifecycle_intent,
-            discovery_records=discovery_records,
-        )
-        from .experimental_candidate_selection import select_experimental_candidates
-        candidates = select_experimental_candidates(candidates, question=query)
-        if internal_diagnostics is not None:
-            internal_diagnostics.update(
-                _retrieval_stage_diagnostics(documentation_query_plan, candidates)
-            )
-            internal_diagnostics["prepared_parents"] = dict(reference_context.structure_diagnostics)
-        selected = [chunk for chunk in candidates
-                    if lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent)]
-        if _control_chunks is not None:
-            _control_chunks.extend(selected)
-        return selected
+        return _finish_candidates(candidates)
 
     @_found_window_retention_producer
     def get_project_docs(

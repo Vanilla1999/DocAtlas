@@ -1,0 +1,17 @@
+{
+  "RESULTS_RU.md": "62d2b092964a5464e93d82e0f2c8cd5f62bde486514ecfb99508a4c45d47aa15",
+  "analysis.json": "8d2add3ec46595bb9b3da9c2877cb093b2d2b8ae0c3e353161cc99c617cfc120",
+  "analyze.py": "e0ada685a098f7057ff4cd0945b902b9b87445e45d4c5ae5e7f00ea74f78fdaf",
+  "model-control/result.json": "807ab0c7529e62b88fbc6912fd5351edeb556ca856c44b5a3da7795f1442b310",
+  "model_control.py": "cefbf062885e87bbf0eda605c889ce3568d8f3b9640636dfd00bcbffe74e00b4",
+  "original-v3/input.json": "ed2aa8bc1990fc1497451282d04754dbac14832d9c4172a5c4f9faa44fcc7bc7",
+  "original-v3/observations.json": "43bf88ad15693c2f40d9216429eabb3099a95147f5756c749201f012821cc759",
+  "original-v3/packet.json": "c9dfc344c2eb94dde330f94e099792ae8e46ba76f78230ead23aaeed7415f965",
+  "original-v3/ranked-scores.json": "8750a0ad72a4621ce61563c98b5918e918c5f36cbdd1925b374d7baf42c73426",
+  "original-v3/receipt.json": "0d4fa75323feac0243400d0c82f75d913c14df3afbba22779285510d0d0f8e2b",
+  "original-v3/sha256.json": "427354a60ad88e6061c83f9fd3e9959f8dc520a22d0d756672a6fe79f4554824",
+  "probe.py": "c4ed253cbb023d0bee3921bad148f9fc19cd923f8b5ef0e55affc0a83e39c2b5",
+  "renewed-v1/input.json": "80d147cc70799a89980addaa094917972c35c9bb34bc3fb8f52fb60d7f5b6e1e",
+  "renewed-v1/observations.json": "72547c6af0fd116851371388442d49e3fcf250e1bc405292fbe2abfe4cc678a5",
+  "renewed-v1/packet.json": "939abf2745fb7659c07c9a4e7bda431c04017a0f0f7a8307493181c18244f912"
+}

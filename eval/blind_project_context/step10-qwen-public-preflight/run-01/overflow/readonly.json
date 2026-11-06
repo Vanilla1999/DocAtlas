@@ -1,0 +1,52 @@
+{
+  "boundary": "post-prepare source/catalog + logical SQLite + pinned assets",
+  "before": {
+    "source_catalog_sha256": {
+      "docatlas.project-docs.yaml": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+      "docs/guide.md": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+      "docs/other.md": "e8d51a4c495dd0290fd45f78b42934a3ddbc3d15f9ffcbac8b521e2e5694ed82"
+    },
+    "logical_db_sha256": "c76ce5efd8a8ea2597fbf8df235f0cc968978aa239682bacd25aef40f01687bc",
+    "assets": {
+      "path": "/tmp/opencode/step10-qwen-reranker-06b-assets",
+      "sha256": {
+        "README.md": "5bba8c734f6dd3ae48317b4139317e45a7fce48fc55e15670b23a0dd15492ab6",
+        "config.json": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0",
+        "generation_config.json": "81051cd3f6e77013827148d0b8a6ead93f8ac390d5ab805f849199f0af6a08db",
+        "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "tokenizer_config.json": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0",
+        "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "chat_template.jinja": "6f682162495ec5b39fd9005c01b6aa2a74669379fe967039f1e2cbbe8752369d",
+        "model.safetensors": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+        "provenance.json": "4d939016a5a168ba580571d0f5193ad7088d90ab16c0e004fefbfd8bc48d1fb8"
+      },
+      "status": "verified"
+    }
+  },
+  "after": {
+    "source_catalog_sha256": {
+      "docatlas.project-docs.yaml": "974689b3a617c6bb43a912a71261b3316307c44f3c0a4dddc054c21a571352a2",
+      "docs/guide.md": "73f1de53b09b7961cf4142397037c85c9fab49103555b0534605b32be9f388d4",
+      "docs/other.md": "e8d51a4c495dd0290fd45f78b42934a3ddbc3d15f9ffcbac8b521e2e5694ed82"
+    },
+    "logical_db_sha256": "c76ce5efd8a8ea2597fbf8df235f0cc968978aa239682bacd25aef40f01687bc",
+    "assets": {
+      "path": "/tmp/opencode/step10-qwen-reranker-06b-assets",
+      "sha256": {
+        "README.md": "5bba8c734f6dd3ae48317b4139317e45a7fce48fc55e15670b23a0dd15492ab6",
+        "config.json": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0",
+        "generation_config.json": "81051cd3f6e77013827148d0b8a6ead93f8ac390d5ab805f849199f0af6a08db",
+        "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "tokenizer_config.json": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0",
+        "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "chat_template.jinja": "6f682162495ec5b39fd9005c01b6aa2a74669379fe967039f1e2cbbe8752369d",
+        "model.safetensors": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+        "provenance.json": "4d939016a5a168ba580571d0f5193ad7088d90ab16c0e004fefbfd8bc48d1fb8"
+      },
+      "status": "verified"
+    }
+  },
+  "unchanged": true
+}

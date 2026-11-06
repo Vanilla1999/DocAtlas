@@ -1,0 +1,1763 @@
+{
+  "status": "ERROR_NOT_PASS",
+  "manifest_sha256": "87585ea10a1c0a4e6673020368ad51ee0e64bdd9ca3d6de4ca8ddce86a34046a",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "threshold": 0.8670357465744019,
+  "diagnostic_keep_all_results": [
+    {
+      "id": "C-T1",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": false,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "architecture.md#Journal design"
+      ],
+      "optional_units": [
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "dashboard.md#Refresh",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#TideGauge",
+        "storage.md#Historical default"
+      ],
+      "unlabelled_units": [
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "overview.md#Navigation",
+        "storage.md#Capacity"
+      ],
+      "selected_units": [
+        "architecture.md#Journal design",
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "dashboard.md#Refresh",
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#Navigation",
+        "overview.md#TideGauge",
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "source_rows": 21,
+      "delivered_source_tokens": 742,
+      "allowed_source_tokens": 742,
+      "role_source_tokens": {
+        "direct": 101,
+        "structural": 108,
+        "optional_support": 256,
+        "optional_context": 35,
+        "negative": 46,
+        "unlabelled": 196
+      },
+      "seconds": 3.9168171970013645,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9627,
+        "planned_input_tokens": 9627,
+        "preflight_units": 21,
+        "model_loads": 1,
+        "runtime_cache_hits": 0,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.5508286740296171,
+        "asset_verification_seconds": 0.5960055169998668,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221214208,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 3.4828901610017056
+      },
+      "packet_json_tokens": 4802,
+      "supported_rendering_tokens": 3034,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-T2",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": false,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "architecture.md#Journal design"
+      ],
+      "optional_units": [
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "export.md#Preview",
+        "overview.md#TideGauge"
+      ],
+      "unlabelled_units": [
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Refresh",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#Navigation",
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "selected_units": [
+        "architecture.md#Journal design",
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "dashboard.md#Refresh",
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#Navigation",
+        "overview.md#TideGauge",
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "source_rows": 21,
+      "delivered_source_tokens": 742,
+      "allowed_source_tokens": 742,
+      "role_source_tokens": {
+        "direct": 72,
+        "structural": 14,
+        "optional_support": 100,
+        "optional_context": 18,
+        "negative": 46,
+        "unlabelled": 492
+      },
+      "seconds": 1.3121903100036434,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9396,
+        "planned_input_tokens": 9396,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.27862815999105806,
+        "asset_verification_seconds": 0.5969988180004293,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221050368,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.9841199040020001
+      },
+      "packet_json_tokens": 4805,
+      "supported_rendering_tokens": 3037,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-T3",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": false,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "operations.md#Survey imports"
+      ],
+      "optional_units": [
+        "dashboard.md#Harbour dashboard",
+        "dashboard.md#Refresh",
+        "overview.md#TideGauge",
+        "storage.md#Historical default"
+      ],
+      "unlabelled_units": [
+        "architecture.md#Journal design",
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "overview.md#Components",
+        "overview.md#Navigation"
+      ],
+      "selected_units": [
+        "architecture.md#Journal design",
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "dashboard.md#Refresh",
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#Navigation",
+        "overview.md#TideGauge",
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "source_rows": 21,
+      "delivered_source_tokens": 742,
+      "allowed_source_tokens": 742,
+      "role_source_tokens": {
+        "direct": 75,
+        "structural": 29,
+        "optional_support": 95,
+        "optional_context": 18,
+        "negative": 41,
+        "unlabelled": 484
+      },
+      "seconds": 1.3229130869949586,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9459,
+        "planned_input_tokens": 9459,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.28049332900263835,
+        "asset_verification_seconds": 0.5996578550038976,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221094400,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.9901863260020036
+      },
+      "packet_json_tokens": 4806,
+      "supported_rendering_tokens": 3038,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-T4",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": true,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "dashboard.md#Refresh",
+        "storage.md#Retention"
+      ],
+      "optional_units": [],
+      "unlabelled_units": [
+        "architecture.md#Journal design",
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#Navigation",
+        "overview.md#TideGauge",
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage"
+      ],
+      "selected_units": [
+        "architecture.md#Journal design",
+        "architecture.md#Processing architecture",
+        "architecture.md#Recovery simulation",
+        "dashboard.md#Display",
+        "dashboard.md#Harbour dashboard",
+        "dashboard.md#Refresh",
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication",
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "overview.md#Components",
+        "overview.md#Navigation",
+        "overview.md#TideGauge",
+        "storage.md#Capacity",
+        "storage.md#Historical default",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "source_rows": 21,
+      "delivered_source_tokens": 742,
+      "allowed_source_tokens": 742,
+      "role_source_tokens": {
+        "direct": 0,
+        "structural": 0,
+        "optional_support": 0,
+        "optional_context": 0,
+        "negative": 74,
+        "unlabelled": 668
+      },
+      "seconds": 1.3960902899998473,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9585,
+        "planned_input_tokens": 9585,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.3522643449905445,
+        "asset_verification_seconds": 0.6019884259949322,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221184512,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0674947989973589
+      },
+      "packet_json_tokens": 4800,
+      "supported_rendering_tokens": 3032,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-L1",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": false,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "recovery.md#Validate"
+      ],
+      "optional_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Rendering internals",
+        "colour.md#Display preference",
+        "overview.md#Loom renderer"
+      ],
+      "unlabelled_units": [
+        "architecture.md#Raster pipeline",
+        "overview.md#Data flow",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Worker recovery",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "selected_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Raster pipeline",
+        "architecture.md#Rendering internals",
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice",
+        "overview.md#Data flow",
+        "overview.md#Loom renderer",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "source_rows": 23,
+      "delivered_source_tokens": 682,
+      "allowed_source_tokens": 682,
+      "role_source_tokens": {
+        "direct": 89,
+        "structural": 15,
+        "optional_support": 87,
+        "optional_context": 21,
+        "negative": 24,
+        "unlabelled": 446
+      },
+      "seconds": 1.377716146002058,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9764,
+        "planned_input_tokens": 9764,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.29193009698792594,
+        "asset_verification_seconds": 0.5931939660003991,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1217899008,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.022387670003809
+      },
+      "packet_json_tokens": 5112,
+      "supported_rendering_tokens": 3218,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-L2",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": false,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [],
+      "optional_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Rendering internals",
+        "overview.md#Loom renderer",
+        "recovery.md#Preview reset"
+      ],
+      "unlabelled_units": [
+        "architecture.md#Raster pipeline",
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice",
+        "overview.md#Data flow",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "selected_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Raster pipeline",
+        "architecture.md#Rendering internals",
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice",
+        "overview.md#Data flow",
+        "overview.md#Loom renderer",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "source_rows": 23,
+      "delivered_source_tokens": 682,
+      "allowed_source_tokens": 682,
+      "role_source_tokens": {
+        "direct": 104,
+        "structural": 16,
+        "optional_support": 85,
+        "optional_context": 21,
+        "negative": 0,
+        "unlabelled": 456
+      },
+      "seconds": 1.361661096001626,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9511,
+        "planned_input_tokens": 9511,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2899597500145319,
+        "asset_verification_seconds": 0.5958489629992982,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1217826304,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0086264739948092
+      },
+      "packet_json_tokens": 5111,
+      "supported_rendering_tokens": 3217,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-L3",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": false,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "recovery.md#Resume"
+      ],
+      "optional_units": [
+        "architecture.md#Raster pipeline",
+        "architecture.md#Rendering internals",
+        "overview.md#Data flow",
+        "overview.md#Loom renderer",
+        "overview.md#Queue ownership",
+        "publication.md#Preview links",
+        "withdrawal.md#Draft cleanup"
+      ],
+      "unlabelled_units": [
+        "architecture.md#Legacy demonstration",
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery"
+      ],
+      "selected_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Raster pipeline",
+        "architecture.md#Rendering internals",
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice",
+        "overview.md#Data flow",
+        "overview.md#Loom renderer",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "source_rows": 23,
+      "delivered_source_tokens": 682,
+      "allowed_source_tokens": 682,
+      "role_source_tokens": {
+        "direct": 80,
+        "structural": 70,
+        "optional_support": 198,
+        "optional_context": 21,
+        "negative": 29,
+        "unlabelled": 284
+      },
+      "seconds": 1.357648582998081,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9419,
+        "planned_input_tokens": 9419,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.28701901197928237,
+        "asset_verification_seconds": 0.5957127589936135,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1214015488,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0066857390047517
+      },
+      "packet_json_tokens": 5111,
+      "supported_rendering_tokens": 3217,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    },
+    {
+      "id": "C-L4",
+      "phase": "calibration-diagnostic",
+      "split": "calibration",
+      "no_answer": true,
+      "missing_required_units": [],
+      "missing_facts": [],
+      "hard_negatives": [
+        "colour.md#Display preference",
+        "colour.md#Profile choice"
+      ],
+      "optional_units": [],
+      "unlabelled_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Raster pipeline",
+        "architecture.md#Rendering internals",
+        "colour.md#Colour processing",
+        "colour.md#Monochrome originals",
+        "overview.md#Data flow",
+        "overview.md#Loom renderer",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "selected_units": [
+        "architecture.md#Legacy demonstration",
+        "architecture.md#Raster pipeline",
+        "architecture.md#Rendering internals",
+        "colour.md#Colour processing",
+        "colour.md#Display preference",
+        "colour.md#Monochrome originals",
+        "colour.md#Profile choice",
+        "overview.md#Data flow",
+        "overview.md#Loom renderer",
+        "overview.md#Queue ownership",
+        "publication.md#Approval",
+        "publication.md#Derivative publication",
+        "publication.md#Embargo",
+        "publication.md#Preview links",
+        "recovery.md#Isolate",
+        "recovery.md#Preview reset",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Resume",
+        "recovery.md#Validate",
+        "recovery.md#Worker recovery",
+        "withdrawal.md#Draft cleanup",
+        "withdrawal.md#Image withdrawal",
+        "withdrawal.md#Withdrawal"
+      ],
+      "source_rows": 23,
+      "delivered_source_tokens": 682,
+      "allowed_source_tokens": 682,
+      "role_source_tokens": {
+        "direct": 0,
+        "structural": 0,
+        "optional_support": 0,
+        "optional_context": 0,
+        "negative": 78,
+        "unlabelled": 604
+      },
+      "seconds": 1.3615455519975512,
+      "scorer_receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9281,
+        "planned_input_tokens": 9281,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2880437390122097,
+        "asset_verification_seconds": 0.5986203709981055,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1213925376,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0086746159940958
+      },
+      "packet_json_tokens": 5107,
+      "supported_rendering_tokens": 3213,
+      "actual_mcp_wire_tokens": null,
+      "actual_client_model_visible_tokens": null
+    }
+  ],
+  "offline_fit_prediction": {
+    "threshold": 0.8670357465744019,
+    "empty_boundary": false,
+    "gates": {
+      "required_pass": true,
+      "no_answer_pass": true,
+      "hard_negative_pass": true,
+      "reduction_pass": true,
+      "source_tokens_numerator": 961,
+      "source_tokens_denominator": 4272,
+      "source_reduction": 0.7750468164794008
+    },
+    "results": [
+      {
+        "id": "C-T1",
+        "no_answer": false,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [
+          "operations.md#Survey imports"
+        ],
+        "unlabelled_units": [],
+        "selected_units": [
+          "operations.md#Disconnected station",
+          "operations.md#Replay",
+          "operations.md#Station operations",
+          "operations.md#Survey imports",
+          "storage.md#Journal storage",
+          "storage.md#Retention"
+        ],
+        "source_rows": 6,
+        "delivered_source_tokens": 250,
+        "allowed_source_tokens": 742,
+        "role_source_tokens": {
+          "direct": 101,
+          "structural": 108,
+          "optional_support": 41,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-T2",
+        "no_answer": false,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [
+          "export.md#Preview"
+        ],
+        "unlabelled_units": [],
+        "selected_units": [
+          "export.md#Bundle export",
+          "export.md#Late observations",
+          "export.md#Preview",
+          "export.md#Publication"
+        ],
+        "source_rows": 4,
+        "delivered_source_tokens": 113,
+        "allowed_source_tokens": 742,
+        "role_source_tokens": {
+          "direct": 72,
+          "structural": 14,
+          "optional_support": 27,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-T3",
+        "no_answer": false,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [
+          "storage.md#Historical default"
+        ],
+        "unlabelled_units": [],
+        "selected_units": [
+          "storage.md#Capacity",
+          "storage.md#Historical default",
+          "storage.md#Journal storage",
+          "storage.md#Retention"
+        ],
+        "source_rows": 4,
+        "delivered_source_tokens": 135,
+        "allowed_source_tokens": 742,
+        "role_source_tokens": {
+          "direct": 75,
+          "structural": 29,
+          "optional_support": 31,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-T4",
+        "no_answer": true,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [],
+        "unlabelled_units": [],
+        "selected_units": [],
+        "source_rows": 0,
+        "delivered_source_tokens": 0,
+        "allowed_source_tokens": 742,
+        "role_source_tokens": {
+          "direct": 0,
+          "structural": 0,
+          "optional_support": 0,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-L1",
+        "no_answer": false,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [
+          "colour.md#Display preference"
+        ],
+        "unlabelled_units": [],
+        "selected_units": [
+          "colour.md#Colour processing",
+          "colour.md#Display preference",
+          "colour.md#Monochrome originals",
+          "colour.md#Profile choice"
+        ],
+        "source_rows": 4,
+        "delivered_source_tokens": 135,
+        "allowed_source_tokens": 682,
+        "role_source_tokens": {
+          "direct": 89,
+          "structural": 15,
+          "optional_support": 31,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-L2",
+        "no_answer": false,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [
+          "recovery.md#Preview reset"
+        ],
+        "unlabelled_units": [],
+        "selected_units": [
+          "recovery.md#Isolate",
+          "recovery.md#Preview reset",
+          "recovery.md#Recovery procedure",
+          "recovery.md#Resume",
+          "recovery.md#Validate",
+          "recovery.md#Worker recovery"
+        ],
+        "source_rows": 6,
+        "delivered_source_tokens": 149,
+        "allowed_source_tokens": 682,
+        "role_source_tokens": {
+          "direct": 104,
+          "structural": 16,
+          "optional_support": 29,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-L3",
+        "no_answer": false,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [
+          "publication.md#Preview links"
+        ],
+        "unlabelled_units": [],
+        "selected_units": [
+          "publication.md#Approval",
+          "publication.md#Derivative publication",
+          "publication.md#Embargo",
+          "publication.md#Preview links",
+          "withdrawal.md#Image withdrawal",
+          "withdrawal.md#Withdrawal"
+        ],
+        "source_rows": 6,
+        "delivered_source_tokens": 179,
+        "allowed_source_tokens": 682,
+        "role_source_tokens": {
+          "direct": 80,
+          "structural": 70,
+          "optional_support": 29,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      },
+      {
+        "id": "C-L4",
+        "no_answer": true,
+        "missing_required_units": [],
+        "missing_facts": [],
+        "hard_negatives": [],
+        "optional_units": [],
+        "unlabelled_units": [],
+        "selected_units": [],
+        "source_rows": 0,
+        "delivered_source_tokens": 0,
+        "allowed_source_tokens": 682,
+        "role_source_tokens": {
+          "direct": 0,
+          "structural": 0,
+          "optional_support": 0,
+          "optional_context": 0,
+          "negative": 0,
+          "unlabelled": 0
+        }
+      }
+    ]
+  },
+  "real_final_policy_results": [
+    {
+      "id": "C-T1",
+      "status": "ok",
+      "reason_code": null,
+      "required_units": [
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "delivered_units": [
+        "operations.md#Disconnected station",
+        "operations.md#Replay",
+        "operations.md#Station operations",
+        "operations.md#Survey imports",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "operations.md#Station operations",
+          "quote": "These procedures apply only to authenticated live station feeds in the active harbour.",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Replay",
+          "quote": "pause the receiver and obtain a journal checkpoint before requesting the missing interval",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Replay",
+          "quote": "Preserve the original observation identifiers during replay.",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Replay",
+          "quote": "Resume the receiver only after the exporter acknowledges the checkpoint.",
+          "delivered": true
+        },
+        {
+          "unit": "operations.md#Disconnected station",
+          "quote": "leave it paused until a fresh authenticated heartbeat arrives",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "Keep a journal file for at least seven days and until the corresponding export checksum is verified.",
+          "delivered": true
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "A legal hold blocks deletion regardless of age or checksum status.",
+          "delivered": true
+        }
+      ],
+      "delivered_hard_negatives": [],
+      "no_answer_expected": false,
+      "complete_scan_public": true,
+      "delivered_source_tokens": 250,
+      "allowed_source_tokens": 742,
+      "gate_pass": true
+    },
+    {
+      "id": "C-T2",
+      "status": "ok",
+      "reason_code": null,
+      "required_units": [
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Publication"
+      ],
+      "delivered_units": [
+        "export.md#Bundle export",
+        "export.md#Late observations",
+        "export.md#Preview",
+        "export.md#Publication"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "export.md#Bundle export",
+          "quote": "These rules govern daily bundles consumed by harbour analysts.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Publication",
+          "quote": "Publish a bundle only when every included station has a verified daily checksum.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Publication",
+          "quote": "Include the observation timezone in the manifest.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Publication",
+          "quote": "A missing station must be listed explicitly as missing rather than represented by zero water levels.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Late observations",
+          "quote": "A late observation creates a new bundle revision; never overwrite an already published bundle.",
+          "delivered": true
+        },
+        {
+          "unit": "export.md#Late observations",
+          "quote": "Keep the previous revision addressable for existing citations.",
+          "delivered": true
+        }
+      ],
+      "delivered_hard_negatives": [],
+      "no_answer_expected": false,
+      "complete_scan_public": true,
+      "delivered_source_tokens": 113,
+      "allowed_source_tokens": 742,
+      "gate_pass": true
+    },
+    {
+      "id": "C-T3",
+      "status": "error",
+      "reason_code": "source_reference_batch_rejected",
+      "required_units": [
+        "storage.md#Capacity",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "delivered_units": [],
+      "missing_required_units": [
+        "storage.md#Capacity",
+        "storage.md#Journal storage",
+        "storage.md#Retention"
+      ],
+      "facts": [
+        {
+          "unit": "storage.md#Journal storage",
+          "quote": "Exported bundles are derived products, not journal replacements until their checksums have been verified.",
+          "delivered": false
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "Keep a journal file for at least seven days and until the corresponding export checksum is verified.",
+          "delivered": false
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "Both conditions must hold before deletion.",
+          "delivered": false
+        },
+        {
+          "unit": "storage.md#Retention",
+          "quote": "A legal hold blocks deletion regardless of age or checksum status.",
+          "delivered": false
+        },
+        {
+          "unit": "storage.md#Capacity",
+          "quote": "A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.",
+          "delivered": false
+        }
+      ],
+      "delivered_hard_negatives": [],
+      "no_answer_expected": false,
+      "complete_scan_public": false,
+      "delivered_source_tokens": 0,
+      "allowed_source_tokens": null,
+      "gate_pass": false
+    },
+    {
+      "id": "C-T4",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "C-L1",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "C-L2",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "C-L3",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "C-L4",
+      "status": "NOT_EXECUTED"
+    }
+  ],
+  "full_calibration_final_aggregate": null,
+  "reason": "final replay aborted on C-T3; five final queries not executed; no split PASS",
+  "validation": "NOT_RUN",
+  "counts": {
+    "public_prepares": 2,
+    "public_queries": 11,
+    "resource_reads": 4,
+    "model_totals_complete": true,
+    "lost_trace_queries": 0,
+    "model_forwards": 239,
+    "model_input_tokens": 104524,
+    "score_cache_hits": 0,
+    "runtime_cache_hits": 10,
+    "model_loads": 1,
+    "inference_seconds": 3.442691589007154,
+    "scoring_total_seconds": 13.503790887007199,
+    "peak_vram_allocated_bytes": 1221214208,
+    "peak_vram_reserved_bytes": 1245708288
+  },
+  "work_receipts": [
+    {
+      "path": "calibration-diagnostic/loom/C-L1.json",
+      "seconds": 1.3654508290055674,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9764,
+        "planned_input_tokens": 9764,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.29193009698792594,
+        "asset_verification_seconds": 0.5931939660003991,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1217899008,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.022387670003809
+      }
+    },
+    {
+      "path": "calibration-diagnostic/loom/C-L2.json",
+      "seconds": 1.3494186379975872,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9511,
+        "planned_input_tokens": 9511,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2899597500145319,
+        "asset_verification_seconds": 0.5958489629992982,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1217826304,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0086264739948092
+      }
+    },
+    {
+      "path": "calibration-diagnostic/loom/C-L3.json",
+      "seconds": 1.3455092310032342,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9419,
+        "planned_input_tokens": 9419,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.28701901197928237,
+        "asset_verification_seconds": 0.5957127589936135,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1214015488,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0066857390047517
+      }
+    },
+    {
+      "path": "calibration-diagnostic/loom/C-L4.json",
+      "seconds": 1.3493685430003097,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9281,
+        "planned_input_tokens": 9281,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2880437390122097,
+        "asset_verification_seconds": 0.5986203709981055,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1213925376,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0086746159940958
+      }
+    },
+    {
+      "path": "calibration-diagnostic/tidegauge/C-T1.json",
+      "seconds": 3.9050055500047165,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9627,
+        "planned_input_tokens": 9627,
+        "preflight_units": 21,
+        "model_loads": 1,
+        "runtime_cache_hits": 0,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.5508286740296171,
+        "asset_verification_seconds": 0.5960055169998668,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221214208,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 3.4828901610017056
+      }
+    },
+    {
+      "path": "calibration-diagnostic/tidegauge/C-T2.json",
+      "seconds": 1.300472887000069,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9396,
+        "planned_input_tokens": 9396,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.27862815999105806,
+        "asset_verification_seconds": 0.5969988180004293,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221050368,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.9841199040020001
+      }
+    },
+    {
+      "path": "calibration-diagnostic/tidegauge/C-T3.json",
+      "seconds": 1.310698434994265,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9459,
+        "planned_input_tokens": 9459,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.28049332900263835,
+        "asset_verification_seconds": 0.5996578550038976,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221094400,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.9901863260020036
+      }
+    },
+    {
+      "path": "calibration-diagnostic/tidegauge/C-T4.json",
+      "seconds": 1.384518927996396,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9585,
+        "planned_input_tokens": 9585,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.3522643449905445,
+        "asset_verification_seconds": 0.6019884259949322,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221184512,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0674947989973589
+      }
+    },
+    {
+      "path": "calibration-final/tidegauge/C-T1.json",
+      "seconds": 1.1508527800033335,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9627,
+        "planned_input_tokens": 9627,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2730859859730117,
+        "asset_verification_seconds": 0.5971659719944,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221214208,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.979198280001583
+      }
+    },
+    {
+      "path": "calibration-final/tidegauge/C-T2.json",
+      "seconds": 1.1260660260013537,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9396,
+        "planned_input_tokens": 9396,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2734240760182729,
+        "asset_verification_seconds": 0.5979206040065037,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221050368,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.9771268320037052
+      }
+    },
+    {
+      "path": "calibration-final/tidegauge/C-T3.json",
+      "seconds": 1.0995255800007726,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9459,
+        "planned_input_tokens": 9459,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.2770144210080616,
+        "asset_verification_seconds": 0.5938211110042175,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221094400,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 0.9764000860013766
+      }
+    }
+  ],
+  "sum_query_seconds": 16.686887427007605,
+  "prepare_seconds": 0.2672296000018832,
+  "readonly_audits": [
+    {
+      "path": "calibration-final/tidegauge/readonly.json",
+      "logical_db_sha256": "60b705b056eb6b259443928ca47db815a624d7b601f7ee4532c1813f1064b3ff",
+      "unchanged": true,
+      "operation_error": "AssertionError({'kind': 'docs_context', 'status': 'error', 'reason_code': 'source_reference_batch_rejected', 'hard_stop': True, 'sources': [], 'read_next': [], 'next_portion': None, 'context_quality': {'status': 'unverified', 'reasons': ['source_reference_batch_rejected']}, 'estimated_tokens': 66})"
+    },
+    {
+      "path": "calibration-diagnostic/loom/readonly.json",
+      "logical_db_sha256": "0ed5502433c08a311d1f601708cecbea37661521a8e72b9feffde78d95eedc50",
+      "unchanged": true,
+      "operation_error": null
+    },
+    {
+      "path": "calibration-diagnostic/tidegauge/readonly.json",
+      "logical_db_sha256": "60b705b056eb6b259443928ca47db815a624d7b601f7ee4532c1813f1064b3ff",
+      "unchanged": true,
+      "operation_error": null
+    }
+  ],
+  "bound_files_post_run": "534 hashes unchanged"
+}

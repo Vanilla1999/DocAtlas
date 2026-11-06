@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .delivery_limits import delivery_token_ceiling
+from .minimal_context_config import minimal_context_enabled
 
 
 @dataclass
@@ -27,6 +28,8 @@ class _BodyRead:
     project_identity: str
     scope: str = "project"
     module_path: str = ""
+    source_path: str | None = None
+    documentation_read: bool = True
     lookup_queries: tuple[str, ...] = ()
     receipts: set[str] = field(default_factory=set)
     active: bool = True
@@ -97,9 +100,18 @@ def original_body_read_scope(handler):
             state.module_path = args.get("module_path") or ""
             state.scope = "module" if state.module_path else args.get("scope") or "all"
             state.lookup_queries = tuple(args.get("lookup_queries") or ())
+            # MCP validates this literal locator before opening the read scope.
+            # It narrows acquisition, never becomes a synthetic lookup question.
+            state.source_path = args.get("source_path")
+            state.documentation_read = (
+                args.get("context_format") is None
+                and not args.get("library") and not args.get("libraries")
+                and args.get("mode") in (None, "project", "auto")
+            )
         # Capture request-local settings once. Wire metadata cannot mint receipts.
         if state is not None:
-            mode = os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION")
+            mode = ("source_valid_candidates_v1" if minimal_context_enabled()
+                    else os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION"))
             if mode in {"policy_candidates_v1", "scalar_label_candidates_v3", "source_valid_candidates_v1"}:
                 state.experiment_admission = mode
             state.experiment_selector_settings = tuple(os.environ.get(key) for key in (
@@ -153,6 +165,19 @@ def experimental_context_max_tokens() -> int | None:
     return state.experiment_context_max_tokens if state is not None and state.active else None
 
 
+def minimal_context_source_path() -> str | None:
+    """Return the validated focused locator only during its owning public read."""
+    state = _BODY_READ.get()
+    return state.source_path if state is not None and state.active else None
+
+
+def minimal_context_documentation_read() -> bool:
+    """Whether this live request uses the complete documentation-only selector."""
+    state = _BODY_READ.get()
+    return bool(state is not None and state.active and state.documentation_read
+                and minimal_context_enabled())
+
+
 def experimental_selector_settings() -> tuple[str | None, str | None, str | None] | None:
     """Host configuration captured at the original read, never from wire data."""
     state = _BODY_READ.get()
@@ -171,6 +196,8 @@ def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -
         return None
     source, member = reference.get("source"), reference.get("member_binding")
     if not isinstance(source, dict) or not isinstance(member, dict):
+        return None
+    if state.source_path is not None and source.get("canonical_path") != state.source_path:
         return None
     scope = source.get("scope")
     if (not isinstance(scope, dict) or root.get("scope") != scope
@@ -215,6 +242,7 @@ def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -
         return None
     material = {
         "question": question, "request_project_path": state.project_path, "request_scope": state.scope,
+        "request_source_path": state.source_path,
         "source": {key: source[key] for key in ("document_id", "canonical_path", "content_sha256")},
         "scope": {key: scope[key] for key in ("project_id", "version", "snapshot_id")},
         "member": {key: member[key] for key in ("doc_scope", "module_path", "catalog_entry_hash")},

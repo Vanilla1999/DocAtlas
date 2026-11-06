@@ -1,0 +1,94 @@
+{
+  "seconds": 0.12845700199977728,
+  "expected_paths": [
+    "apiary.md"
+  ],
+  "indexed_paths": [
+    "apiary.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-810de9b866a6fbca076ec5a47506d7f7892b4169",
+      "source_path": "apiary.md",
+      "display_text": "# Cooperative apiary handbook\n\nThis handbook collects independent work instructions and building information for the cooperative apiary. Each named procedure has its own scope.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-c3e57226e18fd17a14b513ecae8369b6858d7b16",
+      "source_path": "apiary.md",
+      "display_text": "## Moving occupied hives\n\nThe instructions in this section apply only to occupied hives moved between stands inside the same apiary. Moving a hive to another site requires a separate transport plan.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-582c05436c13cc4c696e04b361b1a2b126867ad3",
+      "source_path": "apiary.md",
+      "display_text": "### Entrance preparation\n\nClose the hive entrance with a ventilated transport screen after the last flying bees have returned. Keep the screen unobstructed throughout the move.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-a73f41240ab0ab7db1575bb786e203f8033e2d0a",
+      "source_path": "apiary.md",
+      "display_text": "### Securing the boxes\n\nFasten the hive boxes and floor together with two ratchet straps before lifting. Lift the secured hive with two people and place it level on the new stand.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-6bef42e1535dd50c29da73cd7228b7b608b8a3f8",
+      "source_path": "apiary.md",
+      "display_text": "### Reopening\n\nRemove the transport screen after the hive is stable on its new stand. Place a leafy branch across the entrance to encourage returning bees to reorient.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-0465f078ab6cd76e3b0740632b11662aa2ea641b",
+      "source_path": "apiary.md",
+      "display_text": "### Trolley paint\n\nThe equipment trolley is painted cream. Touch-up paint and brushes are kept in the garden shed; paint colour does not identify a hive's destination.\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-09490d8fc04e3775e7a67b75847ea347025c5479",
+      "source_path": "apiary.md",
+      "display_text": "## Queen inspection exception\n\nAn occupied hive awaiting completion of a queen inspection must not be moved between stands, even when the entrance has been screened and the boxes are strapped. Complete and record the queen inspection before scheduling the move.\n\n",
+      "line_start": 25,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-3512cf4f34e7623392b6ba482989f281bde87044",
+      "source_path": "apiary.md",
+      "display_text": "## Visitor badges\n\nVisitors collect yellow paper badges from reception and return them before leaving. Badges do not record hive health or inspection status.\n",
+      "line_start": 29,
+      "line_end": 31
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "01d81e4f456c637f3e54309efb6f6b86bc4b9d6391da934b3912e8fd849de1c2",
+  "storage_path": "/tmp/docatlas-evidence-vzyo5qff/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-069ec02240d1490886501d2a69bb0f39",
+  "catalog_sha256": "39e21e42cc83b504582ba24452035dce86658015c0e672c5cb8fc131001a8701",
+  "documents": [
+    {
+      "path": "apiary.md",
+      "content_sha256": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b",
+      "catalog_entry_hash": "sha256:8fa074dc6c01678c38bbeb8a68b5526717a3aaf3f7b21076af97743af052fc5b"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-069ec02240d1490886501d2a69bb0f39",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 8,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 8
+  }
+}

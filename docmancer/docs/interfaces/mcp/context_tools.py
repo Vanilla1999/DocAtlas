@@ -288,6 +288,8 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    minimal = minimal_context_enabled()
     context_format = args.get("context_format")
     if context_format is not None and context_format != "patch_context":
         return _bad_request("invalid_context_format", "context_format must be patch_context or null")
@@ -308,16 +310,17 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     source_path = args.get("source_path")
     if source_path is not None:
         from pathlib import PurePosixPath
-        if (not isinstance(source_path, str) or not source_path or len(source_path) > 500
+        if (not isinstance(source_path, str) or not source_path or (not minimal and len(source_path) > 500)
                 or "\\" in source_path or "\x00" in source_path
                 or PurePosixPath(source_path).is_absolute()
                 or any(part in {"", ".", ".."} for part in source_path.split("/"))):
             return _bad_request("invalid_source_path", "source_path must be an exact relative document path")
         if context_format is not None or args.get("library") or args.get("libraries") or args.get("maintenance"):
             return _bad_request("source_path_project_docs_only", "focused reads require project documentation")
-        lookup_queries = list(dict.fromkeys([*(lookup_queries or []), source_path]))
-        if len(lookup_queries) > 5:
-            return _bad_request("invalid_lookup_queries", "source_path reserves one of five lookup slots")
+        if not minimal:
+            lookup_queries = list(dict.fromkeys([*(lookup_queries or []), source_path]))
+            if len(lookup_queries) > 5:
+                return _bad_request("invalid_lookup_queries", "source_path reserves one of five lookup slots")
     if args.get("search_question") is not None and context_format == "patch_context":
         return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
     # Freeze the validated effective query plan before opening the request-owned
@@ -595,7 +598,10 @@ def _handle_prepared_context_tool(
                                 if replay_reader is None:
                                     replay_reader = reader.registration_snapshot()
                                 binding_reader = replay_reader
-                            bind_project_source_continuations(binding_reader, source_root, packet, receipts)
+                            fresh = (binding_reader is reader and args.get("portion", 1) == 1
+                                     and not args.get("continuation_token"))
+                            bind_project_source_continuations(binding_reader, source_root, packet, receipts,
+                                                             binding_intent="fresh_query" if fresh else "rebind")
                             _refresh_projection_estimate(packet)
                         return finalize_joint_context_delivery(packet, receipts, raw)
 
@@ -608,6 +614,11 @@ def _handle_prepared_context_tool(
                                              if key not in {"portion", "continuation_token"}},
                             finalize_packet=finalize_portion,
                         )
+                        if projection.get("hard_stop"):
+                            # Atomic reference registration may reject the full
+                            # packet after a source changes. Its body-free typed
+                            # refusal is not a malformed successful projection.
+                            return projection
                     except ValueError as exc:
                         if str(exc) not in {"invalid_context_portion", "context_continuation_required",
                                             "stale_context_continuation", "portion_unavailable",
@@ -618,7 +629,8 @@ def _handle_prepared_context_tool(
                         and reader is not None and source_root):
                     # Register only the selected batch. Issuing the entire pool
                     # first can evict a selected URI from the bounded reader.
-                    bind_project_source_continuations(reader, source_root, projection, snapshot)
+                    bind_project_source_continuations(reader, source_root, projection, snapshot,
+                        binding_intent="fresh_query" if args.get("portion", 1) == 1 and not args.get("continuation_token") else "rebind")
                     _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,

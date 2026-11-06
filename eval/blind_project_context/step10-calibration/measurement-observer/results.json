@@ -1,0 +1,3191 @@
+[
+  {
+    "id": "C-tail-ru",
+    "split": "calibration",
+    "units": [
+      {
+        "heading": "Relay workshop",
+        "useful": true,
+        "score": -1.503471851348877,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 22
+      },
+      {
+        "heading": "Bench record",
+        "useful": true,
+        "score": 2.392071008682251,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 821
+      },
+      {
+        "heading": "Parcel collection",
+        "useful": false,
+        "score": -3.5069284439086914,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 30
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 3,
+    "delivered_characters": 3605,
+    "source_characters": 3605,
+    "source_count": 3,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-52c79015c957fee98e52ed90e50d4c7ab96c40cdcbe25b3909bcb2e79a2f00cb",
+          "score": -1.503471851348877,
+          "pairs": 2,
+          "body_tokens": 22,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            22
+          ],
+          "body_character_extent": [
+            1,
+            98
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5:relay.md\",\"scope\":{\"project_id\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"snapshot_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 117,
+          "body_char_start": 17,
+          "heading_path": [
+            "Relay workshop"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        },
+        {
+          "identity": "unit-eb5886b8bb3dc2c448a35d5113981d6d1bca4cfabf97c77a1ad7901f6327be43",
+          "score": 2.392071008682251,
+          "pairs": 6,
+          "body_tokens": 821,
+          "ancestor_tokens": 30,
+          "body_token_coverage": [
+            0,
+            821
+          ],
+          "body_character_extent": [
+            1,
+            3323
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5:relay.md\",\"scope\":{\"project_id\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"snapshot_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 117,
+          "char_end": 3458,
+          "body_char_start": 133,
+          "heading_path": [
+            "Relay workshop",
+            "Bench record"
+          ],
+          "line_start": 5,
+          "line_end": 10,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        },
+        {
+          "identity": "unit-fcdca67aa6f5c929c97dfe9a0f14288e73650e558ce5a619633eb67481da9c9b",
+          "score": -3.5069284439086914,
+          "pairs": 2,
+          "body_tokens": 30,
+          "ancestor_tokens": 30,
+          "body_token_coverage": [
+            0,
+            30
+          ],
+          "body_character_extent": [
+            1,
+            125
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5:relay.md\",\"scope\":{\"project_id\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"snapshot_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 3458,
+          "char_end": 3605,
+          "body_char_start": 3479,
+          "heading_path": [
+            "Relay workshop",
+            "Parcel collection"
+          ],
+          "line_start": 11,
+          "line_end": 13,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 3,
+        "model_pairs": 10,
+        "model_forwards": 3,
+        "model_input_tokens": 3283,
+        "inference_seconds": 0.332584264997422,
+        "model_load_attempts": 1,
+        "model_loads": 1,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "asset_verification_seconds": 0.2596930930012604,
+        "model_import_seconds": 1.4121153169980971,
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "model_load_seconds": 2.2455013940016215,
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          36,
+          37
+        ],
+        "total_seconds": 2.5840019380011654
+      },
+      "policy_sha256": "diagnostic-unverified"
+    },
+    "seconds": 2.7664864950020274,
+    "serialized_utf8_bytes": 6320,
+    "serialized_json_tokens": 1537
+  },
+  {
+    "id": "C-tail-noanswer",
+    "split": "calibration",
+    "units": [
+      {
+        "heading": "Relay workshop",
+        "useful": false,
+        "score": -4.750456809997559,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 22
+      },
+      {
+        "heading": "Bench record",
+        "useful": false,
+        "score": -5.439797878265381,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 821
+      },
+      {
+        "heading": "Parcel collection",
+        "useful": false,
+        "score": -6.61798095703125,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 30
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 0,
+    "delivered_characters": 3605,
+    "source_characters": 3605,
+    "source_count": 3,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-52c79015c957fee98e52ed90e50d4c7ab96c40cdcbe25b3909bcb2e79a2f00cb",
+          "score": -4.750456809997559,
+          "pairs": 1,
+          "body_tokens": 22,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            22
+          ],
+          "body_character_extent": [
+            1,
+            98
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5:relay.md\",\"scope\":{\"project_id\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"snapshot_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 117,
+          "body_char_start": 17,
+          "heading_path": [
+            "Relay workshop"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        },
+        {
+          "identity": "unit-eb5886b8bb3dc2c448a35d5113981d6d1bca4cfabf97c77a1ad7901f6327be43",
+          "score": -5.439797878265381,
+          "pairs": 3,
+          "body_tokens": 821,
+          "ancestor_tokens": 30,
+          "body_token_coverage": [
+            0,
+            821
+          ],
+          "body_character_extent": [
+            1,
+            3323
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5:relay.md\",\"scope\":{\"project_id\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"snapshot_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 117,
+          "char_end": 3458,
+          "body_char_start": 133,
+          "heading_path": [
+            "Relay workshop",
+            "Bench record"
+          ],
+          "line_start": 5,
+          "line_end": 10,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        },
+        {
+          "identity": "unit-fcdca67aa6f5c929c97dfe9a0f14288e73650e558ce5a619633eb67481da9c9b",
+          "score": -6.61798095703125,
+          "pairs": 1,
+          "body_tokens": 30,
+          "ancestor_tokens": 30,
+          "body_token_coverage": [
+            0,
+            30
+          ],
+          "body_character_extent": [
+            1,
+            125
+          ],
+          "path": "relay.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"_source_snapshot_sha256\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"member\":{\"catalog_entry_hash\":\"sha256:3eca30a789796600f6df18ac45f16d2e48475f6851d385992b9e0a4459c5d0c3\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"relay.md\",\"content_sha256\":\"14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55\",\"document_id\":\"project_file:local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5:relay.md\",\"scope\":{\"project_id\":\"local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5\",\"snapshot_id\":\"gen-e9d41220626547fe9b99c831429b1bdc\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 3458,
+          "char_end": 3605,
+          "body_char_start": 3479,
+          "heading_path": [
+            "Relay workshop",
+            "Parcel collection"
+          ],
+          "line_start": 11,
+          "line_end": 13,
+          "source_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 3,
+        "model_pairs": 5,
+        "model_forwards": 3,
+        "model_input_tokens": 1572,
+        "inference_seconds": 0.14163777400244726,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          19
+        ],
+        "total_seconds": 0.14436505000048783
+      },
+      "policy_sha256": "diagnostic-unverified"
+    },
+    "seconds": 0.21417866599949775,
+    "serialized_utf8_bytes": 6302,
+    "serialized_json_tokens": 1529
+  },
+  {
+    "id": "C-restart",
+    "split": "calibration",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "useful": true,
+        "score": -5.375772953033447,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 16
+      },
+      {
+        "heading": "Restart",
+        "useful": true,
+        "score": 1.4641504287719727,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 34
+      },
+      {
+        "heading": "Inspection",
+        "useful": true,
+        "score": 3.8619515895843506,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 31
+      },
+      {
+        "heading": "Indicator lamps",
+        "useful": false,
+        "score": 1.7310738563537598,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Frozen intake",
+        "useful": true,
+        "score": 6.27423620223999,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 45
+      },
+      {
+        "heading": "Ledger storage",
+        "useful": false,
+        "score": -6.676738262176514,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 28
+      },
+      {
+        "heading": "Cabinet finish",
+        "useful": false,
+        "score": -7.162359237670898,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 25
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 4,
+    "delivered_characters": 1090,
+    "source_characters": 1090,
+    "source_count": 7,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-d04bf32e7b7d246aab03c9c9e76986be20ab84f37b9178a4aa9648afeb3bb696",
+          "score": -5.375772953033447,
+          "pairs": 1,
+          "body_tokens": 16,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            16
+          ],
+          "body_character_extent": [
+            1,
+            82
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 104,
+          "body_char_start": 20,
+          "heading_path": [
+            "Reservoir station"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-c593a02ceded88fd61b9b47dbb874bfe6cf040aa78efa5f7bda100b975b44846",
+          "score": 1.4641504287719727,
+          "pairs": 1,
+          "body_tokens": 34,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            34
+          ],
+          "body_character_extent": [
+            1,
+            163
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 104,
+          "char_end": 280,
+          "body_char_start": 115,
+          "heading_path": [
+            "Reservoir station",
+            "Restart"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-ce7f7a00a9de61492a2c75d48454fd4c2b08537ed5a46dde296eda06482796ca",
+          "score": 3.8619515895843506,
+          "pairs": 1,
+          "body_tokens": 31,
+          "ancestor_tokens": 62,
+          "body_token_coverage": [
+            0,
+            31
+          ],
+          "body_character_extent": [
+            1,
+            136
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 280,
+          "char_end": 433,
+          "body_char_start": 295,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Inspection"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f0704f979684bf6cf644dfdf04cd49cb12c03ecda2dacd48d1b5f3adaed689af",
+          "score": 1.7310738563537598,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 63,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            158
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 433,
+          "char_end": 613,
+          "body_char_start": 453,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Indicator lamps"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f74434b89b08eac3f11e6676703d2eb9d6fc050a87984276f06dd8cd95e52a52",
+          "score": 6.27423620223999,
+          "pairs": 1,
+          "body_tokens": 45,
+          "ancestor_tokens": 25,
+          "body_token_coverage": [
+            0,
+            45
+          ],
+          "body_character_extent": [
+            1,
+            193
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 613,
+          "char_end": 825,
+          "body_char_start": 630,
+          "heading_path": [
+            "Reservoir station",
+            "Frozen intake"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-4ba1c9e45e99d4b73f7de1df3d90094d87433f007bdd78fddaf7ddbf5f198215",
+          "score": -6.676738262176514,
+          "pairs": 1,
+          "body_tokens": 28,
+          "ancestor_tokens": 24,
+          "body_token_coverage": [
+            0,
+            28
+          ],
+          "body_character_extent": [
+            1,
+            120
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 825,
+          "char_end": 965,
+          "body_char_start": 843,
+          "heading_path": [
+            "Reservoir station",
+            "Ledger storage"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-88c5259951c5eab2d364bdacb5a793a283abedb0175ef2194cb84d39f6097701",
+          "score": -7.162359237670898,
+          "pairs": 1,
+          "body_tokens": 25,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            106
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 965,
+          "char_end": 1090,
+          "body_char_start": 983,
+          "heading_path": [
+            "Reservoir station",
+            "Cabinet finish"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 684,
+        "inference_seconds": 0.07168201300373767,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          31
+        ],
+        "total_seconds": 0.07558118299857597
+      },
+      "policy_sha256": "diagnostic-unverified"
+    },
+    "seconds": 0.1658887510020577,
+    "serialized_utf8_bytes": 5756,
+    "serialized_json_tokens": 1758
+  },
+  {
+    "id": "C-child",
+    "split": "calibration",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "useful": false,
+        "score": -9.40645694732666,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 16
+      },
+      {
+        "heading": "Restart",
+        "useful": false,
+        "score": -9.384908676147461,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 34
+      },
+      {
+        "heading": "Inspection",
+        "useful": false,
+        "score": -9.673530578613281,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 31
+      },
+      {
+        "heading": "Indicator lamps",
+        "useful": true,
+        "score": 4.025307655334473,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Frozen intake",
+        "useful": false,
+        "score": -9.461169242858887,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 45
+      },
+      {
+        "heading": "Ledger storage",
+        "useful": false,
+        "score": -9.505221366882324,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 28
+      },
+      {
+        "heading": "Cabinet finish",
+        "useful": false,
+        "score": -8.350558280944824,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 25
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 2,
+    "delivered_characters": 1090,
+    "source_characters": 1090,
+    "source_count": 7,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-d04bf32e7b7d246aab03c9c9e76986be20ab84f37b9178a4aa9648afeb3bb696",
+          "score": -9.40645694732666,
+          "pairs": 1,
+          "body_tokens": 16,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            16
+          ],
+          "body_character_extent": [
+            1,
+            82
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 104,
+          "body_char_start": 20,
+          "heading_path": [
+            "Reservoir station"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-c593a02ceded88fd61b9b47dbb874bfe6cf040aa78efa5f7bda100b975b44846",
+          "score": -9.384908676147461,
+          "pairs": 1,
+          "body_tokens": 34,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            34
+          ],
+          "body_character_extent": [
+            1,
+            163
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 104,
+          "char_end": 280,
+          "body_char_start": 115,
+          "heading_path": [
+            "Reservoir station",
+            "Restart"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-ce7f7a00a9de61492a2c75d48454fd4c2b08537ed5a46dde296eda06482796ca",
+          "score": -9.673530578613281,
+          "pairs": 1,
+          "body_tokens": 31,
+          "ancestor_tokens": 62,
+          "body_token_coverage": [
+            0,
+            31
+          ],
+          "body_character_extent": [
+            1,
+            136
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 280,
+          "char_end": 433,
+          "body_char_start": 295,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Inspection"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f0704f979684bf6cf644dfdf04cd49cb12c03ecda2dacd48d1b5f3adaed689af",
+          "score": 4.025307655334473,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 63,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            158
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 433,
+          "char_end": 613,
+          "body_char_start": 453,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Indicator lamps"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f74434b89b08eac3f11e6676703d2eb9d6fc050a87984276f06dd8cd95e52a52",
+          "score": -9.461169242858887,
+          "pairs": 1,
+          "body_tokens": 45,
+          "ancestor_tokens": 25,
+          "body_token_coverage": [
+            0,
+            45
+          ],
+          "body_character_extent": [
+            1,
+            193
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 613,
+          "char_end": 825,
+          "body_char_start": 630,
+          "heading_path": [
+            "Reservoir station",
+            "Frozen intake"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-4ba1c9e45e99d4b73f7de1df3d90094d87433f007bdd78fddaf7ddbf5f198215",
+          "score": -9.505221366882324,
+          "pairs": 1,
+          "body_tokens": 28,
+          "ancestor_tokens": 24,
+          "body_token_coverage": [
+            0,
+            28
+          ],
+          "body_character_extent": [
+            1,
+            120
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 825,
+          "char_end": 965,
+          "body_char_start": 843,
+          "heading_path": [
+            "Reservoir station",
+            "Ledger storage"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-88c5259951c5eab2d364bdacb5a793a283abedb0175ef2194cb84d39f6097701",
+          "score": -8.350558280944824,
+          "pairs": 1,
+          "body_tokens": 25,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            106
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 965,
+          "char_end": 1090,
+          "body_char_start": 983,
+          "heading_path": [
+            "Reservoir station",
+            "Cabinet finish"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 593,
+        "inference_seconds": 0.0572794659929059,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          18
+        ],
+        "total_seconds": 0.06020933599938871
+      },
+      "policy_sha256": "diagnostic-unverified"
+    },
+    "seconds": 0.14751414800048224,
+    "serialized_utf8_bytes": 5756,
+    "serialized_json_tokens": 1764
+  },
+  {
+    "id": "C-subtree",
+    "split": "calibration",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "useful": true,
+        "score": -7.280395030975342,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 16
+      },
+      {
+        "heading": "Restart",
+        "useful": true,
+        "score": -5.677188396453857,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 34
+      },
+      {
+        "heading": "Inspection",
+        "useful": true,
+        "score": -4.7430644035339355,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 31
+      },
+      {
+        "heading": "Indicator lamps",
+        "useful": true,
+        "score": -3.011707305908203,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Frozen intake",
+        "useful": true,
+        "score": -3.037487745285034,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 45
+      },
+      {
+        "heading": "Ledger storage",
+        "useful": false,
+        "score": -8.414019584655762,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 28
+      },
+      {
+        "heading": "Cabinet finish",
+        "useful": false,
+        "score": -7.929723262786865,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 25
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 4,
+    "delivered_characters": 1090,
+    "source_characters": 1090,
+    "source_count": 7,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-d04bf32e7b7d246aab03c9c9e76986be20ab84f37b9178a4aa9648afeb3bb696",
+          "score": -7.280395030975342,
+          "pairs": 1,
+          "body_tokens": 16,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            16
+          ],
+          "body_character_extent": [
+            1,
+            82
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 104,
+          "body_char_start": 20,
+          "heading_path": [
+            "Reservoir station"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-c593a02ceded88fd61b9b47dbb874bfe6cf040aa78efa5f7bda100b975b44846",
+          "score": -5.677188396453857,
+          "pairs": 1,
+          "body_tokens": 34,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            34
+          ],
+          "body_character_extent": [
+            1,
+            163
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 104,
+          "char_end": 280,
+          "body_char_start": 115,
+          "heading_path": [
+            "Reservoir station",
+            "Restart"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-ce7f7a00a9de61492a2c75d48454fd4c2b08537ed5a46dde296eda06482796ca",
+          "score": -4.7430644035339355,
+          "pairs": 1,
+          "body_tokens": 31,
+          "ancestor_tokens": 62,
+          "body_token_coverage": [
+            0,
+            31
+          ],
+          "body_character_extent": [
+            1,
+            136
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 280,
+          "char_end": 433,
+          "body_char_start": 295,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Inspection"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f0704f979684bf6cf644dfdf04cd49cb12c03ecda2dacd48d1b5f3adaed689af",
+          "score": -3.011707305908203,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 63,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            158
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 433,
+          "char_end": 613,
+          "body_char_start": 453,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Indicator lamps"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f74434b89b08eac3f11e6676703d2eb9d6fc050a87984276f06dd8cd95e52a52",
+          "score": -3.037487745285034,
+          "pairs": 1,
+          "body_tokens": 45,
+          "ancestor_tokens": 25,
+          "body_token_coverage": [
+            0,
+            45
+          ],
+          "body_character_extent": [
+            1,
+            193
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 613,
+          "char_end": 825,
+          "body_char_start": 630,
+          "heading_path": [
+            "Reservoir station",
+            "Frozen intake"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-4ba1c9e45e99d4b73f7de1df3d90094d87433f007bdd78fddaf7ddbf5f198215",
+          "score": -8.414019584655762,
+          "pairs": 1,
+          "body_tokens": 28,
+          "ancestor_tokens": 24,
+          "body_token_coverage": [
+            0,
+            28
+          ],
+          "body_character_extent": [
+            1,
+            120
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 825,
+          "char_end": 965,
+          "body_char_start": 843,
+          "heading_path": [
+            "Reservoir station",
+            "Ledger storage"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-88c5259951c5eab2d364bdacb5a793a283abedb0175ef2194cb84d39f6097701",
+          "score": -7.929723262786865,
+          "pairs": 1,
+          "body_tokens": 25,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            106
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 965,
+          "char_end": 1090,
+          "body_char_start": 983,
+          "heading_path": [
+            "Reservoir station",
+            "Cabinet finish"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 670,
+        "inference_seconds": 0.08467608100181678,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          29
+        ],
+        "total_seconds": 0.08771848699689144
+      },
+      "policy_sha256": "diagnostic-unverified"
+    },
+    "seconds": 0.17287613799999235,
+    "serialized_utf8_bytes": 5756,
+    "serialized_json_tokens": 1760
+  },
+  {
+    "id": "C-noanswer",
+    "split": "calibration",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "useful": false,
+        "score": -6.652154445648193,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 16
+      },
+      {
+        "heading": "Restart",
+        "useful": false,
+        "score": -8.624911308288574,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 34
+      },
+      {
+        "heading": "Inspection",
+        "useful": false,
+        "score": -9.378246307373047,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 31
+      },
+      {
+        "heading": "Indicator lamps",
+        "useful": false,
+        "score": -9.320427894592285,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Frozen intake",
+        "useful": false,
+        "score": -8.706661224365234,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 45
+      },
+      {
+        "heading": "Ledger storage",
+        "useful": false,
+        "score": -8.619235038757324,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 28
+      },
+      {
+        "heading": "Cabinet finish",
+        "useful": false,
+        "score": -8.955461502075195,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 25
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 0,
+    "delivered_characters": 1090,
+    "source_characters": 1090,
+    "source_count": 7,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-d04bf32e7b7d246aab03c9c9e76986be20ab84f37b9178a4aa9648afeb3bb696",
+          "score": -6.652154445648193,
+          "pairs": 1,
+          "body_tokens": 16,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            16
+          ],
+          "body_character_extent": [
+            1,
+            82
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 104,
+          "body_char_start": 20,
+          "heading_path": [
+            "Reservoir station"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-c593a02ceded88fd61b9b47dbb874bfe6cf040aa78efa5f7bda100b975b44846",
+          "score": -8.624911308288574,
+          "pairs": 1,
+          "body_tokens": 34,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            34
+          ],
+          "body_character_extent": [
+            1,
+            163
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 104,
+          "char_end": 280,
+          "body_char_start": 115,
+          "heading_path": [
+            "Reservoir station",
+            "Restart"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-ce7f7a00a9de61492a2c75d48454fd4c2b08537ed5a46dde296eda06482796ca",
+          "score": -9.378246307373047,
+          "pairs": 1,
+          "body_tokens": 31,
+          "ancestor_tokens": 62,
+          "body_token_coverage": [
+            0,
+            31
+          ],
+          "body_character_extent": [
+            1,
+            136
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 280,
+          "char_end": 433,
+          "body_char_start": 295,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Inspection"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f0704f979684bf6cf644dfdf04cd49cb12c03ecda2dacd48d1b5f3adaed689af",
+          "score": -9.320427894592285,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 63,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            158
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 433,
+          "char_end": 613,
+          "body_char_start": 453,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Indicator lamps"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-f74434b89b08eac3f11e6676703d2eb9d6fc050a87984276f06dd8cd95e52a52",
+          "score": -8.706661224365234,
+          "pairs": 1,
+          "body_tokens": 45,
+          "ancestor_tokens": 25,
+          "body_token_coverage": [
+            0,
+            45
+          ],
+          "body_character_extent": [
+            1,
+            193
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 613,
+          "char_end": 825,
+          "body_char_start": 630,
+          "heading_path": [
+            "Reservoir station",
+            "Frozen intake"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-4ba1c9e45e99d4b73f7de1df3d90094d87433f007bdd78fddaf7ddbf5f198215",
+          "score": -8.619235038757324,
+          "pairs": 1,
+          "body_tokens": 28,
+          "ancestor_tokens": 24,
+          "body_token_coverage": [
+            0,
+            28
+          ],
+          "body_character_extent": [
+            1,
+            120
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 825,
+          "char_end": 965,
+          "body_char_start": 843,
+          "heading_path": [
+            "Reservoir station",
+            "Ledger storage"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-88c5259951c5eab2d364bdacb5a793a283abedb0175ef2194cb84d39f6097701",
+          "score": -8.955461502075195,
+          "pairs": 1,
+          "body_tokens": 25,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            106
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 965,
+          "char_end": 1090,
+          "body_char_start": 983,
+          "heading_path": [
+            "Reservoir station",
+            "Cabinet finish"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 614,
+        "inference_seconds": 0.10103682299813954,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          21
+        ],
+        "total_seconds": 0.10398590999830049
+      },
+      "policy_sha256": "diagnostic-unverified"
+    },
+    "seconds": 0.18812936000176705,
+    "serialized_utf8_bytes": 5756,
+    "serialized_json_tokens": 1760
+  },
+  {
+    "id": "V-tail-ru",
+    "split": "validation",
+    "units": [
+      {
+        "heading": "Loom service hall",
+        "useful": true,
+        "score": -8.648924827575684,
+        "direct_keep": false,
+        "delivered": true,
+        "body_tokens": 19
+      },
+      {
+        "heading": "Service notebook",
+        "useful": true,
+        "score": -1.1380749940872192,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 776
+      },
+      {
+        "heading": "Uniform cupboard",
+        "useful": false,
+        "score": -9.73969554901123,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 25
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 3,
+    "delivered_characters": 3383,
+    "source_characters": 3508,
+    "source_count": 2,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-d5a726c445e61564581b561c5ad878178634c7da4dd91617078dcc0c5f46a15d",
+          "score": -8.648924827575684,
+          "pairs": 2,
+          "body_tokens": 19,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            19
+          ],
+          "body_character_extent": [
+            1,
+            81
+          ],
+          "path": "loom.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 103,
+          "body_char_start": 20,
+          "heading_path": [
+            "Loom service hall"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+        },
+        {
+          "identity": "unit-41016caf10e62c2d9a6e9d315970dbf62ae14224f5048b0ba81097e6ff34045f",
+          "score": -1.1380749940872192,
+          "pairs": 6,
+          "body_tokens": 776,
+          "ancestor_tokens": 27,
+          "body_token_coverage": [
+            0,
+            776
+          ],
+          "body_character_extent": [
+            1,
+            3258
+          ],
+          "path": "loom.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 103,
+          "char_end": 3383,
+          "body_char_start": 123,
+          "heading_path": [
+            "Loom service hall",
+            "Service notebook"
+          ],
+          "line_start": 5,
+          "line_end": 10,
+          "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+        },
+        {
+          "identity": "unit-24fee38d594a71d23be2df602388143cf4904c7ef593623411f01e2d325e32ea",
+          "score": -9.73969554901123,
+          "pairs": 2,
+          "body_tokens": 25,
+          "ancestor_tokens": 29,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            104
+          ],
+          "path": "loom.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 3383,
+          "char_end": 3508,
+          "body_char_start": 3403,
+          "heading_path": [
+            "Loom service hall",
+            "Uniform cupboard"
+          ],
+          "line_start": 11,
+          "line_end": 13,
+          "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 3,
+        "model_pairs": 10,
+        "model_forwards": 3,
+        "model_input_tokens": 3146,
+        "inference_seconds": 0.3671860829999787,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          36,
+          32
+        ],
+        "total_seconds": 0.37165053200078546
+      },
+      "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+    },
+    "seconds": 0.43996493599843234,
+    "serialized_utf8_bytes": 5656,
+    "serialized_json_tokens": 1353
+  },
+  {
+    "id": "V-tail-noanswer",
+    "split": "validation",
+    "units": [
+      {
+        "heading": "Loom service hall",
+        "useful": false,
+        "score": -4.995620250701904,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 19
+      },
+      {
+        "heading": "Service notebook",
+        "useful": false,
+        "score": -5.267369270324707,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 776
+      },
+      {
+        "heading": "Uniform cupboard",
+        "useful": false,
+        "score": -7.705780506134033,
+        "direct_keep": false,
+        "delivered": true,
+        "body_tokens": 25
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 0,
+    "delivered_characters": 3508,
+    "source_characters": 3508,
+    "source_count": 3,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-d5a726c445e61564581b561c5ad878178634c7da4dd91617078dcc0c5f46a15d",
+          "score": -4.995620250701904,
+          "pairs": 1,
+          "body_tokens": 19,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            19
+          ],
+          "body_character_extent": [
+            1,
+            81
+          ],
+          "path": "loom.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 103,
+          "body_char_start": 20,
+          "heading_path": [
+            "Loom service hall"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+        },
+        {
+          "identity": "unit-41016caf10e62c2d9a6e9d315970dbf62ae14224f5048b0ba81097e6ff34045f",
+          "score": -5.267369270324707,
+          "pairs": 3,
+          "body_tokens": 776,
+          "ancestor_tokens": 27,
+          "body_token_coverage": [
+            0,
+            776
+          ],
+          "body_character_extent": [
+            1,
+            3258
+          ],
+          "path": "loom.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 103,
+          "char_end": 3383,
+          "body_char_start": 123,
+          "heading_path": [
+            "Loom service hall",
+            "Service notebook"
+          ],
+          "line_start": 5,
+          "line_end": 10,
+          "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+        },
+        {
+          "identity": "unit-24fee38d594a71d23be2df602388143cf4904c7ef593623411f01e2d325e32ea",
+          "score": -7.705780506134033,
+          "pairs": 1,
+          "body_tokens": 25,
+          "ancestor_tokens": 29,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            104
+          ],
+          "path": "loom.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"_source_snapshot_sha256\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"member\":{\"catalog_entry_hash\":\"sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"loom.md\",\"content_sha256\":\"8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17\",\"document_id\":\"project_file:local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36:loom.md\",\"scope\":{\"project_id\":\"local:919465e4db3e6d329b8a14c68aaed15dabef37581bd7036879cb650a53d0fc36\",\"snapshot_id\":\"gen-72c92ec79f1248a0b75b05b55a4ad3a9\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 3383,
+          "char_end": 3508,
+          "body_char_start": 3403,
+          "heading_path": [
+            "Loom service hall",
+            "Uniform cupboard"
+          ],
+          "line_start": 11,
+          "line_end": 13,
+          "source_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 3,
+        "model_pairs": 5,
+        "model_forwards": 3,
+        "model_input_tokens": 1493,
+        "inference_seconds": 0.19990299200071604,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          14
+        ],
+        "total_seconds": 0.20351127400135738
+      },
+      "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+    },
+    "seconds": 0.27104257799874176,
+    "serialized_utf8_bytes": 6245,
+    "serialized_json_tokens": 1540
+  },
+  {
+    "id": "V-dispatch",
+    "split": "validation",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "useful": true,
+        "score": -0.8596119284629822,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 24
+      },
+      {
+        "heading": "Dispatch",
+        "useful": true,
+        "score": 3.4182169437408447,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 43
+      },
+      {
+        "heading": "Packing",
+        "useful": true,
+        "score": 4.952791690826416,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Label printer",
+        "useful": false,
+        "score": 3.0740411281585693,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 37
+      },
+      {
+        "heading": "Partner restriction",
+        "useful": true,
+        "score": 4.915613174438477,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 40
+      },
+      {
+        "heading": "Visitor register",
+        "useful": false,
+        "score": -0.9300865530967712,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 23
+      },
+      {
+        "heading": "Corridor lighting",
+        "useful": false,
+        "score": -0.9113489389419556,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 27
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 5,
+    "delivered_characters": 1187,
+    "source_characters": 1187,
+    "source_count": 7,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-2204221abc1b186536800b05a3122281af70a81f0292b60e27c1f07cb97dc7ee",
+          "score": -0.8596119284629822,
+          "pairs": 1,
+          "body_tokens": 24,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            24
+          ],
+          "body_character_extent": [
+            1,
+            128
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 152,
+          "body_char_start": 22,
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-e5a3ba0d3c98bd404db9f5f1169192dc0b9e327716bfaa775968f9ba8dc4c8b4",
+          "score": 3.4182169437408447,
+          "pairs": 1,
+          "body_tokens": 43,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            43
+          ],
+          "body_character_extent": [
+            1,
+            194
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 152,
+          "char_end": 360,
+          "body_char_start": 164,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-fb9f7e07c75b11efba1304d434ec58a44ec4c341a22fb42cd260613b3a67c6e1",
+          "score": 4.952791690826416,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            129
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 360,
+          "char_end": 503,
+          "body_char_start": 372,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Packing"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-88758d6a9e594391fb346bb0905c3314d7dea79d9e064cfda08b74f865893328",
+          "score": 3.0740411281585693,
+          "pairs": 1,
+          "body_tokens": 37,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            37
+          ],
+          "body_character_extent": [
+            1,
+            156
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 503,
+          "char_end": 679,
+          "body_char_start": 521,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Label printer"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-65fbf8fa779f51b240c5d6bf853b0bbf74692c3eb39b9e830cf83288c47ec0fb",
+          "score": 4.915613174438477,
+          "pairs": 1,
+          "body_tokens": 40,
+          "ancestor_tokens": 32,
+          "body_token_coverage": [
+            0,
+            40
+          ],
+          "body_character_extent": [
+            1,
+            200
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 679,
+          "char_end": 904,
+          "body_char_start": 702,
+          "heading_path": [
+            "Observatory archive",
+            "Partner restriction"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-812d0dfc7c8e2a17186e357824af7db590f050eb8941e40f8f71282a79a23caa",
+          "score": -0.9300865530967712,
+          "pairs": 1,
+          "body_tokens": 23,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            23
+          ],
+          "body_character_extent": [
+            1,
+            113
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 904,
+          "char_end": 1039,
+          "body_char_start": 924,
+          "heading_path": [
+            "Observatory archive",
+            "Visitor register"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-d846fda76eca5c344d44847ea5f28451ff014213c02a0d266e905164fa51ac53",
+          "score": -0.9113489389419556,
+          "pairs": 1,
+          "body_tokens": 27,
+          "ancestor_tokens": 34,
+          "body_token_coverage": [
+            0,
+            27
+          ],
+          "body_character_extent": [
+            1,
+            126
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 1039,
+          "char_end": 1187,
+          "body_char_start": 1060,
+          "heading_path": [
+            "Observatory archive",
+            "Corridor lighting"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 800,
+        "inference_seconds": 0.11008438399949227,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          35
+        ],
+        "total_seconds": 0.11403250000148546
+      },
+      "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+    },
+    "seconds": 0.20393795099880663,
+    "serialized_utf8_bytes": 5921,
+    "serialized_json_tokens": 1802
+  },
+  {
+    "id": "V-child",
+    "split": "validation",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "useful": false,
+        "score": -9.321194648742676,
+        "direct_keep": false,
+        "delivered": true,
+        "body_tokens": 24
+      },
+      {
+        "heading": "Dispatch",
+        "useful": false,
+        "score": -9.464766502380371,
+        "direct_keep": false,
+        "delivered": true,
+        "body_tokens": 43
+      },
+      {
+        "heading": "Packing",
+        "useful": false,
+        "score": -9.523406028747559,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Label printer",
+        "useful": true,
+        "score": 4.289478302001953,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 37
+      },
+      {
+        "heading": "Partner restriction",
+        "useful": false,
+        "score": -9.738873481750488,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 40
+      },
+      {
+        "heading": "Visitor register",
+        "useful": false,
+        "score": -9.766525268554688,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 23
+      },
+      {
+        "heading": "Corridor lighting",
+        "useful": false,
+        "score": -9.631455421447754,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 27
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 2,
+    "delivered_characters": 536,
+    "source_characters": 1187,
+    "source_count": 3,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-2204221abc1b186536800b05a3122281af70a81f0292b60e27c1f07cb97dc7ee",
+          "score": -9.321194648742676,
+          "pairs": 1,
+          "body_tokens": 24,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            24
+          ],
+          "body_character_extent": [
+            1,
+            128
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 152,
+          "body_char_start": 22,
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-e5a3ba0d3c98bd404db9f5f1169192dc0b9e327716bfaa775968f9ba8dc4c8b4",
+          "score": -9.464766502380371,
+          "pairs": 1,
+          "body_tokens": 43,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            43
+          ],
+          "body_character_extent": [
+            1,
+            194
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 152,
+          "char_end": 360,
+          "body_char_start": 164,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-fb9f7e07c75b11efba1304d434ec58a44ec4c341a22fb42cd260613b3a67c6e1",
+          "score": -9.523406028747559,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            129
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 360,
+          "char_end": 503,
+          "body_char_start": 372,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Packing"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-88758d6a9e594391fb346bb0905c3314d7dea79d9e064cfda08b74f865893328",
+          "score": 4.289478302001953,
+          "pairs": 1,
+          "body_tokens": 37,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            37
+          ],
+          "body_character_extent": [
+            1,
+            156
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 503,
+          "char_end": 679,
+          "body_char_start": 521,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Label printer"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-65fbf8fa779f51b240c5d6bf853b0bbf74692c3eb39b9e830cf83288c47ec0fb",
+          "score": -9.738873481750488,
+          "pairs": 1,
+          "body_tokens": 40,
+          "ancestor_tokens": 32,
+          "body_token_coverage": [
+            0,
+            40
+          ],
+          "body_character_extent": [
+            1,
+            200
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 679,
+          "char_end": 904,
+          "body_char_start": 702,
+          "heading_path": [
+            "Observatory archive",
+            "Partner restriction"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-812d0dfc7c8e2a17186e357824af7db590f050eb8941e40f8f71282a79a23caa",
+          "score": -9.766525268554688,
+          "pairs": 1,
+          "body_tokens": 23,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            23
+          ],
+          "body_character_extent": [
+            1,
+            113
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 904,
+          "char_end": 1039,
+          "body_char_start": 924,
+          "heading_path": [
+            "Observatory archive",
+            "Visitor register"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-d846fda76eca5c344d44847ea5f28451ff014213c02a0d266e905164fa51ac53",
+          "score": -9.631455421447754,
+          "pairs": 1,
+          "body_tokens": 27,
+          "ancestor_tokens": 34,
+          "body_token_coverage": [
+            0,
+            27
+          ],
+          "body_character_extent": [
+            1,
+            126
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 1039,
+          "char_end": 1187,
+          "body_char_start": 1060,
+          "heading_path": [
+            "Observatory archive",
+            "Corridor lighting"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 688,
+        "inference_seconds": 0.08215049499631277,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          19
+        ],
+        "total_seconds": 0.08528243700129678
+      },
+      "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+    },
+    "seconds": 0.14453001999936532,
+    "serialized_utf8_bytes": 3297,
+    "serialized_json_tokens": 974
+  },
+  {
+    "id": "V-subtree",
+    "split": "validation",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "useful": true,
+        "score": -5.734889984130859,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 24
+      },
+      {
+        "heading": "Dispatch",
+        "useful": true,
+        "score": -2.4531314373016357,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 43
+      },
+      {
+        "heading": "Packing",
+        "useful": true,
+        "score": -0.8969766497612,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Label printer",
+        "useful": true,
+        "score": -0.5509474873542786,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 37
+      },
+      {
+        "heading": "Partner restriction",
+        "useful": true,
+        "score": -2.441634178161621,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 40
+      },
+      {
+        "heading": "Visitor register",
+        "useful": false,
+        "score": -6.158563613891602,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 23
+      },
+      {
+        "heading": "Corridor lighting",
+        "useful": false,
+        "score": -6.104284763336182,
+        "direct_keep": true,
+        "delivered": true,
+        "body_tokens": 27
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 4,
+    "delivered_characters": 1187,
+    "source_characters": 1187,
+    "source_count": 7,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-2204221abc1b186536800b05a3122281af70a81f0292b60e27c1f07cb97dc7ee",
+          "score": -5.734889984130859,
+          "pairs": 1,
+          "body_tokens": 24,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            24
+          ],
+          "body_character_extent": [
+            1,
+            128
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 152,
+          "body_char_start": 22,
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-e5a3ba0d3c98bd404db9f5f1169192dc0b9e327716bfaa775968f9ba8dc4c8b4",
+          "score": -2.4531314373016357,
+          "pairs": 1,
+          "body_tokens": 43,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            43
+          ],
+          "body_character_extent": [
+            1,
+            194
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 152,
+          "char_end": 360,
+          "body_char_start": 164,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-fb9f7e07c75b11efba1304d434ec58a44ec4c341a22fb42cd260613b3a67c6e1",
+          "score": -0.8969766497612,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            129
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 360,
+          "char_end": 503,
+          "body_char_start": 372,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Packing"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-88758d6a9e594391fb346bb0905c3314d7dea79d9e064cfda08b74f865893328",
+          "score": -0.5509474873542786,
+          "pairs": 1,
+          "body_tokens": 37,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            37
+          ],
+          "body_character_extent": [
+            1,
+            156
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 503,
+          "char_end": 679,
+          "body_char_start": 521,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Label printer"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-65fbf8fa779f51b240c5d6bf853b0bbf74692c3eb39b9e830cf83288c47ec0fb",
+          "score": -2.441634178161621,
+          "pairs": 1,
+          "body_tokens": 40,
+          "ancestor_tokens": 32,
+          "body_token_coverage": [
+            0,
+            40
+          ],
+          "body_character_extent": [
+            1,
+            200
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 679,
+          "char_end": 904,
+          "body_char_start": 702,
+          "heading_path": [
+            "Observatory archive",
+            "Partner restriction"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-812d0dfc7c8e2a17186e357824af7db590f050eb8941e40f8f71282a79a23caa",
+          "score": -6.158563613891602,
+          "pairs": 1,
+          "body_tokens": 23,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            23
+          ],
+          "body_character_extent": [
+            1,
+            113
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 904,
+          "char_end": 1039,
+          "body_char_start": 924,
+          "heading_path": [
+            "Observatory archive",
+            "Visitor register"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-d846fda76eca5c344d44847ea5f28451ff014213c02a0d266e905164fa51ac53",
+          "score": -6.104284763336182,
+          "pairs": 1,
+          "body_tokens": 27,
+          "ancestor_tokens": 34,
+          "body_token_coverage": [
+            0,
+            27
+          ],
+          "body_character_extent": [
+            1,
+            126
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 1039,
+          "char_end": 1187,
+          "body_char_start": 1060,
+          "heading_path": [
+            "Observatory archive",
+            "Corridor lighting"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 730,
+        "inference_seconds": 0.08133204099794966,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          25
+        ],
+        "total_seconds": 0.08471187699979055
+      },
+      "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+    },
+    "seconds": 0.174063988000853,
+    "serialized_utf8_bytes": 5921,
+    "serialized_json_tokens": 1802
+  },
+  {
+    "id": "V-noanswer",
+    "split": "validation",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "useful": false,
+        "score": -8.11699390411377,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 24
+      },
+      {
+        "heading": "Dispatch",
+        "useful": false,
+        "score": -8.606745719909668,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 43
+      },
+      {
+        "heading": "Packing",
+        "useful": false,
+        "score": -8.886576652526855,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 36
+      },
+      {
+        "heading": "Label printer",
+        "useful": false,
+        "score": -8.934269905090332,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 37
+      },
+      {
+        "heading": "Partner restriction",
+        "useful": false,
+        "score": -8.330435752868652,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 40
+      },
+      {
+        "heading": "Visitor register",
+        "useful": false,
+        "score": -8.842209815979004,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 23
+      },
+      {
+        "heading": "Corridor lighting",
+        "useful": false,
+        "score": -8.533122062683105,
+        "direct_keep": false,
+        "delivered": false,
+        "body_tokens": 27
+      }
+    ],
+    "missing_facts": [],
+    "expected_facts": 0,
+    "delivered_characters": 0,
+    "source_characters": 1187,
+    "source_count": 0,
+    "source_checks": "pass",
+    "semantic_receipt": {
+      "scores": [
+        {
+          "identity": "unit-2204221abc1b186536800b05a3122281af70a81f0292b60e27c1f07cb97dc7ee",
+          "score": -8.11699390411377,
+          "pairs": 1,
+          "body_tokens": 24,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            24
+          ],
+          "body_character_extent": [
+            1,
+            128
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 152,
+          "body_char_start": 22,
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-e5a3ba0d3c98bd404db9f5f1169192dc0b9e327716bfaa775968f9ba8dc4c8b4",
+          "score": -8.606745719909668,
+          "pairs": 1,
+          "body_tokens": 43,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            43
+          ],
+          "body_character_extent": [
+            1,
+            194
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 152,
+          "char_end": 360,
+          "body_char_start": 164,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-fb9f7e07c75b11efba1304d434ec58a44ec4c341a22fb42cd260613b3a67c6e1",
+          "score": -8.886576652526855,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            129
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 360,
+          "char_end": 503,
+          "body_char_start": 372,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Packing"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-88758d6a9e594391fb346bb0905c3314d7dea79d9e064cfda08b74f865893328",
+          "score": -8.934269905090332,
+          "pairs": 1,
+          "body_tokens": 37,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            37
+          ],
+          "body_character_extent": [
+            1,
+            156
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 503,
+          "char_end": 679,
+          "body_char_start": 521,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Label printer"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-65fbf8fa779f51b240c5d6bf853b0bbf74692c3eb39b9e830cf83288c47ec0fb",
+          "score": -8.330435752868652,
+          "pairs": 1,
+          "body_tokens": 40,
+          "ancestor_tokens": 32,
+          "body_token_coverage": [
+            0,
+            40
+          ],
+          "body_character_extent": [
+            1,
+            200
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 679,
+          "char_end": 904,
+          "body_char_start": 702,
+          "heading_path": [
+            "Observatory archive",
+            "Partner restriction"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-812d0dfc7c8e2a17186e357824af7db590f050eb8941e40f8f71282a79a23caa",
+          "score": -8.842209815979004,
+          "pairs": 1,
+          "body_tokens": 23,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            23
+          ],
+          "body_character_extent": [
+            1,
+            113
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 904,
+          "char_end": 1039,
+          "body_char_start": 924,
+          "heading_path": [
+            "Observatory archive",
+            "Visitor register"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-d846fda76eca5c344d44847ea5f28451ff014213c02a0d266e905164fa51ac53",
+          "score": -8.533122062683105,
+          "pairs": 1,
+          "body_tokens": 27,
+          "ancestor_tokens": 34,
+          "body_token_coverage": [
+            0,
+            27
+          ],
+          "body_character_extent": [
+            1,
+            126
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb:observatory.md\",\"scope\":{\"project_id\":\"local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb\",\"snapshot_id\":\"gen-e100903d9ac845e09a766971d3fcd53d\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 1039,
+          "char_end": 1187,
+          "body_char_start": 1060,
+          "heading_path": [
+            "Observatory archive",
+            "Corridor lighting"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 667,
+        "inference_seconds": 0.07185247900270042,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          16
+        ],
+        "total_seconds": 0.07494261499959975
+      },
+      "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+    },
+    "seconds": 0.11316491799880168,
+    "serialized_utf8_bytes": 1148,
+    "serialized_json_tokens": 312
+  }
+]

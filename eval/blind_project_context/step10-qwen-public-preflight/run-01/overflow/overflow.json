@@ -1,0 +1,146 @@
+{
+  "packet": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "scan_incomplete"
+    ],
+    "estimated_tokens": 328,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "scan_incomplete"
+      ]
+    },
+    "read_next": [],
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "sources": [],
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "reason_code": "scan_incomplete",
+    "source_selection": {
+      "policy": "complete_calibrated_context_v1",
+      "failed_stage": "semantic_scoring",
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "scan_incomplete",
+        "units": 0,
+        "model_pairs": 0,
+        "model_forwards": 0,
+        "model_input_tokens": 0,
+        "planned_input_tokens": 0,
+        "preflight_units": 0,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 0,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.0,
+        "asset_verification_seconds": 0.596491160998994,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "error_type": "ValueError",
+        "error": "evidence_prompt_overflow:35263",
+        "total_seconds": 0.6480099350010278
+      }
+    }
+  },
+  "observations": [
+    {
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "scan_incomplete",
+        "units": 0,
+        "model_pairs": 0,
+        "model_forwards": 0,
+        "model_input_tokens": 0,
+        "planned_input_tokens": 0,
+        "preflight_units": 0,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 0,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.0,
+        "asset_verification_seconds": 0.596491160998994,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "error_type": "ValueError",
+        "error": "evidence_prompt_overflow:35263",
+        "total_seconds": 0.6480099350010278
+      },
+      "policy_sha256": "diagnostic-unverified",
+      "delivery_status": "not_confirmed"
+    }
+  ],
+  "work_receipts": [
+    {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "scan_incomplete",
+      "units": 0,
+      "model_pairs": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "planned_input_tokens": 0,
+      "preflight_units": 0,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 0,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.0,
+      "asset_verification_seconds": 0.596491160998994,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "error_type": "ValueError",
+      "error": "evidence_prompt_overflow:35263",
+      "total_seconds": 0.6480099350010278
+    }
+  ],
+  "error": null,
+  "seconds": 1.6148947839974426,
+  "trace_status": "available"
+}

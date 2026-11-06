@@ -86,7 +86,8 @@ def encode_model_result(packet: dict) -> tuple[dict, dict] | None:
     from .projection_tokenizer import projection_token_count
     import math
     body = canonical(view).encode("utf-8")
-    if max(projection_token_count(body), math.ceil(len(body) / 4)) > delivery_token_ceiling():
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if not minimal_context_enabled() and max(projection_token_count(body), math.ceil(len(body) / 4)) > delivery_token_ceiling():
         raise ModelViewError("model_context_output_limit")
     return view, {META_KEY: {"format": FORMAT, "packet": deepcopy(packet)}}
 

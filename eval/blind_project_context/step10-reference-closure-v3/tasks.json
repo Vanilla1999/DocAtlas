@@ -1,0 +1,969 @@
+[
+  {
+    "id": "C-T1",
+    "project": "tidegauge",
+    "question": "Как восстановить прерванный поток станции и когда можно удалить его журнал, если станция ещё не подключилась?",
+    "direct": [
+      "operations.md#Replay",
+      "operations.md#Disconnected station"
+    ],
+    "structural": [
+      "operations.md#Station operations",
+      "storage.md#Journal storage",
+      "storage.md#Retention"
+    ],
+    "optional_support": [
+      "operations.md#Survey imports",
+      "architecture.md#Recovery simulation",
+      "storage.md#Historical default",
+      "dashboard.md#Display",
+      "dashboard.md#Refresh",
+      "overview.md#TideGauge",
+      "overview.md#Components"
+    ],
+    "hard_negatives": [
+      "architecture.md#Journal design"
+    ],
+    "facts": [
+      [
+        "operations.md#Station operations",
+        "These procedures apply only to authenticated live station feeds in the active harbour."
+      ],
+      [
+        "operations.md#Replay",
+        "pause the receiver and obtain a journal checkpoint before requesting the missing interval"
+      ],
+      [
+        "operations.md#Replay",
+        "Preserve the original observation identifiers during replay."
+      ],
+      [
+        "operations.md#Replay",
+        "Resume the receiver only after the exporter acknowledges the checkpoint."
+      ],
+      [
+        "operations.md#Disconnected station",
+        "leave it paused until a fresh authenticated heartbeat arrives"
+      ],
+      [
+        "storage.md#Retention",
+        "Keep a journal file for at least seven days and until the corresponding export checksum is verified."
+      ],
+      [
+        "storage.md#Retention",
+        "A legal hold blocks deletion regardless of age or checksum status."
+      ]
+    ]
+  },
+  {
+    "id": "C-T2",
+    "project": "tidegauge",
+    "question": "What must a public daily bundle contain, and how should missing stations and late observations be handled?",
+    "direct": [
+      "export.md#Publication",
+      "export.md#Late observations"
+    ],
+    "structural": [
+      "export.md#Bundle export"
+    ],
+    "optional_support": [
+      "export.md#Preview",
+      "dashboard.md#Display",
+      "overview.md#TideGauge"
+    ],
+    "hard_negatives": [
+      "architecture.md#Journal design"
+    ],
+    "facts": [
+      [
+        "export.md#Bundle export",
+        "These rules govern daily bundles consumed by harbour analysts."
+      ],
+      [
+        "export.md#Publication",
+        "Publish a bundle only when every included station has a verified daily checksum."
+      ],
+      [
+        "export.md#Publication",
+        "Include the observation timezone in the manifest."
+      ],
+      [
+        "export.md#Publication",
+        "A missing station must be listed explicitly as missing rather than represented by zero water levels."
+      ],
+      [
+        "export.md#Late observations",
+        "A late observation creates a new bundle revision; never overwrite an already published bundle."
+      ],
+      [
+        "export.md#Late observations",
+        "Keep the previous revision addressable for existing citations."
+      ]
+    ]
+  },
+  {
+    "id": "C-T3",
+    "project": "tidegauge",
+    "question": "Can a low-space alert justify deleting a live observation journal after seven days if its export has not been verified?",
+    "direct": [
+      "storage.md#Retention",
+      "storage.md#Capacity"
+    ],
+    "structural": [
+      "storage.md#Journal storage"
+    ],
+    "optional_support": [
+      "storage.md#Historical default",
+      "dashboard.md#Refresh",
+      "overview.md#TideGauge"
+    ],
+    "hard_negatives": [
+      "operations.md#Survey imports"
+    ],
+    "facts": [
+      [
+        "storage.md#Journal storage",
+        "Exported bundles are derived products, not journal replacements until their checksums have been verified."
+      ],
+      [
+        "storage.md#Retention",
+        "Keep a journal file for at least seven days and until the corresponding export checksum is verified."
+      ],
+      [
+        "storage.md#Retention",
+        "Both conditions must hold before deletion."
+      ],
+      [
+        "storage.md#Retention",
+        "A legal hold blocks deletion regardless of age or checksum status."
+      ],
+      [
+        "storage.md#Capacity",
+        "A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold."
+      ]
+    ]
+  },
+  {
+    "id": "C-T4",
+    "project": "tidegauge",
+    "question": "Какой обязательный интервал калибровки установлен для фиксированных датчиков живых станций?",
+    "direct": [],
+    "structural": [],
+    "facts": [],
+    "no_answer": true,
+    "hard_negatives": [
+      "storage.md#Retention",
+      "dashboard.md#Refresh"
+    ],
+    "excluded_temptation": "modules/survey/private.md#Calibration interval"
+  },
+  {
+    "id": "C-L1",
+    "project": "loom",
+    "question": "Как выбрать цветовой профиль для производного изображения и что делать с отсутствующим профилем или монохромным оригиналом?",
+    "direct": [
+      "colour.md#Profile choice",
+      "colour.md#Monochrome originals"
+    ],
+    "structural": [
+      "colour.md#Colour processing"
+    ],
+    "optional_support": [
+      "colour.md#Display preference",
+      "architecture.md#Legacy demonstration",
+      "overview.md#Loom renderer"
+    ],
+    "hard_negatives": [
+      "recovery.md#Validate"
+    ],
+    "facts": [
+      [
+        "colour.md#Colour processing",
+        "These requirements apply to production derivatives of colour camera originals."
+      ],
+      [
+        "colour.md#Profile choice",
+        "Use the camera profile recorded in the capture manifest, not the worker's default profile."
+      ],
+      [
+        "colour.md#Profile choice",
+        "Embed the selected profile identifier in the derivative metadata."
+      ],
+      [
+        "colour.md#Profile choice",
+        "If the manifest profile is unavailable, quarantine the job instead of guessing a profile."
+      ],
+      [
+        "colour.md#Monochrome originals",
+        "skip colour conversion but retain the manifest's monochrome marker in derivative metadata"
+      ],
+      [
+        "colour.md#Monochrome originals",
+        "A filename containing the word grey is not sufficient to establish that status."
+      ]
+    ]
+  },
+  {
+    "id": "C-L2",
+    "project": "loom",
+    "question": "Give the complete Recovery procedure for an interrupted production worker, including every child section and the treatment of mismatching outputs.",
+    "direct": [
+      "recovery.md#Recovery procedure",
+      "recovery.md#Isolate",
+      "recovery.md#Validate",
+      "recovery.md#Resume"
+    ],
+    "structural": [
+      "recovery.md#Worker recovery"
+    ],
+    "explicit_full_section": "recovery.md#Recovery procedure",
+    "optional_support": [
+      "recovery.md#Preview reset",
+      "architecture.md#Legacy demonstration",
+      "overview.md#Loom renderer"
+    ],
+    "hard_negatives": [],
+    "facts": [
+      [
+        "recovery.md#Worker recovery",
+        "This document governs recovery of production rendering workers after interrupted writes."
+      ],
+      [
+        "recovery.md#Recovery procedure",
+        "Follow all child sections in order when recovering an interrupted worker."
+      ],
+      [
+        "recovery.md#Isolate",
+        "Disable the worker lease before inspecting temporary outputs."
+      ],
+      [
+        "recovery.md#Isolate",
+        "Preserve the failed job identifier in the incident record."
+      ],
+      [
+        "recovery.md#Validate",
+        "Compare every completed derivative checksum with its job manifest."
+      ],
+      [
+        "recovery.md#Validate",
+        "Delete only temporary outputs that have no completed manifest entry."
+      ],
+      [
+        "recovery.md#Resume",
+        "Re-enable the worker lease after checksum validation finishes."
+      ],
+      [
+        "recovery.md#Resume",
+        "Jobs with a checksum mismatch remain quarantined and must not be retried automatically."
+      ]
+    ]
+  },
+  {
+    "id": "C-L3",
+    "project": "loom",
+    "question": "When may a derivative be published to visitors, and how must a later recall preserve its identity?",
+    "direct": [
+      "publication.md#Approval",
+      "publication.md#Embargo"
+    ],
+    "structural": [
+      "publication.md#Derivative publication",
+      "withdrawal.md#Image withdrawal",
+      "withdrawal.md#Withdrawal"
+    ],
+    "optional_support": [
+      "publication.md#Preview links",
+      "withdrawal.md#Draft cleanup",
+      "overview.md#Queue ownership",
+      "architecture.md#Raster pipeline",
+      "overview.md#Loom renderer",
+      "overview.md#Data flow"
+    ],
+    "hard_negatives": [
+      "recovery.md#Resume"
+    ],
+    "facts": [
+      [
+        "publication.md#Derivative publication",
+        "Publication rules apply to visitor-visible derivatives, not internal previews."
+      ],
+      [
+        "publication.md#Approval",
+        "Publish only after both curator approval and checksum verification are recorded."
+      ],
+      [
+        "publication.md#Approval",
+        "Include the preserved-original identifier with every published derivative."
+      ],
+      [
+        "publication.md#Embargo",
+        "An active collection embargo prevents publication even after curator approval and checksum verification."
+      ],
+      [
+        "publication.md#Embargo",
+        "Wait for explicit embargo release; reaching a scheduled render date does not release it."
+      ],
+      [
+        "withdrawal.md#Withdrawal",
+        "Replace the public derivative with a withdrawal notice and retain its original identifier."
+      ],
+      [
+        "withdrawal.md#Withdrawal",
+        "Keep the audit record and preserved camera original."
+      ],
+      [
+        "withdrawal.md#Withdrawal",
+        "Do not silently redirect the identifier to a different object."
+      ]
+    ]
+  },
+  {
+    "id": "C-L4",
+    "project": "loom",
+    "question": "What cleaning reagent is required for all public collection camera sensors?",
+    "direct": [],
+    "structural": [],
+    "facts": [],
+    "no_answer": true,
+    "hard_negatives": [
+      "colour.md#Profile choice",
+      "colour.md#Display preference"
+    ],
+    "excluded_temptation": "modules/camera/private.md#Sensor cleaning"
+  },
+  {
+    "id": "V-M1",
+    "project": "meridian",
+    "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+    "direct": [
+      "reservations.md#Transfer",
+      "reservations.md#Locked instrument"
+    ],
+    "structural": [
+      "reservations.md#Confirmed reservations",
+      "weather.md#Weather decisions",
+      "weather.md#Suspension"
+    ],
+    "optional_support": [
+      "reservations.md#Training slots",
+      "calendar.md#Colours",
+      "weather.md#Indoor instrument",
+      "weather.md#Forecast display",
+      "architecture.md#Planner",
+      "overview.md#Meridian scheduler",
+      "overview.md#Services"
+    ],
+    "hard_negatives": [
+      "clock.md#Clock offset"
+    ],
+    "facts": [
+      [
+        "reservations.md#Confirmed reservations",
+        "These rules apply to confirmed night-time reservations on shared instruments."
+      ],
+      [
+        "reservations.md#Transfer",
+        "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."
+      ],
+      [
+        "reservations.md#Transfer",
+        "Retain the original reservation identifier and record both observers in the audit trail."
+      ],
+      [
+        "reservations.md#Locked instrument",
+        "leave the transfer pending even after observer acceptance and operator approval"
+      ],
+      [
+        "reservations.md#Locked instrument",
+        "The lock must be cleared by the instrument team first."
+      ],
+      [
+        "weather.md#Suspension",
+        "Suspend outdoor observations when the wind interlock opens."
+      ],
+      [
+        "weather.md#Suspension",
+        "Preserve reservation identifiers during suspension."
+      ],
+      [
+        "weather.md#Suspension",
+        "Resume only after the interlock closes and the duty operator records a restart approval."
+      ]
+    ]
+  },
+  {
+    "id": "V-M2",
+    "project": "meridian",
+    "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+    "direct": [
+      "weather.md#Suspension",
+      "weather.md#Indoor instrument"
+    ],
+    "structural": [
+      "weather.md#Weather decisions"
+    ],
+    "optional_support": [
+      "weather.md#Forecast display",
+      "calendar.md#Colours",
+      "reservations.md#Transfer",
+      "architecture.md#Planner",
+      "overview.md#Services"
+    ],
+    "hard_negatives": [
+      "clock.md#Simulation clock"
+    ],
+    "facts": [
+      [
+        "weather.md#Weather decisions",
+        "Weather decisions govern execution, not ownership of reservations."
+      ],
+      [
+        "weather.md#Suspension",
+        "Suspend outdoor observations when the wind interlock opens."
+      ],
+      [
+        "weather.md#Suspension",
+        "Preserve reservation identifiers during suspension."
+      ],
+      [
+        "weather.md#Suspension",
+        "Resume only after the interlock closes and the duty operator records a restart approval."
+      ],
+      [
+        "weather.md#Indoor instrument",
+        "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."
+      ],
+      [
+        "weather.md#Indoor instrument",
+        "A roof visible as closed on the calendar does not establish indoor classification."
+      ]
+    ]
+  },
+  {
+    "id": "V-M3",
+    "project": "meridian",
+    "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+    "direct": [
+      "clock.md#Clock offset",
+      "clock.md#Missing reference"
+    ],
+    "structural": [
+      "clock.md#Time coordination"
+    ],
+    "optional_support": [
+      "clock.md#Simulation clock",
+      "architecture.md#Prototype recovery",
+      "calendar.md#Timezones",
+      "architecture.md#Planner",
+      "overview.md#Services"
+    ],
+    "hard_negatives": [
+      "reservations.md#Transfer"
+    ],
+    "facts": [
+      [
+        "clock.md#Time coordination",
+        "The gateway compares instrument time with the observatory reference before executing a schedule."
+      ],
+      [
+        "clock.md#Clock offset",
+        "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."
+      ],
+      [
+        "clock.md#Clock offset",
+        "Keep queued reservations unchanged."
+      ],
+      [
+        "clock.md#Clock offset",
+        "Resume only after two consecutive reference checks report an offset within two seconds."
+      ],
+      [
+        "clock.md#Missing reference",
+        "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."
+      ]
+    ]
+  },
+  {
+    "id": "V-M4",
+    "project": "meridian",
+    "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+    "direct": [],
+    "structural": [],
+    "facts": [],
+    "no_answer": true,
+    "hard_negatives": [
+      "weather.md#Indoor instrument",
+      "weather.md#Forecast display"
+    ],
+    "excluded_temptation": "modules/laser/private.md#Alignment temperature"
+  },
+  {
+    "id": "V-C1",
+    "project": "cairn",
+    "question": "Как выбрать снимок для восстановления производственной коллекции, если последний снимок не проверен, а коллекция находится под расследованием?",
+    "direct": [
+      "restore.md#Snapshot selection",
+      "restore.md#Held collection"
+    ],
+    "structural": [
+      "restore.md#Collection restore"
+    ],
+    "optional_support": [
+      "restore.md#Training archive",
+      "architecture.md#Demonstration mode",
+      "overview.md#Cairn archive",
+      "overview.md#Identity"
+    ],
+    "hard_negatives": [
+      "publication.md#Preview pointer"
+    ],
+    "facts": [
+      [
+        "restore.md#Collection restore",
+        "These rules govern production collections restored from immutable snapshots."
+      ],
+      [
+        "restore.md#Snapshot selection",
+        "Choose a snapshot with a signed manifest and a completed integrity scan."
+      ],
+      [
+        "restore.md#Snapshot selection",
+        "Record the snapshot identifier before copying any payload."
+      ],
+      [
+        "restore.md#Snapshot selection",
+        "If the most recent snapshot lacks either requirement, choose an older snapshot that satisfies both."
+      ],
+      [
+        "restore.md#Held collection",
+        "A collection under an investigation hold may be restored into isolated staging only."
+      ],
+      [
+        "restore.md#Held collection",
+        "Do not publish it until the archive custodian explicitly releases the hold."
+      ]
+    ]
+  },
+  {
+    "id": "V-C2",
+    "project": "cairn",
+    "question": "Provide the entire Recovery procedure for an interrupted production restore, including all child sections and the published pointer's state.",
+    "direct": [
+      "recovery.md#Recovery procedure",
+      "recovery.md#Preserve",
+      "recovery.md#Reconcile",
+      "recovery.md#Reopen"
+    ],
+    "structural": [
+      "recovery.md#Restore failure handling"
+    ],
+    "explicit_full_section": "recovery.md#Recovery procedure",
+    "optional_support": [
+      "recovery.md#Sandbox reset",
+      "architecture.md#Demonstration mode",
+      "restore.md#Training archive",
+      "architecture.md#Object store",
+      "overview.md#Cairn archive",
+      "overview.md#Components",
+      "overview.md#Identity"
+    ],
+    "hard_negatives": [],
+    "facts": [
+      [
+        "recovery.md#Restore failure handling",
+        "This procedure applies to a production restore interrupted before publication."
+      ],
+      [
+        "recovery.md#Recovery procedure",
+        "Execute every child section below in order."
+      ],
+      [
+        "recovery.md#Preserve",
+        "Stop the worker and retain its restore journal."
+      ],
+      [
+        "recovery.md#Preserve",
+        "Record the failed snapshot identifier before changing staging files."
+      ],
+      [
+        "recovery.md#Reconcile",
+        "Compare staged payload checksums with the signed snapshot manifest."
+      ],
+      [
+        "recovery.md#Reconcile",
+        "Recopy mismatching payloads from the same snapshot; do not mix snapshots within one restore."
+      ],
+      [
+        "recovery.md#Reopen",
+        "Resume the worker only after reconciliation completes."
+      ],
+      [
+        "recovery.md#Reopen",
+        "Keep the collection pointer on its previous published snapshot until publication approval is recorded."
+      ]
+    ]
+  },
+  {
+    "id": "V-C3",
+    "project": "cairn",
+    "question": "When can a restored collection become public, and what must happen if publication verification fails?",
+    "direct": [
+      "publication.md#Switch",
+      "publication.md#Partial collections"
+    ],
+    "structural": [
+      "publication.md#Restore publication",
+      "rollback.md#Pointer rollback",
+      "rollback.md#Rollback"
+    ],
+    "optional_support": [
+      "publication.md#Preview pointer",
+      "rollback.md#Abandoned preview",
+      "architecture.md#Demonstration mode",
+      "architecture.md#Object store",
+      "overview.md#Cairn archive",
+      "overview.md#Components",
+      "overview.md#Identity"
+    ],
+    "hard_negatives": [],
+    "facts": [
+      [
+        "publication.md#Restore publication",
+        "Publication changes the visitor-visible pointer for a production collection."
+      ],
+      [
+        "publication.md#Switch",
+        "Switch the collection pointer only after checksum reconciliation and custodian approval."
+      ],
+      [
+        "publication.md#Switch",
+        "Record both the previous and new snapshot identifiers."
+      ],
+      [
+        "publication.md#Partial collections",
+        "If any required payload is missing, leave the previous pointer active even when all present payloads pass checksums."
+      ],
+      [
+        "publication.md#Partial collections",
+        "Custodian approval alone cannot authorize a partial collection."
+      ],
+      [
+        "rollback.md#Rollback",
+        "Restore the previous snapshot pointer when publication verification fails."
+      ],
+      [
+        "rollback.md#Rollback",
+        "Preserve the failed publication record and its snapshot identifier for diagnosis."
+      ],
+      [
+        "rollback.md#Rollback",
+        "Do not delete the failed staging directory until the incident owner authorizes cleanup."
+      ]
+    ]
+  },
+  {
+    "id": "V-C4",
+    "project": "cairn",
+    "question": "What maintenance interval is mandated for every archive storage device?",
+    "direct": [],
+    "structural": [],
+    "facts": [],
+    "no_answer": true,
+    "hard_negatives": [
+      "architecture.md#Object store",
+      "restore.md#Snapshot selection"
+    ],
+    "excluded_temptation": "modules/tape/private.md#Cleaning cycle"
+  },
+  {
+    "id": "H-O1",
+    "project": "otel",
+    "question": "Как безопасно убрать весь baggage перед передачей контекста недоверенному процессу и как при этом приложение должно взаимодействовать с Context, если он распространяется неявно?",
+    "direct": [
+      "specification/baggage/api.md#Context Interaction",
+      "specification/baggage/api.md#Clear Baggage in the Context",
+      "specification/context/README.md#Optional Global operations",
+      "specification/context/README.md#Attach Context",
+      "specification/context/README.md#Detach Context",
+      "specification/context/README.md#Get current Context",
+      "specification/context/README.md#Overview"
+    ],
+    "facts": [
+      [
+        "specification/baggage/api.md#Clear Baggage in the Context",
+        "To avoid sending any name/value pairs to an untrusted process, the Baggage API\nMUST provide a way to remove all baggage entries from a context."
+      ],
+      [
+        "specification/baggage/api.md#Context Interaction",
+        "API users SHOULD NOT have\naccess to the [Context Key](../context/README.md#create-a-key) used by the\nBaggage API implementation."
+      ],
+      [
+        "specification/context/README.md#Optional Global operations",
+        "These operations are expected to only be implemented by languages\nusing `Context` implicitly, and thus are optional."
+      ],
+      [
+        "specification/context/README.md#Attach Context",
+        "Note that every call to this operation should result in a corresponding call to\n[Detach Context](#detach-context)."
+      ],
+      [
+        "specification/context/README.md#Detach Context",
+        "A `Token` that was returned by a previous call to attach a `Context`."
+      ],
+      [
+        "specification/context/README.md#Overview",
+        "Users writing instrumentation in languages that use `Context` implicitly are\ndiscouraged from using the `Context` API directly."
+      ],
+      [
+        "specification/context/README.md#Overview",
+        "In those cases, users will\nmanipulate `Context` through cross-cutting concerns APIs instead, in order to\nperform operations such as setting trace or baggage entries for a specified\n`Context`."
+      ],
+      [
+        "specification/context/README.md#Overview",
+        "A `Context` MUST be immutable, and its write operations MUST\nresult in the creation of a new `Context` containing the original\nvalues and the specified values updated."
+      ],
+      [
+        "specification/baggage/api.md#Clear Baggage in the Context",
+        "This functionality can be implemented by having the user set an empty `Baggage`\nobject/struct into the context, or by providing an API that takes a `Context` as\ninput, and returns a new `Context` with no `Baggage` associated."
+      ],
+      [
+        "specification/baggage/api.md#Context Interaction",
+        "Get the currently active `Baggage` from the implicit context. This is\nequivalent to getting the implicit context, then extracting the `Baggage` from\nthe context."
+      ],
+      [
+        "specification/baggage/api.md#Context Interaction",
+        "Set the currently active `Baggage` to the implicit context. This is equivalent\nto getting the implicit context, then inserting the `Baggage` to the context."
+      ]
+    ],
+    "hard_negatives": [],
+    "structural": [
+      "specification/baggage/api.md#Baggage API",
+      "specification/baggage/api.md#Introduction",
+      "specification/context/README.md#Context",
+      "specification/context/README.md#Introduction"
+    ],
+    "optional_support": []
+  },
+  {
+    "id": "H-O2",
+    "project": "otel",
+    "question": "Что должен делать TextMap Extract с непарсируемым значением и как HTTP Getter обрабатывает отсутствующий ключ, регистр и несколько значений одного ключа?",
+    "direct": [
+      "specification/context/api-propagators.md#Extract",
+      "specification/context/api-propagators.md#TextMap Extract",
+      "specification/context/api-propagators.md#Getter argument",
+      "specification/context/api-propagators.md#Keys",
+      "specification/context/api-propagators.md#Get",
+      "specification/context/api-propagators.md#GetAll"
+    ],
+    "facts": [
+      [
+        "specification/context/api-propagators.md#Extract",
+        "the implementation MUST NOT throw an exception and MUST NOT store a new value in the `Context`,\nin order to preserve any previously existing valid value."
+      ],
+      [
+        "specification/context/api-propagators.md#Get",
+        "The Get function MUST return the first value of the given propagation key or return null if the key doesn't exist."
+      ],
+      [
+        "specification/context/api-propagators.md#Get",
+        "If the getter is intended to work with an HTTP request object, the getter MUST be case insensitive."
+      ],
+      [
+        "specification/context/api-propagators.md#GetAll",
+        "If explicitly implemented, the `GetAll` function MUST return all values of the given propagation key."
+      ],
+      [
+        "specification/context/api-propagators.md#GetAll",
+        "If the key doesn't exist, it SHOULD return an empty collection."
+      ],
+      [
+        "specification/context/api-propagators.md#GetAll",
+        "It SHOULD return them in the same order as they appear in the carrier."
+      ],
+      [
+        "specification/context/api-propagators.md#GetAll",
+        "The `GetAll` function is responsible for handling case sensitivity. If the getter is intended to work with an HTTP request object, the getter MUST be case insensitive."
+      ]
+    ],
+    "hard_negatives": [],
+    "structural": [
+      "specification/context/api-propagators.md#Operations",
+      "specification/context/api-propagators.md#Propagator Types",
+      "specification/context/api-propagators.md#Propagators API",
+      "specification/context/api-propagators.md#TextMap Propagator"
+    ],
+    "optional_support": []
+  },
+  {
+    "id": "H-O3",
+    "project": "otel",
+    "question": "Как объединить несколько propagators и выполнить через composite извлечение и инъекцию: в каком порядке они вызываются и когда обязательны Getter и Setter?",
+    "direct": [
+      "specification/context/api-propagators.md#Composite Propagator",
+      "specification/context/api-propagators.md#Create a Composite Propagator",
+      "specification/context/api-propagators.md#Composite Extract",
+      "specification/context/api-propagators.md#Composite Inject"
+    ],
+    "explicit_full_section": "specification/context/api-propagators.md#Composite Propagator",
+    "facts": [
+      [
+        "specification/context/api-propagators.md#Composite Propagator",
+        "The resulting composite `Propagator` will invoke the `Propagator`s, `Injector`s, or `Extractor`s, in the order they were specified."
+      ],
+      [
+        "specification/context/api-propagators.md#Create a Composite Propagator",
+        "Returns a new composite `Propagator` with the specified `Propagator`s."
+      ],
+      [
+        "specification/context/api-propagators.md#Composite Extract",
+        "If the `TextMapPropagator`'s `Extract` implementation accepts the optional `Getter` argument, the following arguments are REQUIRED, otherwise they are OPTIONAL:"
+      ],
+      [
+        "specification/context/api-propagators.md#Composite Inject",
+        "If the `TextMapPropagator`'s `Inject` implementation accepts the optional `Setter` argument, the following arguments are REQUIRED, otherwise they are OPTIONAL:"
+      ],
+      [
+        "specification/context/api-propagators.md#Composite Extract",
+        "- A `Context`.\n- The carrier that holds propagation fields."
+      ],
+      [
+        "specification/context/api-propagators.md#Composite Extract",
+        "- The instance of `Getter` invoked for each propagation key to get."
+      ],
+      [
+        "specification/context/api-propagators.md#Composite Inject",
+        "- A `Context`.\n- The carrier that holds propagation fields."
+      ],
+      [
+        "specification/context/api-propagators.md#Composite Inject",
+        "- The `Setter` to set a propagation key-value pair. Propagators MAY invoke it multiple times in order to set multiple pairs."
+      ]
+    ],
+    "hard_negatives": [],
+    "structural": [
+      "specification/context/api-propagators.md#Propagators API"
+    ],
+    "optional_support": []
+  },
+  {
+    "id": "H-O4",
+    "project": "otel",
+    "question": "Какие точные преобразования применяются к имени переменной окружения при нормализации ключа carrier, включая пустую строку и имя с цифрой в начале?",
+    "direct": [],
+    "facts": [],
+    "hard_negatives": [],
+    "no_answer": true,
+    "excluded_temptation": "specification/context/env-carriers.md#Key Name Normalization",
+    "no_answer_rationale": "Allowed scope is the four listed baggage/context/propagator/status documents, not all OTel specs. The normalization algorithm is in the actual env-carriers document indexed only in module scope. A link to it does not authorize that source.",
+    "structural": [],
+    "optional_support": []
+  },
+  {
+    "id": "H-R1",
+    "project": "embedded",
+    "question": "Как объявить обработчик прерывания Cortex-M и безопасно хранить его состояние: откуда брать interrupt attribute, можно ли вызывать handler программно и какие оговорки есть для static mut на многоядерной системе?",
+    "direct": [
+      "src/start/interrupts.md#Interrupts",
+      "src/start/exceptions.md#Exceptions"
+    ],
+    "facts": [
+      [
+        "src/start/interrupts.md#Interrupts",
+        "you should use the re-exported version of the interrupt attribute provided by the device crate"
+      ],
+      [
+        "src/start/interrupts.md#Interrupts",
+        "However they can not be called directly by other\nparts of the firmware due to the special calling conventions."
+      ],
+      [
+        "src/start/exceptions.md#Exceptions",
+        "In a multicore system, where multiple processor cores are executing code concurrently, the potential for reentrancy issues becomes relevant again, even within exception handlers."
+      ],
+      [
+        "src/start/exceptions.md#Exceptions",
+        "proper synchronization mechanisms need to be employed within the exception handlers to ensure that access to shared resources is properly coordinated among the cores."
+      ],
+      [
+        "src/start/interrupts.md#Interrupts",
+        "It is however\npossible to generate interrupt requests in software to trigger a diversion to\nthe interrupt handler."
+      ]
+    ],
+    "hard_negatives": [],
+    "structural": [],
+    "optional_support": []
+  },
+  {
+    "id": "H-R2",
+    "project": "embedded",
+    "question": "Как диагностировать HardFault по сохранённым регистрам, почему handler не должен возвращаться и воспроизводится ли пример с чтением несуществующей памяти в QEMU lm3s6965evb?",
+    "direct": [
+      "src/start/exceptions.md#The hard fault handler"
+    ],
+    "facts": [
+      [
+        "src/start/exceptions.md#The hard fault handler",
+        "its handler can *not* return as that could\nresult in undefined behavior."
+      ],
+      [
+        "src/start/exceptions.md#The hard fault handler",
+        "The result is that the `HardFault` handler must have the following signature:\n`fn(&ExceptionFrame) -> !`."
+      ],
+      [
+        "src/start/exceptions.md#The hard fault handler",
+        "These registers are\na snapshot of the processor state at the moment the exception was triggered and\nare useful to diagnose a hard fault."
+      ],
+      [
+        "src/start/exceptions.md#The hard fault handler",
+        "This program won't work, i.e. it won't crash, on QEMU because\n> `qemu-system-arm -machine lm3s6965evb` doesn't check memory loads"
+      ],
+      [
+        "src/start/exceptions.md#The hard fault handler",
+        "The `pc` value is the value of the Program Counter at the time of the exception\nand it points to the instruction that triggered the exception."
+      ]
+    ],
+    "hard_negatives": [],
+    "structural": [
+      "src/start/exceptions.md#Exceptions"
+    ],
+    "optional_support": []
+  },
+  {
+    "id": "H-R3",
+    "project": "embedded",
+    "question": "Как выбрать panic handler для no_std-программы, использовать разные варианты для dev и release и получить сообщение на хосте в примере с выходом за границы массива?",
+    "direct": [
+      "src/start/panicking.md#Panicking",
+      "src/start/panicking.md#An example"
+    ],
+    "facts": [
+      [
+        "src/start/panicking.md#Panicking",
+        "This function must appear exactly *once* in the dependency graph of a program,\nand must have the following signature: `fn(&PanicInfo) -> !`"
+      ],
+      [
+        "src/start/panicking.md#Panicking",
+        "the crate links to the `panic-halt` crate when built with the\ndev profile (`cargo build`), but links to the `panic-abort` crate when built\nwith the release profile (`cargo build --release`)."
+      ],
+      [
+        "src/start/panicking.md#An example",
+        "This example chose the `panic-semihosting` behavior which prints the panic\nmessage to the host console using semihosting."
+      ]
+    ],
+    "hard_negatives": [],
+    "structural": [],
+    "optional_support": []
+  },
+  {
+    "id": "H-R4",
+    "project": "embedded",
+    "question": "Какую точную monitor-команду GDB нужно выполнить для включения semihosting в OpenOCD?",
+    "direct": [],
+    "facts": [],
+    "hard_negatives": [],
+    "no_answer": true,
+    "excluded_temptation": "src/start/semihosting.md#Semihosting",
+    "no_answer_rationale": "Allowed collection covers interrupts/exceptions/panicking; those mention semihosting but do not give the enable monitor command. The actual semihosting chapter contains it and is indexed only in separate module scope.",
+    "structural": [],
+    "optional_support": []
+  }
+]

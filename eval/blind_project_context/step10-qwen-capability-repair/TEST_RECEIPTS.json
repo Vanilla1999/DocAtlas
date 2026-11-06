@@ -1,0 +1,19 @@
+{
+  "launch_failures_preserved": [
+    {"command": "HF_HUB_OFFLINE=1 TMPDIR=/tmp/opencode /tmp/opencode/step10-qwen-gpu-py312/bin/python -m pytest tests/test_context_portions_integration.py::test_context_portion_replay_keeps_spent_reads_spent_and_issues_new_sources -q", "exit": 1, "output": "/tmp/opencode/step10-qwen-gpu-py312/bin/python: No module named pytest", "test_executed": false},
+    {"command": "HF_HUB_OFFLINE=1 TMPDIR=/tmp/opencode pytest tests/test_context_portions_integration.py::test_context_portion_replay_keeps_spent_reads_spent_and_issues_new_sources -q", "exit": 4, "output": "ERROR: found no collectors; collection ImportError: ModuleNotFoundError: No module named 'jsonschema' (system Python3.14)", "test_executed": false}
+  ],
+  "environment_setup": {
+    "command": "uv pip install --offline --python /tmp/opencode/step10-qwen-gpu-py312/bin/python pytest pytest-asyncio",
+    "exit": 0,
+    "added": {"iniconfig": "2.3.1", "pluggy": "1.7.0", "pygments": "2.21.0", "pytest": "9.2.0", "pytest-asyncio": "1.4.0"}
+  },
+  "executed_test": {
+    "command": "HF_HUB_OFFLINE=1 TMPDIR=/tmp/opencode /tmp/opencode/step10-qwen-gpu-py312/bin/python -m pytest tests/test_context_portions_integration.py::test_context_portion_replay_keeps_spent_reads_spent_and_issues_new_sources -q",
+    "exit": 0,
+    "output": "1 passed in 0.90s",
+    "warning": "pytest_asyncio: asyncio_default_fixture_loop_scope unset",
+    "public_calls_from_executed_scenario": {"prepares": 1, "queries": 3, "resource_reads": 6},
+    "boundary": "legacy public portion replay; no Qwen recipe selected; no other tests executed"
+  }
+}

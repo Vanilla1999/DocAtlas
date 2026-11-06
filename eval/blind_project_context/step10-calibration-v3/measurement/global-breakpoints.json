@@ -1,0 +1,1082 @@
+[
+  {
+    "threshold": -10.346491813659668,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.27785587310791,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.270110130310059,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.247295379638672,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.247112274169922,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.246736526489258,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.054279327392578,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.02667236328125,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -10.00434398651123,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.95862102508545,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.946890830993652,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.880925178527832,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.854317665100098,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.77756404876709,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.73292350769043,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-noanswer",
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.732923507690428,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.213360786437988,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -9.040226936340332,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -8.934429168701172,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -8.782588005065918,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -8.620765686035156,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -8.444426536560059,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -8.424798011779785,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -8.127436637878418,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -7.643704891204834,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -7.507199764251709,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -6.489150047302246,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -5.595892429351807,
+    "losses": {},
+    "noanswer_contaminated": [
+      "C2-long-negative"
+    ]
+  },
+  {
+    "threshold": -5.595892429351806,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -5.318131923675537,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -5.265661716461182,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -5.2581706047058105,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -4.9947967529296875,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -4.842067718505859,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -4.688724517822266,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -3.352724552154541,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -1.7263767719268799,
+    "losses": {
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -1.7263767719268797,
+    "losses": {
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -0.6851087212562561,
+    "losses": {
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -0.685108721256256,
+    "losses": {
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -0.49305790662765503,
+    "losses": {
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": -0.0017216131091117859,
+    "losses": {
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 0.3691515326499939,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation"
+        ],
+        "facts": [
+          "after the last flying bees have returned"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 0.6008591055870056,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation",
+          "Securing the boxes"
+        ],
+        "facts": [
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 0.6008591055870057,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation",
+          "Securing the boxes"
+        ],
+        "facts": [
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 1.5891889333724976,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation",
+          "Securing the boxes"
+        ],
+        "facts": [
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 1.7283415794372559,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation",
+          "Securing the boxes",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people",
+          "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 1.728341579437256,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation",
+          "Securing the boxes",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people",
+          "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream.",
+          "Complete and record the queen inspection before scheduling the move."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 2.21944260597229,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Entrance preparation",
+          "Securing the boxes",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people",
+          "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream.",
+          "Complete and record the queen inspection before scheduling the move."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 2.2194426059722905,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "only to occupied hives moved between stands inside the same apiary",
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people",
+          "Place a leafy branch across the entrance",
+          "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream.",
+          "Complete and record the queen inspection before scheduling the move."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 7.2402663230896,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "only to occupied hives moved between stands inside the same apiary",
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people",
+          "Place a leafy branch across the entrance",
+          "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream.",
+          "Complete and record the queen inspection before scheduling the move."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  },
+  {
+    "threshold": 7.2402663230896005,
+    "losses": {
+      "C2-transfer": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "only to occupied hives moved between stands inside the same apiary",
+          "after the last flying bees have returned",
+          "two ratchet straps before lifting",
+          "Lift the secured hive with two people",
+          "Place a leafy branch across the entrance",
+          "must not be moved between stands, even when the entrance has been screened and the boxes are strapped"
+        ]
+      },
+      "C2-own-child": {
+        "units": [
+          "Trolley paint"
+        ],
+        "facts": [
+          "The equipment trolley is painted cream.",
+          "Touch-up paint and brushes are kept in the garden shed"
+        ]
+      },
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint",
+          "Queen inspection exception"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream.",
+          "Complete and record the queen inspection before scheduling the move."
+        ]
+      },
+      "C2-tail-ru": {
+        "units": [
+          "Textile conservation room",
+          "Intake notebook"
+        ],
+        "facts": [
+          "twenty-seven days",
+          "two pest-free inspections seven days apart",
+          "restart the full twenty-seven-day quarantine after treatment instead of releasing the textile"
+        ]
+      },
+      "C2-narrow-facilities": {
+        "units": [
+          "Lighting inventory"
+        ],
+        "facts": [
+          "five ceiling lamps with frosted covers",
+          "Replacement covers are ordered through the buildings office."
+        ]
+      },
+      "C2-building-log": {
+        "units": [
+          "Intake notebook"
+        ],
+        "facts": [
+          "Wet mats are hung in the utility yard rather than folded into a cupboard."
+        ]
+      }
+    },
+    "noanswer_contaminated": []
+  }
+]

@@ -1,0 +1,241 @@
+{
+  "seconds": 0.14679333799722372,
+  "expected_paths": [
+    "architecture.md",
+    "calendar.md",
+    "clock.md",
+    "modules/laser/private.md",
+    "overview.md",
+    "reservations.md",
+    "weather.md"
+  ],
+  "indexed_paths": [
+    "architecture.md",
+    "calendar.md",
+    "clock.md",
+    "modules/laser/private.md",
+    "overview.md",
+    "reservations.md",
+    "weather.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-ce2dc7046b62773e18596edc6ef75ed56f6bd6ac",
+      "source_path": "architecture.md",
+      "display_text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-01c40e6b7b6a800d00e9df61f4a8085f6f43a2e5",
+      "source_path": "architecture.md",
+      "display_text": "## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-054e5fb241cb8edefb209c9ac63e18e92b383b09",
+      "source_path": "architecture.md",
+      "display_text": "## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-864bb34d798983515b306e5af632832ddfbe30fe",
+      "source_path": "calendar.md",
+      "display_text": "# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-9748fb06adb8b041b997928ef643277dec20d604",
+      "source_path": "calendar.md",
+      "display_text": "## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-034375834393632ba73cae5ffba03800a212078d",
+      "source_path": "calendar.md",
+      "display_text": "## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-96134195453f2948e3725dc2c6b65eb5f03db1c7",
+      "source_path": "clock.md",
+      "display_text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-fa134ed4f8bc34d95fd721b171442d40f07863fa",
+      "source_path": "clock.md",
+      "display_text": "## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-03161611772c97613f4c7e80d37e12b4ddbe5175",
+      "source_path": "clock.md",
+      "display_text": "## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-1c735d85de29c17a0331c2a99b31a4c54d1e1681",
+      "source_path": "clock.md",
+      "display_text": "## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-e610c0dfd3f16c0914745b9068cb260672b88ef0",
+      "source_path": "overview.md",
+      "display_text": "# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-89f507d570ca714297383c81a2d3f26c283ee596",
+      "source_path": "overview.md",
+      "display_text": "## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-2c854eeba901bd8594fdea4d1ebbe8a19fadef79",
+      "source_path": "overview.md",
+      "display_text": "## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-a1202ef2988d0bd7f19e1ce59595db052c1cf2fe",
+      "source_path": "reservations.md",
+      "display_text": "# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n",
+      "line_start": 1,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-40b558a7d347ae716adb9b3036f768341b3d167b",
+      "source_path": "reservations.md",
+      "display_text": "## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n",
+      "line_start": 7,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-d059c9454b6712c3b07cd6cbd3a896a12fa1f41b",
+      "source_path": "reservations.md",
+      "display_text": "## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n",
+      "line_start": 11,
+      "line_end": 14
+    },
+    {
+      "stable_chunk_id": "child-5c7fb72f38918e7a7fc58d1b8968d8612f239c5c",
+      "source_path": "reservations.md",
+      "display_text": "## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+      "line_start": 15,
+      "line_end": 17
+    },
+    {
+      "stable_chunk_id": "child-9a8e52d0f7e86f89b5a0f05a11686e17f820d8ba",
+      "source_path": "weather.md",
+      "display_text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-520142ebf30a82ed4d11fa5fcec076b9e4000987",
+      "source_path": "weather.md",
+      "display_text": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-7fa359bce6b8a884fc4d8ee11b03df4d2e2d623e",
+      "source_path": "weather.md",
+      "display_text": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-9e74053ad2085838ce4636b4f11c60d924edd8e5",
+      "source_path": "weather.md",
+      "display_text": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-337a243a9e9993b62afe4f98ca70faf4b54a35f4",
+      "source_path": "modules/laser/private.md",
+      "display_text": "# Laser alignment module\n\nThis restricted module manual is outside project-only scope.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-479d48fcf23767ecc4a0dedd11f44393363fea2a",
+      "source_path": "modules/laser/private.md",
+      "display_text": "## Alignment temperature\n\nThe alignment bench uses a coolant set point of twelve degrees Celsius. This number does not specify a shared observatory instrument's operating temperature.\n",
+      "line_start": 5,
+      "line_end": 7
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "7dff059d435635aff3ef0d1869ef871d91fc0f585c731287687f2d63c724f5f9",
+  "storage_path": "/tmp/opencode/docatlas-evidence-dpyfe1jw/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-803cfbd55fbb4ce0866274bfad7cfd11",
+  "catalog_sha256": "b2131f0bebe9d8586eb981c50fee6154329c5724e54c3648d0f006a61232bb90",
+  "documents": [
+    {
+      "path": "architecture.md",
+      "content_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+      "catalog_entry_hash": "sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37"
+    },
+    {
+      "path": "calendar.md",
+      "content_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+      "catalog_entry_hash": "sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45"
+    },
+    {
+      "path": "clock.md",
+      "content_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+      "catalog_entry_hash": "sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca"
+    },
+    {
+      "path": "modules/laser/private.md",
+      "content_sha256": "c6679714ceccc372227bce88792ea7e01489917a8afd28897a0aed7a6fcf4881",
+      "catalog_entry_hash": "sha256:bb5ae1473a2649977934172be2656d7d95385dae890af45c109f839ec0bdd034"
+    },
+    {
+      "path": "overview.md",
+      "content_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+      "catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61"
+    },
+    {
+      "path": "reservations.md",
+      "content_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+      "catalog_entry_hash": "sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1"
+    },
+    {
+      "path": "weather.md",
+      "content_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+      "catalog_entry_hash": "sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-803cfbd55fbb4ce0866274bfad7cfd11",
+    "members": 7,
+    "new_count": 7,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 23,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 23
+  }
+}

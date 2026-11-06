@@ -118,8 +118,10 @@ def decode_context(view: dict) -> dict:
 def render_layouts(text: str) -> dict[str, str]:
     """Offer reversible candidates with the old representation always present."""
     candidates = {"literal": text}
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    minimal = minimal_context_enabled()
     limit = delivery_token_ceiling()
-    if len(text.encode("utf-8")) > 4 * limit:
+    if not minimal and len(text.encode("utf-8")) > 4 * limit:
         return candidates  # existing full-packet safety boundary, not a new cap
     view = json.loads(text)
     if (not isinstance(view, dict) or view.get("context_format") != BASE or
@@ -140,7 +142,7 @@ def render_layouts(text: str) -> dict[str, str]:
         trial["context_format"] = _FORMATS[name]
         trial["notice"] += _LEGENDS[name]
         serialized = _json(trial)
-        if max(_cost(serialized), math.ceil(len(serialized.encode("utf-8")) / 4)) > limit:
+        if not minimal and max(_cost(serialized), math.ceil(len(serialized.encode("utf-8")) / 4)) > limit:
             continue
         # Compare canonical bytes, not Python's loose bool/int equality.
         if _json(decode_context(trial)) != original:
@@ -155,7 +157,11 @@ def assemble_context(text: str, *, policy: str | None = None) -> str:
     Deterministic ties prefer literal, then grouped, table, grouped-table.
     No approximate score cutoff. No assumption that smaller means sufficient.
     """
-    policy = policy if policy is not None else os.environ.get("DOCATLAS_CONTEXT_ASSEMBLY", "adaptive")
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if minimal_context_enabled():
+        policy = "adaptive"
+    else:
+        policy = policy if policy is not None else os.environ.get("DOCATLAS_CONTEXT_ASSEMBLY", "adaptive")
     if policy not in POLICIES:
         raise ValueError("invalid_DOCATLAS_CONTEXT_ASSEMBLY")
     if policy == "literal":

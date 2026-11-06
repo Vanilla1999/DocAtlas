@@ -1,0 +1,28 @@
+{
+  "value_raw": {
+    "uri": "docatlas://source/v2/78e07cae34d5000c6413464e",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"content_sha256\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"continuation\":\"docatlas://source/v2/9a674198599a0538c3cf751e\",\"line_end\":10,\"line_start\":7,\"path\":\"operations.md\",\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snippet\":\"## Replay\\n\\nTo replay an interrupted feed, pause the receiver and obtain a journal checkpoint before requesting the missing interval. Preserve the original observation identifiers during replay. Resume the receiver only after the exporter acknowledges the checkpoint. See the [retention rule](storage.md#retention) before removing journal files.\\n\\n\",\"status\":\"truncated\"}"
+  },
+  "value": {
+    "content_sha256": "sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789",
+    "continuation": "docatlas://source/v2/9a674198599a0538c3cf751e",
+    "line_end": 10,
+    "line_start": 7,
+    "path": "operations.md",
+    "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+    "snippet": "## Replay\n\nTo replay an interrupted feed, pause the receiver and obtain a journal checkpoint before requesting the missing interval. Preserve the original observation identifiers during replay. Resume the receiver only after the exporter acknowledges the checkpoint. See the [retention rule](storage.md#retention) before removing journal files.\n\n",
+    "status": "truncated"
+  },
+  "replay_raw": {
+    "uri": "docatlas://source/v2/78e07cae34d5000c6413464e",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "replay": {
+    "reason_code": "unknown_or_expired_reference",
+    "status": "source_unavailable"
+  }
+}

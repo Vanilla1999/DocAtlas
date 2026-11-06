@@ -66,6 +66,16 @@ class SourceContinuationReader:
         self.clock = clock
         self._cursors: OrderedDict[str, _Cursor] = OrderedDict()
         self._lock = threading.RLock()
+        from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+        self.minimal = minimal_context_enabled()
+        if self.minimal:
+            self.uri_prefix = "docatlas://source/v2/"
+        # Session tombstones prevent deterministic packet rebinding from reviving
+        # consumed or expired capabilities. They contain no source text.
+        self._spent: set[str] = set()
+        self._issuance_nonce = secrets.token_hex(16)
+        self._issuances: dict[str, tuple[int, str]] = {}
+        self._registration_only = False
 
     def registration_snapshot(self) -> SourceContinuationReader:
         """Replay issuance with live authorization but no session mutations.
@@ -79,13 +89,38 @@ class SourceContinuationReader:
             snapshot = copy(self)
             snapshot._cursors = OrderedDict(self._cursors)
             snapshot._lock = threading.RLock()
+            snapshot._spent = set(self._spent)
+            snapshot._issuances = dict(self._issuances)
+            snapshot._registration_only = True
         return snapshot
+
+    def fresh_locator(self, canonical: str) -> str:
+        """Resolve only on an atomic staging reader after host fresh authorization.
+
+        This is identity allocation, not authorization: issue/issue_range must
+        still validate the exact reference and preserve active budgets/expiry.
+        """
+        with self._lock:
+            self._expire()
+            ordinal, latest = self._issuances.get(canonical, (0, canonical))
+            if latest in self._cursors or latest not in self._spent:
+                return latest
+            while True:
+                ordinal += 1
+                material = json.dumps([self._issuance_nonce, canonical, ordinal])
+                uri = self.uri_prefix + hashlib.sha256(material.encode()).hexdigest()[:24]
+                if uri not in self._cursors and uri not in self._spent:
+                    self._issuances[canonical] = (ordinal, uri)
+                    return uri
 
     def issue(self, reference: SourceReference, *, uri: str | None = None) -> str | None:
         if type(reference.line_end) is not int or reference.line_end < 1 or self.gateway.authorize(reference):
             return None
         with self._lock:
+            self._expire()
             if uri is not None:
+                if self.minimal and uri in self._spent:
+                    return None
                 if not uri.startswith(self.uri_prefix) or len(uri) != len(self.uri_prefix) + 24:
                     return None
                 existing = self._cursors.get(uri)
@@ -99,7 +134,7 @@ class SourceContinuationReader:
                     return uri
                 self._cursors[uri] = _Cursor(reference, reference.line_end + 1, self.max_reads,
                                              self.clock() + self.retention_seconds)
-                while len(self._cursors) > self.max_references:
+                while not self.minimal and len(self._cursors) > self.max_references:
                     self._cursors.popitem(last=False)
                 return uri
             return self._issue_cursor(_Cursor(
@@ -124,9 +159,12 @@ class SourceContinuationReader:
             self.clock() + self.retention_seconds, line_end,
         )
         with self._lock:
+            self._expire()
             if uri is None:
                 return self._issue_cursor(cursor)
             if not uri.startswith(self.uri_prefix) or len(uri) != len(self.uri_prefix) + 24:
+                return None
+            if self.minimal and uri in self._spent:
                 return None
             existing = self._cursors.get(uri)
             if existing is not None:
@@ -139,19 +177,27 @@ class SourceContinuationReader:
                 # Idempotent binding must not refresh expiry or read budget.
                 return uri
             self._cursors[uri] = cursor
-            while len(self._cursors) > self.max_references:
+            while not self.minimal and len(self._cursors) > self.max_references:
                 self._cursors.popitem(last=False)
             return uri
 
     def _issue_cursor(self, cursor: _Cursor) -> str:
         uri = self.uri_prefix + secrets.token_hex(12)
         self._cursors[uri] = cursor
-        while len(self._cursors) > self.max_references:
+        while not self.minimal and len(self._cursors) > self.max_references:
             self._cursors.popitem(last=False)
         return uri
 
+    def _expire(self) -> None:
+        if self.minimal:
+            for uri, cursor in list(self._cursors.items()):
+                if self.clock() >= cursor.expires:
+                    self._spent.add(uri)
+                    del self._cursors[uri]
+
     def has_reference(self, uri: str) -> bool:
         with self._lock:
+            self._expire()
             return uri in self._cursors
 
     def retain_references(self, uris: list[str]) -> None:
@@ -171,6 +217,8 @@ class SourceContinuationReader:
         with self._lock:
             # Consumption also prevents concurrent reads of the same range.
             cursor = self._cursors.pop(uri, None)
+            if self.minimal and cursor is not None:
+                self._spent.add(uri)
         if cursor is None or self.clock() >= cursor.expires:
             return self._failure("source_unavailable", "unknown_or_expired_reference")
         reference = cursor.reference
@@ -188,12 +236,15 @@ class SourceContinuationReader:
         if failure:
             return self._failure(failure, "source_policy_or_snapshot_changed")
         try:
-            lines = raw.decode("utf-8").splitlines()
+            text = raw.decode("utf-8")
+            lines = text.splitlines(keepends=self.minimal)
         except UnicodeDecodeError:
             return self._failure("source_unavailable", "unsupported_encoding")
         target_end = min(len(lines), cursor.end) if cursor.end is not None else len(lines)
         if cursor.start > target_end:
             return {"status": "complete", "reason_code": "end_of_source"}
+        if self.minimal:
+            return self._read_structural(cursor, text, lines, target_end)
         stop = min(target_end, cursor.start + self.max_lines - 1)
         next_uri = self.uri_prefix + secrets.token_hex(12)
         while stop >= cursor.start:
@@ -224,6 +275,40 @@ class SourceContinuationReader:
             stop -= 1
         return self._failure("source_unavailable", "line_exceeds_read_budget")
 
+    def _read_structural(self, cursor: _Cursor, text: str, lines: list[str], target_end: int) -> dict:
+        from docmancer.core.structured_chunking import parse_markdown_parents
+        from docmancer.docs.domain.minimal_context_config import EMERGENCY_TOKENS
+        parents = parse_markdown_parents(text, cursor.reference.path)
+        parent = next((p for p in parents if p.line_start <= cursor.start <= p.line_end), None)
+        start, stop = (parent.line_start, parent.line_end) if parent else (1, len(lines))
+        # Include the complete subtree. An old chunk boundary inside a block is
+        # expanded rather than silently delivering a severed list/table/fence.
+        if parent is not None and parent.level:
+            for following in parents[parents.index(parent) + 1:]:
+                if following.level <= parent.level:
+                    break
+                stop = following.line_end
+        more = stop < target_end
+        continuation = self.uri_prefix + secrets.token_hex(12) if more else None
+        reference = cursor.reference
+        result = {
+            "status": "truncated" if more else "complete",
+            "path": reference.path, "project_identity": reference.project_identity,
+            "content_sha256": reference.content_sha256,
+            "line_start": start, "line_end": stop,
+            "snippet": "".join(lines[start - 1:stop]), "continuation": continuation,
+        }
+        from .model_visible_projection_helpers import canonical_projection_bytes
+        from .projection_tokenizer import projection_token_count
+        measured = projection_token_count(canonical_projection_bytes(result))
+        if measured > EMERGENCY_TOKENS:
+            return {"status": "error", "reason_code": "context_emergency_stop",
+                    "measured_tokens": measured, "emergency_tokens": EMERGENCY_TOKENS}
+        if continuation:
+            with self._lock:
+                self._cursors[continuation] = _Cursor(reference, stop + 1, 0, cursor.expires, cursor.end)
+        return result
+
     @staticmethod
     def _failure(status: str, reason: str) -> dict:
         return {"status": status, "reason_code": reason}
@@ -240,21 +325,29 @@ def source_continuation_uri(project_root: str, source: dict) -> str | None:
                 catalog, source.get('doc_scope'), source.get('module_path'),
                 source.get('heading_path'), source.get('line_start'), source.get('line_end')]
     identity = hashlib.sha256(json.dumps(material, sort_keys=True).encode()).hexdigest()[:24]
-    return SourceContinuationReader.uri_prefix + identity
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    prefix = "docatlas://source/v2/" if minimal_context_enabled() else SourceContinuationReader.uri_prefix
+    return prefix + identity
 
 
 def attach_source_continuation_locators(payload: dict, snapshot: dict, *, root: str, max_tokens: int) -> None:
     """Attach source-local locators and synchronize their snapshot bindings."""
     from .model_visible_projection import _refresh_estimate
+    changed = False
     for source in payload.get('sources') or ():
         bound = snapshot[source['evidence_id']]
         uri = source_continuation_uri(root, bound['source'])
         if not uri or type(source.get('line_end')) is not int:
             continue
         source['source_uri'] = uri
-        _refresh_estimate(payload)
+        changed = True
         bound['projected_source']['source_uri'] = uri
         bound['source_uri'] = uri
+    # Decoration has no intermediate size-dependent decisions. Serializing the
+    # complete preselection pool once per row made full acquisition quadratic.
+    # The same final estimate and all per-source bindings are retained.
+    if changed:
+        _refresh_estimate(payload)
 
 
 def bind_project_source_continuations(reader, project_root: str, projection: dict, snapshot: dict) -> None:

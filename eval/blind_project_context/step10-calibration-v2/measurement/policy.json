@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "recipe": "complete-own-body-gated-maxp-v2",
+  "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "structural_recipe": "minimal-structure-v1",
+  "lanes": "original_translation_max",
+  "threshold": -6.489150047302246,
+  "calibration_sha256": "7c7399ce4f257a383b158ad30132742a9a89083f6dc7ba8bf335dc450e96a539",
+  "calibration_manifest_sha256": "7c7399ce4f257a383b158ad30132742a9a89083f6dc7ba8bf335dc450e96a539"
+}

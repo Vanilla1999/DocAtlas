@@ -1,0 +1,196 @@
+{
+  "boundary": "diagnostic only; new root/generation, not exact historical replay",
+  "historical_file": "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-qwen-calibration/run-01/calibration-diagnostic/tidegauge/C-T2.json",
+  "historical_sha256": "6f79b24871a1bf353960ff17221349ebd717879054e34fcfbedb9a3b4c9a0ad3",
+  "inputs": [
+    {
+      "path": "architecture.md",
+      "char_start": 0,
+      "body_char_start": 26,
+      "char_end": 115,
+      "old_sha256": "f3ad1fcd076912c6ad76312c152484c6d4761c9dae9f98faeaa22eefda8988ba",
+      "new_sha256": "f3ad1fcd076912c6ad76312c152484c6d4761c9dae9f98faeaa22eefda8988ba",
+      "equal": true
+    },
+    {
+      "path": "architecture.md",
+      "char_start": 115,
+      "body_char_start": 133,
+      "char_end": 377,
+      "old_sha256": "0db6d96082f4d2ff79efac62ec9f0785eefd3c6bd21bdb574d6c18b0331f64eb",
+      "new_sha256": "0db6d96082f4d2ff79efac62ec9f0785eefd3c6bd21bdb574d6c18b0331f64eb",
+      "equal": true
+    },
+    {
+      "path": "architecture.md",
+      "char_start": 377,
+      "body_char_start": 400,
+      "char_end": 598,
+      "old_sha256": "f7632b528cd12a48529decf1bd5bdc6f564b7f3ca7684f4fbb87b45d53d253f1",
+      "new_sha256": "f7632b528cd12a48529decf1bd5bdc6f564b7f3ca7684f4fbb87b45d53d253f1",
+      "equal": true
+    },
+    {
+      "path": "dashboard.md",
+      "char_start": 0,
+      "body_char_start": 20,
+      "char_end": 110,
+      "old_sha256": "c4976c5759d61459162aee2ae8283a11b93046ccea72deb372f1527f53aed3f2",
+      "new_sha256": "c4976c5759d61459162aee2ae8283a11b93046ccea72deb372f1527f53aed3f2",
+      "equal": true
+    },
+    {
+      "path": "dashboard.md",
+      "char_start": 110,
+      "body_char_start": 121,
+      "char_end": 330,
+      "old_sha256": "3e0bc51957b1e29360099a16fd24dc7fbbda087a95046161162d34596af59edd",
+      "new_sha256": "c3d03af4e53153db8b51c5790e5a8ee4548c5544a872eca315be6392e60d9dc6",
+      "equal": false
+    },
+    {
+      "path": "dashboard.md",
+      "char_start": 330,
+      "body_char_start": 341,
+      "char_end": 525,
+      "old_sha256": "6709a1d562f26ab0b5937aa20baa7f44ef5d9de805906b38c83605e28b753435",
+      "new_sha256": "6709a1d562f26ab0b5937aa20baa7f44ef5d9de805906b38c83605e28b753435",
+      "equal": true
+    },
+    {
+      "path": "export.md",
+      "char_start": 0,
+      "body_char_start": 16,
+      "char_end": 81,
+      "old_sha256": "c6d3b459e8efa5ee57433aef32fcef2f1b96d45392368e7daca8e93df65a2f68",
+      "new_sha256": "c6d3b459e8efa5ee57433aef32fcef2f1b96d45392368e7daca8e93df65a2f68",
+      "equal": true
+    },
+    {
+      "path": "export.md",
+      "char_start": 81,
+      "body_char_start": 96,
+      "char_end": 330,
+      "old_sha256": "060f04c7266597baafabf082824340a0fbafc8d0bde23a03924c2ed0cb8db3f3",
+      "new_sha256": "060f04c7266597baafabf082824340a0fbafc8d0bde23a03924c2ed0cb8db3f3",
+      "equal": true
+    },
+    {
+      "path": "export.md",
+      "char_start": 330,
+      "body_char_start": 351,
+      "char_end": 511,
+      "old_sha256": "e44acc52c5e6c9afcb3d6a8aa60abe768ef4af09f0bbe03bbcf639541fd35982",
+      "new_sha256": "e44acc52c5e6c9afcb3d6a8aa60abe768ef4af09f0bbe03bbcf639541fd35982",
+      "equal": true
+    },
+    {
+      "path": "export.md",
+      "char_start": 511,
+      "body_char_start": 522,
+      "char_end": 650,
+      "old_sha256": "8fc482373b7b84f63941e470cca324bec80e789be3c5c9c42a044c87a221c8b3",
+      "new_sha256": "8fc482373b7b84f63941e470cca324bec80e789be3c5c9c42a044c87a221c8b3",
+      "equal": true
+    },
+    {
+      "path": "operations.md",
+      "char_start": 0,
+      "body_char_start": 21,
+      "char_end": 216,
+      "old_sha256": "ef6d592ae346dee6e74310337ad45f7d935c25f82b22d420f619bb73a5f3882b",
+      "new_sha256": "ef6d592ae346dee6e74310337ad45f7d935c25f82b22d420f619bb73a5f3882b",
+      "equal": true
+    },
+    {
+      "path": "operations.md",
+      "char_start": 216,
+      "body_char_start": 226,
+      "char_end": 562,
+      "old_sha256": "eb005a46909b27ae3c135fe4e2af36890d0a96e6f232c40231d149309fb9e7d2",
+      "new_sha256": "f89823749cf41dd23fbce130f99e0ab6cc4fe71e426bb31f9650f42313e5c64b",
+      "equal": false
+    },
+    {
+      "path": "operations.md",
+      "char_start": 562,
+      "body_char_start": 586,
+      "char_end": 803,
+      "old_sha256": "2ae1a5b32b39e21156c3b131e5bffb06a274c2cfca551dad210cbe025db901e1",
+      "new_sha256": "2ae1a5b32b39e21156c3b131e5bffb06a274c2cfca551dad210cbe025db901e1",
+      "equal": true
+    },
+    {
+      "path": "operations.md",
+      "char_start": 803,
+      "body_char_start": 821,
+      "char_end": 1033,
+      "old_sha256": "9b14252eb78f6609eeb4ac527d0c5ea548492b209c14a161e8d2b58472ccf3ea",
+      "new_sha256": "9b14252eb78f6609eeb4ac527d0c5ea548492b209c14a161e8d2b58472ccf3ea",
+      "equal": true
+    },
+    {
+      "path": "overview.md",
+      "char_start": 0,
+      "body_char_start": 12,
+      "char_end": 166,
+      "old_sha256": "3200aa9eec135a1b526842a63cdbd3cf2787dc742b38acd0c3686cb54bc99b3b",
+      "new_sha256": "3200aa9eec135a1b526842a63cdbd3cf2787dc742b38acd0c3686cb54bc99b3b",
+      "equal": true
+    },
+    {
+      "path": "overview.md",
+      "char_start": 166,
+      "body_char_start": 180,
+      "char_end": 426,
+      "old_sha256": "7857c222175dc55d52c331de173cff46c086f4ba542e8c1cddb4f742286ab185",
+      "new_sha256": "7857c222175dc55d52c331de173cff46c086f4ba542e8c1cddb4f742286ab185",
+      "equal": true
+    },
+    {
+      "path": "overview.md",
+      "char_start": 426,
+      "body_char_start": 440,
+      "char_end": 646,
+      "old_sha256": "091a617e775d05b34dd625389b583358691afeefe776ea0a1d0a00420dbf1630",
+      "new_sha256": "091a617e775d05b34dd625389b583358691afeefe776ea0a1d0a00420dbf1630",
+      "equal": true
+    },
+    {
+      "path": "storage.md",
+      "char_start": 0,
+      "body_char_start": 18,
+      "char_end": 176,
+      "old_sha256": "4b8af97caaa57dcbfc0957eedc5cfb8b73864690716ff0c77fa9e1de7353de0d",
+      "new_sha256": "4b8af97caaa57dcbfc0957eedc5cfb8b73864690716ff0c77fa9e1de7353de0d",
+      "equal": true
+    },
+    {
+      "path": "storage.md",
+      "char_start": 176,
+      "body_char_start": 189,
+      "char_end": 402,
+      "old_sha256": "c61c9f55e624e213a29218cbad8551bce1b8f23582b15ac7b4e552fa8e9aaaab",
+      "new_sha256": "bf9be6000eb9f96055f05c5ce16bdece38993c3a79612bdf980a890d1e9b4c6f",
+      "equal": false
+    },
+    {
+      "path": "storage.md",
+      "char_start": 402,
+      "body_char_start": 414,
+      "char_end": 588,
+      "old_sha256": "989efb99228ed5d39b20605410829e0f8b1d72c2c73019c369dee2b05a70c77d",
+      "new_sha256": "989efb99228ed5d39b20605410829e0f8b1d72c2c73019c369dee2b05a70c77d",
+      "equal": true
+    },
+    {
+      "path": "storage.md",
+      "char_start": 588,
+      "body_char_start": 610,
+      "char_end": 777,
+      "old_sha256": "24fdb0ed3ab58f75ae1b13b69189e238a890aad8d93b6da4135ea2365639552c",
+      "new_sha256": "24fdb0ed3ab58f75ae1b13b69189e238a890aad8d93b6da4135ea2365639552c",
+      "equal": true
+    }
+  ]
+}

@@ -1,0 +1,507 @@
+{
+  "manifest_sha256": "00fc5fbe8df385ba5c14a4643e0841a37d16c00de934b2b9bb9b907df3495a14",
+  "recipe": {
+    "schema_version": 2,
+    "calibration_recipe": "final-closure-all-useful-breakpoints-v3",
+    "recipe": "complete-own-body-gated-maxp-v2",
+    "structural_recipe": "minimal-structure-v1",
+    "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+    "lanes": "original_translation_max",
+    "threshold_rule": "largest observed global calibration score breakpoint whose final structural-closed set contains every useful own-body unit and every labeled fact for every positive calibration query",
+    "noanswer_gate": "every calibration no-answer query must deliver zero source rows at that threshold; otherwise infeasible, no deployable policy",
+    "raw_retention": "diagnostic only, not a sufficiency gate",
+    "closure": "For each seed add its entire subtree and ancestor own bodies and preamble. Repeatedly follow reference definitions/footnotes to their owner own body with ancestors, and unambiguous authorized anchored links to target subtrees with ancestors, until no new units. Ancestor inclusion alone does not add its siblings or whole subtree. Missing/ambiguous targets remain explicit gaps. Fixed checked source graph; no score-dependent edges or quotas.",
+    "monotonicity": "On a fixed checked graph A subset B implies C(A) subset C(B): all operations only union fixed successors. Threshold increase removes seeds and cannot add delivery units. Emergency rejection is separate and is not monotone delivery success.",
+    "breakpoints": "all distinct finite calibration scores, inclusive >=, plus nextafter(max_score,+infinity) representing the empty-seed interval; ties admitted together",
+    "validation_gate": "all useful units and facts delivered verbatim; exact source span/hash/scope; zero rows for no-answer; unchanged structural closure and emergency50000; direct retention and irrelevant delivery reported",
+    "training": "Existing V2 calibration only, explicitly reused development data. Existing V2 validation and T01 excluded. Fresh validation frozen before any V3 inference. No retuning after validation."
+  },
+  "best": {
+    "threshold": -3.352724552154541,
+    "losses": {},
+    "noanswer_contaminated": []
+  },
+  "calibration_feasible": true,
+  "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+  "public_final_delivery_pass": true,
+  "counts": {
+    "public_prepares": 6,
+    "public_queries": 24,
+    "scorer_executions": 16,
+    "scorer_cache_hits": 8,
+    "model_pairs": 238,
+    "model_forwards": 200,
+    "closure_replays": 52
+  },
+  "results": [
+    {
+      "id": "C2-transfer",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook",
+        "Trolley paint",
+        "Visitor badges"
+      ],
+      "source_rows": 8,
+      "characters": 1496,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 2.631159750999359,
+      "json_tokens": 2333,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-own-child",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook",
+        "Moving occupied hives",
+        "Entrance preparation",
+        "Securing the boxes",
+        "Reopening",
+        "Queen inspection exception",
+        "Visitor badges"
+      ],
+      "source_rows": 8,
+      "characters": 1496,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.29944851800246397,
+      "json_tokens": 2335,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-subtree",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook",
+        "Visitor badges"
+      ],
+      "source_rows": 8,
+      "characters": 1496,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.33890106299804756,
+      "json_tokens": 2339,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-noanswer",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook",
+        "Moving occupied hives",
+        "Entrance preparation",
+        "Securing the boxes",
+        "Reopening",
+        "Trolley paint",
+        "Queen inspection exception",
+        "Visitor badges"
+      ],
+      "source_rows": 8,
+      "characters": 1496,
+      "direct_misses": [],
+      "noanswer": true,
+      "seconds": 0.3003189920054865,
+      "json_tokens": 2341,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-tail-ru",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Lighting inventory"
+      ],
+      "source_rows": 3,
+      "characters": 3883,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.6451368589987396,
+      "json_tokens": 1726,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-long-negative",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Textile conservation room",
+        "Intake notebook",
+        "Lighting inventory"
+      ],
+      "source_rows": 3,
+      "characters": 3883,
+      "direct_misses": [],
+      "noanswer": true,
+      "seconds": 0.33666065400029765,
+      "json_tokens": 1715,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-narrow-facilities",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Textile conservation room",
+        "Intake notebook"
+      ],
+      "source_rows": 3,
+      "characters": 3883,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.38666695800202433,
+      "json_tokens": 1712,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-building-log",
+      "split": "calibration",
+      "diagnostic": true,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Textile conservation room",
+        "Lighting inventory"
+      ],
+      "source_rows": 3,
+      "characters": 3883,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.35555830300290836,
+      "json_tokens": 1716,
+      "source_checks": "PASS",
+      "policy_sha256": "diagnostic-unverified"
+    },
+    {
+      "id": "C2-transfer",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook",
+        "Trolley paint"
+      ],
+      "source_rows": 7,
+      "characters": 1338,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.09246898900164524,
+      "json_tokens": 2139,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-own-child",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook",
+        "Moving occupied hives"
+      ],
+      "source_rows": 3,
+      "characters": 547,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.0640187379976851,
+      "json_tokens": 1156,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-subtree",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cooperative apiary handbook"
+      ],
+      "source_rows": 7,
+      "characters": 1338,
+      "direct_misses": [
+        "Entrance preparation",
+        "Securing the boxes",
+        "Reopening",
+        "Trolley paint"
+      ],
+      "noanswer": false,
+      "seconds": 0.09293161899404367,
+      "json_tokens": 2133,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-noanswer",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [],
+      "source_rows": 0,
+      "characters": 0,
+      "direct_misses": [],
+      "noanswer": true,
+      "seconds": 0.04140293099771952,
+      "json_tokens": 382,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-tail-ru",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [],
+      "source_rows": 2,
+      "characters": 3746,
+      "direct_misses": [
+        "Textile conservation room"
+      ],
+      "noanswer": false,
+      "seconds": 0.0712744440024835,
+      "json_tokens": 1534,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-long-negative",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [],
+      "source_rows": 0,
+      "characters": 0,
+      "direct_misses": [],
+      "noanswer": true,
+      "seconds": 0.044348449002427515,
+      "json_tokens": 373,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-narrow-facilities",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Textile conservation room"
+      ],
+      "source_rows": 2,
+      "characters": 295,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.0601029120007297,
+      "json_tokens": 876,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "C2-building-log",
+      "split": "calibration",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Textile conservation room"
+      ],
+      "source_rows": 2,
+      "characters": 3746,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.06479607000073884,
+      "json_tokens": 1529,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-pack",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Bench accessories"
+      ],
+      "source_rows": 7,
+      "characters": 1123,
+      "direct_misses": [
+        "Meridian mirror workshop",
+        "Cooling",
+        "Wrapping"
+      ],
+      "noanswer": false,
+      "seconds": 0.34599547799734864,
+      "json_tokens": 2099,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-section",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Meridian mirror workshop"
+      ],
+      "source_rows": 7,
+      "characters": 1123,
+      "direct_misses": [
+        "Cooling",
+        "Wrapping",
+        "Crate closure",
+        "Bench accessories",
+        "Crack restriction"
+      ],
+      "noanswer": false,
+      "seconds": 0.3050567280006362,
+      "json_tokens": 2098,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-pencil",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Meridian mirror workshop",
+        "Packing a mirror",
+        "Crack restriction"
+      ],
+      "source_rows": 4,
+      "characters": 681,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.2195658279961208,
+      "json_tokens": 1386,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-optics-noanswer",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [],
+      "source_rows": 0,
+      "characters": 0,
+      "direct_misses": [],
+      "noanswer": true,
+      "seconds": 0.1873521890011034,
+      "json_tokens": 374,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-hold-ru",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Cabinet furniture"
+      ],
+      "source_rows": 5,
+      "characters": 1052,
+      "direct_misses": [
+        "Alder seed archive",
+        "Record cards"
+      ],
+      "noanswer": false,
+      "seconds": 0.2945694119989639,
+      "json_tokens": 1654,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-shelves",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Alder seed archive",
+        "Receiving envelopes",
+        "Damaged seal rule"
+      ],
+      "source_rows": 4,
+      "characters": 886,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.18860249599674717,
+      "json_tokens": 1413,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-lights",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [
+        "Alder seed archive"
+      ],
+      "source_rows": 2,
+      "characters": 306,
+      "direct_misses": [],
+      "noanswer": false,
+      "seconds": 0.17162932400242426,
+      "json_tokens": 886,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    },
+    {
+      "id": "V3-seed-noanswer",
+      "split": "validation",
+      "diagnostic": false,
+      "missing_units": [],
+      "missing_facts": [],
+      "delivered_negative_units": [],
+      "source_rows": 0,
+      "characters": 0,
+      "direct_misses": [],
+      "noanswer": true,
+      "seconds": 0.1633889930017176,
+      "json_tokens": 375,
+      "source_checks": "PASS",
+      "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+    }
+  ],
+  "boundary": "real in-process public prepare/query, real scoring once per exact input, score memo replay on final calibration; no installed/client proof"
+}

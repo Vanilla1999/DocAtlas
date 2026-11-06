@@ -1,0 +1,10 @@
+{
+  "case": "T01-ru",
+  "corpus": "L0",
+  "arm": "minimal-context",
+  "session": "ses_e4e64fcf0ffeDGGXiZi9TslFbt",
+  "seconds": 111.57,
+  "exit": 0,
+  "censored": false,
+  "timeout_seconds": null
+}

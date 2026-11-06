@@ -1,0 +1,54 @@
+{
+  "schema": "index-description-development-queries-v1",
+  "status": "SEEN_DEVELOPMENT_NOT_HOLDOUT",
+  "origin": "step10-qwen-validation/offline-packet-audit.json; original V-M1..V-M4 questions and literal facts preserved",
+  "policy": {"mode": "lexical", "limit": 5, "budget": 4096, "expand": "none"},
+  "queries": [
+    {
+      "id": "V-M1",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "no_answer_expected": false,
+      "facts": [
+        {"source": "reservations.md", "quote": "These rules apply to confirmed night-time reservations on shared instruments."},
+        {"source": "reservations.md", "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."},
+        {"source": "reservations.md", "quote": "Retain the original reservation identifier and record both observers in the audit trail."},
+        {"source": "reservations.md", "quote": "leave the transfer pending even after observer acceptance and operator approval"},
+        {"source": "reservations.md", "quote": "The lock must be cleared by the instrument team first."},
+        {"source": "weather.md", "quote": "Suspend outdoor observations when the wind interlock opens."},
+        {"source": "weather.md", "quote": "Preserve reservation identifiers during suspension."},
+        {"source": "weather.md", "quote": "Resume only after the interlock closes and the duty operator records a restart approval."}
+      ]
+    },
+    {
+      "id": "V-M2",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "no_answer_expected": false,
+      "facts": [
+        {"source": "weather.md", "quote": "Weather decisions govern execution, not ownership of reservations."},
+        {"source": "weather.md", "quote": "Suspend outdoor observations when the wind interlock opens."},
+        {"source": "weather.md", "quote": "Preserve reservation identifiers during suspension."},
+        {"source": "weather.md", "quote": "Resume only after the interlock closes and the duty operator records a restart approval."},
+        {"source": "weather.md", "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."},
+        {"source": "weather.md", "quote": "A roof visible as closed on the calendar does not establish indoor classification."}
+      ]
+    },
+    {
+      "id": "V-M3",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "no_answer_expected": false,
+      "facts": [
+        {"source": "clock.md", "quote": "The gateway compares instrument time with the observatory reference before executing a schedule."},
+        {"source": "clock.md", "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."},
+        {"source": "clock.md", "quote": "Keep queued reservations unchanged."},
+        {"source": "clock.md", "quote": "Resume only after two consecutive reference checks report an offset within two seconds."},
+        {"source": "clock.md", "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."}
+      ]
+    },
+    {
+      "id": "V-M4",
+      "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+      "no_answer_expected": true,
+      "facts": []
+    }
+  ]
+}

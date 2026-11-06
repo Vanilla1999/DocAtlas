@@ -236,9 +236,11 @@ def runtime_public_tool_dicts() -> tuple[dict[str, Any], ...]:
     surface = build_docs_surface(DocsServerConfig())
     tools = tuple(spec.to_tool_dict() for spec in surface.tools)
     names = tuple(tool["name"] for tool in tools)
-    if names != PUBLIC_TOOL_ORDER:
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    expected = (*PUBLIC_TOOL_ORDER, "read_docs_source") if minimal_context_enabled() else PUBLIC_TOOL_ORDER
+    if names != expected:
         raise RuntimeError(
-            f"public Docs MCP tool order drifted: expected {PUBLIC_TOOL_ORDER!r}, got {names!r}"
+            f"public Docs MCP tool order drifted: expected {expected!r}, got {names!r}"
         )
     return deepcopy(tools)
 
@@ -256,9 +258,25 @@ def public_agent_contract() -> dict[str, Any]:
             }
         )
 
+    workflow = deepcopy(WORKFLOW_POLICY)
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled, EMERGENCY_TOKENS
+    if minimal_context_enabled():
+        workflow["free_form_lookup"].update(maximum_lookup_queries=None,
+            semantic_lanes="unchanged_original_and_supplied_full_translation_max")
+        workflow["gap_resolution"].update(source_path_lookup_slots=0, source_path_max_tokens=None,
+            source_resource_reads="whole_authorized_structural_blocks_to_exhaustion",
+            source_read_tool="read_docs_source", emergency_tokens=EMERGENCY_TOKENS,
+            context_portion_stop=["gap_answered", "no_next_portion", "no_useful_new_evidence", "context_emergency_stop"])
+        workflow["minimal_context_candidate"] = {
+            "default_enabled": False, "context_quality": "unverified",
+            "emergency_is_selection_budget": False,
+            "read_returned_conditions_and_exceptions": True,
+            "identify_concrete_missing_aspect_before_another_call": True,
+            "semantic_rejections_are_deferred_pages": False,
+        }
     payload: dict[str, Any] = {
         "schema": CONTRACT_SCHEMA,
-        "workflow": deepcopy(WORKFLOW_POLICY),
+        "workflow": workflow,
         "examples": deepcopy(list(PUBLIC_EXAMPLES)),
         "tools": tool_records,
     }

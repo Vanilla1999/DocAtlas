@@ -1,0 +1,41 @@
+{
+  "model": "capture",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Transport capture only.\n# Your Model\n- Name: capture\n- Provider ID: question-audit\n- Model ID: capture\nInstructions from: /tmp/opencode/step9-gap-resolution/AGENTS.md\n# Правила проверок DocAtlas\n\nРешение владельца от 2026-10-10: существенно сократить тестовый набор;\nновые проверки писать только на интеграционном уровне и выше.\nРазбор и план: `v2plan/TEST_STRATEGY_INTEGRATION_FIRST_RU.md`.\nУточнение владельца: целевое чистое сокращение активного набора минимум40%,\nсначала разбор красных. Критерии и мультиагентный промпт:\n`v2plan/TEST_REDUCTION_40_ANALYSIS_RU.md`.\nНовое решение владельца от 2026-10-10: разрешено удалить все красные тесты\nпо зафиксированному результату FAIL, включая защитные проверки, без обязательного\nпреемника, разбора причины сбоя или независимого review каждого удаления.\nВладелец явно принимает потерю соответствующего покрытия. Это решение имеет\nприоритет над противоречащими ему требованиями сохранения тестов ниже и в\nуказанных планах. Удаление теста не означает исправление продукта или PASS\nпроверяемого свойства. Новые сценарии учитываются в остатке;\nпереносы/skip/скрытые циклы не засчитываются как сокращение.\n\nДополнительное подтверждённое решение владельца от 2026-10-10: удалить также\nвсе зелёные unit-тесты по зафиксированному результату PASS, включая уникальные\nи защитные проверки, без обязательной замены интеграционным сценарием или\nнезависимого review. Владелец явно принимает потерю этого покрытия. Решение\nимеет приоритет над противоречащими требованиями сохранения тестов ниже и в\nпланах. Зелёные интеграционные сценарии и SKIP не входят в это разрешение.\nУровень теста определяется фактической границей исполнения, а не именем файла\nили наличием tmp_path. Общие helpers и fixtures сохраняются для оставшихся\nconsumers. Удаление зелёного unit-теста не доказывает качество продукта.\n\n## Обязательные правила для агента\n\n- Не добавлять unit-тесты, проверки приватных helpers, снимки реализации и\n  матрицы строковых вариантов. Сначала переиспользовать существующий сценарий.\n- Воспроизводить исходную пользовательскую задачу через настоящий публичный\n  API/CLI/MCP с реальными компонентами. Предпочитать установленный пакет и\n  production-путь исполнения на изолированных данных.\n- Проверять конечную выдачу: обязательные факты, исходный текст, допустимые\n  источники/hash/span, scope/version и фактические изменения состояния.\n  Вызов mock, внутренний флаг, наличие лога и exit 0 не доказывают решение задачи.\n- Не подменять проверяемые retrieval, selection, storage или validation mocks.\n  Подмена внешнего транспорта допустима только с явным указанием границы доказательства.\n- Ожидаемые факты брать из исходной задачи и независимых исходных документов,\n  а не вычислять тем же production-кодом, который проверяется.\n- Не переписывать вопросы, эталоны и критерии ради PASS. Изменение продуктового\n  контракта должно быть явным и отдельным от исправления реализации.\n- Сокращать старые тесты группами: уникальное поведение переносить в существующий\n  интеграционный сценарий; дубли и отменённые требования удалять с обоснованием.\n  Для действующих свойств сохранять воспроизводимый positive и обнаружение\n  существенного дефекта. Не требовать отдельного преемника для каждого дубля.\n  Для красных тестов и зелёных unit-тестов действуют разрешённые выше исключения.\n- Сохранять проверки источников, consent, access, authority и отсутствия\n  неразрешённых побочных действий через публичные сценарии, кроме красных\n  тестов и зелёных unit-тестов, удаление которых владелец явно разрешил выше.\n- Подробные логи должны включаться и выключаться настройкой. Включение не\n  меняет результат, права, выбор источников и число продуктовых вызовов.\n  Для MCP логи идут отдельно от protocol stdout; пропуски трассы явны.\n- Разбирать сбой по трассе одного исходного вопроса. Логи объясняют причину,\n  а независимая проверка конечного результата определяет PASS/FAIL.\n- Не скрывать тысячи операций внутри одного теста. Считать сценарии, реальные\n  вызовы, время и обнаруживаемые дефекты; число зелёных assertions не является целью.\n- Не запускать одинаковые наборы повторно без новой причины. Пользоваться\n  разрешённым CI; локальный runtime ограничен текущими решениями checkpoint.\n- Различать integration, installed stdio, реальный клиент и production smoke.\n  Результат одного уровня не объявлять доказательством другого.\n\n\nToday's date: Fri Nov 06 2026\n\nHere is some useful information about the environment you are running in:\n<env>\n  Working directory: /tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-client-question-stdin\n  Workspace root folder: /tmp/opencode/step9-gap-resolution\n  Is directory a git repo: yes\n  Platform: linux\n  Prefer /tmp/opencode over generic system temporary directories such as /tmp; it is pre-created and approved for external access.\n</env>\nWhen you create a worktree outside the current working directory and intend to use it as your primary working directory, consider using `execute` to call `tools.opencode.session_move` and make the worktree the session's working directory."
+    },
+    {
+      "role": "user",
+      "content": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "skill",
+        "description": "Load a specialized skill's instructions and resources into the current conversation when the task at hand matches its description.\n\nThe skill ID must match an available skill or a skill explicitly referenced by the user.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The ID of an available skill or a skill explicitly referenced by the user"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "strict": false
+      }
+    }
+  ],
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  },
+  "max_completion_tokens": 1000
+}

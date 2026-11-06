@@ -1,0 +1,11 @@
+{
+  "historical-user-messages.json": "4c40ceac8248b4b71dbed2144f06231ec63b0723b85e8d44336ea82bbd1bbc65",
+  "observer/index.js": "72155e5e8cbfa02d721d22996acaa6b726fee95613a3a70bbc891f12c9e1ffc9",
+  "opencode.json": "06ed625d8bf2ef93f5a8ebf5322e625671d946fbb3d8eb39b5d49915fa31a32b",
+  "provider-1.json": "e78d021184380881abdaeabd6f7e747fde81da7f44fc1153f771e80c31a64bc6",
+  "receipt.json": "82ace7515913630dd824f18fb2660a7f9b5966add64c01acd4f5214f938664b2",
+  "stdin-argv.json": "2f75f4930dddd5d7d0f1f7683109467b3737d6dafdfac829cef2da9ac96ff89e",
+  "stdin-messages.json": "04e3a604920d94ea9fd5c86c8a5133c3294727e2a17d6ad4fba63e31f43851f1",
+  "stdin.jsonl": "51eebf5d87ccf319b11187ece92f5623777db204cabaca0c0acaa94bc3b2fa81",
+  "stdin.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

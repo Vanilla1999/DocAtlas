@@ -1,0 +1,108 @@
+{
+  "seconds": 0.13302172299881931,
+  "expected_paths": [
+    "loom.md"
+  ],
+  "indexed_paths": [
+    "loom.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-f3f762cf4eb5d89ae338ffae7c5e375272f2ae3f",
+      "source_path": "loom.md",
+      "display_text": "# Loom service hall\n\nThis maintenance record applies to the pneumatic loom in the north weaving hall.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-8865e055da807ab2c1f1274db442c0cfdfdcc530",
+      "source_path": "loom.md",
+      "display_text": "## Service notebook\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-6b7cba3df2f87412755844b4857f5ab1853ad574",
+      "source_path": "loom.md",
+      "display_text": "The hall entrance opens onto a tiled lobby with two benches. The benches are cleaned every morning with a damp cloth. A rack above each bench holds visitor badges. Badges are returned before visitors leave the building. The lobby clock is checked against the office clock once a week. A framed drawing of the original hall hangs beside the notice board. The drawing is decorative and is not a machinery diagram. The notice board has separate spaces for social events and building ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-778c2ad76a37ad5a84c12f836776ad5638a128d5",
+      "source_path": "loom.md",
+      "display_text": "maintenance. Old notices are removed at the end of each month. Spare pins are kept in a small wooden box in the office. The office desk faces a courtyard with a brick wall. The courtyard is planted with herbs in clay pots. The pots are watered by the building caretaker. A watering can stands beside the outside tap. Its handle is painted yellow to make it easy to find. The tap is covered during winter to prevent freezing. The outside broom is stored beneath the stairway. The stairway ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-11a3f01a2da0a00742f01fd39f973233d5ef1a9b",
+      "source_path": "loom.md",
+      "display_text": "leads to a meeting room used for staff briefings. This room contains a round table and eight chairs. Extra chairs may be borrowed from the dining area. Chairs are returned after each meeting. The table is covered with a washable cloth when refreshments are served. Plates and cups are washed in the kitchen sink. Clean cups are stored upside down on a shelf. The kitchen window opens toward the loading yard. Deliveries of office stationery arrive at the yard on Thursdays. A porter ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-86b7ef938d791e981f18d192787aa8ae16d89168",
+      "source_path": "loom.md",
+      "display_text": "brings the stationery to the office cupboard. Paper is kept on the lower shelves and envelopes on the upper shelves. Ink bottles stand in a shallow tray to contain accidental spills. The tray is wiped before new bottles are placed in it. Empty bottles go into a separate recycling box. The recycling box is collected on the first working day of each month. A wall calendar marks the collection dates. Staff write changes to the schedule on a removable card below the calendar. The card ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-97e10b12ffae59b13efb36882be79931adbb8bf9",
+      "source_path": "loom.md",
+      "display_text": "is replaced when it becomes difficult to read. Spare cards are held together with a metal clip. The clip remains in the stationery drawer. The drawer also holds rulers used for drawing lines on paper forms. The rulers are not used to adjust machinery. The corridor outside the office has a long runner rug. The rug is lifted during floor cleaning and replaced only after the tiles dry. A folding screen protects the corridor while wet cleaning is in progress. The screen has three panels ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-0ac7b38a0e7f75ba312ae6706f4d8409e809d214",
+      "source_path": "loom.md",
+      "display_text": "connected by cloth hinges. It is stored upright behind the lobby door. The door has a brass handle polished at the beginning of each week. A small bell above the door announces arriving visitors. Visitors wait in the lobby until a member of staff arrives. Staff may offer drinking water from the lobby dispenser. Empty water containers are returned to the supplier. The dispenser is cleaned according to the supplier's building-services schedule. These building notes describe ordinary ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-1d6ce45806aa8ecf642481596642fd14e1a579dc",
+      "source_path": "loom.md",
+      "display_text": "housekeeping and do not specify the operating pressure of any machine.\n\nSet the pneumatic loom supply regulator to six point two bar. After adjustment, leave the air isolation valve closed for nineteen seconds before opening it. If the supply hose shows exposed reinforcement, keep the valve closed and replace the hose before operating the loom.\n\n",
+      "line_start": 7,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-31e684b342cef2c57c9d6f2e061c5823b440a197",
+      "source_path": "loom.md",
+      "display_text": "## Uniform cupboard\n\nClean uniforms are stored in the cedar cupboard. The laundry service collects used uniforms on Mondays.\n",
+      "line_start": 11,
+      "line_end": 13
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "a33673970f48973b818f4ff35c738be9bb914f38fc10f603b2b5ca447188eeef",
+  "storage_path": "/tmp/docatlas-evidence-_brdpaqd/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-c8be7847e6134a3c82698803f081b2c1",
+  "catalog_sha256": "3e08239a27be19b444e796a850446df9320de69d41a4d8f58503ce887f6768ed",
+  "documents": [
+    {
+      "path": "loom.md",
+      "content_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17",
+      "catalog_entry_hash": "sha256:a3ae507cc7846de519931c2093186fdeab58e37c2b996a9b86abd892a68ed3cc"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-c8be7847e6134a3c82698803f081b2c1",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-8b408880611a47bde7a47c8c",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive",
+      "snippet": "# Observatory archive\n\nThese instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "af2346e74420595ce29c3cefdba2997e8541be5a25edea4a139cf1e69617a156",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/30ece3627184abafa0827ba9"
+    },
+    {
+      "evidence_id": "ev-5cfbb17e1f76ab196267cac6",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch",
+      "snippet": "## Dispatch\n\nDispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "78566564c187eaa3575211e5868f3b327e2c756c27f3b86aad016dc7d14febde",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/4808bd78fca9916b1b125e10"
+    },
+    {
+      "evidence_id": "ev-5f0a9c0c9d62f62f2cd8d3b4",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch > Label printer",
+      "snippet": "### Label printer\n\nThe label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "1a7ec70ba13ea63c05ad86fe197e502eac119d19efc242673c78c8b546a046d3",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/b0b80ee1bed623fc0c58a8bd"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 825,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+    "calibration_status": "empirical",
+    "candidate_units": 7,
+    "selected_units": 1,
+    "delivered_rows": 3,
+    "scan_complete": true,
+    "model_pairs": 7,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 7,
+      "hydrated_sections": 7,
+      "selected_units": 1,
+      "delivered_spans": 3
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "f8b48328a3673bd2cbd69032d34ece264ea4391fdc40559229e42cbd7cd25b44"
+  }
+}

@@ -1,0 +1,6 @@
+[
+  {"id":"tidegauge","split":"calibration","root":"projects/calibration/tidegauge","query_scope":"project","project_documents":["overview.md","operations.md","storage.md","export.md","dashboard.md","architecture.md"],"module_documents":[{"path":"modules/survey/private.md","scope":"module","module_path":"modules/survey"}]},
+  {"id":"loom","split":"calibration","root":"projects/calibration/loom","query_scope":"project","project_documents":["overview.md","colour.md","recovery.md","publication.md","withdrawal.md","architecture.md"],"module_documents":[{"path":"modules/camera/private.md","scope":"module","module_path":"modules/camera"}]},
+  {"id":"meridian","split":"validation","root":"projects/validation/meridian","query_scope":"project","project_documents":["overview.md","reservations.md","weather.md","clock.md","calendar.md","architecture.md"],"module_documents":[{"path":"modules/laser/private.md","scope":"module","module_path":"modules/laser"}]},
+  {"id":"cairn","split":"validation","root":"projects/validation/cairn","query_scope":"project","project_documents":["overview.md","restore.md","recovery.md","publication.md","rollback.md","architecture.md"],"module_documents":[{"path":"modules/tape/private.md","scope":"module","module_path":"modules/tape"}]}
+]

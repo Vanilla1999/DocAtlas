@@ -1,0 +1,27 @@
+{
+  "status": "STATIC_AND_OFFLINE_INTEGRITY_PASS_NOT_RUNTIME",
+  "compiled_files": [
+    "docmancer/docs/application/minimal_context_structure.py",
+    "docmancer/docs/application/context_evidence_structure.py",
+    "docmancer/docs/application/minimal_context_selection.py",
+    "docmancer/docs/domain/minimal_context_config.py",
+    "eval/blind_project_context/step10-multidoc-gate/runner.py",
+    "docmancer/docs/application/reference_closure_contract.py",
+    "prepare_annotations.py"
+  ],
+  "raw_files_verified": 12,
+  "new_literal_fact_spans": 39,
+  "original_tasks_equal": 16,
+  "historical_manifest_sha256": "2bcebef52ab6268e091f5e28de12acc8837988bff36c2068432e2a4b73ebe066",
+  "historical_manifest_current_file_differences": [
+    "docmancer/docs/application/context_evidence_structure.py",
+    "docmancer/docs/application/minimal_context_selection.py",
+    "docmancer/docs/application/minimal_context_structure.py",
+    "docmancer/docs/domain/minimal_context_config.py",
+    "eval/blind_project_context/step10-multidoc-gate/runner.py"
+  ],
+  "source_provenance_matches_parent": true,
+  "graph_matches_parent": true,
+  "runtime_calls": 0,
+  "imports": "not executed; AST/compile only"
+}

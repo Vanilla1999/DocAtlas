@@ -1,0 +1,693 @@
+--- a/docmancer/core/_sqlite_store_part02.py
++++ b/docmancer/core/_sqlite_store_part02.py
+@@ -7,6 +7,9 @@
+     prepared_parents_enabled,
+ )
+ from .structured_chunking import ParentSection
++from docmancer.retrieval.experimental_search_descriptions import (
++    ARTIFACT_KEY, CHILD_KEY, append_description, child_binding, validate_artifact,
++)
+ 
+ 
+ class _SQLiteStorePart02:
+@@ -198,6 +201,12 @@
+             parents, children = chunk_markdown_parent_child(
+                 doc.content, source_identity, config
+             )
++            artifact = metadata.get(ARTIFACT_KEY)
++            description_records = validate_artifact(
++                artifact, source_path=str(metadata.get("source_path") or doc.source),
++                content=doc.content,
++                spans=((child.char_start, child.char_end) for child in children),
++            ) if ARTIFACT_KEY in metadata else {}
+             if prepared_parent_candidates is not None:
+                 prepared_parent_candidates[doc.source] = parents
+             parent_by_id = {parent.logical_id: parent for parent in parents}
+@@ -255,6 +264,13 @@
+                 retrieval_text = embedding_input(context_prefix, child.display_text)
+                 if description:
+                     retrieval_text = f"{retrieval_text}\n{description}"
++                record = description_records.get((child.char_start, child.char_end))
++                description_binding = None
++                if record is not None:
++                    retrieval_text, status = append_description(
++                        retrieval_text, record, config.hard_max_tokens,
++                    )
++                    description_binding = child_binding(artifact, record, status)
+                 retrieval_hash = _chunk_hash(retrieval_text)
+                 filter_metadata = normalized_filter_metadata({
+                     **metadata,
+@@ -300,6 +316,10 @@
+                     "generation_id": generation_id,
+                 }
+                 snippets = _code_snippets(child.display_text)
++                child_metadata.pop(ARTIFACT_KEY, None)
++                child_metadata.pop(CHILD_KEY, None)
++                if description_binding is not None:
++                    child_metadata[CHILD_KEY] = description_binding
+                 if snippets:
+                     child_metadata["code_snippets"] = snippets
+                     child_metadata["has_code_snippet"] = True
+@@ -497,6 +517,24 @@
+         span_errors = 0
+         token_errors = 0
+         context_errors = 0
++        description_bindings = {}
++        for source_row in conn.execute(
++            "SELECT source, content, metadata_json FROM generation_sources WHERE generation_id = ?",
++            (generation_id,),
++        ):
++            source_metadata = json.loads(source_row["metadata_json"])
++            if ARTIFACT_KEY not in source_metadata:
++                continue
++            artifact = source_metadata[ARTIFACT_KEY]
++            spans = conn.execute(
++                "SELECT char_start, char_end FROM retrieval_children WHERE generation_id = ? AND source = ?",
++                (generation_id, source_row["source"]),
++            ).fetchall()
++            records = validate_artifact(
++                artifact, source_path=str(source_metadata.get("source_path") or source_row["source"]),
++                content=source_row["content"], spans=(tuple(span) for span in spans),
++            )
++            description_bindings[source_row["source"]] = (artifact, records)
+         rows = conn.execute(
+             """
+             SELECT c.*, gs.content AS source_content
+@@ -534,6 +572,24 @@
+                 project_doc_description = metadata.get("project_doc_description")
+                 if isinstance(project_doc_description, str) and project_doc_description.strip():
+                     expected_retrieval = f"{expected_retrieval}\n{project_doc_description.strip()}"
++                expected_binding = None
++                if row["source"] in description_bindings:
++                    artifact, records = description_bindings[row["source"]]
++                    record = records.get((start, end))
++                    if record is not None:
++                        # Reconstruct from source-level artifact, not child metadata.
++                        description_text = record["description"]
++                        combined = f"{expected_retrieval}\n{description_text}"
++                        if len(description_text.encode("utf-8")) > 512:
++                            status = "skipped_description_bytes"
++                        elif estimate_utf8_tokens(combined) > config.hard_max_tokens:
++                            status = "skipped_retrieval_budget"
++                        else:
++                            status = "appended"
++                            expected_retrieval = combined
++                        expected_binding = child_binding(artifact, record, status)
++                if metadata.get(CHILD_KEY) != expected_binding or ARTIFACT_KEY in metadata:
++                    context_errors += 1
+                 promoted = normalized_filter_metadata(metadata)
+                 promoted_matches = all(
+                     row[name] == value
+@@ -547,6 +603,7 @@
+                     or manifest.get("config_hash") != context_config.config_hash
+                     or manifest.get("content_hash") != expected_context_hash
+                     or str(row["embedding_input_hash"]) != _chunk_hash(expected_retrieval)
++                    or str(row["retrieval_content_hash"]) != _chunk_hash(expected_retrieval)
+                     or str(row["retrieval_text"]) != expected_retrieval
+                     or len(str(row["context_prefix"]).encode("utf-8"))
+                     > context_config.max_prefix_bytes
+--- a/tests/test_contextual_indexing.py
++++ b/tests/test_contextual_indexing.py
+@@ -1,6 +1,8 @@
+ from __future__ import annotations
+ 
+ import pytest
++import copy
++import hashlib
+ 
+ from docmancer.agent import DocmancerAgent
+ from docmancer.core.config import DocmancerConfig
+@@ -14,6 +16,7 @@
+ )
+ from docmancer.retrieval.contracts import CandidateHit, ContextConfig
+ from docmancer.retrieval.query_planning import build_query_plan, compile_backend_filters
++from docmancer.retrieval.runtime import dispatcher_for_agent
+ 
+ 
+ 
+@@ -63,6 +66,81 @@
+     assert all(row["retrieval_token_estimate"] <= 512 for row in rows)
+ 
+ 
++def test_source_bound_search_descriptions_public_lifecycle(tmp_path, monkeypatch):
++    """Real lexical ingestion/selection; annotations never become source evidence."""
++    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
++    config = DocmancerConfig()
++    config.index.db_path = str(tmp_path / "index.db")
++    config.index.extracted_dir = str(tmp_path / "extracted")
++    agent = DocmancerAgent(config=config)
++    text = ("# Receiver\n\nCooling prevents restart. The receiver waits 19 seconds.\n\n"
++            "# Archive\n\nRecords are retained for 41 nights.\n\n"
++            "# Long procedure\n\n" + "The operator checks the receiver before restarting it. " * 30)
++    metadata = {"format": "markdown", "source_path": "receiver.md",
++                "doc_scope": "project", "project_identity": "fixture-project",
++                "source_class": "project_file", "resolved_version": "snapshot-1"}
++    document = Document(source="receiver.md", content=text, metadata=metadata)
++    agent.ingest_documents([document, Document(
++        source="private.md", content="# Lockout\n\nPRIVATE_ONLY lockout.\n",
++        metadata={**metadata, "source_path": "private.md", "project_identity": "other"},
++    )], with_vectors=False)
++    baseline = [row for row in agent.store.list_sections_for_embedding() if row["source"] == "receiver.md"]
++    filters = {"project_identity": "fixture-project", "doc_scope": "project",
++               "source_class": "project_file", "resolved_version": "snapshot-1"}
++    before = dispatcher_for_agent(agent, mode="lexical").run(
++        "lockout", mode="lexical", filters=filters, limit=5, budget=4096, expand="none")
++    assert not before.chunks
++    sha = lambda value: hashlib.sha256(value.encode("utf-8")).hexdigest()
++    receiver = next(row for row in baseline if "The receiver waits 19 seconds." in row["display_text"])
++    archive = next(row for row in baseline if "Records are retained for 41 nights." in row["display_text"])
++    large = max(baseline, key=lambda row: row["retrieval_token_estimate"])
++    assert large["retrieval_token_estimate"] > 384
++    descriptions = [(receiver, "Receiver cooling lockout prevents restart for 19 seconds."),
++                    (archive, "Archive retention. " * 40), (large, "x" * 512)]
++    artifact = {"source_path": "receiver.md", "source_sha256": sha(text),
++                "context_sha256": sha(text), "recipe": "integration-fixture", "version": "1",
++                "model": "fixture-authored", "model_revision": None,
++                "records": [{"char_start": row["char_start"], "char_end": row["char_end"],
++                             "display_sha256": sha(row["display_text"]), "description": description,
++                             "description_sha256": sha(description)} for row, description in descriptions]}
++    enriched = Document(source="receiver.md", content=text,
++                        metadata={**metadata, "experimental_search_descriptions_v1": artifact})
++    agent.ingest_documents([enriched], with_vectors=False)
++    rows = [row for row in agent.store.list_sections_for_embedding() if row["source"] == "receiver.md"]
++    assert [(r["char_start"], r["char_end"], r["display_text"], r["stable_chunk_id"], r["vector_id"])
++            for r in rows] == [(r["char_start"], r["char_end"], r["display_text"], r["stable_chunk_id"], r["vector_id"])
++                              for r in baseline]
++    selected = next(row for row in rows if row["stable_chunk_id"] == receiver["stable_chunk_id"])
++    assert selected["text"] == receiver["text"] + "\n" + descriptions[0][1]
++    assert selected["content_hash"] != receiver["content_hash"]
++    for original in (archive, large):
++        assert next(r for r in rows if r["stable_chunk_id"] == original["stable_chunk_id"])["text"] == original["text"]
++    hydrated = agent.store.fetch_sections_by_id([r["section_id"] for r in rows], budget=4096)
++    statuses = {chunk.metadata["experimental_search_description_v1"]["status"]
++                for chunk in hydrated if "experimental_search_description_v1" in chunk.metadata}
++    assert statuses == {"appended", "skipped_description_bytes", "skipped_retrieval_budget"}
++    for chunk in hydrated:
++        assert "experimental_search_descriptions_v1" not in chunk.metadata
++        start, end = chunk.metadata["char_span"]
++        assert chunk.text == text[start:end]
++        assert chunk.metadata["content_hash"] == sha(chunk.text)
++        assert chunk.metadata["source_content_hash"] == sha(text)
++    result = dispatcher_for_agent(agent, mode="lexical").run(
++        "lockout", mode="lexical", filters=filters, limit=5, budget=4096, expand="none")
++    assert any("The receiver waits 19 seconds." in chunk.text for chunk in result.chunks)
++    for chunk in result.chunks:
++        assert chunk.source == "receiver.md"
++        assert chunk.text in text
++        assert "lockout" not in chunk.text
++        assert "PRIVATE_ONLY" not in chunk.text
++    generation = agent.store.active_generation_id()
++    stale = copy.deepcopy(artifact)
++    stale["source_sha256"] = "0" * 64
++    with pytest.raises(ValueError, match="binding mismatch"):
++        agent.ingest_documents([Document(source="receiver.md", content=text,
++            metadata={**metadata, "experimental_search_descriptions_v1": stale})], with_vectors=False)
++    assert agent.store.active_generation_id() == generation
++    assert [r["text"] for r in agent.store.list_sections_for_embedding() if r["source"] == "receiver.md"] == [r["text"] for r in rows]
+ 
+ 
+ 
+--- /dev/null
++++ b/docmancer/retrieval/experimental_search_descriptions.py
+@@ -0,0 +1,70 @@
++"""Source-bound, opt-in retrieval annotations; never authoritative evidence."""
++from __future__ import annotations
++
++import hashlib
++
++from docmancer.core.structured_chunking import estimate_utf8_tokens
++
++ARTIFACT_KEY = "experimental_search_descriptions_v1"
++CHILD_KEY = "experimental_search_description_v1"
++
++
++def sha256(text: str) -> str:
++    return hashlib.sha256(text.encode("utf-8")).hexdigest()
++
++
++def validate_artifact(artifact, *, source_path: str, content: str, spans) -> dict:
++    """Validate the entire artifact, including entries not selected for append."""
++    header = {"source_path", "source_sha256", "context_sha256", "recipe", "version",
++              "model", "model_revision", "records"}
++    if type(artifact) is not dict or set(artifact) != header:
++        raise ValueError("invalid search-description artifact fields")
++    for key in header - {"records", "model_revision"}:
++        if type(artifact[key]) is not str or not artifact[key].strip():
++            raise ValueError(f"invalid search-description {key}")
++    if artifact["model_revision"] is not None and (
++        type(artifact["model_revision"]) is not str or not artifact["model_revision"].strip()
++    ):
++        raise ValueError("invalid search-description model_revision")
++    if (artifact["source_path"] != source_path
++            or artifact["source_sha256"] != sha256(content)
++            or artifact["context_sha256"] != sha256(content)):
++        raise ValueError("search-description source/context binding mismatch")
++    if type(artifact["records"]) is not list:
++        raise ValueError("search-description records must be a list")
++    allowed = set(spans)
++    records = {}
++    for record in artifact["records"]:
++        if type(record) is not dict or set(record) != {
++            "char_start", "char_end", "display_sha256", "description", "description_sha256"
++        }:
++            raise ValueError("invalid search-description record fields")
++        start, end = record["char_start"], record["char_end"]
++        if type(start) is not int or type(end) is not int or not 0 <= start < end <= len(content):
++            raise ValueError("invalid search-description span")
++        for key in ("display_sha256", "description", "description_sha256"):
++            if type(record[key]) is not str or not record[key].strip():
++                raise ValueError(f"invalid search-description {key}")
++        span = (start, end)
++        if span not in allowed or span in records:
++            raise ValueError("unmatched or duplicate search-description span")
++        if (record["display_sha256"] != sha256(content[start:end])
++                or record["description_sha256"] != sha256(record["description"])):
++            raise ValueError("search-description content hash mismatch")
++        records[span] = record
++    return records
++
++
++def append_description(baseline: str, record: dict, hard_max: int) -> tuple[str, str]:
++    description = record["description"]
++    if len(description.encode("utf-8")) > 512:
++        return baseline, "skipped_description_bytes"
++    combined = f"{baseline}\n{description}"
++    if estimate_utf8_tokens(combined) > hard_max:
++        return baseline, "skipped_retrieval_budget"
++    return combined, "appended"
++
++
++def child_binding(artifact: dict, record: dict, status: str) -> dict:
++    return {**{key: value for key, value in artifact.items() if key != "records"},
++            "record": record, "status": status}
+--- /dev/null
++++ b/eval/blind_project_context/step10-index-descriptions/experiment.py
+@@ -0,0 +1,299 @@
++"""Bounded public-API preparation / frozen lexical comparison. No model calls."""
++from __future__ import annotations
++
++import argparse
++from dataclasses import asdict
++import hashlib
++import json
++import os
++from pathlib import Path
++import platform
++import sys
++import time
++
++ROOT = Path(__file__).resolve().parent
++SOURCES = ROOT.parent / "step10-multidoc-gate/projects/validation/meridian"
++PROJECT = "step10-index-descriptions-meridian"
++NAMES = {"architecture.md", "calendar.md", "clock.md", "overview.md", "reservations.md", "weather.md"}
++POLICY = {"mode": "lexical", "limit": 5, "budget": 4096, "expand": "none"}
++QUERY_SHA = "ebdc87730508fe47d82cdcd978dff1ac768f443f0c20667417e09e0640f7346f"
++SOURCE_ARTIFACT_SHA = "b9a690edba4f6186074ff4cccaddf5ed1acf1d439936e327e2c36fb8ad7f4b57"
++
++
++def digest(data: bytes) -> str:
++    return hashlib.sha256(data).hexdigest()
++
++
++def write(path: Path, value) -> None:
++    with path.open("x", encoding="utf-8") as stream:
++        json.dump(value, stream, ensure_ascii=False, indent=2)
++        stream.write("\n")
++
++
++def sources() -> dict[str, str]:
++    paths = sorted(SOURCES.glob("*.md"))  # Never traverse modules/.
++    if {path.name for path in paths} != NAMES:
++        raise ValueError("Meridian top-level source inventory changed")
++    return {path.name: path.read_bytes().decode("utf-8") for path in paths}
++
++
++def filters(version: str) -> dict:
++    return {"project_identity": PROJECT, "doc_scope": "project",
++            "source_class": "project_file", "resolved_version": version}
++
++
++def snapshot_identity(texts: dict) -> dict:
++    mapping = {name: digest(text.encode("utf-8")) for name, text in texts.items()}
++    canonical = json.dumps(mapping, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
++    sha = digest(canonical.encode("utf-8"))
++    return {"source_hashes": mapping, "canonical_json": canonical, "sha256": sha,
++            "resolved_version": "meridian-source-sha256:" + sha,
++            "meaning": "corpus snapshot identity, not published library version"}
++
++
++def agent_at(directory: Path):
++    # Set before importing product code. All storage lives in a fresh run tree.
++    directory.mkdir(parents=True, exist_ok=False)
++    os.environ["DOCATLAS_HOME"] = str(directory / "home")
++    os.environ["DOCATLAS_AUTO_VECTORS"] = "0"
++    os.environ["DOCATLAS_EXPERIMENT_ACQUISITION"] = "v0"
++    os.environ["DOCATLAS_EXPERIMENT_ACQUISITION_SECTIONS"] = "0"
++    os.environ["DOCATLAS_EXPERIMENT_ACQUISITION_TERMS"] = "word"
++    os.environ["DOCATLAS_EXPERIMENT_ACQUISITION_E5"] = "0"
++    from docmancer.agent import DocmancerAgent
++    from docmancer.core.config import DocmancerConfig
++    config = DocmancerConfig()
++    config.index.db_path = str(directory / "index.db")
++    config.index.extracted_dir = str(directory / "extracted")
++    config.embeddings.cache = str(directory / "embeddings-unused")
++    config.retrieval.default_mode = "lexical"
++    config.retrieval.max_sections_per_source = None
++    return DocmancerAgent(config=config)
++
++
++def ingest(agent, texts: dict, version: str, artifacts: dict | None = None):
++    from docmancer.core.models import Document
++    documents = []
++    for source, content in texts.items():
++        metadata = {**filters(version), "source_path": source, "format": "markdown",
++                    "docs_snapshot_exact": True}
++        if artifacts is not None:
++            metadata["experimental_search_descriptions_v1"] = artifacts[source]
++        documents.append(Document(source=source, content=content, metadata=metadata))
++    agent.ingest_documents(documents, with_vectors=False)
++
++
++def child_packet(agent) -> list:
++    rows = agent.store.list_sections_for_embedding()
++    hydrated = agent.store.fetch_sections_by_id([row["section_id"] for row in rows], budget=1_000_000)
++    if len(hydrated) != len(rows):
++        raise ValueError("child packet incomplete")
++    return [{**row, "metadata": chunk.metadata} for row, chunk in zip(rows, hydrated)]
++
++
++def prepare(args) -> None:
++    texts = sources()
++    snapshot = snapshot_identity(texts)
++    if args.snapshot_version != snapshot["resolved_version"]:
++        raise ValueError("snapshot version differs from canonical corpus identity")
++    args.work.mkdir(parents=True, exist_ok=False)
++    write(args.work / "prepare-freeze.json", {
++        "command": sys.argv, "executable": sys.executable,
++        "snapshot_version": args.snapshot_version,
++        "snapshot_identity": snapshot,
++        "sources": {name: digest(text.encode()) for name, text in texts.items()},
++        "source_artifact_sha256": digest((ROOT / "source-only-descriptions.json").read_bytes()),
++        "code_sha256": code_hashes(),
++    })
++    agent = agent_at(args.work / "index")
++    ingest(agent, texts, args.snapshot_version)
++    packet = {"schema": "source-only-child-packet-v1", "snapshot_version": args.snapshot_version,
++              "snapshot_identity": snapshot,
++              "filters": filters(args.snapshot_version),
++              "documents": [{"source": source, "source_sha256": digest(text.encode()),
++                             "content": text} for source, text in texts.items()],
++              "children": child_packet(agent)}
++    write(args.work / "children.json", packet)
++    provenance(args.work)
++
++
++def provenance(directory: Path) -> None:
++    import docmancer
++    write(directory / "runtime-provenance.json", {
++        "command": sys.argv, "executable": sys.executable, "python": sys.version,
++        "platform": platform.platform(), "package_file": docmancer.__file__,
++        "boundary": "local public Python API; checkout, not installed stdio",
++        "models_called": 0, "vectors_requested": False,
++    })
++
++
++def code_hashes() -> dict:
++    repository = ROOT.parents[2]
++    paths = [Path(__file__), repository / "tests/test_contextual_indexing.py",
++             *sorted((repository / "docmancer").rglob("*.py"))]
++    return {str(path.relative_to(repository)): digest(path.read_bytes()) for path in paths}
++
++
++def adapt(args) -> None:
++    """No product execution; reject heading/child differences for parent decision."""
++    original = json.loads(args.source_artifact.read_text())
++    if digest(args.source_artifact.read_bytes()) != SOURCE_ARTIFACT_SHA:
++        raise ValueError("parent frozen source-only artifact changed")
++    packet = json.loads(args.packet.read_text())
++    texts = sources()
++    if original.get("generation_mode") != "harness_subagent" or original.get("language") != "en":
++        raise ValueError("unexpected source-only generation provenance")
++    docs = original["documents"]
++    if len(docs) != 6 or {doc["source"] for doc in docs} != NAMES:
++        raise ValueError("description source inventory mismatch")
++    packet_docs = packet["documents"]
++    if len(packet_docs) != 6 or {doc["source"] for doc in packet_docs} != NAMES:
++        raise ValueError("packet source inventory mismatch")
++    for doc in packet_docs:
++        if doc["content"] != texts[doc["source"]] or doc["source_sha256"] != digest(doc["content"].encode()):
++            raise ValueError("packet source changed")
++    artifacts = {}
++    for doc in docs:
++        source = doc["source"]
++        if digest(texts[source].encode()) != doc["source_sha256"]:
++            raise ValueError("source-only artifact is stale")
++        children = {(r["char_start"], r["char_end"]): r for r in packet["children"] if r["source"] == source}
++        records = []
++        seen = set()
++        for record in doc["records"]:
++            span = (record["char_start"], record["char_end"])
++            if span in seen or span not in children:
++                raise ValueError(f"PARENT DECISION REQUIRED: heading != exact child or duplicate: {source}:{span}")
++            seen.add(span)
++            child = children[span]
++            if digest(child["display_text"].encode()) != record["display_sha256"]:
++                raise ValueError("child display hash mismatch")
++            if digest(record["description"].encode()) != record["description_sha256"]:
++                raise ValueError("description hash mismatch")
++            records.append({key: value for key, value in record.items() if key != "heading"})
++        if seen != set(children):
++            raise ValueError(f"PARENT DECISION REQUIRED: incomplete exact child coverage: {source}")
++        artifacts[source] = {"source_path": source, "source_sha256": doc["source_sha256"],
++                             "context_sha256": doc["source_sha256"], "recipe": original["recipe"],
++                             "version": "1", "model": original["model"],
++                             "model_revision": original["model_revision"], "records": records}
++    write(args.output, {"schema": "index-description-input-bundle-v1",
++                        "source_artifact_sha256": digest(args.source_artifact.read_bytes()),
++                        "packet_sha256": digest(args.packet.read_bytes()),
++                        "snapshot_version": packet["snapshot_version"], "documents": artifacts})
++
++
++def freeze(args) -> None:
++    if digest(args.queries.read_bytes()) != QUERY_SHA:
++        raise ValueError("parent frozen queries changed")
++    bundle = json.loads(args.descriptions.read_text())
++    if bundle["source_artifact_sha256"] != SOURCE_ARTIFACT_SHA:
++        raise ValueError("description bundle provenance changed")
++    texts = sources()
++    write(args.manifest, {"schema": "index-description-freeze-v1", "policy": POLICY,
++                         "snapshot_identity": snapshot_identity(texts),
++                         "snapshot_version": bundle["snapshot_version"],
++                         "filters": filters(bundle["snapshot_version"]),
++                         "queries_sha256": digest(args.queries.read_bytes()),
++                         "descriptions_sha256": digest(args.descriptions.read_bytes()),
++                         "source_artifact_sha256": SOURCE_ARTIFACT_SHA,
++                         "runner_sha256": digest(Path(__file__).read_bytes()),
++                         "code_sha256": code_hashes(),
++                         "sources": {name: digest(text.encode()) for name, text in texts.items()}})
++
++
++def run(args) -> None:
++    manifest = json.loads(args.manifest.read_text())
++    texts = sources()
++    if (manifest["queries_sha256"] != digest(args.queries.read_bytes())
++            or manifest["queries_sha256"] != QUERY_SHA
++            or manifest["descriptions_sha256"] != digest(args.descriptions.read_bytes())
++            or manifest["source_artifact_sha256"] != SOURCE_ARTIFACT_SHA
++            or digest((ROOT / "source-only-descriptions.json").read_bytes()) != SOURCE_ARTIFACT_SHA
++            or manifest["runner_sha256"] != digest(Path(__file__).read_bytes())
++            or manifest["code_sha256"] != code_hashes()
++            or manifest["sources"] != {name: digest(text.encode()) for name, text in texts.items()}
++            or manifest["snapshot_identity"] != snapshot_identity(texts)
++            or manifest["snapshot_version"] != snapshot_identity(texts)["resolved_version"]
++            or manifest["policy"] != POLICY
++            or manifest["filters"] != filters(manifest["snapshot_version"])):
++        raise ValueError("frozen inputs changed")
++    queries = json.loads(args.queries.read_text())
++    if queries["policy"] != POLICY:
++        raise ValueError("query policy changed")
++    bundle = json.loads(args.descriptions.read_text())
++    if bundle["snapshot_version"] != manifest["snapshot_version"] or set(bundle["documents"]) != NAMES:
++        raise ValueError("description bundle scope mismatch")
++    args.work.mkdir(parents=True, exist_ok=False)
++    write(args.work / "frozen-inputs.json", manifest)
++    for arm in ("baseline", "descriptions"):
++        agent = agent_at(args.work / arm)
++        from docmancer.retrieval.runtime import dispatcher_for_agent
++        provenance(args.work / arm)
++        started = time.monotonic()
++        ingest(agent, texts, manifest["snapshot_version"], bundle["documents"] if arm == "descriptions" else None)
++        write(args.work / arm / "index.json", {"prepare_seconds": time.monotonic() - started,
++                                              "children": child_packet(agent)})
++        dispatcher = dispatcher_for_agent(agent, mode="lexical")
++        results = []
++        for query in queries["queries"]:
++            started = time.monotonic()
++            result = dispatcher.run(query["question"], filters=manifest["filters"], **POLICY)
++            raw = asdict(result)
++            raw["chunks"] = [chunk.model_dump(mode="json") for chunk in result.chunks]
++            # Preserve raw before grading; only delivered source text proves facts.
++            write(args.work / arm / f"{query['id']}.raw.json", raw)
++            packet_bytes = len((args.work / arm / f"{query['id']}.raw.json").read_bytes())
++            facts = [{**fact, "present": any(chunk.source == fact["source"] and fact["quote"] in chunk.text
++                                            for chunk in result.chunks)} for fact in query["facts"]]
++            fidelity = True
++            for chunk in result.chunks:
++                metadata = chunk.metadata
++                span = metadata.get("char_span", [])
++                fidelity = fidelity and (
++                    chunk.source in texts and len(span) == 2
++                    and texts[chunk.source][span[0]:span[1]] == chunk.text
++                    and metadata.get("content_hash") == digest(chunk.text.encode())
++                    and metadata.get("source_content_hash") == digest(texts[chunk.source].encode())
++                    and all(metadata.get(key) == value for key, value in manifest["filters"].items()))
++            size = sum(len(chunk.text.encode("utf-8")) for chunk in result.chunks)
++            results.append({"id": query["id"], "seconds": time.monotonic() - started,
++                            "measurement_boundary": "public_returned_chunks_only",
++                            "internal_candidate_recall": None, "facts": facts,
++                            "facts_present": sum(fact["present"] for fact in facts),
++                            "facts_required": len(facts), "source_text_fidelity": fidelity,
++                            "no_answer_expected": query["no_answer_expected"],
++                            "empty_packet": not result.chunks, "returned_utf8_bytes": size,
++                            "raw_packet_json_utf8_bytes": packet_bytes,
++                            "description_metadata_client_visible": any(
++                                "experimental_search_description_v1" in chunk.metadata for chunk in result.chunks),
++                            "utf8_bytes_div4_ceiling_estimate": (size + 3) // 4,
++                            "provider_tokens": None,
++                            "complete": fidelity and all(fact["present"] for fact in facts)
++                            and (not query["no_answer_expected"] or not result.chunks)})
++        write(args.work / arm / "results.json", results)
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(__doc__)
++    commands = parser.add_subparsers(dest="command", required=True)
++    p = commands.add_parser("prepare")
++    p.add_argument("--work", type=Path, required=True)
++    p.add_argument("--snapshot-version", required=True)
++    p = commands.add_parser("adapt")
++    p.add_argument("--packet", type=Path, required=True)
++    p.add_argument("--source-artifact", type=Path, default=ROOT / "source-only-descriptions.json")
++    p.add_argument("--output", type=Path, default=ROOT / "descriptions.json")
++    for command in ("freeze", "run"):
++        p = commands.add_parser(command)
++        p.add_argument("--queries", type=Path, default=ROOT / "queries.json")
++        p.add_argument("--descriptions", type=Path, default=ROOT / "descriptions.json")
++        p.add_argument("--manifest", type=Path, default=ROOT / "freeze.json")
++        if command == "run":
++            p.add_argument("--work", type=Path, required=True)
++    args = parser.parse_args()
++    globals()[args.command](args)
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/eval/blind_project_context/step10-index-descriptions/DESIGN_RU.md
+@@ -0,0 +1,95 @@
++# Source-bound search descriptions: bounded development
++
++Разрешение владельца через parent относится только к этому opt-in эксперименту.
++Исторические Qwen validation FAIL / v3 PRE-INFERENCE BLOCKED сохраняются.
++Это local public Python API integration, не installed stdio, hybrid gate или Terra.
++
++## Фиксированный контракт
++
++- Шесть top-level Markdown Meridian; `modules/` не читается и не индексируется.
++- Обычный lexical dispatcher; `with_vectors=False`; limit5, budget4096,
++  expand none. Нет translation, E5, Qwen, classifier, model inference/downloads.
++- `doc_scope=project`, `project_identity=step10-index-descriptions-meridian`,
++  `source_class=project_file`, один явно заданный `resolved_version` snapshot.
++  Значение: `meridian-source-sha256:` + SHA256 UTF8 канонического JSON карты
++  `{path:source_sha256}`: `json.dumps(mapping, ensure_ascii=False, sort_keys=True,
++  separators=(',', ':'))`. Это corpus identity, не опубликованная library version.
++- Четыре неизменённых seen development вопроса и19 source-exact literal facts:
++  `queries.json`, hash `ebdc87730508fe47d82cdcd978dff1ac768f443f0c20667417e09e0640f7346f`.
++- Независимая source-only сессия подготовила English descriptions только из
++  containing documents. `source-only-descriptions.json` не изменяется;
++  hash `b9a690edba4f6186074ff4cccaddf5ed1acf1d439936e327e2c36fb8ad7f4b57`.
++  Model `openai/gpt-6-astra#low`, harness generation, exact revision null.
++  Provider usage недоступен; UTF8/4 — лишь инженерная оценка, не provider tokens.
++
++## Artifact и ingestion
++
++Optional `Document.metadata.experimental_search_descriptions_v1`:
++`source_path`, `source_sha256`, `context_sha256`, `recipe`, `version`, `model`,
++`model_revision` (строка либо null), `records`.
++Record: integer `char_start/end`, `display_sha256`, непустая `description`,
++`description_sha256`. Hashes — SHA256 UTF8, без префикса.
++Context всегда полный containing document, поэтому оба source/context hashes
++равны hash исходного документа. Списка моделей-разрешений нет.
++
++Валидация отвергает неправильные types/ranges/fields, duplicate или unmatched
++spans, устаревшие source/context/display/description hashes. Неполный список
++records допустим в API; adapter development требует полного покрытия children.
++Ошибка ValueError откатывает транзакцию; active generation сохраняется.
++
++Baseline retrieval text и chunk boundaries вычисляются прежним кодом.
++Description добавляется после baseline через newline только если <=512 UTF8
++bytes и вместе с baseline <= прежнего hard_max. Иначе пропускается целиком:
++`skipped_description_bytes` или `skipped_retrieval_budget`; успех `appended`.
++Никаких cropping, re-chunking, замены prefix или source display.
++
++Source-level metadata хранит полный artifact. Child хранит лишь matched binding
++и status в `experimental_search_description_v1`; полный список records удаляется
++из child metadata. Validator повторно проверяет source-level bindings и сам
++восстанавливает ожидаемый retrieval text/status, не доверяя child description.
++Validation не зависит от env-флага: старые поколения остаются проверяемыми.
++
++## Embedding lifecycle (только code-path, без vector claims)
++
++`list_sections_for_embedding()` уже выдаёт retrieval text и retrieval hash.
++`sync_vector_store()` сравнивает retrieval hash для unchanged detection и
++использует весь text в embedding cache identity. Поэтому изменение реально
++добавленного description меняет fingerprint/cache input. Stable child/vector ID
++остаётся source-bound; новый текст upsert заменяет значение этого ID. Public
++agent создаёт отдельную collection на generation и проверяет witness до publish.
++Пропущенное description не меняет embedding input — это намеренно.
++
++## Публичная проверка / сбор evidence
++
++`test_source_bound_search_descriptions_public_lifecycle` в существующем
++`tests/test_contextual_indexing.py`: real ingest, lexical search, scoped selection,
++точный display/hash/span, неизменные boundaries, оба whole-skip, stale rollback.
++Другая project identity обеспечивает out-of-scope проверку. Никаких mocks.
++
++`experiment.py prepare` делает ровно один public ingestion шести документов,
++выгружает exact children через public store APIs, без queries и vectors.
++`adapt` сопоставляет heading spans source-only artifact только exact children.
++При несовпадении останавливается для parent; descriptions не размножаются.
++`descriptions.json` — отдельный adapter bundle, исходный artifact не меняется.
++
++`freeze` сохраняет hashes sources, queries, descriptions и всех Python product
++files (включая прежний dirty worktree). `run` сверяет freeze перед двумя arms.
++Каждый arm использует isolated SQLite/extracted/home. Raw packet сохраняется
++до оценки. Fact считается только в raw delivered chunk.text соответствующего
++source; description и metadata никогда не evidence. Internal candidate recall
++не измеряется: наблюдается лишь публичная returned-chunks boundary.
++
++Проверяются source span/hash и scope/version каждого returned chunk; no-answer
++означает пустой packet для заранее заданного no-answer question. Отдельно
++сохраняются bytes source text, UTF8/4 estimate и bytes полного JSON packet.
++Matched description metadata доступна Python-клиенту; это явно отмечается,
++нельзя объявлять description невидимой клиенту. Projection refactor не входит.
++
++## Исполнение
++
++Нужен Python checkout environment `.venv/bin/python` с зависимостями DocAtlas;
++`PYTHONPATH` указывает checkout. Установленный прежний wheel не содержит patch.
++Команды/provenance, BEFORE, implementation.diff и freeze сохраняются до запуска.
++Один prepare, один scoped integration run, один A/B run разрешены parent.
++Setup ERROR сохраняется и требует нового направления перед повтором; quality
++FAIL не меняет queries, source units, policy или критерии.
+--- a/tests/diagnostic_labels.json
++++ b/tests/diagnostic_labels.json
+@@ -139,7 +139,7 @@
+     "tests/test_cli.py": "13936787a169901ccbfa33048d08212c4858b486324ee951bca153b526043f58",
+     "tests/test_client.py": "6087d915bf583abe27e9a3a7b2ca6beb09da76d1baefb07dd74f149f2f59ac70",
+     "tests/test_config_resolution.py": "e37f4319c5d4f5bd06729545cca27f55e1031f2a9374867631b57be9d3b52a21",
+-    "tests/test_contextual_indexing.py": "3d273d234bcf1d4f4272a1fc4a352355c003431b6af0b98a81cba0ff0a65db88",
++    "tests/test_contextual_indexing.py": "10704e6cd6686333a34ecd14c7ceff8c5373a2b344a93c72eafcd5c465bfffb9",
+     "tests/test_cross_index_retrieval_mvp.py": "b13d8a4cee44860a003502a2874a65d598ce2033c111ae1e0b1c39626e368e08",
+     "tests/test_dart_service_integration.py": "e87ef3a7a4fba985c6f335f457c9fb6a97c472092cada1a6ef39f7ae7da2a71e",
+     "tests/test_diagnostic_labels.py": "0c81a4ec1cb3438c49c1d76954ab4739635dcb18fcc812dd5876407a717b4bc2",

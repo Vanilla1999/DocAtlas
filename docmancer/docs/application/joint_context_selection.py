@@ -378,6 +378,14 @@ def select_joint_context(
     """
     if type(portion) is not int or portion < 1:
         raise ValueError("invalid_context_portion")
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if minimal_context_enabled():
+        from .minimal_context_selection import select_minimal_context
+        return select_minimal_context(
+            payload, snapshot, retrieval, portion=portion,
+            continuation_token=continuation_token, request_binding=request_binding,
+            finalize_packet=finalize_packet,
+        )
     cap = experimental_context_max_tokens()
     if cap is None:
         if portion != 1 or continuation_token is not None:

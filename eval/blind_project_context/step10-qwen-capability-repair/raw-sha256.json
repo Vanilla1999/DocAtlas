@@ -1,0 +1,28 @@
+{
+  "runtime_root": "/tmp/opencode/step10-qwen-capability-repair-01",
+  "files": {
+    "C-T3-reuse.json": "e3996ee96733d5a0de9fde2c79426292a77b97ebb82aa211f5e2c84052fac8bc",
+    "old-U-remains-spent.json": "43c73dbb8d1f2256d22e70773c4cdabd634980b1d5743c29450afe3efc01fe4f",
+    "readonly.json": "b66efe80d2c9773a10624d12e83d6bf4f49bed158c7869726ecf89922890bdf1",
+    "replay-V.json": "5352c1332dd329fe0d1f91043e102670824a1140714dc33fbdf371732647b833",
+    "counts.json": "87807f7de509e33114d4914e3e1a4611e06e10476a12089990b78be5e107a5b2",
+    "replay-U.json": "07c432c8a254c9845a41513b86a00fde75aaaeac9005c5f663b2eda61bc9951e",
+    "C-T1-checks.json": "ce630f9ce7c31267fe9db9cbc70c8abf9a1fed84c25d608ae97afbc8e1048ad2",
+    "C-T3-reuse-checks.json": "e645ac759ff4eb560595886aba8e9dcec1a5fd711382cbf0f7468ed5fc5747dd",
+    "consume-U.json": "d456d901fa13a8b620eedea86a62176f905cbff4604f0515d73221384a0bb218",
+    "C-T1.json": "6a12f8bdde90b7eb7b24e37f3d534fade37a4709feba03f8f5c627a6b253bfda",
+    "C-T3-fresh-checks.json": "e645ac759ff4eb560595886aba8e9dcec1a5fd711382cbf0f7468ed5fc5747dd",
+    "prepare.json": "eeadcbf90329a497f9ba3dd373964c59073224393bd1e359b3734a8aecc5d207",
+    "summary.json": "f5860b9fe8e9c5871693bf8b3d3db8fa96c466938071aba5315d299543a4c3dd",
+    "C-T3-fresh.json": "29f16865a9fdbc5aba0356b48c9cf7045f6305d3642a0321a191de1693cf76c2",
+    "consume-V.json": "30575efb86e4fb466f8bd1bd72afe84d23001f6cd06f6f96194908c210b77198",
+    "project/operations.md": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789",
+    "project/overview.md": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4",
+    "project/dashboard.md": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb",
+    "project/export.md": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe",
+    "project/architecture.md": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4",
+    "project/docatlas.project-docs.yaml": "57c603b75abbe93a6da3cd41e5a8b606a73349996e25db0a5ec954844927d425",
+    "project/storage.md": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561",
+    "project/modules/survey/private.md": "9f6890fe717dfbac5dfb79dbee76d4ab6331b8cbeac86b3a6f8a8f11bce0441b"
+  }
+}

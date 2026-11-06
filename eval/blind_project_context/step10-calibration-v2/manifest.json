@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "frozen_before_inference": true,
+  "provenance": "Independent agent-authored fictional manuals; not an external benchmark",
+  "files": {
+    "tasks.json": "d80ef419510d503607cba392428e5e98c9a5d657386d2d14c3d8955792e5abc7",
+    "labels.json": "503ce8f7e45e662c31d2b9018e9c926cdcc711bd81398448af6d5b0e39f0c98f",
+    "recipe.json": "4886d2e93912643056ccdf0f9a4ae1d129315f5feceda16da0e5446b6f796fae",
+    "README.md": "5cc282d185e8faf8c1a2c4f21fab732d29615df7220d60a580329819bc68427d",
+    "calibration/apiary.md": "f23b74b9ddb73c77e9cee53b913b9f09aef21da0562f4633b72f300a1a330f2b",
+    "calibration/textiles.md": "859d4bc300f963177e5e379c933e86596bc41f05996770afc142218b18d02200",
+    "validation/cave-radio.md": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a",
+    "validation/fermentation.md": "b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6"
+  },
+  "split_families": {
+    "apiary-hive-movement": [
+      "calibration"
+    ],
+    "textile-quarantine": [
+      "calibration"
+    ],
+    "underground-radio": [
+      "validation"
+    ],
+    "rye-fermentation": [
+      "validation"
+    ]
+  },
+  "task_count": 16,
+  "labeled_units": 88
+}

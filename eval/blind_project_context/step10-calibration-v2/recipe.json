@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "recipe": "complete-own-body-gated-maxp-v2",
+  "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "structural_recipe": "minimal-structure-v1",
+  "lanes": "original_translation_max",
+  "semantics": {
+    "contextual_score": "maximum raw logit over all complete query/body/ancestor-context windows and original/translation lanes",
+    "own_body_score": "maximum raw logit over all complete query/body/heading-only-context windows and original/translation lanes",
+    "heading_context": "exact ancestor and current heading lines only; no ancestor introductory bodies",
+    "score": "min(contextual_score, own_body_score)",
+    "pairs": "sum of both exhaustive scoring passes",
+    "threshold": "minimum combined score across every calibration unit independently labelled useful",
+    "closure": "unchanged exact structural closure, no top-k or budget-driven membership"
+  }
+}

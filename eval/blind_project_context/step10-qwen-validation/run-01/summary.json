@@ -1,0 +1,33 @@
+{
+  "status": "FAIL",
+  "phase": "validation",
+  "manifest_sha256": "2bcebef52ab6268e091f5e28de12acc8837988bff36c2068432e2a4b73ebe066",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "gates": {
+    "required_pass": false,
+    "no_answer_pass": true,
+    "hard_negative_pass": true,
+    "reduction_pass": true,
+    "source_tokens_numerator": 1069,
+    "source_tokens_denominator": 4056,
+    "source_reduction": 0.736439842209073
+  },
+  "counts": {
+    "public_prepares": 2,
+    "public_queries": 8,
+    "resource_reads": 8,
+    "model_totals_complete": true,
+    "lost_trace_queries": 0,
+    "model_forwards": 176,
+    "model_input_tokens": 75136,
+    "score_cache_hits": 0,
+    "runtime_cache_hits": 7,
+    "model_loads": 1,
+    "inference_seconds": 2.6714200429123593,
+    "scoring_total_seconds": 10.65817043500283,
+    "peak_vram_allocated_bytes": 1220989952,
+    "peak_vram_reserved_bytes": 1245708288
+  },
+  "process_total_seconds": 22.637163401006546,
+  "boundary": "public in-process, not installed/client/Terra"
+}

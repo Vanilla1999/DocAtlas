@@ -1,0 +1,115 @@
+{
+  "seconds": 0.10575073800282553,
+  "expected_paths": [
+    "fermentation.md"
+  ],
+  "indexed_paths": [
+    "fermentation.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-36dcfa52a56c3df42f76eb4422a9092eada3aaa7",
+      "source_path": "fermentation.md",
+      "display_text": "# Community bakery notebook\n\nThis notebook describes the overnight sourdough fermentation used for the community bakery's rye loaves. Yeast-only dough follows another schedule.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-9a421764a96f3af3d5a3b1d8819e71677faa82de",
+      "source_path": "fermentation.md",
+      "display_text": "## Overnight record\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-1474d8675890538c1e8841d74aed8bff5741b292",
+      "source_path": "fermentation.md",
+      "display_text": "The bakery building was converted from a village meeting hall. A small porch shelters the entrance door from rain. The porch contains a bench where visitors can wait for the shop to open. The bench is wiped each morning before the door is unlocked. A wooden board beside the door displays the shop opening times. The board is brought indoors before the building closes for the night. Its hanging cord is replaced when it becomes frayed. Spare cord is kept with the office ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-2851c0e4461a2bd870633b1316cf225a2704159b",
+      "source_path": "fermentation.md",
+      "display_text": "packing materials. The office occupies a narrow room behind the sales counter. A desk stands against the wall beneath a framed map of the village. The map is decorative and is not used for delivery routing. Delivery routes are written on separate cards and handed to the driver. Cards from completed routes go into a labelled paper envelope. At the end of the month the envelope is placed in the records cupboard. The records cupboard has three shelves and a sliding door.",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-7b703a8658ba07b924ce8873785c586902119597",
+      "source_path": "fermentation.md",
+      "display_text": " The bottom shelf is reserved for empty envelopes and blank cards. The middle shelf holds completed records in date order. The upper shelf holds spare folders. A small step stool is provided for reaching that shelf. The stool is put away after use so that it does not obstruct the narrow passage. The passage leads to a shared washroom and the rear exit. The washroom notice asks visitors to report leaking taps to the shop assistant. The assistant records building ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-1acb96959f14945bddc7ab6521436d50122c0b03",
+      "source_path": "fermentation.md",
+      "display_text": "faults in a notebook at the counter. Faults are reviewed with the landlord during the monthly building visit. The landlord enters through the rear yard rather than crossing the production area. The yard gate is kept closed except when a delivery vehicle is passing through it. A painted line marks the place where drivers should stop before unloading. The line is repainted when it becomes difficult to see. A stiff brush is stored beside the gate for clearing leaves ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-a0575706ea293641a113a60df4fca00c2b346b7c",
+      "source_path": "fermentation.md",
+      "display_text": "from the drain cover. The brush is returned to its hook after use. The drain cover is lifted only by the building caretaker. The caretaker wears a numbered visitor badge while on the premises. Spare badges are stored in a small tray beneath the counter. The tray also holds a roll of adhesive labels for office parcels. Used parcel labels are crossed out before a carton is reused. Torn cartons are flattened and collected for recycling. The recycling collection takes ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-c38f9c20c0cad83fb3292eeb42579effb9354bd6",
+      "source_path": "fermentation.md",
+      "display_text": "place on alternate Wednesdays. A calendar near the rear door marks those Wednesdays with a blue circle. Staff check the calendar before placing cartons in the yard. Cartons remain indoors during heavy rain. The staff room contains a low bookcase with old local newspapers. Papers more than one month old are removed at the end of each week. A basket beside the bookcase holds lost gloves and scarves. Items left in the basket for three months are donated through the ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-5b6873a7123ce2fed3ea436de35b0aae3fa43b02",
+      "source_path": "fermentation.md",
+      "display_text": "village office. The staff room curtains are laundered during the summer closure. While the curtains are away, plain paper screens cover the lower window panes. The screens are taken down when the clean curtains return. These notes record ordinary building administration and do not establish any dough fermentation time, temperature or release condition.\n\n",
+      "line_start": 7,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-6bb9353de987042872be5701b1623fce948e149e",
+      "source_path": "fermentation.md",
+      "display_text": "Hold the rye sourdough at eighteen degrees Celsius for eleven hours. Before dividing the dough, verify that its volume has increased by at least one half and record the observation. If pink streaks or a putrid smell are present, discard the entire batch; do not extend fermentation or blend it into fresh dough.\n\n",
+      "line_start": 9,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-1b57f13ecd96b6245ad88acb8bc9cd553880b31c",
+      "source_path": "fermentation.md",
+      "display_text": "## Customer receipts\n\nDuplicate customer receipts are filed by week in the sales office. Blank receipt rolls are stored under the counter.\n",
+      "line_start": 11,
+      "line_end": 13
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "09e52b2d63c2f87c3c7556200b02dea7e13dcae181baf2479cb9e9b79d0b42aa",
+  "storage_path": "/tmp/docatlas-evidence-lzkb07u2/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-806a657bebc943f190bab492111deada",
+  "catalog_sha256": "44e1600b726b09fcc73bbbb0ec1bbd3d32636fde607eaf7254ac19a917b988d2",
+  "documents": [
+    {
+      "path": "fermentation.md",
+      "content_sha256": "b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6",
+      "catalog_entry_hash": "sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-806a657bebc943f190bab492111deada",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  }
+}

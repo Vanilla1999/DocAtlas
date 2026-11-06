@@ -1,0 +1,12 @@
+[
+  "opencode",
+  "run",
+  "--session",
+  "ses_e4e1c2b08ffeDkqly2BSML4Tdc",
+  "--model",
+  "question-audit/capture",
+  "--agent",
+  "measure",
+  "--format",
+  "json"
+]

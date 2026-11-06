@@ -252,6 +252,16 @@ class SourceReferenceContext:
                                 # from mutable candidate dictionaries.
                                 metadata["_reference_evidence"]["naming_catalog"] = deepcopy(self.naming_catalog)
             result.append(chunk.model_copy(update={"metadata": metadata}))
+        from docmancer.docs.domain.original_body_discovery import minimal_context_documentation_read
+        if minimal_context_documentation_read():
+            # Native identity/hash/span preparation above is mandatory. The
+            # candidate's complete structural closure consumes that provenance,
+            # not legacy bounded need proposals (2 hops / 8 spans / 24 sets).
+            # Do not parse every full document again for each acquired window.
+            self.structure_diagnostics["dependency_proposals"] = "complete_selector_owned"
+            for chunk in result:
+                chunk.metadata.pop("_evidence_sets", None)
+            return result
         from .source_dependency_preparation import prepare_dependency_sets, compact_dependency_record
         prepare_dependency_sets(self, result, self.need_contracts)
         prepared = []

@@ -1,0 +1,27 @@
+{
+  "actual_score_breakpoints_plus_global_empty": 45,
+  "largest_retention_feasible": -3.352724552154541,
+  "next_higher": {
+    "threshold": -1.7263767719268799,
+    "losses": {
+      "C2-subtree": {
+        "units": [
+          "Moving occupied hives",
+          "Entrance preparation",
+          "Securing the boxes",
+          "Reopening",
+          "Trolley paint"
+        ],
+        "facts": [
+          "Moving a hive to another site requires a separate transport plan.",
+          "Keep the screen unobstructed throughout the move.",
+          "place it level on the new stand.",
+          "Remove the transport screen after the hive is stable",
+          "The equipment trolley is painted cream."
+        ]
+      }
+    }
+  },
+  "policy_unchanged": true,
+  "correction": "Initial sweep union also included per-query empty interval representatives; removing these extra diagnostic candidates leaves the identical chosen observed breakpoint. No inference repeated."
+}

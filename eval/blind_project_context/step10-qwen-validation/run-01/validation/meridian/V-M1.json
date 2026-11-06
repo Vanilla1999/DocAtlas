@@ -1,0 +1,579 @@
+{
+  "packet": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-4289b57d4783c1850721e022",
+        "path_or_url": "reservations.md",
+        "section": "Confirmed reservations",
+        "snippet": "# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "bf3fb3bf3f0c7cd443da8a3dfe8620bfd0a08f8dcc263e4968491ae8df23400c",
+        "project_identity": "local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458",
+        "line_start": 1,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/193c8bbf27461fdfaa1a25fa"
+      },
+      {
+        "evidence_id": "ev-c96f04ee53b2c29b5786734d",
+        "path_or_url": "reservations.md",
+        "section": "Confirmed reservations > Transfer",
+        "snippet": "## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "c9e2d207206f653e4781e3fe7175400ea56ae3c303744f436d2c6d4fbd7334d9",
+        "project_identity": "local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458",
+        "line_start": 7,
+        "line_end": 10,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/c7b65a24c88dc138f1fa9785"
+      },
+      {
+        "evidence_id": "ev-eb206342bfd8ebb69ed0c75c",
+        "path_or_url": "reservations.md",
+        "section": "Confirmed reservations > Locked instrument",
+        "snippet": "## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "73f2ccdf6f25256cbeee4a4c851ccf2bf05234a8ae53fed307f3fc7b0245f84d",
+        "project_identity": "local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458",
+        "line_start": 11,
+        "line_end": 14,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/73fd14b230c9c90de0eaee98"
+      },
+      {
+        "evidence_id": "ev-c3dacd54f2b1fdbf8ea58076",
+        "path_or_url": "reservations.md",
+        "section": "Confirmed reservations > Training slots",
+        "snippet": "## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "e166da6db2bb283b1d0d0a2ff02fa2d1b408b73d0f5ed9ca952af1c403089fec",
+        "project_identity": "local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458",
+        "line_start": 15,
+        "line_end": 17,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/29d94f2b715d4bc26d00246b"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 1057,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "complete_calibrated_context_v1",
+      "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+      "calibration_status": "empirical",
+      "candidate_units": 21,
+      "selected_units": 4,
+      "delivered_rows": 4,
+      "scan_complete": true,
+      "model_pairs": 21,
+      "closure": {
+        "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+        "status": "complete",
+        "documents": 6,
+        "incomplete_dependencies": [],
+        "units": 21,
+        "hydrated_sections": 21,
+        "incoming_anchor_edges": 6,
+        "selected_units": 4,
+        "delivered_spans": 4
+      }
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": null,
+      "remaining_rows": 0,
+      "continuation_token": "669a4dde896762603396670d6d7504ede304c286d1c69ad806efad4ff481582e"
+    }
+  },
+  "observations": [
+    {
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9716,
+        "planned_input_tokens": 9716,
+        "preflight_units": 21,
+        "model_loads": 1,
+        "runtime_cache_hits": 0,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.5712550950047444,
+        "asset_verification_seconds": 0.5980634070001543,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1220989952,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 3.518008965002082
+      },
+      "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+      "delivery_status": "returned",
+      "scores": [
+        {
+          "identity": "unit-980666742edafe1a44616044fc5c7326a748d49f97b6f312a00f8d9fb0756398",
+          "score": 0.004331502132117748,
+          "logit_difference": -5.4375,
+          "input_tokens": 378,
+          "input_tokens_sha256": "d5cb338cc2d3c0881bc7d7779ee19fb37feb9fc31c3480007f3c90fc9dafe658",
+          "path": "calendar.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45\",\"_source_snapshot_sha256\":\"sha256:ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"member\":{\"catalog_entry_hash\":\"sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"calendar.md\",\"content_sha256\":\"ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:calendar.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 97,
+          "body_char_start": 19,
+          "heading_path": [
+            "Calendar display"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+        },
+        {
+          "identity": "unit-7d251affaee173801004490455d945fafefadb95f4641b5d0713b25695adbec5",
+          "score": 0.06008664518594742,
+          "logit_difference": -2.75,
+          "input_tokens": 683,
+          "input_tokens_sha256": "5ce1d5ec9b2dccf7db3bc458ae614490b75caff76ce0987b46ce66c128e410ab",
+          "path": "calendar.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45\",\"_source_snapshot_sha256\":\"sha256:ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"member\":{\"catalog_entry_hash\":\"sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"calendar.md\",\"content_sha256\":\"ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:calendar.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 97,
+          "char_end": 340,
+          "body_char_start": 108,
+          "heading_path": [
+            "Calendar display",
+            "Colours"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+        },
+        {
+          "identity": "unit-4a83b3686b70accf8012eae4cd92149246ca5881d58da4a4b0ef453f0af92fb9",
+          "score": 0.010328153148293495,
+          "logit_difference": -4.5625,
+          "input_tokens": 402,
+          "input_tokens_sha256": "e3b87e007012cd6029eacbcb8130da4897494eeeed0afbcaccb379202fd5d478",
+          "path": "calendar.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45\",\"_source_snapshot_sha256\":\"sha256:ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"member\":{\"catalog_entry_hash\":\"sha256:73aad38275339916d1467c04f2b56c4e8fc5e0b415273ced44ce052e46824a45\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"calendar.md\",\"content_sha256\":\"ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:calendar.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 340,
+          "char_end": 538,
+          "body_char_start": 353,
+          "heading_path": [
+            "Calendar display",
+            "Timezones"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+        },
+        {
+          "identity": "unit-ce3ca2d7cee09fa904c4b775ae57244204daa4ec2a00449e55e6db4af98a2130",
+          "score": 0.0003569705877453089,
+          "logit_difference": -7.9375,
+          "input_tokens": 401,
+          "input_tokens_sha256": "35953f5cda7018f8a845ef7669f4435d9a2979e47b27da49c94a46b648cca36e",
+          "path": "clock.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"_source_snapshot_sha256\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"member\":{\"catalog_entry_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"clock.md\",\"content_sha256\":\"182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:clock.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 119,
+          "body_char_start": 20,
+          "heading_path": [
+            "Time coordination"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+        },
+        {
+          "identity": "unit-55c143364bfd336a97fb3c01fdf96715e036eea2b304a4cdd1dc16fd87e0a3a3",
+          "score": 0.005220125894993544,
+          "logit_difference": -5.25,
+          "input_tokens": 577,
+          "input_tokens_sha256": "3790cbd27598cb3ed48ea9521f527ac9ebebe299925dc891c6832245609c98c5",
+          "path": "clock.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"_source_snapshot_sha256\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"member\":{\"catalog_entry_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"clock.md\",\"content_sha256\":\"182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:clock.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 119,
+          "char_end": 366,
+          "body_char_start": 135,
+          "heading_path": [
+            "Time coordination",
+            "Clock offset"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+        },
+        {
+          "identity": "unit-9ac111c5091915eca45488c150cb7dd471e34ebdd1809dd358e7cb3bd4f51ca7",
+          "score": 0.00034599160426296294,
+          "logit_difference": -7.96875,
+          "input_tokens": 413,
+          "input_tokens_sha256": "3ee34c0098ff50b2295ad667cffbebc3bc4441e7592396ebb4a6ea65e5209ae5",
+          "path": "clock.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"_source_snapshot_sha256\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"member\":{\"catalog_entry_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"clock.md\",\"content_sha256\":\"182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:clock.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 366,
+          "char_end": 517,
+          "body_char_start": 387,
+          "heading_path": [
+            "Time coordination",
+            "Missing reference"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+        },
+        {
+          "identity": "unit-301f990581a380edf5bcc039f534731b177f8ad61260023ba8a1a8678e94ceb7",
+          "score": 0.0002959571429528296,
+          "logit_difference": -8.125,
+          "input_tokens": 412,
+          "input_tokens_sha256": "98c8ea9e6b220a51bd546a9653a27cb7cc681fd2365ee5a6819a217f676bc719",
+          "path": "clock.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"_source_snapshot_sha256\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"member\":{\"catalog_entry_hash\":\"sha256:463e9d42b24424f8a328884c49447d038606816bb138f795cc7ba77c6b9c9dca\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"clock.md\",\"content_sha256\":\"182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:clock.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 517,
+          "char_end": 681,
+          "body_char_start": 537,
+          "heading_path": [
+            "Time coordination",
+            "Simulation clock"
+          ],
+          "line_start": 13,
+          "line_end": 15,
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+        },
+        {
+          "identity": "unit-90d5f78d22d5a6f0b38ad68bf188ac0666397456eb5362c19d077fe4f2120a95",
+          "score": 0.7057850360870361,
+          "logit_difference": 0.875,
+          "input_tokens": 406,
+          "input_tokens_sha256": "39ce97b02691c8ec5ff62150c1a6563a6311c62db01e6aae00cffef6e39a403a",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:overview.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 172,
+          "body_char_start": 21,
+          "heading_path": [
+            "Meridian scheduler"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7"
+        },
+        {
+          "identity": "unit-703c09222253d45da84788f85d9f16600a11c309efb712f4483719391f0fcfab",
+          "score": 0.622459352016449,
+          "logit_difference": 0.5,
+          "input_tokens": 414,
+          "input_tokens_sha256": "a005652b58acf35f5255b26da8b1762ccedab3b4aa3fec9c622da08ea49a34b1",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:overview.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 172,
+          "char_end": 372,
+          "body_char_start": 184,
+          "heading_path": [
+            "Meridian scheduler",
+            "Services"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7"
+        },
+        {
+          "identity": "unit-789db8b1daf79eddc07739a041da609507a7c4f673290857e8f20ca542084c26",
+          "score": 0.8354835510253906,
+          "logit_difference": 1.625,
+          "input_tokens": 437,
+          "input_tokens_sha256": "badfb9436d41dbad02adfc607cd205aa04cc5e4946bf2d5654db197d70b33088",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:overview.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 372,
+          "char_end": 595,
+          "body_char_start": 386,
+          "heading_path": [
+            "Meridian scheduler",
+            "Navigation"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7"
+        },
+        {
+          "identity": "unit-f9aa48ecee7860d5065e5b51b1f13e1295b01dee9bdc7048da043b53de5de787",
+          "score": 0.03308597952127457,
+          "logit_difference": -3.375,
+          "input_tokens": 400,
+          "input_tokens_sha256": "77d14ff55b53a33147d4d99acf508f7fa1185d11b971b0570ea980f07c94640a",
+          "path": "weather.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 89,
+          "body_char_start": 20,
+          "heading_path": [
+            "Weather decisions"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+        },
+        {
+          "identity": "unit-20b620a6ce31d429176a6dfabf63593857ec76f3ea6b5654c1c9feaf1e2db722",
+          "score": 0.43782350420951843,
+          "logit_difference": -0.25,
+          "input_tokens": 719,
+          "input_tokens_sha256": "903fbcb8ad676779f933e2e9777ad5dc1b84ff08a25dcbbd54a2852045ce5193",
+          "path": "weather.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 89,
+          "char_end": 306,
+          "body_char_start": 103,
+          "heading_path": [
+            "Weather decisions",
+            "Suspension"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+        },
+        {
+          "identity": "unit-22477807e40ac7a65ea02c0c1e7497c9d34e064bc5cb728ab30b3c7b5a714a76",
+          "score": 0.009708477184176445,
+          "logit_difference": -4.625,
+          "input_tokens": 432,
+          "input_tokens_sha256": "877c2381378880fd2ff4f47f29f76840790cdff3ecb91e020ac3d1bf5178a7be",
+          "path": "weather.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 306,
+          "char_end": 547,
+          "body_char_start": 327,
+          "heading_path": [
+            "Weather decisions",
+            "Indoor instrument"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+        },
+        {
+          "identity": "unit-e56d0e655ec8157f6f77cd81fd8ef84be27d68a3b8c7e657014500c920a4bcd7",
+          "score": 0.014063626527786255,
+          "logit_difference": -4.25,
+          "input_tokens": 416,
+          "input_tokens_sha256": "dfc6532a5e8a1109386c336b39ea72a558cf05d131be6195a8bdc2f5e0cb6915",
+          "path": "weather.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 547,
+          "char_end": 696,
+          "body_char_start": 567,
+          "heading_path": [
+            "Weather decisions",
+            "Forecast display"
+          ],
+          "line_start": 13,
+          "line_end": 15,
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+        },
+        {
+          "identity": "unit-2f3db0741082cf412752f0f48f55a091a35b5f867540c2a7b1439e07d0e36816",
+          "score": 0.0028009270317852497,
+          "logit_difference": -5.875,
+          "input_tokens": 382,
+          "input_tokens_sha256": "ff2abc59f062ecb251f55eb54522ccaa708ba1956d73aa04023e241821723243",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:architecture.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 121,
+          "body_char_start": 25,
+          "heading_path": [
+            "Scheduler architecture"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+        },
+        {
+          "identity": "unit-70c5709a8bf49f9f0a21c29e744f9e513e82f6140072ca6fc0de7703d9d59d2d",
+          "score": 0.0008559006382711232,
+          "logit_difference": -7.0625,
+          "input_tokens": 407,
+          "input_tokens_sha256": "a456f7b9076d8d249f0859182a71af3ce64d98841bbf3b07dc50e4d5b6852e42",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:architecture.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 121,
+          "char_end": 360,
+          "body_char_start": 132,
+          "heading_path": [
+            "Scheduler architecture",
+            "Planner"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+        },
+        {
+          "identity": "unit-ddcdb385fc85d98235dd30e4770c6f29ea33cdce35bbed51a266ec6767baebd8",
+          "score": 0.0008040859247557819,
+          "logit_difference": -7.125,
+          "input_tokens": 398,
+          "input_tokens_sha256": "d144c23abef233c1d95e65501b423d9575f2212b8db46df4281a279aa016d674",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:architecture.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 360,
+          "char_end": 565,
+          "body_char_start": 382,
+          "heading_path": [
+            "Scheduler architecture",
+            "Prototype recovery"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+        },
+        {
+          "identity": "unit-4289b57d4783c1850721e022beb1f4c56046c2a13a341e2b4f53e10d4167f445",
+          "score": 0.8807970285415649,
+          "logit_difference": 2.0,
+          "input_tokens": 469,
+          "input_tokens_sha256": "777478ffb4c0eccafdcecf3b344a66d154f998dbe1e6a840e7871979d59d1611",
+          "path": "reservations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"_source_snapshot_sha256\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"member\":{\"catalog_entry_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservations.md\",\"content_sha256\":\"c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:reservations.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 209,
+          "body_char_start": 25,
+          "heading_path": [
+            "Confirmed reservations"
+          ],
+          "line_start": 1,
+          "line_end": 6,
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+        },
+        {
+          "identity": "unit-c96f04ee53b2c29b5786734defebc7ab6741377fd977f90f75a883c4ef09f835",
+          "score": 0.9796676635742188,
+          "logit_difference": 3.875,
+          "input_tokens": 636,
+          "input_tokens_sha256": "a38d4c5143dfdb5df0f59310f4b75c39f945c65cf1e2c43884d472f74392e414",
+          "path": "reservations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"_source_snapshot_sha256\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"member\":{\"catalog_entry_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservations.md\",\"content_sha256\":\"c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:reservations.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 209,
+          "char_end": 500,
+          "body_char_start": 221,
+          "heading_path": [
+            "Confirmed reservations",
+            "Transfer"
+          ],
+          "line_start": 7,
+          "line_end": 10,
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+        },
+        {
+          "identity": "unit-eb206342bfd8ebb69ed0c75c4a6301d87477d288b796e8dac4688c469d09d802",
+          "score": 0.9740425944328308,
+          "logit_difference": 3.625,
+          "input_tokens": 470,
+          "input_tokens_sha256": "f01c4fe84f21d2b5c771b1637ec1458a2780fe299382e694da986ba1d1171202",
+          "path": "reservations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"_source_snapshot_sha256\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"member\":{\"catalog_entry_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservations.md\",\"content_sha256\":\"c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:reservations.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 500,
+          "char_end": 709,
+          "body_char_start": 521,
+          "heading_path": [
+            "Confirmed reservations",
+            "Locked instrument"
+          ],
+          "line_start": 11,
+          "line_end": 14,
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+        },
+        {
+          "identity": "unit-c3dacd54f2b1fdbf8ea580766bd43bdfba59e36d7d31561ad9e5599810e8ac6a",
+          "score": 0.9324532747268677,
+          "logit_difference": 2.625,
+          "input_tokens": 464,
+          "input_tokens_sha256": "95c9cd02171a0b9106f045ccf1bef578c1fca555dedf75cbb8bc676a187965e4",
+          "path": "reservations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"_source_snapshot_sha256\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"member\":{\"catalog_entry_hash\":\"sha256:ceba2809fcf49889fed1e28a3344f9bef87f369c49afa6b4fbf0b7c8f868a3d1\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservations.md\",\"content_sha256\":\"c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:reservations.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 709,
+          "char_end": 884,
+          "body_char_start": 727,
+          "heading_path": [
+            "Confirmed reservations",
+            "Training slots"
+          ],
+          "line_start": 15,
+          "line_end": 17,
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+        }
+      ]
+    }
+  ],
+  "error": null,
+  "receipt_status": "available",
+  "seconds": 3.7860467310019885
+}

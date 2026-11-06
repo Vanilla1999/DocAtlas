@@ -1,0 +1,241 @@
+{
+  "seconds": 0.1364492339998833,
+  "expected_paths": [
+    "architecture.md",
+    "dashboard.md",
+    "export.md",
+    "modules/survey/private.md",
+    "operations.md",
+    "overview.md",
+    "storage.md"
+  ],
+  "indexed_paths": [
+    "architecture.md",
+    "dashboard.md",
+    "export.md",
+    "modules/survey/private.md",
+    "operations.md",
+    "overview.md",
+    "storage.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-5654217818b8bff19ca4196af1d1abbdb4651bb1",
+      "source_path": "architecture.md",
+      "display_text": "# Processing architecture\n\nThe receiver, journal, exporter and dashboard communicate through durable identifiers.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-4140f6e6630e488112c83a4b2a2bb6c4fe43611b",
+      "source_path": "architecture.md",
+      "display_text": "## Journal design\n\nThe append-only journal permits sequential reads and checksum verification. Its file layout groups records by station, while the exporter groups output by civil day. These different groupings explain why a bundle can depend on several files.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-89d03c46a27eda4ad02a3fa41cc97766b88fa7ac",
+      "source_path": "architecture.md",
+      "display_text": "## Recovery simulation\n\nThe simulator resumes immediately after an in-memory replay and discards records when a demonstration ends. It has no authenticated stations and cannot establish the live receiver recovery policy.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-6a27fea61a953926044c6f0e20e3bdb5621ff56b",
+      "source_path": "dashboard.md",
+      "display_text": "# Harbour dashboard\n\nThe dashboard presents derived observations and is not a control channel for receivers.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-a5105d9b66e1df60b7f3881924c1bbed4edd516e",
+      "source_path": "dashboard.md",
+      "display_text": "## Display\n\nThe display rounds water levels to centimetres, highlights delayed stations, and offers a map with a selectable timezone. Hiding a station on the map does not pause its receiver or change export membership.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-1499ffa49c7a037b6acb1d631a203998b46c6391",
+      "source_path": "dashboard.md",
+      "display_text": "## Refresh\n\nBrowser refresh requests can be repeated freely. They do not replay journal records. Cached display points expire after ten minutes even when original observations remain in storage.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-74fd14a05832d3c57c05f2ebcaf7555f660a3fcf",
+      "source_path": "export.md",
+      "display_text": "# Bundle export\n\nThese rules govern daily bundles consumed by harbour analysts.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-effb23ee794f7cc3d1668870da4868ccbaac1ae5",
+      "source_path": "export.md",
+      "display_text": "## Publication\n\nPublish a bundle only when every included station has a verified daily checksum. Include the observation timezone in the manifest. A missing station must be listed explicitly as missing rather than represented by zero water levels.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-4d6ed15db1d875bc8a92bd6b81a043c4c796779a",
+      "source_path": "export.md",
+      "display_text": "## Late observations\n\nA late observation creates a new bundle revision; never overwrite an already published bundle. Keep the previous revision addressable for existing citations.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-24abc3f411dbb15b98293a95069c5394c8634315",
+      "source_path": "export.md",
+      "display_text": "## Preview\n\nPreview bundles can omit checksums and use provisional labels. They must stay in the sandbox and are not public daily bundles.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-12f9f6b2a63a66f869b7003b09792a895d7f7b22",
+      "source_path": "operations.md",
+      "display_text": "# Station operations\n\nThese procedures apply only to authenticated live station feeds in the active harbour.\n\nFor orientation, the operator console links to the dashboard's [display settings](dashboard.md#display).\n\n",
+      "line_start": 1,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-0ce99061951cf5dd9667a26321abc35c1344e24e",
+      "source_path": "operations.md",
+      "display_text": "## Replay\n\nTo replay an interrupted feed, pause the receiver and obtain a journal checkpoint before requesting the missing interval. Preserve the original observation identifiers during replay. Resume the receiver only after the exporter acknowledges the checkpoint. See the [retention rule](storage.md#retention) before removing journal files.\n\n",
+      "line_start": 7,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-a5d97e957af177e3769369a0fafff6fa1ce6b0a2",
+      "source_path": "operations.md",
+      "display_text": "## Disconnected station\n\nIf a station is still disconnected, do not resume its receiver after replay; leave it paused until a fresh authenticated heartbeat arrives. This exception applies even when the exporter acknowledged the checkpoint.\n\n",
+      "line_start": 11,
+      "line_end": 14
+    },
+    {
+      "stable_chunk_id": "child-5f6b5ae13e3c29468ca73813f5fba02a20a3fbdf",
+      "source_path": "operations.md",
+      "display_text": "## Survey imports\n\nSurvey imports assign new identifiers and may start without a station heartbeat. They are scheduled offline and do not repair a live feed. Reusing this process for a station would create duplicate observations.\n",
+      "line_start": 15,
+      "line_end": 17
+    },
+    {
+      "stable_chunk_id": "child-b78d94e64aaca1ef2ca43d14692a324af24ce715",
+      "source_path": "overview.md",
+      "display_text": "# TideGauge\n\nTideGauge stores harbour water-level observations from fixed stations. These rules apply to live station feeds; survey imports are a different service.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-12ab3f37da07ac8384627183a4827eac90eb0f19",
+      "source_path": "overview.md",
+      "display_text": "## Components\n\nReceivers authenticate station messages, a journal preserves arrival order, and an exporter publishes daily bundles. The journal and exporter can restart independently. The dashboard is a read-only consumer and cannot acknowledge observations.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-564a85b10f1e5d53094b746176807fb0ea6dc416",
+      "source_path": "overview.md",
+      "display_text": "## Navigation\n\nOperational detail is in [Replay](operations.md#replay), [Storage](storage.md#retention), and [Display](dashboard.md#display). These links are a navigation index, not a request to execute every procedure.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-ba47b41d4eb8f3f1cb6a585a140a5e8e37f4fa5e",
+      "source_path": "storage.md",
+      "display_text": "# Journal storage\n\nJournal files contain original live observations. Exported bundles are derived products, not journal replacements until their checksums have been verified.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-b09b3ebeafb37baebc61dd0a089e4146167c04fd",
+      "source_path": "storage.md",
+      "display_text": "## Retention\n\nKeep a journal file for at least seven days and until the corresponding export checksum is verified. Both conditions must hold before deletion. A legal hold blocks deletion regardless of age or checksum status.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-cfafe6af43416fa74486f31c52316faea364cf13",
+      "source_path": "storage.md",
+      "display_text": "## Capacity\n\nThe capacity monitor reports filesystem free space every minute. A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-39c78fb7c557ba6ac2d99ccccf45143f8f5feb6e",
+      "source_path": "storage.md",
+      "display_text": "## Historical default\n\nThe retired prototype deleted files after two days without checking exports. This behaviour is documented for migration diagnosis and is not the live service policy.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-bb2134965291c192411739a572a2dc030fee9486",
+      "source_path": "modules/survey/private.md",
+      "display_text": "# Survey module contract\n\nThis module-only contract is outside project-only documentation scope.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-982249c3d210678c757f578f08e906c665d013cf",
+      "source_path": "modules/survey/private.md",
+      "display_text": "## Calibration interval\n\nThe survey module calibrates its floating instruments every eighteen hours. This interval does not specify calibration for fixed live stations.\n",
+      "line_start": 5,
+      "line_end": 7
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "c72f0d41e2289d0be5026fe26b20b721683576bd2c9db021150d0223cbd1d6fc",
+  "storage_path": "/tmp/opencode/docatlas-evidence-md_ngn_p/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-a95563ed985846ea8dcd5cf4d45ec6ab",
+  "catalog_sha256": "57c603b75abbe93a6da3cd41e5a8b606a73349996e25db0a5ec954844927d425",
+  "documents": [
+    {
+      "path": "architecture.md",
+      "content_sha256": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4",
+      "catalog_entry_hash": "sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37"
+    },
+    {
+      "path": "dashboard.md",
+      "content_sha256": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb",
+      "catalog_entry_hash": "sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2"
+    },
+    {
+      "path": "export.md",
+      "content_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe",
+      "catalog_entry_hash": "sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783"
+    },
+    {
+      "path": "modules/survey/private.md",
+      "content_sha256": "9f6890fe717dfbac5dfb79dbee76d4ab6331b8cbeac86b3a6f8a8f11bce0441b",
+      "catalog_entry_hash": "sha256:43fd4ebd1788da5f1c66c64299abd9bef919e0b7a6b3ba471c99860e83c3212a"
+    },
+    {
+      "path": "operations.md",
+      "content_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789",
+      "catalog_entry_hash": "sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966"
+    },
+    {
+      "path": "overview.md",
+      "content_sha256": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4",
+      "catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61"
+    },
+    {
+      "path": "storage.md",
+      "content_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561",
+      "catalog_entry_hash": "sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-a95563ed985846ea8dcd5cf4d45ec6ab",
+    "members": 7,
+    "new_count": 7,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 23,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 23
+  }
+}

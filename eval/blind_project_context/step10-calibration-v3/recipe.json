@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "calibration_recipe": "final-closure-all-useful-breakpoints-v3",
+  "recipe": "complete-own-body-gated-maxp-v2",
+  "structural_recipe": "minimal-structure-v1",
+  "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "lanes": "original_translation_max",
+  "threshold_rule": "largest observed global calibration score breakpoint whose final structural-closed set contains every useful own-body unit and every labeled fact for every positive calibration query",
+  "noanswer_gate": "every calibration no-answer query must deliver zero source rows at that threshold; otherwise infeasible, no deployable policy",
+  "raw_retention": "diagnostic only, not a sufficiency gate",
+  "closure": "For each seed add its entire subtree and ancestor own bodies and preamble. Repeatedly follow reference definitions/footnotes to their owner own body with ancestors, and unambiguous authorized anchored links to target subtrees with ancestors, until no new units. Ancestor inclusion alone does not add its siblings or whole subtree. Missing/ambiguous targets remain explicit gaps. Fixed checked source graph; no score-dependent edges or quotas.",
+  "monotonicity": "On a fixed checked graph A subset B implies C(A) subset C(B): all operations only union fixed successors. Threshold increase removes seeds and cannot add delivery units. Emergency rejection is separate and is not monotone delivery success.",
+  "breakpoints": "all distinct finite calibration scores, inclusive >=, plus nextafter(max_score,+infinity) representing the empty-seed interval; ties admitted together",
+  "validation_gate": "all useful units and facts delivered verbatim; exact source span/hash/scope; zero rows for no-answer; unchanged structural closure and emergency50000; direct retention and irrelevant delivery reported",
+  "training": "Existing V2 calibration only, explicitly reused development data. Existing V2 validation and T01 excluded. Fresh validation frozen before any V3 inference. No retuning after validation."
+}

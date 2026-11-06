@@ -9,6 +9,149 @@ from eval.evidence_quality_v2.runtime import index_project, isolated_service, wr
 from docmancer.mcp.docs_server import call_docs_tool_payload, current_docs_surface, read_docs_resource
 
 
+def test_minimal_candidate_public_full_scan_refs_and_scope(tmp_path, monkeypatch):
+    """Real MiniLM/public MCP: 257 facts, source refs, scope and stale denial.
+
+    Explicit host model provisioning is required. One preparation and one
+    context request; no fake retrieval, scoring or source validation.
+    """
+    import hashlib
+    import os
+    from pathlib import Path
+    from docmancer.docs.application.projection_tokenizer import projection_token_count
+    from docmancer.docs.application.standalone_text_view import render_standalone_text
+
+    model = os.environ.get("DOCATLAS_TEST_MINI_MODEL_DIR")
+    if not model:
+        pytest.skip("explicit pinned local MiniLM assets required")
+    project = tmp_path / "inventory"
+    documents = {f"docs/serial-{i:03}.md": f"# Inventory\n\nSerial INV-{i:03} belongs to collection CEDAR.\n"
+                 for i in range(257)}
+    documents["modules/private/docs/secret.md"] = "# Inventory\n\nSerial PRIVATE must never enter project-only scope.\n"
+    write_project(project, documents)
+    import yaml
+    catalog_path = project / "docatlas.project-docs.yaml"
+    catalog = yaml.safe_load(catalog_path.read_text())
+    for entry in catalog["documents"]:
+        if entry["path"].startswith("modules/"):
+            entry.update(scope="module", module_path="modules/private")
+    catalog_path.write_text(yaml.safe_dump(catalog))
+    with isolated_service(tmp_path / "state") as (service, config):
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT", "1")
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_MINI_PATH", model)
+        monkeypatch.setenv("DOCATLAS_CONTEXT_COMPRESSION", "off")
+        index_project(service, config, project)
+        db = Path(config.index.db_path)
+        before = hashlib.sha256(db.read_bytes()).hexdigest()
+        args = {"project_path": str(project), "scope": "project",
+                "question": "List every inventory serial and its collection."}
+        result = call_docs_tool_payload("get_docs_context", args, service)
+        (tmp_path / "inventory-receipt.json").write_text(json.dumps(result, ensure_ascii=False, indent=2))
+        assert result.get("status") == "ok", (result.get("reason_code"), result.get("source_selection"))
+        rows = result["sources"]
+        assert len(rows) == 257
+        assert result["source_selection"]["candidate_units"] == 257
+        assert result["source_selection"]["model_pairs"] == 257
+        assert result["more_context"]["next_portion"] is None
+        for i in range(257):
+            row = next(row for row in rows if row["path_or_url"] == f"docs/serial-{i:03}.md")
+            assert f"Serial INV-{i:03} belongs to collection CEDAR." in row["snippet"]
+            assert row["snippet"] == documents[row["path_or_url"]]
+        rendered = render_standalone_text(result)
+        assert rendered.text is not None
+        assert projection_token_count(rendered.text.encode()) <= 50000
+        for row in (rows[0], rows[-1]):
+            response = json.loads(read_docs_resource(row["source_uri"], service)["text"])
+            assert response == {"status": "complete", "reason_code": "end_of_source"}
+            replay = json.loads(read_docs_resource(row["source_uri"], service)["text"])
+            assert replay["reason_code"] == "unknown_or_expired_reference"
+        assert hashlib.sha256(db.read_bytes()).hexdigest() == before
+        stale = rows[1]
+        (project / stale["path_or_url"]).write_text("# Replaced\n\nUnprepared content.\n")
+        denied = json.loads(read_docs_resource(stale["source_uri"], service)["text"])
+        assert "snippet" not in denied and denied.get("status") in {"source_changed", "source_unavailable"}, denied
+
+
+def test_minimal_candidate_public_emergency(tmp_path, monkeypatch):
+    """One real model/public request: a permitted file with >50000 BPE tokens."""
+    import hashlib
+    import os
+    from pathlib import Path
+    from docmancer.docs.application.projection_tokenizer import projection_token_count
+
+    model = os.environ.get("DOCATLAS_TEST_MINI_MODEL_DIR")
+    if not model:
+        pytest.skip("explicit pinned local MiniLM assets required")
+    project = tmp_path / "large"
+    # Fits the unchanged 256000-byte preparation authority limit while the
+    # indivisible fenced block genuinely exceeds the 50000-token delivery stop.
+    large = "# Ledger\n\n```text\n" + "".join(
+        f"ledger {i:05} alpha beta gamma delta epsilon zeta eta theta lambda\n"
+        for i in range(3800)) + "```\n"
+    assert len(large.encode()) < 256000 and projection_token_count(large.encode()) > 50000
+    write_project(project, {"docs/ledger.md": large})
+    with isolated_service(tmp_path / "state") as (service, config):
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT", "1")
+        monkeypatch.setenv("DOCATLAS_EXPERIMENT_MINI_PATH", model)
+        monkeypatch.setenv("DOCATLAS_CONTEXT_COMPRESSION", "off")
+        index_project(service, config, project)
+        db = Path(config.index.db_path)
+        before = hashlib.sha256(db.read_bytes()).hexdigest()
+        stopped = call_docs_tool_payload("get_docs_context", {
+            "project_path": str(project), "question": "Return the complete ledger."}, service)
+        (tmp_path / "emergency-receipt.json").write_text(json.dumps(stopped, ensure_ascii=False, indent=2))
+        assert stopped.get("reason_code") == "context_emergency_stop", stopped
+        assert not stopped.get("sources")
+        assert stopped["source_selection"]["measured_tokens"] > 50000
+        assert hashlib.sha256(db.read_bytes()).hexdigest() == before
+
+
+def test_prepared_scope_stream_exhausts_without_lexical_ceiling(tmp_path):
+    """Public prepare → real storage iterator; 257 facts, one scan, no model.
+
+    This proves the acquisition boundary only, not final context delivery.
+    """
+    import hashlib
+    from pathlib import Path
+    from docmancer.core.sqlite_store import SQLiteStore
+
+    project = tmp_path / "project"
+    documents = {f"docs/item-{i:03}.md": f"# Item {i}\n\nInventory serial S{i:03} is retained.\n"
+                 for i in range(257)}
+    write_project(project, documents)
+    with isolated_service(tmp_path / "state") as (service, config):
+        inventory = index_project(service, config, project)
+        assert not inventory["excluded_or_failed_paths"]
+        store = SQLiteStore(config.index.db_path)
+        db = Path(config.index.db_path)
+        before = hashlib.sha256(db.read_bytes()).hexdigest()
+        receipt = {}
+        chunks = list(store.iter_scope_candidates(
+            filters={"project_path": str(project.resolve()), "doc_scope": "project"},
+            receipt=receipt,
+        ))
+        assert receipt["exhausted"] and receipt["status"] == "complete"
+        assert receipt["generation_id"] == inventory["generation_id"]
+        assert len(chunks) >= 257
+        for path, original in documents.items():
+            matching = [chunk for chunk in chunks if chunk.metadata.get("source_path") == path]
+            assert matching, path
+            assert all(chunk.text in original for chunk in matching)
+            fact = original.split("\n\n", 1)[1].strip()
+            assert any(fact in chunk.text for chunk in matching), path
+        assert not list(store.iter_scope_candidates(filters={"doc_scope": "module"}))
+        assert hashlib.sha256(db.read_bytes()).hexdigest() == before
+
+        interrupted = {}
+        stream = store.iter_scope_candidates(receipt=interrupted)
+        next(stream)
+        (project / "docs/item-000.md").write_text(documents["docs/item-000.md"] + "Revised.\n")
+        index_project(service, config, project)
+        with pytest.raises(ValueError, match="scope_scan_generation_changed"):
+            list(stream)
+        assert interrupted["status"] == "scan_incomplete" and not interrupted["exhausted"]
+
+
 @pytest.fixture
 def prepared_project(tmp_path, monkeypatch):
     project = tmp_path / "project"

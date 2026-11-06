@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/tmp/opencode/step9-gap-resolution/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_contextual_indexing.py",
+    "-q",
+    "--junitxml=/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/integration.r3.junit.xml"
+  ],
+  "cwd": "/tmp/opencode/step9-gap-resolution",
+  "environment_overrides": {
+    "PYTHONPATH": "/tmp/opencode/step9-gap-resolution",
+    "DOCATLAS_AUTO_VECTORS": "0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION": "v0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION_E5": "0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION_SECTIONS": "0",
+    "DOCATLAS_EXPERIMENT_ACQUISITION_TERMS": "word",
+    "DOCATLAS_HOME": "/tmp/opencode/step10-index-descriptions-integration-03/home"
+  },
+  "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+  "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+  "freeze_sha256": "5063bcb86289391453dee146601327c522ad6c01cc4ad86d7cebdc4081a4180a",
+  "reason": "parent-authorized source-description-routing-v1 omission wiring correction; tests unchanged"
+}

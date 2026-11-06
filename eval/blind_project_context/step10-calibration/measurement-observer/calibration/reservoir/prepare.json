@@ -1,0 +1,87 @@
+{
+  "seconds": 0.18853713599673938,
+  "expected_paths": [
+    "reservoir.md"
+  ],
+  "indexed_paths": [
+    "reservoir.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-ca12ec6d82500e1d19d902493c39b2a3d4373a92",
+      "source_path": "reservoir.md",
+      "display_text": "# Reservoir station\n\nThese procedures apply to the unmanned reservoir station during winter operation.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-d4d710527377968bb279a5640bdbbcab9000992c",
+      "source_path": "reservoir.md",
+      "display_text": "## Restart\n\nRestart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-5bc9d9ffc2561018ea2baada99f5c8fd0d34742e",
+      "source_path": "reservoir.md",
+      "display_text": "### Inspection\n\nBefore restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-b1f2cf6334ea3616651ce7d82c42073e1e084665",
+      "source_path": "reservoir.md",
+      "display_text": "### Indicator lamps\n\nThe amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-279ac7e93aba50760878470f1abe4526a1022a81",
+      "source_path": "reservoir.md",
+      "display_text": "## Frozen intake\n\nWhen ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-9d4adbd68d1751e4cf4da656db0cd23f43f56433",
+      "source_path": "reservoir.md",
+      "display_text": "## Ledger storage\n\nCompleted shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-389888de44ac3e19eac87057fa51bd4b4e55f566",
+      "source_path": "reservoir.md",
+      "display_text": "## Cabinet finish\n\nThe exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.\n",
+      "line_start": 25,
+      "line_end": 27
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "92c00f0d1ed32c8a785f2cace6d3492fc50d0b3b05a41fe47d820d0ad8e14b50",
+  "storage_path": "/tmp/docatlas-evidence-d3f3t1n7/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-32a6baef18ab4f9aac44de23f9f1bda7",
+  "catalog_sha256": "d3d6cf25ccffd6773ab0788cf87ee95c96ef614bde6c61fccc3374a383077ddd",
+  "documents": [
+    {
+      "path": "reservoir.md",
+      "content_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137",
+      "catalog_entry_hash": "sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-32a6baef18ab4f9aac44de23f9f1bda7",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 7,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 7
+  }
+}

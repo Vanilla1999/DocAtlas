@@ -1,0 +1,10 @@
+{
+  "status": "PARENT_APPROVED_RECOVERY",
+  "date": "2026-11-06",
+  "manifest_sha256": "2bcebef52ab6268e091f5e28de12acc8837988bff36c2068432e2a4b73ebe066",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "prior_failure_sha256": "388dd7e23506becaba6eb3f95ea872debf41e0952a0f0a9b82d87125ab136e67",
+  "scope": "one fresh-prepared recovery run: 2 prepares, 8 final-policy calibration questions, existing resource checks; no fit",
+  "validation_authorized": false,
+  "on_failure": "preserve artifacts and stop; no retry, threshold changes or validation"
+}

@@ -1,0 +1,111 @@
+{
+  "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+  "threshold": 0.8670357465744019,
+  "weather_scores": [
+    {
+      "identity": "unit-f9aa48ecee7860d5065e5b51b1f13e1295b01dee9bdc7048da043b53de5de787",
+      "score": 0.03308597952127457,
+      "logit_difference": -3.375,
+      "input_tokens": 400,
+      "input_tokens_sha256": "77d14ff55b53a33147d4d99acf508f7fa1185d11b971b0570ea980f07c94640a",
+      "path": "weather.md",
+      "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+      "section_index": 0,
+      "char_start": 0,
+      "char_end": 89,
+      "body_char_start": 20,
+      "heading_path": [
+        "Weather decisions"
+      ],
+      "line_start": 1,
+      "line_end": 4,
+      "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    },
+    {
+      "identity": "unit-20b620a6ce31d429176a6dfabf63593857ec76f3ea6b5654c1c9feaf1e2db722",
+      "score": 0.43782350420951843,
+      "logit_difference": -0.25,
+      "input_tokens": 719,
+      "input_tokens_sha256": "903fbcb8ad676779f933e2e9777ad5dc1b84ff08a25dcbbd54a2852045ce5193",
+      "path": "weather.md",
+      "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+      "section_index": 1,
+      "char_start": 89,
+      "char_end": 306,
+      "body_char_start": 103,
+      "heading_path": [
+        "Weather decisions",
+        "Suspension"
+      ],
+      "line_start": 5,
+      "line_end": 8,
+      "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    },
+    {
+      "identity": "unit-22477807e40ac7a65ea02c0c1e7497c9d34e064bc5cb728ab30b3c7b5a714a76",
+      "score": 0.009708477184176445,
+      "logit_difference": -4.625,
+      "input_tokens": 432,
+      "input_tokens_sha256": "877c2381378880fd2ff4f47f29f76840790cdff3ecb91e020ac3d1bf5178a7be",
+      "path": "weather.md",
+      "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+      "section_index": 2,
+      "char_start": 306,
+      "char_end": 547,
+      "body_char_start": 327,
+      "heading_path": [
+        "Weather decisions",
+        "Indoor instrument"
+      ],
+      "line_start": 9,
+      "line_end": 12,
+      "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    },
+    {
+      "identity": "unit-e56d0e655ec8157f6f77cd81fd8ef84be27d68a3b8c7e657014500c920a4bcd7",
+      "score": 0.014063626527786255,
+      "logit_difference": -4.25,
+      "input_tokens": 416,
+      "input_tokens_sha256": "dfc6532a5e8a1109386c336b39ea72a558cf05d131be6195a8bdc2f5e0cb6915",
+      "path": "weather.md",
+      "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"_source_snapshot_sha256\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"member\":{\"catalog_entry_hash\":\"sha256:35fd11089fd1e1a6a45eaf2d86b18e69929f4bcb1c32af471b551d8aa1e987b7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"weather.md\",\"content_sha256\":\"e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a\",\"document_id\":\"project_file:local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458:weather.md\",\"scope\":{\"project_id\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snapshot_id\":\"gen-803cfbd55fbb4ce0866274bfad7cfd11\",\"version\":\"\"}}}",
+      "section_index": 3,
+      "char_start": 547,
+      "char_end": 696,
+      "body_char_start": 567,
+      "heading_path": [
+        "Weather decisions",
+        "Forecast display"
+      ],
+      "line_start": 13,
+      "line_end": 15,
+      "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    }
+  ],
+  "missing_facts": [
+    [
+      "weather.md#Suspension",
+      "Suspend outdoor observations when the wind interlock opens."
+    ],
+    [
+      "weather.md#Suspension",
+      "Preserve reservation identifiers during suspension."
+    ],
+    [
+      "weather.md#Suspension",
+      "Resume only after the interlock closes and the duty operator records a restart approval."
+    ]
+  ],
+  "closure": {
+    "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+    "status": "complete",
+    "documents": 6,
+    "incomplete_dependencies": [],
+    "units": 21,
+    "hydrated_sections": 21,
+    "incoming_anchor_edges": 6,
+    "selected_units": 4,
+    "delivered_spans": 4
+  },
+  "boundary": "offline original-question trace; no additional calls or counterfactual fitting"
+}

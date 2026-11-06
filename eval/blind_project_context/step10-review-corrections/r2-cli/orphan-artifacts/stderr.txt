@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/run_gap_agent_study.py", line 163, in <module>
+    main()
+    ~~~~^^
+  File "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/run_gap_agent_study.py", line 62, in main
+    raise ValueError("case artifacts exist without study plan; use a new output")
+ValueError: case artifacts exist without study plan; use a new output

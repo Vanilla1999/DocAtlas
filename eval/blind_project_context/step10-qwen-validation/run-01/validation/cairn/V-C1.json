@@ -1,0 +1,692 @@
+{
+  "packet": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-9cf718041646cc32649e4e9e",
+        "path_or_url": "overview.md",
+        "section": "Cairn archive",
+        "snippet": "# Cairn archive\n\nCairn restores research collections from immutable archive snapshots. Recovery procedures concern production collections; disposable training archives are separate.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "1182f8c2eb31270ebc40bcbe9f77d457cc74ed9ae2324518bc021d943528234b",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/669b8deed80254e544b81c95"
+      },
+      {
+        "evidence_id": "ev-b0100326fa47cbc2b1759089",
+        "path_or_url": "overview.md",
+        "section": "Cairn archive > Components",
+        "snippet": "## Components\n\nA catalogue records object identifiers, a verifier checks stored payloads, and a restore worker reconstructs a collection in staging. Publication switches the collection pointer after review; it does not mutate the snapshot.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "468df588b4bddac2fbc50f75d76815425a7a3245c1f68b8b80edb3d42ce0fbc0",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/c0f2a69cab960519e2936950"
+      },
+      {
+        "evidence_id": "ev-c43f33213fbcef671682634f",
+        "path_or_url": "recovery.md",
+        "section": "Restore failure handling",
+        "snippet": "# Restore failure handling\n\nThis procedure applies to a production restore interrupted before publication.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "5d96db7a1f4ec845e22ae35a27b504cc8d02bc7fcb974d80cfb6ad9d0e9f1f28",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/9957aeca2dd9c63b9975a14b"
+      },
+      {
+        "evidence_id": "ev-b46a40b2c12ec82d6560d65d",
+        "path_or_url": "recovery.md",
+        "section": "Restore failure handling > Recovery procedure",
+        "snippet": "## Recovery procedure\n\nExecute every child section below in order. Merely restarting the worker leaves the recovery procedure incomplete.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "ff0ce790b29a7fdc6ab38440b4017257d8414e4bc216530d5b476a8c5909eaf1",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/4f5ed8e978a59eda539403c4"
+      },
+      {
+        "evidence_id": "ev-be0f819cb678858b9fb609cd",
+        "path_or_url": "recovery.md",
+        "section": "Restore failure handling > Recovery procedure > Reconcile",
+        "snippet": "### Reconcile\n\nCompare staged payload checksums with the signed snapshot manifest. Recopy mismatching payloads from the same snapshot; do not mix snapshots within one restore.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "566ff8e4c3e64a0c8f786449925b6da7490b7ac42a1669a095cf50b42f808191",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 13,
+        "line_end": 16,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/4ccacf3ddab03057829bd34c"
+      },
+      {
+        "evidence_id": "ev-774aab5ee051419d0d51f2dd",
+        "path_or_url": "restore.md",
+        "section": "Collection restore",
+        "snippet": "# Collection restore\n\nThese rules govern production collections restored from immutable snapshots.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "7d67c07ea07caec74b281c8537b706eeb03d9cb4ba4e946dcf5c1469fd687de6",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/8ea3fb21db1382edb87f2231"
+      },
+      {
+        "evidence_id": "ev-360680398b361a1d524b7172",
+        "path_or_url": "restore.md",
+        "section": "Collection restore > Snapshot selection",
+        "snippet": "## Snapshot selection\n\nChoose a snapshot with a signed manifest and a completed integrity scan. Record the snapshot identifier before copying any payload. If the most recent snapshot lacks either requirement, choose an older snapshot that satisfies both.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "6b7716358c0235771e9e20d6004fe8dab8ecfc4d3c20b9e9636bcfc72e320daa",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/0dedee5fc6205364c2d0f709"
+      },
+      {
+        "evidence_id": "ev-4373530a4976b2e73b40c05d",
+        "path_or_url": "restore.md",
+        "section": "Collection restore > Held collection",
+        "snippet": "## Held collection\n\nA collection under an investigation hold may be restored into isolated staging only. Do not publish it until the archive custodian explicitly releases the hold.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "f83bfd32a6bc8dbb15d455e149ab179b120a5c0a66c83f34d9e7682204440ee6",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 9,
+        "line_end": 12,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/f261c958afcf25401056850e"
+      },
+      {
+        "evidence_id": "ev-62e7528c1f7e71fceb6d5ede",
+        "path_or_url": "restore.md",
+        "section": "Collection restore > Training archive",
+        "snippet": "## Training archive\n\nDisposable training archives may use unsigned snapshots and overwrite their staging directories. They cannot serve as a source for a production restore.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "51670107f068599919801a0084940109689641efbcaa5cacf14ec7e3d7f8a0c8",
+        "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+        "line_start": 13,
+        "line_end": 15,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/4e1097b9bca25ed859606aeb"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 1822,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "complete_calibrated_context_v1",
+      "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+      "calibration_status": "empirical",
+      "candidate_units": 23,
+      "selected_units": 7,
+      "delivered_rows": 9,
+      "scan_complete": true,
+      "model_pairs": 23,
+      "closure": {
+        "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+        "status": "complete",
+        "documents": 6,
+        "incomplete_dependencies": [],
+        "units": 23,
+        "hydrated_sections": 23,
+        "incoming_anchor_edges": 1,
+        "selected_units": 7,
+        "delivered_spans": 9
+      }
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": null,
+      "remaining_rows": 0,
+      "continuation_token": "5dc2c082edaf085e5bd4d2e0993bf898d6ab5b65a0e299477e0bd6cb6de61ce5"
+    }
+  },
+  "observations": [
+    {
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 23,
+        "model_pairs": 23,
+        "model_forwards": 23,
+        "model_input_tokens": 9742,
+        "planned_input_tokens": 9742,
+        "preflight_units": 23,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 23,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.30569477297831327,
+        "asset_verification_seconds": 0.5957211589993676,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1217932800,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.0344830520043615
+      },
+      "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+      "delivery_status": "returned",
+      "scores": [
+        {
+          "identity": "unit-9cf718041646cc32649e4e9ecbfef28ad3f0d0efb8c29fc5aaeba14d9fd0a2b3",
+          "score": 0.9465966820716858,
+          "logit_difference": 2.875,
+          "input_tokens": 397,
+          "input_tokens_sha256": "60585db3fe7311f09d1aa7133addd76998f2ac4b1a2eec14f73fed3afdc86f8a",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:overview.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 183,
+          "body_char_start": 16,
+          "heading_path": [
+            "Cairn archive"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da"
+        },
+        {
+          "identity": "unit-b0100326fa47cbc2b17590897fd528acbddf60abb04f8e0be2218dcf6efc901f",
+          "score": 0.9933071732521057,
+          "logit_difference": 5.0,
+          "input_tokens": 415,
+          "input_tokens_sha256": "dab9e9a3eb5016a151a5318c70470b4f63340c0ccca3a1f8f10750d7d089517e",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:overview.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 183,
+          "char_end": 424,
+          "body_char_start": 197,
+          "heading_path": [
+            "Cairn archive",
+            "Components"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da"
+        },
+        {
+          "identity": "unit-1b06bcc34a692930820fbc816b280101c0c59e2c372bd4b332a5da32a151942b",
+          "score": 0.851952850818634,
+          "logit_difference": 1.75,
+          "input_tokens": 406,
+          "input_tokens_sha256": "b7ca581744dc87310fc787141babf4cb412ce15d44b26584b0286454ca271bf8",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:overview.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 424,
+          "char_end": 614,
+          "body_char_start": 436,
+          "heading_path": [
+            "Cairn archive",
+            "Identity"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da"
+        },
+        {
+          "identity": "unit-c43f33213fbcef671682634fdc0f68e29c43dc50043d1f14ff17a0eb96bf0557",
+          "score": 0.5926666259765625,
+          "logit_difference": 0.375,
+          "input_tokens": 440,
+          "input_tokens_sha256": "15fc3dfe1172dac9cdd00e3484a53f234c7f7dbd6389204912dd7620c25a0e51",
+          "path": "recovery.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"_source_snapshot_sha256\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"member\":{\"catalog_entry_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"recovery.md\",\"content_sha256\":\"b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:recovery.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 108,
+          "body_char_start": 27,
+          "heading_path": [
+            "Restore failure handling"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+        },
+        {
+          "identity": "unit-b46a40b2c12ec82d6560d65df53ee856f9fed9f435fc5f6276d597f346bb1fbb",
+          "score": 0.7057850360870361,
+          "logit_difference": 0.875,
+          "input_tokens": 453,
+          "input_tokens_sha256": "18694a91db8c8eae813336f22cd27649be2dd173e697cb0d60daf045eaade9ec",
+          "path": "recovery.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"_source_snapshot_sha256\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"member\":{\"catalog_entry_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"recovery.md\",\"content_sha256\":\"b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:recovery.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 108,
+          "char_end": 247,
+          "body_char_start": 130,
+          "heading_path": [
+            "Restore failure handling",
+            "Recovery procedure"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+        },
+        {
+          "identity": "unit-9214e11906fc74d3b609fb7acc5b73e56a9d421af38c9588981479daf7035cac",
+          "score": 0.8354835510253906,
+          "logit_difference": 1.625,
+          "input_tokens": 456,
+          "input_tokens_sha256": "7304c9064bb301afaf71a6fcdc47c6af99a8efdd01208c8c308a4e9f1f6fc5fd",
+          "path": "recovery.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"_source_snapshot_sha256\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"member\":{\"catalog_entry_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"recovery.md\",\"content_sha256\":\"b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:recovery.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 247,
+          "char_end": 379,
+          "body_char_start": 260,
+          "heading_path": [
+            "Restore failure handling",
+            "Recovery procedure",
+            "Preserve"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+        },
+        {
+          "identity": "unit-be0f819cb678858b9fb609cd68a16b6cab0b26d15998666807ee134509405e9f",
+          "score": 0.9399133324623108,
+          "logit_difference": 2.75,
+          "input_tokens": 467,
+          "input_tokens_sha256": "30f017eb02968e09818772a712edb1b57bf3b00843d10e5e6711032c85398c2c",
+          "path": "recovery.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"_source_snapshot_sha256\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"member\":{\"catalog_entry_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"recovery.md\",\"content_sha256\":\"b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:recovery.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 379,
+          "char_end": 556,
+          "body_char_start": 393,
+          "heading_path": [
+            "Restore failure handling",
+            "Recovery procedure",
+            "Reconcile"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+        },
+        {
+          "identity": "unit-4c695b7665cc4c01d3bd665df055adb07d2608ee293976ca63c7f608788d95ba",
+          "score": 0.8354835510253906,
+          "logit_difference": 1.625,
+          "input_tokens": 460,
+          "input_tokens_sha256": "db54f8578d927338d4ef8330b1749dc33660bba4579ce33c4f32d38a1aad6c9e",
+          "path": "recovery.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"_source_snapshot_sha256\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"member\":{\"catalog_entry_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"recovery.md\",\"content_sha256\":\"b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:recovery.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 556,
+          "char_end": 727,
+          "body_char_start": 567,
+          "heading_path": [
+            "Restore failure handling",
+            "Recovery procedure",
+            "Reopen"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+        },
+        {
+          "identity": "unit-e92684314c221c65b27d0351cff41579f0d76a7077d0c9326ebbc30c1b34002e",
+          "score": 0.3486451506614685,
+          "logit_difference": -0.625,
+          "input_tokens": 455,
+          "input_tokens_sha256": "28faeabb39ddb38a712c2b1b33184591a3d3bd7c0be007fc75ad2e56766d232c",
+          "path": "recovery.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"_source_snapshot_sha256\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"member\":{\"catalog_entry_hash\":\"sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"recovery.md\",\"content_sha256\":\"b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:recovery.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 727,
+          "char_end": 884,
+          "body_char_start": 744,
+          "heading_path": [
+            "Restore failure handling",
+            "Sandbox reset"
+          ],
+          "line_start": 21,
+          "line_end": 23,
+          "source_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71"
+        },
+        {
+          "identity": "unit-08ee0a3c12386f8e464cc9a0e02de7c913defb7478cbedb23474dd7a8f261ad5",
+          "score": 0.11920291930437088,
+          "logit_difference": -2.0,
+          "input_tokens": 367,
+          "input_tokens_sha256": "9e6e76ec0b3e28adb058412df41e19786144d0fb5aaa50d71a77354ce105cab4",
+          "path": "rollback.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7\",\"_source_snapshot_sha256\":\"sha256:c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"member\":{\"catalog_entry_hash\":\"sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"rollback.md\",\"content_sha256\":\"c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:rollback.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 97,
+          "body_char_start": 19,
+          "heading_path": [
+            "Pointer rollback"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5"
+        },
+        {
+          "identity": "unit-2ac82333ce3bc463f3d2cabaa8b7876817a37c6f0c84dc5fafd09bc1afe4407b",
+          "score": 0.622459352016449,
+          "logit_difference": 0.5,
+          "input_tokens": 529,
+          "input_tokens_sha256": "7a05ae8599afd560f332cd87333925aa3231c26848e7aaace3185326b353afcf",
+          "path": "rollback.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7\",\"_source_snapshot_sha256\":\"sha256:c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"member\":{\"catalog_entry_hash\":\"sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"rollback.md\",\"content_sha256\":\"c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:rollback.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 97,
+          "char_end": 356,
+          "body_char_start": 109,
+          "heading_path": [
+            "Pointer rollback",
+            "Rollback"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5"
+        },
+        {
+          "identity": "unit-24491b947095d775f414d7d042ed16a26864e02d99e16560975c64052c9a0ed7",
+          "score": 0.09009299427270889,
+          "logit_difference": -2.3125,
+          "input_tokens": 384,
+          "input_tokens_sha256": "9fe8336f1cfb16d6acfe83d1e48934484bb6a5bee635c9c84ff3f54eefcd48aa",
+          "path": "rollback.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7\",\"_source_snapshot_sha256\":\"sha256:c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"member\":{\"catalog_entry_hash\":\"sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"rollback.md\",\"content_sha256\":\"c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:rollback.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 356,
+          "char_end": 522,
+          "body_char_start": 377,
+          "heading_path": [
+            "Pointer rollback",
+            "Abandoned preview"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5"
+        },
+        {
+          "identity": "unit-31ca2a71b5f3ab231b8a4b23107d48f5f652a1afed66e8a4d20d43e7e346b1a2",
+          "score": 0.0002234163403045386,
+          "logit_difference": -8.40625,
+          "input_tokens": 372,
+          "input_tokens_sha256": "0044d18d1e8c796508d8ad2096490531508a0103ce2cf6098be12ecd547c2a3e",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:architecture.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 101,
+          "body_char_start": 23,
+          "heading_path": [
+            "Archive architecture"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411"
+        },
+        {
+          "identity": "unit-f7ef49878df00e2efc47c29c736626e1aea3d0224870052966d87ec16060aef7",
+          "score": 0.0005193048273213208,
+          "logit_difference": -7.5625,
+          "input_tokens": 400,
+          "input_tokens_sha256": "3d57698a74be47e7c266d144da8fda380176641ccbee373c419000baebbebcd2",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:architecture.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 101,
+          "char_end": 354,
+          "body_char_start": 117,
+          "heading_path": [
+            "Archive architecture",
+            "Object store"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411"
+        },
+        {
+          "identity": "unit-0a679808c34100edb2bb3f30aaca418e344bef4d27d7f1461c9fc50027f27a5b",
+          "score": 0.0006070755189284682,
+          "logit_difference": -7.40625,
+          "input_tokens": 391,
+          "input_tokens_sha256": "0157497c21cd0173301fd8110ac5f5609c39b491fcd85c2a2d479f6e554b81b5",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:architecture.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 354,
+          "char_end": 557,
+          "body_char_start": 376,
+          "heading_path": [
+            "Archive architecture",
+            "Demonstration mode"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411"
+        },
+        {
+          "identity": "unit-774aab5ee051419d0d51f2ddd9f8a39a2401f8eab890de84c35e7ce871f628ca",
+          "score": 0.9940890073776245,
+          "logit_difference": 5.125,
+          "input_tokens": 400,
+          "input_tokens_sha256": "d46295fc4b1d7df587e0f48bfed0a28b31a3727f58adb87dc7249f089a8f4de6",
+          "path": "restore.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"_source_snapshot_sha256\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"member\":{\"catalog_entry_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"restore.md\",\"content_sha256\":\"f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:restore.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 100,
+          "body_char_start": 21,
+          "heading_path": [
+            "Collection restore"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+        },
+        {
+          "identity": "unit-360680398b361a1d524b7172e73f789ae20c4285e1227fca4fe1786eb4043264",
+          "score": 0.9985895752906799,
+          "logit_difference": 6.5625,
+          "input_tokens": 433,
+          "input_tokens_sha256": "2513c282555c402ff14604e5694b9459a0ed6aa6c9ab09be95e147694349086e",
+          "path": "restore.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"_source_snapshot_sha256\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"member\":{\"catalog_entry_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"restore.md\",\"content_sha256\":\"f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:restore.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 100,
+          "char_end": 356,
+          "body_char_start": 122,
+          "heading_path": [
+            "Collection restore",
+            "Snapshot selection"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+        },
+        {
+          "identity": "unit-4373530a4976b2e73b40c05d7adc5ed71cf83a9e1d2ef767027c7aa4dd64a097",
+          "score": 0.9966233968734741,
+          "logit_difference": 5.6875,
+          "input_tokens": 423,
+          "input_tokens_sha256": "55100a0cbecd629ece3a8b98b38db7698f2598ec0323a65733ad1804e3ba73d6",
+          "path": "restore.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"_source_snapshot_sha256\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"member\":{\"catalog_entry_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"restore.md\",\"content_sha256\":\"f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:restore.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 356,
+          "char_end": 538,
+          "body_char_start": 375,
+          "heading_path": [
+            "Collection restore",
+            "Held collection"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+        },
+        {
+          "identity": "unit-62e7528c1f7e71fceb6d5edeb65fbecfb0a5c9405c9606653eb25936fc89d06b",
+          "score": 0.9875683188438416,
+          "logit_difference": 4.375,
+          "input_tokens": 417,
+          "input_tokens_sha256": "726ebf81dd7ca4b19a4b8af47a812a3191843d49daf4d56b5a75fec0e434e2b5",
+          "path": "restore.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"_source_snapshot_sha256\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"member\":{\"catalog_entry_hash\":\"sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"restore.md\",\"content_sha256\":\"f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:restore.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 538,
+          "char_end": 712,
+          "body_char_start": 558,
+          "heading_path": [
+            "Collection restore",
+            "Training archive"
+          ],
+          "line_start": 13,
+          "line_end": 15,
+          "source_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6"
+        },
+        {
+          "identity": "unit-03274f2721cd98a05cd43ef34ed75f90444c0c57e20ee90c6511c5fa846d2f56",
+          "score": 0.6513549089431763,
+          "logit_difference": 0.625,
+          "input_tokens": 402,
+          "input_tokens_sha256": "2f7ebe3115d7c6d929b31ea0d56a16e73ab177d04af04155050cd765b49e251c",
+          "path": "publication.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"_source_snapshot_sha256\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"member\":{\"catalog_entry_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"publication.md\",\"content_sha256\":\"9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:publication.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 101,
+          "body_char_start": 22,
+          "heading_path": [
+            "Restore publication"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+        },
+        {
+          "identity": "unit-443ad69b62526ed489e92b38adcaad566f82138204c11a1b0cc8a4c146a09673",
+          "score": 0.8175744414329529,
+          "logit_difference": 1.5,
+          "input_tokens": 432,
+          "input_tokens_sha256": "c21545bc1de4943a55f8ffb76f5d700c6eec39050d98a20b0698c5451a19eadc",
+          "path": "publication.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"_source_snapshot_sha256\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"member\":{\"catalog_entry_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"publication.md\",\"content_sha256\":\"9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:publication.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 101,
+          "char_end": 340,
+          "body_char_start": 111,
+          "heading_path": [
+            "Restore publication",
+            "Switch"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+        },
+        {
+          "identity": "unit-2f887e9f73debe01196f618e0361facc790806bcf76dc3b4c0fc4dc941e27a39",
+          "score": 0.6791787147521973,
+          "logit_difference": 0.75,
+          "input_tokens": 426,
+          "input_tokens_sha256": "704e66fe9547fa79596eb4570b4a3f132149262166e3702d9ae79ad916ee899c",
+          "path": "publication.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"_source_snapshot_sha256\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"member\":{\"catalog_entry_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"publication.md\",\"content_sha256\":\"9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:publication.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 340,
+          "char_end": 546,
+          "body_char_start": 363,
+          "heading_path": [
+            "Restore publication",
+            "Partial collections"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+        },
+        {
+          "identity": "unit-6a30a02596950079e73d7d55b9a6f3e4297ea74b9337dac71fe5d955bfab79b8",
+          "score": 0.5926666259765625,
+          "logit_difference": 0.375,
+          "input_tokens": 417,
+          "input_tokens_sha256": "13450dcb3bc4d3c8f5f00cfc12b9ce874219cc54df54b941ed4be37e04d42f53",
+          "path": "publication.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"_source_snapshot_sha256\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"member\":{\"catalog_entry_hash\":\"sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"publication.md\",\"content_sha256\":\"9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd\",\"document_id\":\"project_file:local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb:publication.md\",\"scope\":{\"project_id\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snapshot_id\":\"gen-f3cc50844fe04d42a443d8f0029a6519\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 546,
+          "char_end": 710,
+          "body_char_start": 565,
+          "heading_path": [
+            "Restore publication",
+            "Preview pointer"
+          ],
+          "line_start": 13,
+          "line_end": 15,
+          "source_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd"
+        }
+      ]
+    }
+  ],
+  "error": null,
+  "receipt_status": "available",
+  "seconds": 1.3331284270025208
+}

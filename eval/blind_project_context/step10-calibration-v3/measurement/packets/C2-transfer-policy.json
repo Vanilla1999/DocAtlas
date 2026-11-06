@@ -1,0 +1,158 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-453e2bf4ae8b012c7b0238aa",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook",
+      "snippet": "# Cooperative apiary handbook\n\nThis handbook collects independent work instructions and building information for the cooperative apiary. Each named procedure has its own scope.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "8238cdd94d2d7d198ff6d78060690afa9f2bb4f03bad13022a8e2fe788c266d5",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/b81df1b05098e7d675f097e5"
+    },
+    {
+      "evidence_id": "ev-5a18a128e0df1e95cbb21c9b",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook > Moving occupied hives",
+      "snippet": "## Moving occupied hives\n\nThe instructions in this section apply only to occupied hives moved between stands inside the same apiary. Moving a hive to another site requires a separate transport plan.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0bde953e53b91f453905d17be44823df72a0041c9cd087277f74d3174c5c8dbf",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/ac37f36c41f31221a91f287c"
+    },
+    {
+      "evidence_id": "ev-d79dc159fd0bbfb14b03d6db",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook > Moving occupied hives > Entrance preparation",
+      "snippet": "### Entrance preparation\n\nClose the hive entrance with a ventilated transport screen after the last flying bees have returned. Keep the screen unobstructed throughout the move.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "107679f0541294710bdcae95d902820375e82e15286a77202fd339706708c0ca",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 9,
+      "line_end": 12,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/71094e5ce0d4802e4115e658"
+    },
+    {
+      "evidence_id": "ev-2e5378237232431a3cb41090",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook > Moving occupied hives > Securing the boxes",
+      "snippet": "### Securing the boxes\n\nFasten the hive boxes and floor together with two ratchet straps before lifting. Lift the secured hive with two people and place it level on the new stand.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "235325d59e8d20d0999bca97420d9479195febf9abcbb3be8ea3bd6437f3368e",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/a4413bcee1683a66dee21cd9"
+    },
+    {
+      "evidence_id": "ev-878319bae34fc1bdcfa19744",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook > Moving occupied hives > Reopening",
+      "snippet": "### Reopening\n\nRemove the transport screen after the hive is stable on its new stand. Place a leafy branch across the entrance to encourage returning bees to reorient.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ecd3ff94f627c6c76ddcd50df71065c5949688f95e46d1300d0593bda4655112",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 17,
+      "line_end": 20,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/c2d775b58eacd818e192b45f"
+    },
+    {
+      "evidence_id": "ev-c060c67d3dab5afadedcd340",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook > Moving occupied hives > Trolley paint",
+      "snippet": "### Trolley paint\n\nThe equipment trolley is painted cream. Touch-up paint and brushes are kept in the garden shed; paint colour does not identify a hive's destination.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "50d7d0ab958aa0289c9b51c4686a174160e175b0efa35afe4ec599d2e0dd0fe1",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 21,
+      "line_end": 24,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/e27382ac61a5e9a55d6719b0"
+    },
+    {
+      "evidence_id": "ev-901575b9ea9ca9e92991a2c2",
+      "path_or_url": "apiary.md",
+      "section": "Cooperative apiary handbook > Queen inspection exception",
+      "snippet": "## Queen inspection exception\n\nAn occupied hive awaiting completion of a queen inspection must not be moved between stands, even when the entrance has been screened and the boxes are strapped. Complete and record the queen inspection before scheduling the move.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "bbff353bcbc90b0052f7cba40150cf8d92265ced04890300f0f8af8dcf5a8e2c",
+      "project_identity": "local:acb5e5e75abfaf1a9bb9adeff00dd0e06b19acc898568512a61bce7dc8c50030",
+      "line_start": 25,
+      "line_end": 28,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/21d6910ea5a660acaec4e3ac"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1549,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+    "calibration_status": "empirical",
+    "candidate_units": 8,
+    "selected_units": 5,
+    "delivered_rows": 7,
+    "scan_complete": true,
+    "model_pairs": 16,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 5,
+      "delivered_spans": 7
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "e0ea4d07fd2212e975e316da145feb71f67b0cec5cf5371a0df0ea7fb8f80af4"
+  }
+}

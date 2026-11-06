@@ -1,0 +1,447 @@
+{
+  "status": "CONFIRMED_QUALITY_FAIL",
+  "per_query": [
+    {
+      "id": "V-M1",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "explicit_full_section": null,
+      "required_units": [
+        "reservations.md#Confirmed reservations",
+        "reservations.md#Locked instrument",
+        "reservations.md#Transfer",
+        "weather.md#Suspension",
+        "weather.md#Weather decisions"
+      ],
+      "delivered_units": [
+        "reservations.md#Confirmed reservations",
+        "reservations.md#Locked instrument",
+        "reservations.md#Training slots",
+        "reservations.md#Transfer"
+      ],
+      "missing_required_units": [
+        "weather.md#Suspension",
+        "weather.md#Weather decisions"
+      ],
+      "facts": [
+        {
+          "unit": "reservations.md#Confirmed reservations",
+          "quote": "These rules apply to confirmed night-time reservations on shared instruments.",
+          "delivered": true
+        },
+        {
+          "unit": "reservations.md#Transfer",
+          "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+          "delivered": true
+        },
+        {
+          "unit": "reservations.md#Transfer",
+          "quote": "Retain the original reservation identifier and record both observers in the audit trail.",
+          "delivered": true
+        },
+        {
+          "unit": "reservations.md#Locked instrument",
+          "quote": "leave the transfer pending even after observer acceptance and operator approval",
+          "delivered": true
+        },
+        {
+          "unit": "reservations.md#Locked instrument",
+          "quote": "The lock must be cleared by the instrument team first.",
+          "delivered": true
+        },
+        {
+          "unit": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens.",
+          "delivered": false
+        },
+        {
+          "unit": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension.",
+          "delivered": false
+        },
+        {
+          "unit": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+          "delivered": false
+        }
+      ],
+      "no_answer_expected": false,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 158,
+      "allowed_source_tokens": 688
+    },
+    {
+      "id": "V-M2",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "explicit_full_section": null,
+      "required_units": [
+        "weather.md#Indoor instrument",
+        "weather.md#Suspension",
+        "weather.md#Weather decisions"
+      ],
+      "delivered_units": [
+        "weather.md#Forecast display",
+        "weather.md#Indoor instrument",
+        "weather.md#Suspension",
+        "weather.md#Weather decisions"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "weather.md#Weather decisions",
+          "quote": "Weather decisions govern execution, not ownership of reservations.",
+          "delivered": true
+        },
+        {
+          "unit": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens.",
+          "delivered": true
+        },
+        {
+          "unit": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension.",
+          "delivered": true
+        },
+        {
+          "unit": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+          "delivered": true
+        },
+        {
+          "unit": "weather.md#Indoor instrument",
+          "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+          "delivered": true
+        },
+        {
+          "unit": "weather.md#Indoor instrument",
+          "quote": "A roof visible as closed on the calendar does not establish indoor classification.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 116,
+      "allowed_source_tokens": 688
+    },
+    {
+      "id": "V-M3",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "explicit_full_section": null,
+      "required_units": [
+        "clock.md#Clock offset",
+        "clock.md#Missing reference",
+        "clock.md#Time coordination"
+      ],
+      "delivered_units": [
+        "architecture.md#Prototype recovery",
+        "architecture.md#Scheduler architecture",
+        "clock.md#Clock offset",
+        "clock.md#Missing reference",
+        "clock.md#Simulation clock",
+        "clock.md#Time coordination"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "clock.md#Time coordination",
+          "quote": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+          "delivered": true
+        },
+        {
+          "unit": "clock.md#Clock offset",
+          "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+          "delivered": true
+        },
+        {
+          "unit": "clock.md#Clock offset",
+          "quote": "Keep queued reservations unchanged.",
+          "delivered": true
+        },
+        {
+          "unit": "clock.md#Clock offset",
+          "quote": "Resume only after two consecutive reference checks report an offset within two seconds.",
+          "delivered": true
+        },
+        {
+          "unit": "clock.md#Missing reference",
+          "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 168,
+      "allowed_source_tokens": 688
+    },
+    {
+      "id": "V-M4",
+      "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+      "explicit_full_section": null,
+      "required_units": [],
+      "delivered_units": [],
+      "missing_required_units": [],
+      "facts": [],
+      "no_answer_expected": true,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 0,
+      "allowed_source_tokens": 688
+    },
+    {
+      "id": "V-C1",
+      "question": "Как выбрать снимок для восстановления производственной коллекции, если последний снимок не проверен, а коллекция находится под расследованием?",
+      "explicit_full_section": null,
+      "required_units": [
+        "restore.md#Collection restore",
+        "restore.md#Held collection",
+        "restore.md#Snapshot selection"
+      ],
+      "delivered_units": [
+        "overview.md#Cairn archive",
+        "overview.md#Components",
+        "recovery.md#Reconcile",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Restore failure handling",
+        "restore.md#Collection restore",
+        "restore.md#Held collection",
+        "restore.md#Snapshot selection",
+        "restore.md#Training archive"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "restore.md#Collection restore",
+          "quote": "These rules govern production collections restored from immutable snapshots.",
+          "delivered": true
+        },
+        {
+          "unit": "restore.md#Snapshot selection",
+          "quote": "Choose a snapshot with a signed manifest and a completed integrity scan.",
+          "delivered": true
+        },
+        {
+          "unit": "restore.md#Snapshot selection",
+          "quote": "Record the snapshot identifier before copying any payload.",
+          "delivered": true
+        },
+        {
+          "unit": "restore.md#Snapshot selection",
+          "quote": "If the most recent snapshot lacks either requirement, choose an older snapshot that satisfies both.",
+          "delivered": true
+        },
+        {
+          "unit": "restore.md#Held collection",
+          "quote": "A collection under an investigation hold may be restored into isolated staging only.",
+          "delivered": true
+        },
+        {
+          "unit": "restore.md#Held collection",
+          "quote": "Do not publish it until the archive custodian explicitly releases the hold.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 260,
+      "allowed_source_tokens": 664
+    },
+    {
+      "id": "V-C2",
+      "question": "Provide the entire Recovery procedure for an interrupted production restore, including all child sections and the published pointer's state.",
+      "explicit_full_section": "recovery.md#Recovery procedure",
+      "required_units": [
+        "recovery.md#Preserve",
+        "recovery.md#Reconcile",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Reopen",
+        "recovery.md#Restore failure handling"
+      ],
+      "delivered_units": [
+        "overview.md#Cairn archive",
+        "overview.md#Components",
+        "recovery.md#Preserve",
+        "recovery.md#Reconcile",
+        "recovery.md#Recovery procedure",
+        "recovery.md#Reopen",
+        "recovery.md#Restore failure handling",
+        "recovery.md#Sandbox reset"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "recovery.md#Restore failure handling",
+          "quote": "This procedure applies to a production restore interrupted before publication.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Recovery procedure",
+          "quote": "Execute every child section below in order.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Preserve",
+          "quote": "Stop the worker and retain its restore journal.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Preserve",
+          "quote": "Record the failed snapshot identifier before changing staging files.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Reconcile",
+          "quote": "Compare staged payload checksums with the signed snapshot manifest.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Reconcile",
+          "quote": "Recopy mismatching payloads from the same snapshot; do not mix snapshots within one restore.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Reopen",
+          "quote": "Resume the worker only after reconciliation completes.",
+          "delivered": true
+        },
+        {
+          "unit": "recovery.md#Reopen",
+          "quote": "Keep the collection pointer on its previous published snapshot until publication approval is recorded.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 219,
+      "allowed_source_tokens": 664
+    },
+    {
+      "id": "V-C3",
+      "question": "When can a restored collection become public, and what must happen if publication verification fails?",
+      "explicit_full_section": null,
+      "required_units": [
+        "publication.md#Partial collections",
+        "publication.md#Restore publication",
+        "publication.md#Switch",
+        "rollback.md#Pointer rollback",
+        "rollback.md#Rollback"
+      ],
+      "delivered_units": [
+        "publication.md#Partial collections",
+        "publication.md#Restore publication",
+        "publication.md#Switch",
+        "rollback.md#Pointer rollback",
+        "rollback.md#Rollback"
+      ],
+      "missing_required_units": [],
+      "facts": [
+        {
+          "unit": "publication.md#Restore publication",
+          "quote": "Publication changes the visitor-visible pointer for a production collection.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Switch",
+          "quote": "Switch the collection pointer only after checksum reconciliation and custodian approval.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Switch",
+          "quote": "Record both the previous and new snapshot identifiers.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Partial collections",
+          "quote": "If any required payload is missing, leave the previous pointer active even when all present payloads pass checksums.",
+          "delivered": true
+        },
+        {
+          "unit": "publication.md#Partial collections",
+          "quote": "Custodian approval alone cannot authorize a partial collection.",
+          "delivered": true
+        },
+        {
+          "unit": "rollback.md#Rollback",
+          "quote": "Restore the previous snapshot pointer when publication verification fails.",
+          "delivered": true
+        },
+        {
+          "unit": "rollback.md#Rollback",
+          "quote": "Preserve the failed publication record and its snapshot identifier for diagnosis.",
+          "delivered": true
+        },
+        {
+          "unit": "rollback.md#Rollback",
+          "quote": "Do not delete the failed staging directory until the incident owner authorizes cleanup.",
+          "delivered": true
+        }
+      ],
+      "no_answer_expected": false,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 148,
+      "allowed_source_tokens": 664
+    },
+    {
+      "id": "V-C4",
+      "question": "What maintenance interval is mandated for every archive storage device?",
+      "explicit_full_section": null,
+      "required_units": [],
+      "delivered_units": [],
+      "missing_required_units": [],
+      "facts": [],
+      "no_answer_expected": true,
+      "hard_negatives": [],
+      "complete_scan": true,
+      "source_order_preserved": true,
+      "delivered_source_tokens": 0,
+      "allowed_source_tokens": 664
+    }
+  ],
+  "facts_delivered": 38,
+  "facts_required": 41,
+  "required_units_delivered": 22,
+  "required_units": 24,
+  "readonly": [
+    {
+      "path": "validation/meridian/readonly.json",
+      "logical_db_sha256": "ab3b948afecf34fb7c9847c4ec66b58440bda470a693994c3147e6046135d764",
+      "before_after_equal": true
+    },
+    {
+      "path": "validation/cairn/readonly.json",
+      "logical_db_sha256": "c7c0015c28d907e3c020cb37415bff20ce31af6aea51f9f16e1d78399c98f46e",
+      "before_after_equal": true
+    }
+  ],
+  "summary_sha256": "14e5f1f2512b16d7795083c7fb992d346b401aa20201c98b1f770878bc08a1a2",
+  "manifest_sha256": "2bcebef52ab6268e091f5e28de12acc8837988bff36c2068432e2a4b73ebe066",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "bound_files_unchanged": 618,
+  "counts": {
+    "public_prepares": 2,
+    "public_queries": 8,
+    "resource_reads": 8,
+    "model_totals_complete": true,
+    "lost_trace_queries": 0,
+    "model_forwards": 176,
+    "model_input_tokens": 75136,
+    "score_cache_hits": 0,
+    "runtime_cache_hits": 7,
+    "model_loads": 1,
+    "inference_seconds": 2.6714200429123593,
+    "scoring_total_seconds": 10.65817043500283,
+    "peak_vram_allocated_bytes": 1220989952,
+    "peak_vram_reserved_bytes": 1245708288
+  }
+}

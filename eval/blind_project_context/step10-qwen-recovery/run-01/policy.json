@@ -1,0 +1,12 @@
+{
+  "schema_version": 3,
+  "recipe": "qwen3-contextual-own-body-evidence-v1",
+  "model_id": "Qwen/Qwen3-Reranker-0.6B",
+  "model_revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+  "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+  "lanes": "exact_original_only",
+  "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+  "calibration_recipe": "largest-finite-breakpoint-required-final-obligations-v1",
+  "calibration_sha256": "87585ea10a1c0a4e6673020368ad51ee0e64bdd9ca3d6de4ca8ddce86a34046a",
+  "threshold": 0.8670357465744019
+}

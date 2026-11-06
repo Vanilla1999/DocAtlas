@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "id": "T01-ru",
+      "topic_id": "T01",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+      "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+    }
+  ],
+  "arm": "minimal-context",
+  "corpora": [
+    "L0"
+  ],
+  "model": "openai/gpt-6.1-terra#low",
+  "skill_sha256": "4a99f86f1ac7825ae385c79cf24fd75ab49a8d14a2de50486de15384239f8ad4",
+  "steps": null,
+  "candidate_ceiling_per_lane_query": null,
+  "focused_packet_cap": null,
+  "ordinary_packet_cap": null,
+  "emergency_tokens": 50000,
+  "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+}

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from docmancer.docs.domain.query_terms import documentation_technical_anchors
+from .minimal_context_config import minimal_context_enabled
 
 QueryRelation = Literal["direct", "audited_rewrite", "host_lookup", "exact_anchor"]
 
@@ -86,14 +87,14 @@ def build_documentation_query_plan(
     question: str, *, lookup_queries: tuple[str, ...] = (), explicit_path: str | None = None,
     requirements: object | None = None,
 ) -> DocumentationQueryPlan:
-    """Keep exact request bytes and the existing five-lookup resource ceiling.
+    """Keep exact request bytes; only legacy mode has a five-lookup ceiling.
 
     Requirements remain in their owning proof pipeline, not a source of search
     aliases, injected expectations, or inherited parent coverage. An explicit
     path remains scope metadata; it is not an additional executable query.
     """
     queries = [DocumentationLookup("query-original", question, "original")]
-    for index, text in enumerate(lookup_queries[:5], 1):
+    for index, text in enumerate(lookup_queries if minimal_context_enabled() else lookup_queries[:5], 1):
         if not text.strip():
             continue
         queries.append(DocumentationLookup(

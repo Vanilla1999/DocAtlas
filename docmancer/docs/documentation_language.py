@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import re
 from typing import Any
+from .domain.minimal_context_config import minimal_context_enabled
 
 
 class DocumentationLanguageError(ValueError):
@@ -146,19 +147,20 @@ def library_language(service: Any, canonical_id: str, inspected: dict) -> dict:
 
 
 def translated_query(question: str, search_question: Any, lookups: tuple[str, ...]) -> tuple[str, tuple[str, ...]]:
-    """Keep the original authoritative question; spend one existing lookup slot.
+    """Keep the original authoritative question and explicit translation lane.
 
     A host-supplied translation is NOT certified semantically equivalent. Source
     validation and scope boundaries do not depend on language or lookup text.
     """
     if search_question is None:
         return question, lookups
-    if not isinstance(search_question, str) or not search_question.strip() or len(search_question) > 500:
+    candidate = minimal_context_enabled()
+    if not isinstance(search_question, str) or not search_question.strip() or (not candidate and len(search_question) > 500):
         raise DocumentationLanguageError("invalid_search_question")
     combined = list(lookups)
     if search_question != question and search_question not in combined:
         combined.append(search_question)
-    if len(combined) > 5:
+    if not candidate and len(combined) > 5:
         raise DocumentationLanguageError("search_question_lookup_limit")
     return search_question, tuple(combined)
 

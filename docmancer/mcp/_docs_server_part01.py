@@ -266,7 +266,7 @@ def call_docs_tool_payload(
                 },
             }
         else:
-            active_service = service if member_sync else _service_for_project_path(
+            active_service = service if member_sync or name == "read_docs_source" else _service_for_project_path(
                 service, handler_args, read_only_startup=name in {"get_docs_context", "docs_status"},
             )
             payload = handler(name, handler_args, active_service)
@@ -287,14 +287,16 @@ def call_docs_tool_payload(
             tool=name,
             phase="validation",
         )
-    if payload.get("status") == "error" and isinstance(payload.get("reason_code"), str):
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    candidate_context = name in {"get_docs_context", "read_docs_source"} and minimal_context_enabled()
+    if payload.get("status") == "error" and isinstance(payload.get("reason_code"), str) and not candidate_context:
         return build_mcp_error_payload(
             reason_code=payload["reason_code"],
             message=str(payload.get("message") or "request failed"),
             tool=name,
             phase="validation",
         )
-    public_payload = payload if payload.get("reason_code") == "member_store_uninitialized" else compact_mcp_payload(payload, tool=name)
+    public_payload = payload if candidate_context or payload.get("reason_code") == "member_store_uninitialized" else compact_mcp_payload(payload, tool=name)
     if name == "docs_status":
         public_payload["project_binding"] = configured_binding()
         public_payload["delivery_configuration"] = {
@@ -404,6 +406,26 @@ def _mcp_tool_result(
     *,
     text_fallback: bool,
 ) -> Any:
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled, EMERGENCY_TOKENS
+    if minimal_context_enabled() and payload.get("kind") != "patch_context":
+        from docmancer.docs.application.standalone_text_view import render_standalone_text
+        from docmancer.docs.application.model_context_view import canonical
+        from docmancer.docs.application.projection_tokenizer import projection_token_count
+        # One text lane, regardless of legacy text/model-view switches. This is
+        # exactly the full rendering priced before atomic capability binding.
+        rendered = render_standalone_text(payload)
+        text = rendered.text if rendered.text is not None else canonical(payload)
+        measured = projection_token_count(text.encode("utf-8"))
+        failed = payload.get("status") in {"error", "failed"}
+        if measured > EMERGENCY_TOKENS:
+            text = canonical({"kind": "docs_context", "status": "error",
+                              "reason_code": "context_emergency_stop", "hard_stop": True,
+                              "measured_tokens": measured, "emergency_tokens": EMERGENCY_TOKENS,
+                              "sources": [], "read_next": [], "next_portion": None})
+            failed = True
+        return mcp_types.CallToolResult(
+            content=[mcp_types.TextContent(type="text", text=text)], isError=failed,
+        )
     payload = compact_mcp_payload(payload)
     if text_fallback and os.environ.get("DOCATLAS_MCP_COMPACT_TEXT") == "1":
         from docmancer.docs.application.standalone_text_view import (
@@ -488,12 +510,14 @@ async def _run_async(service: LibraryDocsService) -> None:
     from mcp.server.stdio import stdio_server
     import mcp.types as mcp_types
 
-    if os.environ.get("DOCATLAS_MCP_MODEL_VIEW", "off") not in ("", "off", "1"):
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    minimal = minimal_context_enabled()
+    if not minimal and os.environ.get("DOCATLAS_MCP_MODEL_VIEW", "off") not in ("", "off", "1"):
         raise ValueError("invalid DOCATLAS_MCP_MODEL_VIEW: use off or 1")
     compact = os.environ.get("DOCATLAS_MCP_COMPACT_TEXT", "off")
-    if compact not in ("", "off", "1"):
+    if not minimal and compact not in ("", "off", "1"):
         raise ValueError("invalid DOCATLAS_MCP_COMPACT_TEXT: use off or 1")
-    if compact == "1" and (os.environ.get("DOCATLAS_MCP_TEXT_FALLBACK") != "1"
+    if not minimal and compact == "1" and (os.environ.get("DOCATLAS_MCP_TEXT_FALLBACK") != "1"
                            or os.environ.get("DOCATLAS_MCP_MODEL_VIEW") == "1"):
         raise ValueError("compact text requires text fallback and excludes private model view")
     server: Server = Server("docmancer-docs")

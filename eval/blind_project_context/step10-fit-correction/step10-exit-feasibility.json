@@ -1,0 +1,27 @@
+{
+  "credential_available": false,
+  "base_metadata_access": {
+    "status": 401,
+    "accessible": false
+  },
+  "base": "google/gemma-2b-it",
+  "base_revision": "96988410cbdaeb8d5093d1ebdc5a8fb563e02bad",
+  "adapter": "doubleyyh/exit-gemma-2b",
+  "adapter_revision": "e286ce9096178a4aefb743d0919705250fdf1b23",
+  "searched_hf_cache_roots": [
+    "/home/viadmin/.cache/huggingface/hub"
+  ],
+  "pinned_snapshots": [],
+  "packages": {
+    "torch": "2.10.0+cpu",
+    "transformers": "4.57.1",
+    "peft": null,
+    "accelerate": null,
+    "huggingface-hub": "0.36.2"
+  },
+  "matching_local_configs_under_tmp_opencode": [],
+  "gpu": "NVIDIA GeForce RTX 5070 Ti, 16303 MiB, 595.84",
+  "downloads": 0,
+  "inference_calls": 0,
+  "limitation": "No license acceptance; HF layouts in configured/default cache and /tmp/opencode plus Gemma config metadata under /tmp/opencode checked; not a whole-disk proof."
+}

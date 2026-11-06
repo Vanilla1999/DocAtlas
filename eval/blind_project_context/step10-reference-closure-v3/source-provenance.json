@@ -1,0 +1,122 @@
+[
+  {
+    "repository": "open-telemetry/opentelemetry-specification",
+    "revision": "616bb3a89de6f860269655edb758e1f329067c8e",
+    "upstream_path": "specification/baggage/api.md",
+    "local_path": "sources/opentelemetry-specification/specification/baggage/api.md",
+    "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/616bb3a89de6f860269655edb758e1f329067c8e/specification/baggage/api.md",
+    "bytes": 8173,
+    "sha256": "90892a0a5d17d4c251bf3ee6d9f0f4f95c71beadfe7297cffd6ca7f5b0fd09ef",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "open-telemetry/opentelemetry-specification",
+    "revision": "616bb3a89de6f860269655edb758e1f329067c8e",
+    "upstream_path": "specification/context/README.md",
+    "local_path": "sources/opentelemetry-specification/specification/context/README.md",
+    "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/616bb3a89de6f860269655edb758e1f329067c8e/specification/context/README.md",
+    "bytes": 4772,
+    "sha256": "66a4f02ba3666f6d0c3412d36dd74c00723af50a9764f53069ce7c9946cd7fa7",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "open-telemetry/opentelemetry-specification",
+    "revision": "616bb3a89de6f860269655edb758e1f329067c8e",
+    "upstream_path": "specification/context/api-propagators.md",
+    "local_path": "sources/opentelemetry-specification/specification/context/api-propagators.md",
+    "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/616bb3a89de6f860269655edb758e1f329067c8e/specification/context/api-propagators.md",
+    "bytes": 17997,
+    "sha256": "7447db9e546f8f59b045294c38ddd47ee643d02fc5e70cb5b253e6b1f78c36bd",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "open-telemetry/opentelemetry-specification",
+    "revision": "616bb3a89de6f860269655edb758e1f329067c8e",
+    "upstream_path": "LICENSE",
+    "local_path": "sources/opentelemetry-specification/LICENSE",
+    "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/616bb3a89de6f860269655edb758e1f329067c8e/LICENSE",
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "rust-embedded/book",
+    "revision": "637b4a0244e16ec391a60184ae0c86b550ffc24b",
+    "upstream_path": "src/start/exceptions.md",
+    "local_path": "sources/book/src/start/exceptions.md",
+    "url": "https://raw.githubusercontent.com/rust-embedded/book/637b4a0244e16ec391a60184ae0c86b550ffc24b/src/start/exceptions.md",
+    "bytes": 8871,
+    "sha256": "950767654a665668ff972d1e66830e2525358acaebc63aaf97f7008d2f740d71",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "rust-embedded/book",
+    "revision": "637b4a0244e16ec391a60184ae0c86b550ffc24b",
+    "upstream_path": "src/start/interrupts.md",
+    "local_path": "sources/book/src/start/interrupts.md",
+    "url": "https://raw.githubusercontent.com/rust-embedded/book/637b4a0244e16ec391a60184ae0c86b550ffc24b/src/start/interrupts.md",
+    "bytes": 3029,
+    "sha256": "abdb31368650fee20dfc2a79e012e50b249925794d8ef0204ecf63c8c143c755",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "rust-embedded/book",
+    "revision": "637b4a0244e16ec391a60184ae0c86b550ffc24b",
+    "upstream_path": "src/start/panicking.md",
+    "local_path": "sources/book/src/start/panicking.md",
+    "url": "https://raw.githubusercontent.com/rust-embedded/book/637b4a0244e16ec391a60184ae0c86b550ffc24b/src/start/panicking.md",
+    "bytes": 4089,
+    "sha256": "a55e90a1ae9b7da4b9fe69c8070b12391054df56d419a0e0516820910dc3bf6b",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "rust-embedded/book",
+    "revision": "637b4a0244e16ec391a60184ae0c86b550ffc24b",
+    "upstream_path": "LICENSE-MIT",
+    "local_path": "sources/book/LICENSE-MIT",
+    "url": "https://raw.githubusercontent.com/rust-embedded/book/637b4a0244e16ec391a60184ae0c86b550ffc24b/LICENSE-MIT",
+    "bytes": 1022,
+    "sha256": "30fefc3a7d6a0041541858293bcbea2dde4caa4c0a5802f996a7f7e8c0085652",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "rust-embedded/book",
+    "revision": "637b4a0244e16ec391a60184ae0c86b550ffc24b",
+    "upstream_path": "LICENSE-APACHE",
+    "local_path": "sources/book/LICENSE-APACHE",
+    "url": "https://raw.githubusercontent.com/rust-embedded/book/637b4a0244e16ec391a60184ae0c86b550ffc24b/LICENSE-APACHE",
+    "bytes": 10850,
+    "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "open-telemetry/opentelemetry-specification",
+    "revision": "616bb3a89de6f860269655edb758e1f329067c8e",
+    "upstream_path": "specification/document-status.md",
+    "local_path": "sources/opentelemetry-specification/specification/document-status.md",
+    "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/616bb3a89de6f860269655edb758e1f329067c8e/specification/document-status.md",
+    "bytes": 573,
+    "sha256": "fe037c1fd122b590417931cfb9c36b991ee0c996a3b7f0528cb9ba9e2b5f1cef",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "open-telemetry/opentelemetry-specification",
+    "revision": "616bb3a89de6f860269655edb758e1f329067c8e",
+    "upstream_path": "specification/context/env-carriers.md",
+    "local_path": "sources/opentelemetry-specification/specification/context/env-carriers.md",
+    "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/616bb3a89de6f860269655edb758e1f329067c8e/specification/context/env-carriers.md",
+    "bytes": 8358,
+    "sha256": "51bc1d07168b9a60a39e3d5b91723faf103280105f6456617ec544f12d0e082d",
+    "transformation": "none; raw bytes"
+  },
+  {
+    "repository": "rust-embedded/book",
+    "revision": "637b4a0244e16ec391a60184ae0c86b550ffc24b",
+    "upstream_path": "src/start/semihosting.md",
+    "local_path": "sources/book/src/start/semihosting.md",
+    "url": "https://raw.githubusercontent.com/rust-embedded/book/637b4a0244e16ec391a60184ae0c86b550ffc24b/src/start/semihosting.md",
+    "bytes": 3469,
+    "sha256": "7b4ec9f04a682e0a8f560fc338d1f11a50c7394869655bd76ef11cff50cc4d95",
+    "transformation": "none; raw bytes"
+  }
+]

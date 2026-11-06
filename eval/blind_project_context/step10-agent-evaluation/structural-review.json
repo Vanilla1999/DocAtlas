@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-11-06",
+  "role": "structure",
+  "reviewed_modules": [
+    "docmancer/docs/application/minimal_context_selection.py",
+    "docmancer/docs/application/minimal_context_structure.py"
+  ],
+  "finding": {
+    "description": "Reference definitions with destinations on the following line were treated as empty URLs, silently omitting linked anchor dependencies.",
+    "status": "fixed_in_source_checkout",
+    "changed_product_file": "docmancer/docs/application/minimal_context_structure.py",
+    "reviewed_source_sha256": "aad12635c2208591db4d85ca4031d6b6597237325561b33d0eabc6288f2122f0",
+    "threshold_or_selector_changes": false,
+    "frozen_inputs_changed": false,
+    "holdout_details_inspected": false
+  },
+  "existing_execution": {
+    "command": "PYTHONPATH=. /tmp/opencode/step10-mini-py313/bin/python /tmp/opencode/step10-structure-probe.py",
+    "working_directory": "/tmp/opencode/step9-gap-resolution",
+    "original_probe_sha256": "e6e2c01182fea3d894501f42e152109d608aa39a258acd2ea731b677bfb7aa01",
+    "model_directory": "/tmp/opencode/step10-mini-assets",
+    "exit_code": 0,
+    "result": {
+      "status": "PASS",
+      "boundary": "public MCP acquisition; observed structural output before model selection",
+      "receipts": [
+        {
+          "structural_recipe": "minimal-structure-v1",
+          "status": "incomplete_dependency",
+          "documents": 2,
+          "incomplete_dependencies": [
+            {
+              "reason_code": "incomplete_dependency",
+              "path": "docs/other.md",
+              "char_start": 30,
+              "target": "private.md#hidden",
+              "reason": "target_not_in_checked_scope"
+            }
+          ],
+          "units": 8,
+          "hydrated_sections": 9,
+          "selected_units": 1,
+          "delivered_spans": 8
+        }
+      ]
+    }
+  },
+  "portable_diagnostic": {
+    "path": "eval/blind_project_context/probe_minimal_structure.py",
+    "sha256": "fb73ee8502588dee47302388920f5b21058e640db46eb73d96f60b0cd3a0f873",
+    "command_template": "python -m eval.blind_project_context.probe_minimal_structure --model-dir MODEL_DIR --work-dir WORK_DIR --output RECEIPT_JSON",
+    "execution_status": "one_final_installed_wheel_run_passed_after_portability_refactor",
+    "static_validation": "Python AST syntax and artifact JSON parsing passed; diagnostic not executed",
+    "changes_from_original": [
+      "Explicit model-dir and optional work-dir/output arguments",
+      "Module entry point without hardcoded repository path",
+      "Direct public call_docs_tool_payload instead of test-module wrapper",
+      "Restore environment and previous profile hook",
+      "Preserve original independently authored documents, question and structural assertions"
+    ]
+  },
+  "evidence_boundary": {
+    "real_components": "Source preparation, storage and public MCP acquisition; no retrieval/selection/validation replacement",
+    "observation": "Return hook on project_native_rank_context exercises structural API while same-call source provenance is live",
+    "asserted": [
+      "Ancestor introductions and empty heading retention",
+      "Selected subtree tail and unselected sibling exclusion",
+      "Footnote continuation, multiline reference destination and cross-document anchor",
+      "Cyclic link fixpoint and explicit inaccessible dependency",
+      "Exact raw-source slices and hashes",
+      "Terminal recheck succeeds in-call and rejects expired provenance",
+      "Read-only SQLite"
+    ],
+    "not_asserted": [
+      "Full calibrated final source membership",
+      "Final answering-model quality",
+      "Installed-wheel or Terra parity"
+    ]
+  },
+  "measured_wheel_distinction": {
+    "frozen_measured_wheel_label": "663e",
+    "review_fix_in_frozen_measured_wheel": false,
+    "frozen_corpus_impact": "unassessed; no zero-impact claim",
+    "possible_effect": "Additional dependency spans can change delivered token counts and emergency outcome",
+    "final_wheel_source_match": "verified by exact installed module origin and SHA256 before the final installed probe",
+    "terra_final_wheel_parity": "not_claimed"
+  },
+  "final_installed_execution": {
+    "wheel_sha256_reported_by_main": "8f1442dea261a0d28d64c7e6993b19e137dd574afb8f5d8e1a2d03bfe6648c46",
+    "wheel_archive_independently_hashed_by_this_probe": false,
+    "working_directory": "/tmp/opencode",
+    "interpreter": "/tmp/opencode/step10-final-py313/bin/python",
+    "installed_module_origin": "/tmp/opencode/step10-final-py313/lib/python3.13/site-packages/docmancer/docs/application/minimal_context_structure.py",
+    "installed_module_sha256": "aad12635c2208591db4d85ca4031d6b6597237325561b33d0eabc6288f2122f0",
+    "matches_reviewed_source": true,
+    "import_order": "Import installed docmancer and structural module, assert exact origin/hash, then add checkout for eval helpers and invoke portable diagnostic with runpy",
+    "command": "/tmp/opencode/step10-final-py313/bin/python -c 'import hashlib, pathlib, runpy, sys; import docmancer; import docmancer.docs.application.minimal_context_structure as structure; origin = pathlib.Path(structure.__file__).resolve(); digest = hashlib.sha256(origin.read_bytes()).hexdigest(); assert origin == pathlib.Path(\"/tmp/opencode/step10-final-py313/lib/python3.13/site-packages/docmancer/docs/application/minimal_context_structure.py\"), origin; assert digest == \"aad12635c2208591db4d85ca4031d6b6597237325561b33d0eabc6288f2122f0\", digest; print(\"Installed structure origin:\", origin, flush=True); print(\"Installed structure SHA256:\", digest, flush=True); sys.path.insert(0, \"/tmp/opencode/step9-gap-resolution\"); runpy.run_module(\"eval.blind_project_context.probe_minimal_structure\", run_name=\"__main__\")' --model-dir /tmp/opencode/step10-mini-assets --work-dir /tmp/opencode --output /tmp/opencode/step10-final-structure-receipt.json",
+    "probe_runs": 1,
+    "exit_code": 0,
+    "receipt_path": "/tmp/opencode/step10-final-structure-receipt.json",
+    "receipt_file_sha256": "030c235a9de8787978c6ac8ee0086664f496d73115d12324f56eb58f86ae5341",
+    "result": {
+      "status": "PASS",
+      "boundary": "public MCP acquisition; observed structural output before model selection",
+      "receipts": [
+        {
+          "structural_recipe": "minimal-structure-v1",
+          "status": "incomplete_dependency",
+          "documents": 2,
+          "incomplete_dependencies": [
+            {
+              "reason_code": "incomplete_dependency",
+              "path": "docs/other.md",
+              "char_start": 30,
+              "target": "private.md#hidden",
+              "reason": "target_not_in_checked_scope"
+            }
+          ],
+          "units": 8,
+          "hydrated_sections": 9,
+          "selected_units": 1,
+          "delivered_spans": 8
+        }
+      ]
+    },
+    "scope_of_evidence": "Installed real public acquisition and structural-stage hook output, including multiline reference delta; not calibrated final source membership or Terra parity",
+    "candidate_measured_environment_changed": false
+  }
+}

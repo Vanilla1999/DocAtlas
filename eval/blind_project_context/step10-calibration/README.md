@@ -1,0 +1,9 @@
+# Independent synthetic source-backed calibration
+
+Authored on 2026-11-06 for Step 10, without consulting old question/answer labels, prior inference outputs, or holdout details. These are fictional operational manuals authored by the calibration agent, not externally sourced facts or an external benchmark. Labels are exhaustive own-body usefulness judgments against these manuals. Heading-only nodes are not positives. Ancestor introductions count as useful when they qualify the scope of a requested procedure. Negatives include related-but-unnecessary sibling material.
+
+Calibration families: reservoir restart and irrigation relay service. Validation families: photographic archive dispatch and textile loom service. No document, question, or family crosses splits. Validation is a fresh independent synthetic split, not the existing project holdout. The small authored set has no statistical representativeness guarantee; near-duplicate structural challenge patterns are intentional and limit generalization claims.
+
+Cases cover own-child selection, parent/subtree delivery, ancestor-context contamination, unlinked sibling exceptions, tail facts beyond 512 tokens, Russian original questions with supplied English translations, and no-answer requests. All own-body units receive a useful/not-useful label for every question. Required quotations are independent source facts, not generated from product output.
+
+`manifest.json` freezes document, question, label and recipe hashes before any inference. The runner refuses altered inputs and never copies labels/questions into the prepared project. Runtime receives the threshold/recipe artifact only. Validation never adjusts that threshold. Reports distinguish semantic direct retention, delivered fact retention, source validation, false positives and payload size; they do not claim final answering-model quality.

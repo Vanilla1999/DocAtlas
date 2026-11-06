@@ -48,6 +48,9 @@ class StandaloneTextError(ValueError):
 def compact_text_fits(text: str) -> bool:
     """Apply the existing text budget without shortening a source or packet."""
     body = text.encode("utf-8")
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled, EMERGENCY_TOKENS
+    if minimal_context_enabled():
+        return projection_token_count(body) <= EMERGENCY_TOKENS
     limit = delivery_token_ceiling()
     return (math.ceil(len(body) / 4) <= limit
             and projection_token_count(body) <= limit)
@@ -87,6 +90,8 @@ def _encode_standalone_text(packet: dict) -> str | None:
     view, _private = rendered  # Do NOT attach a ledger OpenCode cannot retain.
     expanded = expand_sections(packet)
     rows = expanded["sources"]
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    minimal = minimal_context_enabled()
     if len(rows) != len(view["sources"]):
         raise StandaloneTextError("source_row_count_mismatch")
     if any(set(row) - _KNOWN_SOURCE_FIELDS for row in rows):
@@ -114,11 +119,13 @@ def _encode_standalone_text(packet: dict) -> str | None:
         visible["ref"] = original["evidence_id"]
         if "source_uri" in original:
             visible["source_uri"] = deepcopy(original["source_uri"])
+        if minimal and "content_sha256" in original:
+            visible["content_sha256"] = original["content_sha256"]
         if not shared_identity and "project_identity" in original:
             visible["project_identity"] = deepcopy(original["project_identity"])
     view["context_format"] = FORMAT
     text = canonical(view)
-    if not compact_text_fits(text):
+    if not minimal and not compact_text_fits(text):
         raise StandaloneTextError("standalone_context_output_limit")
     # Separate, reversible Context Assembly stage. It never chooses evidence.
     from .context_assembly import assemble_context
