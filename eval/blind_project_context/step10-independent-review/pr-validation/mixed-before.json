@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/workspace/scratch/66f7674793b8/locked-env/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_context_portions_integration.py::test_context_portions_reject_invalid_and_unsupported_requests",
+    "-q",
+    "--tb=short",
+    "--basetemp",
+    "/workspace/scratch/66f7674793b8/step10-pr-review-evidence/pytest-mixed-before"
+  ],
+  "source": "9e2c331c plus regression assertion only",
+  "returncode": 1,
+  "seconds": 1.938,
+  "log": "mixed-before.log",
+  "new_model_inference": false
+}

@@ -1,0 +1,31 @@
+{
+  "source_commit": "9e2c331c45e8f9a86f809a1f4d66c43125250702",
+  "code_sha256": "c15f4adfff00585463b7e642a61c524a96b0a53158d0ab5f34c3b92f41a7cd47",
+  "metrics_sha256": "15331383b258ef998772e60ca510fc7f45c92e75a153f76e102075c4846e1deb",
+  "input_sha256": {
+    "docmancer/docs/application/projection_tokenizer.py": "ee097b4d71fcc0783f2eee35cc14d0d05d262ef2ec8fcee042dd3135d09edfe6",
+    "docmancer/docs/data/o200k_base.tiktoken.gz": "d6e1076513d1ebd773d00f4595efb2751aa27573d5e42adf4c9d7b603d2792db",
+    "eval/blind_project_context/step10-reference-closure-v3/projects.json": "ba2df3bb43b7d58c4c1e19182a1b38c73babdf90d844b4060174d01f7292f039",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/overview.md": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/reservations.md": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/weather.md": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/clock.md": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/calendar.md": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/architecture.md": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+    "eval/blind_project_context/step10-reference-closure-v3/tasks.json": "910f4607e5dafd01d3570cc726245b004bd4addea23af1cd9810576d67efb5b5",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M1.json": "689774d299e94892bd17bd470b1ab4738d611ae21cb095f7458d20c4b84e9cab",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M2.json": "8e6a18d527dea609b6f274848ceeb603a92cabbc01e8a25d18fdc88d327a8f59",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M3.json": "b3505834217f4842991b362d5bfb1953118f10289d80696f2149bf74a4804bba",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M4.json": "226e5552d9def193747cafa003619511efa42c3a3e4bd24ff3a6b542d6eb2032",
+    "eval/blind_project_context/step10-agent-evaluation/renewed-accounting.json": "b8c8a188685d3330f02c8ecc57c01355a8169c74c47e82415eba97a0dd5ee575",
+    "eval/blind_project_context/step10-client-adapter-evidence.json": "d527e8d349c67d00fb98fcc0e3b0c2191cfa7b606f406393aabd926ca92dd2d2",
+    "eval/blind_project_context/step10-client-question-audit/provider-1.json": "cf653b5fdb569f0690bb147d6dcffcdfdea252ff38fcc5454fbc0658a9699230",
+    "eval/blind_project_context/step10-client-question-audit/provider-2.json": "254aa2b4b48d4dfd11c246d0f59adda5dd301b50c4505ffda653730802b5c655",
+    "eval/blind_project_context/step10-client-question-stdin/provider-1.json": "e78d021184380881abdaeabd6f7e747fde81da7f44fc1153f771e80c31a64bc6"
+  },
+  "source_tree_clean_before_after": true,
+  "forbidden_modules_imported": [],
+  "new_model_calls": 0,
+  "new_MCP_calls": 0,
+  "new_tests": 0
+}

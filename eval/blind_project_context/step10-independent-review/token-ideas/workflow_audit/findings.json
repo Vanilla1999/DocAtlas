@@ -1,0 +1,157 @@
+{
+  "source_commit": "9e2c331c45e8f9a86f809a1f4d66c43125250702",
+  "scope": "Read-only workflow review and offline token counts. No inference, public MCP, tests or product edits.",
+  "measurements": "metrics.json; provenance and 19 input hashes in receipt.json; reproducible offline measure.py",
+  "user_numbers": {
+    "values": [69419, 28657],
+    "verified": false,
+    "boundary": "No corresponding raw trace/usage receipt is available. Do not infer a causal breakdown from the historical T01 run."
+  },
+  "ideas": [
+    {
+      "idea": "Skip redundant discovery and known-language status",
+      "status": "Already permitted and instructed; client compliance remains to be measured",
+      "finding": "First retrieval requires no skill read or tool-catalog reload. Language status is optional and only needed when the declared language mode is enabled and the bound source language is unknown. Scope/version/snapshot-bound language can be reused; unknown or mixed metadata cannot be silently treated as English.",
+      "dictionary_free_check": "Audit exact tool names, args, assistant-message IDs and bound language metadata in a saved trace. Flag discovery before an already-known tool and duplicate language status for an unchanged snapshot. Measure potential history bytes, not a counterfactual provider saving.",
+      "evidence": [
+        "SKILL.md:12-15",
+        "docmancer/mcp/agent_workflow_contract.py:29-44",
+        "docmancer/mcp/agent_workflow_contract.py:58-62",
+        "docmancer/mcp/_docs_server_tool_data.py:628-632",
+        "docmancer/templates/references/troubleshooting.md:84-99"
+      ],
+      "remaining": "A real model A/B must verify that skipping the preflight preserves translation, target binding and final answer quality."
+    },
+    {
+      "idea": "Batch independent source reads in one model round",
+      "status": "Feasible when exact authorized targets are already known; not an automatic token saving",
+      "finding": "Parallel calls already emitted in the same assistant turn do not remove an LLM round. Sequential tool-result decisions may be consolidated only if no later request depends on an earlier result. Continuation URIs, discovered paths and preparation job IDs are dependencies. Independent questions stay separate under the current contract.",
+      "dictionary_free_check": "Group actual tool calls by assistant messageID and provider step. Determine independence from explicit arguments/returned IDs, not question keywords. Sum all result bodies and schemas. The old T01 discovery, language status and retrieval occupied three separate message IDs, while its two nested wrapper calls were not two extra model rounds.",
+      "evidence": [
+        "eval/blind_project_context/step10-agent-evaluation/account_sessions.py:41-59",
+        "eval/blind_project_context/step10-agent-evaluation/account_sessions.py:112-117",
+        "docmancer/mcp/agent_workflow_contract.py:81-83",
+        "metrics.json:old_terra_T01_dev"
+      ],
+      "remaining": "Client A/B is required for provider input/cost and agent behavior; parallel wall time is a different metric."
+    },
+    {
+      "idea": "One authorized whole-scope bundle for six tiny documents",
+      "status": "Promising new control; not implemented by this audit and not a PASS of the existing minimal-output gate",
+      "finding": "The six permitted Meridian sources contain 3959 bytes and 688 per-file o200k tokens, including all 19 authored fact occurrences. An illustrative named text bundle is 712 tokens and an illustrative path/hash/line JSON is 1119. Saved full-machine packets canonicalized offline cost1240,1193,1583 tokens for V-M1/V-M2/V-M3, although their source bodies cost only158,116,168. CROSS-AUDIT CORRECTION: the supported model renderer reconstructed by transport_audit costs931,884,1109 for these cases (noanswer331); those are the proper current-delivery comparator. Thus the illustrative1119-token full-scope JSON is not smaller than these current rendered packets. Native identity/authorization metadata and actual wire cost of a new full-scope route remain to be implemented/measured; no net output-token saving is established.",
+      "dictionary_free_check": "Enumerate the explicit authorized project catalog, exclude module-private content by scope, and include every source only when the entire scope fits the declared delivery size. No filename-to-question rules, keyword dictionaries or gold labels select sources. Count exact bytes/tokens and source hashes; annotations enter only the subsequent quality accounting.",
+      "quality_boundary": "Whole-scope delivery includes known distractor labels: V-M1 clock offset, V-M2 simulation clock, V-M3 Transfer; V-M4 noanswer is nonempty and includes indoor-instrument/forecast-display distractors. Thus the existing zero-hardnegative/empty-noanswer selector gate fails by construction. Test final answer/citations/abstention under a separately named full-scope control; do not silently change the old gate.",
+      "evidence": [
+        "metrics.json:six_document_control",
+        "metrics.json:saved_meridian_packets",
+        "measure.py",
+        "receipt.json",
+        "../transport_audit/results.json:qwen_saved_packets V-M1/V-M2/V-M3/V-M4"
+      ],
+      "remaining": "Real model A/B must compare all four Meridian questions on the identical snapshot and capture whole session input/cache/output/rounds, answer facts, false claims, abstention and source scope."
+    },
+    {
+      "idea": "Host preloads the same tiny full scope before the first model call",
+      "status": "Feasible separate client/profile control; not implemented",
+      "finding": "A host can authorize and snapshot all six tiny sources before requesting an answer, then put that exact evidence and scope/version/language bindings in the first model input. In the ideal complete case this uses one answering model call rather than a tool-selection call followed by an answering call. Source acquisition still happens; only an agent round is removed. Existing instruction to always call get_docs_context first must explicitly recognize this prior host-provided evidence in a new profile.",
+      "dictionary_free_check": "Reuse the exact whole-scope catalog and source hashes from the offline six-document control. Count source/provenance text before the model starts; do not select files from question words. Preserve live authorization and refresh on generation/hash/scope changes. Do not claim that merely putting unbound file text into a system prompt is equivalent to a verified source packet.",
+      "evidence": [
+        "metrics.json:six_document_control",
+        "docmancer/mcp/agent_workflow_contract.py:29-44",
+        "docmancer/mcp/agent_workflow_contract.py:108-112"
+      ],
+      "remaining": "Requires a new host integration/profile and model A/B for final quality, abstention and whole-session usage. The saved traces cannot quantify the provider-token or monetary saving."
+    },
+    {
+      "idea": "Increase source_uri read budget",
+      "status": "Already implemented in the opt-in minimal candidate; legacy600/40/2 limits do not govern this path",
+      "finding": "Minimal reads return the complete structural block/subtree and continue to exhaustion, subject to the whole-result emergency guard. The legacy branch still uses token/line/read budgets. Reads remain adjacent forward navigation, not arbitrary missing-section lookup. Live authorization, source hash, expiry and one-use URI lifecycle remain necessary.",
+      "dictionary_free_check": "Read the actual minimal dispatch and structural branch; follow exact returned line ranges and URI consumption in existing traces. Do not propose larger numeric quotas as a new optimization of this candidate.",
+      "evidence": [
+        "docmancer/docs/application/_source_continuation_core.py:216-247",
+        "docmancer/docs/application/_source_continuation_core.py:248-310",
+        "docmancer/mcp/agent_workflow_contract.py:261-275"
+      ],
+      "remaining": "A concrete earlier missing section needs the already-supported focused source_path route, or a new whole-scope control; adjacent source_uri reads cannot jump backward."
+    },
+    {
+      "idea": "Remove JSON pretty-print/double representation overhead",
+      "status": "Already implemented and transport-tested; not a new answer-quality result",
+      "finding": "The adapter preserves the server's self-contained text byte for byte, exposes it as a native tool and guards model-bound rendering. Saved scripted localhost evidence measured5356 result tokens for the object route versus4854 for string/native routes. Tool/system inventories also changed, so502 result tokens cannot be presented as a measured end-to-end saving.",
+      "dictionary_free_check": "Compare exact authoritative server bytes to model-bound content and count both with the pinned tokenizer; detect hidden-file/truncated placeholders. Existing evidence already does this without model inference.",
+      "evidence": [
+        "integrations/opencode-v2-compact/index.js:36-43",
+        "integrations/opencode-v2-compact/index.js:65-109",
+        "eval/blind_project_context/step10-client-adapter-evidence.json",
+        "metrics.json:saved_localhost_transport_probe"
+      ],
+      "remaining": "An actual provider capture is needed to assign total context/cost changes; the saved probe is scripted transport, not Terra semantic A/B."
+    },
+    {
+      "idea": "Reduce repeated tool results/history",
+      "status": "Potentially useful host feature; absent from the reviewed adapter and requires correctness A/B",
+      "finding": "The adapter validates every tool result already in the model-bound messages; it does not remove previous evidence or replace earlier context. Identical payload hashes can expose exact repeated bytes offline. Replacing several results with an evidence union requires preserving source identity, line boundaries, conditions, errors and the transcript's tool-call/result consistency; semantic summaries are not source-exact substitutes.",
+      "dictionary_free_check": "With a saved provider trace, hash and group exact source spans by project identity/content hash/path/line interval and compare repeated wire representations across provider steps. Compute input composition without deleting source conditions or using keyword heuristics. The available old Terra ledger lacks full provider payloads, and question-only captures are insufficient for this audit.",
+      "evidence": [
+        "integrations/opencode-v2-compact/index.js:86-109",
+        "metrics.json:saved_question_capture_shapes",
+        "metrics.json:old_terra_T01_dev"
+      ],
+      "remaining": "Need the new69419/28657 raw traces for diagnosis. Any host history pruning must separately test facts, citations, abstention and tool-protocol validity."
+    },
+    {
+      "idea": "Stop early when no useful evidence remains",
+      "status": "Already instructed; empty semantic selection is not proof that the corpus contains no answer",
+      "finding": "Current contract forbids unchanged retries, repeated exhausted focus and further calls without a concrete gap/useful route. An empty minimal result means no unit passed the frozen threshold, not semantic proof of absence. Semantic rejects are not later pages. A generic unverified coverage flag is not a reason to retry.",
+      "dictionary_free_check": "Audit repeated exact args/state, consumed/exhausted URIs, source-span novelty and typed no-route/error outcomes. Count avoidable identical retries only. Do not infer answerability from question-word lists or a low score.",
+      "evidence": [
+        "docmancer/mcp/agent_workflow_contract.py:89-106",
+        "docmancer/mcp/agent_workflow_contract.py:270-275",
+        "docmancer/docs/application/minimal_context_selection.py:248-258"
+      ],
+      "remaining": "Model A/B is required for an agent stopping policy that could miss a real fact. Tiny full-scope delivery supports a different final-answer abstention control."
+    },
+    {
+      "idea": "Cache local model work",
+      "status": "Runtime/model load cache exists; exact Qwen score cache absent; this is local compute, not provider input savings",
+      "finding": "RequestMemo is request-local only. Qwen caches its runtime but deliberately recomputes scores; score_cache_hits=0. A memo over immutable question/full source inputs/model/tokenizer/recipe can avoid exact repeated local forwards while still rechecking authorization and source state, but does not shrink returned packets or provider history.",
+      "dictionary_free_check": "Compare exact model-input/recipe/source hashes in saved receipts. Separate model-load hits, score hits, local forward tokens, wall time and external provider input. Never infer a score hit from a model-load hit.",
+      "evidence": [
+        "docmancer/docs/request_memo.py:1-34",
+        "docmancer/docs/application/context_evidence_scoring.py:88-126",
+        "docmancer/docs/application/context_evidence_scoring.py:133-168"
+      ],
+      "remaining": "An implementation would require a separately validated immutable key and live checks. It cannot explain a reduction of Terra history by itself."
+    },
+    {
+      "idea": "Provider prompt cache / previous_response_id",
+      "status": "Cost mechanism, not automatic input-token elimination",
+      "finding": "Parent verified official provider documentation: referencing previous responses still bills prior input; cache preserves input count while reducing applicable cost. Stable tool/prompt prefixes may improve cache reuse, but changing tools/prefix/history can invalidate it. No external provider request was made by this audit.",
+      "dictionary_free_check": "Reconcile every provider step's uncached input, cache read, cache write and output; use the same declared accounting basis in both arms. Keep monetary estimates separate and price them only with verified current rates.",
+      "evidence": [
+        "eval/blind_project_context/step10-agent-evaluation/account_sessions.py:41-77",
+        "metrics.json:old_terra_T01_dev"
+      ],
+      "remaining": "Parent supplies official-document citations. Current audit provides no monetary-saving claim."
+    },
+    {
+      "idea": "Separate ready-source queries from preparation and host setup",
+      "status": "Required measurement control; readiness does not justify unconditional status/prepare calls",
+      "finding": "prepare_docs is allowed only after recommended_next_action or explicit lifecycle intent. A successful ready-source query and a first-ever ingest/poll/query workflow have different costs. Tool schemas/system prompts and initial discovery also differ from local source preparation cost; both totals should be reported rather than mixing them.",
+      "dictionary_free_check": "Freeze the exact prepared snapshot once, record whether each arm starts ready, list setup/preparation/job polling separately, and compare the same query scopes. Record host tools/system prefix and source generation. Do not relabel prepare-time or local scoring tokens as provider input tokens.",
+      "evidence": [
+        "docmancer/mcp/agent_workflow_contract.py:53-62",
+        "docmancer/mcp/agent_workflow_contract.py:108-118",
+        "v2plan/STEP10_EXECUTION_CHECKPOINT_RU.md:202-203"
+      ],
+      "remaining": "No extra prepare or service preflight is justified merely to benchmark the ready path."
+    }
+  ],
+  "priority": [
+    "Request the missing raw traces/usage receipts before explaining69419 versus28657 causally.",
+    "Try a separately named full authorized tiny-scope control; the offline size/coverage calculation is already done, model quality and session savings are not.",
+    "Audit compliance with existing no-discovery, known-language and no-useless-retry guidance; do not reimplement them as new features.",
+    "Preserve exact native text output; source read-budget enlargement and JSON flattening are already implemented in the candidate.",
+    "Separate model rounds, local scorer compute, tool result size, provider cached input and monetary cost."
+  ]
+}

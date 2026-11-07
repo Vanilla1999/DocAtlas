@@ -1,0 +1,80 @@
+{
+  "reported_on": "2026-11-07",
+  "provenance": "User-supplied comparison in the current conversation; arithmetic independently checked; new raw provider traces and answers not supplied or inspected.",
+  "scope": {
+    "questions": 4,
+    "documents": 6,
+    "model": "Terra Low",
+    "required_facts": 19
+  },
+  "docatlas_mcp": {
+    "input_total": 69419,
+    "cached_input": 40320,
+    "uncached_input": 29099,
+    "output": 1919,
+    "model_calls": 15,
+    "seconds": 57,
+    "instructions": 46020,
+    "tool_descriptions": 4410,
+    "document_results_with_history": 13706,
+    "status_results_with_history": 3575,
+    "other": 1708,
+    "system_per_step": 3068,
+    "facts_delivered": 17,
+    "facts_full_final": 15,
+    "facts_partial_final": 1,
+    "facts_missing_final": 3
+  },
+  "direct_file_search_and_read": {
+    "input_total": 28657,
+    "cached_input": 7936,
+    "uncached_input": 20721,
+    "output": 1804,
+    "model_calls": 20,
+    "seconds": 56,
+    "instructions": 6800,
+    "tool_descriptions": 10720,
+    "document_results_with_history": 7930,
+    "status_results_with_history": 0,
+    "other": 3207,
+    "system_per_step": 340,
+    "facts_delivered": 19,
+    "facts_full_final": 15,
+    "facts_partial_final": 1,
+    "facts_missing_final": 3
+  },
+  "calculated": {
+    "input_reduction_tokens": 40762,
+    "input_reduction_percent": 58.7187945663291,
+    "uncached_reduction_tokens": 8378,
+    "uncached_reduction_percent": 28.791367400941613,
+    "output_reduction_tokens": 115,
+    "output_reduction_percent": 5.992704533611255,
+    "model_call_increase_percent": 33.333333333333336,
+    "instructions_and_tools_mcp": 50430,
+    "instructions_and_tools_files": 17520,
+    "instructions_and_tools_reduction": 32910,
+    "instructions_and_tools_share_of_total_reduction_percent": 80.73696089495118,
+    "base_per_model_call_mcp": 3362,
+    "base_per_model_call_files": 876
+  },
+  "reported_quality_details": {
+    "both_no_answer_correct": true,
+    "missing_fact_identities_differ": true,
+    "same_final_counts_do_not_prove_paired_equivalence": true
+  },
+  "confounds": [
+    "System prompt 3068 vs 340 tokens per call",
+    "DocAtlas instructions and Code Mode catalog removed in the direct-file setup",
+    "New isolated direct-file folder did not inherit AGENTS.md",
+    "Tool definitions and source representation differ",
+    "Results limited to four questions and six documents; no repeated-run statistical estimate"
+  ],
+  "interpretation": [
+    "Direct files used fewer input and output tokens in this measured setup, despite more model calls.",
+    "Full source coverage did not ensure final-answer completeness.",
+    "No final-quality advantage for DocAtlas is shown by these aggregate counts.",
+    "This does not isolate the MCP protocol or the effect of any single instruction, model, or tool."
+  ],
+  "new_model_runs_in_this_report_update": 0
+}

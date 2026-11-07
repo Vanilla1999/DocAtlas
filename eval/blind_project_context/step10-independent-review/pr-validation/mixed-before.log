@@ -1,0 +1,14 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_context_portions_reject_invalid_and_unsupported_requests _________
+tests/test_context_portions_integration.py:312: in test_context_portions_reject_invalid_and_unsupported_requests
+    assert mixed.get("error", {}).get("reason_code") == "portion_unavailable", mixed
+E   AssertionError: {'answer_available': False, 'answer_supported': False, 'confirmation_reason': 'library_docs_source', 'context_available': False, ...}
+E   assert None == 'portion_unavailable'
+E    +  where None = <built-in method get of dict object at 0x7f15ffeda200>('reason_code')
+E    +    where <built-in method get of dict object at 0x7f15ffeda200> = {}.get
+E    +      where {} = <built-in method get of dict object at 0x7f15ffed8880>('error', {})
+E    +        where <built-in method get of dict object at 0x7f15ffed8880> = {'answer_available': False, 'answer_supported': False, 'confirmation_reason': 'library_docs_source', 'context_available': False, ...}.get
+=========================== short test summary info ============================
+FAILED tests/test_context_portions_integration.py::test_context_portions_reject_invalid_and_unsupported_requests
+1 failed in 1.45s

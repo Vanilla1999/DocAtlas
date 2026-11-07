@@ -1,0 +1,15 @@
+{
+  "source_commit": "9e2c331c45e8f9a86f809a1f4d66c43125250702",
+  "source_tree_clean_before_and_after": true,
+  "script_sha256": "c2289b5154693a2227406cc25081cae882543746e97c4a8489f34813ea2e6d73",
+  "plan_sha256": "3c3a8d8e9e73f69159c0293714e57523d0858b43a52a934d539896b1b161d7b9",
+  "results_sha256": "ad337a1a1fae38c1e49ea74370ee704fbd930fb91aec64b2843503548f6a8174",
+  "input_hash_checks": 56,
+  "qwen_rendering_counts_reconciled": 12,
+  "qwen_empty_rendering_counts_not_recorded": 4,
+  "proposed_representations_roundtrip_verified": true,
+  "vocabulary_uncompressed_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+  "forbidden_modules_loaded": [],
+  "new_model_calls": 0,
+  "new_mcp_calls": 0
+}
