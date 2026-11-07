@@ -116,11 +116,11 @@ Always separate:
     {
         "uri": "docmancer://agent/tool-selection",
         "name": "Docmancer public tool selection",
-        "description": "Mutually exclusive first-call policy for the three public Docs MCP tools.",
+        "description": "Mutually exclusive first-call policy for the default public Docs MCP tools.",
         "mimeType": "text/markdown",
         "text": """# Public tool selection
 
-1. One unchanged original documentation question with explicit scope and optional explicit lookups (at most five) → `get_docs_context`.
+1. One unchanged original documentation question with explicit scope and optional explicit lookups (at most five in default mode) → `get_docs_context`.
 2. Explicit sync/refresh/prefetch/prune/remove request or `recommended_next_action` → `prepare_docs`.
 3. Explicit index freshness, health, source-state, or async job-progress request → `docs_status`.
 
@@ -128,7 +128,7 @@ Returned preparation/status actions may be followed within existing consent and 
 
 Coding questions use default documentation context without a mandatory skill read. Patch representation is absent by default; only explicit server startup with `DOCATLAS_MCP_ADVANCED_TOOLS=1` exposes advanced `context_format="patch_context"`. Verify the advertised schema; never infer representation or permission from prose. Guides do not load or enable tools automatically.
 
-The public Docs MCP surface contains exactly these three tools.
+The default public Docs MCP surface contains these three tools. The opt-in minimal-context mode additionally advertises `read_docs_source`; use its current schema for issued source references and structural reads.
 """,
     },
     {
@@ -195,7 +195,7 @@ MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
     {
         "uriTemplate": "docatlas://source/{reference}",
         "name": "Bounded source continuation",
-        "description": "Read only a returned source_uri for a concrete missing fact. At most 600 tokens per read and two reads per chain; never construct a reference or open a source merely because answer flags are false. Requires host resources/read support.",
+        "description": "Default-mode source continuation: read only a returned source_uri for a concrete missing fact, at most 600 tokens per read and two reads per chain. Never construct a reference or open a source merely because answer flags are false. Requires host resources/read support. The opt-in minimal-context mode instead issues docatlas://source/v2/... references and advertises read_docs_source for complete structural blocks under the 50,000-token emergency stop; the default per-read limits do not apply there.",
         "mimeType": "application/json",
     },
     {
