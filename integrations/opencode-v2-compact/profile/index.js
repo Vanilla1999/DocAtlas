@@ -1,6 +1,7 @@
 import { lstat, readFile, readdir, realpath } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { createLanguagePreflight } from "./language-preflight.js";
 
 class DocumentationReadinessError extends Error {
   constructor(checks, reason = "documentation_profile_mcp_not_ready") {
@@ -58,13 +59,17 @@ export function conciseToolDescriptions(tools, serverName) {
 export default {
   id: "docatlas-documentation-light-v1",
   async setup(ctx) {
-    const { backend, projectRoot, serverName = "docatlas", instructionVariant = "standard" } = ctx.options;
+    const { backend, projectRoot, serverName = "docatlas", instructionVariant = "standard",
+      languagePreflight = "model" } = ctx.options;
     if (!["mcp", "files"].includes(backend) || typeof projectRoot !== "string" ||
         !path.isAbsolute(projectRoot) || !/^[A-Za-z][A-Za-z0-9_]*$/.test(serverName)) {
       throw new Error("Documentation profile requires a backend, absolute root and explicit server name");
     }
     if (!["standard", "concise-v1"].includes(instructionVariant)) {
       throw new Error("Unknown documentation instruction variant; regenerate the profile");
+    }
+    if (!["model", "host-v1"].includes(languagePreflight) || backend !== "mcp" && languagePreflight !== "model") {
+      throw new Error("Host language preflight requires an explicit MCP profile; regenerate the profile");
     }
     const root = await realpath(projectRoot);
     if (root !== projectRoot) throw new Error("Documentation profile root changed; regenerate the profile");
@@ -114,29 +119,6 @@ export default {
         if (backend !== "mcp" || name !== serverName) editor.remove(name);
       }
     });
-    if (backend === "mcp") await ctx.session.hook("prompt", async event => {
-      // MCP's connected notification can precede native tool publication in
-      // V2.2.5. Prompt admission runs before the executable model-tool snapshot.
-      // Wait for the actual public registry condition, never a guessed delay.
-      const started = performance.now();
-      const deadline = started + 10000;
-      let checks = 0;
-      while (!lifecycle.signal.aborted) {
-        const tools = await ctx.tool.list();
-        checks += 1;
-        if ([contextTool, statusTool].every(id => tools.some(tool => tool.id === id))) {
-          event.metadata = { ...event.metadata, docatlas_readiness: {
-            status: "ready", checks, elapsed_ms: Math.round(performance.now() - started),
-            deadline_ms: 10000, required_tools: [contextTool, statusTool],
-          } };
-          return;
-        }
-        const remaining = deadline - performance.now();
-        if (remaining <= 0) throw new DocumentationReadinessError(checks);
-        await new Promise(resolve => setTimeout(resolve, Math.min(25, remaining)));
-      }
-      throw new DocumentationReadinessError(checks, "documentation_profile_unloaded");
-    });
     const localPath = async value => {
       if (typeof value !== "string" || !value) throw new Error("A source path is required");
       const candidate = path.resolve(root, value);
@@ -158,6 +140,36 @@ export default {
         throw new Error("documentation_profile_scope_mismatch");
       }
     };
+    const hostLanguage = languagePreflight === "host-v1" ? createLanguagePreflight({
+      ctx, root, binding: ctx.options.projectBinding, statusTool, lifecycle, projectArgs,
+    }) : null;
+    if (backend === "mcp") await ctx.session.hook("prompt", async event => {
+      // MCP's connected notification can precede native tool publication in
+      // V2.2.5. Prompt admission runs before the executable model-tool snapshot.
+      // Wait for the actual public registry condition, never a guessed delay.
+      const started = performance.now();
+      const deadline = started + 10000;
+      let checks = 0;
+      while (!lifecycle.signal.aborted) {
+        const tools = await ctx.tool.list();
+        checks += 1;
+        if ([contextTool, statusTool].every(id => tools.some(tool => tool.id === id))) {
+          event.metadata = { ...event.metadata, docatlas_readiness: {
+            status: "ready", checks, elapsed_ms: Math.round(performance.now() - started),
+            deadline_ms: 10000, required_tools: [contextTool, statusTool],
+          } };
+          // The opt-in path uses the registered native executor of the same
+          // server, with its permission checks; no second connection or model
+          // tool-call transcript is manufactured for this metadata read.
+          if (hostLanguage) await hostLanguage.admit(event, tools.find(tool => tool.id === statusTool));
+          return;
+        }
+        const remaining = deadline - performance.now();
+        if (remaining <= 0) throw new DocumentationReadinessError(checks);
+        await new Promise(resolve => setTimeout(resolve, Math.min(25, remaining)));
+      }
+      throw new DocumentationReadinessError(checks, "documentation_profile_unloaded");
+    });
     await ctx.tool.hook("execute.before", async event => {
       if (!allowed.has(event.tool)) throw new Error("documentation_profile_read_only");
       if (backend !== "mcp") return;
@@ -194,6 +206,7 @@ export default {
     for (const hook of ["context", "generate", "compaction"]) {
       await ctx.session.hook(hook, visibleTools);
     }
+    if (hostLanguage) await ctx.session.hook("context", hostLanguage.inject);
     await ctx.tool.transform(editor => {
       for (const tool of editor.list()) {
         if (!allowed.has(tool.id)) editor.remove(tool.id);
@@ -235,6 +248,9 @@ export default {
     // Both comparison arms use the same deterministic title, not an extra
     // provider call. No user question, system instruction or history is rewritten.
     await ctx.session.hook("title", event => { event.result = "Documentation"; });
-    return () => lifecycle.abort();
+    return () => {
+      hostLanguage?.dispose();
+      lifecycle.abort();
+    };
   },
 };

@@ -1,0 +1,26 @@
+{
+  "base_commit": "ea045e19a4b1ce452e26b9b85c2d118b4369acc6",
+  "artifact_root": "/workspace/scratch/66f7674793b8/step14-client.UQbSTF/run-01",
+  "client": "OpenCode 2.2.5",
+  "python": "/workspace/scratch/66f7674793b8/step13-wheel.AOHQJ9/venv/bin/python",
+  "wheel_sha256": "0a7c36ff9f2b3066e6c810bdeca39a2f126458446f3c16a919ba5ac59afccadb",
+  "product_boundary": "Existing verified Step13 installed wheel; docmancer and pyproject.toml are unchanged since 16bb862c2ec2536b4763c8bb0608c51413dc301a. No new model or product rebuild.",
+  "planned_client_sessions": 8,
+  "maximum_scripted_provider_requests": 14,
+  "planned_model_inference": 0,
+  "inputs_sha256": {
+    "integrations/opencode-v2-compact/check_profile_client.py": "99d1703d61d36730164ef4e8c72e39330be46f9f23dcd05de1a948ecaed8c6bb",
+    "integrations/opencode-v2-compact/documentation_profile.py": "0cf8658fb602c0ae98fd02498f4abed778846903574019a7f792a2387609925e",
+    "integrations/opencode-v2-compact/profile/index.js": "d072e29e98de3b334e44df9e4f69eac6f516074a2431b05313051d7bc9337468",
+    "integrations/opencode-v2-compact/profile/language-preflight.js": "201814ccec89572689dab1d53c09962cd4c0a94f39f7b374e51a8985e2369622",
+    "integrations/opencode-v2-compact/profile/language-host.txt": "3d12d91c3093cb1e6c2176300acce39a1aea4fca7c0518b9c61c02d517e06920",
+    "integrations/opencode-v2-compact/profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "integrations/opencode-v2-compact/profile/mcp.txt": "56e0662be7df80e20104d6b652ed9f7cc5472e9d18b31c626a1d7b31e2cd84ea",
+    "integrations/opencode-v2-compact/profile/mcp-concise.txt": "bf428bdc64a19f72bacda702fb39a0c4513a5ced571c65c7eaf97ac87dc05d7d",
+    "integrations/opencode-v2-compact/index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "integrations/opencode-v2-compact/count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80",
+    "eval/blind_project_context/step13-runtime-token-review/session_runtime.py": "0b94f14953bd9078a52d285d88344dd5e46d5d2ce36b36b3c1d78c0c90e5944d",
+    "eval/blind_project_context/step13-runtime-token-review/owned_mcp.py": "1f9a00f0c5541d61dddb4cdf990adeefea945036828a6b9a980464b854f8c787",
+    "eval/blind_project_context/step14-host-language/PLAN_RU.md": "0d622648b058968f29d4dd6c77d686d45966b57f734d5dfc83f9660c9fe01e69"
+  }
+}
