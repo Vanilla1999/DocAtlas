@@ -1,0 +1,30 @@
+{
+  "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+  "requests": 5,
+  "focused": {
+    "tokens": 1450,
+    "rows": 9,
+    "next_rows": 0
+  },
+  "observer_delivery_parity": true,
+  "methods": {
+    "hybrid-observed": [
+      "lexical_e5_round_robin_v1"
+    ],
+    "lexical-observed": [
+      "fts5_source_bm25_or_v2"
+    ]
+  },
+  "hashes": {
+    "lexical-observed.trace.jsonl": "370c3b33211ec6d78018e017b4e5c665c112ddfbbe31b5a421ea41c416421f2c",
+    "lexical-observed.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hybrid-observed.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hybrid-observed.json": "1cb31deee095cbf722a244eb4000520ff9c2b0a5b85b05c2bd41e91a28ea0ad9",
+    "hybrid.json": "1cb31deee095cbf722a244eb4000520ff9c2b0a5b85b05c2bd41e91a28ea0ad9",
+    "focused.json": "9407629c55f860077d3a8eedf455f8b6a0371f93a529766c811dd3bad1b7d08e",
+    "hybrid.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hybrid-observed.trace.jsonl": "5ccfe7b71766cfc6fb4cc12a04828e4428ef130e9ae01c99badc525bd740fd4d",
+    "lexical-observed.json": "1d15c70e7718e1ade6c44fa0a211ecf3444cfad6948b6bc830162b1e4f364b87",
+    "focused-continuation.json": "c7ccf183478140a1033edd3204424acbe197f9b8f9157d4efaa9a7252d0aff30"
+  }
+}

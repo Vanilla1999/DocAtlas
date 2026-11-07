@@ -1,0 +1,3556 @@
+{
+  "schema_version": 1,
+  "evaluation": "manual final-answer and citation grading, dev only",
+  "source_run": "/tmp/opencode/terra-step10-final",
+  "arm": "file-current",
+  "method": "Read existing analyze_gap_agent_study.py for accounting boundaries. Independently inspected every final answer and tool failure; checked each frozen dev fact against its original witness source span. Reconciled step token totals with session totals. Exit 0/session succeeded is not answer success.",
+  "scope": "No holdout task details inspected. No production, calibration policy, agent runner, source document, question or oracle changes.",
+  "usage_conventions": "input is provider-reported uncached input; input_with_cache adds cache_read, matching historical analyzer. cache_write separately reported. output and reasoning are preserved as separate reported fields and are not summed to invent a new billable total. tool_calls counts attempted tool invocations; executed_file_operations counts provider executed=true, which is zero here. Empty tool output is not a token-free trajectory: error text is included in subsequent provider input accounting.",
+  "comparability": "Infrastructure-invalid baseline: do not compare these short refusal trajectories as token savings or retrieval/answering quality against a working candidate. Keep incurred usage in cost accounting. Both fresh baseline and candidate require accessible/prepared source environments before a fair paired comparison.",
+  "frozen_artifact_sha256": {
+    "questions.json": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+    "oracle.json": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+    "witness-audit.json": "3fdcc246f6eca84e8c571826f7ca03a01ab0aab9d870cee9803ad845f54c1881"
+  },
+  "summary": {
+    "sessions": 16,
+    "fact_pass": 0,
+    "fact_total": 46,
+    "fact_citations_pass": 0,
+    "answers_pass": 0,
+    "sessions_without_retrieval": 16,
+    "comparison_valid": false,
+    "failure": "All file operations denied by external_directory permission before execution.",
+    "usage": {
+      "input": 44147,
+      "output": 2215,
+      "reasoning": 38,
+      "cache_read": 0,
+      "cache_write": 0,
+      "input_with_cache": 44147,
+      "steps": 46,
+      "tool_calls": 30,
+      "tool_errors": 30,
+      "successful_tool_calls": 0,
+      "executed_file_operations": 0,
+      "retrieved_source_bytes": 0
+    },
+    "tool_counts": {
+      "glob": 7,
+      "read": 12,
+      "grep": 11
+    },
+    "seconds_sum": 155.31
+  },
+  "sessions": [
+    {
+      "corpus": "L0",
+      "case": "T01-en",
+      "question": {
+        "id": "T01-en",
+        "topic_id": "T01",
+        "split": "dev",
+        "lang": "en",
+        "question": "What is expected of me when I submit a pull request to DocAtlas?"
+      },
+      "receipt": {
+        "case": "T01-en",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eebd30dffdPKxwY6vqf2QbmM",
+        "seconds": 8.85,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T01-en.jsonl": "9313335da384a1de6a9c5edd8ffb3d620029f8c9f9705418d4c611615608c16d",
+        "T01-en.session.json": "6c40126a87e33b7e7b975ded9d3e6974a83ee3f95a9300a181f4eda282f284bc",
+        "T01-en.receipt.json": "4518660adc08cc7c88456f4a2e691b7457c2294d2e17ea6d5a865fd4de16b21f",
+        "T01-en.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2865,
+        "output": 127,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2865,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 886,
+            "output": 41,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 958,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1021,
+            "output": 54,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "glob": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b1143840001F2FdEPxE5RAId9",
+          "sessionID": "ses_e4eebd30dffdPKxwY6vqf2QbmM",
+          "messageID": "msg_1b1142dd3001mXWfoTCKpRQQII",
+          "type": "tool",
+          "id": "call_fc5c2f82bb0f423b9f02352ba68121e3",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "**/*",
+              "hidden": true
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0c77b9b0235e416a016aedd81eb92087d29e90453da71de839"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"**/*\",\"hidden\":true}"
+            },
+            "time": {
+              "start": 1793972254784,
+              "end": 1793972255245
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114422d001LXGEcqrxkH0UuL",
+          "sessionID": "ses_e4eebd30dffdPKxwY6vqf2QbmM",
+          "messageID": "msg_1b1143a3f001g3dDAkaW7mnqGm",
+          "type": "tool",
+          "id": "call_83732c53689542db96a231003ef2b34e",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0c77b9b0235e416a016aedd820ef0887d2af6e1247ec46e449"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972257326,
+              "end": 1793972257956
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "I can’t determine DocAtlas’s pull-request expectations because the designated project documentation is inaccessible in this session. I don’t have a source I can cite.\n\nPlease provide the project’s contributing guide or pull-request template, and I can summarize the requirements.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T01.F1",
+          "quote": "Branch name: `feat/<topic>` or `fix/<description>`",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not give either required branch-name pattern feat/<topic> or fix/<description>; requesting a contributing guide is not the branch convention.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 61,
+              "line_end": 61,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Branch name: `feat/<topic>` or `fix/<description>`\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F2",
+          "quote": "Run the full test suite before opening the PR",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that the full test suite must run before opening a PR.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 62,
+              "line_end": 62,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Run the full test suite before opening the PR\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F3",
+          "quote": "New connectors or fetchers should include tests where practical",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that new connectors/fetchers should include tests where practical.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 63,
+              "line_end": 63,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- New connectors or fetchers should include tests where practical\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T01-ru",
+      "question": {
+        "id": "T01-ru",
+        "topic_id": "T01",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+        "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+      },
+      "receipt": {
+        "case": "T01-ru",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eebd30dffe6lPJGVWwk7wEEP",
+        "seconds": 29.39,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T01-ru.jsonl": "8dfadd678ff625f286c254e8f712bb0b81b08f5346af1383cbcb4cef032552c1",
+        "T01-ru.session.json": "6caff4df9da349898ff0bfb441750bba17da5496e38d2ecab319574bc16072c4",
+        "T01-ru.receipt.json": "2d872a24e2cbe20b6e92eb36fa412e63a0cbfbf604b785237ba6693fb28269a8",
+        "T01-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2874,
+        "output": 141,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2874,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 889,
+            "output": 41,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 961,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1024,
+            "output": 68,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "glob": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b1145903001JV1OQGXM6sB66k",
+          "sessionID": "ses_e4eebd30dffe6lPJGVWwk7wEEP",
+          "messageID": "msg_1b1142ddd001AzS4bhyb0UMA6c",
+          "type": "tool",
+          "id": "call_d05d014e63b64710958609fd4dfd7de4",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "pattern": "**/*",
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "hidden": true
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_081f9ffb3f0e3020016aedd827157c87d287272f228dff0316"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"pattern\":\"**/*\",\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"hidden\":true}"
+            },
+            "time": {
+              "start": 1793972263171,
+              "end": 1793972263685
+            }
+          }
+        },
+        {
+          "partID": "prt_1b11479440014Nvvg08k3r5TpO",
+          "sessionID": "ses_e4eebd30dffe6lPJGVWwk7wEEP",
+          "messageID": "msg_1b1145b130014LwTjo1XORkd0R",
+          "type": "tool",
+          "id": "call_461bafde75ec436ea1fb2e24b6f6e6fb",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_081f9ffb3f0e3020016aedd82f5a8887d287de72cf869af5a8"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972271428,
+              "end": 1793972271711
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу определить требования к pull request в DocAtlas: доступ к указанному архиву документации отклонён, поэтому я не могу проверить источники.\n\nПредоставьте, пожалуйста, текст или доступ к документам проекта о внесении изменений — например, `CONTRIBUTING.md` или инструкции для pull request.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T01.F1",
+          "quote": "Branch name: `feat/<topic>` or `fix/<description>`",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not give either required branch-name pattern feat/<topic> or fix/<description>; requesting a contributing guide is not the branch convention.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 61,
+              "line_end": 61,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Branch name: `feat/<topic>` or `fix/<description>`\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F2",
+          "quote": "Run the full test suite before opening the PR",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that the full test suite must run before opening a PR.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 62,
+              "line_end": 62,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Run the full test suite before opening the PR\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F3",
+          "quote": "New connectors or fetchers should include tests where practical",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that new connectors/fetchers should include tests where practical.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 63,
+              "line_end": 63,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- New connectors or fetchers should include tests where practical\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T02-ru",
+      "question": {
+        "id": "T02-ru",
+        "topic_id": "T02",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Как безопасно очистить индекс DocAtlas, не удалив данные, которые ещё нужны?",
+        "search_question": "How can I safely clean up the DocAtlas index without deleting data I still need?"
+      },
+      "receipt": {
+        "case": "T02-ru",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eebb07dfferayumUzyfkfuJF",
+        "seconds": 6.44,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T02-ru.jsonl": "94c0c4a2a685322fe01a7969a550b73618c759e3e2f18b99bb75a2ee45585df1",
+        "T02-ru.session.json": "35073565ed658999a07aae15c80c103e6b82a552ec86065f872be9a297daa9ab",
+        "T02-ru.receipt.json": "5f997e4f446696fb829e77be9326df46141d135f1efa6bf8862234be44f9821e",
+        "T02-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2869,
+        "output": 164,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2869,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 890,
+            "output": 37,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 958,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1021,
+            "output": 95,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "glob": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b1145676001XfclQZI3fM33au",
+          "sessionID": "ses_e4eebb07dfferayumUzyfkfuJF",
+          "messageID": "msg_1b1144fd00012SfMUo4oM15AJ2",
+          "type": "tool",
+          "id": "call_b3afa19d60f743bd9890fe914e15e7b7",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "**/*"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0f65b57cd560213e016aedd826754887d28120f10c92a9548f"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"**/*\"}"
+            },
+            "time": {
+              "start": 1793972262518,
+              "end": 1793972262940
+            }
+          }
+        },
+        {
+          "partID": "prt_1b1145c2d001pYBafCZh6HzyJQ",
+          "sessionID": "ses_e4eebb07dfferayumUzyfkfuJF",
+          "messageID": "msg_1b114583a001WdpPKI9PCmCkhY",
+          "type": "tool",
+          "id": "call_31a0ac58789a429284d770fe8c917372",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0f65b57cd560213e016aedd827e8d487d2a88d38b5aad12dce"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972263981,
+              "end": 1793972264302
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу надёжно описать процедуру: доступ к документации DocAtlas в предоставленном корпусе отклонён, поэтому я не смог проверить команды и условия удаления.\n\nДо проверки документации **не запускайте очистку индекса**: без неё нельзя установить, какие данные будут удалены и можно ли их восстановить. Предоставьте доступ к корпусу или текст соответствующей инструкции — тогда я помогу разобрать безопасные шаги.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T02.F1",
+          "quote": "`doc-atlas clear-index` previews a bounded cleanup plan before removing derived",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Generic advice to avoid cleanup does not identify doc-atlas clear-index or its bounded preview plan.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "README.md",
+              "line_start": 192,
+              "line_end": 192,
+              "source_sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93",
+              "source_span": "`doc-atlas clear-index` previews a bounded cleanup plan before removing derived\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T02.F2",
+          "quote": "for all local indexes while preserving configuration",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not describe the all-local-index cleanup scope or preservation of configuration.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "README.md",
+              "line_start": 195,
+              "line_end": 195,
+              "source_sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93",
+              "source_span": "for all local indexes while preserving configuration. Applying a reviewed plan\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T02.F3",
+          "quote": "can be bound to its `plan_digest`",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not explain that the approved cleanup can be bound to plan_digest.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "README.md",
+              "line_start": 196,
+              "line_end": 196,
+              "source_sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93",
+              "source_span": "can be bound to its `plan_digest`, and live processes, stale plans, remote\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T05-ru",
+      "question": {
+        "id": "T05-ru",
+        "topic_id": "T05",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Что проверяет верификация привязанной к проекту интеграции с OpenCode и чего она не доказывает?",
+        "search_question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?"
+      },
+      "receipt": {
+        "case": "T05-ru",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eeb9758ffe5m6HSiavVm64QW",
+        "seconds": 6.63,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T05-ru.jsonl": "58c2837ee3491991f4981bb65dfac0e4c915403ef0e4d329128974c4a5c682c6",
+        "T05-ru.session.json": "e22a05e848c75160782356788163e13554bb50b258fc88a245554ee765cd6d1f",
+        "T05-ru.receipt.json": "cef3bee698cbf613574b9e734f543730f9b8c90eb08b582395e7764926d2a4ec",
+        "T05-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2931,
+        "output": 123,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2931,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 898,
+            "output": 55,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 985,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1048,
+            "output": 36,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b1147208001rGGeWxlVzrZZkt",
+          "sessionID": "ses_e4eeb9758ffe5m6HSiavVm64QW",
+          "messageID": "msg_1b11468f0001hMFiotMGAuMMtf",
+          "type": "tool",
+          "id": "call_ed6e25c50503429ea4b15aa56040f664",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "верификац|verification|verify|verified",
+              "caseSensitive": false,
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_036084dcc366761e016aedd82d812487d2b8f5beab58d3ef5e"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"верификац|verification|verify|verified\",\"caseSensitive\":false,\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972269576,
+              "end": 1793972270336
+            }
+          }
+        },
+        {
+          "partID": "prt_1b11479750019I7csq4blapMNh",
+          "sessionID": "ses_e4eeb9758ffe5m6HSiavVm64QW",
+          "messageID": "msg_1b114750b001NehTKlnuo48ry6",
+          "type": "tool",
+          "id": "call_7ef3eab0e59e4065acb180003e9e024f",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_036084dcc366761e016aedd82f69e887d2a75dbb9c787f9d5d"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972271477,
+              "end": 1793972271815
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу достоверно ответить: доступ к указанному корпусу проекта запрещён, поэтому я не смог проверить исходные документы и привести ссылки на них.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T05.F1",
+          "quote": "the installed wheel, actual project installer, stdio MCP, SQLite and MiniLM",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify installed wheel, actual installer, stdio MCP, SQLite and MiniLM as the covered verification boundary.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/PROJECT_BINDING.md",
+              "line_start": 75,
+              "line_end": 75,
+              "source_sha256": "b1823bad5e2f19f23cf826df0c6b53cf9d436008e942826bf0ea1d002d06582e",
+              "source_span": "the installed wheel, actual project installer, stdio MCP, SQLite and MiniLM.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T05.F2",
+          "quote": "not autonomous OpenCode/model runs or token benchmarks",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not distinguish that verification from autonomous OpenCode/model runs and token benchmarks.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/PROJECT_BINDING.md",
+              "line_start": 79,
+              "line_end": 79,
+              "source_sha256": "b1823bad5e2f19f23cf826df0c6b53cf9d436008e942826bf0ea1d002d06582e",
+              "source_span": "installed-MCP scenarios, not autonomous OpenCode/model runs or token benchmarks.\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T10-ru",
+      "question": {
+        "id": "T10-ru",
+        "topic_id": "T10",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Какой публичный сценарий предлагается для сравнения запусков с выключенным и включённым логированием?",
+        "search_question": "What public scenario is proposed for comparing runs with logging turned off and on?"
+      },
+      "receipt": {
+        "case": "T10-ru",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eeb7d6effeqj2CxPSRGNis1i",
+        "seconds": 6.04,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T10-ru.jsonl": "029b5e50423c3a1cfdf9a711a4e3c5c1ac9e7545ee4a6934c827502905eadcf9",
+        "T10-ru.session.json": "f654520a3e8edef0905b247842ce63eb3fe8d45235b93f05e7f52c791beebe9d",
+        "T10-ru.receipt.json": "3e3521a49842170d64dfe7ef20553f52eab57d2044567d8a376a876b5f9e676a",
+        "T10-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2917,
+        "output": 141,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2917,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 896,
+            "output": 51,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 979,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1042,
+            "output": 58,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b11489af001Csiv6DOB87eycL",
+          "sessionID": "ses_e4eeb7d6effeqj2CxPSRGNis1i",
+          "messageID": "msg_1b11482db001BEc7t2mYRSrqw3",
+          "type": "tool",
+          "id": "call_dc63ca93b3db4f53bac303d0815204c2",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "логирован|logging|logger",
+              "caseSensitive": false,
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_06fd51379a1e08db016aedd833924887d2900baf6e8f3585af"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"логирован|logging|logger\",\"caseSensitive\":false,\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972275631,
+              "end": 1793972276318
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114914a001hLNNnwKQtLwjyI",
+          "sessionID": "ses_e4eeb7d6effeqj2CxPSRGNis1i",
+          "messageID": "msg_1b1148c85001e04pFZlnDUfNBU",
+          "type": "tool",
+          "id": "call_b7af680d983541fca38700ad8b8b4d4b",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_06fd51379a1e08db016aedd835837887d2a3fbb10cb296ab9e"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972277578,
+              "end": 1793972277868
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не удалось прочитать документы указанного корпуса: доступ к каталогу `/tmp/opencode/step8-corpora2/L0-0/project` запрещён. Поэтому я не могу достоверно определить предлагаемый публичный сценарий или привести ссылки на источники.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T10.F1",
+          "quote": "Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not describe reproducing one original user question through the real public API/CLI/MCP.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/main-flow-evaluation.md",
+              "line_start": 19,
+              "line_end": 19,
+              "source_sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334",
+              "source_span": "Сначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T10.F2",
+          "quote": "**Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not describe log-off and log-on attempts from identical initial states.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/main-flow-evaluation.md",
+              "line_start": 22,
+              "line_end": 22,
+              "source_sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334",
+              "source_span": "2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T10.F3",
+          "quote": "**Два независимых PASS и паритет.**",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not require two independent PASS results plus parity.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/main-flow-evaluation.md",
+              "line_start": 23,
+              "line_end": 23,
+              "source_sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334",
+              "source_span": "3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов. Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T12-ru",
+      "question": {
+        "id": "T12-ru",
+        "topic_id": "T12",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Как MCP-сервер документации работает с собственной документацией проекта?",
+        "search_question": "How does the docs MCP server handle a project's own documentation?"
+      },
+      "receipt": {
+        "case": "T12-ru",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eeb65d9ffegkzJBZHbsDj5N4",
+        "seconds": 6.7,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T12-ru.jsonl": "5495bfb7f30e532445447d97c85df4ff1c27286a8d91570d33b19585886d03fb",
+        "T12-ru.session.json": "7af0e38c609df47e6fd25632a5d40d063d5e21d8cb24600aaba5f0d8c62acfa4",
+        "T12-ru.receipt.json": "90517cac28640eb243bc4a9b586541a460357a80696f74c0e815f86ee483ecef",
+        "T12-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2878,
+        "output": 169,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2878,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 886,
+            "output": 42,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 960,
+            "output": 41,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1032,
+            "output": 86,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "glob": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114a12a001FfSqrCjxJhCdrG",
+          "sessionID": "ses_e4eeb65d9ffegkzJBZHbsDj5N4",
+          "messageID": "msg_1b1149a720013EmhNGtNvUhmW4",
+          "type": "tool",
+          "id": "call_030721d4de0740b496f9e06fce2cd8b4",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "MCP",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0a8a9e54a85c33c6016aedd8398f9087d2a7d8a0e370a809a0"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"MCP\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972281642,
+              "end": 1793972282153
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114a780001CQJrs76dM8Z0IF",
+          "sessionID": "ses_e4eeb65d9ffegkzJBZHbsDj5N4",
+          "messageID": "msg_1b114a33c001XdRuODLI7tKldx",
+          "type": "tool",
+          "id": "call_82d7707a93e64fc6a79ff12ffd959fdf",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "**/*",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0a8a9e54a85c33c6016aedd83b33ec87d294fc679ce5c48b35"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"**/*\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972283264,
+              "end": 1793972283831
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не удалось получить доступ к замороженному корпусу проекта: среда отклонила запрос на чтение каталога. Поэтому я не могу достоверно описать, как MCP-сервер работает с документацией проекта, или привести ссылки на источники.\n\nПредоставьте доступ к `/tmp/opencode/step8-corpora2/L0-0/project` или приложите соответствующие документы.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T12.F1",
+          "quote": "Reads never reconcile\nan index or write to the repository.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that reads neither reconcile an index nor write to the repository.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/mcp-docs-server.md",
+              "line_start": 84,
+              "line_end": 85,
+              "source_sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c",
+              "source_span": "For a repository question, call `get_docs_context` directly unless enabled language mode requires unknown-language preflight first. Reads never reconcile\nan index or write to the repository. Project documentation must belong to a\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T12.F2",
+          "quote": "Project documentation must belong to a\nfinite explicit `docatlas.project-docs.yaml` catalog",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify the finite explicit docatlas.project-docs.yaml catalog requirement.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/mcp-docs-server.md",
+              "line_start": 85,
+              "line_end": 86,
+              "source_sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c",
+              "source_span": "an index or write to the repository. Project documentation must belong to a\nfinite explicit `docatlas.project-docs.yaml` catalog; common names such as README\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T12.F3",
+          "quote": "`prepare_docs(action=\"sync_project_docs\", project_path=...)` without a `mutation`\nperforms no writes.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that prepare_docs sync_project_docs without mutation performs no writes.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/mcp-docs-server.md",
+              "line_start": 89,
+              "line_end": 90,
+              "source_sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c",
+              "source_span": "`prepare_docs(action=\"sync_project_docs\", project_path=...)` without a `mutation`\nperforms no writes. A confirmed member upsert binds the host-selected private\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T15-en",
+      "question": {
+        "id": "T15-en",
+        "topic_id": "T15",
+        "split": "dev",
+        "lang": "en",
+        "question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?"
+      },
+      "receipt": {
+        "case": "T15-en",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eeb6042ffeXfNUjYktb0Q4ZF",
+        "seconds": 8.24,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T15-en.jsonl": "36cb7a2032fa12a976327cb6c15bcdfd5de6de46a9719ab4729cfabefbbb4ac0",
+        "T15-en.session.json": "d1a74fd025f2817a0c65c568037e42e48c0d618a38f1f0d215115ea5ebf6ab40",
+        "T15-en.receipt.json": "ea28075dae4eb7b5e133df6e335a07f4c9001f697208b7e094fc58a980e9c60d",
+        "T15-en.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2888,
+        "output": 137,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2888,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 889,
+            "output": 47,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 968,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1031,
+            "output": 58,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114aa06001Cl18xScAkB7VdY",
+          "sessionID": "ses_e4eeb6042ffeXfNUjYktb0Q4ZF",
+          "messageID": "msg_1b114a003001q76ZRBAoYajxa7",
+          "type": "tool",
+          "id": "call_e4a8d502961c4cdfbf48264908b9f8d7",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "DOCATLAS_MCP_MODEL_VIEW",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0d7f65213ac6562a016aedd83bda4487d2b46702f2b222c314"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"DOCATLAS_MCP_MODEL_VIEW\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972283910,
+              "end": 1793972284817
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114b437001NukqV9Is4cx4rH",
+          "sessionID": "ses_e4eeb6042ffeXfNUjYktb0Q4ZF",
+          "messageID": "msg_1b114add1001pYOPTsIj6g1y45",
+          "type": "tool",
+          "id": "call_5e25adcb227d4fada68cbc2cdff50bb9",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0d7f65213ac6562a016aedd83e6db087d28209ba610db416f0"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972286519,
+              "end": 1793972286897
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "I can’t determine that from the designated project documentation because access to the frozen source corpus was denied. I don’t have evidence to explain the risks or cite the relevant lines.\n\nIf you can provide the relevant documentation or make the corpus accessible, I can answer from it.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T15.F1",
+          "quote": "retains `structuredContent` and `content`, but drops response `_meta`.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not explain that OpenCode retains structuredContent/content but drops response _meta.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/opencode-compact-text.md",
+              "line_start": 41,
+              "line_end": 41,
+              "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea",
+              "source_span": "retains `structuredContent` and `content`, but drops response `_meta`.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T15.F2",
+          "quote": "would lose the original `source-packet` and make its\nresponse-local short references non-resolvable.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not explain loss of the original source-packet and unresolvable response-local short references.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/opencode-compact-text.md",
+              "line_start": 44,
+              "line_end": 45,
+              "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea",
+              "source_span": "mode for stock OpenCode would lose the original `source-packet` and make its\nresponse-local short references non-resolvable.\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L0",
+      "case": "T19-ru",
+      "question": {
+        "id": "T19-ru",
+        "topic_id": "T19",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Какие команды DocAtlas используются для управления Qdrant?",
+        "search_question": "Which DocAtlas commands are used to manage Qdrant?"
+      },
+      "receipt": {
+        "case": "T19-ru",
+        "corpus": "L0",
+        "arm": "file-current",
+        "session": "ses_e4eeb4bb2ffenhvoZuu77sWJpf",
+        "seconds": 6.43,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T19-ru.jsonl": "5a4abe71bbd4932b3188d1eced9e255a2d5b37d696419942152ad82143571eec",
+        "T19-ru.session.json": "f669045b69eab0585b5eb890a3bedf8dfc97b36e1c51abee1e2c376e7c728314",
+        "T19-ru.receipt.json": "048b926c5335a3641090d923bf642ad4a51ee9f1181570d1dd3d3ec9941b7d47",
+        "T19-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2875,
+        "output": 138,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2875,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 884,
+            "output": 48,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 964,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1027,
+            "output": 58,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114bb5c001Ro8h97UmH3sWMh",
+          "sessionID": "ses_e4eeb4bb2ffenhvoZuu77sWJpf",
+          "messageID": "msg_1b114b495001oD6NTNewKDohBX",
+          "type": "tool",
+          "id": "call_f8bf998b38434c1f99e94b96cdf08123",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project",
+              "pattern": "Qdrant",
+              "caseSensitive": false,
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0653425c0adc8e20016aedd84048b087d2bcf14b4c4b6b5a5a"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\",\"pattern\":\"Qdrant\",\"caseSensitive\":false,\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972288348,
+              "end": 1793972288970
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114c2860011amkgOCtJPwz8N",
+          "sessionID": "ses_e4eeb4bb2ffenhvoZuu77sWJpf",
+          "messageID": "msg_1b114bdf4001JQ5l97qCS2fcnQ",
+          "type": "tool",
+          "id": "call_f00a24b187484360b645130e4892a70c",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L0-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0653425c0adc8e20016aedd8421a4087d2aa4b645aa5477cea"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L0-0/project\"}"
+            },
+            "time": {
+              "start": 1793972290182,
+              "end": 1793972290500
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не удалось получить доступ к замороженному корпусу проекта: запросы на чтение и поиск вернули ошибку `Permission denied: external_directory`. Поэтому я не могу достоверно перечислить команды DocAtlas для управления Qdrant или привести ссылки на документацию.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T19.F1",
+          "quote": "The `doc-atlas qdrant` group manages a DocAtlas-owned local Qdrant process.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify the doc-atlas qdrant group or its DocAtlas-owned local-process scope.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 106,
+              "line_end": 106,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "The `doc-atlas qdrant` group manages a DocAtlas-owned local Qdrant process. The default `doc-atlas ingest` runs the hybrid path: on first ingest it downloads the pinned Qdrant binary, starts it in the background, and embeds + upserts vectors alongside FTS5. Use `ingest --no-vectors` (or set `DOCATLAS_AUTO_VECTORS=0`) for FTS5-only runs.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T19.F2",
+          "quote": "`doc-atlas qdrant up` | Download the pinned Qdrant binary",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify qdrant up or its pinned-binary download behavior.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 110,
+              "line_end": 110,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "| `doc-atlas qdrant up` | Download the pinned Qdrant binary (currently `v1.14.1`) to `~/.docatlas/qdrant/qdrant` if absent, start it in the background, write a PID + runtime metadata file, and spawn with telemetry disabled (`QDRANT__TELEMETRY_DISABLED=true`). Pass `--port` to pin a specific port, or `--docker` to print a `docker compose` snippet instead of running the managed binary. |\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T19.F3",
+          "quote": "`doc-atlas qdrant down` | Stop a docmancer-managed process.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify qdrant down or stopping the docmancer-managed process.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 111,
+              "line_end": 111,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "| `doc-atlas qdrant down` | Stop a docmancer-managed process. Refuses to touch a PID file docmancer did not write. |\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T19.F4",
+          "quote": "`doc-atlas qdrant status` | Report pid, port, url, alive",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify qdrant status or its pid/port/url/alive reporting.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 112,
+              "line_end": 112,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "| `doc-atlas qdrant status` | Report pid, port, url, alive, docmancer-ownership, healthy, and version. Add `--json` for raw JSON. |\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T01-en",
+      "question": {
+        "id": "T01-en",
+        "topic_id": "T01",
+        "split": "dev",
+        "lang": "en",
+        "question": "What is expected of me when I submit a pull request to DocAtlas?"
+      },
+      "receipt": {
+        "case": "T01-en",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeb328affeVyjupkxUucMB46",
+        "seconds": 8.64,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T01-en.jsonl": "8ff81c78f9b2def2efd2d2258d2aac5b76d7ff50b21e9c1451f1b0f1eedb0529",
+        "T01-en.session.json": "56535f471e5c297c29a572db56f00172f2f4e4df4eb5f86a9215dc210597867f",
+        "T01-en.receipt.json": "2ee71df7ed81588972ab31c9e456da17e86983eb3e8a5e2847dd02c98848179e",
+        "T01-en.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2865,
+        "output": 114,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2865,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 886,
+            "output": 41,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 958,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1021,
+            "output": 41,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "glob": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114d682001UOsP98y1Ds8hIH",
+          "sessionID": "ses_e4eeb328affeVyjupkxUucMB46",
+          "messageID": "msg_1b114cdbf001axsfwRwKMyVjfj",
+          "type": "tool",
+          "id": "call_0589b3c9b73d44d4b1c4ebb637d60655",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "**/*",
+              "hidden": true
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_04ce51655c6ef88e016aedd847270487d296af48d74950d8f6"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"**/*\",\"hidden\":true}"
+            },
+            "time": {
+              "start": 1793972295299,
+              "end": 1793972295735
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114e3ff001hJiMu14RUFvU3j",
+          "sessionID": "ses_e4eeb328affeVyjupkxUucMB46",
+          "messageID": "msg_1b114da240016enqO014CXnfn1",
+          "type": "tool",
+          "id": "call_41783905f836424e9fe2922e3818a521",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_04ce51655c6ef88e016aedd84aaa8087d2832790c145c71388"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\"}"
+            },
+            "time": {
+              "start": 1793972298751,
+              "end": 1793972299121
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "I can’t determine DocAtlas’s pull request expectations because access to the designated project documentation was denied. Please provide the contributing or pull request guidelines, and I can summarize what’s expected.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T01.F1",
+          "quote": "Branch name: `feat/<topic>` or `fix/<description>`",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not give either required branch-name pattern feat/<topic> or fix/<description>; requesting a contributing guide is not the branch convention.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 61,
+              "line_end": 61,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Branch name: `feat/<topic>` or `fix/<description>`\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F2",
+          "quote": "Run the full test suite before opening the PR",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that the full test suite must run before opening a PR.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 62,
+              "line_end": 62,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Run the full test suite before opening the PR\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F3",
+          "quote": "New connectors or fetchers should include tests where practical",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that new connectors/fetchers should include tests where practical.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 63,
+              "line_end": 63,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- New connectors or fetchers should include tests where practical\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T01-ru",
+      "question": {
+        "id": "T01-ru",
+        "topic_id": "T01",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+        "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+      },
+      "receipt": {
+        "case": "T01-ru",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeb4017ffeIyZC21LUl2oK5n",
+        "seconds": 7.09,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T01-ru.jsonl": "2fce4af86a559b4cb016818e27b34f30155b3f239d0a0baa7bbd635e67b72372",
+        "T01-ru.session.json": "ed7b0fbab675d4d1d4336f14aef6c2721169930fbf6e1cb5196b7552a32a4760",
+        "T01-ru.receipt.json": "e87e1a6c2392ca441c27d4aa5d285e62a8908597ad5fd1e50ac0574b896cfa3f",
+        "T01-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2874,
+        "output": 139,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2874,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 889,
+            "output": 41,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 961,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1024,
+            "output": 66,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "glob": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114ca20001sA20Eqcnd8VPxH",
+          "sessionID": "ses_e4eeb4017ffeIyZC21LUl2oK5n",
+          "messageID": "msg_1b114c0a5001yS2vm5EuEIy9Cq",
+          "type": "tool",
+          "id": "call_c071fd05811c454f8d04f2e2c412cd84",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "**/*",
+              "hidden": true
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0c79aec575d9d337016aedd8440d3487d2927b92db11d4d99a"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"**/*\",\"hidden\":true}"
+            },
+            "time": {
+              "start": 1793972292128,
+              "end": 1793972292651
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114d1210010Rn6qFEE13LDOz",
+          "sessionID": "ses_e4eeb4017ffeIyZC21LUl2oK5n",
+          "messageID": "msg_1b114cc46001myIahqz7k6Zy9I",
+          "type": "tool",
+          "id": "call_2de92674bb0e43588a7a013108f2e8d1",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0c79aec575d9d337016aedd845ba8487d289551368a095624e"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\"}"
+            },
+            "time": {
+              "start": 1793972293921,
+              "end": 1793972294093
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу достоверно ответить: доступ к указанному архиву документации DocAtlas отклонён, поэтому я не смог проверить требования к pull request.\n\nПредоставьте, пожалуйста, текст руководства для участников проекта — например, `CONTRIBUTING.md` или соответствующую страницу документации.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T01.F1",
+          "quote": "Branch name: `feat/<topic>` or `fix/<description>`",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not give either required branch-name pattern feat/<topic> or fix/<description>; requesting a contributing guide is not the branch convention.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 61,
+              "line_end": 61,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Branch name: `feat/<topic>` or `fix/<description>`\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F2",
+          "quote": "Run the full test suite before opening the PR",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that the full test suite must run before opening a PR.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 62,
+              "line_end": 62,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- Run the full test suite before opening the PR\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T01.F3",
+          "quote": "New connectors or fetchers should include tests where practical",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that new connectors/fetchers should include tests where practical.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "CONTRIBUTING.md",
+              "line_start": 63,
+              "line_end": 63,
+              "source_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+              "source_span": "- New connectors or fetchers should include tests where practical\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T02-ru",
+      "question": {
+        "id": "T02-ru",
+        "topic_id": "T02",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Как безопасно очистить индекс DocAtlas, не удалив данные, которые ещё нужны?",
+        "search_question": "How can I safely clean up the DocAtlas index without deleting data I still need?"
+      },
+      "receipt": {
+        "case": "T02-ru",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeb2469ffe9wDPMC0dya9Uhx",
+        "seconds": 6.88,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T02-ru.jsonl": "8cab5364676c7958abd81edc6c8a923cc7fb00a9038f755a60290b2c0db32c5d",
+        "T02-ru.session.json": "ac695c31d09aa2f796d6d81c27a9d71ed630c0f5443efddc9d7cf38fb023dadc",
+        "T02-ru.receipt.json": "8ea40bb08a4fa891a6590cbe719a0c2cb8fd2aa4e799cb10b7f14bdbac4d6727",
+        "T02-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2881,
+        "output": 165,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2881,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 890,
+            "output": 42,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 964,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1027,
+            "output": 91,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114e279001LVP5mOf5wXq8OX",
+          "sessionID": "ses_e4eeb2469ffe9wDPMC0dya9Uhx",
+          "messageID": "msg_1b114dbdd001AKGI4WEEY4Pys6",
+          "type": "tool",
+          "id": "call_6438a5c453da47859e9abcb2ce36dfab",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "DocAtlas",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0cb422b198b06456016aedd84a4ab087d2ab81ba4de103f25c"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"DocAtlas\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972298361,
+              "end": 1793972298913
+            }
+          }
+        },
+        {
+          "partID": "prt_1b114e9140011sUUVqQELzElio",
+          "sessionID": "ses_e4eeb2469ffe9wDPMC0dya9Uhx",
+          "messageID": "msg_1b114e4db001ELJ2XG2AiLfE65",
+          "type": "tool",
+          "id": "call_f4c72164cee34c2ba9441416779c03f8",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0cb422b198b06456016aedd84bfa9887d2ba2c61e919ba231f"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\"}"
+            },
+            "time": {
+              "start": 1793972300052,
+              "end": 1793972300366
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу безопасно рекомендовать процедуру: доступ к документации DocAtlas в предоставленном корпусе отклонён, поэтому я не смог проверить, как очистка индекса влияет на исходные данные.\n\nДо проверки документации **не запускайте команды очистки или удаления**. Предоставьте доступ к корпусу или соответствующие страницы документации — тогда я смогу описать проверенные шаги с указанием источников.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T02.F1",
+          "quote": "`doc-atlas clear-index` previews a bounded cleanup plan before removing derived",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Generic advice to avoid cleanup does not identify doc-atlas clear-index or its bounded preview plan.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "README.md",
+              "line_start": 192,
+              "line_end": 192,
+              "source_sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93",
+              "source_span": "`doc-atlas clear-index` previews a bounded cleanup plan before removing derived\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T02.F2",
+          "quote": "for all local indexes while preserving configuration",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not describe the all-local-index cleanup scope or preservation of configuration.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "README.md",
+              "line_start": 195,
+              "line_end": 195,
+              "source_sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93",
+              "source_span": "for all local indexes while preserving configuration. Applying a reviewed plan\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T02.F3",
+          "quote": "can be bound to its `plan_digest`",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not explain that the approved cleanup can be bound to plan_digest.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "README.md",
+              "line_start": 196,
+              "line_end": 196,
+              "source_sha256": "4cb2336f8633874d1b9e148ab1a6986a9f14ceb4c6b22643cd52613e316dad93",
+              "source_span": "can be bound to its `plan_digest`, and live processes, stale plans, remote\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T05-ru",
+      "question": {
+        "id": "T05-ru",
+        "topic_id": "T05",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Что проверяет верификация привязанной к проекту интеграции с OpenCode и чего она не доказывает?",
+        "search_question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?"
+      },
+      "receipt": {
+        "case": "T05-ru",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeb10caffe234F34P46mCpxP",
+        "seconds": 21.91,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T05-ru.jsonl": "cc6318e28adf587fd61d6e8902ba15eee20ff7ac99dafa940b7bc4521812d6f7",
+        "T05-ru.session.json": "e1fddd657329acdd2804506dcb1d75b49b50835c98eb691c3a12768e57841365",
+        "T05-ru.receipt.json": "954a9ccefa9ae252cc67e2afc474c4521842e51a9161c970d51dcd3c98a9e8db",
+        "T05-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 1881,
+        "output": 120,
+        "reasoning": 13,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 1881,
+        "steps": 2,
+        "tool_calls": 1,
+        "tool_errors": 1,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 898,
+            "output": 53,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 983,
+            "output": 67,
+            "reasoning": 13,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b115143b001ZUiAmUXTdLpCWN",
+          "sessionID": "ses_e4eeb10caffe234F34P46mCpxP",
+          "messageID": "msg_1b114ef830016uAolxpH0LUhoC",
+          "type": "tool",
+          "id": "call_59995dcb994f464bba084bc20c1595e2",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "верификац|verification|verify",
+              "caseSensitive": false,
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_04bd2db3a524c5ac016aedd8570a8487d2afd90416c9512cb1"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"верификац|verification|verify\",\"caseSensitive\":false,\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972311099,
+              "end": 1793972311839
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу достоверно ответить: доступ к указанному корпусу документации был отклонён, поэтому я не смог проверить источники и привести ссылки на строки. Предоставьте доступ к `/tmp/opencode/step8-corpora2/L2-0/project` или соответствующие документы.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T05.F1",
+          "quote": "the installed wheel, actual project installer, stdio MCP, SQLite and MiniLM",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify installed wheel, actual installer, stdio MCP, SQLite and MiniLM as the covered verification boundary.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/PROJECT_BINDING.md",
+              "line_start": 75,
+              "line_end": 75,
+              "source_sha256": "b1823bad5e2f19f23cf826df0c6b53cf9d436008e942826bf0ea1d002d06582e",
+              "source_span": "the installed wheel, actual project installer, stdio MCP, SQLite and MiniLM.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T05.F2",
+          "quote": "not autonomous OpenCode/model runs or token benchmarks",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not distinguish that verification from autonomous OpenCode/model runs and token benchmarks.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/PROJECT_BINDING.md",
+              "line_start": 79,
+              "line_end": 79,
+              "source_sha256": "b1823bad5e2f19f23cf826df0c6b53cf9d436008e942826bf0ea1d002d06582e",
+              "source_span": "installed-MCP scenarios, not autonomous OpenCode/model runs or token benchmarks.\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T10-ru",
+      "question": {
+        "id": "T10-ru",
+        "topic_id": "T10",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Какой публичный сценарий предлагается для сравнения запусков с выключенным и включённым логированием?",
+        "search_question": "What public scenario is proposed for comparing runs with logging turned off and on?"
+      },
+      "receipt": {
+        "case": "T10-ru",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeb0985ffelz3BNVD4gej7IE",
+        "seconds": 9.73,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T10-ru.jsonl": "4937e5155902925a83130b9a36f80ad6bd2b9795dcffdf007ef82414f4aedbec",
+        "T10-ru.session.json": "8d8ae88c72cb72a05496966d4c6ec0c98c5d8efa961799f9d4adcb99434d556c",
+        "T10-ru.receipt.json": "de252f6051d8e2f4f8616a4310c7bd40262eb8b4f7deeb5047e68dba21492ed5",
+        "T10-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2944,
+        "output": 134,
+        "reasoning": 16,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2944,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 896,
+            "output": 51,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 979,
+            "output": 43,
+            "reasoning": 16,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1069,
+            "output": 40,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "glob": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b114fd96001G2XSQ44QPqOP4a",
+          "sessionID": "ses_e4eeb0985ffelz3BNVD4gej7IE",
+          "messageID": "msg_1b114f6bd001l5YLlJTjRXlLE0",
+          "type": "tool",
+          "id": "call_afd8b198f41b4c63a16ddf74f720dfb2",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "логирован|logging|benchmark",
+              "caseSensitive": false,
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_001699f3ac1d856b016aedd851400087d2828ef460706dab92"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"логирован|logging|benchmark\",\"caseSensitive\":false,\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972305302,
+              "end": 1793972305992
+            }
+          }
+        },
+        {
+          "partID": "prt_1b11514d5001apZEKwX7XsA961",
+          "sessionID": "ses_e4eeb0985ffelz3BNVD4gej7IE",
+          "messageID": "msg_1b115006700175FThAyD7yJlQF",
+          "type": "tool",
+          "id": "call_1c2c42532faa4faf89a31f5064c0fd55",
+          "tool": "glob",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "**/*",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_001699f3ac1d856b016aedd857312c87d2911effe0d373d7f1"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"**/*\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972311253,
+              "end": 1793972311287
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не удалось определить предлагаемый публичный сценарий: доступ к указанному корпусу документов был отклонён. Поэтому я не могу подтвердить ответ или привести ссылки на источники.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T10.F1",
+          "quote": "Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not describe reproducing one original user question through the real public API/CLI/MCP.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/main-flow-evaluation.md",
+              "line_start": 19,
+              "line_end": 19,
+              "source_sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334",
+              "source_span": "Сначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T10.F2",
+          "quote": "**Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not describe log-off and log-on attempts from identical initial states.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/main-flow-evaluation.md",
+              "line_start": 22,
+              "line_end": 22,
+              "source_sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334",
+              "source_span": "2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T10.F3",
+          "quote": "**Два независимых PASS и паритет.**",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not require two independent PASS results plus parity.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/main-flow-evaluation.md",
+              "line_start": 23,
+              "line_end": 23,
+              "source_sha256": "7ca7cc8056a68e5b3673bea713a2bd4342164c9c79bdd414d4250b154c267334",
+              "source_span": "3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов. Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T12-ru",
+      "question": {
+        "id": "T12-ru",
+        "topic_id": "T12",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Как MCP-сервер документации работает с собственной документацией проекта?",
+        "search_question": "How does the docs MCP server handle a project's own documentation?"
+      },
+      "receipt": {
+        "case": "T12-ru",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeae385ffezFiIZk7U2HmUjn",
+        "seconds": 7.72,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T12-ru.jsonl": "dc2615b61bb1d5a506d2a6eb95f2eb72d59c6e3885a7ceb9021851142e594e3a",
+        "T12-ru.session.json": "85a572615c9daca3a9fc2b7163c88b8f2db3a4f3418b9a3ea754b94d292e6bab",
+        "T12-ru.receipt.json": "f396f04dd4812d33f930ff8c7f00565e60863de59b228b7acae0e3e911973f14",
+        "T12-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2869,
+        "output": 166,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2869,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 886,
+            "output": 42,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 960,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1023,
+            "output": 92,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b11523ea001O9ZffNmZ5YPQ2P",
+          "sessionID": "ses_e4eeae385ffezFiIZk7U2HmUjn",
+          "messageID": "msg_1b1151cc0001lbZlYeuk88xih0",
+          "type": "tool",
+          "id": "call_225111d2c6c14def91741715eebb60cf",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "MCP",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0386b44a83727415016aedd85b015887d2bdccbada5b38f8c8"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"MCP\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972315114,
+              "end": 1793972315672
+            }
+          }
+        },
+        {
+          "partID": "prt_1b1152d750015hGTh9XIrJtx1K",
+          "sessionID": "ses_e4eeae385ffezFiIZk7U2HmUjn",
+          "messageID": "msg_1b115266e001OmegCzW6HgwgSF",
+          "type": "tool",
+          "id": "call_1f59eee05f5042babc2a5358a19e4cfb",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0386b44a83727415016aedd85d6da087d2af6b434d93412a80"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\"}"
+            },
+            "time": {
+              "start": 1793972317557,
+              "end": 1793972317819
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не могу определить это по документам проекта: доступ к указанному замороженному корпусу отклонён средой (`Permission denied: external_directory`). Поэтому у меня нет проверенных источников, на которые можно сослаться.\n\nПредоставьте доступ к `/tmp/opencode/step8-corpora2/L2-0/project` или пришлите соответствующие документы — тогда я смогу ответить со ссылками на строки.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T12.F1",
+          "quote": "Reads never reconcile\nan index or write to the repository.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that reads neither reconcile an index nor write to the repository.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/mcp-docs-server.md",
+              "line_start": 84,
+              "line_end": 85,
+              "source_sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c",
+              "source_span": "For a repository question, call `get_docs_context` directly unless enabled language mode requires unknown-language preflight first. Reads never reconcile\nan index or write to the repository. Project documentation must belong to a\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T12.F2",
+          "quote": "Project documentation must belong to a\nfinite explicit `docatlas.project-docs.yaml` catalog",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify the finite explicit docatlas.project-docs.yaml catalog requirement.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/mcp-docs-server.md",
+              "line_start": 85,
+              "line_end": 86,
+              "source_sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c",
+              "source_span": "an index or write to the repository. Project documentation must belong to a\nfinite explicit `docatlas.project-docs.yaml` catalog; common names such as README\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T12.F3",
+          "quote": "`prepare_docs(action=\"sync_project_docs\", project_path=...)` without a `mutation`\nperforms no writes.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not state that prepare_docs sync_project_docs without mutation performs no writes.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/mcp-docs-server.md",
+              "line_start": 89,
+              "line_end": 90,
+              "source_sha256": "57f0b85c58c43378ecd0fc7c65f7ffaa11cadd4631b63dd69340543b22ffb81c",
+              "source_span": "`prepare_docs(action=\"sync_project_docs\", project_path=...)` without a `mutation`\nperforms no writes. A confirmed member upsert binds the host-selected private\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T15-en",
+      "question": {
+        "id": "T15-en",
+        "topic_id": "T15",
+        "split": "dev",
+        "lang": "en",
+        "question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?"
+      },
+      "receipt": {
+        "case": "T15-en",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeac559ffeuORh6wNP22bFuZ",
+        "seconds": 7.43,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T15-en.jsonl": "ffc9413c5a92d59bb8e1fa2967150513a65c8a87c1c95e105c50cb4b5f219501",
+        "T15-en.session.json": "46606031d00e84cee926fd8a1c460a2d145d8bf58de2f39a6b29ee19bb830de4",
+        "T15-en.receipt.json": "d9333251adf62b77e5f367412acc5330d58d1fac91509b3390b4437674b6116b",
+        "T15-en.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 2888,
+        "output": 130,
+        "reasoning": 0,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 2888,
+        "steps": 3,
+        "tool_calls": 2,
+        "tool_errors": 2,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 889,
+            "output": 47,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 968,
+            "output": 32,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 1031,
+            "output": 51,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1,
+        "read": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b11542b7001F7hkAmhyp6dK2p",
+          "sessionID": "ses_e4eeac559ffeuORh6wNP22bFuZ",
+          "messageID": "msg_1b1153af0001n8iy8Ifii9VYv8",
+          "type": "tool",
+          "id": "call_9d07812916294252bde70ace77e96598",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "DOCATLAS_MCP_MODEL_VIEW",
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0d1ff44a6b666387016aedd862eeb887d2976c0bc0cc3d040e"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"DOCATLAS_MCP_MODEL_VIEW\",\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972322999,
+              "end": 1793972323622
+            }
+          }
+        },
+        {
+          "partID": "prt_1b1154c43001kmYUToy2ss08WB",
+          "sessionID": "ses_e4eeac559ffeuORh6wNP22bFuZ",
+          "messageID": "msg_1b1154548001QtPHb40oiZSEEk",
+          "type": "tool",
+          "id": "call_57bb8f2573534d669d9be37a89a04fe5",
+          "tool": "read",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project"
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_0d1ff44a6b666387016aedd865589887d2ae4dc77ece6dccb7"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\"}"
+            },
+            "time": {
+              "start": 1793972325443,
+              "end": 1793972325729
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "I can’t determine that from the project documentation: access to the designated frozen corpus was denied. I therefore can’t verify what `DOCATLAS_MCP_MODEL_VIEW=1` does or why OpenCode users should avoid enabling it.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T15.F1",
+          "quote": "retains `structuredContent` and `content`, but drops response `_meta`.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not explain that OpenCode retains structuredContent/content but drops response _meta.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/opencode-compact-text.md",
+              "line_start": 41,
+              "line_end": 41,
+              "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea",
+              "source_span": "retains `structuredContent` and `content`, but drops response `_meta`.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T15.F2",
+          "quote": "would lose the original `source-packet` and make its\nresponse-local short references non-resolvable.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not explain loss of the original source-packet and unresolvable response-local short references.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "docs/opencode-compact-text.md",
+              "line_start": 44,
+              "line_end": 45,
+              "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea",
+              "source_span": "mode for stock OpenCode would lose the original `source-packet` and make its\nresponse-local short references non-resolvable.\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    },
+    {
+      "corpus": "L2",
+      "case": "T19-ru",
+      "question": {
+        "id": "T19-ru",
+        "topic_id": "T19",
+        "split": "dev",
+        "lang": "ru",
+        "question": "Какие команды DocAtlas используются для управления Qdrant?",
+        "search_question": "Which DocAtlas commands are used to manage Qdrant?"
+      },
+      "receipt": {
+        "case": "T19-ru",
+        "corpus": "L2",
+        "arm": "file-current",
+        "session": "ses_e4eeabb37ffe2UQ9N997ZeUj1Z",
+        "seconds": 7.19,
+        "exit": 0,
+        "censored": false,
+        "timeout_seconds": null
+      },
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "session_outcome": "succeeded",
+      "source_artifact_hashes": {
+        "T19-ru.jsonl": "3cf65219a9f4e455ed8e684d3fb5afefacd2a28e01fa5bb6195aef2b623de844",
+        "T19-ru.session.json": "04f5f1fe2921bad2b818e57757fcc7170f12dbad5d18e1a85349d4790101b3ee",
+        "T19-ru.receipt.json": "76359d2a469ef3a81a2c6271ef3fba1ea45607c17443b3b95bf57f9a95a020a4",
+        "T19-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "usage": {
+        "input": 1848,
+        "output": 107,
+        "reasoning": 9,
+        "cache_read": 0,
+        "cache_write": 0,
+        "input_with_cache": 1848,
+        "steps": 2,
+        "tool_calls": 1,
+        "tool_errors": 1,
+        "successful_tool_calls": 0,
+        "executed_file_operations": 0,
+        "retrieved_source_bytes": 0
+      },
+      "step_usage": [
+        {
+          "reason": "tool-calls",
+          "tokens": {
+            "input": 884,
+            "output": 48,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        },
+        {
+          "reason": "stop",
+          "tokens": {
+            "input": 964,
+            "output": 59,
+            "reasoning": 9,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          }
+        }
+      ],
+      "tool_counts": {
+        "grep": 1
+      },
+      "tool_trace": [
+        {
+          "partID": "prt_1b1154c4f001IT62sUj9hfWizT",
+          "sessionID": "ses_e4eeabb37ffe2UQ9N997ZeUj1Z",
+          "messageID": "msg_1b1154538001wUDVtwtYMUjN87",
+          "type": "tool",
+          "id": "call_3c5a8c2012774ab7a9b2bacaae14de74",
+          "tool": "grep",
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/tmp/opencode/step8-corpora2/L2-0/project",
+              "pattern": "Qdrant",
+              "caseSensitive": false,
+              "limit": 100
+            },
+            "error": "Permission denied: external_directory",
+            "metadata": {
+              "providerCall": {
+                "executed": false,
+                "state": {
+                  "itemId": "fc_006021ed7c8dbd62016aedd865662087d2b5838ae546707621"
+                }
+              },
+              "providerResult": {
+                "executed": false
+              },
+              "rawInput": "{\"path\":\"/tmp/opencode/step8-corpora2/L2-0/project\",\"pattern\":\"Qdrant\",\"caseSensitive\":false,\"limit\":100}"
+            },
+            "time": {
+              "start": 1793972325455,
+              "end": 1793972326088
+            }
+          }
+        }
+      ],
+      "event_errors": [],
+      "final_answer": "Не удалось проверить документацию DocAtlas: доступ к указанному корпусу был отклонён. Поэтому я не могу достоверно перечислить команды управления Qdrant.\n\nПредоставьте доступ к корпусу или пришлите соответствующий фрагмент документации.",
+      "commentary": [],
+      "facts": [
+        {
+          "fact_id": "T19.F1",
+          "quote": "The `doc-atlas qdrant` group manages a DocAtlas-owned local Qdrant process.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify the doc-atlas qdrant group or its DocAtlas-owned local-process scope.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 106,
+              "line_end": 106,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "The `doc-atlas qdrant` group manages a DocAtlas-owned local Qdrant process. The default `doc-atlas ingest` runs the hybrid path: on first ingest it downloads the pinned Qdrant binary, starts it in the background, and embeds + upserts vectors alongside FTS5. Use `ingest --no-vectors` (or set `DOCATLAS_AUTO_VECTORS=0`) for FTS5-only runs.\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T19.F2",
+          "quote": "`doc-atlas qdrant up` | Download the pinned Qdrant binary",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify qdrant up or its pinned-binary download behavior.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 110,
+              "line_end": 110,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "| `doc-atlas qdrant up` | Download the pinned Qdrant binary (currently `v1.14.1`) to `~/.docatlas/qdrant/qdrant` if absent, start it in the background, write a PID + runtime metadata file, and spawn with telemetry disabled (`QDRANT__TELEMETRY_DISABLED=true`). Pass `--port` to pin a specific port, or `--docker` to print a `docker compose` snippet instead of running the managed binary. |\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T19.F3",
+          "quote": "`doc-atlas qdrant down` | Stop a docmancer-managed process.",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify qdrant down or stopping the docmancer-managed process.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 111,
+              "line_end": 111,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "| `doc-atlas qdrant down` | Stop a docmancer-managed process. Refuses to touch a PID file docmancer did not write. |\n"
+            }
+          ],
+          "retrieved_witness": false
+        },
+        {
+          "fact_id": "T19.F4",
+          "quote": "`doc-atlas qdrant status` | Report pid, port, url, alive",
+          "answer_grade": "FAIL",
+          "present": false,
+          "reason": "Does not identify qdrant status or its pid/port/url/alive reporting.",
+          "answer_evidence": null,
+          "citation_grade": "FAIL",
+          "citation_reason": "No citation supports this required fact; the answer abstains after denied source access.",
+          "source_witnesses": [
+            {
+              "path": "wiki/Commands.md",
+              "line_start": 112,
+              "line_end": 112,
+              "source_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+              "source_span": "| `doc-atlas qdrant status` | Report pid, port, url, alive, docmancer-ownership, healthy, and version. Add `--json` for raw JSON. |\n"
+            }
+          ],
+          "retrieved_witness": false
+        }
+      ],
+      "answer_pass": false,
+      "citations": [],
+      "citation_pass": false,
+      "retrieval_status": "not_executed_external_directory_denied",
+      "comparison_valid": false,
+      "manual_answer_assessment": "Honest access-failure abstention, not a substantive answer. No required fact or supporting citation is supplied. Any suggested CONTRIBUTING.md is a request for a source, not a source citation. Generic cleanup caution is not a documented cleanup procedure."
+    }
+  ]
+}

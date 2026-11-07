@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="7.578" timestamp="2026-11-07T10:21:18.851082+03:00" hostname="4eba9c42833c"><testcase classname="tests.test_context_portions_integration" name="test_literal_presentation_public_stdio_preserves_sources_and_read_guards" time="5.651"><failure message="KeyError('instruction_trust') [single exception in ExceptionGroup]">+ Exception Group Traceback (most recent call last):
+  |   File "/workspace/scratch/66f7674793b8/DocAtlas-step10-pr/tests/test_context_portions_integration.py", line 534, in test_literal_presentation_public_stdio_preserves_sources_and_read_guards
+  |     asyncio.run(run())
+  |   File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 195, in run
+  |     return runner.run(main)
+  |            ^^^^^^^^^^^^^^^^
+  |   File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+  |     return future.result()
+  |            ^^^^^^^^^^^^^^^
+  |   File "/workspace/scratch/66f7674793b8/DocAtlas-step10-pr/tests/test_context_portions_integration.py", line 472, in run
+  |     async with stdio_client(params) as streams:
+  |                ^^^^^^^^^^^^^^^^^^^^
+  |   File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(value)
+  |   File "/workspace/scratch/66f7674793b8/locked-env/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 183, in stdio_client
+  |     anyio.create_task_group() as tg,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/workspace/scratch/66f7674793b8/locked-env/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "/workspace/scratch/66f7674793b8/locked-env/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 189, in stdio_client
+    |     yield read_stream, write_stream
+    |   File "/workspace/scratch/66f7674793b8/DocAtlas-step10-pr/tests/test_context_portions_integration.py", line 473, in run
+    |     async with ClientSession(*streams) as session:
+    |                ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/workspace/scratch/66f7674793b8/locked-env/lib/python3.12/site-packages/mcp/shared/session.py", line 238, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/workspace/scratch/66f7674793b8/locked-env/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 799, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Traceback (most recent call last):
+      |   File "/workspace/scratch/66f7674793b8/DocAtlas-step10-pr/tests/test_context_portions_integration.py", line 506, in run
+      |     assert effective["instruction_trust"] == "untrusted_data"
+      |            ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+      | KeyError: 'instruction_trust'
+      +------------------------------------</failure></testcase><testcase classname="tests.test_context_portions_integration" name="test_context_portions_bind_snapshot_and_stop_after_exhaustion" time="0.836" /></testsuite></testsuites>

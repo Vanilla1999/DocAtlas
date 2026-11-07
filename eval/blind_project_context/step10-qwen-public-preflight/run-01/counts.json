@@ -1,0 +1,8 @@
+{
+  "public_prepares": 2,
+  "public_queries": 3,
+  "resource_reads": 0,
+  "model_forwards": 16,
+  "model_input_tokens": 6608,
+  "model_totals_complete": true
+}

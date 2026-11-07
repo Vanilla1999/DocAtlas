@@ -1,0 +1,28 @@
+{
+  "value_raw": {
+    "uri": "docatlas://source/v2/4a43505b52f7087854d1121e",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"content_sha256\":\"sha256:c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60\",\"continuation\":\"docatlas://source/v2/2c9563291ff6ba401ecd4186\",\"line_end\":8,\"line_start\":5,\"path\":\"colour.md\",\"project_identity\":\"local:e24f037106c76482dd7c4dd81170dee4f301b284b7e727e6b31d1e4e55f42403\",\"snippet\":\"## Profile choice\\n\\nUse the camera profile recorded in the capture manifest, not the worker's default profile. Embed the selected profile identifier in the derivative metadata. If the manifest profile is unavailable, quarantine the job instead of guessing a profile.\\n\\n\",\"status\":\"truncated\"}"
+  },
+  "value": {
+    "content_sha256": "sha256:c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60",
+    "continuation": "docatlas://source/v2/2c9563291ff6ba401ecd4186",
+    "line_end": 8,
+    "line_start": 5,
+    "path": "colour.md",
+    "project_identity": "local:e24f037106c76482dd7c4dd81170dee4f301b284b7e727e6b31d1e4e55f42403",
+    "snippet": "## Profile choice\n\nUse the camera profile recorded in the capture manifest, not the worker's default profile. Embed the selected profile identifier in the derivative metadata. If the manifest profile is unavailable, quarantine the job instead of guessing a profile.\n\n",
+    "status": "truncated"
+  },
+  "replay_raw": {
+    "uri": "docatlas://source/v2/4a43505b52f7087854d1121e",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "replay": {
+    "reason_code": "unknown_or_expired_reference",
+    "status": "source_unavailable"
+  }
+}

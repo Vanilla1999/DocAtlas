@@ -1,0 +1,89 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original",
+    "query-lookup-1"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-c579546d213f580ae84758a5",
+      "path_or_url": "fermentation.md",
+      "section": "Community bakery notebook",
+      "snippet": "# Community bakery notebook\n\nThis notebook describes the overnight sourdough fermentation used for the community bakery's rye loaves. Yeast-only dough follows another schedule.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "fb3f49bcff093a0f7d0dece9ab8583bb59ef8246d240d26f3bda92c658f57cc0",
+      "project_identity": "local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/66730c3c1232d9a302185fe3"
+    },
+    {
+      "evidence_id": "ev-d3393c5f4049e7ae51a7c394",
+      "path_or_url": "fermentation.md",
+      "section": "Community bakery notebook > Overnight record",
+      "snippet": "## Overnight record\n\nThe bakery building was converted from a village meeting hall. A small porch shelters the entrance door from rain. The porch contains a bench where visitors can wait for the shop to open. The bench is wiped each morning before the door is unlocked. A wooden board beside the door displays the shop opening times. The board is brought indoors before the building closes for the night. Its hanging cord is replaced when it becomes frayed. Spare cord is kept with the office packing materials. The office occupies a narrow room behind the sales counter. A desk stands against the wall beneath a framed map of the village. The map is decorative and is not used for delivery routing. Delivery routes are written on separate cards and handed to the driver. Cards from completed routes go into a labelled paper envelope. At the end of the month the envelope is placed in the records cupboard. The records cupboard has three shelves and a sliding door. The bottom shelf is reserved for empty envelopes and blank cards. The middle shelf holds completed records in date order. The upper shelf holds spare folders. A small step stool is provided for reaching that shelf. The stool is put away after use so that it does not obstruct the narrow passage. The passage leads to a shared washroom and the rear exit. The washroom notice asks visitors to report leaking taps to the shop assistant. The assistant records building faults in a notebook at the counter. Faults are reviewed with the landlord during the monthly building visit. The landlord enters through the rear yard rather than crossing the production area. The yard gate is kept closed except when a delivery vehicle is passing through it. A painted line marks the place where drivers should stop before unloading. The line is repainted when it becomes difficult to see. A stiff brush is stored beside the gate for clearing leaves from the drain cover. The brush is returned to its hook after use. The drain cover is lifted only by the building caretaker. The caretaker wears a numbered visitor badge while on the premises. Spare badges are stored in a small tray beneath the counter. The tray also holds a roll of adhesive labels for office parcels. Used parcel labels are crossed out before a carton is reused. Torn cartons are flattened and collected for recycling. The recycling collection takes place on alternate Wednesdays. A calendar near the rear door marks those Wednesdays with a blue circle. Staff check the calendar before placing cartons in the yard. Cartons remain indoors during heavy rain. The staff room contains a low bookcase with old local newspapers. Papers more than one month old are removed at the end of each week. A basket beside the bookcase holds lost gloves and scarves. Items left in the basket for three months are donated through the village office. The staff room curtains are laundered during the summer closure. While the curtains are away, plain paper screens cover the lower window panes. The screens are taken down when the clean curtains return. These notes record ordinary building administration and do not establish any dough fermentation time, temperature or release condition.\n\nHold the rye sourdough at eighteen degrees Celsius for eleven hours. Before dividing the dough, verify that its volume has increased by at least one half and record the observation. If pink streaks or a putrid smell are present, discard the entire batch; do not extend fermentation or blend it into fresh dough.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "c7adf3c738d3151d67df15175d19ae6f0548f35c04b746eb1a5f48e1747860f8",
+      "project_identity": "local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3",
+      "line_start": 5,
+      "line_end": 10,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/fe5aa8a2fa0665706257b567"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1497,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "5eb8d93aabd318bf24505383ed54c14733a8900eaf19a783f8f078cc953520ff",
+    "calibration_status": "empirical",
+    "candidate_units": 3,
+    "selected_units": 1,
+    "delivered_rows": 2,
+    "scan_complete": true,
+    "model_pairs": 20,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 1,
+      "delivered_spans": 2
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "68235d8de7d27213637c782b2bc6d9e0bec3eb74f02520a97e06f65fe1cdb3d7"
+  }
+}

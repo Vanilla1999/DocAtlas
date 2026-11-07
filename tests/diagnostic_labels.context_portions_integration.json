@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_context_portions_integration.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_context_portions_integration.py": "5c5b4227db4e42570b038133616bc330b9224f82aa6572506879187c027985dd"
+  }
+}

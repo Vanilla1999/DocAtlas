@@ -1,0 +1,22 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "files": [
+    "docmancer/docs/application/_source_continuation_core.py",
+    "docmancer/docs/application/source_continuation.py",
+    "docmancer/docs/interfaces/mcp/context_tools.py",
+    "eval/blind_project_context/step10-qwen-capability-repair/regression.py"
+  ],
+  "checks": [
+    "AST/compile",
+    "Python whitespace",
+    "git diff --check",
+    "only three approved bound production files changed"
+  ],
+  "changed_bound_files": [
+    "docmancer/docs/application/_source_continuation_core.py",
+    "docmancer/docs/application/source_continuation.py",
+    "docmancer/docs/interfaces/mcp/context_tools.py"
+  ],
+  "unchanged_bound_files": 531,
+  "no_runtime_calls": true
+}

@@ -1,0 +1,28 @@
+{
+  "value_raw": {
+    "uri": "docatlas://source/v2/193c8bbf27461fdfaa1a25fa",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"content_sha256\":\"sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080\",\"continuation\":\"docatlas://source/v2/96c617c9351eff9cd7114810\",\"line_end\":10,\"line_start\":7,\"path\":\"reservations.md\",\"project_identity\":\"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458\",\"snippet\":\"## Transfer\\n\\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\\n\\n\",\"status\":\"truncated\"}"
+  },
+  "value": {
+    "content_sha256": "sha256:c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+    "continuation": "docatlas://source/v2/96c617c9351eff9cd7114810",
+    "line_end": 10,
+    "line_start": 7,
+    "path": "reservations.md",
+    "project_identity": "local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458",
+    "snippet": "## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n",
+    "status": "truncated"
+  },
+  "replay_raw": {
+    "uri": "docatlas://source/v2/193c8bbf27461fdfaa1a25fa",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "replay": {
+    "reason_code": "unknown_or_expired_reference",
+    "status": "source_unavailable"
+  }
+}

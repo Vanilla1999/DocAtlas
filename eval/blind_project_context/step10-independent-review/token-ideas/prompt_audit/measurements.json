@@ -1,0 +1,231 @@
+{
+  "schema": "offline-prompt-audit-1",
+  "repository": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review",
+  "source_commit": "9e2c331c45e8f9a86f809a1f4d66c43125250702",
+  "method": "ordinary literal-text o200k_base, explicit local vocabulary; no DocAtlas runtime imports",
+  "vocabulary_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+  "sources": {
+    "repository_skill": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/SKILL.md",
+      "sha256": "4a99f86f1ac7825ae385c79cf24fd75ab49a8d14a2de50486de15384239f8ad4"
+    },
+    "repository_AGENTS": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/AGENTS.md",
+      "sha256": "2c104185055991f618700cc9774e71ad5a9a0e9fa2483b137a8b30f54464f9e3"
+    },
+    "canonical_contract_template": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/docmancer/templates/agent_contract.md",
+      "sha256": "9eb0a9ce7aeae6b374183886df21607082d19a05ea69e951da3b33d5909b9a6b"
+    },
+    "tool_data_source": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/docmancer/mcp/_docs_server_tool_data.py",
+      "sha256": "f4e3da7bf1ff7548dc6d4eb6aa54363024039347e86d69fe3c014a117e5252a9"
+    },
+    "surface_builder_source": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/docmancer/mcp/_docs_server_shared.py",
+      "sha256": "370440efbac53ca833b3928ae090e16625e1ee7d837f698c7dbb9a5397b9bd0e"
+    },
+    "historical_config_source": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/eval/blind_project_context/step10-agent-evaluation/renewed-raw/L0/minimal-context/opencode.json",
+      "sha256": "80482f1641d8fef2988da1033d04789e5475986512fe26ad51aa9f031a904a9a"
+    },
+    "scripted_capture_source": {
+      "path": "/workspace/scratch/66f7674793b8/DocAtlas-step10-review/eval/blind_project_context/step10-client-question-stdin/provider-1.json",
+      "sha256": "e78d021184380881abdaeabd6f7e747fde81da7f44fc1153f771e80c31a64bc6"
+    },
+    "candidate_workflow": {
+      "path": "/workspace/scratch/66f7674793b8/step10-token-ideas/prompt_audit/candidate_workflow.txt",
+      "sha256": "b9e62d1ed86e330b306cba77502ffb5442b32d70d68edeb0504ccf6196c625af"
+    },
+    "candidate_consolidated_agent": {
+      "path": "/workspace/scratch/66f7674793b8/step10-token-ideas/prompt_audit/candidate_consolidated_agent.txt",
+      "sha256": "4f2b14eec4b72289fbc6c827dd77dd72509b198cb5eae165fba57110d3886523"
+    }
+  },
+  "text_measurements": {
+    "repository_skill": {
+      "tokens": 716,
+      "utf8_bytes": 3618,
+      "sha256": "4a99f86f1ac7825ae385c79cf24fd75ab49a8d14a2de50486de15384239f8ad4"
+    },
+    "skill_workflow_without_metadata_heading_links": {
+      "tokens": 613,
+      "utf8_bytes": 3207,
+      "sha256": "93c27c51f69b17ac49ce9d3f412355899f8bb4bb4ed2797688a8c963b6993b42"
+    },
+    "skill_metadata_heading_and_links": {
+      "tokens": 103,
+      "utf8_bytes": 411,
+      "sha256": "eb27568e805177afd2963977f947422a80e167882915445055f83e5117939ce7"
+    },
+    "repository_AGENTS": {
+      "tokens": 1074,
+      "utf8_bytes": 7273,
+      "sha256": "2c104185055991f618700cc9774e71ad5a9a0e9fa2483b137a8b30f54464f9e3"
+    },
+    "canonical_contract_template": {
+      "tokens": 627,
+      "utf8_bytes": 3180,
+      "sha256": "9eb0a9ce7aeae6b374183886df21607082d19a05ea69e951da3b33d5909b9a6b"
+    },
+    "public_description_get_docs_context": {
+      "tokens": 382,
+      "utf8_bytes": 1993,
+      "sha256": "a3cb3d87512f09d86c9081d6187519fe0978f34354d5f9da4002a50c6bde484e"
+    },
+    "public_description_prepare_docs": {
+      "tokens": 33,
+      "utf8_bytes": 205,
+      "sha256": "7912696fb72333f7b89f6504454b6190cd753debc43eb9ad39d49e7fe6844a7e"
+    },
+    "public_description_docs_status": {
+      "tokens": 82,
+      "utf8_bytes": 426,
+      "sha256": "0f3799e3bd8ebca0d84e8316cbcd31d0a47a9d6abb21cc02fdbe51b3a4525b19"
+    },
+    "static_input_schema_get_docs_context": {
+      "tokens": 394,
+      "utf8_bytes": 1812,
+      "sha256": "179f3c74787a8fde9d712c929f90277c0002c7d151ee8ce1b69a7dc2d3c9772e"
+    },
+    "static_input_schema_prepare_docs": {
+      "tokens": 873,
+      "utf8_bytes": 3600,
+      "sha256": "65f335afbba6bf6df3beede7ca0e01251b9ee86ac9fe7afca2bac6f439ca067d"
+    },
+    "static_input_schema_docs_status": {
+      "tokens": 150,
+      "utf8_bytes": 675,
+      "sha256": "016d142f263365c44853e4479cd9c728fe6603bb0e249a947c7c4661e53a40de"
+    },
+    "static_three_tools_text_fallback_projection": {
+      "tokens": 1947,
+      "utf8_bytes": 8883,
+      "sha256": "d8391c2f1cbcdb1dc37cdacc2fb0bad0a293594b882d2ac8b344d86dc3864794"
+    },
+    "minimal_context_description": {
+      "tokens": 103,
+      "utf8_bytes": 602,
+      "sha256": "e6d57808833658b3d2437f69de37a564dd70f9ebaba283121c8931a94781c143"
+    },
+    "historical_configured_system": {
+      "tokens": 836,
+      "utf8_bytes": 4283,
+      "sha256": "8a54eb95603f2aef1d8ed3fc76f719f7ebc57e6879395fe12fdc2bed3a3c624c"
+    },
+    "historical_common_and_binding_prefix": {
+      "tokens": 120,
+      "utf8_bytes": 665,
+      "sha256": "c90c75d33a785fbc96ba6194488ede9953d18b0ab546622e36a25af568d66820"
+    },
+    "scripted_capture_system": {
+      "tokens": 1277,
+      "utf8_bytes": 8150,
+      "sha256": "e9047baa504641ed6c1dc6103c309f45c1d3172023f1730ab920f9ee9b054949"
+    },
+    "scripted_capture_system_without_AGENTS_counterfactual": {
+      "tokens": 203,
+      "utf8_bytes": 877,
+      "sha256": "e1a167443b51bb37580515a8ade85ca5b658a8ab3529a11764794e7defe74c32"
+    },
+    "scripted_capture_tools_json": {
+      "tokens": 101,
+      "utf8_bytes": 509,
+      "sha256": "9611f69e4a6ac6a6e389345bfb033124c92d5c12b40ab2fc3608c0a9599e7b34"
+    },
+    "candidate_workflow": {
+      "tokens": 667,
+      "utf8_bytes": 3807,
+      "sha256": "b9e62d1ed86e330b306cba77502ffb5442b32d70d68edeb0504ccf6196c625af"
+    },
+    "candidate_consolidated_agent": {
+      "tokens": 725,
+      "utf8_bytes": 4132,
+      "sha256": "4f2b14eec4b72289fbc6c827dd77dd72509b198cb5eae165fba57110d3886523"
+    },
+    "candidate_minimal_context_addendum": {
+      "tokens": 93,
+      "utf8_bytes": 482,
+      "sha256": "44d22630f04329b271cda55733fdd128c7efff650e055206e44ebcd809c55c20"
+    },
+    "candidate_consolidated_only_if_minimal_context_disabled": {
+      "tokens": 632,
+      "utf8_bytes": 3649,
+      "sha256": "8836bae2617bfec94309f9771cc9524615239dce2c54f99459871b245d943e20"
+    },
+    "historical_prefix_with_candidate_workflow": {
+      "tokens": 787,
+      "utf8_bytes": 4472,
+      "sha256": "c78060b6877e12ee998d47b27c8738d66923af35fb18019e88e2213c96026b6a"
+    }
+  },
+  "comparisons": [
+    {
+      "before": "repository_skill",
+      "after": "candidate_workflow",
+      "before_tokens": 716,
+      "after_tokens": 667,
+      "delta_tokens": -49,
+      "reduction_percent": 6.843575418994413
+    },
+    {
+      "before": "skill_workflow_without_metadata_heading_links",
+      "after": "candidate_workflow",
+      "before_tokens": 613,
+      "after_tokens": 667,
+      "delta_tokens": 54,
+      "reduction_percent": -8.809135399673735
+    },
+    {
+      "before": "historical_configured_system",
+      "after": "historical_prefix_with_candidate_workflow",
+      "before_tokens": 836,
+      "after_tokens": 787,
+      "delta_tokens": -49,
+      "reduction_percent": 5.861244019138756
+    },
+    {
+      "before": "historical_configured_system",
+      "after": "candidate_consolidated_agent",
+      "before_tokens": 836,
+      "after_tokens": 725,
+      "delta_tokens": -111,
+      "reduction_percent": 13.277511961722489
+    },
+    {
+      "before": "candidate_consolidated_agent",
+      "after": "candidate_consolidated_only_if_minimal_context_disabled",
+      "before_tokens": 725,
+      "after_tokens": 632,
+      "delta_tokens": -93,
+      "reduction_percent": 12.827586206896552
+    },
+    {
+      "before": "scripted_capture_system",
+      "after": "scripted_capture_system_without_AGENTS_counterfactual",
+      "before_tokens": 1277,
+      "after_tokens": 203,
+      "delta_tokens": -1074,
+      "reduction_percent": 84.1033672670321
+    }
+  ],
+  "historical_capture": {
+    "scripted_provider": true,
+    "paid_model_calls": 0,
+    "repository_AGENTS_exact_occurrences": 1
+  },
+  "conditional_fragment": {
+    "name": "candidate_minimal_context_addendum",
+    "omit_only_if": "actual target MCP runtime confirms minimal context is disabled",
+    "unknown_mode": "keep the full candidate",
+    "not_a_historical_baseline_comparison": true
+  },
+  "static_schema_scope": "Only the three base public name/description/inputSchema definitions in a conceptual text-fallback JSON projection. Excludes output schemas, host builtins, Code Mode lowering, advanced settings, minimal-mode overrides and the additional read_docs_source tool.",
+  "boundaries": [
+    "Not provider billing or attribution of the user-supplied 3068 system tokens.",
+    "Standalone text counts do not include message framing or all client-added text.",
+    "Static schemas are direct AST data, not a fresh installed tools/list or Code Mode prompt capture.",
+    "AGENTS counterfactual is historical attribution, not permission to remove repository instructions.",
+    "No answer-quality or behavioral equivalence claim from token counts or a rule checklist."
+  ]
+}

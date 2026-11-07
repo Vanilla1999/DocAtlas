@@ -1,0 +1,18 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "files": [
+    "docmancer/docs/application/minimal_context_selection.py",
+    "eval/blind_project_context/step10-multidoc-gate/runner.py",
+    "eval/blind_project_context/step10-multidoc-gate/prepare_review_manifest.py",
+    "eval/blind_project_context/step10-qwen-public-preflight/diagnostic.py"
+  ],
+  "checks": [
+    "AST/compile",
+    "module imports without execution",
+    "changed Python whitespace",
+    "git diff --check"
+  ],
+  "new_public_calls": 0,
+  "new_model_forwards": 0,
+  "boundary": "R3 late-failure retention reviewed statically, no fault injection"
+}

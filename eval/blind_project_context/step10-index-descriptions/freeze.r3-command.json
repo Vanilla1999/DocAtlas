@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/tmp/opencode/step9-gap-resolution/.venv/bin/python",
+    "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/experiment.py",
+    "freeze",
+    "--manifest",
+    "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/freeze.r3.json"
+  ],
+  "cwd": "/tmp/opencode/step9-gap-resolution",
+  "parent_correction": "source-description-routing-v1; all public acquisition candidates, not final answer",
+  "previous_freeze_sha256": "405229d36d09db6ba596f0eb2c4f5d84842cf1995aa3d384856b5339722320a8",
+  "diagnostic_registration": {
+    "path": "tests/diagnostic_labels.json",
+    "before_sha256": "7724a5d0bbe6cbab65961b2a84ff2c15473039a8fc59353e7b8e425c25d4d692",
+    "after_sha256": "d8b7277273aa3fb9f3b5068db8a515f3417431bc5a5c658dbc326695ba129df6",
+    "label": "behavioral (inherited existing module label; real public integration boundary)",
+    "diff_sha256": "36439370438181a0649e8a4dfa129d1fd5aa2f6c77b38f151622d67fd5eeecd0"
+  }
+}

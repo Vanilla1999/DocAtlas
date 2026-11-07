@@ -1,0 +1,618 @@
+[
+  {
+    "task_id": "C-restart",
+    "document_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These procedures apply to the unmanned reservoir station during winter operation.",
+        "useful": true
+      },
+      {
+        "heading": "Restart",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Restart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.",
+        "useful": true
+      },
+      {
+        "heading": "Inspection",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Before restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.",
+        "useful": true
+      },
+      {
+        "heading": "Indicator lamps",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.",
+        "useful": false
+      },
+      {
+        "heading": "Frozen intake",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "When ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.",
+        "useful": true
+      },
+      {
+        "heading": "Ledger storage",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Completed shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet finish",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C-child",
+    "document_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These procedures apply to the unmanned reservoir station during winter operation.",
+        "useful": false
+      },
+      {
+        "heading": "Restart",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Restart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.",
+        "useful": false
+      },
+      {
+        "heading": "Inspection",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Before restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.",
+        "useful": false
+      },
+      {
+        "heading": "Indicator lamps",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.",
+        "useful": true
+      },
+      {
+        "heading": "Frozen intake",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "When ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.",
+        "useful": false
+      },
+      {
+        "heading": "Ledger storage",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Completed shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet finish",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C-subtree",
+    "document_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These procedures apply to the unmanned reservoir station during winter operation.",
+        "useful": true
+      },
+      {
+        "heading": "Restart",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Restart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.",
+        "useful": true
+      },
+      {
+        "heading": "Inspection",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Before restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.",
+        "useful": true
+      },
+      {
+        "heading": "Indicator lamps",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.",
+        "useful": true
+      },
+      {
+        "heading": "Frozen intake",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "When ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.",
+        "useful": true
+      },
+      {
+        "heading": "Ledger storage",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Completed shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet finish",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C-noanswer",
+    "document_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137",
+    "units": [
+      {
+        "heading": "Reservoir station",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These procedures apply to the unmanned reservoir station during winter operation.",
+        "useful": false
+      },
+      {
+        "heading": "Restart",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Restart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.",
+        "useful": false
+      },
+      {
+        "heading": "Inspection",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Before restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.",
+        "useful": false
+      },
+      {
+        "heading": "Indicator lamps",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.",
+        "useful": false
+      },
+      {
+        "heading": "Frozen intake",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "When ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.",
+        "useful": false
+      },
+      {
+        "heading": "Ledger storage",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Completed shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet finish",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C-tail-ru",
+    "document_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55",
+    "units": [
+      {
+        "heading": "Relay workshop",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This workshop record concerns the ceramic timing relay used in the orchard irrigation controller.",
+        "useful": true
+      },
+      {
+        "heading": "Bench record",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The workbench has a wooden top and a steel frame. Its left drawer contains blank forms and soft pencils. The right drawer holds paper envelopes used for returning small components. A numbered stool stands beneath the bench when the room is closed. The floor is swept at the end of each shift. The wall clock is mechanical and is wound by the caretaker. The west window has a cotton curtain that reduces afternoon glare. A notice board displays the weekly cleaning rota. Visitors leave outdoor coats on hooks beside the entrance. The storage cupboard contains empty trays in three sizes. Each tray has a flat base and rounded corners. The trays are washed with plain water and dried on a rack. The rack stands beside the utility sink. The sink tap is checked for dripping on Friday afternoons. A small bin beneath the sink receives used paper towels. The caretaker empties the bin before locking the room. The room key hangs in a locked box in the reception office. Reception staff record each key loan in a ruled notebook. The notebook is replaced when its pages are full. Completed notebooks are tied with cotton string and placed in a cardboard box. The box is stored on the highest reception shelf. A stepladder is available for reaching that shelf. The ladder has rubber feet and a wooden handrail. Staff return it to the alcove after use. The alcove also contains a brush and a dustpan. The entrance mat is shaken outdoors each morning. During wet weather a second mat is placed beside it. The second mat is rolled away once the floor is dry. The ceiling has four lamps with opaque shades. Their switches are located near the entrance. A small desk lamp supplements the ceiling lamps when detailed handwriting is needed. Its cable runs behind the desk rather than across the walkway. The desk chair has a woven seat and no wheels. A cushion may be borrowed from reception. The cushion cover is washed with the curtains at the end of summer. The curtains are hung back only when completely dry. The window sill holds a wooden calendar and a glass paperweight. Neither object is used for component measurement. The paperweight prevents loose forms from blowing onto the floor. Spare forms are stored flat to prevent curling. Each new packet is opened only when the previous packet is empty. Used envelopes are recycled after their old labels have been removed. A shallow basket beside the door holds outgoing internal mail. Mail is collected after the afternoon break. The break room is located across the courtyard. Its door is closed during cleaning. Drinking cups remain in the break room and are not brought to the workbench. The courtyard path is marked with white stones. A gardener tends the plants along the path twice each month. Rainwater is collected in a barrel behind the shed. The shed stores garden tools rather than electrical components. The barrel lid stays closed to keep leaves out. These housekeeping observations are recorded for facilities staff and do not determine relay settings.\n\nThe ceramic timing relay must be configured to a delay of seventy-three seconds. After changing the delay, disconnect the orchard controller from power for twelve seconds before restoring power. A controller with a swollen relay housing must remain disconnected and be sent for replacement rather than restarted.",
+        "useful": true
+      },
+      {
+        "heading": "Parcel collection",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "Courier parcels are collected at the workshop door on Tuesdays. Parcels awaiting collection are placed on the green trolley.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C-tail-noanswer",
+    "document_sha256": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55",
+    "units": [
+      {
+        "heading": "Relay workshop",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This workshop record concerns the ceramic timing relay used in the orchard irrigation controller.",
+        "useful": false
+      },
+      {
+        "heading": "Bench record",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The workbench has a wooden top and a steel frame. Its left drawer contains blank forms and soft pencils. The right drawer holds paper envelopes used for returning small components. A numbered stool stands beneath the bench when the room is closed. The floor is swept at the end of each shift. The wall clock is mechanical and is wound by the caretaker. The west window has a cotton curtain that reduces afternoon glare. A notice board displays the weekly cleaning rota. Visitors leave outdoor coats on hooks beside the entrance. The storage cupboard contains empty trays in three sizes. Each tray has a flat base and rounded corners. The trays are washed with plain water and dried on a rack. The rack stands beside the utility sink. The sink tap is checked for dripping on Friday afternoons. A small bin beneath the sink receives used paper towels. The caretaker empties the bin before locking the room. The room key hangs in a locked box in the reception office. Reception staff record each key loan in a ruled notebook. The notebook is replaced when its pages are full. Completed notebooks are tied with cotton string and placed in a cardboard box. The box is stored on the highest reception shelf. A stepladder is available for reaching that shelf. The ladder has rubber feet and a wooden handrail. Staff return it to the alcove after use. The alcove also contains a brush and a dustpan. The entrance mat is shaken outdoors each morning. During wet weather a second mat is placed beside it. The second mat is rolled away once the floor is dry. The ceiling has four lamps with opaque shades. Their switches are located near the entrance. A small desk lamp supplements the ceiling lamps when detailed handwriting is needed. Its cable runs behind the desk rather than across the walkway. The desk chair has a woven seat and no wheels. A cushion may be borrowed from reception. The cushion cover is washed with the curtains at the end of summer. The curtains are hung back only when completely dry. The window sill holds a wooden calendar and a glass paperweight. Neither object is used for component measurement. The paperweight prevents loose forms from blowing onto the floor. Spare forms are stored flat to prevent curling. Each new packet is opened only when the previous packet is empty. Used envelopes are recycled after their old labels have been removed. A shallow basket beside the door holds outgoing internal mail. Mail is collected after the afternoon break. The break room is located across the courtyard. Its door is closed during cleaning. Drinking cups remain in the break room and are not brought to the workbench. The courtyard path is marked with white stones. A gardener tends the plants along the path twice each month. Rainwater is collected in a barrel behind the shed. The shed stores garden tools rather than electrical components. The barrel lid stays closed to keep leaves out. These housekeeping observations are recorded for facilities staff and do not determine relay settings.\n\nThe ceramic timing relay must be configured to a delay of seventy-three seconds. After changing the delay, disconnect the orchard controller from power for twelve seconds before restoring power. A controller with a swollen relay housing must remain disconnected and be sent for replacement rather than restarted.",
+        "useful": false
+      },
+      {
+        "heading": "Parcel collection",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "Courier parcels are collected at the workshop door on Tuesdays. Parcels awaiting collection are placed on the green trolley.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V-dispatch",
+    "document_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.",
+        "useful": true
+      },
+      {
+        "heading": "Dispatch",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Dispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.",
+        "useful": true
+      },
+      {
+        "heading": "Packing",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Place each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.",
+        "useful": true
+      },
+      {
+        "heading": "Label printer",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.",
+        "useful": false
+      },
+      {
+        "heading": "Partner restriction",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "A photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.",
+        "useful": true
+      },
+      {
+        "heading": "Visitor register",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Archive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.",
+        "useful": false
+      },
+      {
+        "heading": "Corridor lighting",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V-child",
+    "document_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.",
+        "useful": false
+      },
+      {
+        "heading": "Dispatch",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Dispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.",
+        "useful": false
+      },
+      {
+        "heading": "Packing",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Place each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.",
+        "useful": false
+      },
+      {
+        "heading": "Label printer",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.",
+        "useful": true
+      },
+      {
+        "heading": "Partner restriction",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "A photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.",
+        "useful": false
+      },
+      {
+        "heading": "Visitor register",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Archive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.",
+        "useful": false
+      },
+      {
+        "heading": "Corridor lighting",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V-subtree",
+    "document_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.",
+        "useful": true
+      },
+      {
+        "heading": "Dispatch",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Dispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.",
+        "useful": true
+      },
+      {
+        "heading": "Packing",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Place each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.",
+        "useful": true
+      },
+      {
+        "heading": "Label printer",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.",
+        "useful": true
+      },
+      {
+        "heading": "Partner restriction",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "A photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.",
+        "useful": true
+      },
+      {
+        "heading": "Visitor register",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Archive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.",
+        "useful": false
+      },
+      {
+        "heading": "Corridor lighting",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V-noanswer",
+    "document_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b",
+    "units": [
+      {
+        "heading": "Observatory archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "These instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.",
+        "useful": false
+      },
+      {
+        "heading": "Dispatch",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Dispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.",
+        "useful": false
+      },
+      {
+        "heading": "Packing",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Place each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.",
+        "useful": false
+      },
+      {
+        "heading": "Label printer",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.",
+        "useful": false
+      },
+      {
+        "heading": "Partner restriction",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "A photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.",
+        "useful": false
+      },
+      {
+        "heading": "Visitor register",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Archive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.",
+        "useful": false
+      },
+      {
+        "heading": "Corridor lighting",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "The archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V-tail-ru",
+    "document_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17",
+    "units": [
+      {
+        "heading": "Loom service hall",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This maintenance record applies to the pneumatic loom in the north weaving hall.",
+        "useful": true
+      },
+      {
+        "heading": "Service notebook",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The hall entrance opens onto a tiled lobby with two benches. The benches are cleaned every morning with a damp cloth. A rack above each bench holds visitor badges. Badges are returned before visitors leave the building. The lobby clock is checked against the office clock once a week. A framed drawing of the original hall hangs beside the notice board. The drawing is decorative and is not a machinery diagram. The notice board has separate spaces for social events and building maintenance. Old notices are removed at the end of each month. Spare pins are kept in a small wooden box in the office. The office desk faces a courtyard with a brick wall. The courtyard is planted with herbs in clay pots. The pots are watered by the building caretaker. A watering can stands beside the outside tap. Its handle is painted yellow to make it easy to find. The tap is covered during winter to prevent freezing. The outside broom is stored beneath the stairway. The stairway leads to a meeting room used for staff briefings. This room contains a round table and eight chairs. Extra chairs may be borrowed from the dining area. Chairs are returned after each meeting. The table is covered with a washable cloth when refreshments are served. Plates and cups are washed in the kitchen sink. Clean cups are stored upside down on a shelf. The kitchen window opens toward the loading yard. Deliveries of office stationery arrive at the yard on Thursdays. A porter brings the stationery to the office cupboard. Paper is kept on the lower shelves and envelopes on the upper shelves. Ink bottles stand in a shallow tray to contain accidental spills. The tray is wiped before new bottles are placed in it. Empty bottles go into a separate recycling box. The recycling box is collected on the first working day of each month. A wall calendar marks the collection dates. Staff write changes to the schedule on a removable card below the calendar. The card is replaced when it becomes difficult to read. Spare cards are held together with a metal clip. The clip remains in the stationery drawer. The drawer also holds rulers used for drawing lines on paper forms. The rulers are not used to adjust machinery. The corridor outside the office has a long runner rug. The rug is lifted during floor cleaning and replaced only after the tiles dry. A folding screen protects the corridor while wet cleaning is in progress. The screen has three panels connected by cloth hinges. It is stored upright behind the lobby door. The door has a brass handle polished at the beginning of each week. A small bell above the door announces arriving visitors. Visitors wait in the lobby until a member of staff arrives. Staff may offer drinking water from the lobby dispenser. Empty water containers are returned to the supplier. The dispenser is cleaned according to the supplier's building-services schedule. These building notes describe ordinary housekeeping and do not specify the operating pressure of any machine.\n\nSet the pneumatic loom supply regulator to six point two bar. After adjustment, leave the air isolation valve closed for nineteen seconds before opening it. If the supply hose shows exposed reinforcement, keep the valve closed and replace the hose before operating the loom.",
+        "useful": true
+      },
+      {
+        "heading": "Uniform cupboard",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "Clean uniforms are stored in the cedar cupboard. The laundry service collects used uniforms on Mondays.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V-tail-noanswer",
+    "document_sha256": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17",
+    "units": [
+      {
+        "heading": "Loom service hall",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This maintenance record applies to the pneumatic loom in the north weaving hall.",
+        "useful": false
+      },
+      {
+        "heading": "Service notebook",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The hall entrance opens onto a tiled lobby with two benches. The benches are cleaned every morning with a damp cloth. A rack above each bench holds visitor badges. Badges are returned before visitors leave the building. The lobby clock is checked against the office clock once a week. A framed drawing of the original hall hangs beside the notice board. The drawing is decorative and is not a machinery diagram. The notice board has separate spaces for social events and building maintenance. Old notices are removed at the end of each month. Spare pins are kept in a small wooden box in the office. The office desk faces a courtyard with a brick wall. The courtyard is planted with herbs in clay pots. The pots are watered by the building caretaker. A watering can stands beside the outside tap. Its handle is painted yellow to make it easy to find. The tap is covered during winter to prevent freezing. The outside broom is stored beneath the stairway. The stairway leads to a meeting room used for staff briefings. This room contains a round table and eight chairs. Extra chairs may be borrowed from the dining area. Chairs are returned after each meeting. The table is covered with a washable cloth when refreshments are served. Plates and cups are washed in the kitchen sink. Clean cups are stored upside down on a shelf. The kitchen window opens toward the loading yard. Deliveries of office stationery arrive at the yard on Thursdays. A porter brings the stationery to the office cupboard. Paper is kept on the lower shelves and envelopes on the upper shelves. Ink bottles stand in a shallow tray to contain accidental spills. The tray is wiped before new bottles are placed in it. Empty bottles go into a separate recycling box. The recycling box is collected on the first working day of each month. A wall calendar marks the collection dates. Staff write changes to the schedule on a removable card below the calendar. The card is replaced when it becomes difficult to read. Spare cards are held together with a metal clip. The clip remains in the stationery drawer. The drawer also holds rulers used for drawing lines on paper forms. The rulers are not used to adjust machinery. The corridor outside the office has a long runner rug. The rug is lifted during floor cleaning and replaced only after the tiles dry. A folding screen protects the corridor while wet cleaning is in progress. The screen has three panels connected by cloth hinges. It is stored upright behind the lobby door. The door has a brass handle polished at the beginning of each week. A small bell above the door announces arriving visitors. Visitors wait in the lobby until a member of staff arrives. Staff may offer drinking water from the lobby dispenser. Empty water containers are returned to the supplier. The dispenser is cleaned according to the supplier's building-services schedule. These building notes describe ordinary housekeeping and do not specify the operating pressure of any machine.\n\nSet the pneumatic loom supply regulator to six point two bar. After adjustment, leave the air isolation valve closed for nineteen seconds before opening it. If the supply hose shows exposed reinforcement, keep the valve closed and replace the hose before operating the loom.",
+        "useful": false
+      },
+      {
+        "heading": "Uniform cupboard",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "Clean uniforms are stored in the cedar cupboard. The laundry service collects used uniforms on Mondays.",
+        "useful": false
+      }
+    ]
+  }
+]

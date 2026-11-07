@@ -1,0 +1,9 @@
+{
+  "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+  "raw": {
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"content_sha256\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"continuation\":\"docatlas://source/v2/fd647781d1e34c1484def5e0\",\"line_end\":12,\"line_start\":9,\"path\":\"storage.md\",\"project_identity\":\"local:1ce2b577405e468d5f318ae8809eb77fee5b497c7f5dde31994ad635d42340eb\",\"snippet\":\"## Capacity\\n\\nThe capacity monitor reports filesystem free space every minute. A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.\\n\\n\",\"status\":\"truncated\"}"
+  }
+}

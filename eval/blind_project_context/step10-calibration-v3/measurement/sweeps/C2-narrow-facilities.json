@@ -1,0 +1,119 @@
+[
+  {
+    "threshold": -8.620765686035156,
+    "direct_units": 3,
+    "direct_ids": [
+      "unit-38db31be27198aacdd18604bd45991cad2bb8a10e34d0b6958c8bcf9599f45bc",
+      "unit-3946e3f813128722e6b9a6abad15c1b45a1161c465df2b45a7f7bc938bb727e6",
+      "unit-3ed3a95e1db6877763d4e00e9e37bcea8c5a9dec16f21b3d8735b718a98937fa"
+    ],
+    "delivered_ids": [
+      "ev-38db31be27198aacdd18604b",
+      "ev-3946e3f813128722e6b9a6ab",
+      "ev-3ed3a95e1db6877763d4e00e"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Textile conservation room",
+      "Intake notebook"
+    ],
+    "source_rows": 3,
+    "characters": 3883,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 3,
+      "delivered_spans": 3
+    }
+  },
+  {
+    "threshold": -4.9947967529296875,
+    "direct_units": 2,
+    "direct_ids": [
+      "unit-38db31be27198aacdd18604bd45991cad2bb8a10e34d0b6958c8bcf9599f45bc",
+      "unit-3946e3f813128722e6b9a6abad15c1b45a1161c465df2b45a7f7bc938bb727e6"
+    ],
+    "delivered_ids": [
+      "ev-38db31be27198aacdd18604b",
+      "ev-3946e3f813128722e6b9a6ab",
+      "ev-3ed3a95e1db6877763d4e00e"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Textile conservation room",
+      "Intake notebook"
+    ],
+    "source_rows": 3,
+    "characters": 3883,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 2,
+      "delivered_spans": 3
+    }
+  },
+  {
+    "threshold": 7.2402663230896,
+    "direct_units": 1,
+    "direct_ids": [
+      "unit-3946e3f813128722e6b9a6abad15c1b45a1161c465df2b45a7f7bc938bb727e6"
+    ],
+    "delivered_ids": [
+      "ev-3946e3f813128722e6b9a6ab",
+      "ev-3ed3a95e1db6877763d4e00e"
+    ],
+    "missing_units": [],
+    "missing_facts": [],
+    "delivered_negative_units": [
+      "Textile conservation room"
+    ],
+    "source_rows": 2,
+    "characters": 295,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 1,
+      "delivered_spans": 2
+    }
+  },
+  {
+    "threshold": 7.2402663230896005,
+    "direct_units": 0,
+    "direct_ids": [],
+    "delivered_ids": [],
+    "missing_units": [
+      "Lighting inventory"
+    ],
+    "missing_facts": [
+      "five ceiling lamps with frosted covers",
+      "Replacement covers are ordered through the buildings office."
+    ],
+    "delivered_negative_units": [],
+    "source_rows": 0,
+    "characters": 0,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 0,
+      "delivered_spans": 0
+    }
+  }
+]

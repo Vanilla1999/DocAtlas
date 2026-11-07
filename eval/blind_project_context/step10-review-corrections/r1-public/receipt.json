@@ -1,0 +1,104 @@
+{
+  "status": "PASS",
+  "boundary": "public in-process V4 observer OFF/ON, passive return hook; diagnostic keep-all",
+  "public_prepares": 1,
+  "public_queries": 2,
+  "exact_public_packet_parity": true,
+  "exact_scores_parity": true,
+  "source_hashes": {
+    "docs/guide.md": "538db56b1a7d654cadb1d171599f34bdedba170c36c0b21ec1f43191453b237b",
+    "docs/other.md": "2ae42191c7481d7ea15a2da9a5fc0f5da1b2a4ae2c6b4aa297fbcd6c366029bd"
+  },
+  "logical_db_sha256": "0601f0660e646db50da9cf1983db941818402556406e102bbe9e47ab21e1b887",
+  "receipts": {
+    "off": {
+      "recipe": "complete-fit-first-maxp-v4",
+      "status": "complete",
+      "units": 9,
+      "model_pairs": 11,
+      "model_forwards": 9,
+      "model_input_tokens": 3837,
+      "inference_seconds": 0.2862766990074306,
+      "model_load_attempts": 1,
+      "model_loads": 1,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "max_raw_logit",
+      "intervals_recorded": 0,
+      "intervals_omitted": 11,
+      "asset_verification_seconds": 0.26071445300476626,
+      "model_import_seconds": 2.4718223540039617,
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "model_load_seconds": 3.3728246799946646,
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        10
+      ],
+      "total_seconds": 3.6709667019968037
+    },
+    "on": {
+      "recipe": "complete-fit-first-maxp-v4",
+      "status": "complete",
+      "units": 9,
+      "model_pairs": 11,
+      "model_forwards": 9,
+      "model_input_tokens": 3837,
+      "inference_seconds": 0.3323851440072758,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "max_raw_logit",
+      "intervals_recorded": 11,
+      "intervals_omitted": 0,
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        10
+      ],
+      "total_seconds": 0.3426746249970165
+    }
+  }
+}

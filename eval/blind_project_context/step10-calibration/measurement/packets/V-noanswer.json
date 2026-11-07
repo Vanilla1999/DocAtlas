@@ -1,0 +1,50 @@
+{
+  "status": "insufficient_evidence",
+  "kind": "docs_context",
+  "missing": [
+    "No structural unit met the frozen empirical relevance threshold."
+  ],
+  "estimated_tokens": 287,
+  "context_quality": {
+    "status": "unavailable",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "context_available": false,
+  "answer_supported": false,
+  "answer_available": false,
+  "edit_ready": false,
+  "support_status": "insufficient_evidence",
+  "sources": [],
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+    "calibration_status": "empirical",
+    "candidate_units": 7,
+    "selected_units": 0,
+    "delivered_rows": 0,
+    "scan_complete": true,
+    "model_pairs": 7,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 7,
+      "hydrated_sections": 7,
+      "selected_units": 0,
+      "delivered_spans": 0
+    }
+  },
+  "reason_code": "no_relevant_source_context",
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "ba1d2679f9744fbb15d78277887704c1e434eccc78b07e1f95ccb0215d1ff0fa"
+  }
+}

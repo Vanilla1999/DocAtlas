@@ -1,0 +1,63 @@
+{
+  "schema": "bounded-public-profile-v2",
+  "python": "/tmp/opencode/step10-mini-py313/bin/python",
+  "module": "/tmp/opencode/step9-gap-resolution/docmancer/__init__.py",
+  "config": "/tmp/opencode/terra-step10-final/L2/minimal-context/opencode.json",
+  "import_mode": "source_comparison",
+  "request": {
+    "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?"
+  },
+  "diagnostic_seconds": 30,
+  "result_claim": "diagnostic_only_not_product_success",
+  "model_counters": {
+    "model_pairs": 0,
+    "model_forwards": 0,
+    "model_load_attempts": 0
+  },
+  "interrupted_stack": [
+    "  File \"/tmp/opencode/step9-gap-resolution/eval/blind_project_context/profile_minimal_context.py\", line 125, in <module>\n    main()\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/eval/blind_project_context/profile_minimal_context.py\", line 85, in main\n    result = call_docs_tool_payload(\"get_docs_context\", request, service)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/application/query_trace.py\", line 103, in wrapped\n    return function(*args, **kwargs)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/mcp/_docs_server_part01.py\", line 272, in call_docs_tool_payload\n    payload = handler(name, handler_args, active_service)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/interfaces/mcp/context_tools.py\", line 333, in handle_context_tool\n    return _handle_prepared_context_tool(name, prepared_args, service)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/domain/original_body_discovery.py\", line 132, in scoped\n    return handler(name, args, service)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/interfaces/mcp/context_tools.py\", line 360, in _handle_prepared_context_tool\n    result = _invoke_found_window_retention(app.get_docs_context,\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/domain/project_doc_ranking.py\", line 324, in _invoke_found_window_retention\n    return function(*args, **kwargs)\n",
+    "  File \"<string>\", line 3, in __docatlas_shard_wrapper_get_docs_context_79a74db98ae0\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/domain/original_body_discovery.py\", line 61, in scoped\n    return method(*positional, **keywords)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/domain/project_doc_ranking.py\", line 306, in produce\n    return function(*args, **kwargs)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/application/_unified_context_service_part01.py\", line 301, in get_docs_context\n    context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=project_path)\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/domain/content_trust.py\", line 20, in annotate_context_pack\n    policy_scope = _policy_scope(path, repository_root=repository_root) if scope == \"project\" else None\n",
+    "  File \"/tmp/opencode/step9-gap-resolution/docmancer/docs/domain/content_trust.py\", line 82, in _policy_scope\n    resolved = candidate.resolve()\n",
+    "  File \"/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py\", line 670, in resolve\n    return self.with_segments(os.path.realpath(self, strict=strict))\n",
+    "  File \"<frozen posixpath>\", line 433, in realpath\n"
+  ],
+  "outcome": "diagnostic_aborted_30s",
+  "elapsed_seconds": 30.158822133002104,
+  "phases": [
+    {
+      "file": "/tmp/opencode/step9-gap-resolution/docmancer/retrieval/_dispatch_part01.py",
+      "function": "run",
+      "calls": 1,
+      "cumulative_seconds": 2.138638654,
+      "own_seconds": 0.01956066
+    },
+    {
+      "file": "/tmp/opencode/step9-gap-resolution/docmancer/docs/application/_project_docs_service_part03.py",
+      "function": "_qualify_candidate_lookups",
+      "calls": 1,
+      "cumulative_seconds": 6.167989617000001,
+      "own_seconds": 0.101950831
+    },
+    {
+      "file": "/tmp/opencode/step9-gap-resolution/docmancer/docs/application/source_reference_evidence.py",
+      "function": "prepare",
+      "calls": 1,
+      "cumulative_seconds": 4.3793937210000005,
+      "own_seconds": 0.140747346
+    }
+  ],
+  "model_counter_boundary": "scorer_not_entered",
+  "inputs_unchanged": true,
+  "watched_file_count": 490
+}

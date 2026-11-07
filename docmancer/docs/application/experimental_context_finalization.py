@@ -132,7 +132,9 @@ def project_native_rank_context(*, retrieval: dict, max_tokens: int | None = Non
         snapshot[row["evidence_id"]] = _snapshot_entry(original, row)
         seen.add(key)
     from .experimental_set_selection import select_checked_windows
-    rows = select_checked_windows(question, rows)
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if not minimal_context_enabled():
+        rows = select_checked_windows(question, rows)
     decision = context_selection_decision(rows, tuple(queries))
     payload = _payload(rows, decision=decision, query_plan=plan)
     _mark_unassessed(payload)

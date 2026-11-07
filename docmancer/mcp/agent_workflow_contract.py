@@ -21,7 +21,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "lookup_coverage_transfers_to_original": False,
         "source_link_requires_read": False,
         "false_or_unverified_flags_require_read": False,
-        "continuation_requires": "explicit_lookup_or_issued_bounded_source_read",
+        "continuation_requires": "issued_context_portion_or_explicit_lookup_or_issued_bounded_source_read",
         "repeat_same_source_span": False,
         "authorizes_edit": False,
         "mutation_requires_separate_explicit_target_and_authorization": True,
@@ -87,7 +87,18 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "inferred_semantic_equivalence": False,
     },
     "gap_resolution": {
-        "continuation_requires": "explicit_lookup_or_issued_bounded_source_read",
+        "check_before_answer": "requested_aspects_and_source_stated_prerequisites_exceptions_side_effects",
+        "prefer_known_source_path": True,
+        "source_path": "exact_returned_or_user_supplied_relative_path_same_scope_new_first_portion",
+        "source_path_lookup_slots": 1,
+        "source_path_max_tokens": 2400,
+        "source_resource_reads": "adjacent_text_not_arbitrary_sections_or_citation_resolution",
+        "repeat_exhausted_focused_search": False,
+        "continuation_requires": "issued_context_portion_or_explicit_lookup_or_issued_bounded_source_read",
+        "context_portion_arguments": "same_query_scope_and_issued_continuation_token",
+        "context_portion_stale": "restart_at_first_portion",
+        "context_portion_stop": ["gap_answered", "no_next_portion", "no_useful_new_evidence", "host_budget"],
+        "context_portion_count_is_answer_coverage": False,
         "root_question_immutable": True,
         "inferred_subquestions": False,
         "scope_and_budget_limits_unchanged": True,
@@ -225,9 +236,11 @@ def runtime_public_tool_dicts() -> tuple[dict[str, Any], ...]:
     surface = build_docs_surface(DocsServerConfig())
     tools = tuple(spec.to_tool_dict() for spec in surface.tools)
     names = tuple(tool["name"] for tool in tools)
-    if names != PUBLIC_TOOL_ORDER:
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    expected = (*PUBLIC_TOOL_ORDER, "read_docs_source") if minimal_context_enabled() else PUBLIC_TOOL_ORDER
+    if names != expected:
         raise RuntimeError(
-            f"public Docs MCP tool order drifted: expected {PUBLIC_TOOL_ORDER!r}, got {names!r}"
+            f"public Docs MCP tool order drifted: expected {expected!r}, got {names!r}"
         )
     return deepcopy(tools)
 
@@ -245,9 +258,25 @@ def public_agent_contract() -> dict[str, Any]:
             }
         )
 
+    workflow = deepcopy(WORKFLOW_POLICY)
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled, EMERGENCY_TOKENS
+    if minimal_context_enabled():
+        workflow["free_form_lookup"].update(maximum_lookup_queries=None,
+            semantic_lanes="unchanged_original_and_supplied_full_translation_max")
+        workflow["gap_resolution"].update(source_path_lookup_slots=0, source_path_max_tokens=None,
+            source_resource_reads="whole_authorized_structural_blocks_to_exhaustion",
+            source_read_tool="read_docs_source", emergency_tokens=EMERGENCY_TOKENS,
+            context_portion_stop=["gap_answered", "no_next_portion", "no_useful_new_evidence", "context_emergency_stop"])
+        workflow["minimal_context_candidate"] = {
+            "default_enabled": False, "context_quality": "unverified",
+            "emergency_is_selection_budget": False,
+            "read_returned_conditions_and_exceptions": True,
+            "identify_concrete_missing_aspect_before_another_call": True,
+            "semantic_rejections_are_deferred_pages": False,
+        }
     payload: dict[str, Any] = {
         "schema": CONTRACT_SCHEMA,
-        "workflow": deepcopy(WORKFLOW_POLICY),
+        "workflow": workflow,
         "examples": deepcopy(list(PUBLIC_EXAMPLES)),
         "tools": tool_records,
     }

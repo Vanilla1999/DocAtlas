@@ -1,0 +1,102 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-f9d776c11c37ca7f35ca5a98",
+      "path_or_url": "loom.md",
+      "section": "Loom service hall",
+      "snippet": "# Loom service hall\n\nThis maintenance record applies to the pneumatic loom in the north weaving hall.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "cdd0d8b4acdf4819ded3cad7f15ec3c4c4db078487ab99070bcafed3ed21b990",
+      "project_identity": "local:870d938b72bf18ed73a73e7252b5be10d2b64c62ac9a9518d923ef325be1de74",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/657c56c973cad4c935c49267"
+    },
+    {
+      "evidence_id": "ev-0183b955f96fb0bfa066c981",
+      "path_or_url": "loom.md",
+      "section": "Loom service hall > Service notebook",
+      "snippet": "## Service notebook\n\nThe hall entrance opens onto a tiled lobby with two benches. The benches are cleaned every morning with a damp cloth. A rack above each bench holds visitor badges. Badges are returned before visitors leave the building. The lobby clock is checked against the office clock once a week. A framed drawing of the original hall hangs beside the notice board. The drawing is decorative and is not a machinery diagram. The notice board has separate spaces for social events and building maintenance. Old notices are removed at the end of each month. Spare pins are kept in a small wooden box in the office. The office desk faces a courtyard with a brick wall. The courtyard is planted with herbs in clay pots. The pots are watered by the building caretaker. A watering can stands beside the outside tap. Its handle is painted yellow to make it easy to find. The tap is covered during winter to prevent freezing. The outside broom is stored beneath the stairway. The stairway leads to a meeting room used for staff briefings. This room contains a round table and eight chairs. Extra chairs may be borrowed from the dining area. Chairs are returned after each meeting. The table is covered with a washable cloth when refreshments are served. Plates and cups are washed in the kitchen sink. Clean cups are stored upside down on a shelf. The kitchen window opens toward the loading yard. Deliveries of office stationery arrive at the yard on Thursdays. A porter brings the stationery to the office cupboard. Paper is kept on the lower shelves and envelopes on the upper shelves. Ink bottles stand in a shallow tray to contain accidental spills. The tray is wiped before new bottles are placed in it. Empty bottles go into a separate recycling box. The recycling box is collected on the first working day of each month. A wall calendar marks the collection dates. Staff write changes to the schedule on a removable card below the calendar. The card is replaced when it becomes difficult to read. Spare cards are held together with a metal clip. The clip remains in the stationery drawer. The drawer also holds rulers used for drawing lines on paper forms. The rulers are not used to adjust machinery. The corridor outside the office has a long runner rug. The rug is lifted during floor cleaning and replaced only after the tiles dry. A folding screen protects the corridor while wet cleaning is in progress. The screen has three panels connected by cloth hinges. It is stored upright behind the lobby door. The door has a brass handle polished at the beginning of each week. A small bell above the door announces arriving visitors. Visitors wait in the lobby until a member of staff arrives. Staff may offer drinking water from the lobby dispenser. Empty water containers are returned to the supplier. The dispenser is cleaned according to the supplier's building-services schedule. These building notes describe ordinary housekeeping and do not specify the operating pressure of any machine.\n\nSet the pneumatic loom supply regulator to six point two bar. After adjustment, leave the air isolation valve closed for nineteen seconds before opening it. If the supply hose shows exposed reinforcement, keep the valve closed and replace the hose before operating the loom.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "cfae82ad67c8dee5d128a54a478777e85a99f28c4c4db79338fa5be18706db1d",
+      "project_identity": "local:870d938b72bf18ed73a73e7252b5be10d2b64c62ac9a9518d923ef325be1de74",
+      "line_start": 5,
+      "line_end": 10,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/68ceb253f14b5bc708090a9a"
+    },
+    {
+      "evidence_id": "ev-4a9b8718580249746fe80935",
+      "path_or_url": "loom.md",
+      "section": "Loom service hall > Uniform cupboard",
+      "snippet": "## Uniform cupboard\n\nClean uniforms are stored in the cedar cupboard. The laundry service collects used uniforms on Mondays.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "808e4848a6e5aaad4ac194e140b55fb05ad175c6275c403e5437b38dad8df6bf",
+      "project_identity": "local:870d938b72bf18ed73a73e7252b5be10d2b64c62ac9a9518d923ef325be1de74",
+      "line_start": 11,
+      "line_end": 13,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/7d70571357b03b0f4e9f6ccf"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1562,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+    "calibration_status": "empirical",
+    "candidate_units": 3,
+    "selected_units": 2,
+    "delivered_rows": 3,
+    "scan_complete": true,
+    "model_pairs": 5,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 2,
+      "delivered_spans": 3
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "368e940e6bf859617f16ae4c09a9c14a2164c7855997fc3216dbb7febe013b13"
+  }
+}

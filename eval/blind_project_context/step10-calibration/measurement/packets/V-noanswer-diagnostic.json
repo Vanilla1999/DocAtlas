@@ -1,0 +1,400 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-8b408880611a47bde7a47c8c",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive",
+      "snippet": "# Observatory archive\n\nThese instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "af2346e74420595ce29c3cefdba2997e8541be5a25edea4a139cf1e69617a156",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/30ece3627184abafa0827ba9"
+    },
+    {
+      "evidence_id": "ev-5cfbb17e1f76ab196267cac6",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch",
+      "snippet": "## Dispatch\n\nDispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "78566564c187eaa3575211e5868f3b327e2c756c27f3b86aad016dc7d14febde",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/4808bd78fca9916b1b125e10"
+    },
+    {
+      "evidence_id": "ev-2b7d05b03598c6430fa83985",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch > Packing",
+      "snippet": "### Packing\n\nPlace each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0a54cfa49cb91f65103db7fdee4215fbd0d25cfd375fbc2dc84fd2de891a67e5",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 9,
+      "line_end": 12,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/7dae14f846f5c1d64749936c"
+    },
+    {
+      "evidence_id": "ev-5f0a9c0c9d62f62f2cd8d3b4",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch > Label printer",
+      "snippet": "### Label printer\n\nThe label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "1a7ec70ba13ea63c05ad86fe197e502eac119d19efc242673c78c8b546a046d3",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/b0b80ee1bed623fc0c58a8bd"
+    },
+    {
+      "evidence_id": "ev-bb32e7b34b64f446f705f1f9",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Partner restriction",
+      "snippet": "## Partner restriction\n\nA photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f720f0912dc056cb92724c901eccc7b3e72546e6d4797a9fcb63888065275f55",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 17,
+      "line_end": 20,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/42897038ce7d354f2af72b4a"
+    },
+    {
+      "evidence_id": "ev-2ffffd53b7253a2541a7798f",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Visitor register",
+      "snippet": "## Visitor register\n\nArchive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "a02d2d045fed0985f2b1cfbe67c09fd85a1cc405874d29a567168fbfd01cb54b",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 21,
+      "line_end": 24,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/48d8db8231a332567e53a7ee"
+    },
+    {
+      "evidence_id": "ev-b21a146e26fe4e58ad55ee1d",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Corridor lighting",
+      "snippet": "## Corridor lighting\n\nThe archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "6c6742764ee5dc86763c2dac871913b9e914f938892a0daa43e6f1690e0a6df1",
+      "project_identity": "local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d",
+      "line_start": 25,
+      "line_end": 27,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/cd99c6ef2d4d31b916a9eab9"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 4801,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "diagnostic-unverified",
+    "calibration_status": "diagnostic_unverified",
+    "candidate_units": 7,
+    "selected_units": 7,
+    "delivered_rows": 7,
+    "scan_complete": true,
+    "model_pairs": 7,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 7,
+      "hydrated_sections": 7,
+      "selected_units": 7,
+      "delivered_spans": 7
+    },
+    "minimal_semantic": {
+      "scores": [
+        {
+          "identity": "unit-8b408880611a47bde7a47c8c7df34d1cc53ee329425f3f06d19ce47bdf27a76f",
+          "score": -8.11699390411377,
+          "pairs": 1,
+          "body_tokens": 24,
+          "ancestor_tokens": 5,
+          "body_token_coverage": [
+            0,
+            24
+          ],
+          "body_character_extent": [
+            1,
+            128
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 152,
+          "body_char_start": 22,
+          "heading_path": [
+            "Observatory archive"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-5cfbb17e1f76ab196267cac63c65e52eb4eb87fa551578ecf5058c8c038d1325",
+          "score": -8.606745719909668,
+          "pairs": 1,
+          "body_tokens": 43,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            43
+          ],
+          "body_character_extent": [
+            1,
+            194
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 152,
+          "char_end": 360,
+          "body_char_start": 164,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-2b7d05b03598c6430fa839855304bea816363e7dbd2a7d3b638f6a96362229ae",
+          "score": -8.886576652526855,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            129
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 360,
+          "char_end": 503,
+          "body_char_start": 372,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Packing"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-5f0a9c0c9d62f62f2cd8d3b4f5022ecb806b9c8134be91196b7510b4ea3807d5",
+          "score": -8.934269905090332,
+          "pairs": 1,
+          "body_tokens": 37,
+          "ancestor_tokens": 80,
+          "body_token_coverage": [
+            0,
+            37
+          ],
+          "body_character_extent": [
+            1,
+            156
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 503,
+          "char_end": 679,
+          "body_char_start": 521,
+          "heading_path": [
+            "Observatory archive",
+            "Dispatch",
+            "Label printer"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-bb32e7b34b64f446f705f1f91b60d010b2d20b77b82f72b0362ac67920726fb1",
+          "score": -8.330435752868652,
+          "pairs": 1,
+          "body_tokens": 40,
+          "ancestor_tokens": 32,
+          "body_token_coverage": [
+            0,
+            40
+          ],
+          "body_character_extent": [
+            1,
+            200
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 679,
+          "char_end": 904,
+          "body_char_start": 702,
+          "heading_path": [
+            "Observatory archive",
+            "Partner restriction"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-2ffffd53b7253a2541a7798fbe92965e2603f734b293c0f8f7e73ac144db0dd5",
+          "score": -8.842209815979004,
+          "pairs": 1,
+          "body_tokens": 23,
+          "ancestor_tokens": 33,
+          "body_token_coverage": [
+            0,
+            23
+          ],
+          "body_character_extent": [
+            1,
+            113
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 904,
+          "char_end": 1039,
+          "body_char_start": 924,
+          "heading_path": [
+            "Observatory archive",
+            "Visitor register"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        },
+        {
+          "identity": "unit-b21a146e26fe4e58ad55ee1d0a4b4b8a3c358e2c008af62bc0926b8d2422ea69",
+          "score": -8.533122062683105,
+          "pairs": 1,
+          "body_tokens": 27,
+          "ancestor_tokens": 34,
+          "body_token_coverage": [
+            0,
+            27
+          ],
+          "body_character_extent": [
+            1,
+            126
+          ],
+          "path": "observatory.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"_source_snapshot_sha256\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"member\":{\"catalog_entry_hash\":\"sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"observatory.md\",\"content_sha256\":\"a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b\",\"document_id\":\"project_file:local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d:observatory.md\",\"scope\":{\"project_id\":\"local:aab9dc703acc3da501b58414194c3a6874093ab30032bc097c0490c78f5a637d\",\"snapshot_id\":\"gen-e87c517df295451d84b952cf1900dec0\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 1039,
+          "char_end": 1187,
+          "body_char_start": 1060,
+          "heading_path": [
+            "Observatory archive",
+            "Corridor lighting"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 667,
+        "inference_seconds": 0.07103256699701888,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          16
+        ],
+        "total_seconds": 0.07419434199982788
+      }
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "e7cd8b3700cb5c6422d4257033d579193810a3f0cef49af1fb6cda9439f72a89"
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "boundary": "installed_in_process_public_MCP_handler_with_passive_observer",
+  "case": "original-v3",
+  "request": {
+    "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?"
+  },
+  "python": "/tmp/opencode/step10-v3-py313/bin/python",
+  "module": "/tmp/opencode/step10-v3-py313/lib/python3.13/site-packages/docmancer/__init__.py",
+  "code_files_equal": 434,
+  "seconds": 38.289938148001966,
+  "public_calls": 1,
+  "terra_calls": 0,
+  "sources_and_logical_database_unchanged": true,
+  "exact_source_spans_checked": 72,
+  "facts": [
+    false,
+    false,
+    false
+  ],
+  "selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+    "calibration_status": "empirical",
+    "candidate_units": 157,
+    "selected_units": 34,
+    "delivered_rows": 72,
+    "scan_complete": true,
+    "model_pairs": 900,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "incomplete_dependency",
+      "documents": 19,
+      "incomplete_dependencies": [
+        {
+          "reason_code": "incomplete_dependency",
+          "path": "README.md",
+          "char_start": 72,
+          "target": "./docs/capabilities.md#end-to-end-examples-of-current-behavior",
+          "reason": "target_not_in_checked_scope"
+        },
+        {
+          "reason_code": "incomplete_dependency",
+          "path": "wiki/Configuration.md",
+          "char_start": 6151,
+          "target": "./Architecture.md#mcp-runtime",
+          "reason": "missing_or_ambiguous_anchor"
+        }
+      ],
+      "units": 157,
+      "hydrated_sections": 162,
+      "selected_units": 34,
+      "delivered_spans": 72
+    }
+  },
+  "scoring": {
+    "recipe": "complete-own-body-gated-maxp-v2",
+    "status": "complete",
+    "units": 157,
+    "model_pairs": 900,
+    "model_forwards": 323,
+    "model_input_tokens": 341394,
+    "inference_seconds": 33.30867125403893,
+    "model_load_attempts": 1,
+    "model_loads": 1,
+    "coverage": "all_query_body_ancestor_tokens",
+    "aggregation": "min_contextual_and_own_body_max_raw_logit",
+    "asset_verification_seconds": 0.25930368500121403,
+    "model_import_seconds": 1.3752744800003711,
+    "model": {
+      "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+      "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+      "assets_sha256": {
+        "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+        "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+        "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+        "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+        "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+        "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+      },
+      "device": "cpu",
+      "dtype": "FP32",
+      "torch": "2.10.0+cpu",
+      "transformers": "4.57.1",
+      "threads": 8,
+      "interop_threads": 16,
+      "max_length": 512,
+      "truncation": false,
+      "score": "raw_logits[0,0]",
+      "tie_break": "original_pool_index"
+    },
+    "model_load_seconds": 2.212908214998606,
+    "maximum_sequence_length": 512,
+    "pair_special_tokens": 4,
+    "query_tokens": [
+      17
+    ],
+    "total_seconds": 35.91912373800005,
+    "own_body_gate": true
+  },
+  "contributing": [
+    {
+      "rank": 68,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Documentation MCP changes"
+      ],
+      "line_start": 34,
+      "line_end": 39,
+      "score": -4.859125137329102,
+      "contextual_score": -4.859125137329102,
+      "own_body_score": -4.384776592254639,
+      "pairs": 2,
+      "body_tokens": 199,
+      "ancestor_tokens": 63
+    },
+    {
+      "rank": 72,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Adding a new doc source (fetcher)"
+      ],
+      "line_start": 40,
+      "line_end": 44,
+      "score": -4.930008411407471,
+      "contextual_score": -4.930008411407471,
+      "own_body_score": -4.275141716003418,
+      "pairs": 2,
+      "body_tokens": 75,
+      "ancestor_tokens": 68
+    },
+    {
+      "rank": 78,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Adding a new document parser"
+      ],
+      "line_start": 29,
+      "line_end": 33,
+      "score": -5.12653112411499,
+      "contextual_score": -5.12653112411499,
+      "own_body_score": -4.272816181182861,
+      "pairs": 2,
+      "body_tokens": 60,
+      "ancestor_tokens": 65
+    },
+    {
+      "rank": 82,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Submitting a PR"
+      ],
+      "line_start": 59,
+      "line_end": 63,
+      "score": -5.191558361053467,
+      "contextual_score": -5.191558361053467,
+      "own_body_score": -4.345316410064697,
+      "pairs": 2,
+      "body_tokens": 44,
+      "ancestor_tokens": 63
+    },
+    {
+      "rank": 85,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Project structure"
+      ],
+      "line_start": 7,
+      "line_end": 28,
+      "score": -5.327067852020264,
+      "contextual_score": -4.82042121887207,
+      "own_body_score": -5.327067852020264,
+      "pairs": 2,
+      "body_tokens": 228,
+      "ancestor_tokens": 60
+    },
+    {
+      "rank": 109,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas"
+      ],
+      "line_start": 1,
+      "line_end": 6,
+      "score": -6.041884899139404,
+      "contextual_score": -6.041884899139404,
+      "own_body_score": -6.041884899139404,
+      "pairs": 2,
+      "body_tokens": 49,
+      "ancestor_tokens": 8
+    },
+    {
+      "rank": 112,
+      "path": "CONTRIBUTING.md",
+      "heading_path": [
+        "Contributing to DocAtlas",
+        "Running tests"
+      ],
+      "line_start": 45,
+      "line_end": 58,
+      "score": -6.125243186950684,
+      "contextual_score": -6.125243186950684,
+      "own_body_score": -5.676768779754639,
+      "pairs": 2,
+      "body_tokens": 64,
+      "ancestor_tokens": 61
+    }
+  ]
+}

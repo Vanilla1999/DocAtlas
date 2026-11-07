@@ -1,0 +1,53 @@
+code_files: []
+documents:
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  path: architecture.md
+  role: other
+  scope: project
+  status: active
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  path: colour.md
+  role: other
+  scope: project
+  status: active
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  module_path: modules/camera
+  path: modules/camera/private.md
+  role: other
+  scope: module
+  status: active
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  path: overview.md
+  role: other
+  scope: project
+  status: active
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  path: publication.md
+  role: other
+  scope: project
+  status: active
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  path: recovery.md
+  role: other
+  scope: project
+  status: active
+- authority: source_of_truth
+  description: Pinned documentation source
+  impact: track
+  path: withdrawal.md
+  role: other
+  scope: project
+  status: active
+schema_version: 1

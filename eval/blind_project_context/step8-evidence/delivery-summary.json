@@ -1,0 +1,2164 @@
+{
+  "schema_version": 1,
+  "studies": {
+    "baseline": {
+      "score_sha256": "9dd741ad4c4986d0e107779c4c659ee623a5e8e9e095a1dbd5920351b1d5e21d",
+      "source_tree": {
+        "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:16:28+00:00",
+        "eval_tree": {
+          "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/blind-baseline-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/blind-baseline-work/L0-0/project",
+            "prepare_seconds": 0.392,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/blind-baseline-work/L2-0/project",
+            "prepare_seconds": 21.741,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/blind-baseline-work/L0-1/project",
+            "prepare_seconds": 0.435,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/blind-baseline-work/L2-1/project",
+            "prepare_seconds": 22.883,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/blind-baseline-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 176,
+        "facts_total": 260,
+        "all_found": 62,
+        "mean_output_tokens": 8590.2,
+        "median_output_tokens": 9698.5,
+        "total_output_tokens": 824656,
+        "mean_output_bytes": 34887.0,
+        "calls": 96,
+        "delivery_budget_cases": 49,
+        "reference_limit_cases": 0
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 10,
+          "output_budget": 6,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 104475,
+          "utf8_bytes": 406948,
+          "calls": 12,
+          "seconds": 55.1
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 11,
+          "output_budget": 7,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 106328,
+          "utf8_bytes": 431024,
+          "calls": 12,
+          "seconds": 63.0
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 66564,
+          "utf8_bytes": 264028,
+          "calls": 12,
+          "seconds": 109.1
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 18,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 16,
+          "facts_total": 37,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 11,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 116719,
+          "utf8_bytes": 501177,
+          "calls": 12,
+          "seconds": 245.8
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 21,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 4,
+          "facts_total": 28,
+          "all_found": 9,
+          "limit_reached": 10,
+          "output_budget": 7,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 121251,
+          "utf8_bytes": 476629,
+          "calls": 12,
+          "seconds": 61.7
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 24,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 4,
+          "facts_total": 28,
+          "all_found": 10,
+          "limit_reached": 11,
+          "output_budget": 9,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 117235,
+          "utf8_bytes": 475199,
+          "calls": 12,
+          "seconds": 64.5
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 7,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 75154,
+          "utf8_bytes": 300152,
+          "calls": 12,
+          "seconds": 119.9
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 11,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 14,
+          "facts_total": 28,
+          "all_found": 3,
+          "limit_reached": 12,
+          "output_budget": 9,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 116930,
+          "utf8_bytes": 493996,
+          "calls": 12,
+          "seconds": 242.6
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 105,
+          "not_acquired": 12,
+          "not_observed": 31
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 31,
+            "not_acquired": 3,
+            "not_observed": 3
+          },
+          "dev/L0/ru": {
+            "delivered": 31,
+            "not_acquired": 3,
+            "not_observed": 3
+          },
+          "dev/L2/en": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          },
+          "dev/L2/ru": {
+            "delivered": 18,
+            "not_acquired": 3,
+            "not_observed": 16
+          }
+        }
+      },
+      "cumulative_portions": {}
+    },
+    "portions": {
+      "score_sha256": "6367aa545904700e1aea79faa744c520871f25b7d88270f71c5b0da652441d31",
+      "source_tree": {
+        "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:33:55+00:00",
+        "eval_tree": {
+          "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/step8-evidence/final/full-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/step8-evidence/final/full-work/L0-0/project",
+            "prepare_seconds": 0.484,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/step8-evidence/final/full-work/L2-0/project",
+            "prepare_seconds": 20.795,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/step8-evidence/final/full-work/L0-1/project",
+            "prepare_seconds": 0.582,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/step8-evidence/final/full-work/L2-1/project",
+            "prepare_seconds": 22.116,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/step8-evidence/final/full-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1",
+        "BLIND_OBSERVER_SELECTION": "1"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 176,
+        "facts_total": 260,
+        "all_found": 62,
+        "mean_output_tokens": 8631.8,
+        "median_output_tokens": 9713.0,
+        "total_output_tokens": 828657,
+        "mean_output_bytes": 34994,
+        "calls": 96,
+        "delivery_budget_cases": 49,
+        "reference_limit_cases": 0
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 10,
+          "output_budget": 6,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 104807,
+          "utf8_bytes": 408418,
+          "calls": 12,
+          "seconds": 60.8
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 11,
+          "output_budget": 7,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 106448,
+          "utf8_bytes": 431285,
+          "calls": 12,
+          "seconds": 67.5
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 67374,
+          "utf8_bytes": 266338,
+          "calls": 12,
+          "seconds": 114.5
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 18,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 16,
+          "facts_total": 37,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 11,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 117123,
+          "utf8_bytes": 501054,
+          "calls": 12,
+          "seconds": 256.1
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 21,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 4,
+          "facts_total": 28,
+          "all_found": 9,
+          "limit_reached": 10,
+          "output_budget": 7,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 121740,
+          "utf8_bytes": 478214,
+          "calls": 12,
+          "seconds": 66.1
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 24,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 4,
+          "facts_total": 28,
+          "all_found": 10,
+          "limit_reached": 11,
+          "output_budget": 9,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 117934,
+          "utf8_bytes": 477295,
+          "calls": 12,
+          "seconds": 72.7
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 7,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 75924,
+          "utf8_bytes": 302363,
+          "calls": 12,
+          "seconds": 131.5
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 11,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 14,
+          "facts_total": 28,
+          "all_found": 3,
+          "limit_reached": 12,
+          "output_budget": 9,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 117307,
+          "utf8_bytes": 494457,
+          "calls": 12,
+          "seconds": 280.9
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 105,
+          "delivery_budget": 9,
+          "nonpositive_gain": 7,
+          "not_acquired": 12,
+          "pool_pruning": 15
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 31,
+            "delivery_budget": 2,
+            "nonpositive_gain": 1,
+            "not_acquired": 3
+          },
+          "dev/L0/ru": {
+            "delivered": 31,
+            "nonpositive_gain": 3,
+            "not_acquired": 3
+          },
+          "dev/L2/en": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "pool_pruning": 9
+          },
+          "dev/L2/ru": {
+            "delivered": 18,
+            "delivery_budget": 7,
+            "nonpositive_gain": 3,
+            "not_acquired": 3,
+            "pool_pruning": 6
+          }
+        }
+      },
+      "cumulative_portions": {
+        "2": {
+          "aggregate": {
+            "cases": 96,
+            "facts_found": 205,
+            "facts_total": 260,
+            "all_found": 72,
+            "mean_output_tokens": 16701.7,
+            "median_output_tokens": 19099.5,
+            "total_output_tokens": 1603364,
+            "mean_output_bytes": 67747.4,
+            "calls": 192,
+            "delivery_budget_cases": 49,
+            "reference_limit_cases": 0
+          },
+          "slices": {
+            "dev/L0/en": {
+              "cases": 12,
+              "facts_found": 34,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 0,
+              "facts_total": 37,
+              "all_found": 11,
+              "limit_reached": 10,
+              "output_budget": 6,
+              "candidate_ceiling": 9,
+              "o200k_tokens": 206666,
+              "utf8_bytes": 809511,
+              "calls": 24,
+              "seconds": 146.2
+            },
+            "dev/L0/ru": {
+              "cases": 12,
+              "facts_found": 34,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 0,
+              "facts_total": 37,
+              "all_found": 11,
+              "limit_reached": 11,
+              "output_budget": 7,
+              "candidate_ceiling": 9,
+              "o200k_tokens": 213200,
+              "utf8_bytes": 861736,
+              "calls": 24,
+              "seconds": 169.3
+            },
+            "dev/L2/en": {
+              "cases": 12,
+              "facts_found": 31,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 3,
+              "facts_total": 37,
+              "all_found": 10,
+              "limit_reached": 12,
+              "output_budget": 0,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 117564,
+              "utf8_bytes": 467253,
+              "calls": 24,
+              "seconds": 265.2
+            },
+            "dev/L2/ru": {
+              "cases": 12,
+              "facts_found": 28,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 6,
+              "facts_total": 37,
+              "all_found": 9,
+              "limit_reached": 12,
+              "output_budget": 11,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 237537,
+              "utf8_bytes": 1009529,
+              "calls": 24,
+              "seconds": 631.9
+            },
+            "holdout/L0/en": {
+              "cases": 12,
+              "facts_found": 22,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 3,
+              "facts_total": 28,
+              "all_found": 9,
+              "limit_reached": 10,
+              "output_budget": 7,
+              "candidate_ceiling": 10,
+              "o200k_tokens": 235893,
+              "utf8_bytes": 924730,
+              "calls": 24,
+              "seconds": 167.5
+            },
+            "holdout/L0/ru": {
+              "cases": 12,
+              "facts_found": 27,
+              "lost_not_acquired": 0,
+              "lost_after_acquisition": 1,
+              "facts_total": 28,
+              "all_found": 11,
+              "limit_reached": 11,
+              "output_budget": 9,
+              "candidate_ceiling": 10,
+              "o200k_tokens": 230520,
+              "utf8_bytes": 925487,
+              "calls": 24,
+              "seconds": 179.2
+            },
+            "holdout/L2/en": {
+              "cases": 12,
+              "facts_found": 15,
+              "lost_not_acquired": 6,
+              "lost_after_acquisition": 7,
+              "facts_total": 28,
+              "all_found": 6,
+              "limit_reached": 12,
+              "output_budget": 0,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 124895,
+              "utf8_bytes": 499169,
+              "calls": 24,
+              "seconds": 308.7
+            },
+            "holdout/L2/ru": {
+              "cases": 12,
+              "facts_found": 14,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 11,
+              "facts_total": 28,
+              "all_found": 5,
+              "limit_reached": 12,
+              "output_budget": 9,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 237089,
+              "utf8_bytes": 1006334,
+              "calls": 24,
+              "seconds": 677.0
+            }
+          },
+          "limit_counters_scope": "first portion; facts, calls and output sizes are cumulative"
+        },
+        "3": {
+          "aggregate": {
+            "cases": 96,
+            "facts_found": 218,
+            "facts_total": 260,
+            "all_found": 77,
+            "mean_output_tokens": 22802.8,
+            "median_output_tokens": 24067.0,
+            "total_output_tokens": 2189065,
+            "mean_output_bytes": 92165.0,
+            "calls": 288,
+            "delivery_budget_cases": 49,
+            "reference_limit_cases": 0
+          },
+          "slices": {
+            "dev/L0/en": {
+              "cases": 12,
+              "facts_found": 34,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 0,
+              "facts_total": 37,
+              "all_found": 11,
+              "limit_reached": 10,
+              "output_budget": 6,
+              "candidate_ceiling": 9,
+              "o200k_tokens": 273881,
+              "utf8_bytes": 1068744,
+              "calls": 36,
+              "seconds": 248.5
+            },
+            "dev/L0/ru": {
+              "cases": 12,
+              "facts_found": 34,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 0,
+              "facts_total": 37,
+              "all_found": 11,
+              "limit_reached": 11,
+              "output_budget": 7,
+              "candidate_ceiling": 9,
+              "o200k_tokens": 291982,
+              "utf8_bytes": 1169700,
+              "calls": 36,
+              "seconds": 288.4
+            },
+            "dev/L2/en": {
+              "cases": 12,
+              "facts_found": 31,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 3,
+              "facts_total": 37,
+              "all_found": 10,
+              "limit_reached": 12,
+              "output_budget": 0,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 177556,
+              "utf8_bytes": 703608,
+              "calls": 36,
+              "seconds": 494.8
+            },
+            "dev/L2/ru": {
+              "cases": 12,
+              "facts_found": 34,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 0,
+              "facts_total": 37,
+              "all_found": 11,
+              "limit_reached": 12,
+              "output_budget": 11,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 317809,
+              "utf8_bytes": 1339008,
+              "calls": 36,
+              "seconds": 1058.2
+            },
+            "holdout/L0/en": {
+              "cases": 12,
+              "facts_found": 24,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 1,
+              "facts_total": 28,
+              "all_found": 10,
+              "limit_reached": 10,
+              "output_budget": 7,
+              "candidate_ceiling": 10,
+              "o200k_tokens": 304807,
+              "utf8_bytes": 1195582,
+              "calls": 36,
+              "seconds": 284.3
+            },
+            "holdout/L0/ru": {
+              "cases": 12,
+              "facts_found": 27,
+              "lost_not_acquired": 0,
+              "lost_after_acquisition": 1,
+              "facts_total": 28,
+              "all_found": 11,
+              "limit_reached": 11,
+              "output_budget": 9,
+              "candidate_ceiling": 10,
+              "o200k_tokens": 314114,
+              "utf8_bytes": 1253249,
+              "calls": 36,
+              "seconds": 300.6
+            },
+            "holdout/L2/en": {
+              "cases": 12,
+              "facts_found": 18,
+              "lost_not_acquired": 6,
+              "lost_after_acquisition": 4,
+              "facts_total": 28,
+              "all_found": 7,
+              "limit_reached": 12,
+              "output_budget": 0,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 187315,
+              "utf8_bytes": 752345,
+              "calls": 36,
+              "seconds": 565.1
+            },
+            "holdout/L2/ru": {
+              "cases": 12,
+              "facts_found": 16,
+              "lost_not_acquired": 3,
+              "lost_after_acquisition": 9,
+              "facts_total": 28,
+              "all_found": 6,
+              "limit_reached": 12,
+              "output_budget": 9,
+              "candidate_ceiling": 12,
+              "o200k_tokens": 321601,
+              "utf8_bytes": 1365600,
+              "calls": 36,
+              "seconds": 1147.8
+            }
+          },
+          "limit_counters_scope": "first portion; facts, calls and output sizes are cumulative"
+        }
+      }
+    },
+    "cap6000": {
+      "score_sha256": "ccb8f4c94c80b88b3909f78baa712fd2bfb67d7d3965b3d1fec31056cd47e9e6",
+      "source_tree": {
+        "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:33:54+00:00",
+        "eval_tree": {
+          "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/limits-6000-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-6000-work/L0-0/project",
+            "prepare_seconds": 0.597,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-6000-work/L2-0/project",
+            "prepare_seconds": 22.076,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-6000-work/L0-1/project",
+            "prepare_seconds": 0.596,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-6000-work/L2-1/project",
+            "prepare_seconds": 23.868,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/limits-6000-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1",
+        "DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS": "6000"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 119,
+        "facts_total": 260,
+        "all_found": 42,
+        "mean_output_tokens": 5054.4,
+        "median_output_tokens": 5234.5,
+        "total_output_tokens": 485220,
+        "mean_output_bytes": 20431.2,
+        "calls": 96,
+        "delivery_budget_cases": 86,
+        "reference_limit_cases": 0
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 21,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 13,
+          "facts_total": 37,
+          "all_found": 7,
+          "limit_reached": 11,
+          "output_budget": 11,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 61154,
+          "utf8_bytes": 237443,
+          "calls": 12,
+          "seconds": 48.3
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 21,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 13,
+          "facts_total": 37,
+          "all_found": 7,
+          "limit_reached": 11,
+          "output_budget": 11,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 58500,
+          "utf8_bytes": 236919,
+          "calls": 12,
+          "seconds": 52.4
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 21,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 13,
+          "facts_total": 37,
+          "all_found": 7,
+          "limit_reached": 12,
+          "output_budget": 7,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 57185,
+          "utf8_bytes": 227188,
+          "calls": 12,
+          "seconds": 104.8
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 13,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 21,
+          "facts_total": 37,
+          "all_found": 4,
+          "limit_reached": 12,
+          "output_budget": 12,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 61817,
+          "utf8_bytes": 263467,
+          "calls": 12,
+          "seconds": 194.3
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 14,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 11,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 12,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 64344,
+          "utf8_bytes": 250206,
+          "calls": 12,
+          "seconds": 50.7
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 16,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 12,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 12,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 60667,
+          "utf8_bytes": 246923,
+          "calls": 12,
+          "seconds": 54.9
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 10,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 12,
+          "facts_total": 28,
+          "all_found": 4,
+          "limit_reached": 12,
+          "output_budget": 9,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 59539,
+          "utf8_bytes": 239106,
+          "calls": 12,
+          "seconds": 112.2
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 3,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 22,
+          "facts_total": 28,
+          "all_found": 1,
+          "limit_reached": 12,
+          "output_budget": 12,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 62014,
+          "utf8_bytes": 260139,
+          "calls": 12,
+          "seconds": 186.4
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 76,
+          "not_acquired": 12,
+          "not_observed": 60
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 21,
+            "not_acquired": 3,
+            "not_observed": 13
+          },
+          "dev/L0/ru": {
+            "delivered": 21,
+            "not_acquired": 3,
+            "not_observed": 13
+          },
+          "dev/L2/en": {
+            "delivered": 21,
+            "not_acquired": 3,
+            "not_observed": 13
+          },
+          "dev/L2/ru": {
+            "delivered": 13,
+            "not_acquired": 3,
+            "not_observed": 21
+          }
+        }
+      },
+      "cumulative_portions": {}
+    },
+    "cap18000": {
+      "score_sha256": "f5626aabbae0fccb83fbad56e10ac18d7d249796807e63988f96495c80d23791",
+      "source_tree": {
+        "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:33:54+00:00",
+        "eval_tree": {
+          "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/limits-18000-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-18000-work/L0-0/project",
+            "prepare_seconds": 0.543,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-18000-work/L2-0/project",
+            "prepare_seconds": 25.277,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-18000-work/L0-1/project",
+            "prepare_seconds": 0.574,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-18000-work/L2-1/project",
+            "prepare_seconds": 21.171,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/limits-18000-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1",
+        "DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS": "18000"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 193,
+        "facts_total": 260,
+        "all_found": 68,
+        "mean_output_tokens": 10348.2,
+        "median_output_tokens": 10759.0,
+        "total_output_tokens": 993426,
+        "mean_output_bytes": 42040.6,
+        "calls": 96,
+        "delivery_budget_cases": 22,
+        "reference_limit_cases": 0
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 34,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 0,
+          "facts_total": 37,
+          "all_found": 11,
+          "limit_reached": 9,
+          "output_budget": 1,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 123799,
+          "utf8_bytes": 481003,
+          "calls": 12,
+          "seconds": 63.6
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 9,
+          "output_budget": 3,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 127592,
+          "utf8_bytes": 516613,
+          "calls": 12,
+          "seconds": 69.5
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 67397,
+          "utf8_bytes": 266338,
+          "calls": 12,
+          "seconds": 112.1
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 8,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 164195,
+          "utf8_bytes": 700505,
+          "calls": 12,
+          "seconds": 301.0
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 24,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 1,
+          "facts_total": 28,
+          "all_found": 10,
+          "limit_reached": 10,
+          "output_budget": 2,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 141872,
+          "utf8_bytes": 558268,
+          "calls": 12,
+          "seconds": 72.2
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 24,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 4,
+          "facts_total": 28,
+          "all_found": 10,
+          "limit_reached": 10,
+          "output_budget": 2,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 138097,
+          "utf8_bytes": 557372,
+          "calls": 12,
+          "seconds": 72.5
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 7,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 75986,
+          "utf8_bytes": 302363,
+          "calls": 12,
+          "seconds": 123.5
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 10,
+          "facts_total": 28,
+          "all_found": 5,
+          "limit_reached": 12,
+          "output_budget": 6,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 154488,
+          "utf8_bytes": 653435,
+          "calls": 12,
+          "seconds": 288.3
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 115,
+          "not_acquired": 12,
+          "not_observed": 21
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 34,
+            "not_acquired": 3
+          },
+          "dev/L0/ru": {
+            "delivered": 31,
+            "not_acquired": 3,
+            "not_observed": 3
+          },
+          "dev/L2/en": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          },
+          "dev/L2/ru": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          }
+        }
+      },
+      "cumulative_portions": {}
+    },
+    "cap24000": {
+      "score_sha256": "d1e0ddf2489717e212bae5e2337a6a8c7eb47c66e657320a45d73bf7271b56e4",
+      "source_tree": {
+        "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:43:09+00:00",
+        "eval_tree": {
+          "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/limits-24000-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-24000-work/L0-0/project",
+            "prepare_seconds": 0.58,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-24000-work/L2-0/project",
+            "prepare_seconds": 22.573,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-24000-work/L0-1/project",
+            "prepare_seconds": 0.559,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-24000-work/L2-1/project",
+            "prepare_seconds": 22.939,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/limits-24000-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1",
+        "DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS": "24000"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 196,
+        "facts_total": 260,
+        "all_found": 69,
+        "mean_output_tokens": 11027.1,
+        "median_output_tokens": 10820.5,
+        "total_output_tokens": 1058602,
+        "mean_output_bytes": 44878.1,
+        "calls": 96,
+        "delivery_budget_cases": 5,
+        "reference_limit_cases": 1
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 34,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 0,
+          "facts_total": 37,
+          "all_found": 11,
+          "limit_reached": 9,
+          "output_budget": 0,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 124495,
+          "utf8_bytes": 482978,
+          "calls": 12,
+          "seconds": 62.6
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 9,
+          "output_budget": 0,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 143640,
+          "utf8_bytes": 582601,
+          "calls": 12,
+          "seconds": 75.3
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 67340,
+          "utf8_bytes": 266338,
+          "calls": 12,
+          "seconds": 124.4
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 1,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 182324,
+          "utf8_bytes": 776329,
+          "calls": 12,
+          "seconds": 365.3
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 24,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 1,
+          "facts_total": 28,
+          "all_found": 10,
+          "limit_reached": 10,
+          "output_budget": 0,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 144896,
+          "utf8_bytes": 570261,
+          "calls": 12,
+          "seconds": 72.2
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 27,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 1,
+          "facts_total": 28,
+          "all_found": 11,
+          "limit_reached": 10,
+          "output_budget": 0,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 141334,
+          "utf8_bytes": 569803,
+          "calls": 12,
+          "seconds": 72.0
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 7,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 75874,
+          "utf8_bytes": 302363,
+          "calls": 12,
+          "seconds": 142.5
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 10,
+          "facts_total": 28,
+          "all_found": 5,
+          "limit_reached": 12,
+          "output_budget": 4,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 178699,
+          "utf8_bytes": 757624,
+          "calls": 12,
+          "seconds": 377.1
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 115,
+          "not_acquired": 12,
+          "not_observed": 21
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 34,
+            "not_acquired": 3
+          },
+          "dev/L0/ru": {
+            "delivered": 31,
+            "not_acquired": 3,
+            "not_observed": 3
+          },
+          "dev/L2/en": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          },
+          "dev/L2/ru": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          }
+        }
+      },
+      "cumulative_portions": {}
+    },
+    "cap1000000": {
+      "score_sha256": "161a2bfa69db9f85400c20d9f7a7f6ee3261f752646a9c2dafa8940e5f89814a",
+      "source_tree": {
+        "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:48:20+00:00",
+        "eval_tree": {
+          "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/limits-1000000-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-1000000-work/L0-0/project",
+            "prepare_seconds": 0.592,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-1000000-work/L2-0/project",
+            "prepare_seconds": 25.737,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-1000000-work/L0-1/project",
+            "prepare_seconds": 0.607,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/limits-1000000-work/L2-1/project",
+            "prepare_seconds": 40.456,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/limits-1000000-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1",
+        "DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS": "1000000"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 198,
+        "facts_total": 260,
+        "all_found": 70,
+        "mean_output_tokens": 11124.9,
+        "median_output_tokens": 10815.5,
+        "total_output_tokens": 1067987,
+        "mean_output_bytes": 45301.6,
+        "calls": 96,
+        "delivery_budget_cases": 0,
+        "reference_limit_cases": 5
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 34,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 0,
+          "facts_total": 37,
+          "all_found": 11,
+          "limit_reached": 9,
+          "output_budget": 0,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 124254,
+          "utf8_bytes": 482978,
+          "calls": 12,
+          "seconds": 68.6
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 31,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 3,
+          "facts_total": 37,
+          "all_found": 10,
+          "limit_reached": 9,
+          "output_budget": 0,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 143468,
+          "utf8_bytes": 582601,
+          "calls": 12,
+          "seconds": 82.4
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 67422,
+          "utf8_bytes": 266338,
+          "calls": 12,
+          "seconds": 133.9
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 25,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 9,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 186860,
+          "utf8_bytes": 795353,
+          "calls": 12,
+          "seconds": 378.4
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 24,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 1,
+          "facts_total": 28,
+          "all_found": 10,
+          "limit_reached": 10,
+          "output_budget": 0,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 144632,
+          "utf8_bytes": 570261,
+          "calls": 12,
+          "seconds": 76.6
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 27,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 1,
+          "facts_total": 28,
+          "all_found": 11,
+          "limit_reached": 10,
+          "output_budget": 0,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 141160,
+          "utf8_bytes": 569803,
+          "calls": 12,
+          "seconds": 73.2
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 15,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 7,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 76025,
+          "utf8_bytes": 302363,
+          "calls": 12,
+          "seconds": 133.6
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 17,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 8,
+          "facts_total": 28,
+          "all_found": 6,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 184166,
+          "utf8_bytes": 779257,
+          "calls": 12,
+          "seconds": 356.6
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 115,
+          "not_acquired": 12,
+          "not_observed": 21
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 34,
+            "not_acquired": 3
+          },
+          "dev/L0/ru": {
+            "delivered": 31,
+            "not_acquired": 3,
+            "not_observed": 3
+          },
+          "dev/L2/en": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          },
+          "dev/L2/ru": {
+            "delivered": 25,
+            "not_acquired": 3,
+            "not_observed": 9
+          }
+        }
+      },
+      "cumulative_portions": {}
+    },
+    "minilm": {
+      "score_sha256": "1271f127d6649377696d998900e3579d56e04d947190cccf5e508da2fb24d264",
+      "source_tree": {
+        "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+        "dirty_paths": []
+      },
+      "questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+      "oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+      "run": {
+        "started_at_utc": "2026-11-06T07:17:44+00:00",
+        "eval_tree": {
+          "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+          "dirty_paths": []
+        },
+        "python": "3.12.14",
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "cpus": 9,
+        "jobs": 2,
+        "work_root": "/workspace/scratch/66f7674793b8/evidence-mini-work",
+        "project_config": {
+          "docatlas.yaml": {
+            "project": {
+              "scan_deadline_seconds": 300
+            }
+          }
+        },
+        "units": [
+          {
+            "name": "L0-0",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/evidence-mini-work/L0-0/project",
+            "prepare_seconds": 0.419,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-0",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/evidence-mini-work/L2-0/project",
+            "prepare_seconds": 20.031,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L0-1",
+            "corpus": "L0",
+            "project_path": "/workspace/scratch/66f7674793b8/evidence-mini-work/L0-1/project",
+            "prepare_seconds": 0.423,
+            "prepared_documents": 19,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          },
+          {
+            "name": "L2-1",
+            "corpus": "L2",
+            "project_path": "/workspace/scratch/66f7674793b8/evidence-mini-work/L2-1/project",
+            "prepare_seconds": 20.231,
+            "prepared_documents": 489,
+            "reused_store": false,
+            "cold_reason_code": "member_store_uninitialized"
+          }
+        ]
+      },
+      "server_environment": {
+        "HOME": "/workspace/scratch/66f7674793b8/evidence-mini-work/L0-0/home",
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_MCP_COMPACT_TEXT": "1",
+        "DOCATLAS_OFFLINE": "1",
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "PYTHONNOUSERSITE": "1",
+        "NO_PROXY": "*",
+        "HF_HUB_OFFLINE": "1",
+        "DOCATLAS_CONTEXT_COMPRESSION": "minilm-sections-v1",
+        "DOCATLAS_MINILM_MODEL_DIR": "/workspace/scratch/66f7674793b8/models/ms-marco-MiniLM-L6-v2",
+        "DOCATLAS_SECTION_SELECTION": "facet-guarded-lexical-v2",
+        "DOCATLAS_EXPERIMENT_POOL_PRUNE": "own_heading_or_body"
+      },
+      "first_portion": {
+        "cases": 96,
+        "facts_found": 149,
+        "facts_total": 260,
+        "all_found": 49,
+        "mean_output_tokens": 1499.0,
+        "median_output_tokens": 1443.0,
+        "total_output_tokens": 143905,
+        "mean_output_bytes": 5978.7,
+        "calls": 96,
+        "delivery_budget_cases": 0,
+        "reference_limit_cases": 0
+      },
+      "slices": {
+        "dev/L0/en": {
+          "cases": 12,
+          "facts_found": 26,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 8,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 9,
+          "output_budget": 0,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 22710,
+          "utf8_bytes": 90327,
+          "calls": 12,
+          "seconds": 76.3
+        },
+        "dev/L0/ru": {
+          "cases": 12,
+          "facts_found": 26,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 8,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 9,
+          "output_budget": 0,
+          "candidate_ceiling": 9,
+          "o200k_tokens": 22692,
+          "utf8_bytes": 90088,
+          "calls": 12,
+          "seconds": 101.6
+        },
+        "dev/L2/en": {
+          "cases": 12,
+          "facts_found": 26,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 8,
+          "facts_total": 37,
+          "all_found": 8,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 17295,
+          "utf8_bytes": 69125,
+          "calls": 12,
+          "seconds": 102.9
+        },
+        "dev/L2/ru": {
+          "cases": 12,
+          "facts_found": 23,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 11,
+          "facts_total": 37,
+          "all_found": 7,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 14556,
+          "utf8_bytes": 56742,
+          "calls": 12,
+          "seconds": 230.1
+        },
+        "holdout/L0/en": {
+          "cases": 12,
+          "facts_found": 13,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 12,
+          "facts_total": 28,
+          "all_found": 5,
+          "limit_reached": 10,
+          "output_budget": 0,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 18303,
+          "utf8_bytes": 72720,
+          "calls": 12,
+          "seconds": 75.4
+        },
+        "holdout/L0/ru": {
+          "cases": 12,
+          "facts_found": 13,
+          "lost_not_acquired": 0,
+          "lost_after_acquisition": 15,
+          "facts_total": 28,
+          "all_found": 5,
+          "limit_reached": 10,
+          "output_budget": 0,
+          "candidate_ceiling": 10,
+          "o200k_tokens": 16319,
+          "utf8_bytes": 64637,
+          "calls": 12,
+          "seconds": 92.0
+        },
+        "holdout/L2/en": {
+          "cases": 12,
+          "facts_found": 11,
+          "lost_not_acquired": 6,
+          "lost_after_acquisition": 11,
+          "facts_total": 28,
+          "all_found": 4,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 17555,
+          "utf8_bytes": 70580,
+          "calls": 12,
+          "seconds": 99.7
+        },
+        "holdout/L2/ru": {
+          "cases": 12,
+          "facts_found": 11,
+          "lost_not_acquired": 3,
+          "lost_after_acquisition": 14,
+          "facts_total": 28,
+          "all_found": 4,
+          "limit_reached": 12,
+          "output_budget": 0,
+          "candidate_ceiling": 12,
+          "o200k_tokens": 14475,
+          "utf8_bytes": 59732,
+          "calls": 12,
+          "seconds": 202.6
+        }
+      },
+      "dev_loss_stages": {
+        "dev_total": {
+          "delivered": 101,
+          "not_acquired": 12,
+          "not_observed": 35
+        },
+        "slices": {
+          "dev/L0/en": {
+            "delivered": 26,
+            "not_acquired": 3,
+            "not_observed": 8
+          },
+          "dev/L0/ru": {
+            "delivered": 26,
+            "not_acquired": 3,
+            "not_observed": 8
+          },
+          "dev/L2/en": {
+            "delivered": 26,
+            "not_acquired": 3,
+            "not_observed": 8
+          },
+          "dev/L2/ru": {
+            "delivered": 23,
+            "not_acquired": 3,
+            "not_observed": 11
+          }
+        }
+      },
+      "cumulative_portions": {}
+    }
+  },
+  "unions": {
+    "baseline+minilm": {
+      "total": {
+        "facts_found": 201,
+        "facts_total": 260,
+        "all_found": 71,
+        "cases": 96
+      },
+      "slices": {
+        "dev/L0/en": {
+          "facts_found": 31,
+          "facts_total": 37,
+          "all_found": 10,
+          "cases": 12
+        },
+        "dev/L0/ru": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L2/en": {
+          "facts_found": 31,
+          "facts_total": 37,
+          "all_found": 10,
+          "cases": 12
+        },
+        "dev/L2/ru": {
+          "facts_found": 28,
+          "facts_total": 37,
+          "all_found": 9,
+          "cases": 12
+        },
+        "holdout/L0/en": {
+          "facts_found": 21,
+          "facts_total": 28,
+          "all_found": 9,
+          "cases": 12
+        },
+        "holdout/L0/ru": {
+          "facts_found": 24,
+          "facts_total": 28,
+          "all_found": 10,
+          "cases": 12
+        },
+        "holdout/L2/en": {
+          "facts_found": 17,
+          "facts_total": 28,
+          "all_found": 7,
+          "cases": 12
+        },
+        "holdout/L2/ru": {
+          "facts_found": 15,
+          "facts_total": 28,
+          "all_found": 5,
+          "cases": 12
+        }
+      },
+      "interpretation": "offline union of credited facts from separate responses; no agent-policy claim"
+    },
+    "portions:2+minilm": {
+      "total": {
+        "facts_found": 215,
+        "facts_total": 260,
+        "all_found": 76,
+        "cases": 96
+      },
+      "slices": {
+        "dev/L0/en": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L0/ru": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L2/en": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L2/ru": {
+          "facts_found": 31,
+          "facts_total": 37,
+          "all_found": 10,
+          "cases": 12
+        },
+        "holdout/L0/en": {
+          "facts_found": 22,
+          "facts_total": 28,
+          "all_found": 9,
+          "cases": 12
+        },
+        "holdout/L0/ru": {
+          "facts_found": 27,
+          "facts_total": 28,
+          "all_found": 11,
+          "cases": 12
+        },
+        "holdout/L2/en": {
+          "facts_found": 17,
+          "facts_total": 28,
+          "all_found": 7,
+          "cases": 12
+        },
+        "holdout/L2/ru": {
+          "facts_found": 16,
+          "facts_total": 28,
+          "all_found": 6,
+          "cases": 12
+        }
+      },
+      "interpretation": "offline union of credited facts from separate responses; no agent-policy claim"
+    },
+    "portions:3+minilm": {
+      "total": {
+        "facts_found": 225,
+        "facts_total": 260,
+        "all_found": 80,
+        "cases": 96
+      },
+      "slices": {
+        "dev/L0/en": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L0/ru": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L2/en": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "dev/L2/ru": {
+          "facts_found": 34,
+          "facts_total": 37,
+          "all_found": 11,
+          "cases": 12
+        },
+        "holdout/L0/en": {
+          "facts_found": 24,
+          "facts_total": 28,
+          "all_found": 10,
+          "cases": 12
+        },
+        "holdout/L0/ru": {
+          "facts_found": 27,
+          "facts_total": 28,
+          "all_found": 11,
+          "cases": 12
+        },
+        "holdout/L2/en": {
+          "facts_found": 20,
+          "facts_total": 28,
+          "all_found": 8,
+          "cases": 12
+        },
+        "holdout/L2/ru": {
+          "facts_found": 18,
+          "facts_total": 28,
+          "all_found": 7,
+          "cases": 12
+        }
+      },
+      "interpretation": "offline union of credited facts from separate responses; no agent-policy claim"
+    }
+  },
+  "limitations": [
+    "65 distinct reference facts tested in four language/corpus conditions, total 260",
+    "measures evidence delivery, not final answer correctness",
+    "latency is not compared under concurrent CPU load"
+  ]
+}

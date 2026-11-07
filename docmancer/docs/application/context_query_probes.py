@@ -5,6 +5,7 @@ import re
 from typing import Any
 
 from docmancer.docs.domain.documentation_query_plan import technical_anchors
+from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
 
 from docmancer.docs.domain.query_terms import query_constraint_roles
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
@@ -30,7 +31,8 @@ def authoritative_queries(query_plan):
         if query_id == 'query-original':
             valid = q.get('origin') == 'original' and q.get('relation') == 'direct' and q['text'] == original
         else:
-            valid = bool(re.fullmatch(r'query-lookup-[1-5]', query_id)) and q.get('origin') == 'host_lookup' and q.get('relation') == 'host_lookup'
+            pattern = r'query-lookup-[1-9][0-9]*' if minimal_context_enabled() else r'query-lookup-[1-5]'
+            valid = bool(re.fullmatch(pattern, query_id)) and q.get('origin') == 'host_lookup' and q.get('relation') == 'host_lookup'
         if valid:
             result[query_id] = dict(q)
     return result if 'query-original' in result else {}

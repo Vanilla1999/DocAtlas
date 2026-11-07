@@ -158,6 +158,9 @@ def _unit_materialized_item(
 
 def _request_input_limit_failures(question: str, retrieval: dict[str, Any], decision: Any = None) -> list[str]:
     """Validate current bounded inputs independently of cached answer decisions."""
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if minimal_context_enabled():
+        return []
     fresh = build_requirements(
         question, profile="project_docs_answer",
         required_evidence_paths=retrieval.get("required_evidence_paths") or (),
@@ -373,7 +376,8 @@ def project_docs_answer(
     technical_failures = _request_input_limit_failures(question, retrieval, decision)
     # Apply the established question bound even to generic and cached profiles.
     # Context-only is a weaker answer claim, not permission to bypass limits.
-    if len(question) > 4_000 and "input_limit:question" not in technical_failures:
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if not minimal_context_enabled() and len(question) > 4_000 and "input_limit:question" not in technical_failures:
         technical_failures.append("input_limit:question")
     if technical_failures:
         return project_insufficient(

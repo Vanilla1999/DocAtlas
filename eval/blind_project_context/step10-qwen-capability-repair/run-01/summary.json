@@ -1,0 +1,15 @@
+{
+  "status": "PASS_PUBLIC_LIFECYCLE_REGRESSION",
+  "counts": {
+    "public_prepares": 1,
+    "public_queries": 3,
+    "resource_reads": 5,
+    "model_forwards": 63,
+    "model_input_tokens": 28536,
+    "model_totals_complete": true
+  },
+  "old_uri": "docatlas://source/v2/fada3566f9716ad5ba9fabc0",
+  "new_uri": "docatlas://source/v2/0e311d458e89a1c87e2a72cd",
+  "exact_active_alias_packet_reuse": true,
+  "boundary": "not calibration acceptance; new root and generation"
+}

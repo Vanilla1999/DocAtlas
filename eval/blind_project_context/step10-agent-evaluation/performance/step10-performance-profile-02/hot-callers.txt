@@ -1,0 +1,14 @@
+   Ordered by: cumulative time
+   List reduced from 1150 to 5 due to restriction <'source_graph|parse_markdown_parents|prepare_dependency_sets|_closure|builtins.hash'>
+
+Function                                                                                                                                              was called by...
+                                                                                                                                                          ncalls  tottime  cumtime
+/tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/application/source_dependency_preparation.py:14(prepare_dependency_sets)  <-       1    0.102   20.775  /tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/application/source_reference_evidence.py:178(prepare)
+/tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/domain/source_dependency_graph.py:72(source_graph)                        <-    7695    0.447   12.773  /tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/domain/evidence_set_validation.py:79(_build_source_sets)
+/tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/core/structured_chunking.py:175(parse_markdown_parents)                        <-     489    0.062    0.232  /tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/application/source_reference_evidence.py:123(_document)
+                                                                                                                                                            7695    1.002    5.066  /tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/domain/source_dependency_graph.py:72(source_graph)
+{built-in method builtins.hash}                                                                                                                       <- 6385046    0.435    0.435  <string>:23(__hash__)
+                                                                                                                                                        13716135    2.651    8.994  <string>:24(__hash__)
+/tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/domain/evidence_set_validation.py:35(_closure)                            <-    9668    0.033    1.520  /tmp/opencode/step10-mini-py313/lib/python3.13/site-packages/docmancer/docs/domain/evidence_set_validation.py:79(_build_source_sets)
+
+

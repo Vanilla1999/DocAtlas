@@ -1,0 +1,3 @@
+{"method": "tools/call", "params": {"name": "docs_status", "arguments": {"action": "project", "include_language": true}, "_meta": {"ai.opencode/sessionID": "ses_e4afb5eb9ffeumapnqMjD7E2YH", "progressToken": 2}}, "jsonrpc": "2.0", "id": 2}
+{"method": "tools/call", "params": {"name": "get_docs_context", "arguments": {"question": "Who signs the hand-off record, and may a courier sign it?", "scope": "project"}, "_meta": {"ai.opencode/sessionID": "ses_e4afb5eb9ffeumapnqMjD7E2YH", "progressToken": 3}}, "jsonrpc": "2.0", "id": 3}
+{"method": "resources/read", "params": {"uri": "docatlas://source/b38196c7f3917d1ae971af90"}, "jsonrpc": "2.0", "id": 4}

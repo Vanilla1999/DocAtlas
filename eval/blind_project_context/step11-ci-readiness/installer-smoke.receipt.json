@@ -1,0 +1,36 @@
+{
+  "head_before_change": "2d667913f279ba72104f158ee6500d75d5ace81f",
+  "observed_at": "2026-11-07T07:14:21.139090+00:00",
+  "command": [
+    "sh",
+    "scripts/test-install.sh"
+  ],
+  "environment_override": {
+    "TMPDIR": "/workspace/scratch/66f7674793b8/step11-ci-readiness-tmp"
+  },
+  "test_boundary": "Existing installer smoke with real install.sh; external uv/agent CLIs stubbed by the pre-existing harness; no model or real installation",
+  "exit_code": 0,
+  "wall_seconds": 5.668,
+  "script_sha256": "237890546f862dae34aabf98a680de04cbc26a3d735eb8bbea70ae902311c09a",
+  "log_sha256": "61f8dd14e7532b09aca9bcedc19058e1719d932caa62589b04f25da9bb6dcdb1",
+  "unicode_change": {
+    "removed_only": "U+202F NARROW NO-BREAK SPACE",
+    "category": "Zs",
+    "bidi": "CS",
+    "bidi_controls_U202A_through_U202E_retained": true,
+    "all_Cf_still_rejected": true,
+    "no_path_exclusions_added": true
+  },
+  "frozen_artifacts": {
+    "eval/blind_project_context/step10-agent-evaluation/candidate.md": {
+      "sha256": "5c862c5c46e1e87bab8b12858b299a59d8c684ac5f7417046bdfbed1431e6644",
+      "u202f_count": 2,
+      "unchanged_from_head": true
+    },
+    "eval/blind_project_context/step10-agent-evaluation/candidate-partial.md": {
+      "sha256": "2852e75e815e59d95a9e604e3cb831ef4984cb4b279dc8049a5caf0aaa12b864",
+      "u202f_count": 2,
+      "unchanged_from_head": true
+    }
+  }
+}

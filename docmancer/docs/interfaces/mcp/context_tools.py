@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
-from docmancer.docs.application.projection_decision_trace import same_call_projection_observation
-from docmancer.docs.application.query_trace import current_request_id, query_trace_enabled
 from docmancer.docs.application.source_continuation import (
     bind_project_source_continuations,
 )
@@ -15,9 +13,8 @@ from docmancer.docs.domain.original_body_discovery import original_body_read_sco
 from docmancer.docs.request_memo import request_memo_scope
 from docmancer.docs.documentation_language import record_translation, translated_query
 import math
-import sys
-from uuid import uuid4
 from typing import Any
+from ._context_diagnostics import _observe_same_call_diagnostics
 from ._context_recovery_actions import (
     _replace_network_retries_with_prepare_actions,
 )
@@ -291,9 +288,18 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    minimal = minimal_context_enabled()
     context_format = args.get("context_format")
     if context_format is not None and context_format != "patch_context":
         return _bad_request("invalid_context_format", "context_format must be patch_context or null")
+    portion = args.get("portion", 1)
+    if type(portion) is not int or portion < 1:
+        return _bad_request("invalid_context_portion", "portion must be a positive integer")
+    if context_format == "patch_context" and (portion != 1 or args.get("continuation_token") is not None):
+        return _bad_request("portion_docs_only", "context portions apply to documentation responses only")
+    if portion > 1 and not args.get("continuation_token"):
+        return _bad_request("context_continuation_required", "use the continuation_token issued in more_context")
     question = args.get("question") if isinstance(args.get("question"), str) else ""
     if not question.strip():
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
@@ -301,12 +307,24 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
     search_question, lookup_queries = translated_query(question, args.get("search_question"), lookup_queries)
+    source_path = args.get("source_path")
+    if source_path is not None:
+        from pathlib import PurePosixPath
+        if (not isinstance(source_path, str) or not source_path or (not minimal and len(source_path) > 500)
+                or "\\" in source_path or "\x00" in source_path
+                or PurePosixPath(source_path).is_absolute()
+                or any(part in {"", ".", ".."} for part in source_path.split("/"))):
+            return _bad_request("invalid_source_path", "source_path must be an exact relative document path")
+        if context_format is not None or args.get("library") or args.get("libraries") or args.get("maintenance"):
+            return _bad_request("source_path_project_docs_only", "focused reads require project documentation")
+        if not minimal:
+            lookup_queries = list(dict.fromkeys([*(lookup_queries or []), source_path]))
+            if len(lookup_queries) > 5:
+                return _bad_request("invalid_lookup_queries", "source_path reserves one of five lookup slots")
     if args.get("search_question") is not None and context_format == "patch_context":
         return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
-    # Freeze the validated effective query plan before opening the request-owned
-    # native body read. The translated host lookup must be in the same plan used
-    # to acquire sources and to verify their original-read receipts; otherwise
-    # a successful translated search is incorrectly rejected at admission.
+    # Freeze the effective plan before opening the native read scope.
+    # Acquisition and original-read admission must use the same translated lookup.
     prepared_args = {**args, "lookup_queries": lookup_queries}
     # Request-local reuse of pure results only; every check still runs.
     with request_memo_scope():
@@ -320,6 +338,13 @@ def _handle_prepared_context_tool(
     question = args["question"]
     context_format = args.get("context_format")
     lookup_queries = args["lookup_queries"]
+    if args.get("portion", 1) > 1 or args.get("continuation_token") is not None or args.get("source_path"):
+        from docmancer.docs.application.section_compression import enabled as section_compression_enabled
+        if (experimental_context_max_tokens() is None or args.get("maintenance")
+                or args.get("library") or args.get("libraries")
+                or args.get("mode") not in (None, "auto", "project")
+                or section_compression_enabled()):
+            return _bad_request("portion_unavailable", "context portions require native checked project documentation")
     search_question = args.get("search_question") if args.get("search_question") is not None else question
     # Explicit presentation choice is read-only; it is not a mutation contract
     # and is never forwarded as permission or inferred from request prose.
@@ -386,6 +411,8 @@ def _handle_prepared_context_tool(
             str(raw.get("message") or "Invalid documentation target or arguments; fix the binding and retry."),
         )
     record_translation(raw, question, args.get("search_question"))
+    if args.get("source_path"):
+        raw["_focused_source_path"] = args["source_path"]
     # Check the original operational decision before support/recovery decoration
     # can overwrite its reason or retain a previously admitted partial quote.
     blocked_kind = (
@@ -414,6 +441,8 @@ def _handle_prepared_context_tool(
         if blocked_kind == "docs_context":
             _observe_same_call_diagnostics(service, raw, blocked, {}, delivery_blocked=True)
         return blocked
+    if args.get("source_path") and raw.get("mode_selected") != "project":
+        return _bad_request("source_path_project_docs_only", "focused reads require project documentation")
     operational_answer_available = bool(raw.get("answer_available", True))
     operational_reason_code = raw.get("reason_code")
     canonical_support = getattr(canonical_selection, "support_decision", None)
@@ -556,17 +585,53 @@ def _handle_prepared_context_tool(
                     # One joint choice after lookup merge and live source checks.
                     # Price already attached URI strings before issuing cursors;
                     # the explicit MiniLM section policy is not selected twice.
-                    projection, snapshot = select_joint_context(
-                        projection, snapshot, raw,
-                        max_source_references=(reader.max_references if reader is not None else None),
-                    )
-                if experimental_context_max_tokens() is not None and reader is not None and source_root:
+                    replay_reader = None
+
+                    def finalize_portion(packet, receipts):
+                        nonlocal replay_reader
+                        if experimental_context_max_tokens() is not None and reader is not None and source_root:
+                            binding_reader = reader
+                            if (packet.get("more_context") or {}).get("portion", 1) != args.get("portion", 1):
+                                # Earlier portions still need live authorization
+                                # and exact final pricing, but replay must not
+                                # reissue spent URIs or evict session references.
+                                if replay_reader is None:
+                                    replay_reader = reader.registration_snapshot()
+                                binding_reader = replay_reader
+                            fresh = (binding_reader is reader and args.get("portion", 1) == 1
+                                     and not args.get("continuation_token"))
+                            bind_project_source_continuations(binding_reader, source_root, packet, receipts,
+                                                             binding_intent="fresh_query" if fresh else "rebind")
+                            _refresh_projection_estimate(packet)
+                        return finalize_joint_context_delivery(packet, receipts, raw)
+
+                    try:
+                        projection, snapshot = select_joint_context(
+                            projection, snapshot, raw,
+                            max_source_references=(reader.max_references if reader is not None else None),
+                            portion=args.get("portion", 1), continuation_token=args.get("continuation_token"),
+                            request_binding={key: value for key, value in args.items()
+                                             if key not in {"portion", "continuation_token"}},
+                            finalize_packet=finalize_portion,
+                        )
+                        if projection.get("hard_stop"):
+                            # Atomic reference registration may reject the full
+                            # packet after a source changes. Its body-free typed
+                            # refusal is not a malformed successful projection.
+                            return projection
+                    except ValueError as exc:
+                        if str(exc) not in {"invalid_context_portion", "context_continuation_required",
+                                            "stale_context_continuation", "portion_unavailable",
+                                            "invalid_context_continuation"}:
+                            raise
+                        return _bad_request(str(exc), "restart at portion 1 after a query, snapshot or settings change")
+                if (section_compression_active and experimental_context_max_tokens() is not None
+                        and reader is not None and source_root):
                     # Register only the selected batch. Issuing the entire pool
                     # first can evict a selected URI from the bounded reader.
-                    bind_project_source_continuations(reader, source_root, projection, snapshot)
+                    bind_project_source_continuations(reader, source_root, projection, snapshot,
+                        binding_intent="fresh_query" if args.get("portion", 1) == 1 and not args.get("continuation_token") else "rebind")
                     _refresh_projection_estimate(projection)
-                if not section_compression_active:
-                    projection, snapshot = finalize_joint_context_delivery(projection, snapshot, raw)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
@@ -660,108 +725,6 @@ def _handle_prepared_context_tool(
 def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
     if payload.get("reason_code") is None:
         payload.pop("reason_code", None)
-
-
-def _observe_same_call_diagnostics(
-    service: LibraryDocsService, raw: dict[str, Any], projection: dict[str, Any],
-    selection_trace: dict[str, Any], *, delivery_blocked: bool = False,
-) -> None:
-    """Send bounded internals to an in-process observer, never the MCP payload."""
-    if not query_trace_enabled():
-        return
-    observer = getattr(service, "_same_call_diagnostics_observer", None)
-    if not callable(observer):
-        try:
-            observation = same_call_projection_observation(raw, projection, delivery_blocked=delivery_blocked)
-            sys.stderr.write(json.dumps({
-                "event": "docatlas_query_trace", "request_id": current_request_id() or uuid4().hex,
-                "projection_observation": observation,
-            }, ensure_ascii=False) + "\n")
-        except Exception:
-            pass
-        return
-    ingestion = raw.get("ingestion_diagnostics") or {}
-    project = ingestion.get("project") if isinstance(ingestion, dict) else {}
-    service_trace = (
-        project.get("same_call_pipeline") if isinstance(project, dict) else None
-    ) or {}
-    projection_trace = ((raw.get("retrieval_diagnostics") or {}).get(
-        "docs_context_projection"
-    ) or {})
-    coverage = selection_trace.get("component_coverage")
-    outcomes = list(service_trace.get("qualification_outcomes") or ())[:32]
-    retrieved = list(service_trace.get("retrieved_candidates") or ())[:32]
-    ranked = list(projection_trace.get("ranked_candidate_ids") or ())[:32]
-    variants = list(projection_trace.get("considered_variants") or ())[:32]
-    final_ids = list(projection_trace.get("final_visible_evidence_ids") or ())[:3]
-    diagnostics = {
-        "runtime_component_coverage": coverage if isinstance(coverage, dict) else {"status": "unclassified"},
-        "stage_status": {
-            "planning": "observed" if service_trace.get("planned_query_ids") is not None else "unclassified",
-            "retrieval": "observed" if service_trace.get("retrieved_candidates") is not None else "unclassified",
-            "qualification": "observed" if service_trace.get("qualification_outcomes") is not None else "unclassified",
-            "ranking": "not_reached" if delivery_blocked else "observed" if projection_trace.get("ranked_candidate_ids") is not None else "unclassified",
-            "projection": "not_reached" if delivery_blocked else "observed" if projection_trace.get("considered_variants") is not None else "unclassified",
-            "coverage": "not_reached" if delivery_blocked else "observed" if isinstance(coverage, dict) else "unclassified",
-            "delivery": "blocked_before_projection" if delivery_blocked else "projected",
-        },
-    }
-    if delivery_blocked:
-        # Observe the decision already enforced above. The private callback
-        # cannot retry retrieval, bypass the veto or alter the public payload.
-        decision = raw.get("delivery_decision")
-        diagnostics["delivery_decision"] = {
-            "deliverable": False,
-            "reason_code": str(
-                (decision.get("reason_code") if isinstance(decision, dict) else None)
-                or projection.get("reason_code") or "unspecified_delivery_veto"
-            )[:120],
-        }
-    if service_trace.get("planned_query_ids") is not None:
-        diagnostics["planned_query_ids"] = list(service_trace.get("planned_query_ids") or ())[:32]
-    if service_trace.get("retrieved_candidates") is not None:
-        diagnostics.update({
-            "retrieved_candidates": retrieved,
-            "retrieved_candidate_ids": [
-                str(item.get("stable_chunk_id") or item.get("document_id") or "")
-                for item in retrieved if isinstance(item, dict)
-            ],
-        })
-    if service_trace.get("qualification_outcomes") is not None:
-        diagnostics.update({
-            "qualification_outcomes": outcomes,
-            "qualification_rejections": [
-                str(item.get("stable_chunk_id") or item.get("document_id") or "")
-                for item in outcomes
-                if isinstance(item, dict) and item.get("outcome") == "rejected"
-            ],
-            "pre_projection_qualified_ids": list(dict.fromkeys(
-                str(item.get("stable_chunk_id") or item.get("document_id") or "")
-                for item in outcomes
-                if isinstance(item, dict) and item.get("outcome") == "qualified"
-            ))[:32],
-        })
-    if projection_trace.get("ranked_candidate_ids") is not None:
-        diagnostics["ranked_candidate_ids"] = ranked
-    if projection_trace.get("considered_variants") is not None:
-        diagnostics.update({
-            "selected_candidate_ids": list(dict.fromkeys(
-                str(item.get("candidate_id") or "") for item in variants
-                if isinstance(item, dict) and item.get("candidate_id")
-            ))[:32],
-            "considered_variants": variants,
-            "projection_rejections": list(projection_trace.get("projection_rejections") or ())[:32],
-            "final_visible_evidence_ids": final_ids,
-        })
-    try:
-        diagnostics["projection_observation"] = same_call_projection_observation(
-            raw, projection, delivery_blocked=delivery_blocked,
-        )
-        observer(diagnostics)
-    except Exception:
-        # Debug observers cannot alter the validated public MCP result.
-        return
-
 
 
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:

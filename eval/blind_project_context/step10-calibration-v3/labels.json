@@ -1,0 +1,882 @@
+[
+  {
+    "task_id": "C2-transfer",
+    "units": [
+      {
+        "heading": "Cooperative apiary handbook",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook collects independent work instructions and building information for the cooperative apiary. Each named procedure has its own scope.",
+        "useful": false
+      },
+      {
+        "heading": "Moving occupied hives",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "The instructions in this section apply only to occupied hives moved between stands inside the same apiary. Moving a hive to another site requires a separate transport plan.",
+        "useful": true
+      },
+      {
+        "heading": "Entrance preparation",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Close the hive entrance with a ventilated transport screen after the last flying bees have returned. Keep the screen unobstructed throughout the move.",
+        "useful": true
+      },
+      {
+        "heading": "Securing the boxes",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Fasten the hive boxes and floor together with two ratchet straps before lifting. Lift the secured hive with two people and place it level on the new stand.",
+        "useful": true
+      },
+      {
+        "heading": "Reopening",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Remove the transport screen after the hive is stable on its new stand. Place a leafy branch across the entrance to encourage returning bees to reorient.",
+        "useful": true
+      },
+      {
+        "heading": "Trolley paint",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The equipment trolley is painted cream. Touch-up paint and brushes are kept in the garden shed; paint colour does not identify a hive's destination.",
+        "useful": false
+      },
+      {
+        "heading": "Queen inspection exception",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "An occupied hive awaiting completion of a queen inspection must not be moved between stands, even when the entrance has been screened and the boxes are strapped. Complete and record the queen inspection before scheduling the move.",
+        "useful": true
+      },
+      {
+        "heading": "Visitor badges",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "Visitors collect yellow paper badges from reception and return them before leaving. Badges do not record hive health or inspection status.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C2-own-child",
+    "units": [
+      {
+        "heading": "Cooperative apiary handbook",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook collects independent work instructions and building information for the cooperative apiary. Each named procedure has its own scope.",
+        "useful": false
+      },
+      {
+        "heading": "Moving occupied hives",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "The instructions in this section apply only to occupied hives moved between stands inside the same apiary. Moving a hive to another site requires a separate transport plan.",
+        "useful": false
+      },
+      {
+        "heading": "Entrance preparation",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Close the hive entrance with a ventilated transport screen after the last flying bees have returned. Keep the screen unobstructed throughout the move.",
+        "useful": false
+      },
+      {
+        "heading": "Securing the boxes",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Fasten the hive boxes and floor together with two ratchet straps before lifting. Lift the secured hive with two people and place it level on the new stand.",
+        "useful": false
+      },
+      {
+        "heading": "Reopening",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Remove the transport screen after the hive is stable on its new stand. Place a leafy branch across the entrance to encourage returning bees to reorient.",
+        "useful": false
+      },
+      {
+        "heading": "Trolley paint",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The equipment trolley is painted cream. Touch-up paint and brushes are kept in the garden shed; paint colour does not identify a hive's destination.",
+        "useful": true
+      },
+      {
+        "heading": "Queen inspection exception",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "An occupied hive awaiting completion of a queen inspection must not be moved between stands, even when the entrance has been screened and the boxes are strapped. Complete and record the queen inspection before scheduling the move.",
+        "useful": false
+      },
+      {
+        "heading": "Visitor badges",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "Visitors collect yellow paper badges from reception and return them before leaving. Badges do not record hive health or inspection status.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C2-subtree",
+    "units": [
+      {
+        "heading": "Cooperative apiary handbook",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook collects independent work instructions and building information for the cooperative apiary. Each named procedure has its own scope.",
+        "useful": false
+      },
+      {
+        "heading": "Moving occupied hives",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "The instructions in this section apply only to occupied hives moved between stands inside the same apiary. Moving a hive to another site requires a separate transport plan.",
+        "useful": true
+      },
+      {
+        "heading": "Entrance preparation",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Close the hive entrance with a ventilated transport screen after the last flying bees have returned. Keep the screen unobstructed throughout the move.",
+        "useful": true
+      },
+      {
+        "heading": "Securing the boxes",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Fasten the hive boxes and floor together with two ratchet straps before lifting. Lift the secured hive with two people and place it level on the new stand.",
+        "useful": true
+      },
+      {
+        "heading": "Reopening",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Remove the transport screen after the hive is stable on its new stand. Place a leafy branch across the entrance to encourage returning bees to reorient.",
+        "useful": true
+      },
+      {
+        "heading": "Trolley paint",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The equipment trolley is painted cream. Touch-up paint and brushes are kept in the garden shed; paint colour does not identify a hive's destination.",
+        "useful": true
+      },
+      {
+        "heading": "Queen inspection exception",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "An occupied hive awaiting completion of a queen inspection must not be moved between stands, even when the entrance has been screened and the boxes are strapped. Complete and record the queen inspection before scheduling the move.",
+        "useful": true
+      },
+      {
+        "heading": "Visitor badges",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "Visitors collect yellow paper badges from reception and return them before leaving. Badges do not record hive health or inspection status.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C2-noanswer",
+    "units": [
+      {
+        "heading": "Cooperative apiary handbook",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook collects independent work instructions and building information for the cooperative apiary. Each named procedure has its own scope.",
+        "useful": false
+      },
+      {
+        "heading": "Moving occupied hives",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "The instructions in this section apply only to occupied hives moved between stands inside the same apiary. Moving a hive to another site requires a separate transport plan.",
+        "useful": false
+      },
+      {
+        "heading": "Entrance preparation",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Close the hive entrance with a ventilated transport screen after the last flying bees have returned. Keep the screen unobstructed throughout the move.",
+        "useful": false
+      },
+      {
+        "heading": "Securing the boxes",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Fasten the hive boxes and floor together with two ratchet straps before lifting. Lift the secured hive with two people and place it level on the new stand.",
+        "useful": false
+      },
+      {
+        "heading": "Reopening",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Remove the transport screen after the hive is stable on its new stand. Place a leafy branch across the entrance to encourage returning bees to reorient.",
+        "useful": false
+      },
+      {
+        "heading": "Trolley paint",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The equipment trolley is painted cream. Touch-up paint and brushes are kept in the garden shed; paint colour does not identify a hive's destination.",
+        "useful": false
+      },
+      {
+        "heading": "Queen inspection exception",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "An occupied hive awaiting completion of a queen inspection must not be moved between stands, even when the entrance has been screened and the boxes are strapped. Complete and record the queen inspection before scheduling the move.",
+        "useful": false
+      },
+      {
+        "heading": "Visitor badges",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "Visitors collect yellow paper badges from reception and return them before leaving. Badges do not record hive health or inspection status.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C2-tail-ru",
+    "units": [
+      {
+        "heading": "Textile conservation room",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "The following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.",
+        "useful": true
+      },
+      {
+        "heading": "Intake notebook",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The conservation room occupies the upper floor of the east wing. A stone staircase leads from the entrance lobby to the corridor outside the room. The staircase has a wooden rail along its inner edge. Visitors use the lobby telephone to announce their arrival. A member of staff meets them at the bottom of the staircase and accompanies them upstairs. Coats and bags remain in the lobby lockers. Each locker has a small brass number attached to its door. Lost locker keys are reported to reception. The reception counter contains a shallow drawer for spare name cards. Name cards are written with a broad black pen so that they can be read from across the lobby. Empty card boxes are flattened before they are placed in the recycling container. The recycling container stands under the counter but must not obstruct the staff footrest. A wooden notice frame on the opposite wall displays the opening hours. The frame is removed from the wall for cleaning at the beginning of each season. Two screws hold the frame in place. The maintenance caretaker keeps the screwdriver in a locked tool cabinet. Only the caretaker opens that cabinet. The corridor has a row of tall windows overlooking a paved courtyard. The window blinds are raised for cleaning and lowered again afterwards. A pair of indoor shoes is available for each member of the housekeeping staff. The shoes remain on a low rack beside the service entrance. Their soles are brushed before they are returned to the rack. A bell at the service entrance alerts reception when a delivery arrives. The bell is checked during the weekly building inspection. Delivery drivers wait outside until a staff member opens the door. Empty delivery cartons are kept flat in the ground-floor storeroom. Cartons with torn corners are put aside for recycling rather than reused. The storeroom has a large wall calendar showing collection dates. The calendar is replaced at the beginning of January. The old calendar is removed rather than left underneath the new one. A round clock above the storeroom doorway has a plain white face. Its battery is replaced when the minute hand begins to stop. Spare clock batteries are stored in the office stationery cupboard. That cupboard also holds pencil sharpeners and paper clips. Paper clips are sorted by size into two small tins. The tins have lids to prevent their contents spilling into the drawer. A felt pad beneath each tin protects the wooden drawer base. The pads are shaken outdoors when dust accumulates. A cleaning cloth hangs from a peg near the office sink. The cloth is washed after use and dried before it is returned to the peg. The sink is not used for drinking water. Drinking water is available from a dispenser in the staff dining room. The dining room tables are wiped after every break. Staff return chairs to their marked positions before leaving the room. The floor markings leave a clear route between the entrance and the rear exit. The rear exit opens onto a covered walkway. During rain the walkway mat is replaced with a dry one at midday. Wet mats are hung in the utility yard rather than folded into a cupboard. These facilities observations are included for the building team and do not set quarantine release requirements.\n\nA newly received woven textile must remain in a sealed quarantine cabinet for twenty-seven days. Release requires a conservator to record two pest-free inspections seven days apart. If live larvae are found at either inspection, restart the full twenty-seven-day quarantine after treatment instead of releasing the textile.",
+        "useful": true
+      },
+      {
+        "heading": "Lighting inventory",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "The room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C2-long-negative",
+    "units": [
+      {
+        "heading": "Textile conservation room",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "The following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.",
+        "useful": false
+      },
+      {
+        "heading": "Intake notebook",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The conservation room occupies the upper floor of the east wing. A stone staircase leads from the entrance lobby to the corridor outside the room. The staircase has a wooden rail along its inner edge. Visitors use the lobby telephone to announce their arrival. A member of staff meets them at the bottom of the staircase and accompanies them upstairs. Coats and bags remain in the lobby lockers. Each locker has a small brass number attached to its door. Lost locker keys are reported to reception. The reception counter contains a shallow drawer for spare name cards. Name cards are written with a broad black pen so that they can be read from across the lobby. Empty card boxes are flattened before they are placed in the recycling container. The recycling container stands under the counter but must not obstruct the staff footrest. A wooden notice frame on the opposite wall displays the opening hours. The frame is removed from the wall for cleaning at the beginning of each season. Two screws hold the frame in place. The maintenance caretaker keeps the screwdriver in a locked tool cabinet. Only the caretaker opens that cabinet. The corridor has a row of tall windows overlooking a paved courtyard. The window blinds are raised for cleaning and lowered again afterwards. A pair of indoor shoes is available for each member of the housekeeping staff. The shoes remain on a low rack beside the service entrance. Their soles are brushed before they are returned to the rack. A bell at the service entrance alerts reception when a delivery arrives. The bell is checked during the weekly building inspection. Delivery drivers wait outside until a staff member opens the door. Empty delivery cartons are kept flat in the ground-floor storeroom. Cartons with torn corners are put aside for recycling rather than reused. The storeroom has a large wall calendar showing collection dates. The calendar is replaced at the beginning of January. The old calendar is removed rather than left underneath the new one. A round clock above the storeroom doorway has a plain white face. Its battery is replaced when the minute hand begins to stop. Spare clock batteries are stored in the office stationery cupboard. That cupboard also holds pencil sharpeners and paper clips. Paper clips are sorted by size into two small tins. The tins have lids to prevent their contents spilling into the drawer. A felt pad beneath each tin protects the wooden drawer base. The pads are shaken outdoors when dust accumulates. A cleaning cloth hangs from a peg near the office sink. The cloth is washed after use and dried before it is returned to the peg. The sink is not used for drinking water. Drinking water is available from a dispenser in the staff dining room. The dining room tables are wiped after every break. Staff return chairs to their marked positions before leaving the room. The floor markings leave a clear route between the entrance and the rear exit. The rear exit opens onto a covered walkway. During rain the walkway mat is replaced with a dry one at midday. Wet mats are hung in the utility yard rather than folded into a cupboard. These facilities observations are included for the building team and do not set quarantine release requirements.\n\nA newly received woven textile must remain in a sealed quarantine cabinet for twenty-seven days. Release requires a conservator to record two pest-free inspections seven days apart. If live larvae are found at either inspection, restart the full twenty-seven-day quarantine after treatment instead of releasing the textile.",
+        "useful": false
+      },
+      {
+        "heading": "Lighting inventory",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "The room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "C2-narrow-facilities",
+    "units": [
+      {
+        "heading": "Textile conservation room",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "The following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.",
+        "useful": false
+      },
+      {
+        "heading": "Intake notebook",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The conservation room occupies the upper floor of the east wing. A stone staircase leads from the entrance lobby to the corridor outside the room. The staircase has a wooden rail along its inner edge. Visitors use the lobby telephone to announce their arrival. A member of staff meets them at the bottom of the staircase and accompanies them upstairs. Coats and bags remain in the lobby lockers. Each locker has a small brass number attached to its door. Lost locker keys are reported to reception. The reception counter contains a shallow drawer for spare name cards. Name cards are written with a broad black pen so that they can be read from across the lobby. Empty card boxes are flattened before they are placed in the recycling container. The recycling container stands under the counter but must not obstruct the staff footrest. A wooden notice frame on the opposite wall displays the opening hours. The frame is removed from the wall for cleaning at the beginning of each season. Two screws hold the frame in place. The maintenance caretaker keeps the screwdriver in a locked tool cabinet. Only the caretaker opens that cabinet. The corridor has a row of tall windows overlooking a paved courtyard. The window blinds are raised for cleaning and lowered again afterwards. A pair of indoor shoes is available for each member of the housekeeping staff. The shoes remain on a low rack beside the service entrance. Their soles are brushed before they are returned to the rack. A bell at the service entrance alerts reception when a delivery arrives. The bell is checked during the weekly building inspection. Delivery drivers wait outside until a staff member opens the door. Empty delivery cartons are kept flat in the ground-floor storeroom. Cartons with torn corners are put aside for recycling rather than reused. The storeroom has a large wall calendar showing collection dates. The calendar is replaced at the beginning of January. The old calendar is removed rather than left underneath the new one. A round clock above the storeroom doorway has a plain white face. Its battery is replaced when the minute hand begins to stop. Spare clock batteries are stored in the office stationery cupboard. That cupboard also holds pencil sharpeners and paper clips. Paper clips are sorted by size into two small tins. The tins have lids to prevent their contents spilling into the drawer. A felt pad beneath each tin protects the wooden drawer base. The pads are shaken outdoors when dust accumulates. A cleaning cloth hangs from a peg near the office sink. The cloth is washed after use and dried before it is returned to the peg. The sink is not used for drinking water. Drinking water is available from a dispenser in the staff dining room. The dining room tables are wiped after every break. Staff return chairs to their marked positions before leaving the room. The floor markings leave a clear route between the entrance and the rear exit. The rear exit opens onto a covered walkway. During rain the walkway mat is replaced with a dry one at midday. Wet mats are hung in the utility yard rather than folded into a cupboard. These facilities observations are included for the building team and do not set quarantine release requirements.\n\nA newly received woven textile must remain in a sealed quarantine cabinet for twenty-seven days. Release requires a conservator to record two pest-free inspections seven days apart. If live larvae are found at either inspection, restart the full twenty-seven-day quarantine after treatment instead of releasing the textile.",
+        "useful": false
+      },
+      {
+        "heading": "Lighting inventory",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "The room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.",
+        "useful": true
+      }
+    ]
+  },
+  {
+    "task_id": "C2-building-log",
+    "units": [
+      {
+        "heading": "Textile conservation room",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "The following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.",
+        "useful": false
+      },
+      {
+        "heading": "Intake notebook",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 9,
+        "own_text": "The conservation room occupies the upper floor of the east wing. A stone staircase leads from the entrance lobby to the corridor outside the room. The staircase has a wooden rail along its inner edge. Visitors use the lobby telephone to announce their arrival. A member of staff meets them at the bottom of the staircase and accompanies them upstairs. Coats and bags remain in the lobby lockers. Each locker has a small brass number attached to its door. Lost locker keys are reported to reception. The reception counter contains a shallow drawer for spare name cards. Name cards are written with a broad black pen so that they can be read from across the lobby. Empty card boxes are flattened before they are placed in the recycling container. The recycling container stands under the counter but must not obstruct the staff footrest. A wooden notice frame on the opposite wall displays the opening hours. The frame is removed from the wall for cleaning at the beginning of each season. Two screws hold the frame in place. The maintenance caretaker keeps the screwdriver in a locked tool cabinet. Only the caretaker opens that cabinet. The corridor has a row of tall windows overlooking a paved courtyard. The window blinds are raised for cleaning and lowered again afterwards. A pair of indoor shoes is available for each member of the housekeeping staff. The shoes remain on a low rack beside the service entrance. Their soles are brushed before they are returned to the rack. A bell at the service entrance alerts reception when a delivery arrives. The bell is checked during the weekly building inspection. Delivery drivers wait outside until a staff member opens the door. Empty delivery cartons are kept flat in the ground-floor storeroom. Cartons with torn corners are put aside for recycling rather than reused. The storeroom has a large wall calendar showing collection dates. The calendar is replaced at the beginning of January. The old calendar is removed rather than left underneath the new one. A round clock above the storeroom doorway has a plain white face. Its battery is replaced when the minute hand begins to stop. Spare clock batteries are stored in the office stationery cupboard. That cupboard also holds pencil sharpeners and paper clips. Paper clips are sorted by size into two small tins. The tins have lids to prevent their contents spilling into the drawer. A felt pad beneath each tin protects the wooden drawer base. The pads are shaken outdoors when dust accumulates. A cleaning cloth hangs from a peg near the office sink. The cloth is washed after use and dried before it is returned to the peg. The sink is not used for drinking water. Drinking water is available from a dispenser in the staff dining room. The dining room tables are wiped after every break. Staff return chairs to their marked positions before leaving the room. The floor markings leave a clear route between the entrance and the rear exit. The rear exit opens onto a covered walkway. During rain the walkway mat is replaced with a dry one at midday. Wet mats are hung in the utility yard rather than folded into a cupboard. These facilities observations are included for the building team and do not set quarantine release requirements.\n\nA newly received woven textile must remain in a sealed quarantine cabinet for twenty-seven days. Release requires a conservator to record two pest-free inspections seven days apart. If live larvae are found at either inspection, restart the full twenty-seven-day quarantine after treatment instead of releasing the textile.",
+        "useful": true
+      },
+      {
+        "heading": "Lighting inventory",
+        "heading_line": 11,
+        "line_start": 13,
+        "line_end": 13,
+        "own_text": "The room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-pack",
+    "units": [
+      {
+        "heading": "Meridian mirror workshop",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook covers the workshop's removable observatory mirrors. It does not prescribe work on permanently mounted lenses.",
+        "useful": true
+      },
+      {
+        "heading": "Packing a mirror",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Use this procedure only for a cooled, removable mirror. The [crack restriction](#crack-restriction) applies even after packing is complete.",
+        "useful": true
+      },
+      {
+        "heading": "Cooling",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Leave the mirror on its padded bench for forty minutes before wrapping it. Do not start wrapping while the surface remains warmer than the room.",
+        "useful": true
+      },
+      {
+        "heading": "Wrapping",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Place acid-free tissue against the reflective face, followed by a rigid cover. Never put adhesive tape directly on the reflective coating.",
+        "useful": true
+      },
+      {
+        "heading": "Crate closure",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Fasten both brass latches and have a second technician record the crate number before moving it to dispatch.",
+        "useful": true
+      },
+      {
+        "heading": "Bench accessories",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The bench pencil cup is violet. Replacement pencils are stored in drawer six; their colour is not an inspection result.",
+        "useful": false
+      },
+      {
+        "heading": "Crack restriction",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "A mirror with a visible edge crack must remain in the inspection room, even if both crate latches are fastened. Obtain the optics supervisor's written release before moving that mirror to dispatch.",
+        "useful": true
+      },
+      {
+        "heading": "Tea cupboard",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "The staff tea cupboard is restocked on Thursdays. Spare mugs belong on its lower shelf.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-section",
+    "units": [
+      {
+        "heading": "Meridian mirror workshop",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook covers the workshop's removable observatory mirrors. It does not prescribe work on permanently mounted lenses.",
+        "useful": false
+      },
+      {
+        "heading": "Packing a mirror",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Use this procedure only for a cooled, removable mirror. The [crack restriction](#crack-restriction) applies even after packing is complete.",
+        "useful": true
+      },
+      {
+        "heading": "Cooling",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Leave the mirror on its padded bench for forty minutes before wrapping it. Do not start wrapping while the surface remains warmer than the room.",
+        "useful": true
+      },
+      {
+        "heading": "Wrapping",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Place acid-free tissue against the reflective face, followed by a rigid cover. Never put adhesive tape directly on the reflective coating.",
+        "useful": true
+      },
+      {
+        "heading": "Crate closure",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Fasten both brass latches and have a second technician record the crate number before moving it to dispatch.",
+        "useful": true
+      },
+      {
+        "heading": "Bench accessories",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The bench pencil cup is violet. Replacement pencils are stored in drawer six; their colour is not an inspection result.",
+        "useful": true
+      },
+      {
+        "heading": "Crack restriction",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "A mirror with a visible edge crack must remain in the inspection room, even if both crate latches are fastened. Obtain the optics supervisor's written release before moving that mirror to dispatch.",
+        "useful": true
+      },
+      {
+        "heading": "Tea cupboard",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "The staff tea cupboard is restocked on Thursdays. Spare mugs belong on its lower shelf.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-pencil",
+    "units": [
+      {
+        "heading": "Meridian mirror workshop",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook covers the workshop's removable observatory mirrors. It does not prescribe work on permanently mounted lenses.",
+        "useful": false
+      },
+      {
+        "heading": "Packing a mirror",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Use this procedure only for a cooled, removable mirror. The [crack restriction](#crack-restriction) applies even after packing is complete.",
+        "useful": false
+      },
+      {
+        "heading": "Cooling",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Leave the mirror on its padded bench for forty minutes before wrapping it. Do not start wrapping while the surface remains warmer than the room.",
+        "useful": false
+      },
+      {
+        "heading": "Wrapping",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Place acid-free tissue against the reflective face, followed by a rigid cover. Never put adhesive tape directly on the reflective coating.",
+        "useful": false
+      },
+      {
+        "heading": "Crate closure",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Fasten both brass latches and have a second technician record the crate number before moving it to dispatch.",
+        "useful": false
+      },
+      {
+        "heading": "Bench accessories",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The bench pencil cup is violet. Replacement pencils are stored in drawer six; their colour is not an inspection result.",
+        "useful": true
+      },
+      {
+        "heading": "Crack restriction",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "A mirror with a visible edge crack must remain in the inspection room, even if both crate latches are fastened. Obtain the optics supervisor's written release before moving that mirror to dispatch.",
+        "useful": false
+      },
+      {
+        "heading": "Tea cupboard",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "The staff tea cupboard is restocked on Thursdays. Spare mugs belong on its lower shelf.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-optics-noanswer",
+    "units": [
+      {
+        "heading": "Meridian mirror workshop",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This handbook covers the workshop's removable observatory mirrors. It does not prescribe work on permanently mounted lenses.",
+        "useful": false
+      },
+      {
+        "heading": "Packing a mirror",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Use this procedure only for a cooled, removable mirror. The [crack restriction](#crack-restriction) applies even after packing is complete.",
+        "useful": false
+      },
+      {
+        "heading": "Cooling",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Leave the mirror on its padded bench for forty minutes before wrapping it. Do not start wrapping while the surface remains warmer than the room.",
+        "useful": false
+      },
+      {
+        "heading": "Wrapping",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "Place acid-free tissue against the reflective face, followed by a rigid cover. Never put adhesive tape directly on the reflective coating.",
+        "useful": false
+      },
+      {
+        "heading": "Crate closure",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "Fasten both brass latches and have a second technician record the crate number before moving it to dispatch.",
+        "useful": false
+      },
+      {
+        "heading": "Bench accessories",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "The bench pencil cup is violet. Replacement pencils are stored in drawer six; their colour is not an inspection result.",
+        "useful": false
+      },
+      {
+        "heading": "Crack restriction",
+        "heading_line": 25,
+        "line_start": 27,
+        "line_end": 27,
+        "own_text": "A mirror with a visible edge crack must remain in the inspection room, even if both crate latches are fastened. Obtain the optics supervisor's written release before moving that mirror to dispatch.",
+        "useful": false
+      },
+      {
+        "heading": "Tea cupboard",
+        "heading_line": 29,
+        "line_start": 31,
+        "line_end": 31,
+        "own_text": "The staff tea cupboard is restocked on Thursdays. Spare mugs belong on its lower shelf.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-hold-ru",
+    "units": [
+      {
+        "heading": "Alder seed archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This manual governs the archive's sealed seed envelopes, not living seedlings. Keep each accession identifier attached during every inspection.",
+        "useful": true
+      },
+      {
+        "heading": "Receiving envelopes",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Hold incoming envelopes in the dry cabinet for nineteen days. Before shelving them, record two humidity readings at least four days apart, both below thirty percent. If either reading reaches thirty percent, restart the entire nineteen-day hold after drying; do not average the readings to authorize shelving. The [damaged seal rule](#damaged-seal-rule) overrides a completed hold.",
+        "useful": true
+      },
+      {
+        "heading": "Record cards",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Write the accession identifier and both measurement dates on the blue record card. A missing date prevents shelving until the record is corrected.",
+        "useful": true
+      },
+      {
+        "heading": "Cabinet furniture",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The cabinet has seven removable shelves. Spare shelf pins are kept in the maintenance locker.",
+        "useful": false
+      },
+      {
+        "heading": "Damaged seal rule",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "An envelope with a split seal must be isolated in tray D and examined by the collection keeper before shelving, even when both humidity readings are below thirty percent.",
+        "useful": true
+      },
+      {
+        "heading": "Bicycle shelter",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Staff bicycles use the west shelter. Unclaimed cycle lights are handed to reception on the first Monday of each month.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-shelves",
+    "units": [
+      {
+        "heading": "Alder seed archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This manual governs the archive's sealed seed envelopes, not living seedlings. Keep each accession identifier attached during every inspection.",
+        "useful": false
+      },
+      {
+        "heading": "Receiving envelopes",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Hold incoming envelopes in the dry cabinet for nineteen days. Before shelving them, record two humidity readings at least four days apart, both below thirty percent. If either reading reaches thirty percent, restart the entire nineteen-day hold after drying; do not average the readings to authorize shelving. The [damaged seal rule](#damaged-seal-rule) overrides a completed hold.",
+        "useful": false
+      },
+      {
+        "heading": "Record cards",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Write the accession identifier and both measurement dates on the blue record card. A missing date prevents shelving until the record is corrected.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet furniture",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The cabinet has seven removable shelves. Spare shelf pins are kept in the maintenance locker.",
+        "useful": true
+      },
+      {
+        "heading": "Damaged seal rule",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "An envelope with a split seal must be isolated in tray D and examined by the collection keeper before shelving, even when both humidity readings are below thirty percent.",
+        "useful": false
+      },
+      {
+        "heading": "Bicycle shelter",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Staff bicycles use the west shelter. Unclaimed cycle lights are handed to reception on the first Monday of each month.",
+        "useful": false
+      }
+    ]
+  },
+  {
+    "task_id": "V3-lights",
+    "units": [
+      {
+        "heading": "Alder seed archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This manual governs the archive's sealed seed envelopes, not living seedlings. Keep each accession identifier attached during every inspection.",
+        "useful": false
+      },
+      {
+        "heading": "Receiving envelopes",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Hold incoming envelopes in the dry cabinet for nineteen days. Before shelving them, record two humidity readings at least four days apart, both below thirty percent. If either reading reaches thirty percent, restart the entire nineteen-day hold after drying; do not average the readings to authorize shelving. The [damaged seal rule](#damaged-seal-rule) overrides a completed hold.",
+        "useful": false
+      },
+      {
+        "heading": "Record cards",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Write the accession identifier and both measurement dates on the blue record card. A missing date prevents shelving until the record is corrected.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet furniture",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The cabinet has seven removable shelves. Spare shelf pins are kept in the maintenance locker.",
+        "useful": false
+      },
+      {
+        "heading": "Damaged seal rule",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "An envelope with a split seal must be isolated in tray D and examined by the collection keeper before shelving, even when both humidity readings are below thirty percent.",
+        "useful": false
+      },
+      {
+        "heading": "Bicycle shelter",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Staff bicycles use the west shelter. Unclaimed cycle lights are handed to reception on the first Monday of each month.",
+        "useful": true
+      }
+    ]
+  },
+  {
+    "task_id": "V3-seed-noanswer",
+    "units": [
+      {
+        "heading": "Alder seed archive",
+        "heading_line": 1,
+        "line_start": 3,
+        "line_end": 3,
+        "own_text": "This manual governs the archive's sealed seed envelopes, not living seedlings. Keep each accession identifier attached during every inspection.",
+        "useful": false
+      },
+      {
+        "heading": "Receiving envelopes",
+        "heading_line": 5,
+        "line_start": 7,
+        "line_end": 7,
+        "own_text": "Hold incoming envelopes in the dry cabinet for nineteen days. Before shelving them, record two humidity readings at least four days apart, both below thirty percent. If either reading reaches thirty percent, restart the entire nineteen-day hold after drying; do not average the readings to authorize shelving. The [damaged seal rule](#damaged-seal-rule) overrides a completed hold.",
+        "useful": false
+      },
+      {
+        "heading": "Record cards",
+        "heading_line": 9,
+        "line_start": 11,
+        "line_end": 11,
+        "own_text": "Write the accession identifier and both measurement dates on the blue record card. A missing date prevents shelving until the record is corrected.",
+        "useful": false
+      },
+      {
+        "heading": "Cabinet furniture",
+        "heading_line": 13,
+        "line_start": 15,
+        "line_end": 15,
+        "own_text": "The cabinet has seven removable shelves. Spare shelf pins are kept in the maintenance locker.",
+        "useful": false
+      },
+      {
+        "heading": "Damaged seal rule",
+        "heading_line": 17,
+        "line_start": 19,
+        "line_end": 19,
+        "own_text": "An envelope with a split seal must be isolated in tray D and examined by the collection keeper before shelving, even when both humidity readings are below thirty percent.",
+        "useful": false
+      },
+      {
+        "heading": "Bicycle shelter",
+        "heading_line": 21,
+        "line_start": 23,
+        "line_end": 23,
+        "own_text": "Staff bicycles use the west shelter. Unclaimed cycle lights are handed to reception on the first Monday of each month.",
+        "useful": false
+      }
+    ]
+  }
+]

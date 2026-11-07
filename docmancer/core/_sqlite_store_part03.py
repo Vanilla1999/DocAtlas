@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 from collections import Counter
+from contextlib import closing
 from math import log1p
 
 from ._sqlite_store_shared import *  # noqa: F401,F403
@@ -230,11 +231,83 @@ class _SQLiteStorePart03:
             }
         return selected
 
+    def iter_scope_candidates(
+        self, *, filters: dict[str, Any] | None = None,
+        batch_size: int = 128, receipt: dict[str, Any] | None = None,
+    ):
+        """Enumerate a complete filtered generation without lexical admission.
+
+        Keyset batches bound memory, not corpus size. This deliberately bypasses
+        the legacy acquisition memo (which deep-copies whole pools). Source
+        authorization and freshness must still be checked by the public reader.
+        Consumers must exhaust this iterator before publishing a successful
+        response; closure/cancellation and generation changes are not success.
+        """
+        if type(batch_size) is not int or batch_size <= 0:
+            raise ValueError("batch_size must be a positive integer")
+        state = receipt if receipt is not None else {}
+        state.update(status="scanning", rows=0, batches=0, exhausted=False)
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        with closing(self._connect()) as conn:
+            generation = self._active_generation_id(conn)
+        state["generation_id"] = generation
+        if not generation:
+            state["status"] = "scan_incomplete"
+            raise ValueError("scope_scan_requires_prepared_generation")
+        last_id = -1
+        try:
+            while True:
+                with closing(self._connect()) as conn:
+                    if self._active_generation_id(conn) != generation:
+                        raise ValueError("scope_scan_generation_changed")
+                    rows = conn.execute(
+                        f"""
+                        SELECT sections.hydration_id AS id, sections.*,
+                               sections.display_text AS text,
+                               sections.display_token_estimate AS token_estimate
+                        FROM retrieval_children AS sections
+                        WHERE sections.generation_id = ? AND sections.hydration_id > ?
+                        {filter_sql}
+                        ORDER BY sections.hydration_id LIMIT ?
+                        """,
+                        (generation, last_id, *filter_params, batch_size),
+                    ).fetchall()
+                if not rows:
+                    # A fresh connection observes concurrent promotion rather
+                    # than rechecking an old SQLite read transaction's snapshot.
+                    with closing(self._connect()) as conn:
+                        if self._active_generation_id(conn) != generation:
+                            raise ValueError("scope_scan_generation_changed")
+                    state.update(status="complete", exhausted=True)
+                    return
+                state["batches"] += 1
+                for row in rows:
+                    metadata = json.loads(row["metadata_json"] or "{}")
+                    metadata.update(
+                        title=row["title"], section_id=int(row["id"]),
+                        token_estimate=int(row["token_estimate"]),
+                        acquisition={"method": "complete_filtered_generation_v1",
+                                     "generation_id": generation,
+                                     "relevance_unassessed": True},
+                    )
+                    last_id = int(row["id"])
+                    state["rows"] += 1
+                    yield RetrievedChunk(
+                        source=row["source"], chunk_index=int(row["chunk_index"]),
+                        text=row["text"], score=0.0, metadata=metadata,
+                    )
+        finally:
+            if not state["exhausted"]:
+                state["status"] = "scan_incomplete"
+
     def acquire_candidates(
         self, text: str, *, expand: str | None = None,
         filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
         """Internal acquisition; public delivery caps do not shrink this pool."""
+        from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+        if minimal_context_enabled():
+            return list(self.iter_scope_candidates(filters=filters))
         entries = active_acquisition_entries()
         if entries is None:
             return self._query_bm25_candidates(
@@ -286,6 +359,14 @@ class _SQLiteStorePart03:
             raise ValueError("expand must be none, adjacent or page")
         rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
         native_count = len(rows)
+        import os
+        hybrid = os.environ.get("DOCATLAS_EXPERIMENT_ACQUISITION_E5", "0")
+        if hybrid not in {"0", "1"}:
+            raise ValueError("DOCATLAS_EXPERIMENT_ACQUISITION_E5 must be 0 or 1")
+        if hybrid == "1":
+            from docmancer.retrieval.experimental_e5_acquisition import hybrid_rows
+            rows = hybrid_rows(self, text, rows, filters, ACQUISITION_CANDIDATES)
+        method = "lexical_e5_round_robin_v1" if hybrid == "1" else ACQUISITION_METHOD
         # Research flag, off by default: fill the same ceiling in rank order,
         # each ranked hit followed by every window under its author heading.
         # Section boundaries come from the document; no new count is added.
@@ -345,7 +426,7 @@ class _SQLiteStorePart03:
         savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - token_total / raw_tokens))
         runway = 1.0 if token_total <= 0 else raw_tokens / token_total
         acquisition = {
-            "method": ACQUISITION_METHOD,
+            "method": method,
             "sql_rows": native_count,
             "candidate_ceiling": ACQUISITION_CANDIDATES,
             "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
@@ -382,7 +463,7 @@ class _SQLiteStorePart03:
                     "base_utility": -cost, "feature_contributions": {},
                     "final_utility": -cost, "raw_rank": rank,
                     "final_rank": rank, "rank_delta": 0,
-                    "candidate_pool_size": len(rows), "method": ACQUISITION_METHOD,
+                    "candidate_pool_size": len(rows), "method": method,
                 },
                 "lexical_match": self._lexical_match_trace(
                     text, title=str(row["title"]), body=str(row["text"]),
@@ -397,6 +478,8 @@ class _SQLiteStorePart03:
                     "anchor_section_id": row["_expansion_anchor_id"],
                 }
                 metadata.pop("lexical_match", None)
+            if "_e5_cosine" in row:
+                metadata["ranking"]["e5_cosine"] = row["_e5_cosine"]
             results.append(RetrievedChunk(
                 source=row["source"], chunk_index=int(row["chunk_index"]),
                 text=row["text"], score=-cost, metadata=metadata,
@@ -743,6 +826,15 @@ class _SQLiteStorePart03:
             # out valid body matches. The connection-local function performs no
             # schema/index repair and also works on MemberReadStore's ro handle.
             conn.create_function("docatlas_source_utility", 3, source_utility, deterministic=True)
+            # source-description-routing-v1: only successfully appended, source-bound
+            # annotations join the existing low-weight description routing field.
+            # Keep clean-body statistics/BM25 and the no-artifact expression intact.
+            description_sql = """CASE WHEN json_extract(sections.metadata_json,
+                '$.experimental_search_description_v1.status') = 'appended'
+                THEN COALESCE(json_extract(sections.metadata_json, '$.project_doc_description'), '')
+                     || char(10) || json_extract(sections.metadata_json,
+                         '$.experimental_search_description_v1.record.description')
+                ELSE json_extract(sections.metadata_json, '$.project_doc_description') END"""
             rows = list(conn.execute(
                 f"""
                 SELECT sections.hydration_id AS id, sections.*,
@@ -751,14 +843,14 @@ class _SQLiteStorePart03:
                        sections.display_content_hash AS content_hash,
                        -docatlas_source_utility(
                             sections.title, {score_body_sql},
-                           json_extract(sections.metadata_json, '$.project_doc_description')
+                            {description_sql}
                        ) AS rank
                 FROM retrieval_children AS sections
                 WHERE ({candidate_sql})
                   AND sections.generation_id = ?
                   AND (docatlas_source_utility(
                        sections.title, {score_body_sql},
-                      json_extract(sections.metadata_json, '$.project_doc_description')
+                       {description_sql}
                   ) > 0 OR {locator_sql})
                 {filter_sql}
                 ORDER BY CASE WHEN {locator_sql} THEN 1 ELSE 0 END DESC,

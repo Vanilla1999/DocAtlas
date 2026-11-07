@@ -1,0 +1,584 @@
+[
+  {
+    "id": "V-M1",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": false,
+    "missing_required_units": [
+      "weather.md#Suspension",
+      "weather.md#Weather decisions"
+    ],
+    "missing_facts": [
+      [
+        "weather.md#Suspension",
+        "Suspend outdoor observations when the wind interlock opens."
+      ],
+      [
+        "weather.md#Suspension",
+        "Preserve reservation identifiers during suspension."
+      ],
+      [
+        "weather.md#Suspension",
+        "Resume only after the interlock closes and the duty operator records a restart approval."
+      ]
+    ],
+    "hard_negatives": [],
+    "optional_units": [
+      "reservations.md#Training slots"
+    ],
+    "unlabelled_units": [],
+    "selected_units": [
+      "reservations.md#Confirmed reservations",
+      "reservations.md#Locked instrument",
+      "reservations.md#Training slots",
+      "reservations.md#Transfer"
+    ],
+    "source_rows": 4,
+    "delivered_source_tokens": 158,
+    "allowed_source_tokens": 688,
+    "role_source_tokens": {
+      "direct": 89,
+      "structural": 38,
+      "optional_support": 31,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 3.7909522840054706,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 21,
+      "model_pairs": 21,
+      "model_forwards": 21,
+      "model_input_tokens": 9716,
+      "planned_input_tokens": 9716,
+      "preflight_units": 21,
+      "model_loads": 1,
+      "runtime_cache_hits": 0,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 21,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.5712550950047444,
+      "asset_verification_seconds": 0.5980634070001543,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1220989952,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 3.518008965002082
+    },
+    "packet_json_tokens": 1240,
+    "supported_rendering_tokens": 931,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-M2",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": false,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [
+      "weather.md#Forecast display"
+    ],
+    "unlabelled_units": [],
+    "selected_units": [
+      "weather.md#Forecast display",
+      "weather.md#Indoor instrument",
+      "weather.md#Suspension",
+      "weather.md#Weather decisions"
+    ],
+    "source_rows": 4,
+    "delivered_source_tokens": 116,
+    "allowed_source_tokens": 688,
+    "role_source_tokens": {
+      "direct": 75,
+      "structural": 14,
+      "optional_support": 27,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 1.1749125279966393,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 21,
+      "model_pairs": 21,
+      "model_forwards": 21,
+      "model_input_tokens": 9275,
+      "planned_input_tokens": 9275,
+      "preflight_units": 21,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 21,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.2983048649839475,
+      "asset_verification_seconds": 0.6017897759957123,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1220674048,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.0118697680009063
+    },
+    "packet_json_tokens": 1193,
+    "supported_rendering_tokens": 884,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-M3",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": false,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [
+      "architecture.md#Prototype recovery",
+      "architecture.md#Scheduler architecture",
+      "clock.md#Simulation clock"
+    ],
+    "unlabelled_units": [],
+    "selected_units": [
+      "architecture.md#Prototype recovery",
+      "architecture.md#Scheduler architecture",
+      "clock.md#Clock offset",
+      "clock.md#Missing reference",
+      "clock.md#Simulation clock",
+      "clock.md#Time coordination"
+    ],
+    "source_rows": 6,
+    "delivered_source_tokens": 168,
+    "allowed_source_tokens": 688,
+    "role_source_tokens": {
+      "direct": 67,
+      "structural": 19,
+      "optional_support": 62,
+      "optional_context": 20,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 1.1905694189990754,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 21,
+      "model_pairs": 21,
+      "model_forwards": 21,
+      "model_input_tokens": 9275,
+      "planned_input_tokens": 9275,
+      "preflight_units": 21,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 21,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.2936026559691527,
+      "asset_verification_seconds": 0.6000118169977213,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1220674048,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.004922293999698
+    },
+    "packet_json_tokens": 1583,
+    "supported_rendering_tokens": 1109,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-M4",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": true,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [],
+    "unlabelled_units": [],
+    "selected_units": [],
+    "source_rows": 0,
+    "delivered_source_tokens": 0,
+    "allowed_source_tokens": 688,
+    "role_source_tokens": {
+      "direct": 0,
+      "structural": 0,
+      "optional_support": 0,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 1.1244160720016225,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 21,
+      "model_pairs": 21,
+      "model_forwards": 21,
+      "model_input_tokens": 9443,
+      "planned_input_tokens": 9443,
+      "preflight_units": 21,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 21,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.2982365649950225,
+      "asset_verification_seconds": 0.5990707699966151,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1220795392,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.0130124559946125
+    },
+    "packet_json_tokens": 331,
+    "supported_rendering_tokens": null,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-C1",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": false,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [
+      "overview.md#Cairn archive",
+      "restore.md#Training archive"
+    ],
+    "unlabelled_units": [
+      "overview.md#Components",
+      "recovery.md#Reconcile",
+      "recovery.md#Recovery procedure",
+      "recovery.md#Restore failure handling"
+    ],
+    "selected_units": [
+      "overview.md#Cairn archive",
+      "overview.md#Components",
+      "recovery.md#Reconcile",
+      "recovery.md#Recovery procedure",
+      "recovery.md#Restore failure handling",
+      "restore.md#Collection restore",
+      "restore.md#Held collection",
+      "restore.md#Snapshot selection",
+      "restore.md#Training archive"
+    ],
+    "source_rows": 9,
+    "delivered_source_tokens": 260,
+    "allowed_source_tokens": 664,
+    "role_source_tokens": {
+      "direct": 75,
+      "structural": 14,
+      "optional_support": 56,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 115
+    },
+    "seconds": 1.3399743129994022,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 23,
+      "model_pairs": 23,
+      "model_forwards": 23,
+      "model_input_tokens": 9742,
+      "planned_input_tokens": 9742,
+      "preflight_units": 23,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 23,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.30569477297831327,
+      "asset_verification_seconds": 0.5957211589993676,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1217932800,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.0344830520043615
+    },
+    "packet_json_tokens": 2258,
+    "supported_rendering_tokens": 1505,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-C2",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": false,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [
+      "overview.md#Cairn archive",
+      "overview.md#Components",
+      "recovery.md#Sandbox reset"
+    ],
+    "unlabelled_units": [],
+    "selected_units": [
+      "overview.md#Cairn archive",
+      "overview.md#Components",
+      "recovery.md#Preserve",
+      "recovery.md#Reconcile",
+      "recovery.md#Recovery procedure",
+      "recovery.md#Reopen",
+      "recovery.md#Restore failure handling",
+      "recovery.md#Sandbox reset"
+    ],
+    "source_rows": 8,
+    "delivered_source_tokens": 219,
+    "allowed_source_tokens": 664,
+    "role_source_tokens": {
+      "direct": 106,
+      "structural": 16,
+      "optional_support": 97,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 1.2384184199981974,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 23,
+      "model_pairs": 23,
+      "model_forwards": 23,
+      "model_input_tokens": 9351,
+      "planned_input_tokens": 9351,
+      "preflight_units": 23,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 23,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.3037637080051354,
+      "asset_verification_seconds": 0.5956199709980865,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1215042560,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.0290399709992926
+    },
+    "packet_json_tokens": 2059,
+    "supported_rendering_tokens": 1393,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-C3",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": false,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [],
+    "unlabelled_units": [],
+    "selected_units": [
+      "publication.md#Partial collections",
+      "publication.md#Restore publication",
+      "publication.md#Switch",
+      "rollback.md#Pointer rollback",
+      "rollback.md#Rollback"
+    ],
+    "source_rows": 5,
+    "delivered_source_tokens": 148,
+    "allowed_source_tokens": 664,
+    "role_source_tokens": {
+      "direct": 77,
+      "structural": 71,
+      "optional_support": 0,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 1.1979164310032502,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 23,
+      "model_pairs": 23,
+      "model_forwards": 23,
+      "model_input_tokens": 9236,
+      "planned_input_tokens": 9236,
+      "preflight_units": 23,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 23,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.2970075859921053,
+      "asset_verification_seconds": 0.5969826400032616,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1213985792,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.0217569969972828
+    },
+    "packet_json_tokens": 1434,
+    "supported_rendering_tokens": 1026,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  },
+  {
+    "id": "V-C4",
+    "phase": "validation",
+    "split": "validation",
+    "no_answer": true,
+    "missing_required_units": [],
+    "missing_facts": [],
+    "hard_negatives": [],
+    "optional_units": [],
+    "unlabelled_units": [],
+    "selected_units": [],
+    "source_rows": 0,
+    "delivered_source_tokens": 0,
+    "allowed_source_tokens": 664,
+    "role_source_tokens": {
+      "direct": 0,
+      "structural": 0,
+      "optional_support": 0,
+      "optional_context": 0,
+      "negative": 0,
+      "unlabelled": 0
+    },
+    "seconds": 1.140334661999077,
+    "scorer_receipt": {
+      "recipe": "qwen3-contextual-own-body-evidence-v1",
+      "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+      "status": "complete",
+      "units": 23,
+      "model_pairs": 23,
+      "model_forwards": 23,
+      "model_input_tokens": 9098,
+      "planned_input_tokens": 9098,
+      "preflight_units": 23,
+      "model_loads": 0,
+      "runtime_cache_hits": 1,
+      "score_cache_hits": 0,
+      "diagnostics_recorded": 23,
+      "diagnostics_omitted": 0,
+      "inference_seconds": 0.30355479498393834,
+      "asset_verification_seconds": 0.5963562190008815,
+      "runtime": {
+        "torch": "2.10.0+cu128",
+        "cuda": "12.8",
+        "transformers": "4.57.1",
+        "tokenizers": "0.22.2",
+        "safetensors": "0.8.0",
+        "capability": [
+          12,
+          0
+        ],
+        "dtype": "bfloat16",
+        "attention": "sdpa",
+        "batch": 1
+      },
+      "peak_vram_allocated_bytes": 1213895680,
+      "peak_vram_reserved_bytes": 1245708288,
+      "total_seconds": 1.0250769320045947
+    },
+    "packet_json_tokens": 326,
+    "supported_rendering_tokens": null,
+    "actual_mcp_wire_tokens": null,
+    "actual_client_model_visible_tokens": null
+  }
+]

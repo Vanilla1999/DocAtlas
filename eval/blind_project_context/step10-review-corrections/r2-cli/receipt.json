@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "boundary": "real evaluator CLI; strace execve audit; no mocks",
+  "cli_calls": 2,
+  "session_calls": 0,
+  "model_calls": 0,
+  "cases": [
+    {
+      "case": "historical-plan",
+      "command": [
+        "/tmp/opencode/step10-v3-py313/bin/python",
+        "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/run_gap_agent_study.py",
+        "--out",
+        "/tmp/opencode/step10-review-r2-cli-01/historical-plan/output",
+        "--prepared-root",
+        "/tmp/opencode/step8-corpora2",
+        "--executable",
+        "/tmp/opencode/step10-v3-py313/bin/doc-atlas",
+        "--arm",
+        "file-current",
+        "--corpus",
+        "L0",
+        "--case",
+        "T01-ru"
+      ],
+      "exit": 1,
+      "expected_error": "study plan changed; use a new output",
+      "sentinel_bytes_unchanged": true,
+      "before_sha256": {
+        "file-current-plan.json": "632a6d41b53071ccea99b1a7d3a48edaa66150821f8c5540a6c1e6e76e2a8950",
+        "L0/file-current/T01-ru.jsonl": "e554616e533b51109df5ee613032f29a41bf099055cc35b5a48a3e9a2f987308",
+        "L0/file-current/opencode.json": "74c7bd1a5ad086edf891ca69360f604388dec2af650c171587fac1b4695b0870"
+      },
+      "after_sha256": {
+        "file-current-plan.json": "632a6d41b53071ccea99b1a7d3a48edaa66150821f8c5540a6c1e6e76e2a8950",
+        "L0/file-current/T01-ru.jsonl": "e554616e533b51109df5ee613032f29a41bf099055cc35b5a48a3e9a2f987308",
+        "L0/file-current/opencode.json": "74c7bd1a5ad086edf891ca69360f604388dec2af650c171587fac1b4695b0870"
+      },
+      "execve_count_including_evaluator": 1,
+      "session_model_processes": 0
+    },
+    {
+      "case": "orphan-artifacts",
+      "command": [
+        "/tmp/opencode/step10-v3-py313/bin/python",
+        "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/run_gap_agent_study.py",
+        "--out",
+        "/tmp/opencode/step10-review-r2-cli-01/orphan-artifacts/output",
+        "--prepared-root",
+        "/tmp/opencode/step8-corpora2",
+        "--executable",
+        "/tmp/opencode/step10-v3-py313/bin/doc-atlas",
+        "--arm",
+        "file-current",
+        "--corpus",
+        "L0",
+        "--case",
+        "T01-ru"
+      ],
+      "exit": 1,
+      "expected_error": "case artifacts exist without study plan; use a new output",
+      "sentinel_bytes_unchanged": true,
+      "before_sha256": {
+        "L0/file-current/T01-ru.jsonl": "e554616e533b51109df5ee613032f29a41bf099055cc35b5a48a3e9a2f987308",
+        "L0/file-current/opencode.json": "74c7bd1a5ad086edf891ca69360f604388dec2af650c171587fac1b4695b0870"
+      },
+      "after_sha256": {
+        "L0/file-current/T01-ru.jsonl": "e554616e533b51109df5ee613032f29a41bf099055cc35b5a48a3e9a2f987308",
+        "L0/file-current/opencode.json": "74c7bd1a5ad086edf891ca69360f604388dec2af650c171587fac1b4695b0870"
+      },
+      "execve_count_including_evaluator": 1,
+      "session_model_processes": 0
+    }
+  ]
+}

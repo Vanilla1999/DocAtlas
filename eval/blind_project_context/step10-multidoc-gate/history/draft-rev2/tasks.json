@@ -1,0 +1,209 @@
+[
+  {
+    "id":"C-T1","project":"tidegauge","question":"Как восстановить прерванный поток станции и когда можно удалить его журнал, если станция ещё не подключилась?",
+    "direct":["operations.md#Replay","operations.md#Disconnected station"],
+    "structural":["operations.md#Station operations","storage.md#Journal storage","storage.md#Retention"],
+    "optional_support":["operations.md#Survey imports","architecture.md#Recovery simulation","storage.md#Historical default","dashboard.md#Display","dashboard.md#Refresh"],
+    "hard_negatives":["architecture.md#Journal design"],
+    "facts":[
+      ["operations.md#Station operations","These procedures apply only to authenticated live station feeds in the active harbour."],
+      ["operations.md#Replay","pause the receiver and obtain a journal checkpoint before requesting the missing interval"],
+      ["operations.md#Replay","Preserve the original observation identifiers during replay."],
+      ["operations.md#Replay","Resume the receiver only after the exporter acknowledges the checkpoint."],
+      ["operations.md#Disconnected station","leave it paused until a fresh authenticated heartbeat arrives"],
+      ["storage.md#Retention","Keep a journal file for at least seven days and until the corresponding export checksum is verified."],
+      ["storage.md#Retention","A legal hold blocks deletion regardless of age or checksum status."]
+    ]
+  },
+  {
+    "id":"C-T2","project":"tidegauge","question":"What must a public daily bundle contain, and how should missing stations and late observations be handled?",
+    "direct":["export.md#Publication","export.md#Late observations"],"structural":["export.md#Bundle export"],
+    "optional_support":["export.md#Preview","dashboard.md#Display"],
+    "hard_negatives":["architecture.md#Journal design"],
+    "facts":[
+      ["export.md#Bundle export","These rules govern daily bundles consumed by harbour analysts."],
+      ["export.md#Publication","Publish a bundle only when every included station has a verified daily checksum."],
+      ["export.md#Publication","Include the observation timezone in the manifest."],
+      ["export.md#Publication","A missing station must be listed explicitly as missing rather than represented by zero water levels."],
+      ["export.md#Late observations","A late observation creates a new bundle revision; never overwrite an already published bundle."],
+      ["export.md#Late observations","Keep the previous revision addressable for existing citations."]
+    ]
+  },
+  {
+    "id":"C-T3","project":"tidegauge","question":"Can a low-space alert justify deleting a live observation journal after seven days if its export has not been verified?",
+    "direct":["storage.md#Retention","storage.md#Capacity"],"structural":["storage.md#Journal storage"],
+    "optional_support":["storage.md#Historical default","dashboard.md#Refresh"],
+    "hard_negatives":["operations.md#Survey imports"],
+    "facts":[
+      ["storage.md#Journal storage","Exported bundles are derived products, not journal replacements until their checksums have been verified."],
+      ["storage.md#Retention","Keep a journal file for at least seven days and until the corresponding export checksum is verified."],
+      ["storage.md#Retention","Both conditions must hold before deletion."],
+      ["storage.md#Retention","A legal hold blocks deletion regardless of age or checksum status."],
+      ["storage.md#Capacity","A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold."]
+    ]
+  },
+  {
+    "id":"C-T4","project":"tidegauge","question":"Какой обязательный интервал калибровки установлен для фиксированных датчиков живых станций?",
+    "direct":[],"structural":[],"facts":[],"no_answer":true,
+    "hard_negatives":["storage.md#Retention","dashboard.md#Refresh"],
+    "excluded_temptation":"modules/survey/private.md#Calibration interval"
+  },
+  {
+    "id":"C-L1","project":"loom","question":"Как выбрать цветовой профиль для производного изображения и что делать с отсутствующим профилем или монохромным оригиналом?",
+    "direct":["colour.md#Profile choice","colour.md#Monochrome originals"],"structural":["colour.md#Colour processing"],
+    "optional_support":["colour.md#Display preference","architecture.md#Legacy demonstration"],
+    "hard_negatives":["recovery.md#Validate"],
+    "facts":[
+      ["colour.md#Colour processing","These requirements apply to production derivatives of colour camera originals."],
+      ["colour.md#Profile choice","Use the camera profile recorded in the capture manifest, not the worker's default profile."],
+      ["colour.md#Profile choice","Embed the selected profile identifier in the derivative metadata."],
+      ["colour.md#Profile choice","If the manifest profile is unavailable, quarantine the job instead of guessing a profile."],
+      ["colour.md#Monochrome originals","skip colour conversion but retain the manifest's monochrome marker in derivative metadata"],
+      ["colour.md#Monochrome originals","A filename containing the word grey is not sufficient to establish that status."]
+    ]
+  },
+  {
+    "id":"C-L2","project":"loom","question":"Give the complete Recovery procedure for an interrupted production worker, including every child section and the treatment of mismatching outputs.",
+    "direct":["recovery.md#Recovery procedure","recovery.md#Isolate","recovery.md#Validate","recovery.md#Resume"],
+    "structural":["recovery.md#Worker recovery"],"explicit_full_section":"recovery.md#Recovery procedure",
+    "optional_support":["recovery.md#Preview reset","architecture.md#Legacy demonstration"],
+    "hard_negatives":[],
+    "facts":[
+      ["recovery.md#Worker recovery","This document governs recovery of production rendering workers after interrupted writes."],
+      ["recovery.md#Recovery procedure","Follow all child sections in order when recovering an interrupted worker."],
+      ["recovery.md#Isolate","Disable the worker lease before inspecting temporary outputs."],
+      ["recovery.md#Isolate","Preserve the failed job identifier in the incident record."],
+      ["recovery.md#Validate","Compare every completed derivative checksum with its job manifest."],
+      ["recovery.md#Validate","Delete only temporary outputs that have no completed manifest entry."],
+      ["recovery.md#Resume","Re-enable the worker lease after checksum validation finishes."],
+      ["recovery.md#Resume","Jobs with a checksum mismatch remain quarantined and must not be retried automatically."]
+    ]
+  },
+  {
+    "id":"C-L3","project":"loom","question":"When may a derivative be published to visitors, and how must a later recall preserve its identity?",
+    "direct":["publication.md#Approval","publication.md#Embargo"],
+    "structural":["publication.md#Derivative publication","withdrawal.md#Image withdrawal","withdrawal.md#Withdrawal"],
+    "optional_support":["publication.md#Preview links","withdrawal.md#Draft cleanup"],
+    "hard_negatives":["recovery.md#Resume"],
+    "facts":[
+      ["publication.md#Derivative publication","Publication rules apply to visitor-visible derivatives, not internal previews."],
+      ["publication.md#Approval","Publish only after both curator approval and checksum verification are recorded."],
+      ["publication.md#Approval","Include the preserved-original identifier with every published derivative."],
+      ["publication.md#Embargo","An active collection embargo prevents publication even after curator approval and checksum verification."],
+      ["publication.md#Embargo","Wait for explicit embargo release; reaching a scheduled render date does not release it."],
+      ["withdrawal.md#Withdrawal","Replace the public derivative with a withdrawal notice and retain its original identifier."],
+      ["withdrawal.md#Withdrawal","Keep the audit record and preserved camera original."],
+      ["withdrawal.md#Withdrawal","Do not silently redirect the identifier to a different object."]
+    ]
+  },
+  {
+    "id":"C-L4","project":"loom","question":"What cleaning reagent is required for all public collection camera sensors?",
+    "direct":[],"structural":[],"facts":[],"no_answer":true,
+    "hard_negatives":["colour.md#Profile choice","colour.md#Display preference"],
+    "excluded_temptation":"modules/camera/private.md#Sensor cleaning"
+  },
+  {
+    "id":"V-M1","project":"meridian","question":"Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+    "direct":["reservations.md#Transfer","reservations.md#Locked instrument"],
+    "structural":["reservations.md#Confirmed reservations","weather.md#Weather decisions","weather.md#Suspension"],
+    "optional_support":["reservations.md#Training slots","calendar.md#Colours","weather.md#Indoor instrument","weather.md#Forecast display"],
+    "hard_negatives":["clock.md#Clock offset"],
+    "facts":[
+      ["reservations.md#Confirmed reservations","These rules apply to confirmed night-time reservations on shared instruments."],
+      ["reservations.md#Transfer","Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."],
+      ["reservations.md#Transfer","Retain the original reservation identifier and record both observers in the audit trail."],
+      ["reservations.md#Locked instrument","leave the transfer pending even after observer acceptance and operator approval"],
+      ["reservations.md#Locked instrument","The lock must be cleared by the instrument team first."],
+      ["weather.md#Suspension","Suspend outdoor observations when the wind interlock opens."],
+      ["weather.md#Suspension","Preserve reservation identifiers during suspension."],
+      ["weather.md#Suspension","Resume only after the interlock closes and the duty operator records a restart approval."]
+    ]
+  },
+  {
+    "id":"V-M2","project":"meridian","question":"When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+    "direct":["weather.md#Suspension","weather.md#Indoor instrument"],"structural":["weather.md#Weather decisions"],
+    "optional_support":["weather.md#Forecast display","calendar.md#Colours","reservations.md#Transfer"],
+    "hard_negatives":["clock.md#Simulation clock"],
+    "facts":[
+      ["weather.md#Weather decisions","Weather decisions govern execution, not ownership of reservations."],
+      ["weather.md#Suspension","Suspend outdoor observations when the wind interlock opens."],
+      ["weather.md#Suspension","Preserve reservation identifiers during suspension."],
+      ["weather.md#Suspension","Resume only after the interlock closes and the duty operator records a restart approval."],
+      ["weather.md#Indoor instrument","An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."],
+      ["weather.md#Indoor instrument","A roof visible as closed on the calendar does not establish indoor classification."]
+    ]
+  },
+  {
+    "id":"V-M3","project":"meridian","question":"What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+    "direct":["clock.md#Clock offset","clock.md#Missing reference"],"structural":["clock.md#Time coordination"],
+    "optional_support":["clock.md#Simulation clock","architecture.md#Prototype recovery","calendar.md#Timezones"],
+    "hard_negatives":["reservations.md#Transfer"],
+    "facts":[
+      ["clock.md#Time coordination","The gateway compares instrument time with the observatory reference before executing a schedule."],
+      ["clock.md#Clock offset","If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."],
+      ["clock.md#Clock offset","Keep queued reservations unchanged."],
+      ["clock.md#Clock offset","Resume only after two consecutive reference checks report an offset within two seconds."],
+      ["clock.md#Missing reference","If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."]
+    ]
+  },
+  {
+    "id":"V-M4","project":"meridian","question":"Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+    "direct":[],"structural":[],"facts":[],"no_answer":true,
+    "hard_negatives":["weather.md#Indoor instrument","weather.md#Forecast display"],
+    "excluded_temptation":"modules/laser/private.md#Alignment temperature"
+  },
+  {
+    "id":"V-C1","project":"cairn","question":"Как выбрать снимок для восстановления производственной коллекции, если последний снимок не проверен, а коллекция находится под расследованием?",
+    "direct":["restore.md#Snapshot selection","restore.md#Held collection"],"structural":["restore.md#Collection restore"],
+    "optional_support":["restore.md#Training archive","architecture.md#Demonstration mode"],
+    "hard_negatives":["publication.md#Preview pointer"],
+    "facts":[
+      ["restore.md#Collection restore","These rules govern production collections restored from immutable snapshots."],
+      ["restore.md#Snapshot selection","Choose a snapshot with a signed manifest and a completed integrity scan."],
+      ["restore.md#Snapshot selection","Record the snapshot identifier before copying any payload."],
+      ["restore.md#Snapshot selection","If the most recent snapshot lacks either requirement, choose an older snapshot that satisfies both."],
+      ["restore.md#Held collection","A collection under an investigation hold may be restored into isolated staging only."],
+      ["restore.md#Held collection","Do not publish it until the archive custodian explicitly releases the hold."]
+    ]
+  },
+  {
+    "id":"V-C2","project":"cairn","question":"Provide the entire Recovery procedure for an interrupted production restore, including all child sections and the published pointer's state.",
+    "direct":["recovery.md#Recovery procedure","recovery.md#Preserve","recovery.md#Reconcile","recovery.md#Reopen"],
+    "structural":["recovery.md#Restore failure handling"],"explicit_full_section":"recovery.md#Recovery procedure",
+    "optional_support":["recovery.md#Sandbox reset","architecture.md#Demonstration mode","restore.md#Training archive","architecture.md#Object store"],
+    "hard_negatives":[],
+    "facts":[
+      ["recovery.md#Restore failure handling","This procedure applies to a production restore interrupted before publication."],
+      ["recovery.md#Recovery procedure","Execute every child section below in order."],
+      ["recovery.md#Preserve","Stop the worker and retain its restore journal."],
+      ["recovery.md#Preserve","Record the failed snapshot identifier before changing staging files."],
+      ["recovery.md#Reconcile","Compare staged payload checksums with the signed snapshot manifest."],
+      ["recovery.md#Reconcile","Recopy mismatching payloads from the same snapshot; do not mix snapshots within one restore."],
+      ["recovery.md#Reopen","Resume the worker only after reconciliation completes."],
+      ["recovery.md#Reopen","Keep the collection pointer on its previous published snapshot until publication approval is recorded."]
+    ]
+  },
+  {
+    "id":"V-C3","project":"cairn","question":"When can a restored collection become public, and what must happen if publication verification fails?",
+    "direct":["publication.md#Switch","publication.md#Partial collections"],
+    "structural":["publication.md#Restore publication","rollback.md#Pointer rollback","rollback.md#Rollback"],
+    "optional_support":["publication.md#Preview pointer","rollback.md#Abandoned preview","architecture.md#Demonstration mode","architecture.md#Object store"],
+    "hard_negatives":[],
+    "facts":[
+      ["publication.md#Restore publication","Publication changes the visitor-visible pointer for a production collection."],
+      ["publication.md#Switch","Switch the collection pointer only after checksum reconciliation and custodian approval."],
+      ["publication.md#Switch","Record both the previous and new snapshot identifiers."],
+      ["publication.md#Partial collections","If any required payload is missing, leave the previous pointer active even when all present payloads pass checksums."],
+      ["publication.md#Partial collections","Custodian approval alone cannot authorize a partial collection."],
+      ["rollback.md#Rollback","Restore the previous snapshot pointer when publication verification fails."],
+      ["rollback.md#Rollback","Preserve the failed publication record and its snapshot identifier for diagnosis."],
+      ["rollback.md#Rollback","Do not delete the failed staging directory until the incident owner authorizes cleanup."]
+    ]
+  },
+  {
+    "id":"V-C4","project":"cairn","question":"What maintenance interval is mandated for every archive storage device?",
+    "direct":[],"structural":[],"facts":[],"no_answer":true,
+    "hard_negatives":["architecture.md#Object store","restore.md#Snapshot selection"],
+    "excluded_temptation":"modules/tape/private.md#Cleaning cycle"
+  }
+]

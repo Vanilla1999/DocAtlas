@@ -1,0 +1,214 @@
+{
+  "boundary": "diagnostic only; new root/generation, not exact historical replay",
+  "historical_file": "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-qwen-calibration/run-01/calibration-diagnostic/loom/C-L4.json",
+  "historical_sha256": "d669bc1b5b3a3bfdf885b54c972b8443dcc19c2cf80330fdbbbad6fbce72f578",
+  "inputs": [
+    {
+      "path": "architecture.md",
+      "char_start": 0,
+      "body_char_start": 22,
+      "char_end": 105,
+      "old_sha256": "124b4bd430e253ae8bd5f0ffdec13f736f0dfdb00204a73db13d41dae485deec",
+      "new_sha256": "124b4bd430e253ae8bd5f0ffdec13f736f0dfdb00204a73db13d41dae485deec",
+      "equal": true
+    },
+    {
+      "path": "architecture.md",
+      "char_start": 105,
+      "body_char_start": 124,
+      "char_end": 388,
+      "old_sha256": "82eb8c34e45e35ff31e37be2335368883987719bd4fb2c655de2817153827af6",
+      "new_sha256": "82eb8c34e45e35ff31e37be2335368883987719bd4fb2c655de2817153827af6",
+      "equal": true
+    },
+    {
+      "path": "architecture.md",
+      "char_start": 388,
+      "body_char_start": 412,
+      "char_end": 575,
+      "old_sha256": "cb43118616339d5e755950cb8d8514fe0ad3db9f9884e22fc6d90cb4a6ebb75d",
+      "new_sha256": "cb43118616339d5e755950cb8d8514fe0ad3db9f9884e22fc6d90cb4a6ebb75d",
+      "equal": true
+    },
+    {
+      "path": "colour.md",
+      "char_start": 0,
+      "body_char_start": 20,
+      "char_end": 101,
+      "old_sha256": "f28489d5ebddd3f112056d6f0039a28e3d5c34c358c91056cbd53745560a572b",
+      "new_sha256": "f28489d5ebddd3f112056d6f0039a28e3d5c34c358c91056cbd53745560a572b",
+      "equal": true
+    },
+    {
+      "path": "colour.md",
+      "char_start": 101,
+      "body_char_start": 119,
+      "char_end": 368,
+      "old_sha256": "a029d527d238fe9d6731eecc39fc378030350990798d24b7512138b162d667c5",
+      "new_sha256": "a029d527d238fe9d6731eecc39fc378030350990798d24b7512138b162d667c5",
+      "equal": true
+    },
+    {
+      "path": "colour.md",
+      "char_start": 368,
+      "body_char_start": 392,
+      "char_end": 609,
+      "old_sha256": "db80185141c8540df06cd8b89a36e3514cb57ce66323606b766d87e676d781fc",
+      "new_sha256": "db80185141c8540df06cd8b89a36e3514cb57ce66323606b766d87e676d781fc",
+      "equal": true
+    },
+    {
+      "path": "colour.md",
+      "char_start": 609,
+      "body_char_start": 631,
+      "char_end": 791,
+      "old_sha256": "61d72971d93a7188e94600565a3d489ace9d1728e7ef4c11bee92ce145bf79eb",
+      "new_sha256": "61d72971d93a7188e94600565a3d489ace9d1728e7ef4c11bee92ce145bf79eb",
+      "equal": true
+    },
+    {
+      "path": "overview.md",
+      "char_start": 0,
+      "body_char_start": 16,
+      "char_end": 170,
+      "old_sha256": "692e94804da5a820ac64b140a211086fce36280a5285ccc2877890cdf58c0c09",
+      "new_sha256": "692e94804da5a820ac64b140a211086fce36280a5285ccc2877890cdf58c0c09",
+      "equal": true
+    },
+    {
+      "path": "overview.md",
+      "char_start": 170,
+      "body_char_start": 183,
+      "char_end": 403,
+      "old_sha256": "b6ee60dd47ab126103d8679f622fd2be9785e7869f249e9addb26bef626d0304",
+      "new_sha256": "b6ee60dd47ab126103d8679f622fd2be9785e7869f249e9addb26bef626d0304",
+      "equal": true
+    },
+    {
+      "path": "overview.md",
+      "char_start": 403,
+      "body_char_start": 422,
+      "char_end": 591,
+      "old_sha256": "9ea5b166c863dc9b898dd447f494ea85557dfdac71acfdfeced0b86b6efbf2fe",
+      "new_sha256": "9ea5b166c863dc9b898dd447f494ea85557dfdac71acfdfeced0b86b6efbf2fe",
+      "equal": true
+    },
+    {
+      "path": "publication.md",
+      "char_start": 0,
+      "body_char_start": 25,
+      "char_end": 106,
+      "old_sha256": "8efc4f24c94f516face9c5c98bb0830eae40f8ee6a1536cba4e2666d0dd25e11",
+      "new_sha256": "8efc4f24c94f516face9c5c98bb0830eae40f8ee6a1536cba4e2666d0dd25e11",
+      "equal": true
+    },
+    {
+      "path": "publication.md",
+      "char_start": 106,
+      "body_char_start": 118,
+      "char_end": 369,
+      "old_sha256": "621466ff5720b9e43c9bad76bf07438000a25779112bc7ca3c4d1186236d7b51",
+      "new_sha256": "621466ff5720b9e43c9bad76bf07438000a25779112bc7ca3c4d1186236d7b51",
+      "equal": true
+    },
+    {
+      "path": "publication.md",
+      "char_start": 369,
+      "body_char_start": 380,
+      "char_end": 576,
+      "old_sha256": "9115f8b0de9251811da9c8eacf9a7f67accf1335af0012b881dbfb63e43f91ea",
+      "new_sha256": "9115f8b0de9251811da9c8eacf9a7f67accf1335af0012b881dbfb63e43f91ea",
+      "equal": true
+    },
+    {
+      "path": "publication.md",
+      "char_start": 576,
+      "body_char_start": 593,
+      "char_end": 733,
+      "old_sha256": "c56773e3a8bc5dbed5b5a6c1c670232e3695614a18cdf312ffec3f4c2f3dcee9",
+      "new_sha256": "c56773e3a8bc5dbed5b5a6c1c670232e3695614a18cdf312ffec3f4c2f3dcee9",
+      "equal": true
+    },
+    {
+      "path": "recovery.md",
+      "char_start": 0,
+      "body_char_start": 18,
+      "char_end": 109,
+      "old_sha256": "0d13bb4d1d70dfb57596c79eaa24ef78e40fd64e8c2edc1d10791a6da18c59b4",
+      "new_sha256": "0d13bb4d1d70dfb57596c79eaa24ef78e40fd64e8c2edc1d10791a6da18c59b4",
+      "equal": true
+    },
+    {
+      "path": "recovery.md",
+      "char_start": 109,
+      "body_char_start": 131,
+      "char_end": 271,
+      "old_sha256": "6bed29826144423be03c2a4066a580768b1b16723d17affa27e91963b1bb9f66",
+      "new_sha256": "6bed29826144423be03c2a4066a580768b1b16723d17affa27e91963b1bb9f66",
+      "equal": true
+    },
+    {
+      "path": "recovery.md",
+      "char_start": 271,
+      "body_char_start": 283,
+      "char_end": 406,
+      "old_sha256": "153dc74b9f8416281272bc2584dd2668593c9358af042cd886f350c39fae8b60",
+      "new_sha256": "153dc74b9f8416281272bc2584dd2668593c9358af042cd886f350c39fae8b60",
+      "equal": true
+    },
+    {
+      "path": "recovery.md",
+      "char_start": 406,
+      "body_char_start": 419,
+      "char_end": 557,
+      "old_sha256": "cd6633b779fc230d31a31f33c262d56814982e09c63eee23d4c84a1d70364cfe",
+      "new_sha256": "cd6633b779fc230d31a31f33c262d56814982e09c63eee23d4c84a1d70364cfe",
+      "equal": true
+    },
+    {
+      "path": "recovery.md",
+      "char_start": 557,
+      "body_char_start": 568,
+      "char_end": 721,
+      "old_sha256": "42a19ebb290a520d1c3122b331e38873599c982909fc09d2348f4d40a78c74b8",
+      "new_sha256": "42a19ebb290a520d1c3122b331e38873599c982909fc09d2348f4d40a78c74b8",
+      "equal": true
+    },
+    {
+      "path": "recovery.md",
+      "char_start": 721,
+      "body_char_start": 738,
+      "char_end": 901,
+      "old_sha256": "e832dd0fada3cfd22c3b23cf519d8583607bf36935945f5287979134d717b912",
+      "new_sha256": "e832dd0fada3cfd22c3b23cf519d8583607bf36935945f5287979134d717b912",
+      "equal": true
+    },
+    {
+      "path": "withdrawal.md",
+      "char_start": 0,
+      "body_char_start": 19,
+      "char_end": 101,
+      "old_sha256": "3c4168f3a89144396450b13bc458eb5c5372f5a20f64f96da575ad499b803613",
+      "new_sha256": "3c4168f3a89144396450b13bc458eb5c5372f5a20f64f96da575ad499b803613",
+      "equal": true
+    },
+    {
+      "path": "withdrawal.md",
+      "char_start": 101,
+      "body_char_start": 115,
+      "char_end": 324,
+      "old_sha256": "0a8347bc36befbccf4a3f55ae3c051575702f6cecfe2b1f74a4161dfde408b76",
+      "new_sha256": "03b83bde5e4399084830a49e5e2e37094586f486608b1b424b4c28e4c0204d38",
+      "equal": false
+    },
+    {
+      "path": "withdrawal.md",
+      "char_start": 324,
+      "body_char_start": 341,
+      "char_end": 468,
+      "old_sha256": "ca64c239383ba1fcfb9d636147a9eade2d54ec9305bf3a91bb9b86d045e924a9",
+      "new_sha256": "ca64c239383ba1fcfb9d636147a9eade2d54ec9305bf3a91bb9b86d045e924a9",
+      "equal": true
+    }
+  ]
+}

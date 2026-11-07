@@ -1,0 +1,385 @@
+{
+  "verified_historical_artifacts": 40,
+  "calibration": {
+    "threshold": -7.280395030975342,
+    "limiting_positive": [
+      -7.280395030975342,
+      "C-subtree",
+      "Reservoir station"
+    ],
+    "positive_pairs": 12,
+    "distinct_positive_bodies": 7,
+    "highest_noanswer_score": [
+      -4.750456809997559,
+      "C-tail-noanswer",
+      "Relay workshop"
+    ],
+    "all_direct_positives_and_empty_noanswer_threshold_exists": false
+  },
+  "runs": {
+    "original-v3": {
+      "threshold": -3.352724552154541,
+      "units": 157,
+      "direct": 34,
+      "delivered": 72,
+      "model_pairs": 900,
+      "facts": [
+        false,
+        false,
+        false
+      ],
+      "witness_rank": 82,
+      "witness_score": -5.191558361053467,
+      "direct_kept_if_witness_admitted": 82,
+      "source_spans_and_bound_scopes_checked": 72,
+      "current_source_and_database_match_pre_call": true,
+      "per_document": {
+        "README.md": {
+          "direct": 9,
+          "delivered": 17
+        },
+        "docs/PROJECT_BINDING.md": {
+          "direct": 1,
+          "delivered": 4
+        },
+        "docs/index-cleanup.md": {
+          "direct": 4,
+          "delivered": 5
+        },
+        "docs/main-flow-logging.md": {
+          "direct": 2,
+          "delivered": 3
+        },
+        "docs/mcp-docs-server.md": {
+          "direct": 3,
+          "delivered": 4
+        },
+        "docs/opencode-compact-text.md": {
+          "direct": 3,
+          "delivered": 4
+        },
+        "docs/project-docs-mcp-workflow.md": {
+          "direct": 1,
+          "delivered": 2
+        },
+        "wiki/Architecture.md": {
+          "direct": 4,
+          "delivered": 22
+        },
+        "wiki/Commands.md": {
+          "direct": 5,
+          "delivered": 7
+        },
+        "wiki/Configuration.md": {
+          "direct": 2,
+          "delivered": 4
+        }
+      },
+      "selected_roots": [
+        {
+          "path": "wiki/Architecture.md",
+          "score": -3.032963991165161
+        },
+        {
+          "path": "README.md",
+          "score": -2.721562147140503
+        },
+        {
+          "path": "docs/PROJECT_BINDING.md",
+          "score": -2.518887519836426
+        },
+        {
+          "path": "docs/index-cleanup.md",
+          "score": -3.3008229732513428
+        }
+      ],
+      "contextual_only_kept": 72,
+      "own_body_only_kept": 34,
+      "gate_rejections": 38,
+      "gate_rejections_restored_by_closure": 22
+    },
+    "renewed-v1": {
+      "threshold": -7.280395030975342,
+      "units": 157,
+      "direct": 152,
+      "delivered": 157,
+      "model_pairs": 1398,
+      "facts": [
+        true,
+        true,
+        true
+      ],
+      "witness_rank": 126,
+      "witness_score": -5.307424068450928,
+      "direct_kept_if_witness_admitted": 126,
+      "source_spans_and_bound_scopes_checked": 157,
+      "current_source_and_database_match_pre_call": true,
+      "per_document": {
+        "CONTRIBUTING.md": {
+          "direct": 7,
+          "delivered": 7
+        },
+        "README.md": {
+          "direct": 17,
+          "delivered": 17
+        },
+        "docs/INDEX.md": {
+          "direct": 9,
+          "delivered": 9
+        },
+        "docs/PROJECT_BINDING.md": {
+          "direct": 4,
+          "delivered": 4
+        },
+        "docs/PROJECT_MAP.md": {
+          "direct": 4,
+          "delivered": 4
+        },
+        "docs/adr/0003-context-first-project-reads.md": {
+          "direct": 3,
+          "delivered": 4
+        },
+        "docs/index-cleanup.md": {
+          "direct": 5,
+          "delivered": 5
+        },
+        "docs/main-flow-evaluation.md": {
+          "direct": 5,
+          "delivered": 5
+        },
+        "docs/main-flow-logging.md": {
+          "direct": 4,
+          "delivered": 4
+        },
+        "docs/mcp-docs-server.md": {
+          "direct": 9,
+          "delivered": 9
+        },
+        "docs/modules/evidence-selection.md": {
+          "direct": 4,
+          "delivered": 5
+        },
+        "docs/modules/project-context-retrieval.md": {
+          "direct": 7,
+          "delivered": 8
+        },
+        "docs/opencode-compact-text.md": {
+          "direct": 4,
+          "delivered": 5
+        },
+        "docs/project-docs-mcp-workflow.md": {
+          "direct": 7,
+          "delivered": 7
+        },
+        "docs/testing.md": {
+          "direct": 1,
+          "delivered": 1
+        },
+        "wiki/Architecture.md": {
+          "direct": 22,
+          "delivered": 22
+        },
+        "wiki/Commands.md": {
+          "direct": 13,
+          "delivered": 13
+        },
+        "wiki/Configuration.md": {
+          "direct": 19,
+          "delivered": 20
+        },
+        "wiki/Supported-Sources.md": {
+          "direct": 8,
+          "delivered": 8
+        }
+      },
+      "selected_roots": [
+        {
+          "path": "wiki/Architecture.md",
+          "score": -3.427668333053589
+        },
+        {
+          "path": "docs/main-flow-evaluation.md",
+          "score": -3.528102159500122
+        },
+        {
+          "path": "docs/INDEX.md",
+          "score": -6.354691505432129
+        },
+        {
+          "path": "wiki/Commands.md",
+          "score": -5.084239482879639
+        },
+        {
+          "path": "wiki/Supported-Sources.md",
+          "score": -5.415775775909424
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "score": -5.8667097091674805
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "score": -4.848780632019043
+        },
+        {
+          "path": "README.md",
+          "score": -2.5951783657073975
+        },
+        {
+          "path": "docs/main-flow-logging.md",
+          "score": -3.477475881576538
+        },
+        {
+          "path": "docs/PROJECT_BINDING.md",
+          "score": -2.882657766342163
+        },
+        {
+          "path": "docs/mcp-docs-server.md",
+          "score": -4.543010234832764
+        },
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "score": -6.632533550262451
+        },
+        {
+          "path": "docs/index-cleanup.md",
+          "score": -3.4467458724975586
+        },
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "score": -4.4165358543396
+        },
+        {
+          "path": "docs/testing.md",
+          "score": -5.729048252105713
+        }
+      ],
+      "unnecessary_split_units": 11,
+      "single_window_per_lane_units": 74,
+      "single_window_per_lane_kept": 69,
+      "unnecessary_split_examples": [
+        {
+          "path": "wiki/Architecture.md",
+          "heading_path": [
+            "Architecture",
+            "Project Docs pipeline"
+          ],
+          "body_tokens": 38,
+          "ancestor_tokens": 401,
+          "pairs": 8
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Configuration Reference",
+            "Index"
+          ],
+          "body_tokens": 166,
+          "ancestor_tokens": 245,
+          "pairs": 5
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Configuration Reference",
+            "Query"
+          ],
+          "body_tokens": 130,
+          "ancestor_tokens": 246,
+          "pairs": 5
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Configuration Reference",
+            "Web fetch"
+          ],
+          "body_tokens": 119,
+          "ancestor_tokens": 247,
+          "pairs": 6
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Configuration Reference",
+            "Loaders"
+          ],
+          "body_tokens": 200,
+          "ancestor_tokens": 247,
+          "pairs": 6
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Example `docatlas.yaml`"
+          ],
+          "body_tokens": 78,
+          "ancestor_tokens": 248,
+          "pairs": 6
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Example with OpenAI embeddings"
+          ],
+          "body_tokens": 60,
+          "ancestor_tokens": 247,
+          "pairs": 6
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Deprecated and removed keys"
+          ],
+          "body_tokens": 83,
+          "ancestor_tokens": 246,
+          "pairs": 5
+        },
+        {
+          "path": "wiki/Configuration.md",
+          "heading_path": [
+            "Configuration",
+            "Notes"
+          ],
+          "body_tokens": 73,
+          "ancestor_tokens": 240,
+          "pairs": 4
+        },
+        {
+          "path": "docs/main-flow-logging.md",
+          "heading_path": [
+            "Логи основного потока",
+            "Проверка"
+          ],
+          "body_tokens": 145,
+          "ancestor_tokens": 313,
+          "pairs": 6
+        },
+        {
+          "path": "docs/index-cleanup.md",
+          "heading_path": [
+            "Cleaning DocAtlas index state safely",
+            "Clear all local indexes while preserving configuration"
+          ],
+          "body_tokens": 142,
+          "ancestor_tokens": 249,
+          "pairs": 6
+        }
+      ],
+      "initial_probe_failure": "Post-call evaluator incorrectly required every scope to be project; 13 allowed module rows triggered its assertion. Packet and scores were already saved. Corrected offline by checking bound source scope. No repeated inference; wall time was not persisted."
+    }
+  },
+  "new_runtime_work": {
+    "public_calls": 2,
+    "public_model_pairs": 2298,
+    "independent_model_control_pairs": 8,
+    "terra_calls": 0
+  }
+}

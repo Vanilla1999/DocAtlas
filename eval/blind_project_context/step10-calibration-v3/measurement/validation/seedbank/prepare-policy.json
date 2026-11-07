@@ -1,0 +1,80 @@
+{
+  "seconds": 0.13361728800373385,
+  "expected_paths": [
+    "seedbank.md"
+  ],
+  "indexed_paths": [
+    "seedbank.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-69ea4a32d1bdd2bec9484e2eb85ebec1e2c9a2b2",
+      "source_path": "seedbank.md",
+      "display_text": "# Alder seed archive\n\nThis manual governs the archive's sealed seed envelopes, not living seedlings. Keep each accession identifier attached during every inspection.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-64064948a03ff41ccfa76ef649dfa6b52f462f66",
+      "source_path": "seedbank.md",
+      "display_text": "## Receiving envelopes\n\nHold incoming envelopes in the dry cabinet for nineteen days. Before shelving them, record two humidity readings at least four days apart, both below thirty percent. If either reading reaches thirty percent, restart the entire nineteen-day hold after drying; do not average the readings to authorize shelving. The [damaged seal rule](#damaged-seal-rule) overrides a completed hold.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-551d2f51400ebc819e767eb7b68918c605d7b87f",
+      "source_path": "seedbank.md",
+      "display_text": "### Record cards\n\nWrite the accession identifier and both measurement dates on the blue record card. A missing date prevents shelving until the record is corrected.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-e6366afe0e1e6176da810514cfe58cc069fcd919",
+      "source_path": "seedbank.md",
+      "display_text": "### Cabinet furniture\n\nThe cabinet has seven removable shelves. Spare shelf pins are kept in the maintenance locker.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-e3cf3cb7891464e3486680ab6d6261a0dcf1ab79",
+      "source_path": "seedbank.md",
+      "display_text": "## Damaged seal rule\n\nAn envelope with a split seal must be isolated in tray D and examined by the collection keeper before shelving, even when both humidity readings are below thirty percent.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-8fdf35a899948bc3dd7d7925483f592d4c0e4a21",
+      "source_path": "seedbank.md",
+      "display_text": "## Bicycle shelter\n\nStaff bicycles use the west shelter. Unclaimed cycle lights are handed to reception on the first Monday of each month.\n",
+      "line_start": 21,
+      "line_end": 23
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "a6a71f21a5ab6f01ab65c4b14a27c2fc31e9b9a01735e02517360af4344072ce",
+  "storage_path": "/tmp/docatlas-evidence-isgxifej/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d",
+  "catalog_sha256": "1d445463f53418f402d3f81803bba9671176e921c66193a3b0636d57db0eccd0",
+  "documents": [
+    {
+      "path": "seedbank.md",
+      "content_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c",
+      "catalog_entry_hash": "sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 6,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 6
+  }
+}

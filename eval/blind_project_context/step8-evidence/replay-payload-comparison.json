@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "scope": "normal MCP stdio calls without resource consumption; 2 dev questions x 3 portions",
+  "same_prepared_store": true,
+  "old_source_tree": {
+    "commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+    "dirty_paths": []
+  },
+  "new_source_tree": {
+    "commit": "b88f8f178c601576f5181b36c27266dc5ab525c3",
+    "dirty_paths": []
+  },
+  "old_run": "/workspace/scratch/66f7674793b8/step8-evidence/passivity/replay-original-prepared/run.json",
+  "new_run": "/workspace/scratch/66f7674793b8/step8-evidence/passivity/replay-fixed/run.json",
+  "equal_payload_count": 6,
+  "payload_count": 6,
+  "all_equal": true,
+  "payloads": [
+    {
+      "payload": "L0/T03-en.json",
+      "equal_bytes": true,
+      "old_sha256": "31e0fcbdee0830703375f13f445b0083296493ec093771f0497005abeaadb40a",
+      "new_sha256": "31e0fcbdee0830703375f13f445b0083296493ec093771f0497005abeaadb40a",
+      "bytes": 38698
+    },
+    {
+      "payload": "L0/T03-en.portion-2.json",
+      "equal_bytes": true,
+      "old_sha256": "923aa57928f50ff0d32b60fc63f9f29f4ed9afe8f344b548a01bf29c96625135",
+      "new_sha256": "923aa57928f50ff0d32b60fc63f9f29f4ed9afe8f344b548a01bf29c96625135",
+      "bytes": 38170
+    },
+    {
+      "payload": "L0/T03-en.portion-3.json",
+      "equal_bytes": true,
+      "old_sha256": "265cd5663c4a55902ec0227bd0f66ada49a3fc37579c1d6d50258e2d5eeb6331",
+      "new_sha256": "265cd5663c4a55902ec0227bd0f66ada49a3fc37579c1d6d50258e2d5eeb6331",
+      "bytes": 11865
+    },
+    {
+      "payload": "L0/T03-ru.json",
+      "equal_bytes": true,
+      "old_sha256": "f6694219b05042c7ede7b01bde05abac955ed23d39a80c60fd6576ca689f93ab",
+      "new_sha256": "f6694219b05042c7ede7b01bde05abac955ed23d39a80c60fd6576ca689f93ab",
+      "bytes": 39855
+    },
+    {
+      "payload": "L0/T03-ru.portion-2.json",
+      "equal_bytes": true,
+      "old_sha256": "7d9e65a8872134e4107329edb1d131b1683fe74771a8fdbd1c3f451009b8c8c2",
+      "new_sha256": "7d9e65a8872134e4107329edb1d131b1683fe74771a8fdbd1c3f451009b8c8c2",
+      "bytes": 41507
+    },
+    {
+      "payload": "L0/T03-ru.portion-3.json",
+      "equal_bytes": true,
+      "old_sha256": "e469857cee01496beea65cc3792b0485339b4ff9a93fc9a12c8179c625abfada",
+      "new_sha256": "e469857cee01496beea65cc3792b0485339b4ff9a93fc9a12c8179c625abfada",
+      "bytes": 23139
+    }
+  ],
+  "public_source_state_integration": {
+    "new_module_tests": 3,
+    "passed": 3,
+    "baseline_regression_reproduced": [
+      "consumed source URI after exhausted portion",
+      "consumed source URI after second portion"
+    ],
+    "existing_failure_confirmed_unchanged": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot (covered_query_ids assertion before source read)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "contract": {
+    "recipe": "qwen3-contextual-addressed-section-closure-v3",
+    "structural_recipe": "explicit_addressed_section_closure_v3",
+    "scoring_contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+    "seeds": "own body plus ancestors; no seed subtree",
+    "expand": "all delivered bodies, including ancestors and definition owners",
+    "anchor": "unique owning section through next heading of same or lower level",
+    "document": "exact checked local Markdown path without fragment: full document",
+    "definitions": "whole owner body and its actual links",
+    "unresolved": "delivered dependency gap => body-free dependency_incomplete refusal; unselected graph gaps are diagnostics only; no fetch or scope expansion",
+    "syntax": "existing masked Markdown inline/full/collapsed/defined-shortcut/footnote and quoted HTML href/id/name; images are unsupported assets",
+    "external_query_scheme": "unresolved; never fetched",
+    "identity": "full native scope/version/generation/content/catalog identity, not path alone"
+  },
+  "contract_sha256": "402b53a7cedb90133d8fe5df79252363731bd078e4b9a12601c022865ec618e3",
+  "extraction": "AST literals; production not imported"
+}

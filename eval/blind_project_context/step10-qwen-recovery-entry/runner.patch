@@ -1,0 +1,108 @@
+--- reviewed-repair/eval/blind_project_context/step10-multidoc-gate/runner.py
++++ recovery-entry/eval/blind_project_context/step10-multidoc-gate/runner.py
+@@ -16,6 +16,8 @@
+ 
+ ROOT = Path(__file__).resolve().parent
+ TREE = ROOT.parents[2]
++ORIGINAL_POLICY_SHA256 = "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11"
++PRIOR_RUN = ROOT.parent / "step10-qwen-calibration/run-01"
+ 
+ 
+ def digest(raw):
+@@ -216,6 +218,7 @@
+ 
+ 
+ def run(args):
++    process_started = time.perf_counter()
+     if not __debug__:
+         raise ValueError("gate_requires_assertions_enabled")
+     manifest, manifest_sha = verify_manifest(args.manifest)
+@@ -321,6 +324,24 @@
+                              "error": error, "receipt_status": "available" if receipt else "lost_trace_unknown_work",
+                              "seconds": time.perf_counter() - tick})
+                         save(args.out / "counts.json", counts)
++                        if args.command == "recovery":
++                            historical = PRIOR_RUN / "calibration-diagnostic" / project["id"] / (task["id"] + ".json")
++                            old_observed = json.loads(historical.read_text())["observations"]
++                            def input_map(observations):
++                                return {(s["path"], s["char_start"], s["body_char_start"], s["char_end"]):
++                                        s.get("input_tokens_sha256")
++                                        for o in observations for s in o.get("scores", [])}
++                            old_inputs, new_inputs = input_map(old_observed), input_map(observed)
++                            comparison = [{"path": key[0], "char_start": key[1], "body_char_start": key[2],
++                                           "char_end": key[3], "old_sha256": old_inputs.get(key),
++                                           "new_sha256": new_inputs.get(key),
++                                           "equal": (old_inputs[key] == new_inputs[key])
++                                           if old_inputs.get(key) and new_inputs.get(key) else None}
++                                          for key in sorted(old_inputs.keys() | new_inputs.keys())]
++                            save(dest / (task["id"] + "-input-comparison.json"), {
++                                "boundary": "diagnostic only; new root/generation, not exact historical replay",
++                                "historical_file": str(historical), "historical_sha256": digest(historical.read_bytes()),
++                                "inputs": comparison})
+                     assert len(observed) == 1, packet
+                     expected_policy = digest(policy_path.read_bytes()) if policy_path else "diagnostic-unverified"
+                     assert observed[0]["policy_sha256"] == expected_policy
+@@ -403,13 +424,35 @@
+             verdict = gates(final)
+             prediction = {r["id"]: r["selected_units"] for r in best["results"]}
+             assert all(r["selected_units"] == prediction[r["id"]] for r in final), "offline closure fit disagrees with real final delivery"
++        elif args.command == "recovery":
++            if not args.recovery_authorization:
++                raise ValueError("recovery_requires_separate_parent_authorization")
++            policy_path = PRIOR_RUN / "policy.json"
++            prior_failure = PRIOR_RUN / "failure.json"
++            assert digest(policy_path.read_bytes()) == ORIGINAL_POLICY_SHA256
++            assert json.loads(prior_failure.read_text())["status"] == "ERROR_NOT_PASS"
++            binding = manifest["recovery"]
++            assert binding["policy_sha256"] == ORIGINAL_POLICY_SHA256
++            assert binding["prior_failure_sha256"] == digest(prior_failure.read_bytes())
++            authorization = json.loads(args.recovery_authorization.read_text())
++            assert authorization["status"] == "PARENT_APPROVED_RECOVERY"
++            assert authorization["manifest_sha256"] == manifest_sha
++            assert authorization["policy_sha256"] == ORIGINAL_POLICY_SHA256
++            assert authorization["prior_failure_sha256"] == binding["prior_failure_sha256"]
++            save(args.out / "authorization.json", authorization)
++            (args.out / "policy.json").write_bytes(policy_path.read_bytes())
++            final = phase("calibration", "recovery", policy_path)
++            assert len(final) == 8
++            verdict = gates(final)
+         else:
+             if not args.calibration or not args.validation_authorization:
+                 raise ValueError("validation_requires_calibration_directory_and_separate_permission")
+             summary = json.loads((args.calibration / "summary.json").read_text())
+             policy_path = args.calibration / "policy.json"
+-            assert summary["status"] == "PASS" and summary["phase"] == "calibration" and summary["manifest_sha256"] == manifest_sha
++            assert summary["status"] == "PASS" and summary["phase"] in {"calibration", "recovery"} and summary["manifest_sha256"] == manifest_sha
+             assert digest(policy_path.read_bytes()) == summary["policy_sha256"]
++            if summary["phase"] == "recovery":
++                assert summary["policy_sha256"] == ORIGINAL_POLICY_SHA256
+             authorization = json.loads(args.validation_authorization.read_text())
+             assert authorization["status"] == "PARENT_APPROVED_VALIDATION"
+             assert authorization["manifest_sha256"] == manifest_sha
+@@ -419,18 +462,24 @@
+             verdict = gates(final)
+         save(args.out / "summary.json", {"status": "PASS" if all(verdict[k] for k in ("required_pass", "no_answer_pass", "hard_negative_pass", "reduction_pass")) else "FAIL",
+              "phase": args.command, "manifest_sha256": manifest_sha, "policy_sha256": digest(policy_path.read_bytes()),
+-             "gates": verdict, "counts": counts, "boundary": "public in-process, not installed/client/Terra"})
++             "gates": verdict, "counts": counts, "process_total_seconds": time.perf_counter() - process_started,
++             "boundary": ("public in-process fresh-prepared recovery acceptance, not exact historical replay/validation/installed/client"
++                          if args.command == "recovery" else "public in-process, not installed/client/Terra")})
+     except Exception as exc:
+         save(args.out / "failure.json", {"status": "ERROR_NOT_PASS", "error_type": type(exc).__name__, "error": str(exc), "counts": counts})
+         raise
++    finally:
++        save(args.out / "process-receipt.json", {"phase": args.command, "manifest_sha256": manifest_sha,
++             "process_total_seconds": time.perf_counter() - process_started, "counts": counts})
+ 
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("command", choices=("calibration", "validation"))
++    parser.add_argument("command", choices=("calibration", "recovery", "validation"))
+     parser.add_argument("--manifest", type=Path, required=True)
+     parser.add_argument("--model", type=Path, required=True)
+     parser.add_argument("--out", type=Path, required=True)
+     parser.add_argument("--calibration", type=Path)
+     parser.add_argument("--validation-authorization", type=Path)
++    parser.add_argument("--recovery-authorization", type=Path)
+     run(parser.parse_args())

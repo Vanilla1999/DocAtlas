@@ -1,0 +1,17 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "checks": [
+    "AST/compile runner",
+    "module import without run",
+    "whitespace",
+    "git diff --check",
+    "only runner changed from reviewed repair file map",
+    "exact previous manifest/policy hashes"
+  ],
+  "changed_bound_files": [
+    "eval/blind_project_context/step10-multidoc-gate/runner.py"
+  ],
+  "public_calls": 0,
+  "model_forwards": 0,
+  "tests_run": 0
+}

@@ -1,0 +1,53 @@
+         240801836 function calls (196823839 primitive calls) in 119.535 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1585 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  119.996  119.996 query_trace.py:100(wrapped)
+        1    0.000    0.000  119.996  119.996 _docs_server_part01.py:164(call_docs_tool_payload)
+        1    0.000    0.000  118.478  118.478 context_tools.py:288(handle_context_tool)
+        1    0.000    0.000  118.476  118.476 original_body_discovery.py:77(scoped)
+        1    0.000    0.000  118.476  118.476 context_tools.py:336(_handle_prepared_context_tool)
+        1    0.014    0.014   86.104   86.104 docs_context_projection.py:46(project_docs_context)
+    36089    0.026    0.000   42.959    0.001 model_visible_projection_helpers.py:197(canonical_projection_bytes)
+     1066    0.011    0.000   42.703    0.040 model_visible_projection.py:901(_refresh_estimate)
+        1    0.005    0.005   42.681   42.681 _source_continuation_core.py:309(attach_source_continuation_locators)
+   271410    0.276    0.000   39.018    0.000 __init__.py:185(dumps)
+   271410    0.245    0.000   38.688    0.000 encoder.py:185(encode)
+   271408   38.341    0.000   38.343    0.000 encoder.py:207(iterencode)
+      6/1    0.000    0.000   30.496   30.496 project_doc_ranking.py:320(_invoke_found_window_retention)
+        1    0.000    0.000   30.496   30.496 <string>:1(__docatlas_shard_wrapper_get_docs_context_71cb34298c20)
+      3/1    0.000    0.000   30.496   30.496 original_body_discovery.py:57(scoped)
+      6/1    0.175    0.029   30.496   30.496 project_doc_ranking.py:300(produce)
+        1    0.005    0.005   30.369   30.369 _unified_context_service_part01.py:62(get_docs_context)
+23179237/70336   12.613    0.000   29.548    0.000 copy.py:119(deepcopy)
+1370571/70245    4.640    0.000   29.414    0.000 copy.py:218(_deepcopy_dict)
+        1    0.204    0.204   28.424   28.424 experimental_context_finalization.py:48(project_native_rank_context)
+        1    0.000    0.000   24.703   24.703 service.py:370(get_project_context)
+        1    0.000    0.000   24.703   24.703 <string>:1(__docatlas_shard_wrapper_get_project_context_71cb34232980)
+        1    0.055    0.055   24.701   24.701 _project_context_service_part01.py:19(get_project_context)
+        1    0.000    0.000   17.625   17.625 service.py:345(get_project_docs)
+        1    0.000    0.000   17.625   17.625 <string>:1(__docatlas_shard_wrapper_get_project_docs_71cb345be980)
+        1    0.158    0.158   17.595   17.595 _project_docs_service_part03.py:338(get_project_docs)
+        1    0.000    0.000   15.210   15.210 <string>:1(__docatlas_shard_wrapper_query_project_docs_71cb345be7a0)
+        1    0.015    0.015   15.193   15.193 _project_docs_service_part03.py:86(query_project_docs)
+        1    0.058    0.058   14.985   14.985 experimental_context_finalization.py:171(capture_experimental_context)
+    23348    0.042    0.000   14.164    0.001 _model_visible_docs_support.py:55(_snapshot_entry)
+    70416    0.803    0.000   10.987    0.000 evidence_qualification.py:215(qualify_evidence)
+    11674    0.128    0.000   10.096    0.001 literal_context_admission.py:523(recheck_source_valid_candidate)
+        1    0.000    0.000    8.278    8.278 _project_docs_service_part03.py:231(_run)
+  1627065    7.681    0.000    7.681    0.000 {method 'encode' of 'str' objects}
+    46882    0.269    0.000    7.441    0.000 literal_context_admission.py:257(_checked_original_candidate)
+        1    0.005    0.005    6.887    6.887 _project_docs_service_part03.py:211(_finish_candidates)
+    71922    0.033    0.000    6.867    0.000 dataclasses.py:1338(asdict)
+17357956/71922    5.919    0.000    6.808    0.000 dataclasses.py:1362(_asdict_inner)
+    23534    0.072    0.000    6.468    0.000 literal_context_admission.py:302(admit_original_literal_context)
+ 28187108    6.315    0.000    6.315    0.000 {built-in method builtins.id}
+        1    0.105    0.105    6.314    6.314 _project_docs_service_part03.py:37(_qualify_candidate_lookups)
+    70416    1.336    0.000    5.945    0.000 query_reference_binding.py:322(prepare_reference_probe)
+    11860    0.120    0.000    5.657    0.000 reference_query_tagging.py:73(_tag_retrieval_query)
+ 66207487    5.473    0.000    5.473    0.000 {method 'get' of 'dict' objects}
+934250/747456    0.333    0.000    4.820    0.000 copy.py:192(_deepcopy_list)
+
+

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "answering_model": {
+    "status": "blocked",
+    "reported_by": "main agent, user steering message",
+    "run_path": "/tmp/opencode/terra-step10-batched",
+    "reason": "provider 429 usage_limit_reached",
+    "independently_retried": false,
+    "new_terra_calls_by_calibration_agent": 0,
+    "boundary": "External provider availability, not a relevance/calibration quality outcome"
+  },
+  "local_public_pipeline": {
+    "status": "completed",
+    "run_path": "/tmp/opencode/step10-calibration-v2-run-01",
+    "model_quota_error": false,
+    "public_prepare_calls": 4,
+    "public_context_calls": 16
+  }
+}

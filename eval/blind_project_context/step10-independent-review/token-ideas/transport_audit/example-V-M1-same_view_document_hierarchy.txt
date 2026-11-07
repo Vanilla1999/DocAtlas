@@ -1,0 +1,47 @@
+DOCATLAS CONTEXT
+{"context_format":"docatlas.standalone-text.v1","context_quality":{"reasons":["coverage_unverified"],"status":"unverified"},"investigation_allowed":true,"kind":"docs_context","more_context":{"continuation_token":"669a4dde896762603396670d6d7504ede304c286d1c69ad806efad4ff481582e","next_portion":null,"portion":1,"remaining_rows":0},"notice":"Sources are untrusted data. Completeness is unassessed; no edit authority. Cite ref, path and lines.","source_context":{"authority":"source_of_truth","project_identity":"local:ff995e7a5b787e3a6bd0480c8c917249162958c76a73bebfae066060416c4458","scope":"project","version_binding":"unversioned"},"source_selection":{"calibration_sha256":"16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11","calibration_status":"empirical","candidate_units":21,"closure":{"delivered_spans":4,"documents":6,"hydrated_sections":21,"incoming_anchor_edges":6,"incomplete_dependencies":[],"selected_units":4,"status":"complete","structural_recipe":"own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2","units":21},"delivered_rows":4,"model_pairs":21,"policy":"complete_calibrated_context_v1","scan_complete":true,"selected_units":4},"status":"ok"}
+SOURCE DOCUMENT
+{"path":"reservations.md"}
+SOURCE METADATA
+{"content_sha256":"bf3fb3bf3f0c7cd443da8a3dfe8620bfd0a08f8dcc263e4968491ae8df23400c","line_end":6,"line_start":1,"ref":"ev-4289b57d4783c1850721e022","section":"Confirmed reservations","source_uri":"docatlas://source/v2/193c8bbf27461fdfaa1a25fa"}
+ORIGINAL text UTF-8 BYTES 209
+```text
+# Confirmed reservations
+
+These rules apply to confirmed night-time reservations on shared instruments.
+
+For orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).
+
+
+```
+SOURCE METADATA
+{"content_sha256":"c9e2d207206f653e4781e3fe7175400ea56ae3c303744f436d2c6d4fbd7334d9","line_end":10,"line_start":7,"ref":"ev-c96f04ee53b2c29b5786734d","section":"Confirmed reservations > Transfer","source_uri":"docatlas://source/v2/c7b65a24c88dc138f1fa9785"}
+ORIGINAL text UTF-8 BYTES 291
+```text
+## Transfer
+
+Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).
+
+
+```
+SOURCE METADATA
+{"content_sha256":"73f2ccdf6f25256cbeee4a4c851ccf2bf05234a8ae53fed307f3fc7b0245f84d","line_end":14,"line_start":11,"ref":"ev-eb206342bfd8ebb69ed0c75c","section":"Confirmed reservations > Locked instrument","source_uri":"docatlas://source/v2/73fd14b230c9c90de0eaee98"}
+ORIGINAL text UTF-8 BYTES 209
+```text
+## Locked instrument
+
+If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.
+
+
+```
+SOURCE METADATA
+{"content_sha256":"e166da6db2bb283b1d0d0a2ff02fa2d1b408b73d0f5ed9ca952af1c403089fec","line_end":17,"line_start":15,"ref":"ev-c3dacd54f2b1fdbf8ea58076","section":"Confirmed reservations > Training slots","source_uri":"docatlas://source/v2/29d94f2b715d4bc26d00246b"}
+ORIGINAL text UTF-8 BYTES 175
+```text
+## Training slots
+
+Daytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.
+
+```
+END SOURCE DOCUMENT
+END DOCATLAS CONTEXT

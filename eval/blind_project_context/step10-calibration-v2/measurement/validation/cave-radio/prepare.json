@@ -1,0 +1,94 @@
+{
+  "seconds": 0.1333725919976132,
+  "expected_paths": [
+    "cave-radio.md"
+  ],
+  "indexed_paths": [
+    "cave-radio.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-06a1dfd34b54113e5fea7b204c2883ad9768af23",
+      "source_path": "cave-radio.md",
+      "display_text": "# Cave team equipment guide\n\nThis guide contains separate equipment procedures and storeroom information for the cave survey team. A heading's instructions apply only to the equipment it names.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-d113d8b6658a27e642fa3128d45cd8ac31068e8b",
+      "source_path": "cave-radio.md",
+      "display_text": "## Underground radio check\n\nThis procedure applies to the low-frequency radios used by the survey team below ground. Surface vehicle radios use a different check sheet.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-4e8fcb85350970287b168d9b2325176339cfccb9",
+      "source_path": "cave-radio.md",
+      "display_text": "### Antenna connection\n\nConnect the loop antenna to the marked socket before enabling the transmitter. Lay the loop flat and keep its cable clear of the footpath.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-5cf9e766a52bacdbd595e3360540f38df12074fc",
+      "source_path": "cave-radio.md",
+      "display_text": "### Voice exchange\n\nAsk the surface operator to repeat the test phrase exactly and record the reply in the trip log. A carrier indication alone does not count as a completed radio check.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-ec9f53bb39c24040caa7b52dcc3dcdf8f25c10a6",
+      "source_path": "cave-radio.md",
+      "display_text": "### Standby\n\nAfter a successful voice exchange, place the transmitter in receive-only standby until the scheduled check-in. Leave the antenna connected during standby.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-254ad4cc3e794445e2440fef54a6f76cddeb0d7c",
+      "source_path": "cave-radio.md",
+      "display_text": "### Storage labels\n\nThe radio cases have orange inventory labels. Replacement labels are available in the stationery tray; their colour does not indicate battery charge or signal quality.\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-563f171774913d50df192dd59459c1bea78da2ca",
+      "source_path": "cave-radio.md",
+      "display_text": "## Flood watch exception\n\nDuring an active flood watch, the underground radio check does not authorize entering the cave even if the test phrase is repeated correctly. The expedition leader must formally clear the flood watch before entry.\n\n",
+      "line_start": 25,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-5d12393348052e0b0db2d1e8719ff534c32380fb",
+      "source_path": "cave-radio.md",
+      "display_text": "## Membership forms\n\nNew team members submit membership forms to the secretary. Blank forms are printed on recycled paper and kept beside the visitor book.\n",
+      "line_start": 29,
+      "line_end": 31
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "3d1daa07b84147c88825183240169d256d231c87f0d81d19b2f45eeed4a94e7b",
+  "storage_path": "/tmp/docatlas-evidence-9ztgucaz/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-c26007ed1b9142009627adb13c193e76",
+  "catalog_sha256": "a6e9091842e6bb58749c04240156c0302f42c9630403837a17ff8d9ab644fb48",
+  "documents": [
+    {
+      "path": "cave-radio.md",
+      "content_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a",
+      "catalog_entry_hash": "sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-c26007ed1b9142009627adb13c193e76",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 8,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 8
+  }
+}

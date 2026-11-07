@@ -1,0 +1,11 @@
+{
+  "uri": "docatlas://source/v2/fada3566f9716ad5ba9fabc0",
+  "raw": {
+    "uri": "docatlas://source/v2/fada3566f9716ad5ba9fabc0",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "error": null,
+  "seconds": 0.00022049400286050513
+}

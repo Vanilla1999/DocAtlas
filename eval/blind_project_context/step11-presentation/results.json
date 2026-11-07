@@ -1,0 +1,96 @@
+{
+  "status": "PUBLIC_ORDINARY_PASS_OFFLINE_REPLAY_PASS_MINIMAL_RUNTIME_NOT_RUN",
+  "executions": [
+    {
+      "run": "public-01",
+      "tests": [
+        {
+          "name": "test_literal_presentation_public_stdio_preserves_sources_and_read_guards",
+          "seconds": 5.651,
+          "status": "FAIL"
+        },
+        {
+          "name": "test_context_portions_bind_snapshot_and_stop_after_exhaustion",
+          "seconds": 0.836,
+          "status": "PASS"
+        }
+      ],
+      "stdio_calls": {
+        "prepare_docs": 1,
+        "get_docs_context": 6,
+        "resource_reads": 0
+      },
+      "wire_costs": {
+        "canonical": {
+          "utf8_bytes": 3427,
+          "local_o200k_tokens": 1177
+        },
+        "historical": {
+          "utf8_bytes": 1892,
+          "local_o200k_tokens": 552
+        },
+        "literal-v2": {
+          "utf8_bytes": 1976,
+          "local_o200k_tokens": 587
+        }
+      },
+      "receipt_sha256": "06c03ed19781c526e55e453e7e231c125cb64f0699015916031807d532c37a1e"
+    },
+    {
+      "run": "public-02",
+      "tests": [
+        {
+          "name": "test_literal_presentation_public_stdio_preserves_sources_and_read_guards",
+          "seconds": 5.834,
+          "status": "PASS"
+        }
+      ],
+      "stdio_calls": {
+        "prepare_docs": 1,
+        "get_docs_context": 6,
+        "resource_reads": 3
+      },
+      "wire_costs": {
+        "canonical": {
+          "utf8_bytes": 3427,
+          "local_o200k_tokens": 1152
+        },
+        "historical": {
+          "utf8_bytes": 1892,
+          "local_o200k_tokens": 555
+        },
+        "literal-v2": {
+          "utf8_bytes": 1976,
+          "local_o200k_tokens": 584
+        }
+      },
+      "receipt_sha256": "0aaeb87bb98e3969dcab9dcebf57f69d18a5bd970389213df926d355decd4f82"
+    }
+  ],
+  "source_stdio": {
+    "canonical_sources_keep_hashes": true,
+    "literal_source_fields_preserved_except_visible_hash": true,
+    "original_reference_values_preserved": true,
+    "literal_has_no_columns_or_groups": true,
+    "scope_private_document_excluded": true,
+    "patch_packet_matches_canonical": true,
+    "source_read_returns_original_bytes_and_hash": true,
+    "changed_source_and_replay_rejected": true,
+    "database_readonly": true
+  },
+  "continuation": {
+    "presentation_change_rejected": true,
+    "explicit_off_accepts_historical_token": true
+  },
+  "minimal_runtime": {
+    "executed": false,
+    "inference_calls": 0,
+    "reason": "pinned multilingual MiniLM safetensors and torch runtime are unavailable; English ONNX was not substituted"
+  },
+  "offline_replay_results_sha256": "85d88201fabd584f34fc22f3510792ee5e99cedfc70407d23f8ab7de419b1065",
+  "interpretation": [
+    "ordinary standalone already omitted source hashes; literal-v2 can be larger than adaptive",
+    "saved Qwen packet replay measures local text rendering, not model/server integration or provider usage",
+    "unsupported docs shapes, patch, source reads, error and lifecycle fallback retain the pre-existing canonical contract"
+  ]
+}

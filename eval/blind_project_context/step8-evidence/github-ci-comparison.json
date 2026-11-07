@@ -1,0 +1,1086 @@
+{
+  "runs": [
+    {
+      "commit": "ae81aaae",
+      "run_id": 42117494090,
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42117494090",
+      "jobs": [
+        {
+          "id": 127560920359,
+          "name": "platform-smoke (macos-15-intel)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify package and CLI surface"
+          ]
+        },
+        {
+          "id": 127560920624,
+          "name": "installer-smoke",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Installer smoke tests"
+          ]
+        },
+        {
+          "id": 127560920681,
+          "name": "platform-smoke (macos-15)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify package and CLI surface"
+          ]
+        },
+        {
+          "id": 127560920737,
+          "name": "installed-mcp-harness",
+          "conclusion": "success",
+          "failed_steps": []
+        },
+        {
+          "id": 127560920786,
+          "name": "static-contract",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify lock and static repository contracts"
+          ]
+        },
+        {
+          "id": 127560920833,
+          "name": "test (3.12)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run offline core tests"
+          ]
+        },
+        {
+          "id": 127560920856,
+          "name": "advanced-contract",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run recoverable documentation failure gate",
+            "Run recoverable documentation failure mutation gate",
+            "Run Legacy live compatibility report and lineage floor",
+            "Run V2 project-context acceptance gate",
+            "Run question surface regression gate",
+            "Run Agent Developer Protocol gate",
+            "Run Agent Developer adversarial/token gate",
+            "Run critical mutation gate",
+            "Compare historical and compact literal contract tests"
+          ]
+        },
+        {
+          "id": 127560920887,
+          "name": "test (3.13)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run offline core tests"
+          ]
+        },
+        {
+          "id": 127560920908,
+          "name": "platform-smoke (ubuntu-latest)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify package and CLI surface"
+          ]
+        },
+        {
+          "id": 127560920911,
+          "name": "retrieval-evidence",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify frozen retrieval evidence and independent sample"
+          ]
+        },
+        {
+          "id": 127560920966,
+          "name": "bilingual-context-integration (macos-15-intel)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify bilingual selection and source continuations over installed MCP"
+          ]
+        },
+        {
+          "id": 127560920983,
+          "name": "bilingual-context-integration (ubuntu-latest)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify bilingual selection and source continuations over installed MCP"
+          ]
+        },
+        {
+          "id": 127560921047,
+          "name": "docs-contract",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify documented CLI and public Docs MCP contracts"
+          ]
+        },
+        {
+          "id": 127560921058,
+          "name": "bilingual-context-integration (macos-15)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify bilingual selection and source continuations over installed MCP"
+          ]
+        },
+        {
+          "id": 127560921066,
+          "name": "test (3.11)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run offline core tests"
+          ]
+        },
+        {
+          "id": 127560922259,
+          "name": "docs-impact",
+          "conclusion": "skipped",
+          "failed_steps": []
+        },
+        {
+          "id": 127560922415,
+          "name": "p1-harden-branch",
+          "conclusion": "skipped",
+          "failed_steps": []
+        },
+        {
+          "id": 127562981336,
+          "name": "acceptance-diagnostics",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Summarize existing quality and contract evidence"
+          ]
+        },
+        {
+          "id": 127566702506,
+          "name": "required-ci",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Enforce required CI jobs"
+          ]
+        }
+      ],
+      "core_summary": "= 95 failed, 1438 passed, 10 skipped, 136 deselected, 69 warnings in 199.04s (0:03:19) =",
+      "core_failures": [
+        {
+          "test": "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+          "failure": "AssertionError: critical_relation_original_body_context"
+        },
+        {
+          "test": "tests/docs/test_context_projection_boundaries.py::test_path_only_projection_uses_the_current_exact_topic_guard",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+          "failure": "IndexError: list index out of range"
+        },
+        {
+          "test": "tests/docs/test_contiguous_seed_envelope.py::test_index_restriction_and_cause_arrive_together_in_first_packet",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_complete_window_preserves_quality_and_quote",
+          "failure": "AssertionError: assert 2 == 1"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[control-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-eed3529509d61474', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-aef716654dc245d0', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-77ef6a3d4"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[control-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-834f92fce8a2c7fc', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-4720338b717ef019', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-0fd6955c3"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[absent-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-21862db0dbeeb7d0', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-a9ec9515843840c8', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-9a9f2a43e"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[absent-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-28b8573fdc4e5272', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-22494c0c6ea025c4', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-786fa0887"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[True-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-a14045a10b70343f', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-8e92e61048790d4e', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-d2e23a1de"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[True-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-67ce79385d7184ff', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-e756f0f1e2011097', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-b8b1d077a"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[False-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-737155d713ccedf7', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-a605942b7b673c00', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-5918e08f7"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[False-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-1bc2e7f160265686', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-ba2e4f39648a16d4', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-98038603b"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_contributor_live_reading_and_tests",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-offline]",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial]",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_real_architecture_boundary_enters_candidates_without_borrowed_coverage",
+          "failure": "AssertionError: real infrastructure boundary was lost before qualification"
+        },
+        {
+          "test": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[all-None-What constraints apply to `ForeignOnlyAnswer`?-None]",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/docs/test_joint_context_acceptance.py::test_original_and_known_paraphrase_deliver_complete_block[httpx-paraphrase-1]",
+          "failure": "AssertionError: {'case_id': 'httpx-paraphrase-1', 'request': {'question': 'What do connect, read, write, and pool timeouts each limit in HTTPX?', 'project_path': '/tmp/pytest-of-runner/pytest-0/test_original_and_known_paraph1/project', 'scope': 'all'}, 'payload': {'status': 'truncated', 'kind': 'doc"
+        },
+        {
+          "test": "tests/docs/test_joint_context_acceptance.py::test_original_and_known_paraphrase_deliver_complete_block[httpx-paraphrase-2]",
+          "failure": "AssertionError: {'case_id': 'httpx-paraphrase-2', 'request': {'question': 'What is the difference between connect, read, write, and pool timeout limits?', 'project_path': '/tmp/pytest-of-runner/pytest-0/test_original_and_known_paraph2/project', 'scope': 'all'}, 'payload': {'status': 'truncated', 'ki"
+        },
+        {
+          "test": "tests/docs/test_language_flow_experiment.py::test_real_frozen_flow_all_witnesses_without_changing_expected_labels",
+          "failure": "ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/__init__.py)"
+        },
+        {
+          "test": "tests/docs/test_language_packing_experiment.py::test_real_handler_retains_complete_client_example_with_lookup",
+          "failure": "ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/__init__.py)"
+        },
+        {
+          "test": "tests/docs/test_language_packing_trace.py::test_same_prepared_input_delivers_complete_quote_with_intervention",
+          "failure": "assert 0 == 1"
+        },
+        {
+          "test": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "failure": "AssertionError: critical_mixed_same_call_snapshot"
+        },
+        {
+          "test": "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+          "failure": "IndexError: list index out of range"
+        },
+        {
+          "test": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot",
+          "failure": "AssertionError: assert 'query-original' in []"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_condition_lead.py::test_neutral_condition_remains_complete_without_certifying_postconditions",
+          "failure": "assert False"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[project]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[stale]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[freshness]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[lifecycle]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_name_only_hint_does_not_establish_an_unknown_topic[\\u041a\\u0430\\u043a Pebble \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?]",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_name_only_hint_does_not_establish_an_unknown_topic[\\u041a\\u0430\\u043a Pebble Pebble \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?]",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_final_merge_retains_qualified_windows_without_changing_acquisition",
+          "failure": "assert 0 == 32"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_project_control_view_and_routing_remain_bounded",
+          "failure": "AssertionError: assert 0 == 32"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_explicit_public_patch_retains_windows_with_live_validation",
+          "failure": "KeyError: 'sources'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_ranking_retains_only_independently_qualified_eligible_windows",
+          "failure": "IndexError: list index out of range"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_late_catalog_authority_change_is_rejected",
+          "failure": "KeyError: 'error'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_partial_packet_preserves_explicit_constraints_and_window_bindings",
+          "failure": "AssertionError: assert 'unavailable' == 'partial'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_acquisition_source_content_reads_unchanged_validation_io_increases",
+          "failure": "AssertionError: assert set() == {'/tmp/pytest...ct-docs.yaml'}"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_real_generation_duplicate_lookup_bindings_survive",
+          "failure": "assert []"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_completed_invocation_cannot_deliver_another_result_or_sink[changed_result]",
+          "failure": "KeyError: 'error'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_completed_invocation_cannot_deliver_another_result_or_sink[changed_sink]",
+          "failure": "KeyError: 'error'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_supported_project_docs_delegate_completes_actual_result_and_sink",
+          "failure": "KeyError: 'sources'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[omitted]",
+          "failure": "assert [] == [{'source': '....0, ...}, ...]"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[false]",
+          "failure": "assert [] == [{'source': '....0, ...}, ...]"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[unacknowledged-true]",
+          "failure": "assert [] == [{'source': '....0, ...}, ...]"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_real_lexical_public_retention_preserves_every_qualified_window",
+          "failure": "assert 0 == 1"
+        },
+        {
+          "test": "tests/test_action_packet_v4_public.py::test_public_caller_kind_and_mutation_do_not_change_docs_policy",
+          "failure": "KeyError: 'kind'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_public.py::test_patch_order_is_deterministic",
+          "failure": "assert {'schema_vers...': False, ...} == {'schema_vers...': False, ...}"
+        },
+        {
+          "test": "tests/test_action_packet_v4_public.py::test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap",
+          "failure": "KeyError: 'result'"
+        },
+        {
+          "test": "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+          "failure": "AssertionError: {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['no_docs_context_available'], 'estimated_tokens': 146, ...}"
+        },
+        {
+          "test": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries0]",
+          "failure": "AssertionError: assert ['child-81ea4...dc684e780927'] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries1]",
+          "failure": "AssertionError: assert ['child-816cc...fda54a18902e'] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[absent]",
+          "failure": "AssertionError: assert ([{'behavior':...': None, ...}] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[empty]",
+          "failure": "AssertionError: assert ([{'behavior':...': None, ...}] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[invalid]",
+          "failure": "AssertionError: assert ([{'behavior':...': None, ...}] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_membership.py::test_committed_pilot_exact_roles_hashes_and_no_discovery",
+          "failure": "AssertionError: assert {'CONTRIBUTIN...runbook', ...} == {'README.md':...tecture', ...}"
+        },
+        {
+          "test": "tests/test_dictionary_exit_public_request.py::test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator[ok]",
+          "failure": "assert False"
+        },
+        {
+          "test": "tests/test_dictionary_exit_public_request.py::test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator[insufficient_evidence]",
+          "failure": "assert False"
+        },
+        {
+          "test": "tests/test_dictionary_exit_review_boundaries.py::test_actual_public_partial_quote_survives_without_explicit_block",
+          "failure": "AssertionError: assert ('insufficient_evidence' == 'ok'"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten",
+          "failure": "AssertionError: assert ([{'doc_scope': 'library', 'origin_lane': 'library', 'source_class': 'library_doc', 'source': 'file:///tmp/pytest-of-runner/pytest-0/test_real_library_cleaning_kee0/library-test/project/library-fixtures/1.0.0/reference.md', ...}] and False)"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_acquisition_observer_uses_real_small_public_route_without_changing_results",
+          "failure": "assert 0 > 0"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[False]",
+          "failure": "RuntimeError(\"Invalid structured content returned by tool get_docs_context: False was expected\\n\\nFailed validating 'const' in schema[1]['properties']['recommended_next_action']['properties']['requires_confirmation']:\\n    {'const': False}\\n\\nOn instance['recommended_next_action']['requires_confirma"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[True]",
+          "failure": "AssertionError({'status': 'not_prepared', 'reason_code': 'member_store_uninitialized', 'message': 'MCP is connected, but documentation has not been prepared. Installation does not index documents.', 'project_path': '/tmp/pytest-of-runner/pytest-0/test_cold_smoke_helpers_prepar1/project', 'storage_pa"
+        },
+        {
+          "test": "tests/test_heuristic_removal_public_integration.py::test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only",
+          "failure": "AssertionError: assert [('docs/issue... storage.\\n')] == [('docs/issue...optique».\\n')]"
+        },
+        {
+          "test": "tests/test_heuristic_removal_public_integration.py::test_vector_runtime_preserves_source_windows_and_access",
+          "failure": "RuntimeError: vector indexing failed after FTS5 ingest: unregistered outbound DNS blocked: 'embeddings.invalid'"
+        },
+        {
+          "test": "tests/test_mcp_delivery_member_transaction.py::test_source_and_storage_boundaries[config_shadow]",
+          "failure": "Failed: DID NOT RAISE any of (PermissionError, ValueError, OSError)"
+        },
+        {
+          "test": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+          "failure": "AssertionError: critical_project_read_acquired_qualified"
+        },
+        {
+          "test": "tests/test_mcp_trusted_storage_lifecycle.py::test_project_config_cannot_redirect_prepare_or_retrieval",
+          "failure": "AssertionError: assert 'success' != 'success'"
+        },
+        {
+          "test": "tests/test_named_document_context_integration.py::test_public_project_answer_heading_only_is_not_factual_proof",
+          "failure": "AssertionError: assert 'ok' == 'insufficient_evidence'"
+        },
+        {
+          "test": "tests/test_named_document_context_integration.py::test_real_sqlite_newcomer_topics_reach_expected_project_docs[How are external dependency docs prepared for a project?-docs/project-docs-mcp-workflow.md-prefetch_project_dependency_docs]",
+          "failure": "AssertionError: {'status': 'truncated', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/test_native_context_preservation_integration.py::test_selected_native_context_survives_public_delivery_with_trace_parity",
+          "failure": "AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}"
+        },
+        {
+          "test": "tests/test_nl_dictionary_removal_literal_contract.py::test_public_mcp_read_keeps_risk_labelled_quote_and_denies_permissions",
+          "failure": "AssertionError: assert ('insufficient_evidence' == 'ok'"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[False-shell_writer]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[False-python]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[True-shell_writer]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[True-python]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_shell_jsonc_noop_preserves_comments_and_update_refuses",
+          "failure": "assert 2 == 0"
+        },
+        {
+          "test": "tests/test_parent_child_index.py::test_plain_documents_create_a_queryable_current_generation",
+          "failure": "AssertionError: assert ['both.md', 'alpha.md'] == ['both.md']"
+        },
+        {
+          "test": "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+          "failure": "AssertionError: ('docs/dispatch.md', 'Record the serial number from each lens barrel in the case inventory before closing the case.', ['# Optical case dispatch checklist"
+        },
+        {
+          "test": "tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls",
+          "failure": "AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}"
+        },
+        {
+          "test": "tests/test_project_context_quality_v2_protocol.py::test_delivery_veto_observer_distinguishes_rejected_candidates_from_empty_acquisition[\\u041a\\u0430\\u043a DocAtlas \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?-True]",
+          "failure": "AssertionError: assert ('ok' == 'insufficient_evidence'"
+        },
+        {
+          "test": "tests/test_project_context_quality_v2_protocol.py::test_public_partial_context_preserves_short_facts_without_cross_owner_or_numeric_credit",
+          "failure": "AssertionError: ('different section owner', '/tmp/pytest-of-runner/pytest-0/test_public_partial_context_pr0/qualification-review-proof.json')"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_cold_read_does_not_create_or_authorize_storage",
+          "failure": "AssertionError: assert 'not_prepared' == 'failed'"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_frozen_catalog_only_changes_isolated_prepared_membership",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_public_surface_integration.py::test_public_cli_and_cold_stdio_contract_without_implicit_preparation",
+          "failure": "RuntimeError(\"Invalid structured content returned by tool get_docs_context: 'not_prepared' is not one of ['ok', 'truncated', 'insufficient_evidence', 'failed']\\n\\nFailed validating 'enum' in schema['properties']['status']:\\n    {'enum': ['ok', 'truncated', 'insufficient_evidence', 'failed']}\\n\\nOn i"
+        },
+        {
+          "test": "tests/test_public_vector_retrieval.py::test_public_project_docs_query_consumes_dense_vector_index",
+          "failure": "assert []"
+        },
+        {
+          "test": "tests/test_retrieval_quality_baseline.py::test_case_artifacts_trace_candidates_without_full_document_fields",
+          "failure": "assert 2 == 1"
+        },
+        {
+          "test": "tests/test_sqlite_ranking_truth.py::test_ranking_trace_exposes_named_components_without_document_text",
+          "failure": "AssertionError: assert dict_keys(['c...exical_cost']) == {'fts5_bm25_cost'}"
+        },
+        {
+          "test": "tests/test_sqlite_ranking_truth.py::test_exact_filename_qualification_uses_the_same_corpus_as_fts",
+          "failure": "AssertionError: assert ['docatlas.project-docs.yaml'] == []"
+        }
+      ]
+    },
+    {
+      "commit": "610d9da6",
+      "run_id": 42040910239,
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42040910239",
+      "jobs": [
+        {
+          "id": 127291160413,
+          "name": "docs-contract",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify documented CLI and public Docs MCP contracts"
+          ]
+        },
+        {
+          "id": 127291160777,
+          "name": "installed-mcp-harness",
+          "conclusion": "success",
+          "failed_steps": []
+        },
+        {
+          "id": 127291160812,
+          "name": "test (3.13)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run offline core tests"
+          ]
+        },
+        {
+          "id": 127291160882,
+          "name": "platform-smoke (macos-15-intel)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify package and CLI surface"
+          ]
+        },
+        {
+          "id": 127291160895,
+          "name": "static-contract",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify lock and static repository contracts"
+          ]
+        },
+        {
+          "id": 127291160924,
+          "name": "bilingual-context-integration (macos-15)",
+          "conclusion": "success",
+          "failed_steps": []
+        },
+        {
+          "id": 127291160961,
+          "name": "test (3.11)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run offline core tests"
+          ]
+        },
+        {
+          "id": 127291161013,
+          "name": "retrieval-evidence",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify frozen retrieval evidence and independent sample"
+          ]
+        },
+        {
+          "id": 127291161050,
+          "name": "bilingual-context-integration (macos-15-intel)",
+          "conclusion": "success",
+          "failed_steps": []
+        },
+        {
+          "id": 127291161112,
+          "name": "platform-smoke (macos-15)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify package and CLI surface"
+          ]
+        },
+        {
+          "id": 127291161192,
+          "name": "bilingual-context-integration (ubuntu-latest)",
+          "conclusion": "success",
+          "failed_steps": []
+        },
+        {
+          "id": 127291161267,
+          "name": "test (3.12)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run offline core tests"
+          ]
+        },
+        {
+          "id": 127291161306,
+          "name": "platform-smoke (ubuntu-latest)",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Verify package and CLI surface"
+          ]
+        },
+        {
+          "id": 127291161338,
+          "name": "advanced-contract",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Run recoverable documentation failure gate",
+            "Run recoverable documentation failure mutation gate",
+            "Run Legacy live compatibility report and lineage floor",
+            "Run V2 project-context acceptance gate",
+            "Run question surface regression gate",
+            "Run Agent Developer Protocol gate",
+            "Run Agent Developer adversarial/token gate",
+            "Run critical mutation gate",
+            "Compare historical and compact literal contract tests"
+          ]
+        },
+        {
+          "id": 127291161497,
+          "name": "installer-smoke",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Installer smoke tests"
+          ]
+        },
+        {
+          "id": 127291163359,
+          "name": "docs-impact",
+          "conclusion": "skipped",
+          "failed_steps": []
+        },
+        {
+          "id": 127291163383,
+          "name": "p1-harden-branch",
+          "conclusion": "skipped",
+          "failed_steps": []
+        },
+        {
+          "id": 127293193371,
+          "name": "acceptance-diagnostics",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Summarize existing quality and contract evidence"
+          ]
+        },
+        {
+          "id": 127295303705,
+          "name": "required-ci",
+          "conclusion": "failure",
+          "failed_steps": [
+            "Enforce required CI jobs"
+          ]
+        }
+      ],
+      "core_summary": "= 95 failed, 1431 passed, 10 skipped, 136 deselected, 69 warnings in 175.96s (0:02:55) =",
+      "core_failures": [
+        {
+          "test": "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+          "failure": "AssertionError: critical_relation_original_body_context"
+        },
+        {
+          "test": "tests/docs/test_context_projection_boundaries.py::test_path_only_projection_uses_the_current_exact_topic_guard",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+          "failure": "IndexError: list index out of range"
+        },
+        {
+          "test": "tests/docs/test_contiguous_seed_envelope.py::test_index_restriction_and_cause_arrive_together_in_first_packet",
+          "failure": "AssertionError: {'status': 'truncated', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_complete_window_preserves_quality_and_quote",
+          "failure": "AssertionError: assert 2 == 1"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[control-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-87f836973b0b10b7', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-b1b20ba3a134c8bb', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-2716a5d02"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[control-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-d2e1d646125e4dc0', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-d040ed277325c21a', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-f75c1cfc5"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[absent-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-e26fd9f5210ab1f7', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-8dc1fb3dd42eb52e', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-a5ef40464"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[absent-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-90a2261fb5a0b40d', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-a88ba3867960a708', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-d7180dd0a"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[True-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-efe1fbd50af2a5bc', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-8a7f2f1433e1f2b4', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-2b5691b55"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[True-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-e030f88f787dfc70', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-a6b8bb7a97d5f1e0', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-674bbab76"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[False-authorized]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-b4fb04d4281c171c', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-1e4176a083d99f23', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-f9a96018b"
+        },
+        {
+          "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[False-revoked]",
+          "failure": "AssertionError: {'source_count': 12, 'sources': [{'evidence_id': 'ev-1e7719ab07f62494', 'path_or_url': 'docs/polling.md', 'line_start': 1, 'line_end': 4, ...}, {'evidence_id': 'ev-566619d411159c18', 'path_or_url': 'docs/polling.md', 'line_start': 5, 'line_end': 6, ...}, {'evidence_id': 'ev-54bdbe5bd"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_contributor_live_reading_and_tests",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-offline]",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial]",
+          "failure": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md"
+        },
+        {
+          "test": "tests/docs/test_generic_context_workflows.py::test_real_architecture_boundary_enters_candidates_without_borrowed_coverage",
+          "failure": "AssertionError: real infrastructure boundary was lost before qualification"
+        },
+        {
+          "test": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[all-None-What constraints apply to `ForeignOnlyAnswer`?-None]",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/docs/test_joint_context_acceptance.py::test_original_and_known_paraphrase_deliver_complete_block[httpx-paraphrase-1]",
+          "failure": "AssertionError: {'case_id': 'httpx-paraphrase-1', 'request': {'question': 'What do connect, read, write, and pool timeouts each limit in HTTPX?', 'project_path': '/tmp/pytest-of-runner/pytest-0/test_original_and_known_paraph1/project', 'scope': 'all'}, 'payload': {'status': 'truncated', 'kind': 'doc"
+        },
+        {
+          "test": "tests/docs/test_joint_context_acceptance.py::test_original_and_known_paraphrase_deliver_complete_block[httpx-paraphrase-2]",
+          "failure": "AssertionError: {'case_id': 'httpx-paraphrase-2', 'request': {'question': 'What is the difference between connect, read, write, and pool timeout limits?', 'project_path': '/tmp/pytest-of-runner/pytest-0/test_original_and_known_paraph2/project', 'scope': 'all'}, 'payload': {'status': 'truncated', 'ki"
+        },
+        {
+          "test": "tests/docs/test_language_flow_experiment.py::test_real_frozen_flow_all_witnesses_without_changing_expected_labels",
+          "failure": "ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/__init__.py)"
+        },
+        {
+          "test": "tests/docs/test_language_packing_experiment.py::test_real_handler_retains_complete_client_example_with_lookup",
+          "failure": "ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/__init__.py)"
+        },
+        {
+          "test": "tests/docs/test_language_packing_trace.py::test_same_prepared_input_delivers_complete_quote_with_intervention",
+          "failure": "assert 0 == 1"
+        },
+        {
+          "test": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+          "failure": "AssertionError: critical_mixed_same_call_snapshot"
+        },
+        {
+          "test": "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+          "failure": "IndexError: list index out of range"
+        },
+        {
+          "test": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot",
+          "failure": "AssertionError: assert 'query-original' in []"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_condition_lead.py::test_neutral_condition_remains_complete_without_certifying_postconditions",
+          "failure": "assert False"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[project]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[stale]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[freshness]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[lifecycle]",
+          "failure": "KeyError: 'answer_supported'"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_name_only_hint_does_not_establish_an_unknown_topic[\\u041a\\u0430\\u043a Pebble \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?]",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_name_only_hint_does_not_establish_an_unknown_topic[\\u041a\\u0430\\u043a Pebble Pebble \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?]",
+          "failure": "AssertionError: {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_final_merge_retains_qualified_windows_without_changing_acquisition",
+          "failure": "assert 0 == 32"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_project_control_view_and_routing_remain_bounded",
+          "failure": "AssertionError: assert 0 == 32"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_explicit_public_patch_retains_windows_with_live_validation",
+          "failure": "KeyError: 'sources'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_ranking_retains_only_independently_qualified_eligible_windows",
+          "failure": "IndexError: list index out of range"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_late_catalog_authority_change_is_rejected",
+          "failure": "KeyError: 'error'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_partial_packet_preserves_explicit_constraints_and_window_bindings",
+          "failure": "AssertionError: assert 'unavailable' == 'partial'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_acquisition_source_content_reads_unchanged_validation_io_increases",
+          "failure": "AssertionError: assert set() == {'/tmp/pytest...ct-docs.yaml'}"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_real_generation_duplicate_lookup_bindings_survive",
+          "failure": "assert []"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_completed_invocation_cannot_deliver_another_result_or_sink[changed_result]",
+          "failure": "KeyError: 'error'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_completed_invocation_cannot_deliver_another_result_or_sink[changed_sink]",
+          "failure": "KeyError: 'error'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_supported_project_docs_delegate_completes_actual_result_and_sink",
+          "failure": "KeyError: 'sources'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[omitted]",
+          "failure": "assert [] == [{'source': '....0, ...}, ...]"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[false]",
+          "failure": "assert [] == [{'source': '....0, ...}, ...]"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[unacknowledged-true]",
+          "failure": "assert [] == [{'source': '....0, ...}, ...]"
+        },
+        {
+          "test": "tests/test_action_packet_v4_found_window_retention.py::test_real_lexical_public_retention_preserves_every_qualified_window",
+          "failure": "assert 0 == 1"
+        },
+        {
+          "test": "tests/test_action_packet_v4_public.py::test_public_caller_kind_and_mutation_do_not_change_docs_policy",
+          "failure": "KeyError: 'kind'"
+        },
+        {
+          "test": "tests/test_action_packet_v4_public.py::test_patch_order_is_deterministic",
+          "failure": "assert {'schema_vers...': False, ...} == {'schema_vers...': False, ...}"
+        },
+        {
+          "test": "tests/test_action_packet_v4_public.py::test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap",
+          "failure": "KeyError: 'result'"
+        },
+        {
+          "test": "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+          "failure": "AssertionError: {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['no_docs_context_available'], 'estimated_tokens': 146, ...}"
+        },
+        {
+          "test": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries0]",
+          "failure": "AssertionError: assert ['child-81ea4...dc684e780927'] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries1]",
+          "failure": "AssertionError: assert ['child-816cc...fda54a18902e'] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[absent]",
+          "failure": "AssertionError: assert ([{'behavior':...': None, ...}] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[empty]",
+          "failure": "AssertionError: assert ([{'behavior':...': None, ...}] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[invalid]",
+          "failure": "AssertionError: assert ([{'behavior':...': None, ...}] == []"
+        },
+        {
+          "test": "tests/test_dictionary_exit_local_membership.py::test_committed_pilot_exact_roles_hashes_and_no_discovery",
+          "failure": "AssertionError: assert {'CONTRIBUTIN...runbook', ...} == {'README.md':...tecture', ...}"
+        },
+        {
+          "test": "tests/test_dictionary_exit_public_request.py::test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator[ok]",
+          "failure": "assert False"
+        },
+        {
+          "test": "tests/test_dictionary_exit_public_request.py::test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator[insufficient_evidence]",
+          "failure": "assert False"
+        },
+        {
+          "test": "tests/test_dictionary_exit_review_boundaries.py::test_actual_public_partial_quote_survives_without_explicit_block",
+          "failure": "AssertionError: assert ('insufficient_evidence' == 'ok'"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten",
+          "failure": "AssertionError: assert ([{'doc_scope': 'library', 'origin_lane': 'library', 'source_class': 'library_doc', 'source': 'file:///tmp/pytest-of-runner/pytest-0/test_real_library_cleaning_kee0/library-test/project/library-fixtures/1.0.0/reference.md', ...}] and False)"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_acquisition_observer_uses_real_small_public_route_without_changing_results",
+          "failure": "assert 0 > 0"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[False]",
+          "failure": "RuntimeError(\"Invalid structured content returned by tool get_docs_context: False was expected\\n\\nFailed validating 'const' in schema[1]['properties']['recommended_next_action']['properties']['requires_confirmation']:\\n    {'const': False}\\n\\nOn instance['recommended_next_action']['requires_confirma"
+        },
+        {
+          "test": "tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio[True]",
+          "failure": "AssertionError({'status': 'not_prepared', 'reason_code': 'member_store_uninitialized', 'message': 'MCP is connected, but documentation has not been prepared. Installation does not index documents.', 'project_path': '/tmp/pytest-of-runner/pytest-0/test_cold_smoke_helpers_prepar1/project', 'storage_pa"
+        },
+        {
+          "test": "tests/test_heuristic_removal_public_integration.py::test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only",
+          "failure": "AssertionError: assert [('docs/issue... storage.\\n')] == [('docs/issue...optique».\\n')]"
+        },
+        {
+          "test": "tests/test_heuristic_removal_public_integration.py::test_vector_runtime_preserves_source_windows_and_access",
+          "failure": "RuntimeError: vector indexing failed after FTS5 ingest: unregistered outbound DNS blocked: 'embeddings.invalid'"
+        },
+        {
+          "test": "tests/test_mcp_delivery_member_transaction.py::test_source_and_storage_boundaries[config_shadow]",
+          "failure": "Failed: DID NOT RAISE any of (PermissionError, ValueError, OSError)"
+        },
+        {
+          "test": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+          "failure": "AssertionError: critical_project_read_acquired_qualified"
+        },
+        {
+          "test": "tests/test_mcp_trusted_storage_lifecycle.py::test_project_config_cannot_redirect_prepare_or_retrieval",
+          "failure": "AssertionError: assert 'success' != 'success'"
+        },
+        {
+          "test": "tests/test_named_document_context_integration.py::test_public_project_answer_heading_only_is_not_factual_proof",
+          "failure": "AssertionError: assert 'ok' == 'insufficient_evidence'"
+        },
+        {
+          "test": "tests/test_named_document_context_integration.py::test_real_sqlite_newcomer_topics_reach_expected_project_docs[How are external dependency docs prepared for a project?-docs/project-docs-mcp-workflow.md-prefetch_project_dependency_docs]",
+          "failure": "AssertionError: {'status': 'truncated', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}"
+        },
+        {
+          "test": "tests/test_native_context_preservation_integration.py::test_selected_native_context_survives_public_delivery_with_trace_parity",
+          "failure": "AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}"
+        },
+        {
+          "test": "tests/test_nl_dictionary_removal_literal_contract.py::test_public_mcp_read_keeps_risk_labelled_quote_and_denies_permissions",
+          "failure": "AssertionError: assert ('insufficient_evidence' == 'ok'"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[False-shell_writer]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[False-python]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[True-shell_writer]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_unique_owned_name_and_state_preserved[True-python]",
+          "failure": "AssertionError: assert {'command': [...: 42000}, ...} == {'type': 'loc...K': '1'}, ...}"
+        },
+        {
+          "test": "tests/test_opencode_v2_installer.py::test_shell_jsonc_noop_preserves_comments_and_update_refuses",
+          "failure": "assert 2 == 0"
+        },
+        {
+          "test": "tests/test_parent_child_index.py::test_plain_documents_create_a_queryable_current_generation",
+          "failure": "AssertionError: assert ['both.md', 'alpha.md'] == ['both.md']"
+        },
+        {
+          "test": "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+          "failure": "AssertionError: ('docs/dispatch.md', 'Record the serial number from each lens barrel in the case inventory before closing the case.', ['# Optical case dispatch checklist"
+        },
+        {
+          "test": "tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls",
+          "failure": "AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}"
+        },
+        {
+          "test": "tests/test_project_context_quality_v2_protocol.py::test_delivery_veto_observer_distinguishes_rejected_candidates_from_empty_acquisition[\\u041a\\u0430\\u043a DocAtlas \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?-True]",
+          "failure": "AssertionError: assert ('ok' == 'insufficient_evidence'"
+        },
+        {
+          "test": "tests/test_project_context_quality_v2_protocol.py::test_public_partial_context_preserves_short_facts_without_cross_owner_or_numeric_credit",
+          "failure": "AssertionError: ('different section owner', '/tmp/pytest-of-runner/pytest-0/test_public_partial_context_pr0/qualification-review-proof.json')"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_cold_read_does_not_create_or_authorize_storage",
+          "failure": "AssertionError: assert 'not_prepared' == 'failed'"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_project_docs_self_host_fixture.py::test_frozen_catalog_only_changes_isolated_prepared_membership",
+          "failure": "AssertionError: assert False"
+        },
+        {
+          "test": "tests/test_public_surface_integration.py::test_public_cli_and_cold_stdio_contract_without_implicit_preparation",
+          "failure": "RuntimeError(\"Invalid structured content returned by tool get_docs_context: 'not_prepared' is not one of ['ok', 'truncated', 'insufficient_evidence', 'failed']\\n\\nFailed validating 'enum' in schema['properties']['status']:\\n    {'enum': ['ok', 'truncated', 'insufficient_evidence', 'failed']}\\n\\nOn i"
+        },
+        {
+          "test": "tests/test_public_vector_retrieval.py::test_public_project_docs_query_consumes_dense_vector_index",
+          "failure": "assert []"
+        },
+        {
+          "test": "tests/test_retrieval_quality_baseline.py::test_case_artifacts_trace_candidates_without_full_document_fields",
+          "failure": "assert 2 == 1"
+        },
+        {
+          "test": "tests/test_sqlite_ranking_truth.py::test_ranking_trace_exposes_named_components_without_document_text",
+          "failure": "AssertionError: assert dict_keys(['c...exical_cost']) == {'fts5_bm25_cost'}"
+        },
+        {
+          "test": "tests/test_sqlite_ranking_truth.py::test_exact_filename_qualification_uses_the_same_corpus_as_fts",
+          "failure": "AssertionError: assert ['docatlas.project-docs.yaml'] == []"
+        }
+      ]
+    }
+  ]
+}

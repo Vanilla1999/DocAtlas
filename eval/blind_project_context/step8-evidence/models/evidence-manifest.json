@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "scope": "Aggregate/provenance artifacts only; no new oracle, holdout questions, retrieved text, per-case fact results or ranking payloads are published.",
+  "raw_evidence_sha256": {
+    "minilm_run.json": "79c58a73e453c09e0726a98d73ff86bf5adb6d28ac68773d07d1551f987a7330",
+    "minilm_score.json": "1271f127d6649377696d998900e3579d56e04d947190cccf5e508da2fb24d264",
+    "baseline_score.json": "9dd741ad4c4986d0e107779c4c659ee623a5e8e9e095a1dbd5920351b1d5e21d",
+    "e5_embedding-receipt.json": "4c0801895fe70ae3d7ca92ff0df7eba7f1d3e52957d258b4a324d348349f46f2",
+    "e5_rankings.json": "54078f3e4a5eab347da27e4a0dab51edc33a6f4e2901921ba4165af72be7e5d8"
+  },
+  "published_sha256": {
+    "e5-embedding-summary.json": "120afba30072217ddd0cec10447e74804af97be11880c518584fa0c4aab7b94d",
+    "e5-plan.json": "d16c1429def22e80dcb03f0c65cfccc76b6b32d9ee3afb586868750409f43e6e",
+    "e5-ranking-receipt.json": "f972c408992c8b87009a52d2160ae66e30d5380bb93fed737eff3c2b72db5bc3",
+    "e5-summary.json": "41faa0d42c5768073e8b69d4b29207007246493837442ae2f1f45bb6f0352664",
+    "minilm-manifest.json": "60e7066770a14b04056aec207930f559d9ef71297396d6a65be1348def2d3639",
+    "minilm-summary.json": "405812f9de3e4ec5958dffe4232f4c3d187ef2da293df75ff922d57d0ae27b9a",
+    "minilm-union-with-baseline.json": "4c0fe5ec5f47e74db4203a006403111da9efa09510a2351f79426b9749808429",
+    "runtime-versions.json": "407b2b5615da005e379ff1af37a95cd92c7c7c96a6d3fe3202fb382d105951d4"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "measurement_commit": "33c831c0b8d0571dc53dd77242d5f73cf51cb272",
+  "published_commit": "5aa3813ed85d98d1a7b3f05fca0aa1e3f3281466",
+  "tree_sha": "04b45dca1481c5327c48bfcbe99bbac1e3f6aff3",
+  "published_branch": "work/step8-measured-snapshot",
+  "base_commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+  "interpretation": "Git trees are identical. This is the frozen measurement snapshot, not the final reviewed runtime."
+}

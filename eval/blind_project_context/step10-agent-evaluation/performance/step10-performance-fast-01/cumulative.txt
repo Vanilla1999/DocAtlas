@@ -1,0 +1,53 @@
+         74851982 function calls (61395864 primitive calls) in 29.724 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1475 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   29.996   29.996 query_trace.py:100(wrapped)
+        1    0.000    0.000   29.996   29.996 _docs_server_part01.py:164(call_docs_tool_payload)
+        1    0.000    0.000   28.449   28.449 context_tools.py:288(handle_context_tool)
+        1    0.000    0.000   28.447   28.447 original_body_discovery.py:77(scoped)
+        1    0.000    0.000   28.446   28.446 context_tools.py:336(_handle_prepared_context_tool)
+      6/1    0.000    0.000   28.446   28.446 project_doc_ranking.py:320(_invoke_found_window_retention)
+        1    0.000    0.000   28.446   28.446 <string>:1(__docatlas_shard_wrapper_get_docs_context_79a74db98ae0)
+      3/1    0.000    0.000   28.446   28.446 original_body_discovery.py:57(scoped)
+      6/1    0.046    0.008   28.446   28.446 project_doc_ranking.py:300(produce)
+        1    0.004    0.004   28.446   28.446 _unified_context_service_part01.py:62(get_docs_context)
+        1    0.000    0.000   24.175   24.175 service.py:370(get_project_context)
+        1    0.000    0.000   24.175   24.175 <string>:1(__docatlas_shard_wrapper_get_project_context_79a74e4a2a20)
+        1    0.052    0.052   24.173   24.173 _project_context_service_part01.py:19(get_project_context)
+        1    0.000    0.000   17.361   17.361 service.py:345(get_project_docs)
+        1    0.000    0.000   17.361   17.361 <string>:1(__docatlas_shard_wrapper_get_project_docs_79a74e452de0)
+        1    0.152    0.152   17.331   17.331 _project_docs_service_part03.py:338(get_project_docs)
+        1    0.000    0.000   14.993   14.993 <string>:1(__docatlas_shard_wrapper_query_project_docs_79a74e452c00)
+        1    0.014    0.014   14.978   14.978 _project_docs_service_part03.py:86(query_project_docs)
+        1    0.000    0.000    8.214    8.214 _project_docs_service_part03.py:231(_run)
+        1    0.004    0.004    6.737    6.737 _project_docs_service_part03.py:211(_finish_candidates)
+        1    0.102    0.102    6.168    6.168 _project_docs_service_part03.py:37(_qualify_candidate_lookups)
+    11860    0.118    0.000    5.528    0.000 reference_query_tagging.py:73(_tag_retrieval_query)
+    71921    0.033    0.000    4.850    0.000 dataclasses.py:1338(asdict)
+11741357/71921    4.012    0.000    4.790    0.000 dataclasses.py:1362(_asdict_inner)
+        1    0.141    0.141    4.379    4.379 source_reference_evidence.py:178(prepare)
+        1    0.000    0.000    3.840    3.840 <string>:1(__docatlas_shard_wrapper__to_dict_79a74db99f80)
+        1    0.000    0.000    3.840    3.840 _unified_context_service_part02.py:660(_to_dict)
+    11860    0.022    0.000    3.759    0.000 source_reference_evidence.py:123(_document)
+    23720    0.267    0.000    3.683    0.000 evidence_qualification.py:215(qualify_evidence)
+        1    0.047    0.047    3.460    3.460 _evidence_selection_part03.py:33(select_evidence)
+    11860    0.034    0.000    3.088    0.000 literal_context_admission.py:302(admit_original_literal_context)
+        1    0.263    0.263    2.449    2.449 evidence_candidates.py:189(normalize_candidates)
+      591    2.204    0.004    2.204    0.004 {method 'fetchall' of 'sqlite3.Cursor' objects}
+        1    0.000    0.000    2.139    2.139 _project_docs_service_part03.py:168(_run)
+        1    0.000    0.000    2.139    2.139 <string>:1(__docatlas_shard_wrapper_run_79a74f2e5b20)
+        1    0.020    0.020    2.139    2.139 _dispatch_part01.py:65(run)
+    23720    0.449    0.000    2.115    0.000 query_reference_binding.py:322(prepare_reference_probe)
+    36348    1.369    0.000    2.082    0.000 shard_compat.py:71(sync)
+      598    0.013    0.000    2.067    0.003 member_read_store.py:37(_connect)
+    11860    0.068    0.000    1.855    0.000 literal_context_admission.py:257(_checked_original_candidate)
+        1    0.019    0.019    1.696    1.696 reference_query_tagging.py:36(_record_query_discovery)
+    11860    0.005    0.000    1.694    0.000 <string>:1(__docatlas_shard_wrapper__looks_like_placeholder_search_result_79a74e4a09a0)
+      598    0.014    0.000    1.679    0.003 member_read_store.py:56(_validate_read_generation)
+     5989    1.679    0.000    1.679    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+    35580    0.365    0.000    1.665    0.000 original_body_discovery.py:187(_window_binding)
+
+

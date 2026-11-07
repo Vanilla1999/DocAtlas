@@ -177,8 +177,9 @@ def test_self_host_cold_read_does_not_create_or_authorize_storage(tmp_path):
         cold = fixture.service._cold
         policy = cold.member_storage_policy
         payload = _cold_read(fixture)
-        assert payload['status'] == 'failed'
-        assert payload['error']['reason_code'] == 'permission_denied'
+        assert payload['status'] == 'not_prepared'
+        assert payload['reason_code'] == 'member_store_uninitialized'
+        assert payload['recommended_next_action']['requires_confirmation'] is True
         assert cold._service is None and not policy.db_path.exists() and not policy.marker.exists()
         for invalid in (None, [], 'unexpected', {'status': 'ok'},
                         {'recommended_next_action': {'arguments_patch': {'action': 'sync_project_docs'}}}):
@@ -226,7 +227,10 @@ def test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project(tmp
         assert payload['status'] == 'ok' and payload['kind'] == 'docs_context', diagnostic
         assert payload['context_available'] is True and snapshot, diagnostic
         assert payload['answer_available'] is False and payload['support_status'] == 'retrieval_only', diagnostic
-        assert 'query-lookup-1' in payload['covered_query_ids'], diagnostic
+        # Source-only context does not promise qualified lookup coverage. A
+        # lookup may receive its own credit, but can never cover the original
+        # (ADR 0003); the source bytes and bindings are checked below.
+        assert set(payload['covered_query_ids']) <= {'query-lookup-1'}, diagnostic
         assert 'query-original' not in payload['covered_query_ids'], diagnostic
         assert 'query-original' in payload['missing_query_ids'], diagnostic
         assert payload['answer_supported'] is False and payload['edit_ready'] is False
@@ -252,20 +256,16 @@ def test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project(tmp
             fixture.prepare()
 
 
-def test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization(tmp_path):
+def test_self_host_ignores_project_storage_and_rejects_changed_grants(tmp_path):
     origin, documents = _checkout(tmp_path)
     with fixture_module.self_host_fixture(origin) as fixture:
         cold = fixture.service._cold
         policy = cold.member_storage_policy
         assert fixture.verify_cold_read(_cold_read(fixture))
         path = fixture.root / 'docatlas.yaml'
-        relocated = path.read_bytes()
         path.chmod(0o600)
         path.write_bytes(documents['docatlas.yaml'])
-        with pytest.raises(RuntimeError, match='explicit member preparation failed'):
-            fixture.prepare()
         assert not policy.db_path.exists() and not policy.marker.exists() and cold._service is None
-        path.write_bytes(relocated)
         path.chmod(0o444)
         for field in ('content_sha256', 'catalog_entry_hash', 'catalog_sha256', 'expected_generation_id'):
             mutation = deepcopy(fixture.mutation)
@@ -280,6 +280,14 @@ def test_self_host_conflicting_config_and_changed_hashes_fail_before_initializat
             assert not policy.db_path.exists() and not policy.marker.exists() and cold._service is None
         fixture.prepare()
         assert policy.generation() == fixture.provenance['preparation']['generation_id']
+        # The host-selected store is authoritative; project configuration is
+        # not a storage selector (mcp-storage/FRESH_PLAN_RU.md). Even with the
+        # conflicting path left in the project, preparation uses only the
+        # explicitly granted target outside it.
+        assert fixture.provenance['preparation']['storage_path'] == str(policy.db_path)
+        assert not (fixture.root / '.docatlas').exists()
+        assert not (origin / '.docatlas').exists()
+        assert path.read_bytes() == documents['docatlas.yaml']
 
 
 def test_self_host_fixture_restores_environment_and_preserves_original_repository(tmp_path, monkeypatch):

@@ -1,0 +1,230 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-d27c59e8e8904fa85c7c03e3d2910e5fa39841afeb0f6bcbf95209b514161fe6",
+        "score": -9.710765838623047,
+        "pairs": 2,
+        "body_tokens": 35,
+        "ancestor_tokens": 6,
+        "body_token_coverage": [
+          0,
+          35
+        ],
+        "body_character_extent": [
+          1,
+          144
+        ],
+        "contextual_score": -9.710765838623047,
+        "own_body_score": -9.710765838623047,
+        "path": "seedbank.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"_source_snapshot_sha256\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"member\":{\"catalog_entry_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"seedbank.md\",\"content_sha256\":\"03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"document_id\":\"project_file:local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567:seedbank.md\",\"scope\":{\"project_id\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"snapshot_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 167,
+        "body_char_start": 21,
+        "heading_path": [
+          "Alder seed archive"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+      },
+      {
+        "identity": "unit-8207631370f079adc477a8c08f0d482119b68308a852913537cbff655ec97e4f",
+        "score": -8.424092292785645,
+        "pairs": 2,
+        "body_tokens": 103,
+        "ancestor_tokens": 47,
+        "body_token_coverage": [
+          0,
+          103
+        ],
+        "body_character_extent": [
+          1,
+          382
+        ],
+        "contextual_score": -8.424092292785645,
+        "own_body_score": -7.703921318054199,
+        "path": "seedbank.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"_source_snapshot_sha256\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"member\":{\"catalog_entry_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"seedbank.md\",\"content_sha256\":\"03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"document_id\":\"project_file:local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567:seedbank.md\",\"scope\":{\"project_id\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"snapshot_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 167,
+        "char_end": 574,
+        "body_char_start": 190,
+        "heading_path": [
+          "Alder seed archive",
+          "Receiving envelopes"
+        ],
+        "line_start": 5,
+        "line_end": 8,
+        "source_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+      },
+      {
+        "identity": "unit-619f1a20b459607dd53769f0966ef22b6b1c5e60e0ba3f5e4b270f5b78a62772",
+        "score": -9.622662544250488,
+        "pairs": 2,
+        "body_tokens": 34,
+        "ancestor_tokens": 154,
+        "body_token_coverage": [
+          0,
+          34
+        ],
+        "body_character_extent": [
+          1,
+          147
+        ],
+        "contextual_score": -8.467999458312988,
+        "own_body_score": -9.622662544250488,
+        "path": "seedbank.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"_source_snapshot_sha256\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"member\":{\"catalog_entry_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"seedbank.md\",\"content_sha256\":\"03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"document_id\":\"project_file:local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567:seedbank.md\",\"scope\":{\"project_id\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"snapshot_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 574,
+        "char_end": 740,
+        "body_char_start": 591,
+        "heading_path": [
+          "Alder seed archive",
+          "Receiving envelopes",
+          "Record cards"
+        ],
+        "line_start": 9,
+        "line_end": 12,
+        "source_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+      },
+      {
+        "identity": "unit-9e485a8092bd96f72ea0d85bc752d8cd0ec156907b282294a549abae7bd8da02",
+        "score": -10.323722839355469,
+        "pairs": 2,
+        "body_tokens": 25,
+        "ancestor_tokens": 154,
+        "body_token_coverage": [
+          0,
+          25
+        ],
+        "body_character_extent": [
+          1,
+          94
+        ],
+        "contextual_score": -8.654756546020508,
+        "own_body_score": -10.323722839355469,
+        "path": "seedbank.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"_source_snapshot_sha256\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"member\":{\"catalog_entry_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"seedbank.md\",\"content_sha256\":\"03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"document_id\":\"project_file:local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567:seedbank.md\",\"scope\":{\"project_id\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"snapshot_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"version\":\"\"}}}",
+        "section_index": 3,
+        "char_start": 740,
+        "char_end": 858,
+        "body_char_start": 762,
+        "heading_path": [
+          "Alder seed archive",
+          "Receiving envelopes",
+          "Cabinet furniture"
+        ],
+        "line_start": 13,
+        "line_end": 16,
+        "source_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+      },
+      {
+        "identity": "unit-757b9360d857250b729f99765705fd2ca2e4311c0e2f84f6f7f9759cf584b2b3",
+        "score": -9.566130638122559,
+        "pairs": 2,
+        "body_tokens": 42,
+        "ancestor_tokens": 46,
+        "body_token_coverage": [
+          0,
+          42
+        ],
+        "body_character_extent": [
+          1,
+          171
+        ],
+        "contextual_score": -9.56119441986084,
+        "own_body_score": -9.566130638122559,
+        "path": "seedbank.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"_source_snapshot_sha256\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"member\":{\"catalog_entry_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"seedbank.md\",\"content_sha256\":\"03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"document_id\":\"project_file:local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567:seedbank.md\",\"scope\":{\"project_id\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"snapshot_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"version\":\"\"}}}",
+        "section_index": 4,
+        "char_start": 858,
+        "char_end": 1052,
+        "body_char_start": 879,
+        "heading_path": [
+          "Alder seed archive",
+          "Damaged seal rule"
+        ],
+        "line_start": 17,
+        "line_end": 20,
+        "source_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+      },
+      {
+        "identity": "unit-819815eb6965281d7fdfb96ef9eaaadabf99d7af73e1f951932a44f331e73ff7",
+        "score": 3.3157541751861572,
+        "pairs": 2,
+        "body_tokens": 30,
+        "ancestor_tokens": 47,
+        "body_token_coverage": [
+          0,
+          30
+        ],
+        "body_character_extent": [
+          1,
+          119
+        ],
+        "contextual_score": 3.3157541751861572,
+        "own_body_score": 4.878964424133301,
+        "path": "seedbank.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"_source_snapshot_sha256\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"member\":{\"catalog_entry_hash\":\"sha256:a0729dc33f9003ab385ed3b6d5d7773d16d437d1d07e94cd328050dc5d8d3f4c\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"seedbank.md\",\"content_sha256\":\"03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c\",\"document_id\":\"project_file:local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567:seedbank.md\",\"scope\":{\"project_id\":\"local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567\",\"snapshot_id\":\"gen-e36ab7e085ff45ebbe3ab98ec7b3ba3d\",\"version\":\"\"}}}",
+        "section_index": 5,
+        "char_start": 1052,
+        "char_end": 1191,
+        "body_char_start": 1071,
+        "heading_path": [
+          "Alder seed archive",
+          "Bicycle shelter"
+        ],
+        "line_start": 21,
+        "line_end": 23,
+        "source_sha256": "03fb7b99abdfd872510e65281acf5b6d962c2043c90ebebe505a4b6c7bfcb89c"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-own-body-gated-maxp-v2",
+      "status": "complete",
+      "units": 6,
+      "model_pairs": 12,
+      "model_forwards": 12,
+      "model_input_tokens": 1281,
+      "inference_seconds": 0.11303567500726786,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "min_contextual_and_own_body_max_raw_logit",
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        14
+      ],
+      "total_seconds": 0.11859693799488014,
+      "own_body_gate": true
+    },
+    "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+  }
+]

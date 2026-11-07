@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "installed_stdio": true,
+  "strict_public_schema": true,
+  "source_fidelity": true,
+  "metadata_only_evidence": false,
+  "existing_store_unchanged": true,
+  "files_and_sqlite_unchanged": true,
+  "source_commit": "72a215a10006febaaa114a7ef5b66f84dd698d20",
+  "merged_selection": {
+    "budget_limited": false,
+    "candidate_rows": 449,
+    "eligible_rows": 2,
+    "omitted_rows": 447,
+    "policy": "joint_checked_body_mmr_v1",
+    "pruned_rows": 447,
+    "query_count": 2,
+    "reference_limited": false,
+    "scope": "source_checked_merged_candidates",
+    "selected_rows": 2
+  },
+  "merged_required_facts": 2,
+  "retained_reference": {
+    "status": "PASS",
+    "previously_issued_references": 128,
+    "retained_reference_readable": true,
+    "source_fidelity": true,
+    "files_and_sqlite_unchanged": true
+  },
+  "large_packet": {
+    "source_rows": 18,
+    "compact_source_rows": 18,
+    "required_fact_delivered": true,
+    "source_fidelity": true,
+    "files_and_sqlite_unchanged": true,
+    "trace_does_not_change_result": true
+  },
+  "claim_boundary": "Linux installed wheel MCP stdio; not actual OpenCode, not macOS, not a full core rerun"
+}

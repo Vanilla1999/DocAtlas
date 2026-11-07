@@ -1,0 +1,138 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-c579546d213f580ae84758a585b3ee82c8a2ed89da9448826d10b1b72ecc1b8f",
+        "score": -9.689600944519043,
+        "pairs": 2,
+        "body_tokens": 38,
+        "ancestor_tokens": 5,
+        "body_token_coverage": [
+          0,
+          38
+        ],
+        "body_character_extent": [
+          1,
+          148
+        ],
+        "contextual_score": -9.689600944519043,
+        "own_body_score": -9.689600944519043,
+        "path": "fermentation.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707\",\"_source_snapshot_sha256\":\"sha256:b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-806a657bebc943f190bab492111deada\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"member\":{\"catalog_entry_hash\":\"sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"fermentation.md\",\"content_sha256\":\"b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"document_id\":\"project_file:local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3:fermentation.md\",\"scope\":{\"project_id\":\"local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3\",\"snapshot_id\":\"gen-806a657bebc943f190bab492111deada\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 178,
+        "body_char_start": 28,
+        "heading_path": [
+          "Community bakery notebook"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6"
+      },
+      {
+        "identity": "unit-d3393c5f4049e7ae51a7c39468bcc4fdffa3998c42b08519f9de90090182759d",
+        "score": 2.160876512527466,
+        "pairs": 6,
+        "body_tokens": 827,
+        "ancestor_tokens": 47,
+        "body_token_coverage": [
+          0,
+          827
+        ],
+        "body_character_extent": [
+          1,
+          3482
+        ],
+        "contextual_score": 2.7084155082702637,
+        "own_body_score": 2.160876512527466,
+        "path": "fermentation.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707\",\"_source_snapshot_sha256\":\"sha256:b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-806a657bebc943f190bab492111deada\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"member\":{\"catalog_entry_hash\":\"sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"fermentation.md\",\"content_sha256\":\"b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"document_id\":\"project_file:local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3:fermentation.md\",\"scope\":{\"project_id\":\"local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3\",\"snapshot_id\":\"gen-806a657bebc943f190bab492111deada\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 178,
+        "char_end": 3682,
+        "body_char_start": 198,
+        "heading_path": [
+          "Community bakery notebook",
+          "Overnight record"
+        ],
+        "line_start": 5,
+        "line_end": 10,
+        "source_sha256": "b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6"
+      },
+      {
+        "identity": "unit-46176b9b0c0934a4fb11d99a4cec5184a4d9d0559688cd222ca47303c2494d91",
+        "score": -9.982161521911621,
+        "pairs": 2,
+        "body_tokens": 30,
+        "ancestor_tokens": 48,
+        "body_token_coverage": [
+          0,
+          30
+        ],
+        "body_character_extent": [
+          1,
+          117
+        ],
+        "contextual_score": -9.7659273147583,
+        "own_body_score": -9.982161521911621,
+        "path": "fermentation.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707\",\"_source_snapshot_sha256\":\"sha256:b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-806a657bebc943f190bab492111deada\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"member\":{\"catalog_entry_hash\":\"sha256:01d03a2eff439d6e9e516d19647a9793eab48b0bb50b928809da608be06d7707\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"fermentation.md\",\"content_sha256\":\"b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6\",\"document_id\":\"project_file:local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3:fermentation.md\",\"scope\":{\"project_id\":\"local:fbc3df04a745f3abba5620bf1c1f90e158f28ace01e23b4eda700845c46365f3\",\"snapshot_id\":\"gen-806a657bebc943f190bab492111deada\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 3682,
+        "char_end": 3821,
+        "body_char_start": 3703,
+        "heading_path": [
+          "Community bakery notebook",
+          "Customer receipts"
+        ],
+        "line_start": 11,
+        "line_end": 13,
+        "source_sha256": "b69b55db7f41a5058eda1ba11b7976f0bc49db4f1b29fedb8d56686d06543db6"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-own-body-gated-maxp-v2",
+      "status": "complete",
+      "units": 3,
+      "model_pairs": 10,
+      "model_forwards": 6,
+      "model_input_tokens": 3210,
+      "inference_seconds": 0.28822153100190917,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "min_contextual_and_own_body_max_raw_logit",
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        23
+      ],
+      "total_seconds": 0.2940992340008961,
+      "own_body_gate": true
+    },
+    "policy_sha256": "5eb8d93aabd318bf24505383ed54c14733a8900eaf19a783f8f078cc953520ff"
+  }
+]

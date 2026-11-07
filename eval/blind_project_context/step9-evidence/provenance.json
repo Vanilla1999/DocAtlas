@@ -1,0 +1,66 @@
+{
+  "base_commit": "76766008789d963ccad33a220c3bd76217ce9f81",
+  "branch": "work/step9-gap-resolution",
+  "committed": false,
+  "model": "openai/gpt-6.1-terra#low",
+  "measured_wheel": {
+    "path": "/tmp/opencode/step9-wheels/doc_atlas-1.3.2-py3-none-any.whl",
+    "sha256": "aded302cff52c23a57b99411c725f48bbc7dfa43db1674539eb1a1d60f0132ae",
+    "bytes": 2886008,
+    "agent_sessions": 48
+  },
+  "final_wheel": {
+    "path": "/tmp/opencode/step9-final-wheels/doc_atlas-1.3.2-py3-none-any.whl",
+    "sha256": "99fe1ece2899e27b7fa09e92138ea9ccb38987a6d2d29cb36f2b1a0d35e0a9e3",
+    "bytes": 2886067,
+    "installed": {
+      "module": "/tmp/opencode/step9-gap-resolution/.venv/lib/python3.13/site-packages/docmancer/__init__.py"
+    },
+    "package_matches_checkout": true
+  },
+  "changed_package_files": [
+    "docmancer/docs/application/joint_context_selection.py",
+    "docmancer/docs/interfaces/mcp/context_tools.py"
+  ],
+  "measured_to_final_patch_sha256": "939ddf16e5326ea6c6278c247d1c0e7425b620c8e6e05326fc130f8109637f56",
+  "source_files": {
+    "SKILL.md": "fe2223e8f438d1b09eba241c532c66c53b2a51353f82234b74c623e6b86eb240",
+    "docmancer/core/_sqlite_store_part03.py": "c820b2d2bd95fdaf43c54cfcd79a4af2b3c81cdd2af7b56301d42ef01818be6d",
+    "docmancer/docs/agent_contract.py": "77f7dbfd0180cbdebf2d116f22263d94b7572b67fa116def645b5fc99a6a9770",
+    "docmancer/docs/application/joint_context_selection.py": "2cdebc095fdff7ceaee939274b2a8014db983d3bdf1c94c4aa609a012f121d8c",
+    "docmancer/docs/interfaces/mcp/context_tools.py": "eb11ceb2d7a64a13df668615acd14171e157e9bb207c67c22a7b3d9960281baa",
+    "docmancer/mcp/_docs_server_resources.py": "e19caf9769e96af36ffbe0aaf64ccc89a4a05fc91bab41f102c2b4ac4d775e03",
+    "docmancer/mcp/_docs_server_tool_data.py": "9bb9509153e2704cfc37a9e6bd5e2d377c76d7dfb36806ec402448e7ea8c1c5a",
+    "docmancer/mcp/agent_workflow_contract.py": "5c1d0b3b65389110e6e2b2d8b7d253de183f3291ad08691ba3cff5c2643095e0",
+    "docmancer/retrieval/experimental_e5_acquisition.py": "0578264e64cdfa8581447e48f4f5d4f705ef6411d0e6145ed36a6e56724bda53",
+    "docmancer/templates/agent_contract.md": "9fd972697e2cb96f41b89cb9b8e4672714d3ed5b86871cf587c7f0a64fcd7129",
+    "docmancer/templates/references/troubleshooting.md": "9d463a23c723eb5bef36cf65f14efe07234a06426ce76a4d0430227393a83592",
+    "eval/blind_project_context/STEP9_GAP_RESOLUTION_RU.md": "27d4a6662e1f61a5db0cfdeae5c9029d2a8e7ee1bb9d496d0e6f6ae1fd11f97d",
+    "eval/blind_project_context/analyze_gap_agent_study.py": "002a2be729b6e313596108d0222d038f6c8c6ce36dcf4f175ef99698fe5db2e0",
+    "eval/blind_project_context/prepare_e5_cache.py": "c07aba186bacae12c8dca457adbfdb6f8be41860b676338b24a13a2bdbe34e4d",
+    "eval/blind_project_context/probe_gap_delivery.py": "1765a43e393b3e8d15119dd7e562cbf7f8f68a1898cf83dda3820ccd6b47ccc9",
+    "eval/blind_project_context/run_gap_agent_study.py": "d992d51769f9fb4a41c227f892aad618fe8c4c6a6db03d76437f96b4244a54f4",
+    "eval/blind_project_context/summarize_gap_agent_study.py": "65bc4cdf51a27df83146c82ca58e60e2d90cee83a766a6fb1ab1d9beaed8d2b2",
+    "tests/diagnostic_labels.context_portions_integration.json": "4c1184390ac7a144bcec89f8e9188cb30f76fa2c6e5c0ede0f7a23105c8d273f",
+    "tests/test_context_portions_integration.py": "225dcbec2345987de4397ff3a3b18892e3cc2e76d4c6f76215de23c50fe0248d"
+  },
+  "frozen_inputs": {
+    "questions.json": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+    "oracle.json": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+    "witness-audit.json": "3fdcc246f6eca84e8c571826f7ca03a01ab0aab9d870cee9803ad845f54c1881"
+  },
+  "corpus_manifest_sha256": "fba9ac620b870e5a4ad6ac9bfcf21044e2259a258c4cf8b69d425092d3c51f02",
+  "e5": {
+    "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    "vectors_sha256": "ced1af22fa10d93bf2909cc67a240390bd9abe1ddaeddc0586c6f6856f4df549",
+    "unique_vectors": 11860,
+    "preparation_seconds": 482.64972634100013,
+    "threads": 4,
+    "databases": {
+      "/home/viadmin/.cache/docatlas-step8-review-work/L0-0/docatlas-home/mcp-members/members.db": "46e14ba8d1e86667d9afaaeed9e3da49cdb3f507904573e2f3aac119763f6f2c",
+      "/home/viadmin/.cache/docatlas-step8-review-work/L2-0/docatlas-home/mcp-members/members.db": "94bf3d1622e1fe5534ce35f8385eb53a4022c643c413f723f9d0b1f483c181f8"
+    },
+    "databases_unchanged": true
+  },
+  "probe_note": "Agent runs and delivery-probe used measured wheel. final-wheel-probe-confirmed used final wheel. First final probe failed in empty-packet decoding, fixed in diagnostic script only."
+}

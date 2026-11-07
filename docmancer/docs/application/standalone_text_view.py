@@ -14,12 +14,16 @@ from copy import deepcopy
 from dataclasses import dataclass
 import math
 
+from docmancer.docs.domain.delivery_limits import DEFAULT_DELIVERY_MAX_TOKENS, delivery_token_ceiling
+from docmancer.docs.domain.context_presentation import LITERAL_FORMAT, literal_presentation_enabled
+
 from .model_context_view import ModelViewError, canonical, encode_model_result
 from .projection_tokenizer import projection_token_count
 from .section_compression import expand_sections
 
 FORMAT = "docatlas.standalone-text.v1"
-COMPACT_TEXT_MAX_TOKENS = 12000
+# Compatibility constant for consumers describing the default, not a live cap.
+COMPACT_TEXT_MAX_TOKENS = DEFAULT_DELIVERY_MAX_TOKENS
 # Never discard a future source field silently. All recognized omitted fields
 # are either redundant with the display, or the hash verified by the server.
 _KNOWN_SOURCE_FIELDS = frozenset({
@@ -45,8 +49,12 @@ class StandaloneTextError(ValueError):
 def compact_text_fits(text: str) -> bool:
     """Apply the existing text budget without shortening a source or packet."""
     body = text.encode("utf-8")
-    return (math.ceil(len(body) / 4) <= COMPACT_TEXT_MAX_TOKENS
-            and projection_token_count(body) <= COMPACT_TEXT_MAX_TOKENS)
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled, EMERGENCY_TOKENS
+    if minimal_context_enabled():
+        return projection_token_count(body) <= EMERGENCY_TOKENS
+    limit = delivery_token_ceiling()
+    return (math.ceil(len(body) / 4) <= limit
+            and projection_token_count(body) <= limit)
 
 
 def render_standalone_text(packet: dict) -> StandaloneTextResult:
@@ -61,6 +69,7 @@ def render_standalone_text(packet: dict) -> StandaloneTextResult:
             "invalid_model_view_sources": "invalid_source_binding",
             "model_view_field_collision": "model_view_field_collision",
             "invalid_DOCATLAS_CONTEXT_ASSEMBLY": "invalid_context_assembly_policy",
+            "invalid_DOCATLAS_CONTEXT_PRESENTATION": "invalid_context_presentation_policy",
         }.get(str(exc), "invalid_compact_context")
         return StandaloneTextResult(None, reason)
 
@@ -77,12 +86,15 @@ def _encode_standalone_text(packet: dict) -> str | None:
     standard projection. Unsupported source shapes never lose unknown fields
     merely to make the compact representation fit.
     """
+    literal_v2 = literal_presentation_enabled()
     rendered = encode_model_result(packet)
     if rendered is None:
         return None
     view, _private = rendered  # Do NOT attach a ledger OpenCode cannot retain.
     expanded = expand_sections(packet)
     rows = expanded["sources"]
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    minimal = minimal_context_enabled()
     if len(rows) != len(view["sources"]):
         raise StandaloneTextError("source_row_count_mismatch")
     if any(set(row) - _KNOWN_SOURCE_FIELDS for row in rows):
@@ -110,11 +122,15 @@ def _encode_standalone_text(packet: dict) -> str | None:
         visible["ref"] = original["evidence_id"]
         if "source_uri" in original:
             visible["source_uri"] = deepcopy(original["source_uri"])
+        if minimal and not literal_v2 and "content_sha256" in original:
+            visible["content_sha256"] = original["content_sha256"]
         if not shared_identity and "project_identity" in original:
             visible["project_identity"] = deepcopy(original["project_identity"])
-    view["context_format"] = FORMAT
+    # v2 hides only the initial source hash from the model. The original
+    # machine packet, public capabilities and server-side hash checks remain.
+    view["context_format"] = LITERAL_FORMAT if literal_v2 else FORMAT
     text = canonical(view)
-    if not compact_text_fits(text):
+    if not minimal and not compact_text_fits(text):
         raise StandaloneTextError("standalone_context_output_limit")
     # Separate, reversible Context Assembly stage. It never chooses evidence.
     from .context_assembly import assemble_context

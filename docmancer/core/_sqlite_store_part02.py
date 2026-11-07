@@ -7,6 +7,9 @@ from .prepared_parent_sections import (
     prepared_parents_enabled,
 )
 from .structured_chunking import ParentSection
+from docmancer.retrieval.experimental_search_descriptions import (
+    ARTIFACT_KEY, CHILD_KEY, append_description, child_binding, validate_artifact,
+)
 
 
 class _SQLiteStorePart02:
@@ -198,6 +201,12 @@ class _SQLiteStorePart02:
             parents, children = chunk_markdown_parent_child(
                 doc.content, source_identity, config
             )
+            artifact = metadata.get(ARTIFACT_KEY)
+            description_records = validate_artifact(
+                artifact, source_path=str(metadata.get("source_path") or doc.source),
+                content=doc.content,
+                spans=((child.char_start, child.char_end) for child in children),
+            ) if ARTIFACT_KEY in metadata else {}
             if prepared_parent_candidates is not None:
                 prepared_parent_candidates[doc.source] = parents
             parent_by_id = {parent.logical_id: parent for parent in parents}
@@ -255,6 +264,13 @@ class _SQLiteStorePart02:
                 retrieval_text = embedding_input(context_prefix, child.display_text)
                 if description:
                     retrieval_text = f"{retrieval_text}\n{description}"
+                record = description_records.get((child.char_start, child.char_end))
+                description_binding = None
+                if record is not None:
+                    retrieval_text, status = append_description(
+                        retrieval_text, record, config.hard_max_tokens,
+                    )
+                    description_binding = child_binding(artifact, record, status)
                 retrieval_hash = _chunk_hash(retrieval_text)
                 filter_metadata = normalized_filter_metadata({
                     **metadata,
@@ -300,6 +316,10 @@ class _SQLiteStorePart02:
                     "generation_id": generation_id,
                 }
                 snippets = _code_snippets(child.display_text)
+                child_metadata.pop(ARTIFACT_KEY, None)
+                child_metadata.pop(CHILD_KEY, None)
+                if description_binding is not None:
+                    child_metadata[CHILD_KEY] = description_binding
                 if snippets:
                     child_metadata["code_snippets"] = snippets
                     child_metadata["has_code_snippet"] = True
@@ -497,6 +517,24 @@ class _SQLiteStorePart02:
         span_errors = 0
         token_errors = 0
         context_errors = 0
+        description_bindings = {}
+        for source_row in conn.execute(
+            "SELECT source, content, metadata_json FROM generation_sources WHERE generation_id = ?",
+            (generation_id,),
+        ):
+            source_metadata = json.loads(source_row["metadata_json"])
+            if ARTIFACT_KEY not in source_metadata:
+                continue
+            artifact = source_metadata[ARTIFACT_KEY]
+            spans = conn.execute(
+                "SELECT char_start, char_end FROM retrieval_children WHERE generation_id = ? AND source = ?",
+                (generation_id, source_row["source"]),
+            ).fetchall()
+            records = validate_artifact(
+                artifact, source_path=str(source_metadata.get("source_path") or source_row["source"]),
+                content=source_row["content"], spans=(tuple(span) for span in spans),
+            )
+            description_bindings[source_row["source"]] = (artifact, records)
         rows = conn.execute(
             """
             SELECT c.*, gs.content AS source_content
@@ -534,6 +572,24 @@ class _SQLiteStorePart02:
                 project_doc_description = metadata.get("project_doc_description")
                 if isinstance(project_doc_description, str) and project_doc_description.strip():
                     expected_retrieval = f"{expected_retrieval}\n{project_doc_description.strip()}"
+                expected_binding = None
+                if row["source"] in description_bindings:
+                    artifact, records = description_bindings[row["source"]]
+                    record = records.get((start, end))
+                    if record is not None:
+                        # Reconstruct from source-level artifact, not child metadata.
+                        description_text = record["description"]
+                        combined = f"{expected_retrieval}\n{description_text}"
+                        if len(description_text.encode("utf-8")) > 512:
+                            status = "skipped_description_bytes"
+                        elif estimate_utf8_tokens(combined) > config.hard_max_tokens:
+                            status = "skipped_retrieval_budget"
+                        else:
+                            status = "appended"
+                            expected_retrieval = combined
+                        expected_binding = child_binding(artifact, record, status)
+                if metadata.get(CHILD_KEY) != expected_binding or ARTIFACT_KEY in metadata:
+                    context_errors += 1
                 promoted = normalized_filter_metadata(metadata)
                 promoted_matches = all(
                     row[name] == value
@@ -547,6 +603,7 @@ class _SQLiteStorePart02:
                     or manifest.get("config_hash") != context_config.config_hash
                     or manifest.get("content_hash") != expected_context_hash
                     or str(row["embedding_input_hash"]) != _chunk_hash(expected_retrieval)
+                    or str(row["retrieval_content_hash"]) != _chunk_hash(expected_retrieval)
                     or str(row["retrieval_text"]) != expected_retrieval
                     or len(str(row["context_prefix"]).encode("utf-8"))
                     > context_config.max_prefix_bytes

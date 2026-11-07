@@ -1,0 +1,115 @@
+{
+  "seconds": 0.015086926003277767,
+  "expected_paths": [
+    "textiles.md"
+  ],
+  "indexed_paths": [
+    "textiles.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-6579d53f53678b78d209d4ddda12884af6939f9d",
+      "source_path": "textiles.md",
+      "display_text": "# Textile conservation room\n\nThe following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-76005622753379cc60ff9780a50635801d5ad62c",
+      "source_path": "textiles.md",
+      "display_text": "## Intake notebook\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-db71e01b8eb893ebd8429a852f5d0fa904fe6f23",
+      "source_path": "textiles.md",
+      "display_text": "The conservation room occupies the upper floor of the east wing. A stone staircase leads from the entrance lobby to the corridor outside the room. The staircase has a wooden rail along its inner edge. Visitors use the lobby telephone to announce their arrival. A member of staff meets them at the bottom of the staircase and accompanies them upstairs. Coats and bags remain in the lobby lockers. Each locker has a small brass number attached to its door. Lost locker keys are ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-db07735177778817edf25c233a1b99c08f4beccd",
+      "source_path": "textiles.md",
+      "display_text": "reported to reception. The reception counter contains a shallow drawer for spare name cards. Name cards are written with a broad black pen so that they can be read from across the lobby. Empty card boxes are flattened before they are placed in the recycling container. The recycling container stands under the counter but must not obstruct the staff footrest. A wooden notice frame on the opposite wall displays the opening hours. The frame is removed from the wall for cleaning ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-3b62196072d81c9690bd2bf704c8bc8b8d1393dc",
+      "source_path": "textiles.md",
+      "display_text": "at the beginning of each season. Two screws hold the frame in place. The maintenance caretaker keeps the screwdriver in a locked tool cabinet. Only the caretaker opens that cabinet. The corridor has a row of tall windows overlooking a paved courtyard. The window blinds are raised for cleaning and lowered again afterwards. A pair of indoor shoes is available for each member of the housekeeping staff. The shoes remain on a low rack beside the service entrance. Their soles are ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-d4ea1e93aba2e6e205a4cc6cd1261f33338116c7",
+      "source_path": "textiles.md",
+      "display_text": "brushed before they are returned to the rack. A bell at the service entrance alerts reception when a delivery arrives. The bell is checked during the weekly building inspection. Delivery drivers wait outside until a staff member opens the door. Empty delivery cartons are kept flat in the ground-floor storeroom. Cartons with torn corners are put aside for recycling rather than reused. The storeroom has a large wall calendar showing collection dates. The calendar is replaced ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-507c956c4cd8c07ca734533525f9dcdc4554f49b",
+      "source_path": "textiles.md",
+      "display_text": "at the beginning of January. The old calendar is removed rather than left underneath the new one. A round clock above the storeroom doorway has a plain white face. Its battery is replaced when the minute hand begins to stop. Spare clock batteries are stored in the office stationery cupboard. That cupboard also holds pencil sharpeners and paper clips. Paper clips are sorted by size into two small tins. The tins have lids to prevent their contents spilling into the drawer. A ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-dc2991b43304ba2e41e81b5d58d4604be89166e0",
+      "source_path": "textiles.md",
+      "display_text": "felt pad beneath each tin protects the wooden drawer base. The pads are shaken outdoors when dust accumulates. A cleaning cloth hangs from a peg near the office sink. The cloth is washed after use and dried before it is returned to the peg. The sink is not used for drinking water. Drinking water is available from a dispenser in the staff dining room. The dining room tables are wiped after every break. Staff return chairs to their marked positions before leaving the room. The ",
+      "line_start": 7,
+      "line_end": 7
+    },
+    {
+      "stable_chunk_id": "child-7898e5a85c1ebf2a5a656c97b086503b65040e04",
+      "source_path": "textiles.md",
+      "display_text": "floor markings leave a clear route between the entrance and the rear exit. The rear exit opens onto a covered walkway. During rain the walkway mat is replaced with a dry one at midday. Wet mats are hung in the utility yard rather than folded into a cupboard. These facilities observations are included for the building team and do not set quarantine release requirements.\n\n",
+      "line_start": 7,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-3ebefb24095228026d42fd85e470d821bae7fba2",
+      "source_path": "textiles.md",
+      "display_text": "A newly received woven textile must remain in a sealed quarantine cabinet for twenty-seven days. Release requires a conservator to record two pest-free inspections seven days apart. If live larvae are found at either inspection, restart the full twenty-seven-day quarantine after treatment instead of releasing the textile.\n\n",
+      "line_start": 9,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-41791e321164a41ee33989c3fd9e03accc17d4da",
+      "source_path": "textiles.md",
+      "display_text": "## Lighting inventory\n\nThe room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.\n",
+      "line_start": 11,
+      "line_end": 13
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "1c6201ec682f9972c0b31081436485d72c4cff046cbb42647932609400528c1e",
+  "storage_path": "/tmp/docatlas-evidence-mi94vc27/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-04a40d7f47384544b824881229ebb32e",
+  "catalog_sha256": "9e88f1674f76b15f0396b26925b5f69c65ebed117a088445bb46ff22e25a81b9",
+  "documents": [
+    {
+      "path": "textiles.md",
+      "content_sha256": "859d4bc300f963177e5e379c933e86596bc41f05996770afc142218b18d02200",
+      "catalog_entry_hash": "sha256:b1f873d673b7f618905f5efb50fe3136c13522fba4a0a3cea868e205f28e5c99"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-04a40d7f47384544b824881229ebb32e",
+    "members": 1,
+    "new_count": 0,
+    "changed_count": 0,
+    "unchanged_files": 1,
+    "derived_writes": 0,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 0
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "api-messages.json": "a92e577c3caf138f8d66590a9962e9dc15c3140015a6db78807b11ed3e6df995",
+  "cli-argv.json": "c8f7e772ee0d7ce95ba34c3be1c99d9c76e113d55e1242ed94fcf77debf8ddd1",
+  "cli-messages.json": "931e65c6047458617b3d3b13b8f3a6a19c91b46c2320ce230ca686ebcb073307",
+  "cli.jsonl": "8e47f29cd29b9799ff77c56edb12c51b6028802722f0de654a491adf073c50f3",
+  "cli.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "historical-user-messages.json": "4c40ceac8248b4b71dbed2144f06231ec63b0723b85e8d44336ea82bbd1bbc65",
+  "observer/index.js": "72155e5e8cbfa02d721d22996acaa6b726fee95613a3a70bbc891f12c9e1ffc9",
+  "opencode.json": "7c3209b3a165741c60e2ec2dbffc44d0a5ca49b11d3ca92f8eea47a28945ee01",
+  "provider-1.json": "cf653b5fdb569f0690bb147d6dcffcdfdea252ff38fcc5454fbc0658a9699230",
+  "provider-2.json": "254aa2b4b48d4dfd11c246d0f59adda5dd301b50c4505ffda653730802b5c655",
+  "receipt.json": "1469e15132d8b749a827ee21577574691a98d16ea04c65c303080c97676d12c3"
+}

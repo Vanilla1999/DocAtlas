@@ -1,0 +1,13 @@
+[
+  "opencode",
+  "run",
+  "--session",
+  "ses_e4e1d7ce1ffeEjKP0K4nEl9hFN",
+  "--model",
+  "question-audit/capture",
+  "--agent",
+  "measure",
+  "--format",
+  "json",
+  "Что от меня ожидается, когда я отправляю pull request в DocAtlas?"
+]

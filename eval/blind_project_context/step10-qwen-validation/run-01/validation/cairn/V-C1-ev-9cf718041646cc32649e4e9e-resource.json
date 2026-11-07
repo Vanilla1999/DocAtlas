@@ -1,0 +1,28 @@
+{
+  "value_raw": {
+    "uri": "docatlas://source/v2/669b8deed80254e544b81c95",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"content_sha256\":\"sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da\",\"continuation\":\"docatlas://source/v2/adb34e0aae5b1e9af529b8d1\",\"line_end\":8,\"line_start\":5,\"path\":\"overview.md\",\"project_identity\":\"local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb\",\"snippet\":\"## Components\\n\\nA catalogue records object identifiers, a verifier checks stored payloads, and a restore worker reconstructs a collection in staging. Publication switches the collection pointer after review; it does not mutate the snapshot.\\n\\n\",\"status\":\"truncated\"}"
+  },
+  "value": {
+    "content_sha256": "sha256:41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da",
+    "continuation": "docatlas://source/v2/adb34e0aae5b1e9af529b8d1",
+    "line_end": 8,
+    "line_start": 5,
+    "path": "overview.md",
+    "project_identity": "local:53f68603ce7cab2d7f25bc079fd4d18c0a9f666b5f0966617cddb5ba5211a6fb",
+    "snippet": "## Components\n\nA catalogue records object identifiers, a verifier checks stored payloads, and a restore worker reconstructs a collection in staging. Publication switches the collection pointer after review; it does not mutate the snapshot.\n\n",
+    "status": "truncated"
+  },
+  "replay_raw": {
+    "uri": "docatlas://source/v2/669b8deed80254e544b81c95",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "replay": {
+    "reason_code": "unknown_or_expired_reference",
+    "status": "source_unavailable"
+  }
+}

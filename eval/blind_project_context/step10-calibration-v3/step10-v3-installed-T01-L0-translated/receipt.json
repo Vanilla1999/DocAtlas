@@ -1,0 +1,58 @@
+{
+  "boundary": "installed_stdio",
+  "requests": 1,
+  "trace_parity": null,
+  "recipe": "complete-own-body-gated-maxp-v2",
+  "read_only": true,
+  "calls": [
+    {
+      "lane": "translated",
+      "seconds": 63.62764562400116,
+      "tokens": 26354,
+      "rows": 72,
+      "facts": [
+        false,
+        false,
+        false
+      ],
+      "reason_code": null,
+      "selection": {
+        "calibration_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+        "calibration_status": "empirical",
+        "candidate_units": 157,
+        "closure": {
+          "delivered_spans": 72,
+          "documents": 19,
+          "hydrated_sections": 162,
+          "incomplete_dependencies": [
+            {
+              "char_start": 6151,
+              "path": "wiki/Configuration.md",
+              "reason": "missing_or_ambiguous_anchor",
+              "reason_code": "incomplete_dependency",
+              "target": "./Architecture.md#mcp-runtime"
+            },
+            {
+              "char_start": 72,
+              "path": "README.md",
+              "reason": "target_not_in_checked_scope",
+              "reason_code": "incomplete_dependency",
+              "target": "./docs/capabilities.md#end-to-end-examples-of-current-behavior"
+            }
+          ],
+          "selected_units": 34,
+          "status": "incomplete_dependency",
+          "structural_recipe": "minimal-structure-v1",
+          "units": 157
+        },
+        "delivered_rows": 72,
+        "model_pairs": 1780,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "selected_units": 34
+      }
+    }
+  ],
+  "all_three_facts_original": false,
+  "policy_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391"
+}

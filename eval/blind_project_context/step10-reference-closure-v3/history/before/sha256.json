@@ -1,0 +1,7 @@
+{
+  "docmancer/docs/application/minimal_context_structure.py": "03d88187eb87a002d3a38fd793f34b0340d338876d40138abea4040ac93ad4e6",
+  "docmancer/docs/application/context_evidence_structure.py": "7c71a79a0b979c773d351cf6c699d3f8a0e6b4351844e7e102404f8e317ec857",
+  "docmancer/docs/application/minimal_context_selection.py": "348064bec2c377042a176602930b3ca0e60190a6ac31ea7f451bff0c3b08ff49",
+  "docmancer/docs/domain/minimal_context_config.py": "bdb2982fa3b25404270782a0c7e50e72808ac5b94f50f3e978917895cce34b39",
+  "eval/blind_project_context/step10-multidoc-gate/runner.py": "42316bc424553e76435057474f8254368b7bf297414f47b9b1cf16056bb5cd94"
+}

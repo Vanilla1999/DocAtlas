@@ -1,0 +1,2527 @@
+[
+  {
+    "rank": 1,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime"
+    ],
+    "line_start": 106,
+    "line_end": 120,
+    "score": -0.7533150911331177,
+    "contextual_score": 0.3854973018169403,
+    "own_body_score": -0.7533150911331177,
+    "pairs": 14,
+    "body_tokens": 582,
+    "ancestor_tokens": 402
+  },
+  {
+    "rank": 2,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "Recommended workflow"
+    ],
+    "line_start": 126,
+    "line_end": 147,
+    "score": -0.9379939436912537,
+    "contextual_score": -0.5466413497924805,
+    "own_body_score": -0.9379939436912537,
+    "pairs": 54,
+    "body_tokens": 966,
+    "ancestor_tokens": 819
+  },
+  {
+    "rank": 3,
+    "path": "docs/index-cleanup.md",
+    "heading_path": [
+      "Cleaning DocAtlas index state safely",
+      "Clear one project-local index"
+    ],
+    "line_start": 17,
+    "line_end": 63,
+    "score": -0.9504154920578003,
+    "contextual_score": -0.8189881443977356,
+    "own_body_score": -0.9504154920578003,
+    "pairs": 7,
+    "body_tokens": 450,
+    "ancestor_tokens": 245
+  },
+  {
+    "rank": 4,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "Change-aware documentation review"
+    ],
+    "line_start": 176,
+    "line_end": 189,
+    "score": -1.6793055534362793,
+    "contextual_score": -0.33065080642700195,
+    "own_body_score": -1.6793055534362793,
+    "pairs": 11,
+    "body_tokens": 317,
+    "ancestor_tokens": 820
+  },
+  {
+    "rank": 5,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Qdrant lifecycle"
+    ],
+    "line_start": 104,
+    "line_end": 124,
+    "score": -1.7407586574554443,
+    "contextual_score": -1.4079761505126953,
+    "own_body_score": -1.7407586574554443,
+    "pairs": 5,
+    "body_tokens": 706,
+    "ancestor_tokens": 93
+  },
+  {
+    "rank": 6,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Public tool contract"
+    ],
+    "line_start": 18,
+    "line_end": 47,
+    "score": -2.0922064781188965,
+    "contextual_score": -1.8227324485778809,
+    "own_body_score": -2.0922064781188965,
+    "pairs": 3,
+    "body_tokens": 462,
+    "ancestor_tokens": 76
+  },
+  {
+    "rank": 7,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "External-library documentation"
+    ],
+    "line_start": 111,
+    "line_end": 120,
+    "score": -2.1858747005462646,
+    "contextual_score": -2.109553575515747,
+    "own_body_score": -2.1858747005462646,
+    "pairs": 2,
+    "body_tokens": 114,
+    "ancestor_tokens": 80
+  },
+  {
+    "rank": 8,
+    "path": "docs/main-flow-logging.md",
+    "heading_path": [
+      "Логи основного потока",
+      "События и границы"
+    ],
+    "line_start": 25,
+    "line_end": 43,
+    "score": -2.2058637142181396,
+    "contextual_score": -1.0051531791687012,
+    "own_body_score": -2.2058637142181396,
+    "pairs": 4,
+    "body_tokens": 323,
+    "ancestor_tokens": 315
+  },
+  {
+    "rank": 9,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-aware exact dependency docs"
+    ],
+    "line_start": 219,
+    "line_end": 226,
+    "score": -2.429426431655884,
+    "contextual_score": -1.9328744411468506,
+    "own_body_score": -2.429426431655884,
+    "pairs": 8,
+    "body_tokens": 292,
+    "ancestor_tokens": 583
+  },
+  {
+    "rank": 10,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Packs MCP runtime"
+    ],
+    "line_start": 242,
+    "line_end": 262,
+    "score": -2.45000958442688,
+    "contextual_score": -2.040980577468872,
+    "own_body_score": -2.45000958442688,
+    "pairs": 32,
+    "body_tokens": 1166,
+    "ancestor_tokens": 402
+  },
+  {
+    "rank": 11,
+    "path": "docs/PROJECT_BINDING.md",
+    "heading_path": [
+      "Project-bound OpenCode integration"
+    ],
+    "line_start": 1,
+    "line_end": 50,
+    "score": -2.518887519836426,
+    "contextual_score": -2.518887519836426,
+    "own_body_score": -2.518887519836426,
+    "pairs": 4,
+    "body_tokens": 567,
+    "ancestor_tokens": 7
+  },
+  {
+    "rank": 12,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "What DocAtlas is and what problem it solves"
+    ],
+    "line_start": 52,
+    "line_end": 69,
+    "score": -2.583279848098755,
+    "contextual_score": -1.0560927391052246,
+    "own_body_score": -2.583279848098755,
+    "pairs": 8,
+    "body_tokens": 322,
+    "ancestor_tokens": 585
+  },
+  {
+    "rank": 13,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow",
+      "Documentation changes and verification"
+    ],
+    "line_start": 124,
+    "line_end": 142,
+    "score": -2.604170083999634,
+    "contextual_score": -2.2839748859405518,
+    "own_body_score": -2.604170083999634,
+    "pairs": 2,
+    "body_tokens": 227,
+    "ancestor_tokens": 65
+  },
+  {
+    "rank": 14,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "One-line install"
+    ],
+    "line_start": 70,
+    "line_end": 96,
+    "score": -2.6254966259002686,
+    "contextual_score": -1.0627415180206299,
+    "own_body_score": -2.6254966259002686,
+    "pairs": 31,
+    "body_tokens": 732,
+    "ancestor_tokens": 578
+  },
+  {
+    "rank": 15,
+    "path": "docs/opencode-compact-text.md",
+    "heading_path": [
+      "OpenCode: concise instructions and self-contained MCP text",
+      "Why not just set `DOCATLAS_MCP_MODEL_VIEW=1`?"
+    ],
+    "line_start": 36,
+    "line_end": 71,
+    "score": -2.637709379196167,
+    "contextual_score": -2.637709379196167,
+    "own_body_score": -2.637709379196167,
+    "pairs": 4,
+    "body_tokens": 644,
+    "ancestor_tokens": 37
+  },
+  {
+    "rank": 16,
+    "path": "docs/main-flow-logging.md",
+    "heading_path": [
+      "Логи основного потока",
+      "Где потерян найденный фрагмент"
+    ],
+    "line_start": 44,
+    "line_end": 88,
+    "score": -2.6957976818084717,
+    "contextual_score": -2.3353869915008545,
+    "own_body_score": -2.6957976818084717,
+    "pairs": 15,
+    "body_tokens": 739,
+    "ancestor_tokens": 317
+  },
+  {
+    "rank": 17,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "MCP responses"
+    ],
+    "line_start": 160,
+    "line_end": 163,
+    "score": -2.69899582862854,
+    "contextual_score": -1.8644726276397705,
+    "own_body_score": -2.69899582862854,
+    "pairs": 11,
+    "body_tokens": 104,
+    "ancestor_tokens": 818
+  },
+  {
+    "rank": 18,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas"
+    ],
+    "line_start": 4,
+    "line_end": 35,
+    "score": -2.721562147140503,
+    "contextual_score": -2.3287570476531982,
+    "own_body_score": -2.721562147140503,
+    "pairs": 4,
+    "body_tokens": 540,
+    "ancestor_tokens": 33
+  },
+  {
+    "rank": 19,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Vector store"
+    ],
+    "line_start": 49,
+    "line_end": 64,
+    "score": -2.7275850772857666,
+    "contextual_score": -1.9481617212295532,
+    "own_body_score": -2.7275850772857666,
+    "pairs": 11,
+    "body_tokens": 579,
+    "ancestor_tokens": 247
+  },
+  {
+    "rank": 20,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "MCP pack commands"
+    ],
+    "line_start": 77,
+    "line_end": 90,
+    "score": -2.794424533843994,
+    "contextual_score": -2.794424533843994,
+    "own_body_score": -2.3529343605041504,
+    "pairs": 4,
+    "body_tokens": 491,
+    "ancestor_tokens": 93
+  },
+  {
+    "rank": 21,
+    "path": "docs/opencode-compact-text.md",
+    "heading_path": [
+      "OpenCode: concise instructions and self-contained MCP text",
+      "Delivery failure is distinct from missing evidence"
+    ],
+    "line_start": 72,
+    "line_end": 94,
+    "score": -2.849148750305176,
+    "contextual_score": -2.849148750305176,
+    "own_body_score": -2.849148750305176,
+    "pairs": 2,
+    "body_tokens": 387,
+    "ancestor_tokens": 25
+  },
+  {
+    "rank": 22,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "Reproducible documentation manifests"
+    ],
+    "line_start": 148,
+    "line_end": 159,
+    "score": -2.8671586513519287,
+    "contextual_score": -0.12639011442661285,
+    "own_body_score": -2.8671586513519287,
+    "pairs": 32,
+    "body_tokens": 646,
+    "ancestor_tokens": 820
+  },
+  {
+    "rank": 23,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Response delivery and host controls"
+    ],
+    "line_start": 121,
+    "line_end": 148,
+    "score": -2.8906776905059814,
+    "contextual_score": -2.509159803390503,
+    "own_body_score": -2.8906776905059814,
+    "pairs": 3,
+    "body_tokens": 439,
+    "ancestor_tokens": 79
+  },
+  {
+    "rank": 24,
+    "path": "docs/index-cleanup.md",
+    "heading_path": [
+      "Cleaning DocAtlas index state safely",
+      "Safety rules",
+      "Coordination with index writers"
+    ],
+    "line_start": 102,
+    "line_end": 121,
+    "score": -2.907006025314331,
+    "contextual_score": -2.907006025314331,
+    "own_body_score": -2.788642168045044,
+    "pairs": 7,
+    "body_tokens": 272,
+    "ancestor_tokens": 522
+  },
+  {
+    "rank": 25,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "MCP pack commands",
+      "MCP runtime behavior"
+    ],
+    "line_start": 100,
+    "line_end": 103,
+    "score": -2.9801113605499268,
+    "contextual_score": -2.9801113605499268,
+    "own_body_score": -2.770322799682617,
+    "pairs": 8,
+    "body_tokens": 233,
+    "ancestor_tokens": 591
+  },
+  {
+    "rank": 26,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Core commands"
+    ],
+    "line_start": 5,
+    "line_end": 22,
+    "score": -3.0035855770111084,
+    "contextual_score": -3.0035855770111084,
+    "own_body_score": -2.3725662231445312,
+    "pairs": 5,
+    "body_tokens": 631,
+    "ancestor_tokens": 91
+  },
+  {
+    "rank": 27,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "MCP runtime"
+    ],
+    "line_start": 93,
+    "line_end": 108,
+    "score": -3.00620698928833,
+    "contextual_score": -2.6626484394073486,
+    "own_body_score": -3.00620698928833,
+    "pairs": 11,
+    "body_tokens": 596,
+    "ancestor_tokens": 248
+  },
+  {
+    "rank": 28,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Optional extras"
+    ],
+    "line_start": 135,
+    "line_end": 145,
+    "score": -3.0107362270355225,
+    "contextual_score": -3.0107362270355225,
+    "own_body_score": -2.9389026165008545,
+    "pairs": 2,
+    "body_tokens": 286,
+    "ancestor_tokens": 92
+  },
+  {
+    "rank": 29,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture"
+    ],
+    "line_start": 1,
+    "line_end": 12,
+    "score": -3.032963991165161,
+    "contextual_score": -3.032963991165161,
+    "own_body_score": -3.032963991165161,
+    "pairs": 2,
+    "body_tokens": 392,
+    "ancestor_tokens": 3
+  },
+  {
+    "rank": 30,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server"
+    ],
+    "line_start": 110,
+    "line_end": 125,
+    "score": -3.07596755027771,
+    "contextual_score": -2.1652724742889404,
+    "own_body_score": -3.07596755027771,
+    "pairs": 8,
+    "body_tokens": 231,
+    "ancestor_tokens": 581
+  },
+  {
+    "rank": 31,
+    "path": "docs/index-cleanup.md",
+    "heading_path": [
+      "Cleaning DocAtlas index state safely",
+      "Safety rules"
+    ],
+    "line_start": 87,
+    "line_end": 101,
+    "score": -3.134901285171509,
+    "contextual_score": -2.3059580326080322,
+    "own_body_score": -3.134901285171509,
+    "pairs": 3,
+    "body_tokens": 271,
+    "ancestor_tokens": 241
+  },
+  {
+    "rank": 32,
+    "path": "docs/opencode-compact-text.md",
+    "heading_path": [
+      "OpenCode: concise instructions and self-contained MCP text",
+      "Installation and normal use"
+    ],
+    "line_start": 3,
+    "line_end": 35,
+    "score": -3.2835381031036377,
+    "contextual_score": -3.2835381031036377,
+    "own_body_score": -3.2835381031036377,
+    "pairs": 4,
+    "body_tokens": 495,
+    "ancestor_tokens": 22
+  },
+  {
+    "rank": 33,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Hybrid retrieval"
+    ],
+    "line_start": 42,
+    "line_end": 58,
+    "score": -3.28515887260437,
+    "contextual_score": -2.316826581954956,
+    "own_body_score": -3.28515887260437,
+    "pairs": 23,
+    "body_tokens": 935,
+    "ancestor_tokens": 400
+  },
+  {
+    "rank": 34,
+    "path": "docs/index-cleanup.md",
+    "heading_path": [
+      "Cleaning DocAtlas index state safely"
+    ],
+    "line_start": 1,
+    "line_end": 16,
+    "score": -3.3008229732513428,
+    "contextual_score": -3.3008229732513428,
+    "own_body_score": -3.3008229732513428,
+    "pairs": 2,
+    "body_tokens": 228,
+    "ancestor_tokens": 10
+  },
+  {
+    "rank": 35,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Advanced retrieval"
+    ],
+    "line_start": 125,
+    "line_end": 134,
+    "score": -3.419774293899536,
+    "contextual_score": -3.2598893642425537,
+    "own_body_score": -3.419774293899536,
+    "pairs": 2,
+    "body_tokens": 279,
+    "ancestor_tokens": 92
+  },
+  {
+    "rank": 36,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Environment variables"
+    ],
+    "line_start": 109,
+    "line_end": 126,
+    "score": -3.4971766471862793,
+    "contextual_score": -2.2799456119537354,
+    "own_body_score": -3.4971766471862793,
+    "pairs": 11,
+    "body_tokens": 527,
+    "ancestor_tokens": 250
+  },
+  {
+    "rank": 37,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Deprecated and removed keys"
+    ],
+    "line_start": 247,
+    "line_end": 251,
+    "score": -3.5315864086151123,
+    "contextual_score": -2.3166940212249756,
+    "own_body_score": -3.5315864086151123,
+    "pairs": 4,
+    "body_tokens": 83,
+    "ancestor_tokens": 246
+  },
+  {
+    "rank": 38,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Docs MCP server"
+    ],
+    "line_start": 65,
+    "line_end": 76,
+    "score": -3.5359363555908203,
+    "contextual_score": -3.4277431964874268,
+    "own_body_score": -3.5359363555908203,
+    "pairs": 2,
+    "body_tokens": 190,
+    "ancestor_tokens": 93
+  },
+  {
+    "rank": 39,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "Advanced MCP Pack Source Types"
+    ],
+    "line_start": 76,
+    "line_end": 88,
+    "score": -3.543686628341675,
+    "contextual_score": -2.5099589824676514,
+    "own_body_score": -3.543686628341675,
+    "pairs": 5,
+    "body_tokens": 550,
+    "ancestor_tokens": 142
+  },
+  {
+    "rank": 40,
+    "path": "docs/adr/0003-context-first-project-reads.md",
+    "heading_path": [
+      "ADR 0003: Context-first project reads",
+      "Literal partial body context"
+    ],
+    "line_start": 37,
+    "line_end": 100,
+    "score": -3.6151816844940186,
+    "contextual_score": -3.6151816844940186,
+    "own_body_score": -3.6151816844940186,
+    "pairs": 8,
+    "body_tokens": 956,
+    "ancestor_tokens": 21
+  },
+  {
+    "rank": 41,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "docatlas.docs.yaml manifest"
+    ],
+    "line_start": 150,
+    "line_end": 181,
+    "score": -3.729365587234497,
+    "contextual_score": -2.18717098236084,
+    "own_body_score": -3.729365587234497,
+    "pairs": 25,
+    "body_tokens": 373,
+    "ancestor_tokens": 996
+  },
+  {
+    "rank": 42,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Query options"
+    ],
+    "line_start": 23,
+    "line_end": 35,
+    "score": -3.8901941776275635,
+    "contextual_score": -3.421692371368408,
+    "own_body_score": -3.8901941776275635,
+    "pairs": 2,
+    "body_tokens": 317,
+    "ancestor_tokens": 91
+  },
+  {
+    "rank": 43,
+    "path": "docs/main-flow-logging.md",
+    "heading_path": [
+      "Логи основного потока"
+    ],
+    "line_start": 1,
+    "line_end": 24,
+    "score": -3.9302661418914795,
+    "contextual_score": -3.9302661418914795,
+    "own_body_score": -3.9302661418914795,
+    "pairs": 2,
+    "body_tokens": 303,
+    "ancestor_tokens": 6
+  },
+  {
+    "rank": 44,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "Prefetch and job tools"
+    ],
+    "line_start": 121,
+    "line_end": 126,
+    "score": -3.930669069290161,
+    "contextual_score": -1.9922220706939697,
+    "own_body_score": -3.930669069290161,
+    "pairs": 13,
+    "body_tokens": 172,
+    "ancestor_tokens": 992
+  },
+  {
+    "rank": 45,
+    "path": "docs/opencode-compact-text.md",
+    "heading_path": [
+      "OpenCode: concise instructions and self-contained MCP text",
+      "Diagnose the installed route without a model call"
+    ],
+    "line_start": 95,
+    "line_end": 127,
+    "score": -3.9433038234710693,
+    "contextual_score": -3.9433038234710693,
+    "own_body_score": -3.9433038234710693,
+    "pairs": 4,
+    "body_tokens": 546,
+    "ancestor_tokens": 29
+  },
+  {
+    "rank": 46,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Project Docs pipeline",
+      "Discovery"
+    ],
+    "line_start": 223,
+    "line_end": 241,
+    "score": -3.950208902359009,
+    "contextual_score": -3.1539831161499023,
+    "own_body_score": -3.950208902359009,
+    "pairs": 6,
+    "body_tokens": 261,
+    "ancestor_tokens": 442
+  },
+  {
+    "rank": 47,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Concurrency"
+    ],
+    "line_start": 263,
+    "line_end": 268,
+    "score": -3.9588072299957275,
+    "contextual_score": -3.2267792224884033,
+    "own_body_score": -3.9588072299957275,
+    "pairs": 5,
+    "body_tokens": 98,
+    "ancestor_tokens": 400
+  },
+  {
+    "rank": 48,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow",
+      "Maintained project-doc catalog"
+    ],
+    "line_start": 23,
+    "line_end": 60,
+    "score": -4.010345935821533,
+    "contextual_score": -3.723484516143799,
+    "own_body_score": -4.010345935821533,
+    "pairs": 2,
+    "body_tokens": 318,
+    "ancestor_tokens": 66
+  },
+  {
+    "rank": 49,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Retrieval response"
+    ],
+    "line_start": 48,
+    "line_end": 81,
+    "score": -4.052908420562744,
+    "contextual_score": -2.35258412361145,
+    "own_body_score": -4.052908420562744,
+    "pairs": 4,
+    "body_tokens": 487,
+    "ancestor_tokens": 77
+  },
+  {
+    "rank": 50,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow",
+      "Confirmed member synchronization"
+    ],
+    "line_start": 61,
+    "line_end": 95,
+    "score": -4.064330577850342,
+    "contextual_score": -2.111248254776001,
+    "own_body_score": -4.064330577850342,
+    "pairs": 4,
+    "body_tokens": 485,
+    "ancestor_tokens": 65
+  },
+  {
+    "rank": 51,
+    "path": "docs/index-cleanup.md",
+    "heading_path": [
+      "Cleaning DocAtlas index state safely",
+      "Clear all local indexes while preserving configuration"
+    ],
+    "line_start": 64,
+    "line_end": 86,
+    "score": -4.1209540367126465,
+    "contextual_score": -2.651210069656372,
+    "own_body_score": -4.1209540367126465,
+    "pairs": 4,
+    "body_tokens": 142,
+    "ancestor_tokens": 249
+  },
+  {
+    "rank": 52,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "Docs Source Types"
+    ],
+    "line_start": 10,
+    "line_end": 23,
+    "score": -4.15239143371582,
+    "contextual_score": -4.15239143371582,
+    "own_body_score": -3.8556506633758545,
+    "pairs": 2,
+    "body_tokens": 345,
+    "ancestor_tokens": 140
+  },
+  {
+    "rank": 53,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Project documentation"
+    ],
+    "line_start": 82,
+    "line_end": 110,
+    "score": -4.154513835906982,
+    "contextual_score": -2.6082818508148193,
+    "own_body_score": -4.154513835906982,
+    "pairs": 2,
+    "body_tokens": 397,
+    "ancestor_tokens": 75
+  },
+  {
+    "rank": 54,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "Agent contract for a local project"
+    ],
+    "line_start": 200,
+    "line_end": 210,
+    "score": -4.299994945526123,
+    "contextual_score": -2.3061037063598633,
+    "own_body_score": -4.299994945526123,
+    "pairs": 11,
+    "body_tokens": 184,
+    "ancestor_tokens": 820
+  },
+  {
+    "rank": 55,
+    "path": "docs/PROJECT_BINDING.md",
+    "heading_path": [
+      "Project-bound OpenCode integration",
+      "Effective settings"
+    ],
+    "line_start": 60,
+    "line_end": 71,
+    "score": -4.330707550048828,
+    "contextual_score": -1.9914803504943848,
+    "own_body_score": -4.330707550048828,
+    "pairs": 8,
+    "body_tokens": 154,
+    "ancestor_tokens": 578
+  },
+  {
+    "rank": 56,
+    "path": "docs/modules/evidence-selection.md",
+    "heading_path": [
+      "Evidence selection module",
+      "Contract with question planning"
+    ],
+    "line_start": 16,
+    "line_end": 25,
+    "score": -4.376021862030029,
+    "contextual_score": -4.376021862030029,
+    "own_body_score": -4.376021862030029,
+    "pairs": 2,
+    "body_tokens": 98,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 57,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Advanced surfaces"
+    ],
+    "line_start": 211,
+    "line_end": 218,
+    "score": -4.393645763397217,
+    "contextual_score": -3.3688502311706543,
+    "own_body_score": -4.393645763397217,
+    "pairs": 8,
+    "body_tokens": 272,
+    "ancestor_tokens": 577
+  },
+  {
+    "rank": 58,
+    "path": "docs/PROJECT_MAP.md",
+    "heading_path": [
+      "Project map"
+    ],
+    "line_start": 1,
+    "line_end": 6,
+    "score": -4.418323040008545,
+    "contextual_score": -4.418323040008545,
+    "own_body_score": -4.418323040008545,
+    "pairs": 2,
+    "body_tokens": 47,
+    "ancestor_tokens": 3
+  },
+  {
+    "rank": 59,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "Maintenance rules"
+    ],
+    "line_start": 53,
+    "line_end": 60,
+    "score": -4.5719451904296875,
+    "contextual_score": -4.216577529907227,
+    "own_body_score": -4.5719451904296875,
+    "pairs": 2,
+    "body_tokens": 227,
+    "ancestor_tokens": 46
+  },
+  {
+    "rank": 60,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "Safe index cleanup"
+    ],
+    "line_start": 190,
+    "line_end": 199,
+    "score": -4.578728675842285,
+    "contextual_score": -2.3604953289031982,
+    "own_body_score": -4.578728675842285,
+    "pairs": 11,
+    "body_tokens": 146,
+    "ancestor_tokens": 818
+  },
+  {
+    "rank": 61,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Embeddings"
+    ],
+    "line_start": 65,
+    "line_end": 75,
+    "score": -4.581681728363037,
+    "contextual_score": -3.7779242992401123,
+    "own_body_score": -4.581681728363037,
+    "pairs": 4,
+    "body_tokens": 282,
+    "ancestor_tokens": 248
+  },
+  {
+    "rank": 62,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Optional documentation-language lookup"
+    ],
+    "line_start": 163,
+    "line_end": 181,
+    "score": -4.685888767242432,
+    "contextual_score": -2.223781108856201,
+    "own_body_score": -4.685888767242432,
+    "pairs": 2,
+    "body_tokens": 285,
+    "ancestor_tokens": 80
+  },
+  {
+    "rank": 63,
+    "path": "docs/main-flow-evaluation.md",
+    "heading_path": [
+      "Оценка основного потока: результат, источники и трасса"
+    ],
+    "line_start": 1,
+    "line_end": 6,
+    "score": -4.689547061920166,
+    "contextual_score": -4.689547061920166,
+    "own_body_score": -4.689547061920166,
+    "pairs": 2,
+    "body_tokens": 97,
+    "ancestor_tokens": 14
+  },
+  {
+    "rank": 64,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server"
+    ],
+    "line_start": 1,
+    "line_end": 17,
+    "score": -4.714381694793701,
+    "contextual_score": -4.714381694793701,
+    "own_body_score": -4.714381694793701,
+    "pairs": 2,
+    "body_tokens": 66,
+    "ancestor_tokens": 6
+  },
+  {
+    "rank": 65,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "License"
+    ],
+    "line_start": 227,
+    "line_end": 229,
+    "score": -4.733625411987305,
+    "contextual_score": -3.9423420429229736,
+    "own_body_score": -4.733625411987305,
+    "pairs": 8,
+    "body_tokens": 1,
+    "ancestor_tokens": 575
+  },
+  {
+    "rank": 66,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration"
+    ],
+    "line_start": 1,
+    "line_end": 11,
+    "score": -4.837087154388428,
+    "contextual_score": -4.837087154388428,
+    "own_body_score": -4.837087154388428,
+    "pairs": 2,
+    "body_tokens": 233,
+    "ancestor_tokens": 4
+  },
+  {
+    "rank": 67,
+    "path": "docs/PROJECT_MAP.md",
+    "heading_path": [
+      "Project map",
+      "Default documentation flow"
+    ],
+    "line_start": 23,
+    "line_end": 38,
+    "score": -4.848198413848877,
+    "contextual_score": -2.5453529357910156,
+    "own_body_score": -4.848198413848877,
+    "pairs": 2,
+    "body_tokens": 149,
+    "ancestor_tokens": 56
+  },
+  {
+    "rank": 68,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas",
+      "Documentation MCP changes"
+    ],
+    "line_start": 34,
+    "line_end": 39,
+    "score": -4.859125137329102,
+    "contextual_score": -4.859125137329102,
+    "own_body_score": -4.384776592254639,
+    "pairs": 2,
+    "body_tokens": 199,
+    "ancestor_tokens": 63
+  },
+  {
+    "rank": 69,
+    "path": "README.md",
+    "heading_path": [],
+    "line_start": 1,
+    "line_end": 3,
+    "score": -4.889424800872803,
+    "contextual_score": -4.889424800872803,
+    "own_body_score": -4.889424800872803,
+    "pairs": 2,
+    "body_tokens": 29,
+    "ancestor_tokens": 0
+  },
+  {
+    "rank": 70,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Compact model delivery"
+    ],
+    "line_start": 182,
+    "line_end": 184,
+    "score": -4.924771308898926,
+    "contextual_score": -3.935131788253784,
+    "own_body_score": -4.924771308898926,
+    "pairs": 2,
+    "body_tokens": 77,
+    "ancestor_tokens": 76
+  },
+  {
+    "rank": 71,
+    "path": "docs/main-flow-evaluation.md",
+    "heading_path": [
+      "Оценка основного потока: результат, источники и трасса",
+      "Что подтверждают источники"
+    ],
+    "line_start": 7,
+    "line_end": 16,
+    "score": -4.9294891357421875,
+    "contextual_score": -3.100360155105591,
+    "own_body_score": -4.9294891357421875,
+    "pairs": 5,
+    "body_tokens": 706,
+    "ancestor_tokens": 117
+  },
+  {
+    "rank": 72,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas",
+      "Adding a new doc source (fetcher)"
+    ],
+    "line_start": 40,
+    "line_end": 44,
+    "score": -4.930008411407471,
+    "contextual_score": -4.930008411407471,
+    "own_body_score": -4.275141716003418,
+    "pairs": 2,
+    "body_tokens": 75,
+    "ancestor_tokens": 68
+  },
+  {
+    "rank": 73,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "API keys",
+      "Where to put them"
+    ],
+    "line_start": 199,
+    "line_end": 217,
+    "score": -4.9352850914001465,
+    "contextual_score": -3.8350164890289307,
+    "own_body_score": -4.9352850914001465,
+    "pairs": 7,
+    "body_tokens": 135,
+    "ancestor_tokens": 548
+  },
+  {
+    "rank": 74,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Context packs"
+    ],
+    "line_start": 59,
+    "line_end": 67,
+    "score": -4.94520378112793,
+    "contextual_score": -3.550626516342163,
+    "own_body_score": -4.94520378112793,
+    "pairs": 5,
+    "body_tokens": 106,
+    "ancestor_tokens": 400
+  },
+  {
+    "rank": 75,
+    "path": "docs/main-flow-evaluation.md",
+    "heading_path": [
+      "Оценка основного потока: результат, источники и трасса",
+      "Репрезентативные отрицательные проверки"
+    ],
+    "line_start": 28,
+    "line_end": 38,
+    "score": -4.966864109039307,
+    "contextual_score": -2.3068578243255615,
+    "own_body_score": -4.966864109039307,
+    "pairs": 2,
+    "body_tokens": 235,
+    "ancestor_tokens": 120
+  },
+  {
+    "rank": 76,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "Async prefetch and job tracking"
+    ],
+    "line_start": 135,
+    "line_end": 149,
+    "score": -5.032057762145996,
+    "contextual_score": -1.6384468078613281,
+    "own_body_score": -5.032057762145996,
+    "pairs": 25,
+    "body_tokens": 400,
+    "ancestor_tokens": 996
+  },
+  {
+    "rank": 77,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow",
+      "Dependency docs are separate"
+    ],
+    "line_start": 143,
+    "line_end": 148,
+    "score": -5.080747127532959,
+    "contextual_score": -3.863785982131958,
+    "own_body_score": -5.080747127532959,
+    "pairs": 2,
+    "body_tokens": 69,
+    "ancestor_tokens": 66
+  },
+  {
+    "rank": 78,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas",
+      "Adding a new document parser"
+    ],
+    "line_start": 29,
+    "line_end": 33,
+    "score": -5.12653112411499,
+    "contextual_score": -5.12653112411499,
+    "own_body_score": -4.272816181182861,
+    "pairs": 2,
+    "body_tokens": 60,
+    "ancestor_tokens": 65
+  },
+  {
+    "rank": 79,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands"
+    ],
+    "line_start": 1,
+    "line_end": 4,
+    "score": -5.132114887237549,
+    "contextual_score": -5.132114887237549,
+    "own_body_score": -5.132114887237549,
+    "pairs": 2,
+    "body_tokens": 84,
+    "ancestor_tokens": 3
+  },
+  {
+    "rank": 80,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Indexing"
+    ],
+    "line_start": 13,
+    "line_end": 20,
+    "score": -5.1383957862854,
+    "contextual_score": -3.0989248752593994,
+    "own_body_score": -5.1383957862854,
+    "pairs": 5,
+    "body_tokens": 291,
+    "ancestor_tokens": 398
+  },
+  {
+    "rank": 81,
+    "path": "docs/testing.md",
+    "heading_path": [
+      "Complete pytest marker inventory and test tiers"
+    ],
+    "line_start": 1,
+    "line_end": 5,
+    "score": -5.1612467765808105,
+    "contextual_score": -5.1612467765808105,
+    "own_body_score": -5.1612467765808105,
+    "pairs": 2,
+    "body_tokens": 149,
+    "ancestor_tokens": 10
+  },
+  {
+    "rank": 82,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas",
+      "Submitting a PR"
+    ],
+    "line_start": 59,
+    "line_end": 63,
+    "score": -5.191558361053467,
+    "contextual_score": -5.191558361053467,
+    "own_body_score": -4.345316410064697,
+    "pairs": 2,
+    "body_tokens": 44,
+    "ancestor_tokens": 63
+  },
+  {
+    "rank": 83,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs source registry"
+    ],
+    "line_start": 68,
+    "line_end": 93,
+    "score": -5.2387213706970215,
+    "contextual_score": -2.8562562465667725,
+    "own_body_score": -5.2387213706970215,
+    "pairs": 14,
+    "body_tokens": 604,
+    "ancestor_tokens": 401
+  },
+  {
+    "rank": 84,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Flow"
+    ],
+    "line_start": 269,
+    "line_end": 307,
+    "score": -5.251444339752197,
+    "contextual_score": -2.3397958278656006,
+    "own_body_score": -5.251444339752197,
+    "pairs": 9,
+    "body_tokens": 450,
+    "ancestor_tokens": 398
+  },
+  {
+    "rank": 85,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas",
+      "Project structure"
+    ],
+    "line_start": 7,
+    "line_end": 28,
+    "score": -5.327067852020264,
+    "contextual_score": -4.82042121887207,
+    "own_body_score": -5.327067852020264,
+    "pairs": 2,
+    "body_tokens": 228,
+    "ancestor_tokens": 60
+  },
+  {
+    "rank": 86,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Per-library index isolation"
+    ],
+    "line_start": 21,
+    "line_end": 24,
+    "score": -5.350226879119873,
+    "contextual_score": -3.6912667751312256,
+    "own_body_score": -5.350226879119873,
+    "pairs": 5,
+    "body_tokens": 110,
+    "ancestor_tokens": 404
+  },
+  {
+    "rank": 87,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Ingest options"
+    ],
+    "line_start": 36,
+    "line_end": 47,
+    "score": -5.396914958953857,
+    "contextual_score": -3.5920374393463135,
+    "own_body_score": -5.396914958953857,
+    "pairs": 2,
+    "body_tokens": 330,
+    "ancestor_tokens": 91
+  },
+  {
+    "rank": 88,
+    "path": "docs/adr/0003-context-first-project-reads.md",
+    "heading_path": [
+      "ADR 0003: Context-first project reads",
+      "Invariants"
+    ],
+    "line_start": 22,
+    "line_end": 36,
+    "score": -5.408280849456787,
+    "contextual_score": -5.408280849456787,
+    "own_body_score": -5.408280849456787,
+    "pairs": 2,
+    "body_tokens": 266,
+    "ancestor_tokens": 18
+  },
+  {
+    "rank": 89,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources"
+    ],
+    "line_start": 1,
+    "line_end": 9,
+    "score": -5.471436977386475,
+    "contextual_score": -5.471436977386475,
+    "own_body_score": -5.471436977386475,
+    "pairs": 2,
+    "body_tokens": 129,
+    "ancestor_tokens": 5
+  },
+  {
+    "rank": 90,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "Updating sources"
+    ],
+    "line_start": 54,
+    "line_end": 63,
+    "score": -5.564396381378174,
+    "contextual_score": -5.564396381378174,
+    "own_body_score": -5.367238998413086,
+    "pairs": 2,
+    "body_tokens": 84,
+    "ancestor_tokens": 138
+  },
+  {
+    "rank": 91,
+    "path": "docs/mcp-docs-server.md",
+    "heading_path": [
+      "Docs MCP server",
+      "Evaluation and release"
+    ],
+    "line_start": 149,
+    "line_end": 162,
+    "score": -5.581873893737793,
+    "contextual_score": -4.52667760848999,
+    "own_body_score": -5.581873893737793,
+    "pairs": 2,
+    "body_tokens": 205,
+    "ancestor_tokens": 77
+  },
+  {
+    "rank": 92,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Project-docs MCP server",
+      "When to use each tool"
+    ],
+    "line_start": 164,
+    "line_end": 175,
+    "score": -5.61008358001709,
+    "contextual_score": -3.0479815006256104,
+    "own_body_score": -5.61008358001709,
+    "pairs": 11,
+    "body_tokens": 238,
+    "ancestor_tokens": 819
+  },
+  {
+    "rank": 93,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "MCP pack commands",
+      "install-pack options"
+    ],
+    "line_start": 91,
+    "line_end": 99,
+    "score": -5.695014953613281,
+    "contextual_score": -3.2245047092437744,
+    "own_body_score": -5.695014953613281,
+    "pairs": 8,
+    "body_tokens": 227,
+    "ancestor_tokens": 590
+  },
+  {
+    "rank": 94,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "MCP adapter and fidelity"
+    ],
+    "line_start": 70,
+    "line_end": 87,
+    "score": -5.7382941246032715,
+    "contextual_score": -5.7382941246032715,
+    "own_body_score": -5.7382941246032715,
+    "pairs": 2,
+    "body_tokens": 237,
+    "ancestor_tokens": 14
+  },
+  {
+    "rank": 95,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "URL security and docs policy"
+    ],
+    "line_start": 188,
+    "line_end": 204,
+    "score": -5.739856243133545,
+    "contextual_score": -1.9283382892608643,
+    "own_body_score": -5.739856243133545,
+    "pairs": 13,
+    "body_tokens": 210,
+    "ancestor_tokens": 992
+  },
+  {
+    "rank": 96,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Try it"
+    ],
+    "line_start": 36,
+    "line_end": 51,
+    "score": -5.751284122467041,
+    "contextual_score": -3.2888176441192627,
+    "own_body_score": -5.751284122467041,
+    "pairs": 8,
+    "body_tokens": 177,
+    "ancestor_tokens": 577
+  },
+  {
+    "rank": 97,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Public boundary"
+    ],
+    "line_start": 9,
+    "line_end": 19,
+    "score": -5.759090900421143,
+    "contextual_score": -5.759090900421143,
+    "own_body_score": -5.759090900421143,
+    "pairs": 2,
+    "body_tokens": 161,
+    "ancestor_tokens": 12
+  },
+  {
+    "rank": 98,
+    "path": "docs/modules/evidence-selection.md",
+    "heading_path": [
+      "Evidence selection module",
+      "Native multilingual selection"
+    ],
+    "line_start": 26,
+    "line_end": 47,
+    "score": -5.766794681549072,
+    "contextual_score": -5.766794681549072,
+    "own_body_score": -5.766794681549072,
+    "pairs": 2,
+    "body_tokens": 299,
+    "ancestor_tokens": 13
+  },
+  {
+    "rank": 99,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Failure policy"
+    ],
+    "line_start": 98,
+    "line_end": 103,
+    "score": -5.775513648986816,
+    "contextual_score": -5.775513648986816,
+    "own_body_score": -5.775513648986816,
+    "pairs": 2,
+    "body_tokens": 72,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 100,
+    "path": "README.md",
+    "heading_path": [
+      "DocAtlas",
+      "Python import namespace"
+    ],
+    "line_start": 97,
+    "line_end": 109,
+    "score": -5.777249336242676,
+    "contextual_score": -3.3612754344940186,
+    "own_body_score": -5.777249336242676,
+    "pairs": 8,
+    "body_tokens": 121,
+    "ancestor_tokens": 578
+  },
+  {
+    "rank": 101,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Retrieval"
+    ],
+    "line_start": 36,
+    "line_end": 41,
+    "score": -5.79641056060791,
+    "contextual_score": -2.821920871734619,
+    "own_body_score": -5.79641056060791,
+    "pairs": 5,
+    "body_tokens": 135,
+    "ancestor_tokens": 399
+  },
+  {
+    "rank": 102,
+    "path": "docs/main-flow-evaluation.md",
+    "heading_path": [
+      "Оценка основного потока: результат, источники и трасса",
+      "Предлагаемый публичный сценарий logging off/on"
+    ],
+    "line_start": 17,
+    "line_end": 27,
+    "score": -5.798586845397949,
+    "contextual_score": -2.053044080734253,
+    "own_body_score": -5.798586845397949,
+    "pairs": 3,
+    "body_tokens": 453,
+    "ancestor_tokens": 122
+  },
+  {
+    "rank": 103,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "API keys",
+      "Switching to local embeddings instead"
+    ],
+    "line_start": 222,
+    "line_end": 234,
+    "score": -5.8287224769592285,
+    "contextual_score": -4.277466297149658,
+    "own_body_score": -5.8287224769592285,
+    "pairs": 7,
+    "body_tokens": 65,
+    "ancestor_tokens": 553
+  },
+  {
+    "rank": 104,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "API keys"
+    ],
+    "line_start": 187,
+    "line_end": 198,
+    "score": -5.851192951202393,
+    "contextual_score": -2.296147108078003,
+    "own_body_score": -5.851192951202393,
+    "pairs": 3,
+    "body_tokens": 301,
+    "ancestor_tokens": 241
+  },
+  {
+    "rank": 105,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Version-aware dependency resolution"
+    ],
+    "line_start": 94,
+    "line_end": 105,
+    "score": -5.88917875289917,
+    "contextual_score": -2.691445827484131,
+    "own_body_score": -5.88917875289917,
+    "pairs": 9,
+    "body_tokens": 383,
+    "ancestor_tokens": 403
+  },
+  {
+    "rank": 106,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Notes"
+    ],
+    "line_start": 252,
+    "line_end": 255,
+    "score": -5.955036640167236,
+    "contextual_score": -5.091681480407715,
+    "own_body_score": -5.955036640167236,
+    "pairs": 3,
+    "body_tokens": 73,
+    "ancestor_tokens": 240
+  },
+  {
+    "rank": 107,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Application orchestration"
+    ],
+    "line_start": 28,
+    "line_end": 40,
+    "score": -5.998799800872803,
+    "contextual_score": -5.998799800872803,
+    "own_body_score": -5.998799800872803,
+    "pairs": 2,
+    "body_tokens": 154,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 108,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Infrastructure port"
+    ],
+    "line_start": 41,
+    "line_end": 69,
+    "score": -6.0418572425842285,
+    "contextual_score": -6.0418572425842285,
+    "own_body_score": -6.0418572425842285,
+    "pairs": 2,
+    "body_tokens": 369,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 109,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas"
+    ],
+    "line_start": 1,
+    "line_end": 6,
+    "score": -6.041884899139404,
+    "contextual_score": -6.041884899139404,
+    "own_body_score": -6.041884899139404,
+    "pairs": 2,
+    "body_tokens": 49,
+    "ancestor_tokens": 8
+  },
+  {
+    "rank": 110,
+    "path": "docs/modules/evidence-selection.md",
+    "heading_path": [
+      "Evidence selection module",
+      "Responsibility"
+    ],
+    "line_start": 3,
+    "line_end": 15,
+    "score": -6.043882846832275,
+    "contextual_score": -6.043882846832275,
+    "own_body_score": -6.043882846832275,
+    "pairs": 2,
+    "body_tokens": 145,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 111,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "Product and architecture"
+    ],
+    "line_start": 19,
+    "line_end": 29,
+    "score": -6.088076114654541,
+    "contextual_score": -4.1684393882751465,
+    "own_body_score": -6.088076114654541,
+    "pairs": 2,
+    "body_tokens": 302,
+    "ancestor_tokens": 46
+  },
+  {
+    "rank": 112,
+    "path": "CONTRIBUTING.md",
+    "heading_path": [
+      "Contributing to DocAtlas",
+      "Running tests"
+    ],
+    "line_start": 45,
+    "line_end": 58,
+    "score": -6.125243186950684,
+    "contextual_score": -6.125243186950684,
+    "own_body_score": -5.676768779754639,
+    "pairs": 2,
+    "body_tokens": 64,
+    "ancestor_tokens": 61
+  },
+  {
+    "rank": 113,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Responsibility"
+    ],
+    "line_start": 3,
+    "line_end": 8,
+    "score": -6.14799165725708,
+    "contextual_score": -6.14799165725708,
+    "own_body_score": -6.14799165725708,
+    "pairs": 2,
+    "body_tokens": 60,
+    "ancestor_tokens": 12
+  },
+  {
+    "rank": 114,
+    "path": "docs/PROJECT_MAP.md",
+    "heading_path": [
+      "Project map",
+      "Runtime areas"
+    ],
+    "line_start": 7,
+    "line_end": 22,
+    "score": -6.189184665679932,
+    "contextual_score": -3.354525327682495,
+    "own_body_score": -6.189184665679932,
+    "pairs": 2,
+    "body_tokens": 390,
+    "ancestor_tokens": 54
+  },
+  {
+    "rank": 115,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index"
+    ],
+    "line_start": 1,
+    "line_end": 4,
+    "score": -6.193832874298096,
+    "contextual_score": -6.193832874298096,
+    "own_body_score": -6.193832874298096,
+    "pairs": 2,
+    "body_tokens": 37,
+    "ancestor_tokens": 4
+  },
+  {
+    "rank": 116,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Project documentation storage and isolation"
+    ],
+    "line_start": 25,
+    "line_end": 35,
+    "score": -6.242491245269775,
+    "contextual_score": -3.3021490573883057,
+    "own_body_score": -6.242491245269775,
+    "pairs": 5,
+    "body_tokens": 156,
+    "ancestor_tokens": 402
+  },
+  {
+    "rank": 117,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Retrieval"
+    ],
+    "line_start": 76,
+    "line_end": 92,
+    "score": -6.2558369636535645,
+    "contextual_score": -3.165388345718384,
+    "own_body_score": -6.2558369636535645,
+    "pairs": 11,
+    "body_tokens": 557,
+    "ancestor_tokens": 247
+  },
+  {
+    "rank": 118,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Domain vocabulary"
+    ],
+    "line_start": 20,
+    "line_end": 27,
+    "score": -6.267083644866943,
+    "contextual_score": -6.267083644866943,
+    "own_body_score": -6.267083644866943,
+    "pairs": 2,
+    "body_tokens": 101,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 119,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Example `docatlas.yaml`"
+    ],
+    "line_start": 127,
+    "line_end": 144,
+    "score": -6.298409461975098,
+    "contextual_score": -4.710513114929199,
+    "own_body_score": -6.298409461975098,
+    "pairs": 4,
+    "body_tokens": 78,
+    "ancestor_tokens": 248
+  },
+  {
+    "rank": 120,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "API keys",
+      "What happens when a key is missing"
+    ],
+    "line_start": 218,
+    "line_end": 221,
+    "score": -6.298889636993408,
+    "contextual_score": -3.9819083213806152,
+    "own_body_score": -6.298889636993408,
+    "pairs": 7,
+    "body_tokens": 82,
+    "ancestor_tokens": 551
+  },
+  {
+    "rank": 121,
+    "path": "docs/modules/evidence-selection.md",
+    "heading_path": [
+      "Evidence selection module",
+      "Invariants"
+    ],
+    "line_start": 48,
+    "line_end": 57,
+    "score": -6.3282151222229,
+    "contextual_score": -6.3282151222229,
+    "own_body_score": -6.3282151222229,
+    "pairs": 2,
+    "body_tokens": 124,
+    "ancestor_tokens": 10
+  },
+  {
+    "rank": 122,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Add options"
+    ],
+    "line_start": 48,
+    "line_end": 57,
+    "score": -6.3468852043151855,
+    "contextual_score": -4.629797458648682,
+    "own_body_score": -6.3468852043151855,
+    "pairs": 2,
+    "body_tokens": 192,
+    "ancestor_tokens": 90
+  },
+  {
+    "rank": 123,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "Start here"
+    ],
+    "line_start": 5,
+    "line_end": 10,
+    "score": -6.357065677642822,
+    "contextual_score": -5.643224239349365,
+    "own_body_score": -6.357065677642822,
+    "pairs": 2,
+    "body_tokens": 136,
+    "ancestor_tokens": 44
+  },
+  {
+    "rank": 124,
+    "path": "docs/PROJECT_MAP.md",
+    "heading_path": [
+      "Project map",
+      "Security boundary"
+    ],
+    "line_start": 39,
+    "line_end": 44,
+    "score": -6.389057636260986,
+    "contextual_score": -4.794996738433838,
+    "own_body_score": -6.389057636260986,
+    "pairs": 2,
+    "body_tokens": 77,
+    "ancestor_tokens": 55
+  },
+  {
+    "rank": 125,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "Local Ingest Options"
+    ],
+    "line_start": 37,
+    "line_end": 45,
+    "score": -6.396381855010986,
+    "contextual_score": -5.168628692626953,
+    "own_body_score": -6.396381855010986,
+    "pairs": 2,
+    "body_tokens": 141,
+    "ancestor_tokens": 139
+  },
+  {
+    "rank": 126,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "How indexing works"
+    ],
+    "line_start": 64,
+    "line_end": 75,
+    "score": -6.420212268829346,
+    "contextual_score": -5.414882183074951,
+    "own_body_score": -6.420212268829346,
+    "pairs": 2,
+    "body_tokens": 159,
+    "ancestor_tokens": 139
+  },
+  {
+    "rank": 127,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow"
+    ],
+    "line_start": 1,
+    "line_end": 6,
+    "score": -6.433743000030518,
+    "contextual_score": -6.433743000030518,
+    "own_body_score": -6.433743000030518,
+    "pairs": 2,
+    "body_tokens": 50,
+    "ancestor_tokens": 8
+  },
+  {
+    "rank": 128,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "Evaluation and research"
+    ],
+    "line_start": 43,
+    "line_end": 48,
+    "score": -6.444342136383057,
+    "contextual_score": -6.2046332359313965,
+    "own_body_score": -6.444342136383057,
+    "pairs": 2,
+    "body_tokens": 114,
+    "ancestor_tokens": 46
+  },
+  {
+    "rank": 129,
+    "path": "docs/adr/0003-context-first-project-reads.md",
+    "heading_path": [
+      "ADR 0003: Context-first project reads",
+      "Decision"
+    ],
+    "line_start": 9,
+    "line_end": 21,
+    "score": -6.473514080047607,
+    "contextual_score": -6.473514080047607,
+    "own_body_score": -6.473514080047607,
+    "pairs": 2,
+    "body_tokens": 163,
+    "ancestor_tokens": 17
+  },
+  {
+    "rank": 130,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Example with hybrid retrieval"
+    ],
+    "line_start": 145,
+    "line_end": 186,
+    "score": -6.638926029205322,
+    "contextual_score": -4.324103832244873,
+    "own_body_score": -6.638926029205322,
+    "pairs": 4,
+    "body_tokens": 256,
+    "ancestor_tokens": 245
+  },
+  {
+    "rank": 131,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow",
+      "Context first"
+    ],
+    "line_start": 7,
+    "line_end": 22,
+    "score": -6.646983623504639,
+    "contextual_score": -4.371257305145264,
+    "own_body_score": -6.646983623504639,
+    "pairs": 2,
+    "body_tokens": 194,
+    "ancestor_tokens": 62
+  },
+  {
+    "rank": 132,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "URL Add Options"
+    ],
+    "line_start": 46,
+    "line_end": 53,
+    "score": -6.687344074249268,
+    "contextual_score": -4.1091628074646,
+    "own_body_score": -6.687344074249268,
+    "pairs": 2,
+    "body_tokens": 148,
+    "ancestor_tokens": 138
+  },
+  {
+    "rank": 133,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "External docs manifest"
+    ],
+    "line_start": 49,
+    "line_end": 52,
+    "score": -6.757544994354248,
+    "contextual_score": -5.869274616241455,
+    "own_body_score": -6.757544994354248,
+    "pairs": 2,
+    "body_tokens": 43,
+    "ancestor_tokens": 47
+  },
+  {
+    "rank": 134,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "Version provenance on every response"
+    ],
+    "line_start": 205,
+    "line_end": 218,
+    "score": -6.806028366088867,
+    "contextual_score": -1.8136770725250244,
+    "own_body_score": -6.806028366088867,
+    "pairs": 13,
+    "body_tokens": 310,
+    "ancestor_tokens": 992
+  },
+  {
+    "rank": 135,
+    "path": "wiki/Supported-Sources.md",
+    "heading_path": [
+      "Supported Sources",
+      "Docs Source Types",
+      "Local file formats"
+    ],
+    "line_start": 24,
+    "line_end": 36,
+    "score": -6.863344669342041,
+    "contextual_score": -4.5406575202941895,
+    "own_body_score": -6.863344669342041,
+    "pairs": 7,
+    "body_tokens": 212,
+    "ancestor_tokens": 491
+  },
+  {
+    "rank": 136,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Loaders"
+    ],
+    "line_start": 40,
+    "line_end": 48,
+    "score": -6.921237468719482,
+    "contextual_score": -3.963762044906616,
+    "own_body_score": -6.921237468719482,
+    "pairs": 4,
+    "body_tokens": 200,
+    "ancestor_tokens": 247
+  },
+  {
+    "rank": 137,
+    "path": "docs/modules/evidence-selection.md",
+    "heading_path": [
+      "Evidence selection module",
+      "Verification"
+    ],
+    "line_start": 58,
+    "line_end": 63,
+    "score": -7.137951374053955,
+    "contextual_score": -7.137951374053955,
+    "own_body_score": -7.137951374053955,
+    "pairs": 2,
+    "body_tokens": 56,
+    "ancestor_tokens": 9
+  },
+  {
+    "rank": 138,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "Dartdoc discovery"
+    ],
+    "line_start": 182,
+    "line_end": 187,
+    "score": -7.162471294403076,
+    "contextual_score": -3.271937370300293,
+    "own_body_score": -7.162471294403076,
+    "pairs": 13,
+    "body_tokens": 155,
+    "ancestor_tokens": 991
+  },
+  {
+    "rank": 139,
+    "path": "docs/opencode-compact-text.md",
+    "heading_path": [
+      "OpenCode: concise instructions and self-contained MCP text",
+      "Evidence"
+    ],
+    "line_start": 128,
+    "line_end": 145,
+    "score": -7.175662994384766,
+    "contextual_score": -7.175662994384766,
+    "own_body_score": -7.175662994384766,
+    "pairs": 2,
+    "body_tokens": 304,
+    "ancestor_tokens": 21
+  },
+  {
+    "rank": 140,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "User-facing reference"
+    ],
+    "line_start": 30,
+    "line_end": 38,
+    "score": -7.20423698425293,
+    "contextual_score": -4.851556301116943,
+    "own_body_score": -7.20423698425293,
+    "pairs": 2,
+    "body_tokens": 175,
+    "ancestor_tokens": 47
+  },
+  {
+    "rank": 141,
+    "path": "docs/project-docs-mcp-workflow.md",
+    "heading_path": [
+      "Project docs MCP workflow",
+      "Scope and module selection"
+    ],
+    "line_start": 96,
+    "line_end": 123,
+    "score": -7.2411980628967285,
+    "contextual_score": -3.3454997539520264,
+    "own_body_score": -7.2411980628967285,
+    "pairs": 2,
+    "body_tokens": 293,
+    "ancestor_tokens": 64
+  },
+  {
+    "rank": 142,
+    "path": "docs/modules/project-context-retrieval.md",
+    "heading_path": [
+      "Project context retrieval module",
+      "Invariants"
+    ],
+    "line_start": 88,
+    "line_end": 97,
+    "score": -7.278470039367676,
+    "contextual_score": -7.278470039367676,
+    "own_body_score": -7.278470039367676,
+    "pairs": 2,
+    "body_tokens": 112,
+    "ancestor_tokens": 11
+  },
+  {
+    "rank": 143,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Project Docs pipeline"
+    ],
+    "line_start": 219,
+    "line_end": 222,
+    "score": -7.368103504180908,
+    "contextual_score": -4.016773700714111,
+    "own_body_score": -7.368103504180908,
+    "pairs": 5,
+    "body_tokens": 38,
+    "ancestor_tokens": 401
+  },
+  {
+    "rank": 144,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Index"
+    ],
+    "line_start": 14,
+    "line_end": 23,
+    "score": -7.397994041442871,
+    "contextual_score": -4.567001819610596,
+    "own_body_score": -7.397994041442871,
+    "pairs": 4,
+    "body_tokens": 166,
+    "ancestor_tokens": 245
+  },
+  {
+    "rank": 145,
+    "path": "docs/adr/0003-context-first-project-reads.md",
+    "heading_path": [
+      "ADR 0003: Context-first project reads",
+      "Status"
+    ],
+    "line_start": 3,
+    "line_end": 8,
+    "score": -7.434415340423584,
+    "contextual_score": -7.434415340423584,
+    "own_body_score": -7.434415340423584,
+    "pairs": 2,
+    "body_tokens": 53,
+    "ancestor_tokens": 16
+  },
+  {
+    "rank": 146,
+    "path": "docs/main-flow-logging.md",
+    "heading_path": [
+      "Логи основного потока",
+      "Проверка"
+    ],
+    "line_start": 89,
+    "line_end": 98,
+    "score": -7.476266384124756,
+    "contextual_score": -3.0769879817962646,
+    "own_body_score": -7.476266384124756,
+    "pairs": 4,
+    "body_tokens": 145,
+    "ancestor_tokens": 313
+  },
+  {
+    "rank": 147,
+    "path": "wiki/Commands.md",
+    "heading_path": [
+      "Commands",
+      "Update options"
+    ],
+    "line_start": 58,
+    "line_end": 64,
+    "score": -7.8031463623046875,
+    "contextual_score": -5.067160129547119,
+    "own_body_score": -7.8031463623046875,
+    "pairs": 2,
+    "body_tokens": 77,
+    "ancestor_tokens": 90
+  },
+  {
+    "rank": 148,
+    "path": "docs/main-flow-evaluation.md",
+    "heading_path": [
+      "Оценка основного потока: результат, источники и трасса",
+      "Границы доказательства"
+    ],
+    "line_start": 39,
+    "line_end": 41,
+    "score": -7.8099446296691895,
+    "contextual_score": -4.502141952514648,
+    "own_body_score": -7.8099446296691895,
+    "pairs": 2,
+    "body_tokens": 116,
+    "ancestor_tokens": 116
+  },
+  {
+    "rank": 149,
+    "path": "docs/adr/0003-context-first-project-reads.md",
+    "heading_path": [
+      "ADR 0003: Context-first project reads",
+      "Consequences"
+    ],
+    "line_start": 101,
+    "line_end": 109,
+    "score": -8.000804901123047,
+    "contextual_score": -8.000804901123047,
+    "own_body_score": -8.000804901123047,
+    "pairs": 2,
+    "body_tokens": 99,
+    "ancestor_tokens": 19
+  },
+  {
+    "rank": 150,
+    "path": "docs/PROJECT_BINDING.md",
+    "heading_path": [
+      "Project-bound OpenCode integration",
+      "Project versus search scope"
+    ],
+    "line_start": 51,
+    "line_end": 59,
+    "score": -8.147746086120605,
+    "contextual_score": -4.008103847503662,
+    "own_body_score": -8.147746086120605,
+    "pairs": 8,
+    "body_tokens": 118,
+    "ancestor_tokens": 580
+  },
+  {
+    "rank": 151,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "MCP and project-docs workflows"
+    ],
+    "line_start": 11,
+    "line_end": 18,
+    "score": -8.51415729522705,
+    "contextual_score": -5.7334065437316895,
+    "own_body_score": -8.51415729522705,
+    "pairs": 2,
+    "body_tokens": 175,
+    "ancestor_tokens": 52
+  },
+  {
+    "rank": 152,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Example with OpenAI embeddings"
+    ],
+    "line_start": 235,
+    "line_end": 246,
+    "score": -8.529458045959473,
+    "contextual_score": -4.637633800506592,
+    "own_body_score": -8.529458045959473,
+    "pairs": 4,
+    "body_tokens": 60,
+    "ancestor_tokens": 247
+  },
+  {
+    "rank": 153,
+    "path": "docs/PROJECT_BINDING.md",
+    "heading_path": [
+      "Project-bound OpenCode integration",
+      "Verification boundary"
+    ],
+    "line_start": 72,
+    "line_end": 79,
+    "score": -8.560351371765137,
+    "contextual_score": -4.4370436668396,
+    "own_body_score": -8.560351371765137,
+    "pairs": 8,
+    "body_tokens": 133,
+    "ancestor_tokens": 580
+  },
+  {
+    "rank": 154,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Query"
+    ],
+    "line_start": 24,
+    "line_end": 31,
+    "score": -8.645852088928223,
+    "contextual_score": -4.529778003692627,
+    "own_body_score": -8.645852088928223,
+    "pairs": 4,
+    "body_tokens": 130,
+    "ancestor_tokens": 246
+  },
+  {
+    "rank": 155,
+    "path": "wiki/Architecture.md",
+    "heading_path": [
+      "Architecture",
+      "Docs MCP runtime",
+      "docs_url template"
+    ],
+    "line_start": 127,
+    "line_end": 134,
+    "score": -8.865700721740723,
+    "contextual_score": -3.2004473209381104,
+    "own_body_score": -8.865700721740723,
+    "pairs": 13,
+    "body_tokens": 124,
+    "ancestor_tokens": 991
+  },
+  {
+    "rank": 156,
+    "path": "docs/INDEX.md",
+    "heading_path": [
+      "Documentation Index",
+      "MCP Packs"
+    ],
+    "line_start": 39,
+    "line_end": 42,
+    "score": -9.409136772155762,
+    "contextual_score": -6.06607723236084,
+    "own_body_score": -9.409136772155762,
+    "pairs": 2,
+    "body_tokens": 39,
+    "ancestor_tokens": 46
+  },
+  {
+    "rank": 157,
+    "path": "wiki/Configuration.md",
+    "heading_path": [
+      "Configuration",
+      "Configuration Reference",
+      "Web fetch"
+    ],
+    "line_start": 32,
+    "line_end": 39,
+    "score": -9.942609786987305,
+    "contextual_score": -4.702050685882568,
+    "own_body_score": -9.942609786987305,
+    "pairs": 4,
+    "body_tokens": 119,
+    "ancestor_tokens": 247
+  }
+]

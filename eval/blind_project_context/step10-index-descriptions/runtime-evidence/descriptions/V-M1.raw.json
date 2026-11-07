@@ -1,0 +1,13 @@
+{
+  "chunks": [],
+  "contributions": {},
+  "mode_used": "lexical",
+  "candidate_counts": {
+    "lexical": 0
+  },
+  "failures": {},
+  "query_plan_hash": "805a2c0cac3d960c17bca93a20c6d02fefd0df9b5b42696309732003c64153aa",
+  "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+  "requirements_hash": "",
+  "requirements": null
+}

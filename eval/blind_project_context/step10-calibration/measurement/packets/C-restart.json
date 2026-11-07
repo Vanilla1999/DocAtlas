@@ -1,0 +1,400 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-f597b9a340c8205bdaec9e3b",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station",
+      "snippet": "# Reservoir station\n\nThese procedures apply to the unmanned reservoir station during winter operation.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "72e1b44e3b95c794a6680eca333839f8db6656e036242d6dbad8f29b005746b6",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/4850238d6fc9b284795ec625"
+    },
+    {
+      "evidence_id": "ev-e40f6271cb0204546f83513b",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Restart",
+      "snippet": "## Restart\n\nRestart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f74f4b8a8b5efa9f7962d27a1f8e4cac73fc07efe73e4c8d09568beef93025b4",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/427929d96fce9252fcf28ec8"
+    },
+    {
+      "evidence_id": "ev-4f1c500bcc5e0847c8719b0d",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Restart > Inspection",
+      "snippet": "### Inspection\n\nBefore restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "5555665ea7b901c9c21f2029a0e595a48e0c3cc519e085297ef2aca84ce16706",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 9,
+      "line_end": 12,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/6c27338b53b5cd422ed6d7f5"
+    },
+    {
+      "evidence_id": "ev-4c9eece8c7c03d5272568b12",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Restart > Indicator lamps",
+      "snippet": "### Indicator lamps\n\nThe amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "944b68c6c8f693206778a999409ffa2901d1f59486c74fc351be35df4e86ca22",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/1db4ec10c9b2b772289b3e5e"
+    },
+    {
+      "evidence_id": "ev-fcb28837ca78bbd18764d65e",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Frozen intake",
+      "snippet": "## Frozen intake\n\nWhen ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "124e2d8bcb7ea80e5f607ec6d40aad596dbd084bebcb3dd682f5e10de7822d1c",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 17,
+      "line_end": 20,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/93a8ad390c4f1a9ecd26a43d"
+    },
+    {
+      "evidence_id": "ev-65b075b8745ce235accd3230",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Ledger storage",
+      "snippet": "## Ledger storage\n\nCompleted shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ceba1d345b922a000cb6657cc1bdb7ca7ab4f4d988d422ebd51bd63f1e85c48d",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 21,
+      "line_end": 24,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/ec2b23f8a7606d8acd537e0f"
+    },
+    {
+      "evidence_id": "ev-e8f44864988ed30b0bac081a",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Cabinet finish",
+      "snippet": "## Cabinet finish\n\nThe exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "8ddb7bb10ef03cc536893546ed1e96358072dbf78e3795b7e68408df2e42645c",
+      "project_identity": "local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910",
+      "line_start": 25,
+      "line_end": 27,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/b976be5510a80996bc4b0323"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 4749,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "diagnostic-unverified",
+    "calibration_status": "diagnostic_unverified",
+    "candidate_units": 7,
+    "selected_units": 7,
+    "delivered_rows": 7,
+    "scan_complete": true,
+    "model_pairs": 7,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 7,
+      "hydrated_sections": 7,
+      "selected_units": 7,
+      "delivered_spans": 7
+    },
+    "minimal_semantic": {
+      "scores": [
+        {
+          "identity": "unit-f597b9a340c8205bdaec9e3be3347caf9ade37bad1edd6aa04d76fd0495e64eb",
+          "score": -5.375772953033447,
+          "pairs": 1,
+          "body_tokens": 16,
+          "ancestor_tokens": 4,
+          "body_token_coverage": [
+            0,
+            16
+          ],
+          "body_character_extent": [
+            1,
+            82
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 104,
+          "body_char_start": 20,
+          "heading_path": [
+            "Reservoir station"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-e40f6271cb0204546f83513b0ff550ea76936ae1350e24fd1ad6e1f24b0fd6fd",
+          "score": 1.4641504287719727,
+          "pairs": 1,
+          "body_tokens": 34,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            34
+          ],
+          "body_character_extent": [
+            1,
+            163
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 104,
+          "char_end": 280,
+          "body_char_start": 115,
+          "heading_path": [
+            "Reservoir station",
+            "Restart"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-4f1c500bcc5e0847c8719b0d653fd39f4877ac9f87d78f6ab680c001d0bdd418",
+          "score": 3.8619515895843506,
+          "pairs": 1,
+          "body_tokens": 31,
+          "ancestor_tokens": 62,
+          "body_token_coverage": [
+            0,
+            31
+          ],
+          "body_character_extent": [
+            1,
+            136
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 280,
+          "char_end": 433,
+          "body_char_start": 295,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Inspection"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-4c9eece8c7c03d5272568b12948d1b7f4ef1cf3020f0c2cf6858df19fd5bd392",
+          "score": 1.7310738563537598,
+          "pairs": 1,
+          "body_tokens": 36,
+          "ancestor_tokens": 63,
+          "body_token_coverage": [
+            0,
+            36
+          ],
+          "body_character_extent": [
+            1,
+            158
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 433,
+          "char_end": 613,
+          "body_char_start": 453,
+          "heading_path": [
+            "Reservoir station",
+            "Restart",
+            "Indicator lamps"
+          ],
+          "line_start": 13,
+          "line_end": 16,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-fcb28837ca78bbd18764d65ea6c06f55110cf04c65213edf646d0ca5227f3ac5",
+          "score": 6.27423620223999,
+          "pairs": 1,
+          "body_tokens": 45,
+          "ancestor_tokens": 25,
+          "body_token_coverage": [
+            0,
+            45
+          ],
+          "body_character_extent": [
+            1,
+            193
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 4,
+          "char_start": 613,
+          "char_end": 825,
+          "body_char_start": 630,
+          "heading_path": [
+            "Reservoir station",
+            "Frozen intake"
+          ],
+          "line_start": 17,
+          "line_end": 20,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-65b075b8745ce235accd3230b21e5375175311c3e92481528ac0a17b0a41d6cf",
+          "score": -6.676738262176514,
+          "pairs": 1,
+          "body_tokens": 28,
+          "ancestor_tokens": 24,
+          "body_token_coverage": [
+            0,
+            28
+          ],
+          "body_character_extent": [
+            1,
+            120
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 5,
+          "char_start": 825,
+          "char_end": 965,
+          "body_char_start": 843,
+          "heading_path": [
+            "Reservoir station",
+            "Ledger storage"
+          ],
+          "line_start": 21,
+          "line_end": 24,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        },
+        {
+          "identity": "unit-e8f44864988ed30b0bac081a6e196ce234328f212e15a239977c21d9bbc99dfd",
+          "score": -7.162359237670898,
+          "pairs": 1,
+          "body_tokens": 25,
+          "ancestor_tokens": 23,
+          "body_token_coverage": [
+            0,
+            25
+          ],
+          "body_character_extent": [
+            1,
+            106
+          ],
+          "path": "reservoir.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910:reservoir.md\",\"scope\":{\"project_id\":\"local:fa2c03151dd5362cb3fcf7eb3037b5ff95d9db79a25257d9cccab51206927910\",\"snapshot_id\":\"gen-30badba3e4664524af349861d2d25db9\",\"version\":\"\"}}}",
+          "section_index": 6,
+          "char_start": 965,
+          "char_end": 1090,
+          "body_char_start": 983,
+          "heading_path": [
+            "Reservoir station",
+            "Cabinet finish"
+          ],
+          "line_start": 25,
+          "line_end": 27,
+          "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+        }
+      ],
+      "receipt": {
+        "recipe": "complete-maxp-token-overlap-v1",
+        "status": "complete",
+        "units": 7,
+        "model_pairs": 7,
+        "model_forwards": 7,
+        "model_input_tokens": 684,
+        "inference_seconds": 0.06451245300195296,
+        "model_load_attempts": 0,
+        "model_loads": 0,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          31
+        ],
+        "total_seconds": 0.068408671002544
+      }
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "77d72d8830d2a8c19a1ad0c1255309e8c90c2567888d37098caa11b1bf5cbfd8"
+  }
+}

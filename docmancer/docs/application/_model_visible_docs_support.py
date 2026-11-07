@@ -27,8 +27,10 @@ def _docs_source(item: dict[str, Any], *, evidence_id: str | None = None,
         snippet = snippet.get("code") or snippet.get("text") or snippet.get("content")
     snippet = str(snippet or "")
     version = str(item.get("version_binding") or item.get("version") or item.get("requested_version") or "unversioned")
-    if (not path or not snippet.strip() or len(path) > 500 or len(section) > 300
-        or len(version) > 100):
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if (not path or not snippet.strip() or
+        (not minimal_context_enabled() and
+         (len(path) > 500 or len(section) > 300 or len(version) > 100))):
         return None
     digest = public._source_digest(item)
     identity = canonical_projection_bytes({"path": path, "section": section, "sha256": digest})

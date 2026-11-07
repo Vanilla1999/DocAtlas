@@ -1,0 +1,94 @@
+{
+  "seconds": 0.13285153699689545,
+  "expected_paths": [
+    "optics.md"
+  ],
+  "indexed_paths": [
+    "optics.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-92e579d2d4de68ba877632b4ed3a42038607b8ca",
+      "source_path": "optics.md",
+      "display_text": "# Meridian mirror workshop\n\nThis handbook covers the workshop's removable observatory mirrors. It does not prescribe work on permanently mounted lenses.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-6b4b66830863190c9ca93e409a937b5996290ad0",
+      "source_path": "optics.md",
+      "display_text": "## Packing a mirror\n\nUse this procedure only for a cooled, removable mirror. The [crack restriction](#crack-restriction) applies even after packing is complete.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-c026f6adb9e571b476603ac35a904d94992af7b7",
+      "source_path": "optics.md",
+      "display_text": "### Cooling\n\nLeave the mirror on its padded bench for forty minutes before wrapping it. Do not start wrapping while the surface remains warmer than the room.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-ed19074113ee682f1a28bfcbb1f4153acd133088",
+      "source_path": "optics.md",
+      "display_text": "### Wrapping\n\nPlace acid-free tissue against the reflective face, followed by a rigid cover. Never put adhesive tape directly on the reflective coating.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-668e7b64a3649956f0efde217ff6280053f59714",
+      "source_path": "optics.md",
+      "display_text": "### Crate closure\n\nFasten both brass latches and have a second technician record the crate number before moving it to dispatch.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-70fb117192b6d3674b610f6699e56d09310b6e61",
+      "source_path": "optics.md",
+      "display_text": "### Bench accessories\n\nThe bench pencil cup is violet. Replacement pencils are stored in drawer six; their colour is not an inspection result.\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-1ee3e0524cc468ad897385511b7e8e8ff4e911b5",
+      "source_path": "optics.md",
+      "display_text": "## Crack restriction\n\nA mirror with a visible edge crack must remain in the inspection room, even if both crate latches are fastened. Obtain the optics supervisor's written release before moving that mirror to dispatch.\n\n",
+      "line_start": 25,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-60acbfe6bf4596fd2ef6851e60be971f6c75e575",
+      "source_path": "optics.md",
+      "display_text": "## Tea cupboard\n\nThe staff tea cupboard is restocked on Thursdays. Spare mugs belong on its lower shelf.\n",
+      "line_start": 29,
+      "line_end": 31
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "72c4aaa390fa5d392d43e4759d9657c615752ab01afeba5614a44d84c14688ed",
+  "storage_path": "/tmp/docatlas-evidence-67mm2e9g/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-b0c8f9322256469a98bdf1e9b4163fc5",
+  "catalog_sha256": "f3a7dfbeff1c8bc4e9f67d160e71d6d4e75200f93b16b4e5b90f8141e49f8260",
+  "documents": [
+    {
+      "path": "optics.md",
+      "content_sha256": "cc3b0692abfadc559695f8b8a349c89c606b7979c061a7f6bbcb97a873b40d39",
+      "catalog_entry_hash": "sha256:51b61693072b5a385fe884693577c42caf5498427e5caa082094773d36cc19eb"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-b0c8f9322256469a98bdf1e9b4163fc5",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 8,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 8
+  }
+}

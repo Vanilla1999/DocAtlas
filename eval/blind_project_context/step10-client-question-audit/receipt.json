@@ -1,0 +1,33 @@
+{
+  "boundary": "real_OpenCode_transport_scripted_provider_no_DocAtlas_or_Terra",
+  "expected_question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+  "expected_sha256": "22aa9105536830f76ea8651e6dc3ae7c1780bd792023fa97f41650c6c8bd1e1a",
+  "version": "2.2.5",
+  "lanes": {
+    "cli": {
+      "session": "ses_e4e1d7ce1ffeEjKP0K4nEl9hFN",
+      "user_texts": [
+        "\"Что от меня ожидается, когда я отправляю pull request в DocAtlas?\""
+      ],
+      "persisted_exact": false,
+      "provider_requests": 1,
+      "provider_user_content": [
+        "\"Что от меня ожидается, когда я отправляю pull request в DocAtlas?\""
+      ],
+      "provider_exact": false
+    },
+    "api": {
+      "session": "ses_e4e1d7aebffe2nMNF03BflPLiN",
+      "user_texts": [
+        "Что от меня ожидается, когда я отправляю pull request в DocAtlas?"
+      ],
+      "persisted_exact": true,
+      "provider_requests": 1,
+      "provider_user_content": [
+        "Что от меня ожидается, когда я отправляю pull request в DocAtlas?"
+      ],
+      "provider_exact": true
+    }
+  },
+  "historical_user_question_exact": false
+}

@@ -1,0 +1,4730 @@
+{
+  "chunks": [
+    {
+      "source": "weather.md",
+      "chunk_index": 2,
+      "text": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n",
+      "score": 1.341329762843884,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "weather.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Indoor instrument",
+        "section_level": 2,
+        "document_title": "weather",
+        "document_title_hash": "f98669cc9b81fea7",
+        "anchor": "Weather decisions > Indoor instrument",
+        "content_hash": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+        "retrieval_content_hash": "82426bbbcbfe4c0c56fa12ffd05eca931d58e9bdf2663ba47d7806f01be5f4da",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "6e637ef644c2d69eba1dd5fe144073400cd5bcf94a8a79ef910530bc5fc5703c",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "6e637ef644c2d69eba1dd5fe144073400cd5bcf94a8a79ef910530bc5fc5703c",
+          "token_estimate": 63,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "weather",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "weather.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Weather decisions > Indoor instrument",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "82426bbbcbfe4c0c56fa12ffd05eca931d58e9bdf2663ba47d7806f01be5f4da",
+        "stable_chunk_id": "child-596cc794616be76c12cacbe7aa7e266ce718ac64",
+        "vector_id": "39e2b6db-7313-5b94-b0f1-70dcbf519f9f",
+        "parent_logical_id": "parent-8c8ada59c6b1edfba71128e3868abfdf",
+        "atom_type": "mixed",
+        "atom_id": "atom-462aa2b642fc591dbfe6645ee1456ff8",
+        "source_identity": "project_file:weather.md",
+        "source_content_hash": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "heading_path": [
+          "Weather decisions",
+          "Indoor instrument"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          306,
+          547
+        ],
+        "byte_span": [
+          306,
+          547
+        ],
+        "line_span": [
+          9,
+          12
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 61,
+        "retrieval_token_estimate": 175,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "context_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 306,
+            "char_end": 547,
+            "display_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+            "description": "An explicitly indoor-classified instrument may continue during wind suspension if its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification.",
+            "description_sha256": "0a2a11be3694976d0ee8e9bf9c4ebf90c925e08babe6d881a71e1b06f8d9589f"
+          },
+          "status": "appended"
+        },
+        "title": "Indoor instrument",
+        "section_id": 1960443627724552551,
+        "token_estimate": 61,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-596cc794616be76c12cacbe7aa7e266ce718ac64",
+          "section_id": 1960443627724552551,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.341329762843884
+          },
+          "base_utility": 1.341329762843884,
+          "feature_contributions": {},
+          "final_utility": 1.341329762843884,
+          "raw_rank": 1,
+          "final_rank": 1,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "wind",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 6,
+          "match_ratio": 0.375,
+          "content_lexical_cost": -1.341329762843884,
+          "lexical_score": 1.341329762843884,
+          "field_matches": {
+            "title": [
+              "indoor",
+              "instrument"
+            ],
+            "body": [
+              "wind",
+              "may",
+              "an",
+              "indoor",
+              "instrument",
+              "continue"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 1
+          },
+          "pre_post_rank": 1,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 1
+        }
+      }
+    },
+    {
+      "source": "weather.md",
+      "chunk_index": 1,
+      "text": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+      "score": 1.228430090916856,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "weather.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Suspension",
+        "section_level": 2,
+        "document_title": "weather",
+        "document_title_hash": "f98669cc9b81fea7",
+        "anchor": "Weather decisions > Suspension",
+        "content_hash": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+        "retrieval_content_hash": "294511d0ff6f5caaad1e7b4ec2c95f7fb142343adf4776e2461d966de838b08d",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "82d444e88502878859c6421f5a256ce3776b26045d3257961b546d148b914b43",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "82d444e88502878859c6421f5a256ce3776b26045d3257961b546d148b914b43",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "weather",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "weather.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Weather decisions > Suspension",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "294511d0ff6f5caaad1e7b4ec2c95f7fb142343adf4776e2461d966de838b08d",
+        "stable_chunk_id": "child-ead304d0f2b72b86f0d560747c726599b9035b38",
+        "vector_id": "df425d01-7f99-5db4-a574-594dc18f5a36",
+        "parent_logical_id": "parent-100124edf801718a63f2348f0aaced89",
+        "atom_type": "mixed",
+        "atom_id": "atom-a3f251f4911d92375213bcbd15d94e7a",
+        "source_identity": "project_file:weather.md",
+        "source_content_hash": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "heading_path": [
+          "Weather decisions",
+          "Suspension"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          89,
+          306
+        ],
+        "byte_span": [
+          89,
+          306
+        ],
+        "line_span": [
+          5,
+          8
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 55,
+        "retrieval_token_estimate": 166,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "context_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 89,
+            "char_end": 306,
+            "display_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+            "description": "An open wind interlock requires suspending outdoor observations while preserving reservation identifiers. Resumption requires the interlock to close and the duty operator to record restart approval.",
+            "description_sha256": "7864ecde0f2aef39a89f97c92cf42e99210455751ce8995cb6041198e5fd2b6a"
+          },
+          "status": "appended"
+        },
+        "title": "Suspension",
+        "section_id": 1773093776197140054,
+        "token_estimate": 55,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-ead304d0f2b72b86f0d560747c726599b9035b38",
+          "section_id": 1773093776197140054,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.228430090916856
+          },
+          "base_utility": 1.228430090916856,
+          "feature_contributions": {},
+          "final_utility": 1.228430090916856,
+          "raw_rank": 2,
+          "final_rank": 2,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "when",
+            "wind",
+            "observations",
+            "restart",
+            "and"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 16,
+          "matched_term_count": 5,
+          "match_ratio": 0.3125,
+          "content_lexical_cost": -1.228430090916856,
+          "lexical_score": 1.228430090916856,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "when",
+              "wind",
+              "observations",
+              "restart",
+              "and"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 2
+          },
+          "pre_post_rank": 2,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 2
+        }
+      }
+    },
+    {
+      "source": "weather.md",
+      "chunk_index": 3,
+      "text": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "score": 1.2029778353442557,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "weather.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Forecast display",
+        "section_level": 2,
+        "document_title": "weather",
+        "document_title_hash": "f98669cc9b81fea7",
+        "anchor": "Weather decisions > Forecast display",
+        "content_hash": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+        "retrieval_content_hash": "4bc473e31710db0ae13ebfd6f0ea492d6d0dca2699efcedde360d1455b2705ac",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "ff5d24f8f001fd8895b7de41e5d8666f44665bd967d16d6eb6906398a461ea5a",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "ff5d24f8f001fd8895b7de41e5d8666f44665bd967d16d6eb6906398a461ea5a",
+          "token_estimate": 63,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "weather",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "weather.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Weather decisions > Forecast display",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "4bc473e31710db0ae13ebfd6f0ea492d6d0dca2699efcedde360d1455b2705ac",
+        "stable_chunk_id": "child-273ffddd7e511f92ce9a64d3c5c5c11d5c4c4c6b",
+        "vector_id": "d46d3282-02b7-516c-9691-15f5867887d9",
+        "parent_logical_id": "parent-114a852c09e788462c70d0c9eb99df76",
+        "atom_type": "mixed",
+        "atom_id": "atom-0c9d100b3e2916c93515144bbe25e586",
+        "source_identity": "project_file:weather.md",
+        "source_content_hash": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "heading_path": [
+          "Weather decisions",
+          "Forecast display"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          547,
+          696
+        ],
+        "byte_span": [
+          547,
+          696
+        ],
+        "line_span": [
+          13,
+          15
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 38,
+        "retrieval_token_estimate": 133,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "context_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 547,
+            "char_end": 696,
+            "display_sha256": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+            "description": "The forecast panel predicts wind for planning. A favourable forecast is neither an interlock signal nor authorization to restart.",
+            "description_sha256": "a28d96b627892e3d7bc091247b33856a968d9bd5a1e096ac2087069e15e17eb9"
+          },
+          "status": "appended"
+        },
+        "title": "Forecast display",
+        "section_id": 2309002587423490061,
+        "token_estimate": 38,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-273ffddd7e511f92ce9a64d3c5c5c11d5c4c4c6b",
+          "section_id": 2309002587423490061,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.2029778353442557
+          },
+          "base_utility": 1.2029778353442557,
+          "feature_contributions": {},
+          "final_utility": 1.2029778353442557,
+          "raw_rank": 3,
+          "final_rank": 3,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "wind",
+            "is",
+            "restart",
+            "and",
+            "an"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 5,
+          "match_ratio": 0.3125,
+          "content_lexical_cost": -1.2029778353442557,
+          "lexical_score": 1.2029778353442557,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "wind",
+              "is",
+              "restart",
+              "and",
+              "an"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 3
+          },
+          "pre_post_rank": 3,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 3
+        }
+      }
+    },
+    {
+      "source": "reservations.md",
+      "chunk_index": 3,
+      "text": "## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+      "score": 1.1254248308910513,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "reservations.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Training slots",
+        "section_level": 2,
+        "document_title": "reservations",
+        "document_title_hash": "c62a93b580aee9f1",
+        "anchor": "Confirmed reservations > Training slots",
+        "content_hash": "5f99a2452b1953505685e5a7051250f6683b537aa0d2ef332815dfff5ed1e2ec",
+        "retrieval_content_hash": "f3d4ea9a62559c6a7320b500b0902996ea8316af38b6153f513a4a0566af267b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "9dc0a8d30b0a643f2221507934fb8584c34adde5e0a8a288b6bc0edd49151ce6",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "9dc0a8d30b0a643f2221507934fb8584c34adde5e0a8a288b6bc0edd49151ce6",
+          "token_estimate": 66,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "reservations",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "reservations.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Confirmed reservations > Training slots",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "f3d4ea9a62559c6a7320b500b0902996ea8316af38b6153f513a4a0566af267b",
+        "stable_chunk_id": "child-1c912da0a84232df5ab6c1ef0613841d2349c343",
+        "vector_id": "e85d9b88-9160-522b-8043-bae65a0aa047",
+        "parent_logical_id": "parent-2daa53056a1c33b9d26fae6e1500b3d8",
+        "atom_type": "mixed",
+        "atom_id": "atom-2fbafb5ec2c112086de134584942666c",
+        "source_identity": "project_file:reservations.md",
+        "source_content_hash": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "heading_path": [
+          "Confirmed reservations",
+          "Training slots"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          709,
+          884
+        ],
+        "byte_span": [
+          709,
+          884
+        ],
+        "line_span": [
+          15,
+          17
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 44,
+        "retrieval_token_estimate": 148,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "reservations.md",
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "context_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 709,
+            "char_end": 884,
+            "display_sha256": "5f99a2452b1953505685e5a7051250f6683b537aa0d2ef332815dfff5ed1e2ec",
+            "description": "An instructor may reassign daytime training slots without the night-time approval workflow. This shortcut does not apply to confirmed observations.",
+            "description_sha256": "cefa81dfcfe847fea550b2497b6c4ea5b0b96659cc2912240d127e0faa0cb65c"
+          },
+          "status": "appended"
+        },
+        "title": "Training slots",
+        "section_id": 166904906401015518,
+        "token_estimate": 44,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-1c912da0a84232df5ab6c1ef0613841d2349c343",
+          "section_id": 166904906401015518,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.1254248308910513
+          },
+          "base_utility": 1.1254248308910513,
+          "feature_contributions": {},
+          "final_utility": 1.1254248308910513,
+          "raw_rank": 4,
+          "final_rank": 4,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "observations",
+            "to",
+            "an"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.1254248308910513,
+          "lexical_score": 1.1254248308910513,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "observations",
+              "to",
+              "an"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 4
+          },
+          "pre_post_rank": 4,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 4
+        }
+      }
+    },
+    {
+      "source": "architecture.md",
+      "chunk_index": 1,
+      "text": "## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n",
+      "score": 1.1078989703792481,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "architecture.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Planner",
+        "section_level": 2,
+        "document_title": "architecture",
+        "document_title_hash": "f380cbcd9a79a4ea",
+        "anchor": "Scheduler architecture > Planner",
+        "content_hash": "92721039461460ccff2809111f117b407d75f9ee85956e2011f0c8bd693f10f4",
+        "retrieval_content_hash": "ac9e0bd709dc9aaf42a5a228c83c36a16717c9241d589c313daffb6c6b015374",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "caa9b1fbe2fa7324fc15f873a95de62e6cfd0d0bc868bb4cdd1d7fd72f0a98d2",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "caa9b1fbe2fa7324fc15f873a95de62e6cfd0d0bc868bb4cdd1d7fd72f0a98d2",
+          "token_estimate": 65,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "architecture",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "architecture.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Scheduler architecture > Planner",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "ac9e0bd709dc9aaf42a5a228c83c36a16717c9241d589c313daffb6c6b015374",
+        "stable_chunk_id": "child-8085fb3214d0a3a3fee3adf091dde0ca684c1c25",
+        "vector_id": "a1037ab9-1d86-5f30-a473-8984317257aa",
+        "parent_logical_id": "parent-fdb79706b74bdfb78b76bfd2cc2b46ac",
+        "atom_type": "mixed",
+        "atom_id": "atom-97f000de272c649c9f6d5459f5fa7652",
+        "source_identity": "project_file:architecture.md",
+        "source_content_hash": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+        "heading_path": [
+          "Scheduler architecture",
+          "Planner"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          121,
+          360
+        ],
+        "byte_span": [
+          121,
+          360
+        ],
+        "line_span": [
+          5,
+          8
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 60,
+        "retrieval_token_estimate": 174,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "architecture.md",
+          "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "context_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 121,
+            "char_end": 360,
+            "display_sha256": "92721039461460ccff2809111f117b407d75f9ee85956e2011f0c8bd693f10f4",
+            "description": "The planner resolves interval conflicts using instrument availability and reservation priority, even while execution is suspended. A computed plan cannot bypass a weather interlock or clock check.",
+            "description_sha256": "beddfe1d52448c640d2811d63b501b5365c83fc6d0bc15890866a84a920dae8e"
+          },
+          "status": "appended"
+        },
+        "title": "Planner",
+        "section_id": 6139623375622351735,
+        "token_estimate": 60,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-8085fb3214d0a3a3fee3adf091dde0ca684c1c25",
+          "section_id": 6139623375622351735,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.1078989703792481
+          },
+          "base_utility": 1.1078989703792481,
+          "feature_contributions": {},
+          "final_utility": 1.1078989703792481,
+          "raw_rank": 5,
+          "final_rank": 5,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "is",
+            "to",
+            "and",
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 4,
+          "match_ratio": 0.25,
+          "content_lexical_cost": -1.1078989703792481,
+          "lexical_score": 1.1078989703792481,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "is",
+              "to",
+              "and",
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 5
+          },
+          "pre_post_rank": 5,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 5
+        }
+      }
+    },
+    {
+      "source": "architecture.md",
+      "chunk_index": 2,
+      "text": "## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n",
+      "score": 1.1036672730599828,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "architecture.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Prototype recovery",
+        "section_level": 2,
+        "document_title": "architecture",
+        "document_title_hash": "f380cbcd9a79a4ea",
+        "anchor": "Scheduler architecture > Prototype recovery",
+        "content_hash": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+        "retrieval_content_hash": "10dd551b306bac4cfc907f3a1a0ecd2ebccbc88e3956bb122f6d0fb8e35bdc13",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "d0591c69482c04b554d5c3bda5c9b7261a887e289af4bb3e47caad365fa8a6fb",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "d0591c69482c04b554d5c3bda5c9b7261a887e289af4bb3e47caad365fa8a6fb",
+          "token_estimate": 67,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "architecture",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "architecture.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Scheduler architecture > Prototype recovery",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "10dd551b306bac4cfc907f3a1a0ecd2ebccbc88e3956bb122f6d0fb8e35bdc13",
+        "stable_chunk_id": "child-1d8a68cc19497c5a00245abbec17f93eec2fa0dc",
+        "vector_id": "26923662-e970-5c7a-9add-6a22d6f9491e",
+        "parent_logical_id": "parent-dd47886d232c751fa28a1a7744276bf8",
+        "atom_type": "mixed",
+        "atom_id": "atom-bbcff5f4be0363b962f87c6b437c8ce8",
+        "source_identity": "project_file:architecture.md",
+        "source_content_hash": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+        "heading_path": [
+          "Scheduler architecture",
+          "Prototype recovery"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          360,
+          565
+        ],
+        "byte_span": [
+          360,
+          565
+        ],
+        "line_span": [
+          9,
+          11
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 52,
+        "retrieval_token_estimate": 163,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "architecture.md",
+          "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "context_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 360,
+            "char_end": 565,
+            "display_sha256": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+            "description": "The retired prototype cleared pending reservations on time drift and restarted on its first local clock sample. These behaviours must not be used for current gateway recovery.",
+            "description_sha256": "530a1141e213110fb4c67f355a7397d123f0fb08b3f08713b33074a853171890"
+          },
+          "status": "appended"
+        },
+        "title": "Prototype recovery",
+        "section_id": 925168766152420420,
+        "token_estimate": 52,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-1d8a68cc19497c5a00245abbec17f93eec2fa0dc",
+          "section_id": 925168766152420420,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.1036672730599828
+          },
+          "base_utility": 1.1036672730599828,
+          "feature_contributions": {},
+          "final_utility": 1.1036672730599828,
+          "raw_rank": 6,
+          "final_rank": 6,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "when",
+            "to",
+            "and"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.1036672730599828,
+          "lexical_score": 1.1036672730599828,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "when",
+              "to",
+              "and"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 6
+          },
+          "pre_post_rank": 6,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 6
+        }
+      }
+    },
+    {
+      "source": "calendar.md",
+      "chunk_index": 2,
+      "text": "## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n",
+      "score": 1.1021443238089426,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "calendar.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Timezones",
+        "section_level": 2,
+        "document_title": "calendar",
+        "document_title_hash": "e4ffacba5591440a",
+        "anchor": "Calendar display > Timezones",
+        "content_hash": "e3db38f0b8fa7571db9f7fa429783c28622ed79086cf3d9b41a55db2c3b2005f",
+        "retrieval_content_hash": "b3a58b2c1cd49596ddaa5e377a7bafce93d47d1ffecbe4ecb68e856302895cba",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "c4c806db0f8177cb7dacaea4ee70a0ca00eaf4bc634407d1c483a554e0f643a9",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "c4c806db0f8177cb7dacaea4ee70a0ca00eaf4bc634407d1c483a554e0f643a9",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "calendar",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "calendar.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Calendar display > Timezones",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "b3a58b2c1cd49596ddaa5e377a7bafce93d47d1ffecbe4ecb68e856302895cba",
+        "stable_chunk_id": "child-9ba47365641f04330ab8aefa57942ff8b0a6b05b",
+        "vector_id": "2fa34109-ae58-55a9-8abd-7e9b94d09c8a",
+        "parent_logical_id": "parent-ecd81a54451980974ded9aee46ce3692",
+        "atom_type": "mixed",
+        "atom_id": "atom-65251030ebb388e77cf304795fd7d651",
+        "source_identity": "project_file:calendar.md",
+        "source_content_hash": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "heading_path": [
+          "Calendar display",
+          "Timezones"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          340,
+          538
+        ],
+        "byte_span": [
+          340,
+          538
+        ],
+        "line_span": [
+          9,
+          11
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 50,
+        "retrieval_token_estimate": 153,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "calendar.md",
+          "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "context_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 340,
+            "char_end": 538,
+            "display_sha256": "e3db38f0b8fa7571db9f7fa429783c28622ed79086cf3d9b41a55db2c3b2005f",
+            "description": "Observers can view a reservation in different timezones without changing its stored start time or identifier. Calendar export is a view rather than a gateway command.",
+            "description_sha256": "5fa0c41329278dbff70051c3038269c369ebe9caad3e1da38cefd85926009117"
+          },
+          "status": "appended"
+        },
+        "title": "Timezones",
+        "section_id": 1083034498719398011,
+        "token_estimate": 50,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-9ba47365641f04330ab8aefa57942ff8b0a6b05b",
+          "section_id": 1083034498719398011,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.1021443238089426
+          },
+          "base_utility": 1.1021443238089426,
+          "feature_contributions": {},
+          "final_utility": 1.1021443238089426,
+          "raw_rank": 7,
+          "final_rank": 7,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "is",
+            "and",
+            "may"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.1021443238089426,
+          "lexical_score": 1.1021443238089426,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "is",
+              "and",
+              "may"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 7
+          },
+          "pre_post_rank": 7,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 7
+        }
+      }
+    },
+    {
+      "source": "calendar.md",
+      "chunk_index": 0,
+      "text": "# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n",
+      "score": 1.0863072319184532,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "calendar.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Calendar display",
+        "section_level": 1,
+        "document_title": "calendar",
+        "document_title_hash": "e4ffacba5591440a",
+        "anchor": "Calendar display",
+        "content_hash": "7d60a4fa66e4609132a3693811e06c273674bb2be6f5e8f23f64afcb7cb4ec38",
+        "retrieval_content_hash": "3236ba6feef871f7cf796e4071229ffaec87cedf61bbf036e263bea9ac31f21b",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "b13626913ca81d4ed6faeaa6354b755749fa129455373e970506a8123fb9fca5",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "b13626913ca81d4ed6faeaa6354b755749fa129455373e970506a8123fb9fca5",
+          "token_estimate": 59,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "calendar",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "calendar.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Calendar display",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "3236ba6feef871f7cf796e4071229ffaec87cedf61bbf036e263bea9ac31f21b",
+        "stable_chunk_id": "child-391594e73f4b0f98d643831b7fd28598c12aff7d",
+        "vector_id": "18785e29-1570-5c17-8abb-b268d3208c5f",
+        "parent_logical_id": "parent-9556d22bf15be56d7d2e9ba5c4e03769",
+        "atom_type": "mixed",
+        "atom_id": "atom-4b53dbbed43484ed1efb152aaca1b57a",
+        "source_identity": "project_file:calendar.md",
+        "source_content_hash": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "heading_path": [
+          "Calendar display"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          97
+        ],
+        "byte_span": [
+          0,
+          97
+        ],
+        "line_span": [
+          1,
+          4
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 25,
+        "retrieval_token_estimate": 104,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "calendar.md",
+          "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "context_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 0,
+            "char_end": 97,
+            "display_sha256": "7d60a4fa66e4609132a3693811e06c273674bb2be6f5e8f23f64afcb7cb4ec38",
+            "description": "The calendar provides a read-only projection of reservation and instrument state.",
+            "description_sha256": "332c82010574d2187b5c2c1824769f63b90b2e6ad18c02a40c237136e41c6840"
+          },
+          "status": "appended"
+        },
+        "title": "Calendar display",
+        "section_id": 9069662225189349163,
+        "token_estimate": 25,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-391594e73f4b0f98d643831b7fd28598c12aff7d",
+          "section_id": 9069662225189349163,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0863072319184532
+          },
+          "base_utility": 1.0863072319184532,
+          "feature_contributions": {},
+          "final_utility": 1.0863072319184532,
+          "raw_rank": 8,
+          "final_rank": 8,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "is",
+            "and",
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.0863072319184532,
+          "lexical_score": 1.0863072319184532,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "is",
+              "and",
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 8
+          },
+          "pre_post_rank": 8,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 8
+        }
+      }
+    },
+    {
+      "source": "reservations.md",
+      "chunk_index": 2,
+      "text": "## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n",
+      "score": 1.0801002627817826,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "reservations.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Locked instrument",
+        "section_level": 2,
+        "document_title": "reservations",
+        "document_title_hash": "c62a93b580aee9f1",
+        "anchor": "Confirmed reservations > Locked instrument",
+        "content_hash": "6818b4616a76497f549ae45d760110948783427bc0515e1a0c276a0ca2f0a3ad",
+        "retrieval_content_hash": "df578045736ad4c66a3c385e38c8283479bc51faeb441a2f3085852fd207bfde",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "f497767c656b2ac0d6c3825c5fcc0982010677be01183b73a630edf2dda4acaa",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "f497767c656b2ac0d6c3825c5fcc0982010677be01183b73a630edf2dda4acaa",
+          "token_estimate": 67,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "reservations",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "reservations.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Confirmed reservations > Locked instrument",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "df578045736ad4c66a3c385e38c8283479bc51faeb441a2f3085852fd207bfde",
+        "stable_chunk_id": "child-167d806c93e4b69cbceaa2a115a322f38f57579c",
+        "vector_id": "7f49ca74-e676-54cc-b717-8feebeb59b6a",
+        "parent_logical_id": "parent-c379752531656880b8d71b96542c0064",
+        "atom_type": "mixed",
+        "atom_id": "atom-45aed4c201a29fb2cf89d2b051adc69d",
+        "source_identity": "project_file:reservations.md",
+        "source_content_hash": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "heading_path": [
+          "Confirmed reservations",
+          "Locked instrument"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          500,
+          709
+        ],
+        "byte_span": [
+          500,
+          709
+        ],
+        "line_span": [
+          11,
+          14
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 53,
+        "retrieval_token_estimate": 161,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "reservations.md",
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "context_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 500,
+            "char_end": 709,
+            "display_sha256": "6818b4616a76497f549ae45d760110948783427bc0515e1a0c276a0ca2f0a3ad",
+            "description": "An active instrument maintenance lock keeps a transfer pending even after observer acceptance and operator approval. The instrument team must clear the lock first.",
+            "description_sha256": "7de71139c9674a385e979e106a3e83f2e6b9924a56acdce1ccafbfae97e283af"
+          },
+          "status": "appended"
+        },
+        "title": "Locked instrument",
+        "section_id": 7493267796231968118,
+        "token_estimate": 53,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-167d806c93e4b69cbceaa2a115a322f38f57579c",
+          "section_id": 7493267796231968118,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0801002627817826
+          },
+          "base_utility": 1.0801002627817826,
+          "feature_contributions": {},
+          "final_utility": 1.0801002627817826,
+          "raw_rank": 9,
+          "final_rank": 9,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "and",
+            "an",
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.0801002627817826,
+          "lexical_score": 1.0801002627817826,
+          "field_matches": {
+            "title": [
+              "instrument"
+            ],
+            "body": [
+              "and",
+              "an",
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 9
+          },
+          "pre_post_rank": 9,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 9
+        }
+      }
+    },
+    {
+      "source": "clock.md",
+      "chunk_index": 3,
+      "text": "## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n",
+      "score": 1.0736460243020542,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "clock.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Simulation clock",
+        "section_level": 2,
+        "document_title": "clock",
+        "document_title_hash": "83655a5560ef1c43",
+        "anchor": "Time coordination > Simulation clock",
+        "content_hash": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+        "retrieval_content_hash": "20286d34f1719ef014785c8de5d17c786edc1de13e3cd217e9243fb81eeb01ee",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "2e6c657ca2eef175329e2e66344483148b3c5f87e11123a4ab90ef669f708793",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "2e6c657ca2eef175329e2e66344483148b3c5f87e11123a4ab90ef669f708793",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "clock",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "clock.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Time coordination > Simulation clock",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "20286d34f1719ef014785c8de5d17c786edc1de13e3cd217e9243fb81eeb01ee",
+        "stable_chunk_id": "child-33c625ca554b5ce1b49ba01bf20c73f5b3fca8ec",
+        "vector_id": "d40045dd-bce4-5831-b4be-c784a19c089f",
+        "parent_logical_id": "parent-b3322d010b172e75df5fd22fb554be82",
+        "atom_type": "mixed",
+        "atom_id": "atom-4fe7a87dd93dfc84be64d6b0b081d692",
+        "source_identity": "project_file:clock.md",
+        "source_content_hash": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "heading_path": [
+          "Time coordination",
+          "Simulation clock"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          517,
+          681
+        ],
+        "byte_span": [
+          517,
+          681
+        ],
+        "line_span": [
+          13,
+          15
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 41,
+        "retrieval_token_estimate": 139,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "clock.md",
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "context_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 517,
+            "char_end": 681,
+            "display_sha256": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+            "description": "The simulator advances time manually without waiting for reference checks. Its accelerated clock is isolated from the real instrument gateway.",
+            "description_sha256": "9d6a510513a3fcab8651e2afff1fcdbf64725b39689aba8cbf84333806feb425"
+          },
+          "status": "appended"
+        },
+        "title": "Simulation clock",
+        "section_id": 7844006082432429843,
+        "token_estimate": 41,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-33c625ca554b5ce1b49ba01bf20c73f5b3fca8ec",
+          "section_id": 7844006082432429843,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0736460243020542
+          },
+          "base_utility": 1.0736460243020542,
+          "feature_contributions": {},
+          "final_utility": 1.0736460243020542,
+          "raw_rank": 10,
+          "final_rank": 10,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "is",
+            "and",
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.0736460243020542,
+          "lexical_score": 1.0736460243020542,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "is",
+              "and",
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 10
+          },
+          "pre_post_rank": 10,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 10
+        }
+      }
+    },
+    {
+      "source": "overview.md",
+      "chunk_index": 1,
+      "text": "## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n",
+      "score": 1.0713209722325339,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "overview.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Services",
+        "section_level": 2,
+        "document_title": "overview",
+        "document_title_hash": "fed758b7a842befd",
+        "anchor": "Meridian scheduler > Services",
+        "content_hash": "e32523001d60708a9c296836c3272f317db34062ac237d4f27e802974c17523a",
+        "retrieval_content_hash": "b89a7a7b1f7c846ed42ac3f9bb0cb11587ac28201e0a85aa239efd2ba64e12a4",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "9f18504aa0a1dcef76f682be40e4c6bc0ed364a14c293aa8b6d43a6163cd83dd",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "9f18504aa0a1dcef76f682be40e4c6bc0ed364a14c293aa8b6d43a6163cd83dd",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "overview",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "overview.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Meridian scheduler > Services",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "b89a7a7b1f7c846ed42ac3f9bb0cb11587ac28201e0a85aa239efd2ba64e12a4",
+        "stable_chunk_id": "child-f93a463b64c1183aae39384cb6e4b7c0268f1e10",
+        "vector_id": "7ad543bf-79df-5af8-80d7-e529ea19086b",
+        "parent_logical_id": "parent-fee3ea864c1e3ed281c3dbb504b526d4",
+        "atom_type": "mixed",
+        "atom_id": "atom-ea77e88a56140dcac93d545e7baa5b30",
+        "source_identity": "project_file:overview.md",
+        "source_content_hash": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+        "heading_path": [
+          "Meridian scheduler",
+          "Services"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          172,
+          372
+        ],
+        "byte_span": [
+          172,
+          372
+        ],
+        "line_span": [
+          5,
+          8
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 50,
+        "retrieval_token_estimate": 160,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "overview.md",
+          "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "context_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 172,
+            "char_end": 372,
+            "display_sha256": "e32523001d60708a9c296836c3272f317db34062ac237d4f27e802974c17523a",
+            "description": "The reservation service accepts requests, the planner assigns intervals, and the instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.",
+            "description_sha256": "57f73da1c9e9d5a49b95bdd9da736ff7cdc03c4e3538b3916017b33794006332"
+          },
+          "status": "appended"
+        },
+        "title": "Services",
+        "section_id": 7901224104359631226,
+        "token_estimate": 50,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-f93a463b64c1183aae39384cb6e4b7c0268f1e10",
+          "section_id": 7901224104359631226,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0713209722325339
+          },
+          "base_utility": 1.0713209722325339,
+          "feature_contributions": {},
+          "final_utility": 1.0713209722325339,
+          "raw_rank": 11,
+          "final_rank": 11,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "and",
+            "an",
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 3,
+          "match_ratio": 0.1875,
+          "content_lexical_cost": -1.0713209722325339,
+          "lexical_score": 1.0713209722325339,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "and",
+              "an",
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 11
+          },
+          "pre_post_rank": 11,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 11
+        }
+      }
+    },
+    {
+      "source": "architecture.md",
+      "chunk_index": 0,
+      "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n",
+      "score": 1.0614788205158197,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "architecture.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Scheduler architecture",
+        "section_level": 1,
+        "document_title": "architecture",
+        "document_title_hash": "f380cbcd9a79a4ea",
+        "anchor": "Scheduler architecture",
+        "content_hash": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+        "retrieval_content_hash": "ae11cef2c0eac88e3806d03cdaf7e336fe2189ae59bdddcc5bf0fc7ea2d64d84",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "89ffaad46a5543d00346eeb47a30a2cae1778cf63247dd08fb8b0ce6d70e08f3",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "89ffaad46a5543d00346eeb47a30a2cae1778cf63247dd08fb8b0ce6d70e08f3",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "architecture",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "architecture.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Scheduler architecture",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "ae11cef2c0eac88e3806d03cdaf7e336fe2189ae59bdddcc5bf0fc7ea2d64d84",
+        "stable_chunk_id": "child-eb4ec83164ef72682417025fcb734eb122985a32",
+        "vector_id": "0f30f0e8-28c7-5f77-9498-4b7b79fc9175",
+        "parent_logical_id": "parent-8a9b9b3e0de225c434b4ea754ee7bb98",
+        "atom_type": "mixed",
+        "atom_id": "atom-a8fe26d70aaee5aeb837206f4488f652",
+        "source_identity": "project_file:architecture.md",
+        "source_content_hash": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+        "heading_path": [
+          "Scheduler architecture"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          121
+        ],
+        "byte_span": [
+          0,
+          121
+        ],
+        "line_span": [
+          1,
+          4
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 31,
+        "retrieval_token_estimate": 119,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "architecture.md",
+          "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "context_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 0,
+            "char_end": 121,
+            "display_sha256": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+            "description": "Meridian separates ownership, planning, execution, and display so that they can restart independently.",
+            "description_sha256": "54c08c0e4aae0d4795251a0c30f1332ffbe95d647b9d905916308ff0669731ca"
+          },
+          "status": "appended"
+        },
+        "title": "Scheduler architecture",
+        "section_id": 5841698377264971419,
+        "token_estimate": 31,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-eb4ec83164ef72682417025fcb734eb122985a32",
+          "section_id": 5841698377264971419,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0614788205158197
+          },
+          "base_utility": 1.0614788205158197,
+          "feature_contributions": {},
+          "final_utility": 1.0614788205158197,
+          "raw_rank": 12,
+          "final_rank": 12,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "to",
+            "and"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 2,
+          "match_ratio": 0.125,
+          "content_lexical_cost": -1.0614788205158197,
+          "lexical_score": 1.0614788205158197,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "to",
+              "and"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 12
+          },
+          "pre_post_rank": 12,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 12
+        }
+      }
+    },
+    {
+      "source": "overview.md",
+      "chunk_index": 0,
+      "text": "# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n",
+      "score": 1.0576737950929966,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "overview.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Meridian scheduler",
+        "section_level": 1,
+        "document_title": "overview",
+        "document_title_hash": "fed758b7a842befd",
+        "anchor": "Meridian scheduler",
+        "content_hash": "d9f1563ffaf17d3b5bdbbfd49a84d9ab2c48a1ed9f4c4eec76d8ddd0475f19dc",
+        "retrieval_content_hash": "af33668ebc6678598c9b24af9cc9edaea8e20d6977caf99f35274c7181bc55be",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "df8b48e13bdef493005f6b26db4b50df72cdb2f8c46489899c428b63bf8cd710",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "df8b48e13bdef493005f6b26db4b50df72cdb2f8c46489899c428b63bf8cd710",
+          "token_estimate": 59,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "overview",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "overview.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Meridian scheduler",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "af33668ebc6678598c9b24af9cc9edaea8e20d6977caf99f35274c7181bc55be",
+        "stable_chunk_id": "child-ee0c4ce97fec0377925a64858f96dabde94ef0b6",
+        "vector_id": "45fd32d9-fced-56be-8ba8-a59373371c3a",
+        "parent_logical_id": "parent-a5a03672b1db88f3377c694e82aa093c",
+        "atom_type": "mixed",
+        "atom_id": "atom-d7b676a13e30f5ea34cf239140204668",
+        "source_identity": "project_file:overview.md",
+        "source_content_hash": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+        "heading_path": [
+          "Meridian scheduler"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          172
+        ],
+        "byte_span": [
+          0,
+          172
+        ],
+        "line_span": [
+          1,
+          4
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 43,
+        "retrieval_token_estimate": 141,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "overview.md",
+          "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "context_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 0,
+            "char_end": 172,
+            "display_sha256": "d9f1563ffaf17d3b5bdbbfd49a84d9ab2c48a1ed9f4c4eec76d8ddd0475f19dc",
+            "description": "Meridian schedules shared observatory instruments. The reservation rules concern confirmed night-time observations rather than daytime training sessions.",
+            "description_sha256": "87e6ffea5d12147d3199513a49998fd86a13664790cf05bf0bb2f3e7e0f8c37e"
+          },
+          "status": "appended"
+        },
+        "title": "Meridian scheduler",
+        "section_id": 4658274921949474324,
+        "token_estimate": 43,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-ee0c4ce97fec0377925a64858f96dabde94ef0b6",
+          "section_id": 4658274921949474324,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0576737950929966
+          },
+          "base_utility": 1.0576737950929966,
+          "feature_contributions": {},
+          "final_utility": 1.0576737950929966,
+          "raw_rank": 13,
+          "final_rank": 13,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "observations"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 1,
+          "match_ratio": 0.0625,
+          "content_lexical_cost": -1.0576737950929966,
+          "lexical_score": 1.0576737950929966,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "observations"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 13
+          },
+          "pre_post_rank": 13,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 13
+        }
+      }
+    },
+    {
+      "source": "reservations.md",
+      "chunk_index": 0,
+      "text": "# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n",
+      "score": 1.0516061879738259,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "reservations.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Confirmed reservations",
+        "section_level": 1,
+        "document_title": "reservations",
+        "document_title_hash": "c62a93b580aee9f1",
+        "anchor": "Confirmed reservations",
+        "content_hash": "a0ce59b3d3a5fad6548716d80e96c7f49bb96c53007d0028e0209129924c66f4",
+        "retrieval_content_hash": "2d862b7bf42e48cec5c98c220ad159e7c5ef0d22a75c7ec8a076ee0d8700f336",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "bddad9402851a1a2373a8801418901dcccea780977d7d6518ba104db12f54697",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "bddad9402851a1a2373a8801418901dcccea780977d7d6518ba104db12f54697",
+          "token_estimate": 69,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "reservations",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "reservations.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Confirmed reservations",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "symbol_aliases",
+              "value": "calendar.md",
+              "provenance": "source.display_text.symbol_extractor",
+              "priority": 110
+            }
+          ]
+        },
+        "embedding_input_hash": "2d862b7bf42e48cec5c98c220ad159e7c5ef0d22a75c7ec8a076ee0d8700f336",
+        "stable_chunk_id": "child-a53280a993fb9b4c4a428985744b6a2fcd00f020",
+        "vector_id": "44909c38-bb22-59bf-a3cb-4338e48fc2eb",
+        "parent_logical_id": "parent-4ff487cb057829740d01dd67f85541cf",
+        "atom_type": "mixed",
+        "atom_id": "atom-778e9a2b8dc3dc9031210776a290cf5b",
+        "source_identity": "project_file:reservations.md",
+        "source_content_hash": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "heading_path": [
+          "Confirmed reservations"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          209
+        ],
+        "byte_span": [
+          0,
+          209
+        ],
+        "line_span": [
+          1,
+          6
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 53,
+        "retrieval_token_estimate": 166,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "reservations.md",
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "context_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 0,
+            "char_end": 209,
+            "display_sha256": "a0ce59b3d3a5fad6548716d80e96c7f49bb96c53007d0028e0209129924c66f4",
+            "description": "The reservation rules apply to confirmed night-time reservations on shared instruments. An orientation link points to the calendar colour legend from the reservation console.",
+            "description_sha256": "1b7c660cfb8c7b3f00ac2fbb0f2773ee6e1695bad2bf99f6ef03413d167df5ba"
+          },
+          "status": "appended"
+        },
+        "title": "Confirmed reservations",
+        "section_id": 740924192531068043,
+        "token_estimate": 53,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-a53280a993fb9b4c4a428985744b6a2fcd00f020",
+          "section_id": 740924192531068043,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0516061879738259
+          },
+          "base_utility": 1.0516061879738259,
+          "feature_contributions": {},
+          "final_utility": 1.0516061879738259,
+          "raw_rank": 14,
+          "final_rank": 14,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "to"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 1,
+          "match_ratio": 0.0625,
+          "content_lexical_cost": -1.0516061879738259,
+          "lexical_score": 1.0516061879738259,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "to"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 14
+          },
+          "pre_post_rank": 14,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 14
+        }
+      }
+    },
+    {
+      "source": "clock.md",
+      "chunk_index": 1,
+      "text": "## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n",
+      "score": 1.0388351084466376,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "clock.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Clock offset",
+        "section_level": 2,
+        "document_title": "clock",
+        "document_title_hash": "83655a5560ef1c43",
+        "anchor": "Time coordination > Clock offset",
+        "content_hash": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+        "retrieval_content_hash": "b30e411971f94493fd94986c1364dbccf1e66d9c254fcc14137d2ca20151b0c1",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "712c53ec746964ee600cd342d1427e88dc75cd5b48ee3abab7accfdde5119bdb",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "712c53ec746964ee600cd342d1427e88dc75cd5b48ee3abab7accfdde5119bdb",
+          "token_estimate": 61,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "clock",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "clock.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Time coordination > Clock offset",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "b30e411971f94493fd94986c1364dbccf1e66d9c254fcc14137d2ca20151b0c1",
+        "stable_chunk_id": "child-09b076ea4471dc5b6c200e057d141dee41547728",
+        "vector_id": "d6b61125-63ad-5bbf-84e1-08af472624da",
+        "parent_logical_id": "parent-56ed52a02a2cb03f853946eeaf8e9983",
+        "atom_type": "mixed",
+        "atom_id": "atom-a48372f864a25ae5db080f181d3daebe",
+        "source_identity": "project_file:clock.md",
+        "source_content_hash": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "heading_path": [
+          "Time coordination",
+          "Clock offset"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          119,
+          366
+        ],
+        "byte_span": [
+          119,
+          366
+        ],
+        "line_span": [
+          5,
+          8
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 62,
+        "retrieval_token_estimate": 185,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "clock.md",
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "context_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 119,
+            "char_end": 366,
+            "display_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+            "description": "An absolute clock offset exceeding two seconds requires pausing schedule execution and notifying the duty operator while leaving queued reservations unchanged. Resumption requires two consecutive reference checks with an offset within two seconds.",
+            "description_sha256": "ef67605330d6c78be2355b3e7bda837fec21bfaeced80865fef4351c0f775e42"
+          },
+          "status": "appended"
+        },
+        "title": "Clock offset",
+        "section_id": 4642239603394285999,
+        "token_estimate": 62,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-09b076ea4471dc5b6c200e057d141dee41547728",
+          "section_id": 4642239603394285999,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0388351084466376
+          },
+          "base_utility": 1.0388351084466376,
+          "feature_contributions": {},
+          "final_utility": 1.0388351084466376,
+          "raw_rank": 15,
+          "final_rank": 15,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "and",
+            "an"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 2,
+          "match_ratio": 0.125,
+          "content_lexical_cost": -1.0388351084466376,
+          "lexical_score": 1.0388351084466376,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "and",
+              "an"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 15
+          },
+          "pre_post_rank": 15,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 15
+        }
+      }
+    },
+    {
+      "source": "clock.md",
+      "chunk_index": 2,
+      "text": "## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n",
+      "score": 1.0364758943507857,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "clock.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Missing reference",
+        "section_level": 2,
+        "document_title": "clock",
+        "document_title_hash": "83655a5560ef1c43",
+        "anchor": "Time coordination > Missing reference",
+        "content_hash": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+        "retrieval_content_hash": "966a7d139115b7a978e6d49b1494f07dbb3cbda93fe9b37f930777c54f8e641a",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "ea016a15c0bfe5ea4a8940d3ae0779adf4e9f58ef5a1c87bb4326e3e81c10b0f",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "ea016a15c0bfe5ea4a8940d3ae0779adf4e9f58ef5a1c87bb4326e3e81c10b0f",
+          "token_estimate": 62,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "clock",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "clock.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Time coordination > Missing reference",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "966a7d139115b7a978e6d49b1494f07dbb3cbda93fe9b37f930777c54f8e641a",
+        "stable_chunk_id": "child-18903708d12948dc6bad9ec002a7ed6e6cbbdac7",
+        "vector_id": "30c9e38f-6cfe-5183-802a-d9bc9638d6ce",
+        "parent_logical_id": "parent-43c7bae2009234ef3621d5502c3f8952",
+        "atom_type": "mixed",
+        "atom_id": "atom-ded674334bf0f6f666b45b93d913f8f6",
+        "source_identity": "project_file:clock.md",
+        "source_content_hash": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "heading_path": [
+          "Time coordination",
+          "Missing reference"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          366,
+          517
+        ],
+        "byte_span": [
+          366,
+          517
+        ],
+        "line_span": [
+          9,
+          12
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 38,
+        "retrieval_token_estimate": 134,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "clock.md",
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "context_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 366,
+            "char_end": 517,
+            "display_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+            "description": "Execution remains paused when the reference clock is unavailable. A local clock reading alone cannot satisfy either recovery check.",
+            "description_sha256": "8d9e3c9a638e5769ffb16f4aeb88ac93b74796c2abde79539c87498d7c3465c7"
+          },
+          "status": "appended"
+        },
+        "title": "Missing reference",
+        "section_id": 8257673946893461058,
+        "token_estimate": 38,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-18903708d12948dc6bad9ec002a7ed6e6cbbdac7",
+          "section_id": 8257673946893461058,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0364758943507857
+          },
+          "base_utility": 1.0364758943507857,
+          "feature_contributions": {},
+          "final_utility": 1.0364758943507857,
+          "raw_rank": 16,
+          "final_rank": 16,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "is"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 1,
+          "match_ratio": 0.0625,
+          "content_lexical_cost": -1.0364758943507857,
+          "lexical_score": 1.0364758943507857,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "is"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 16
+          },
+          "pre_post_rank": 16,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 16
+        }
+      }
+    },
+    {
+      "source": "calendar.md",
+      "chunk_index": 1,
+      "text": "## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n",
+      "score": 1.0325271494293282,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "calendar.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Colours",
+        "section_level": 2,
+        "document_title": "calendar",
+        "document_title_hash": "e4ffacba5591440a",
+        "anchor": "Calendar display > Colours",
+        "content_hash": "a9610a975f27b5175555e73a29dcac6f5d76ac327cb52487d83a8cb9bcf614e2",
+        "retrieval_content_hash": "0443f65be58c595285270cfac4425641aea63b6edd6bf0bd7740c67508e46bb0",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "218034b7a6ad7681e18ceacd30b83da3eeed45e4ae5cc9922b00f883952dafb1",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "218034b7a6ad7681e18ceacd30b83da3eeed45e4ae5cc9922b00f883952dafb1",
+          "token_estimate": 61,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "calendar",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "calendar.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Calendar display > Colours",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "0443f65be58c595285270cfac4425641aea63b6edd6bf0bd7740c67508e46bb0",
+        "stable_chunk_id": "child-2c1039b3ca430920f63b6fccf6d8bbe0661d5dea",
+        "vector_id": "b07d56f0-a565-5469-89d8-aa811ab4894b",
+        "parent_logical_id": "parent-cbfdb6cf0c27106d7f12b78f94272749",
+        "atom_type": "mixed",
+        "atom_id": "atom-08f9c09131ffa1c3c1c3149a8ab9e588",
+        "source_identity": "project_file:calendar.md",
+        "source_content_hash": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "heading_path": [
+          "Calendar display",
+          "Colours"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          97,
+          340
+        ],
+        "byte_span": [
+          97,
+          340
+        ],
+        "line_span": [
+          5,
+          8
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 61,
+        "retrieval_token_estimate": 186,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "calendar.md",
+          "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "context_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 97,
+            "char_end": 340,
+            "display_sha256": "a9610a975f27b5175555e73a29dcac6f5d76ac327cb52487d83a8cb9bcf614e2",
+            "description": "Calendar colours indicate pending assignments, confirmed slots, and suspended intervals with amber, blue, and grey respectively. Browser theme changes affect colours locally without changing execution, and a visual refresh cannot clear a maintenance lock.",
+            "description_sha256": "2e204c3587ab1403e09cf852561f8f46bb8e1558c673e874c9369f5cc04841a0"
+          },
+          "status": "appended"
+        },
+        "title": "Colours",
+        "section_id": 676614909379222918,
+        "token_estimate": 61,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-2c1039b3ca430920f63b6fccf6d8bbe0661d5dea",
+          "section_id": 676614909379222918,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0325271494293282
+          },
+          "base_utility": 1.0325271494293282,
+          "feature_contributions": {},
+          "final_utility": 1.0325271494293282,
+          "raw_rank": 17,
+          "final_rank": 17,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "and",
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 2,
+          "match_ratio": 0.125,
+          "content_lexical_cost": -1.0325271494293282,
+          "lexical_score": 1.0325271494293282,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "and",
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 17
+          },
+          "pre_post_rank": 17,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 17
+        }
+      }
+    },
+    {
+      "source": "clock.md",
+      "chunk_index": 0,
+      "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n",
+      "score": 1.0312957523218398,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "clock.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Time coordination",
+        "section_level": 1,
+        "document_title": "clock",
+        "document_title_hash": "83655a5560ef1c43",
+        "anchor": "Time coordination",
+        "content_hash": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+        "retrieval_content_hash": "b87442b54ca1bf1453fa2fab4e7559b86fa82bcfe9a64b079428ba2f244dc65c",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "b3c37e3b6bb0de51f8b879bc53e28f1376b57a26b5e10098d4426a92b1ef2caa",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "b3c37e3b6bb0de51f8b879bc53e28f1376b57a26b5e10098d4426a92b1ef2caa",
+          "token_estimate": 57,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "clock",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "clock.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Time coordination",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            }
+          ]
+        },
+        "embedding_input_hash": "b87442b54ca1bf1453fa2fab4e7559b86fa82bcfe9a64b079428ba2f244dc65c",
+        "stable_chunk_id": "child-c35bae0e1fb5491bf0067c16d4e0eb2ed9aee392",
+        "vector_id": "d68ad434-eab3-569d-8899-1a2eca12e629",
+        "parent_logical_id": "parent-cae71505940f838a4985b5191d7cbf7f",
+        "atom_type": "mixed",
+        "atom_id": "atom-00b5bb45b4e55522fa9380a2bda76846",
+        "source_identity": "project_file:clock.md",
+        "source_content_hash": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "heading_path": [
+          "Time coordination"
+        ],
+        "heading_levels": [
+          1
+        ],
+        "char_span": [
+          0,
+          119
+        ],
+        "byte_span": [
+          0,
+          119
+        ],
+        "line_span": [
+          1,
+          4
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 30,
+        "retrieval_token_estimate": 113,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "clock.md",
+          "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "context_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 0,
+            "char_end": 119,
+            "display_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+            "description": "The gateway compares instrument time against the observatory reference before executing a schedule.",
+            "description_sha256": "19ec77ea9da7c8208b88b04f045bd19cc3d79c5b6be019de6ca5f6a66b64aec6"
+          },
+          "status": "appended"
+        },
+        "title": "Time coordination",
+        "section_id": 7348592375246236910,
+        "token_estimate": 30,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-c35bae0e1fb5491bf0067c16d4e0eb2ed9aee392",
+          "section_id": 7348592375246236910,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0312957523218398
+          },
+          "base_utility": 1.0312957523218398,
+          "feature_contributions": {},
+          "final_utility": 1.0312957523218398,
+          "raw_rank": 18,
+          "final_rank": 18,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "instrument"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 1,
+          "match_ratio": 0.0625,
+          "content_lexical_cost": -1.0312957523218398,
+          "lexical_score": 1.0312957523218398,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "instrument"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 18
+          },
+          "pre_post_rank": 18,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 18
+        }
+      }
+    },
+    {
+      "source": "reservations.md",
+      "chunk_index": 1,
+      "text": "## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n",
+      "score": 1.0124480814718568,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "reservations.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Transfer",
+        "section_level": 2,
+        "document_title": "reservations",
+        "document_title_hash": "c62a93b580aee9f1",
+        "anchor": "Confirmed reservations > Transfer",
+        "content_hash": "f7d3f13974929d476081693be393eb8b846ed68354a29c4861defca5667aae73",
+        "retrieval_content_hash": "b5307bbe93f049100d1e417eaf2e62a5c1bd995dc403ec384cbb4b6c97173909",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "94d44d6280f64ada53148a133daa828fe0d818e60055006cc3c3da84fd163953",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "94d44d6280f64ada53148a133daa828fe0d818e60055006cc3c3da84fd163953",
+          "token_estimate": 72,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "reservations",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "reservations.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Confirmed reservations > Transfer",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "symbol_aliases",
+              "value": "weather.md",
+              "provenance": "source.display_text.symbol_extractor",
+              "priority": 110
+            }
+          ]
+        },
+        "embedding_input_hash": "b5307bbe93f049100d1e417eaf2e62a5c1bd995dc403ec384cbb4b6c97173909",
+        "stable_chunk_id": "child-45021b7c1c3a1fb94f8d979d707c68ab45d316ce",
+        "vector_id": "aba8a9d1-aab7-5c33-bc16-d700804a0751",
+        "parent_logical_id": "parent-a4a5fbd05619f246d0c22352da0bd3ae",
+        "atom_type": "mixed",
+        "atom_id": "atom-17481d3cb6df85640c7ccec3022d09c0",
+        "source_identity": "project_file:reservations.md",
+        "source_content_hash": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "heading_path": [
+          "Confirmed reservations",
+          "Transfer"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          209,
+          500
+        ],
+        "byte_span": [
+          209,
+          500
+        ],
+        "line_span": [
+          7,
+          10
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 73,
+        "retrieval_token_estimate": 204,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "reservations.md",
+          "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "context_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 209,
+            "char_end": 500,
+            "display_sha256": "f7d3f13974929d476081693be393eb8b846ed68354a29c4861defca5667aae73",
+            "description": "Transferring a reservation requires acceptance by the receiving observer and approval by the duty operator, retaining the original identifier and recording both observers in the audit trail. Transfer does not alter weather suspension.",
+            "description_sha256": "b3432a72b00d7b71291956db35d0609305e641b07ea9a5ee6d3a2a6ddb893a66"
+          },
+          "status": "appended"
+        },
+        "title": "Transfer",
+        "section_id": 8644480417413504655,
+        "token_estimate": 73,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-45021b7c1c3a1fb94f8d979d707c68ab45d316ce",
+          "section_id": 8644480417413504655,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0124480814718568
+          },
+          "base_utility": 1.0124480814718568,
+          "feature_contributions": {},
+          "final_utility": 1.0124480814718568,
+          "raw_rank": 19,
+          "final_rank": 19,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "and"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 1,
+          "match_ratio": 0.0625,
+          "content_lexical_cost": -1.0124480814718568,
+          "lexical_score": 1.0124480814718568,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "and"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 19
+          },
+          "pre_post_rank": 19,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 19
+        }
+      }
+    },
+    {
+      "source": "overview.md",
+      "chunk_index": 2,
+      "text": "## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n",
+      "score": 1.0101516091290532,
+      "metadata": {
+        "project_identity": "step10-index-descriptions-meridian",
+        "doc_scope": "project",
+        "source_class": "project_file",
+        "resolved_version": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+        "source_path": "overview.md",
+        "format": "markdown",
+        "docs_snapshot_exact": 1,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512,
+        "library_id": "",
+        "version_family": "",
+        "project_path": "",
+        "module_id": "",
+        "authority": "unknown",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "section_title": "Navigation",
+        "section_level": 2,
+        "document_title": "overview",
+        "document_title_hash": "fed758b7a842befd",
+        "anchor": "Meridian scheduler > Navigation",
+        "content_hash": "9a4afeb6ccafba0a2361b9e1b558e90c6eadddc7b73298de1ec9169ebf7e1d77",
+        "retrieval_content_hash": "299a6491bfc06c19ea69b572b49c0dcca0aabff428feb6c8b92fc8ca775a535f",
+        "context_schema_version": "deterministic-context-v2",
+        "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+        "context_content_hash": "a6aa27b003fc04a1be578a85fbdcd46084ba5ef5f5472ef165d154a527b59d8e",
+        "context_manifest": {
+          "schema_version": "deterministic-context-v2",
+          "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "content_hash": "a6aa27b003fc04a1be578a85fbdcd46084ba5ef5f5472ef165d154a527b59d8e",
+          "token_estimate": 79,
+          "truncated": false,
+          "fields": [
+            {
+              "name": "document_title",
+              "value": "overview",
+              "provenance": "source.metadata.title",
+              "priority": 10
+            },
+            {
+              "name": "canonical_location",
+              "value": "overview.md",
+              "provenance": "source.metadata.relative_path",
+              "priority": 20
+            },
+            {
+              "name": "heading_path",
+              "value": "Meridian scheduler > Navigation",
+              "provenance": "source.markdown.heading_path",
+              "priority": 30
+            },
+            {
+              "name": "resolved_version",
+              "value": "meridian-source-sha256:84b16af8b502dcee8e001fb169102cd1b531ce3e8e1e100374e9e620cc3fc3cf",
+              "provenance": "source.metadata.resolved_version",
+              "priority": 50
+            },
+            {
+              "name": "project_scope",
+              "value": "project",
+              "provenance": "source.metadata.doc_scope",
+              "priority": 80
+            },
+            {
+              "name": "source_class",
+              "value": "project_file",
+              "provenance": "source.metadata.source_class",
+              "priority": 90
+            },
+            {
+              "name": "symbol_aliases",
+              "value": "reservations.md, weather.md, clock.md, calendar.md",
+              "provenance": "source.display_text.symbol_extractor",
+              "priority": 110
+            }
+          ]
+        },
+        "embedding_input_hash": "299a6491bfc06c19ea69b572b49c0dcca0aabff428feb6c8b92fc8ca775a535f",
+        "stable_chunk_id": "child-c2bfe94323fa610e89bbdd11b6ce2e28c2068d46",
+        "vector_id": "e237df39-8728-5061-bfb4-953dcc777dea",
+        "parent_logical_id": "parent-da8cc6b7fd8fb5a4903335e3d470bd9f",
+        "atom_type": "mixed",
+        "atom_id": "atom-47669bf072d8f2f2d5cb7b7dce016023",
+        "source_identity": "project_file:overview.md",
+        "source_content_hash": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+        "heading_path": [
+          "Meridian scheduler",
+          "Navigation"
+        ],
+        "heading_levels": [
+          1,
+          2
+        ],
+        "char_span": [
+          372,
+          595
+        ],
+        "byte_span": [
+          372,
+          595
+        ],
+        "line_span": [
+          9,
+          11
+        ],
+        "chunk_schema_version": "parent-child-v1",
+        "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+        "token_estimator_version": "utf8-bytes-div4-v1",
+        "display_token_estimate": 56,
+        "retrieval_token_estimate": 175,
+        "generation_id": "gen-688e9fd7187d416ca1c9ef2dadf24345",
+        "experimental_search_description_v1": {
+          "source_path": "overview.md",
+          "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "context_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "recipe": "source-only-section-description-v1",
+          "version": "1",
+          "model": "openai/gpt-6-astra#low",
+          "model_revision": null,
+          "record": {
+            "char_start": 372,
+            "char_end": 595,
+            "display_sha256": "9a4afeb6ccafba0a2361b9e1b558e90c6eadddc7b73298de1ec9169ebf7e1d77",
+            "description": "This navigation section links to transfer, weather suspension, and clock offset operational details. It also points to calendar colours as display conventions.",
+            "description_sha256": "4af0208fcc46b5a30047a69febe75335a9445f2e5f98baeb048ce8809adebae7"
+          },
+          "status": "appended"
+        },
+        "title": "Navigation",
+        "section_id": 4541905272847400922,
+        "token_estimate": 56,
+        "docmancer_tokens": 976,
+        "raw_tokens": 992,
+        "savings_percent": 1.6,
+        "runway_multiplier": 1.02,
+        "acquisition": {
+          "method": "fts5_source_bm25_or_v2",
+          "sql_rows": 20,
+          "candidate_ceiling": 256,
+          "estimated_token_ceiling": 131072,
+          "text_byte_ceiling": 1048576,
+          "admitted_rows": 20,
+          "admitted_estimated_tokens": 976,
+          "admitted_text_bytes": 3870,
+          "resource_skipped_rows": 0,
+          "expansion": "none",
+          "statistics_scope": "source_matching_windows_in_filtered_fts_pool",
+          "dispatcher_post_policy_rows": 20,
+          "delivery_limit_not_applied": 5,
+          "delivery_budget_not_applied": 4096
+        },
+        "ranking": {
+          "stable_id": "child-c2bfe94323fa610e89bbdd11b6ce2e28c2068d46",
+          "section_id": 4541905272847400922,
+          "score_direction": "higher_is_better",
+          "raw_component_ranks": {
+            "content_lexical_cost": -1.0101516091290532
+          },
+          "base_utility": 1.0101516091290532,
+          "feature_contributions": {},
+          "final_utility": 1.0101516091290532,
+          "raw_rank": 20,
+          "final_rank": 20,
+          "rank_delta": 0,
+          "candidate_pool_size": 20,
+          "method": "fts5_source_bm25_or_v2"
+        },
+        "lexical_match": {
+          "mode": "or",
+          "query_terms": [
+            "when",
+            "should",
+            "wind",
+            "stop",
+            "observations",
+            "what",
+            "is",
+            "required",
+            "to",
+            "restart",
+            "and",
+            "may",
+            "an",
+            "indoor",
+            "instrument",
+            "continue"
+          ],
+          "matched_terms": [
+            "and"
+          ],
+          "exact_terms": [
+            "when"
+          ],
+          "missing_exact_terms": [
+            "when"
+          ],
+          "query_term_count": 16,
+          "matched_term_count": 1,
+          "match_ratio": 0.0625,
+          "content_lexical_cost": -1.0101516091290532,
+          "lexical_score": 1.0101516091290532,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "and"
+            ],
+            "description": []
+          },
+          "routing_only": false,
+          "routing_match_ratio": 0.0,
+          "source_locator_matches": []
+        },
+        "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+        "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+        "retrieval_trace": {
+          "requested_mode": "lexical",
+          "mode_used": "lexical",
+          "component_ranks": {
+            "lexical": 20
+          },
+          "pre_post_rank": 20,
+          "intent_boost": 0.0,
+          "supplemental_rank": null,
+          "final_rank": 20
+        }
+      }
+    }
+  ],
+  "contributions": {
+    "1960443627724552551": {
+      "lexical": 1
+    },
+    "1773093776197140054": {
+      "lexical": 2
+    },
+    "2309002587423490061": {
+      "lexical": 3
+    },
+    "166904906401015518": {
+      "lexical": 4
+    },
+    "6139623375622351735": {
+      "lexical": 5
+    },
+    "925168766152420420": {
+      "lexical": 6
+    },
+    "1083034498719398011": {
+      "lexical": 7
+    },
+    "9069662225189349163": {
+      "lexical": 8
+    },
+    "7493267796231968118": {
+      "lexical": 9
+    },
+    "7844006082432429843": {
+      "lexical": 10
+    },
+    "7901224104359631226": {
+      "lexical": 11
+    },
+    "5841698377264971419": {
+      "lexical": 12
+    },
+    "4658274921949474324": {
+      "lexical": 13
+    },
+    "740924192531068043": {
+      "lexical": 14
+    },
+    "4642239603394285999": {
+      "lexical": 15
+    },
+    "8257673946893461058": {
+      "lexical": 16
+    },
+    "676614909379222918": {
+      "lexical": 17
+    },
+    "7348592375246236910": {
+      "lexical": 18
+    },
+    "8644480417413504655": {
+      "lexical": 19
+    },
+    "4541905272847400922": {
+      "lexical": 20
+    }
+  },
+  "mode_used": "lexical",
+  "candidate_counts": {
+    "lexical": 20
+  },
+  "failures": {},
+  "query_plan_hash": "c17184e2200bb9161f0f580ff1164ec1278d5c96a3f78ce4b2625c2446993a69",
+  "fusion_config_hash": "f1cfa37387ecec7016f01b00386180ed3b0675a744e1dab30f04cebffdf8246f",
+  "requirements_hash": "",
+  "requirements": null
+}

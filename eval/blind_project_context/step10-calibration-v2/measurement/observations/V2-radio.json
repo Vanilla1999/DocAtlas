@@ -1,0 +1,292 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-aace0e53c89256add3d663ec7d6ac24cf69231289ac72380b979ba5367c10be9",
+        "score": -6.408663272857666,
+        "pairs": 2,
+        "body_tokens": 32,
+        "ancestor_tokens": 6,
+        "body_token_coverage": [
+          0,
+          32
+        ],
+        "body_character_extent": [
+          1,
+          165
+        ],
+        "contextual_score": -6.408663272857666,
+        "own_body_score": -6.408663272857666,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 195,
+        "body_char_start": 28,
+        "heading_path": [
+          "Cave team equipment guide"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-c29435611bde8860a74f502d05286f94aeff8122e7b374083f5368da75e85328",
+        "score": 0.284837543964386,
+        "pairs": 2,
+        "body_tokens": 31,
+        "ancestor_tokens": 43,
+        "body_token_coverage": [
+          0,
+          31
+        ],
+        "body_character_extent": [
+          1,
+          141
+        ],
+        "contextual_score": 0.284837543964386,
+        "own_body_score": 1.1778461933135986,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 195,
+        "char_end": 365,
+        "body_char_start": 222,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Underground radio check"
+        ],
+        "line_start": 5,
+        "line_end": 8,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-4fc8f5d2aa31c6310a356c45a5f0c9b913aeb765791e451420fa69536042188d",
+        "score": -0.0907289981842041,
+        "pairs": 2,
+        "body_tokens": 33,
+        "ancestor_tokens": 79,
+        "body_token_coverage": [
+          0,
+          33
+        ],
+        "body_character_extent": [
+          1,
+          139
+        ],
+        "contextual_score": 0.46169671416282654,
+        "own_body_score": -0.0907289981842041,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 365,
+        "char_end": 529,
+        "body_char_start": 388,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Underground radio check",
+          "Antenna connection"
+        ],
+        "line_start": 9,
+        "line_end": 12,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-e5ff1541e00ffcb48aaa29fd7c1892c4acc7cc05a996227f49c157042fe9a8d2",
+        "score": 0.8387760519981384,
+        "pairs": 2,
+        "body_tokens": 34,
+        "ancestor_tokens": 78,
+        "body_token_coverage": [
+          0,
+          34
+        ],
+        "body_character_extent": [
+          1,
+          167
+        ],
+        "contextual_score": 1.1317412853240967,
+        "own_body_score": 0.8387760519981384,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 3,
+        "char_start": 529,
+        "char_end": 717,
+        "body_char_start": 548,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Underground radio check",
+          "Voice exchange"
+        ],
+        "line_start": 13,
+        "line_end": 16,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-ced8db941caeceec1aab3fd55124ebf84576be2aa6749396752234d354d67c39",
+        "score": 2.5738847255706787,
+        "pairs": 2,
+        "body_tokens": 34,
+        "ancestor_tokens": 78,
+        "body_token_coverage": [
+          0,
+          34
+        ],
+        "body_character_extent": [
+          1,
+          155
+        ],
+        "contextual_score": 2.5738847255706787,
+        "own_body_score": 2.6898610591888428,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 4,
+        "char_start": 717,
+        "char_end": 886,
+        "body_char_start": 729,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Underground radio check",
+          "Standby"
+        ],
+        "line_start": 17,
+        "line_end": 20,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-174ecb097b7deb6418ff5772645eca9e281e61707882f0125af1b603cbbc7f7a",
+        "score": -1.7352052927017212,
+        "pairs": 2,
+        "body_tokens": 36,
+        "ancestor_tokens": 79,
+        "body_token_coverage": [
+          0,
+          36
+        ],
+        "body_character_extent": [
+          1,
+          168
+        ],
+        "contextual_score": 0.167924165725708,
+        "own_body_score": -1.7352052927017212,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 5,
+        "char_start": 886,
+        "char_end": 1075,
+        "body_char_start": 905,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Underground radio check",
+          "Storage labels"
+        ],
+        "line_start": 21,
+        "line_end": 24,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-4914af9c8630c5542a96706d4428486e1113d2ac270fd875832d24ae43db8d33",
+        "score": 5.697523593902588,
+        "pairs": 2,
+        "body_tokens": 44,
+        "ancestor_tokens": 43,
+        "body_token_coverage": [
+          0,
+          44
+        ],
+        "body_character_extent": [
+          1,
+          214
+        ],
+        "contextual_score": 6.65578031539917,
+        "own_body_score": 5.697523593902588,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 6,
+        "char_start": 1075,
+        "char_end": 1316,
+        "body_char_start": 1100,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Flood watch exception"
+        ],
+        "line_start": 25,
+        "line_end": 28,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      },
+      {
+        "identity": "unit-3c4790619cdd8390f35206e1a2eef923b7f6f53108d55d64c49f4c90dbd447b6",
+        "score": -7.696876049041748,
+        "pairs": 2,
+        "body_tokens": 32,
+        "ancestor_tokens": 43,
+        "body_token_coverage": [
+          0,
+          32
+        ],
+        "body_character_extent": [
+          1,
+          135
+        ],
+        "contextual_score": -5.8649821281433105,
+        "own_body_score": -7.696876049041748,
+        "path": "cave-radio.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"_source_snapshot_sha256\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"member\":{\"catalog_entry_hash\":\"sha256:59f3adca2dd5276ef617770ea13fd4d03525c5eda356a599f8ba0b79af775994\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"cave-radio.md\",\"content_sha256\":\"19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a\",\"document_id\":\"project_file:local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5:cave-radio.md\",\"scope\":{\"project_id\":\"local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5\",\"snapshot_id\":\"gen-c26007ed1b9142009627adb13c193e76\",\"version\":\"\"}}}",
+        "section_index": 7,
+        "char_start": 1316,
+        "char_end": 1472,
+        "body_char_start": 1336,
+        "heading_path": [
+          "Cave team equipment guide",
+          "Membership forms"
+        ],
+        "line_start": 29,
+        "line_end": 31,
+        "source_sha256": "19758e3c408de1749c9317270220dea42806725d85e756aae62cce965f87085a"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-own-body-gated-maxp-v2",
+      "status": "complete",
+      "units": 8,
+      "model_pairs": 16,
+      "model_forwards": 16,
+      "model_input_tokens": 1662,
+      "inference_seconds": 0.14993131102528423,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "min_contextual_and_own_body_max_raw_logit",
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        31
+      ],
+      "total_seconds": 0.15817341700312681,
+      "own_body_gate": true
+    },
+    "policy_sha256": "5eb8d93aabd318bf24505383ed54c14733a8900eaf19a783f8f078cc953520ff"
+  }
+]

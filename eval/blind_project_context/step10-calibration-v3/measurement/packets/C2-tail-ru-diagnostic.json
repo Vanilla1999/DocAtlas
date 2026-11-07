@@ -1,0 +1,103 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original",
+    "query-lookup-1"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-3ed3a95e1db6877763d4e00e",
+      "path_or_url": "textiles.md",
+      "section": "Textile conservation room",
+      "snippet": "# Textile conservation room\n\nThe following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "60be31add61e85e719633114d9d743bd0ac931577362f2d900ba15bf97033cc8",
+      "project_identity": "local:8cec383684f35d72a23ffc7eafc8a647093db96389011cc00328c646472dedaa",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/29d6262f22d6b4ba3c7b1aa9"
+    },
+    {
+      "evidence_id": "ev-38db31be27198aacdd18604b",
+      "path_or_url": "textiles.md",
+      "section": "Textile conservation room > Intake notebook",
+      "snippet": "## Intake notebook\n\nThe conservation room occupies the upper floor of the east wing. A stone staircase leads from the entrance lobby to the corridor outside the room. The staircase has a wooden rail along its inner edge. Visitors use the lobby telephone to announce their arrival. A member of staff meets them at the bottom of the staircase and accompanies them upstairs. Coats and bags remain in the lobby lockers. Each locker has a small brass number attached to its door. Lost locker keys are reported to reception. The reception counter contains a shallow drawer for spare name cards. Name cards are written with a broad black pen so that they can be read from across the lobby. Empty card boxes are flattened before they are placed in the recycling container. The recycling container stands under the counter but must not obstruct the staff footrest. A wooden notice frame on the opposite wall displays the opening hours. The frame is removed from the wall for cleaning at the beginning of each season. Two screws hold the frame in place. The maintenance caretaker keeps the screwdriver in a locked tool cabinet. Only the caretaker opens that cabinet. The corridor has a row of tall windows overlooking a paved courtyard. The window blinds are raised for cleaning and lowered again afterwards. A pair of indoor shoes is available for each member of the housekeeping staff. The shoes remain on a low rack beside the service entrance. Their soles are brushed before they are returned to the rack. A bell at the service entrance alerts reception when a delivery arrives. The bell is checked during the weekly building inspection. Delivery drivers wait outside until a staff member opens the door. Empty delivery cartons are kept flat in the ground-floor storeroom. Cartons with torn corners are put aside for recycling rather than reused. The storeroom has a large wall calendar showing collection dates. The calendar is replaced at the beginning of January. The old calendar is removed rather than left underneath the new one. A round clock above the storeroom doorway has a plain white face. Its battery is replaced when the minute hand begins to stop. Spare clock batteries are stored in the office stationery cupboard. That cupboard also holds pencil sharpeners and paper clips. Paper clips are sorted by size into two small tins. The tins have lids to prevent their contents spilling into the drawer. A felt pad beneath each tin protects the wooden drawer base. The pads are shaken outdoors when dust accumulates. A cleaning cloth hangs from a peg near the office sink. The cloth is washed after use and dried before it is returned to the peg. The sink is not used for drinking water. Drinking water is available from a dispenser in the staff dining room. The dining room tables are wiped after every break. Staff return chairs to their marked positions before leaving the room. The floor markings leave a clear route between the entrance and the rear exit. The rear exit opens onto a covered walkway. During rain the walkway mat is replaced with a dry one at midday. Wet mats are hung in the utility yard rather than folded into a cupboard. These facilities observations are included for the building team and do not set quarantine release requirements.\n\nA newly received woven textile must remain in a sealed quarantine cabinet for twenty-seven days. Release requires a conservator to record two pest-free inspections seven days apart. If live larvae are found at either inspection, restart the full twenty-seven-day quarantine after treatment instead of releasing the textile.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "2f55c12edf6888d14f99c0d4c08bef781352d669e6bd87943d631d23e3afdf5f",
+      "project_identity": "local:8cec383684f35d72a23ffc7eafc8a647093db96389011cc00328c646472dedaa",
+      "line_start": 5,
+      "line_end": 10,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/2d94e1f71d249f9ad5f7334b"
+    },
+    {
+      "evidence_id": "ev-3946e3f813128722e6b9a6ab",
+      "path_or_url": "textiles.md",
+      "section": "Textile conservation room > Lighting inventory",
+      "snippet": "## Lighting inventory\n\nThe room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9badc913f4b12aca2e0dddd3dab57321e86b55ff0ae7defa9a3787a94751bd66",
+      "project_identity": "local:8cec383684f35d72a23ffc7eafc8a647093db96389011cc00328c646472dedaa",
+      "line_start": 11,
+      "line_end": 13,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/15637fc9414aca85876e52d0"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1661,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "diagnostic-unverified",
+    "calibration_status": "diagnostic_unverified",
+    "candidate_units": 3,
+    "selected_units": 3,
+    "delivered_rows": 3,
+    "scan_complete": true,
+    "model_pairs": 20,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 3,
+      "delivered_spans": 3
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "96bda39bf61e53a4f0965d79a3de5f60bd0ab2ac495c922689a70a6910f57ab6"
+  }
+}

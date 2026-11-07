@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "off": {
+      "tokens": 447,
+      "bytes": 1515,
+      "sha256": "caea4f611d531471d8d047a469e5df6117ceccb4de7d7929da7e5ce81c58388f"
+    },
+    "literal-v2": {
+      "tokens": 447,
+      "bytes": 1515,
+      "sha256": "67cd874c98d751ded6c616323cf407d3cd1dd13a1170c3cef97fef977afbc697"
+    }
+  },
+  "packet_sha256": "05f44aa324507ae6c3ff3d6e82dc101928f269f11c7a6bb46badb33e79022b77",
+  "boundary": "Same ordinary canonical packet, rendered offline. No minimal/Qwen percentages or new quality claim."
+}

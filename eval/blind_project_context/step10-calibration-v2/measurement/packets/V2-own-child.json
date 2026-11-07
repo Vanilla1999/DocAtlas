@@ -1,0 +1,102 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-aace0e53c89256add3d663ec",
+      "path_or_url": "cave-radio.md",
+      "section": "Cave team equipment guide",
+      "snippet": "# Cave team equipment guide\n\nThis guide contains separate equipment procedures and storeroom information for the cave survey team. A heading's instructions apply only to the equipment it names.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e91d8ad238d918f4a31d686967d0d16e2af878be44c07430cdab591b1e2dcb52",
+      "project_identity": "local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/f2926f30931f9aa001aa06bb"
+    },
+    {
+      "evidence_id": "ev-c29435611bde8860a74f502d",
+      "path_or_url": "cave-radio.md",
+      "section": "Cave team equipment guide > Underground radio check",
+      "snippet": "## Underground radio check\n\nThis procedure applies to the low-frequency radios used by the survey team below ground. Surface vehicle radios use a different check sheet.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "b226e0703b552a153bdc3d916477c5e6e53c38604e205876012d18ea3b1b90e8",
+      "project_identity": "local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/8a12fdeaa802113ffe1e83bf"
+    },
+    {
+      "evidence_id": "ev-174ecb097b7deb6418ff5772",
+      "path_or_url": "cave-radio.md",
+      "section": "Cave team equipment guide > Underground radio check > Storage labels",
+      "snippet": "### Storage labels\n\nThe radio cases have orange inventory labels. Replacement labels are available in the stationery tray; their colour does not indicate battery charge or signal quality.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "81ae322459d885983fa98b10da9a51ade5e1fc78b82cf29999b225f87682db94",
+      "project_identity": "local:505e3f3fa9f43844161d99171f979a802340ab7efbe44322b924bf217c225ec5",
+      "line_start": 21,
+      "line_end": 24,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/4b5ec25cae6562afd3661012"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 841,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "5eb8d93aabd318bf24505383ed54c14733a8900eaf19a783f8f078cc953520ff",
+    "calibration_status": "empirical",
+    "candidate_units": 8,
+    "selected_units": 1,
+    "delivered_rows": 3,
+    "scan_complete": true,
+    "model_pairs": 16,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 8,
+      "hydrated_sections": 8,
+      "selected_units": 1,
+      "delivered_spans": 3
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "73415057cff7c7e10d8724b0fb36149a07486a8e0dcd0c558668beb733af89e2"
+  }
+}

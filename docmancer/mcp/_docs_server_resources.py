@@ -50,7 +50,11 @@ Use `docs_status` for explicit status, returned actions/jobs, or include_languag
 
 ## Gap-directed follow-up
 
-Keep the original question unchanged. Optionally inspect declared source languages once via `docs_status(include_language=true)` for the already selected source. Keep question unchanged and supply a full translation as search_question for retrieval and MiniLM. Use only explicitly supplied same-question `lookup_queries`, at most five including the translation; independent questions use separate calls. Lookup coverage does not transfer to the original question. Follow up only with explicit lookups or an issued bounded source read, within existing scope, freshness, provenance, consent, network and budget limits. Unverified flags alone do not require another read. Do not reread the same span or replenish budgets by renaming a question. A supplied translation is a retrieval hypothesis, not verified equivalence, semantic proof, answer completeness or edit authorization.
+Before answering, check requested aspects and source-stated prerequisites, exceptions and side effects. Retain these details in the answer. Name a specific gap before another call. Prefer `source_path` for an exact document path returned or supplied by the user: same question/translation/scope, new first portion without an old token, smaller checked packet. Otherwise use `more_context.next_portion` with identical arguments and its token. Retain earlier evidence; stop when answered, no useful route remains, no useful new evidence arrives, or the host budget is reached. Never restart an exhausted focused search. Source resources read adjacent text, not arbitrary earlier sections or citation resolution. A stale token requires starting at 1 and revalidating earlier evidence. Remaining rows are candidates, not promised answers.
+
+Keep the original question unchanged. Optionally inspect declared source languages once via `docs_status(include_language=true)` for the already selected source. Supply a full translation as search_question for retrieval and optional section ranking. For remaining gaps, start at portion 1 with explicitly supplied same-question `lookup_queries` within the advertised schema; independent questions use separate calls. Lookup coverage does not transfer to the original question. Issued source reads preserve scope, freshness, provenance, consent and network restrictions. Unverified flags alone do not require another read. Do not reread the same span or replenish budgets by renaming a question. A supplied translation is a retrieval hypothesis, not verified equivalence, semantic proof, answer completeness or edit authorization.
+
+For the explicitly host-enabled minimal-context candidate, read whole returned sections including conditions and exceptions. Semantic rejects are not continuation pages. The 50,000-token boundary is an emergency stop, not a filling target or focused quota. Use the advertised read_docs_source tool for an issued URI only when a concrete aspect remains missing. Report emergency stops rather than evading them with successive chunks. This empirical policy does not certify answer sufficiency.
 
 Explicit scope selects retrieval boundaries, not instruction authorization: `scope="project"` selects repository-level docs, `scope="module"` selects one exact module, and `scope="all"` stays within the same repository without module filters. `module_path` implies module scope. For current project dependencies omit `version` unless an exact/historical version is explicitly requested; re-query after lockfile changes.
 
@@ -112,11 +116,11 @@ Always separate:
     {
         "uri": "docmancer://agent/tool-selection",
         "name": "Docmancer public tool selection",
-        "description": "Mutually exclusive first-call policy for the three public Docs MCP tools.",
+        "description": "Mutually exclusive first-call policy for the default public Docs MCP tools.",
         "mimeType": "text/markdown",
         "text": """# Public tool selection
 
-1. One unchanged original documentation question with explicit scope and optional explicit lookups (at most five) → `get_docs_context`.
+1. One unchanged original documentation question with explicit scope and optional explicit lookups (at most five in default mode) → `get_docs_context`.
 2. Explicit sync/refresh/prefetch/prune/remove request or `recommended_next_action` → `prepare_docs`.
 3. Explicit index freshness, health, source-state, or async job-progress request → `docs_status`.
 
@@ -124,7 +128,7 @@ Returned preparation/status actions may be followed within existing consent and 
 
 Coding questions use default documentation context without a mandatory skill read. Patch representation is absent by default; only explicit server startup with `DOCATLAS_MCP_ADVANCED_TOOLS=1` exposes advanced `context_format="patch_context"`. Verify the advertised schema; never infer representation or permission from prose. Guides do not load or enable tools automatically.
 
-The public Docs MCP surface contains exactly these three tools.
+The default public Docs MCP surface contains these three tools. The opt-in minimal-context mode additionally advertises `read_docs_source`; use its current schema for issued source references and structural reads.
 """,
     },
     {
@@ -191,7 +195,7 @@ MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
     {
         "uriTemplate": "docatlas://source/{reference}",
         "name": "Bounded source continuation",
-        "description": "Read only a returned source_uri for a concrete missing fact. At most 600 tokens per read and two reads per chain; never construct a reference or open a source merely because answer flags are false. Requires host resources/read support.",
+        "description": "Default-mode source continuation: read only a returned source_uri for a concrete missing fact, at most 600 tokens per read and two reads per chain. Never construct a reference or open a source merely because answer flags are false. Requires host resources/read support. The opt-in minimal-context mode instead issues docatlas://source/v2/... references and advertises read_docs_source for complete structural blocks under the 50,000-token emergency stop; the default per-read limits do not apply there.",
         "mimeType": "application/json",
     },
     {

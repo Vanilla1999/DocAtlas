@@ -15,6 +15,40 @@ never requires a read. Do not open whole files simply to improve confidence.
 
 ## Read only a missing part
 
+### Opt-in minimal-context candidate
+
+With the host-only `DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT=1` configuration and
+prepared pinned model assets, selected structural sections are delivered whole.
+There is no 600-token, 40-line, two-read or 128-reference quota on this path.
+Semantic exclusions do not create `read_next` recovery requests.
+
+Candidate `docatlas://source/v2/…` capabilities are committed atomically for an
+accepted packet. Resource reads return a complete heading-scoped subtree (or
+whole document when no heading boundary is available), preserving UTF-8 source
+characters and LF/CRLF endings. A start inside a block expands to its beginning
+rather than cutting a list, table or fenced block. Further cursors advance to
+the next structural block until exhaustion.
+
+The candidate also advertises `read_docs_source(uri)` as a dedicated native MCP
+tool. Pass the exact capability URI; it delegates to the same resource reader
+and consumes the same one-use cursor. Prefer this tool with the supported
+OpenCode adapter, configured for both `docatlas_get_docs_context` and
+`docatlas_read_docs_source`, so source reads receive its final model-visible
+token guard too. No path, scope, range or authority can be added through this tool.
+
+The entire serialized result is measured with the pinned offline tokenizer.
+Above 50,000 tokens the result is an explicit `context_emergency_stop`, with no
+source body or continuation; the server does not trim a prefix. This is a server
+boundary, not a provider billing or full-dialogue limit.
+
+Expiry remains ten minutes from original issuance. Reads consume their URI;
+republication cannot revive consumed/expired URIs or refresh expiry. Source
+scope, authority, catalog, active-index and full-file hash checks still apply.
+All references in a delivery batch are validated before any are committed.
+Registration failure rejects the whole packet rather than dropping locators.
+
+### Legacy path (default)
+
 When spare space remains in the initial 800-token admission budget, a selected
 project source may carry `source_uri`. This optional locator never displaces a
 selected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary

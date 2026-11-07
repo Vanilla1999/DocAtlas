@@ -1,0 +1,87 @@
+{
+  "seconds": 0.14080118399942876,
+  "expected_paths": [
+    "observatory.md"
+  ],
+  "indexed_paths": [
+    "observatory.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-4020fef858fef6a2291dc649b47013cf03d32b0f",
+      "source_path": "observatory.md",
+      "display_text": "# Observatory archive\n\nThese instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-b74e34b2cbbc53d809882c7656fc55fb1639f3b7",
+      "source_path": "observatory.md",
+      "display_text": "## Dispatch\n\nDispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-c76bda70626c2f327b4a0acab9c54eb917d0d8fb",
+      "source_path": "observatory.md",
+      "display_text": "### Packing\n\nPlace each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-bdedca36da482cb254e748266978695b545c26a2",
+      "source_path": "observatory.md",
+      "display_text": "### Label printer\n\nThe label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-db70a464720265d43e4f119ba66b49e85d11852e",
+      "source_path": "observatory.md",
+      "display_text": "## Partner restriction\n\nA photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-dd1895b5dea6ec5e48f3d6675dfa19c7bea1b65d",
+      "source_path": "observatory.md",
+      "display_text": "## Visitor register\n\nArchive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-ef0515fec5ddf234b7ea1685b6e28ea881714ea0",
+      "source_path": "observatory.md",
+      "display_text": "## Corridor lighting\n\nThe archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.\n",
+      "line_start": 25,
+      "line_end": 27
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "693ea3532be951db5f367a7ef7a3b66701b2e805501487ecde60c0300d7928d8",
+  "storage_path": "/tmp/docatlas-evidence-j90gdemj/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-e100903d9ac845e09a766971d3fcd53d",
+  "catalog_sha256": "7e3d3cf4a196a6f8831561cb90dff4efa80f09b43704a11f0426f5c6d1019531",
+  "documents": [
+    {
+      "path": "observatory.md",
+      "content_sha256": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b",
+      "catalog_entry_hash": "sha256:6b37cb1cc53b6ec2e459aca27e219732918d9a93e1d89fc11a1e115cde231484"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-e100903d9ac845e09a766971d3fcd53d",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 7,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 7
+  }
+}

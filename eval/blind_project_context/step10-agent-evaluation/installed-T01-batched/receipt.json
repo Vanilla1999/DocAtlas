@@ -1,0 +1,105 @@
+{
+  "boundary": "installed_stdio",
+  "requests": 6,
+  "trace_parity": true,
+  "read_only": true,
+  "calls": [
+    {
+      "lane": "plain",
+      "seconds": 479.39627619900057,
+      "tokens": 157,
+      "rows": 0,
+      "facts": [
+        false,
+        false,
+        false
+      ],
+      "reason_code": "context_emergency_stop",
+      "selection": {
+        "emergency_tokens": 50000,
+        "measured_tokens": 1179395,
+        "model_pairs": 9327,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "scope": "all",
+        "selected_units": 2561
+      }
+    },
+    {
+      "lane": "translated",
+      "seconds": 816.7914123709998,
+      "tokens": 157,
+      "rows": 0,
+      "facts": [
+        false,
+        false,
+        false
+      ],
+      "reason_code": "context_emergency_stop",
+      "selection": {
+        "emergency_tokens": 50000,
+        "measured_tokens": 1202140,
+        "model_pairs": 18562,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "scope": "all",
+        "selected_units": 2626
+      }
+    },
+    {
+      "lane": "focused",
+      "seconds": 1.5521601280015602,
+      "tokens": 1729,
+      "rows": 7,
+      "facts": [
+        true,
+        true,
+        true
+      ],
+      "reason_code": null,
+      "selection": {
+        "calibration_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+        "calibration_status": "empirical",
+        "candidate_units": 7,
+        "closure": {
+          "delivered_spans": 7,
+          "documents": 1,
+          "hydrated_sections": 7,
+          "incomplete_dependencies": [],
+          "selected_units": 7,
+          "status": "complete",
+          "structural_recipe": "minimal-structure-v1",
+          "units": 7
+        },
+        "delivered_rows": 7,
+        "model_pairs": 7,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "selected_units": 7
+      }
+    },
+    {
+      "lane": "observed",
+      "seconds": 432.0059583759976,
+      "tokens": 157,
+      "rows": 0,
+      "facts": [
+        false,
+        false,
+        false
+      ],
+      "reason_code": "context_emergency_stop",
+      "selection": {
+        "emergency_tokens": 50000,
+        "measured_tokens": 1179395,
+        "model_pairs": 9327,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "scope": "all",
+        "selected_units": 2561
+      }
+    }
+  ],
+  "all_three_facts_original": false,
+  "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c"
+}

@@ -1,0 +1,89 @@
+{
+  "boundary": "independent_direct_HuggingFace_model_card_control_not_public_acceptance",
+  "model_pairs": 8,
+  "inference_seconds": 0.07410728099785047,
+  "torch": "2.10.0+cpu",
+  "transformers": "4.57.1",
+  "assets_sha256": {
+    "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+    "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+    "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+    "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+    "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+    "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+  },
+  "records": [
+    {
+      "lane": "original",
+      "variant": "contextual",
+      "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+      "passage": "# Contributing to DocAtlas\n\nThe product and CLI are named DocAtlas and `doc-atlas`; the Python import namespace remains `docmancer`.\n\nThank you for contributing! This guide covers project layout and common extension points.\n\n## Submitting a PR\n\n- Branch name: `feat/<topic>` or `fix/<description>`\n- Run the full test suite before opening the PR\n- New connectors or fetchers should include tests where practical\n",
+      "tokens": 128,
+      "split_encoding_equal": true,
+      "score": -5.1915602684021
+    },
+    {
+      "lane": "original",
+      "variant": "headings",
+      "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+      "passage": "# Contributing to DocAtlas\n## Submitting a PR\n\n- Branch name: `feat/<topic>` or `fix/<description>`\n- Run the full test suite before opening the PR\n- New connectors or fetchers should include tests where practical\n",
+      "tokens": 79,
+      "split_encoding_equal": true,
+      "score": -4.345316410064697
+    },
+    {
+      "lane": "original",
+      "variant": "body",
+      "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+      "passage": "\n- Branch name: `feat/<topic>` or `fix/<description>`\n- Run the full test suite before opening the PR\n- New connectors or fetchers should include tests where practical\n",
+      "tokens": 65,
+      "split_encoding_equal": true,
+      "score": -5.99769926071167
+    },
+    {
+      "lane": "translation",
+      "variant": "contextual",
+      "question": "What is expected of me when I submit a pull request to DocAtlas?",
+      "passage": "# Contributing to DocAtlas\n\nThe product and CLI are named DocAtlas and `doc-atlas`; the Python import namespace remains `docmancer`.\n\nThank you for contributing! This guide covers project layout and common extension points.\n\n## Submitting a PR\n\n- Branch name: `feat/<topic>` or `fix/<description>`\n- Run the full test suite before opening the PR\n- New connectors or fetchers should include tests where practical\n",
+      "tokens": 127,
+      "split_encoding_equal": true,
+      "score": -5.307424068450928
+    },
+    {
+      "lane": "translation",
+      "variant": "headings",
+      "question": "What is expected of me when I submit a pull request to DocAtlas?",
+      "passage": "# Contributing to DocAtlas\n## Submitting a PR\n\n- Branch name: `feat/<topic>` or `fix/<description>`\n- Run the full test suite before opening the PR\n- New connectors or fetchers should include tests where practical\n",
+      "tokens": 78,
+      "split_encoding_equal": true,
+      "score": -4.231404781341553
+    },
+    {
+      "lane": "translation",
+      "variant": "body",
+      "question": "What is expected of me when I submit a pull request to DocAtlas?",
+      "passage": "\n- Branch name: `feat/<topic>` or `fix/<description>`\n- Run the full test suite before opening the PR\n- New connectors or fetchers should include tests where practical\n",
+      "tokens": 64,
+      "split_encoding_equal": true,
+      "score": -6.455948829650879
+    },
+    {
+      "lane": "model_card_control",
+      "question": "How many people live in Berlin?",
+      "passage": "Berlin has a population of 3,520,031 registered inhabitants in an area of 891.82 square kilometers.",
+      "tokens": 36,
+      "score": 10.761544227600098
+    },
+    {
+      "lane": "model_card_control",
+      "question": "How many people live in Berlin?",
+      "passage": "New York City is famous for the Metropolitan Museum of Art.",
+      "tokens": 23,
+      "score": -8.127742767333984
+    }
+  ],
+  "public_contextual_score": -5.191558361053467,
+  "public_own_body_score": -4.345316410064697,
+  "original_contextual_delta": -1.9073486328125e-06,
+  "original_headings_delta": 0.0
+}

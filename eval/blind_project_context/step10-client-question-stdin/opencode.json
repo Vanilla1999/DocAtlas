@@ -1,0 +1,103 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "snapshots": false,
+  "model": "question-audit/capture",
+  "compaction": {
+    "auto": false
+  },
+  "plugins": [
+    "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-client-question-stdin/observer"
+  ],
+  "agents": {
+    "measure": {
+      "mode": "primary",
+      "system": "Transport capture only.",
+      "permissions": [
+        {
+          "action": "*",
+          "resource": "*",
+          "effect": "deny"
+        }
+      ]
+    }
+  },
+  "providers": {
+    "question-audit": {
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://127.0.0.1:36879/v1",
+        "apiKey": "local-capture"
+      },
+      "models": {
+        "capture": {
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 100000,
+            "output": 1000
+          }
+        }
+      }
+    }
+  },
+  "mcp": {
+    "servers": {
+      "grounded": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      },
+      "orcaslicer": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      },
+      "blender": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      },
+      "context7": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      },
+      "freecad": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      },
+      "word-server": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      },
+      "sequential-thinking": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "false"
+        ]
+      }
+    }
+  }
+}

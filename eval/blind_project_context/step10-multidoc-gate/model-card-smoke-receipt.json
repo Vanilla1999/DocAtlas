@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "boundary": "official pinned model-card 2pairs, not evidence recipe/gate/public DocAtlas",
+  "model_revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+  "assets_hashes_verified": true,
+  "torch": "2.10.0+cu128",
+  "transformers": "4.57.1",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5070 Ti",
+  "dtype": "bfloat16",
+  "attention": "sdpa",
+  "pairs": 2,
+  "model_forwards": 2,
+  "score_cache_hits": 0,
+  "batch_size": 1,
+  "model_input_tokens": 189,
+  "model_loads": 1,
+  "load_seconds": 0.6019104370061541,
+  "forward_seconds": 0.3327424040035112,
+  "total_seconds_after_asset_checks": 0.9366758700052742,
+  "peak_vram_allocated_bytes": 1202927104,
+  "peak_vram_reserved_bytes": 1218445312,
+  "records": [
+    {
+      "query": "What is the capital of China?",
+      "document": "The capital of China is Beijing.",
+      "input_tokens": 85,
+      "input_ids_sha256": "8b5910c112dab3ae2ea53a2f35937c6f8481900c1a7e5944d2ddc93ab8cdb450",
+      "logits_no_yes": [
+        13.8125,
+        21.375
+      ],
+      "p_yes": 0.999480664730072,
+      "forward_seconds": 0.3213770799993654
+    },
+    {
+      "query": "Explain gravity",
+      "document": "Gravity is a force that attracts two bodies towards each other. It gives weight to physical objects and is responsible for the movement of planets around the sun.",
+      "input_tokens": 104,
+      "input_ids_sha256": "42c27cfb261225645d28baf1591fe90343aea12d54b8d0b3d146f86e14a5bb80",
+      "logits_no_yes": [
+        13.0,
+        20.375
+      ],
+      "p_yes": 0.999373733997345,
+      "forward_seconds": 0.011365324004145805
+    }
+  ],
+  "gate_calls": 0,
+  "terra_calls": 0,
+  "context_32k_verified": false
+}

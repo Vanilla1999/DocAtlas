@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 import yaml
 import tiktoken
 
@@ -326,13 +327,14 @@ def test_public_library_native_context_isolates_versions(tmp_path, monkeypatch):
     assert [database(path) for path in paths] == before
 
 
+@pytest.mark.mock_network_dns
 def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatch, record_property):
     """Production ingest/runtime with SQLite+sqlite-vec; only embedding HTTP is substituted.
 
     The fixed embedding response proves rank delivery/access, not model relevance.
     """
     import httpx
-    import pytest
+    from openai import DefaultHttpxClient, OpenAI
     from docmancer.agent import DocmancerAgent
     from docmancer.core.config import DocmancerConfig, VectorStoreConfig
     from docmancer.core.models import Document
@@ -348,7 +350,7 @@ def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatc
     ensure_owned_home(home)
     calls = []
 
-    def embedding_transport(self, request):
+    def embedding_transport(request):
         assert str(request.url) == "https://embeddings.invalid/v1/embeddings"
         body = json.loads(request.content)
         calls.append(len(body["input"]))
@@ -359,7 +361,15 @@ def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatc
             "usage": {"prompt_tokens": 1, "total_tokens": 1},
         })
 
-    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", embedding_transport)
+    def sdk_with_mock_http(*args, **kwargs):
+        # Keep the real SDK and provider, and replace only their external HTTP.
+        # This mock has no socket transport and must not inherit host proxies.
+        kwargs["http_client"] = DefaultHttpxClient(
+            transport=httpx.MockTransport(embedding_transport), trust_env=False,
+        )
+        return OpenAI(*args, **kwargs)
+
+    monkeypatch.setattr("openai.OpenAI", sdk_with_mock_http)
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")
     config.index.extracted_dir = str(tmp_path / "extracted")

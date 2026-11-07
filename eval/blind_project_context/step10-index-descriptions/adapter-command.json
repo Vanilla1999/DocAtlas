@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/tmp/opencode/step9-gap-resolution/.venv/bin/python",
+    "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/step10-index-descriptions/experiment.py",
+    "adapt",
+    "--packet",
+    "/tmp/opencode/step10-index-descriptions-prepare-01/children.json"
+  ],
+  "cwd": "/tmp/opencode/step9-gap-resolution",
+  "PYTHONPATH": "/tmp/opencode/step9-gap-resolution"
+}

@@ -1,0 +1,255 @@
+{
+  "seconds": 0.2810829800000647,
+  "expected_paths": [
+    "architecture.md",
+    "modules/tape/private.md",
+    "overview.md",
+    "publication.md",
+    "recovery.md",
+    "restore.md",
+    "rollback.md"
+  ],
+  "indexed_paths": [
+    "architecture.md",
+    "modules/tape/private.md",
+    "overview.md",
+    "publication.md",
+    "recovery.md",
+    "restore.md",
+    "rollback.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-32309ff35b6d930fcb12c0e38bbe573e688534fe",
+      "source_path": "architecture.md",
+      "display_text": "# Archive architecture\n\nCairn separates immutable payload storage from mutable collection pointers.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-9a24cb69a861c3dc9a5f9516dd7c97a85a6c3647",
+      "source_path": "architecture.md",
+      "display_text": "## Object store\n\nThe object store uses content checksums to detect corruption. Replication improves availability but does not supply custodian approval. The catalogue maps stable object identifiers to snapshot manifests and supports historical lookup.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-61b5cd89879ccab19023cdac09471c179caa823d",
+      "source_path": "architecture.md",
+      "display_text": "## Demonstration mode\n\nThe demonstration mode publishes whatever payloads are present and deletes the previous pointer. It is restricted to disposable examples and is not the archive publication policy.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-da9a5f9312668011c4ce64c86b5ef27e058dbf8e",
+      "source_path": "overview.md",
+      "display_text": "# Cairn archive\n\nCairn restores research collections from immutable archive snapshots. Recovery procedures concern production collections; disposable training archives are separate.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-2d7fce9441ab96339f65166a05fc34811a719251",
+      "source_path": "overview.md",
+      "display_text": "## Components\n\nA catalogue records object identifiers, a verifier checks stored payloads, and a restore worker reconstructs a collection in staging. Publication switches the collection pointer after review; it does not mutate the snapshot.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-77f45b6412864c57cf109b46c26ae435c93baeb7",
+      "source_path": "overview.md",
+      "display_text": "## Identity\n\nObject identifiers remain stable across storage locations. A path in a staging directory is not a new object identity. Snapshot manifests bind identifiers to payload checksums.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-ca59ffd9761d709e905b6280bd1a6a7b125e5f74",
+      "source_path": "publication.md",
+      "display_text": "# Restore publication\n\nPublication changes the visitor-visible pointer for a production collection.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-48507932d6d1fbecbe75a4e8b9b4d4044a7f5b62",
+      "source_path": "publication.md",
+      "display_text": "## Switch\n\nSwitch the collection pointer only after checksum reconciliation and custodian approval. Record both the previous and new snapshot identifiers. Apply the [rollback rule](rollback.md#rollback) if publication verification fails.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-ddacc2aa17b64c49b2a01450cb1c7095552743eb",
+      "source_path": "publication.md",
+      "display_text": "## Partial collections\n\nIf any required payload is missing, leave the previous pointer active even when all present payloads pass checksums. Custodian approval alone cannot authorize a partial collection.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-c0b17ee3ed10d15cfac12ae508843f9a3a320ab6",
+      "source_path": "publication.md",
+      "display_text": "## Preview pointer\n\nAn internal preview may point at an incomplete staged collection. Its address must remain separate from the visitor-visible collection pointer.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-407d95f9f3096d9df7cb035821f8f5fec921f4c2",
+      "source_path": "recovery.md",
+      "display_text": "# Restore failure handling\n\nThis procedure applies to a production restore interrupted before publication.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-a2a37cac905db1937ad974b21072b34b4ac9384f",
+      "source_path": "recovery.md",
+      "display_text": "## Recovery procedure\n\nExecute every child section below in order. Merely restarting the worker leaves the recovery procedure incomplete.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-ec3eaf97493195e7f5cac39ba44b693ce974ca32",
+      "source_path": "recovery.md",
+      "display_text": "### Preserve\n\nStop the worker and retain its restore journal. Record the failed snapshot identifier before changing staging files.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-3b75762e339877e5ccc6c36c4b070c2f935a6e9e",
+      "source_path": "recovery.md",
+      "display_text": "### Reconcile\n\nCompare staged payload checksums with the signed snapshot manifest. Recopy mismatching payloads from the same snapshot; do not mix snapshots within one restore.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-6a5a1192707eabd2f94b97fd1f08da6173cc582f",
+      "source_path": "recovery.md",
+      "display_text": "### Reopen\n\nResume the worker only after reconciliation completes. Keep the collection pointer on its previous published snapshot until publication approval is recorded.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-11872c7244cd6c62a49237ba62672833b090bea5",
+      "source_path": "recovery.md",
+      "display_text": "## Sandbox reset\n\nThe training sandbox can erase its journal and start from any demonstration snapshot. That shortcut does not apply to production recovery.\n",
+      "line_start": 21,
+      "line_end": 23
+    },
+    {
+      "stable_chunk_id": "child-15a347475bcf9b1021a5d59c425e14ca47fd416a",
+      "source_path": "restore.md",
+      "display_text": "# Collection restore\n\nThese rules govern production collections restored from immutable snapshots.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-520acf1d9533af16dfcc061cec8fce8efd604336",
+      "source_path": "restore.md",
+      "display_text": "## Snapshot selection\n\nChoose a snapshot with a signed manifest and a completed integrity scan. Record the snapshot identifier before copying any payload. If the most recent snapshot lacks either requirement, choose an older snapshot that satisfies both.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-e83dd661082ca218849397fefde8095ccd98b1a1",
+      "source_path": "restore.md",
+      "display_text": "## Held collection\n\nA collection under an investigation hold may be restored into isolated staging only. Do not publish it until the archive custodian explicitly releases the hold.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-9b9050985377486256655d24339e6d9f6e330e97",
+      "source_path": "restore.md",
+      "display_text": "## Training archive\n\nDisposable training archives may use unsigned snapshots and overwrite their staging directories. They cannot serve as a source for a production restore.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-efd343122fcdcb63c0bd5c365a742efd93166050",
+      "source_path": "rollback.md",
+      "display_text": "# Pointer rollback\n\nRollback changes a published pointer while preserving the incident history.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-e5bbc97d5e71c2fe4579c9588fdb0c7998dbe47a",
+      "source_path": "rollback.md",
+      "display_text": "## Rollback\n\nRestore the previous snapshot pointer when publication verification fails. Preserve the failed publication record and its snapshot identifier for diagnosis. Do not delete the failed staging directory until the incident owner authorizes cleanup.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-17241416ce43df561ee66e377aba04d377afc4e3",
+      "source_path": "rollback.md",
+      "display_text": "## Abandoned preview\n\nAn unpublished preview pointer may be removed without changing the public collection. Preview removal is not a rollback of a published pointer.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-0c75e8f027bdeecb2607bdee52877075d362073c",
+      "source_path": "modules/tape/private.md",
+      "display_text": "# Tape drive module\n\nThis hardware-specific module is outside project-only scope.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-2a989b44700386d3c5cb81f33e678810e645f116",
+      "source_path": "modules/tape/private.md",
+      "display_text": "## Cleaning cycle\n\nThe tape lab runs a cleaning cycle after forty cartridge mounts. This is not a project-wide archive maintenance interval.\n",
+      "line_start": 5,
+      "line_end": 7
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "caa3ac914cd49025544fa506c80d39bdfda850d4d39eb8224805c80b31fa5a0e",
+  "storage_path": "/tmp/opencode/docatlas-evidence-9kkisaer/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-f3cc50844fe04d42a443d8f0029a6519",
+  "catalog_sha256": "57944aa53f4ed54cf960bfe7befc43638a9b510925fcd9f94f301d6f9263d51d",
+  "documents": [
+    {
+      "path": "architecture.md",
+      "content_sha256": "f8af0687cef5a6020a1f5f751e99ab2229f9b025c7bee87444ea991265b14411",
+      "catalog_entry_hash": "sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37"
+    },
+    {
+      "path": "modules/tape/private.md",
+      "content_sha256": "50025b185ecb2dbb422745332c9270c6b2e045c9d04d1ec48cf2fbd14d1d21b3",
+      "catalog_entry_hash": "sha256:fae20fbcd85b004ae133b5dc7417cae154a7caa22fcb238784cfb99a57443a7f"
+    },
+    {
+      "path": "overview.md",
+      "content_sha256": "41f7877f9c26f4b4c6aaddaa5af67c20d855ab597ddfa318f4c87c6ef4e8b3da",
+      "catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61"
+    },
+    {
+      "path": "publication.md",
+      "content_sha256": "9310be652bef298b60b8edce71c546baaae9c160f26b72f64af5c788dc9500dd",
+      "catalog_entry_hash": "sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb"
+    },
+    {
+      "path": "recovery.md",
+      "content_sha256": "b284cad528516c6e063648a7d92ee286b3d80e9fa332b59363af546a759d8c71",
+      "catalog_entry_hash": "sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698"
+    },
+    {
+      "path": "restore.md",
+      "content_sha256": "f45106810f04e1f9ce3249a0f8eb71835230cb6d659bbc4e4d1d091ce3e6b4f6",
+      "catalog_entry_hash": "sha256:a3a2987dabe15cfba5702c05653216204a86106f439765ede0cfcb96b5fa0e4c"
+    },
+    {
+      "path": "rollback.md",
+      "content_sha256": "c2718225f88d783bc219c89b7ec67715b71efb2bf9b6949e2bafaa9bf2efc5c5",
+      "catalog_entry_hash": "sha256:028dc9f650a7bdc2bf53a02a188c7bff819be1df7eaf77d87b34c076a45244c7"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-f3cc50844fe04d42a443d8f0029a6519",
+    "members": 7,
+    "new_count": 7,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 25,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 25
+  }
+}

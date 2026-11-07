@@ -1,0 +1,53 @@
+         73980247 function calls (57653872 primitive calls) in 27.471 seconds
+
+   Ordered by: internal time
+   List reduced from 1150 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+20101181/5370091    3.086    0.000    5.164    0.000 {built-in method builtins.hash}
+      585    2.270    0.004    2.270    0.004 {method 'fetchall' of 'sqlite3.Cursor' objects}
+     5920    1.704    0.000    1.704    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+  1234976    1.617    0.000    1.617    0.000 {method 'encode' of 'str' objects}
+    95061    1.246    0.000    3.098    0.000 structured_chunking.py:261(_atom_spans)
+     8184    1.064    0.000    5.298    0.001 structured_chunking.py:175(parse_markdown_parents)
+  4877549    1.029    0.000    1.029    0.000 {method 'match' of 're.Pattern' objects}
+  6385046    0.897    0.000    1.332    0.000 <string>:23(__hash__)
+   443068    0.707    0.000    0.707    0.000 encoder.py:207(iterencode)
+   103245    0.632    0.000    1.377    0.000 structured_chunking.py:154(_line_offsets)
+   988127    0.620    0.000    0.620    0.000 {built-in method _hashlib.openssl_sha256}
+    37751    0.479    0.000    0.479    0.000 decoder.py:351(raw_decode)
+     7695    0.447    0.000   12.773    0.002 source_dependency_graph.py:72(source_graph)
+6342261/6302507    0.431    0.000    0.438    0.000 {built-in method builtins.len}
+   126446    0.429    0.000    0.429    0.000 {method 'splitlines' of 'str' objects}
+    43104    0.422    0.000    0.716    0.000 source_dependency_graph.py:37(_list_parts)
+849282/63480    0.388    0.000    0.818    0.000 dataclasses.py:1362(_asdict_inner)
+     8115    0.385    0.000    3.781    0.000 evidence_set_validation.py:109(validate_evidence_set)
+   565744    0.384    0.000    1.371    0.000 source_dependency_graph.py:25(source_span)
+  4187007    0.354    0.000    0.354    0.000 {method 'append' of 'list' objects}
+   629550    0.332    0.000    1.450    0.000 source_dependency_graph.py:21(digest)
+   443069    0.311    0.000    1.144    0.000 encoder.py:185(encode)
+   443069    0.287    0.000    1.480    0.000 __init__.py:185(dumps)
+2793970/2255848    0.285    0.000    0.573    0.000 {built-in method builtins.isinstance}
+    12580    0.275    0.000    0.411    0.000 shard_compat.py:71(sync)
+   988127    0.257    0.000    0.257    0.000 {method 'hexdigest' of '_hashlib.HASH' objects}
+  2226398    0.257    0.000    0.257    0.000 {method 'strip' of 'str' objects}
+    98617    0.257    0.000    1.058    0.000 structured_chunking.py:167(_span_values)
+   214568    0.231    0.000    0.347    0.000 dataclasses.py:1308(fields)
+  2761591    0.230    0.000    0.230    0.000 {method 'startswith' of 'str' objects}
+     8181    0.207    0.000   16.666    0.002 evidence_set_validation.py:79(_build_source_sets)
+   117010    0.198    0.000    0.318    0.000 {built-in method builtins.all}
+  1462745    0.188    0.000    0.279    0.000 {method 'get' of 'dict' objects}
+    57856    0.168    0.000    1.211    0.000 evidence_set_validation.py:39(<genexpr>)
+  1014955    0.160    0.000    2.300    0.000 <string>:24(__hash__)
+   199610    0.157    0.000    0.888    0.000 structured_chunking.py:34(_digest)
+        1    0.155    0.155    1.506    1.506 _sqlite_store_part02.py:417(_validate_generation)
+        1    0.151    0.151   25.388   25.388 source_reference_evidence.py:178(prepare)
+   273221    0.144    0.000    0.505    0.000 {method 'extend' of 'list' objects}
+    11308    0.137    0.000    0.657    0.000 source_dependency_graph.py:53(_table_parts)
+   213498    0.132    0.000    0.501    0.000 query_planning.py:155(texts)
+   416312    0.129    0.000    0.245    0.000 source_dependency_graph.py:101(<genexpr>)
+    11860    0.124    0.000    1.009    0.000 query_planning.py:225(metadata_matches_filters)
+    11861    0.109    0.000    0.737    0.000 _sqlite_store_part03.py:234(iter_scope_candidates)
+    23722    0.104    0.000    0.723    0.000 query_planning.py:148(_filter_spec)
+
+

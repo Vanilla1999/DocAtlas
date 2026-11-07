@@ -1,0 +1,131 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original",
+    "query-lookup-1"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-d27c59e8e8904fa85c7c03e3",
+      "path_or_url": "seedbank.md",
+      "section": "Alder seed archive",
+      "snippet": "# Alder seed archive\n\nThis manual governs the archive's sealed seed envelopes, not living seedlings. Keep each accession identifier attached during every inspection.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "6e523810044a79aa39a23b99442279e27571aba16306e5e279a84477c7065e75",
+      "project_identity": "local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/e72c442829778e0bbfed3100"
+    },
+    {
+      "evidence_id": "ev-8207631370f079adc477a8c0",
+      "path_or_url": "seedbank.md",
+      "section": "Alder seed archive > Receiving envelopes",
+      "snippet": "## Receiving envelopes\n\nHold incoming envelopes in the dry cabinet for nineteen days. Before shelving them, record two humidity readings at least four days apart, both below thirty percent. If either reading reaches thirty percent, restart the entire nineteen-day hold after drying; do not average the readings to authorize shelving. The [damaged seal rule](#damaged-seal-rule) overrides a completed hold.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ddc850e26b8ec12c3a0173708f0cac461492202c27f1ebec499b1722edcfca23",
+      "project_identity": "local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/319fbda3cdceca47ceeb71d3"
+    },
+    {
+      "evidence_id": "ev-619f1a20b459607dd53769f0",
+      "path_or_url": "seedbank.md",
+      "section": "Alder seed archive > Receiving envelopes > Record cards",
+      "snippet": "### Record cards\n\nWrite the accession identifier and both measurement dates on the blue record card. A missing date prevents shelving until the record is corrected.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "bedacc505963fd343f2033296a55d08d8a515f526e0258715b444e022e0e3dc0",
+      "project_identity": "local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567",
+      "line_start": 9,
+      "line_end": 12,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/1ee8cc53af6a94659f477d5f"
+    },
+    {
+      "evidence_id": "ev-9e485a8092bd96f72ea0d85b",
+      "path_or_url": "seedbank.md",
+      "section": "Alder seed archive > Receiving envelopes > Cabinet furniture",
+      "snippet": "### Cabinet furniture\n\nThe cabinet has seven removable shelves. Spare shelf pins are kept in the maintenance locker.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "2bedd312f6a28953560ad3772e3aab33a228438e63fd33b28d15e7f48e55e27d",
+      "project_identity": "local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/d66b3e21766cd0ab18e846e8"
+    },
+    {
+      "evidence_id": "ev-757b9360d857250b729f9976",
+      "path_or_url": "seedbank.md",
+      "section": "Alder seed archive > Damaged seal rule",
+      "snippet": "## Damaged seal rule\n\nAn envelope with a split seal must be isolated in tray D and examined by the collection keeper before shelving, even when both humidity readings are below thirty percent.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3a4084b0aeafc2fb34877c6919e36a85139d3f6f5518a0b422a59ffeeb142345",
+      "project_identity": "local:5ad3fb5d641ea1182cbe171babdcbd3282e5f1d8401e40f050ae60de7b8bd567",
+      "line_start": 17,
+      "line_end": 20,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/c7c082f12011c4fcd5b07da6"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1210,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+    "calibration_status": "empirical",
+    "candidate_units": 6,
+    "selected_units": 2,
+    "delivered_rows": 5,
+    "scan_complete": true,
+    "model_pairs": 24,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 6,
+      "hydrated_sections": 6,
+      "selected_units": 2,
+      "delivered_spans": 5
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "12b91391415a375e69bd2c6c751708d6da137c9d4220f080a8577eec55c578bc"
+  }
+}

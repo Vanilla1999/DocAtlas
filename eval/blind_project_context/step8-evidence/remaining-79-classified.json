@@ -1,0 +1,584 @@
+{
+  "schema": "docatlas.ci-failure-classification.v1",
+  "run": {
+    "commit": "3f790c9cfe104667c80a8df69c5f2d26a6ab6457",
+    "summary": "79 failed, 1456 passed, 10 skipped, 136 deselected, 25 warnings in 281.36s (0:04:41)",
+    "failed": 79,
+    "errors": 0,
+    "passed": 1456,
+    "skipped": 10,
+    "deselected": 136,
+    "warnings": 25,
+    "elapsed_seconds": 281.36,
+    "junit_path": "/workspace/scratch/66f7674793b8/step8-evidence/core-confirmed.xml",
+    "junit_sha256": "c75f812a8ae8d2377aad43c9d36353034204dc4cbeb148f65fd1aa2d4cd9f3cd",
+    "log_path": "/workspace/scratch/66f7674793b8/step8-evidence/core-confirmed.log",
+    "log_sha256": "f29405e5b83a92b26ead1d5d7067141d777e35517613d7564ccb00fd7c8b02a8",
+    "dependency_policy": "uv.lock pinned dependencies",
+    "telemetry_opt_out": "ORT_DISABLE_TELEMETRY=1"
+  },
+  "classification_caveat": "Groups identify failure locations, not permission to weaken assertions or a claim that every old expectation is obsolete.",
+  "groups": {
+    "old_qualification_or_diagnostic_expectation": 30,
+    "independent_fact_or_complete_block_missing": 8,
+    "source_response_shape_status_or_mock_contract": 29,
+    "corpus_or_frozen_protocol_drift": 5,
+    "removed_private_module": 2,
+    "separate_product_contract_review": 5
+  },
+  "items": [
+    {
+      "test": "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+      "kind": "failure",
+      "message": "AssertionError: critical_relation_original_body_context",
+      "text": "tests/docs/test_admission_relation_safety.py:13: in test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto\n    run_relation_source_context_controls(tmp_path / 'current-source-context')\neval/agent_developer_v1/relation_source_context_controls.py:219: in run_relation_source_context_controls\n    _require(all(item[\"result\"].qualified is True and item[\"result\"].reason == \"visible_fields\"\neval/agent_developer_v1/relation_source_context_controls.py:37: in _require\n    raise AssertionError(guard)\nE   AssertionError: critical_relation_original_body_context",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+      "kind": "failure",
+      "message": "AssertionError: [{'id': 'flow_mcp', 'lookup_query_ids': ['query-lookup-1'], 'met': False, 'visible_witnesses': []}, {'id': 'flow_appli...rieval.md'}]}, {'id': 'flow_selection', 'lookup_query_ids': ['query-lookup-3'], 'met': False, 'visible_witnesses': []}]\nassert False\n +  where False = all(<generator object test_frozen_request_flow_prefers_project_context_module_witnesses.<locals>.<genexpr> at 0x7f4b4c48bd30>)",
+      "text": "tests/docs/test_context_projection_boundaries.py:187: in test_frozen_request_flow_prefers_project_context_module_witnesses\n    assert all(row[\"met\"] for row in verdict[\"obligations\"]), verdict[\"obligations\"]\nE   AssertionError: [{'id': 'flow_mcp', 'lookup_query_ids': ['query-lookup-1'], 'met': False, 'visible_witnesses': []}, {'id': 'flow_appli...rieval.md'}]}, {'id': 'flow_selection', 'lookup_query_ids': ['query-lookup-3'], 'met': False, 'visible_witnesses': []}]\nE   assert False\nE    +  where False = all(<generator object test_frozen_request_flow_prefers_project_context_module_witnesses.<locals>.<genexpr> at 0x7f4b4c48bd30>)",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/docs/test_context_projection_boundaries.py::test_path_only_projection_uses_the_current_exact_topic_guard",
+      "kind": "failure",
+      "message": "AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nassert 'ok' == 'insufficient_evidence'\n  \n  - insufficient_evidence\n  + ok",
+      "text": "tests/docs/test_context_projection_boundaries.py:50: in test_path_only_projection_uses_the_current_exact_topic_guard\n    assert negative[\"status\"] == \"insufficient_evidence\", negative\nE   AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nE   assert 'ok' == 'insufficient_evidence'\nE     \nE     - insufficient_evidence\nE     + ok",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_contiguous_seed_envelope.py::test_index_restriction_and_cause_arrive_together_in_first_packet",
+      "kind": "failure",
+      "message": "AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nassert False\n +  where False = any(<generator object test_index_restriction_and_cause_arrive_together_in_first_packet.<locals>.<genexpr> at 0x7f4b6eb0b3e0>)",
+      "text": "tests/docs/test_contiguous_seed_envelope.py:18: in test_index_restriction_and_cause_arrive_together_in_first_packet\n    assert any(required in s['snippet'] for s in payload.get('sources', [])), payload\nE   AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nE   assert False\nE    +  where False = any(<generator object test_index_restriction_and_cause_arrive_together_in_first_packet.<locals>.<genexpr> at 0x7f4b6eb0b3e0>)",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_complete_window_preserves_quality_and_quote",
+      "kind": "failure",
+      "message": "AssertionError: assert 2 == 1\n +  where 2 = len([{'authority': 'source_of_truth', 'content_sha256': '4d60040c7dd179f039d32ebe34d4e29292e0a339c368c4fb8ac48cbbc64c8488'...ca2033ddd5bbdfee90f4b91f3fcf55dcdf78e936dd41b6e102f28fda4', 'evidence_id': 'ev-b394f6368650a9a0', 'line_end': 40, ...}])",
+      "text": "tests/docs/test_docs_context_read_next.py:73: in test_final_public_handler_complete_window_preserves_quality_and_quote\n    assert len(payload[\"sources\"]) == 1\nE   AssertionError: assert 2 == 1\nE    +  where 2 = len([{'authority': 'source_of_truth', 'content_sha256': '4d60040c7dd179f039d32ebe34d4e29292e0a339c368c4fb8ac48cbbc64c8488'...ca2033ddd5bbdfee90f4b91f3fcf55dcdf78e936dd41b6e102f28fda4', 'evidence_id': 'ev-b394f6368650a9a0', 'line_end': 40, ...}])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[False-authorized]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-0b2661... ...}, {'evidence_id': 'ev-083f4f265aeb40a0', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-0b2661... ...}, {'evidence_id': 'ev-083f4f265aeb40a0', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[False-revoked]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-689a4a... ...}, {'evidence_id': 'ev-a6a0d554f5c439c1', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-689a4a... ...}, {'evidence_id': 'ev-a6a0d554f5c439c1', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[True-authorized]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-c4a009... ...}, {'evidence_id': 'ev-4fb21e45da44c550', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-c4a009... ...}, {'evidence_id': 'ev-4fb21e45da44c550', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[True-revoked]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-d9f146... ...}, {'evidence_id': 'ev-e9684102a4db0b0c', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-d9f146... ...}, {'evidence_id': 'ev-e9684102a4db0b0c', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[absent-authorized]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-601319... ...}, {'evidence_id': 'ev-39dab2dad52cd1bf', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-601319... ...}, {'evidence_id': 'ev-39dab2dad52cd1bf', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[absent-revoked]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-b14543... ...}, {'evidence_id': 'ev-06c0cc7757795309', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-b14543... ...}, {'evidence_id': 'ev-06c0cc7757795309', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[control-authorized]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-13df75... ...}, {'evidence_id': 'ev-da8d26fc19655847', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-13df75... ...}, {'evidence_id': 'ev-da8d26fc19655847', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_docs_context_read_next.py::test_final_public_handler_continuation_preserves_quality_and_usable_reference[control-revoked]",
+      "kind": "failure",
+      "message": "AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-258e23... ...}, {'evidence_id': 'ev-7378f68d0b7ad348', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nassert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_docs_context_read_next.py:195: in test_final_public_handler_continuation_preserves_quality_and_usable_reference\n    assert len(payload[\"read_next\"]) == 1, {\nE   AssertionError: {'envelope_attempt_count': 0, 'envelope_option_counts': [], 'source_count': 12, 'sources': [{'evidence_id': 'ev-258e23... ...}, {'evidence_id': 'ev-7378f68d0b7ad348', 'line_end': 10, 'line_start': 9, 'path_or_url': 'docs/polling.md', ...}]}\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_generic_context_workflows.py::test_contributor_live_reading_and_tests",
+      "kind": "failure",
+      "message": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "text": "tests/docs/test_generic_context_workflows.py:98: in test_contributor_live_reading_and_tests\n    validate_corpus()\neval/project_context_quality_v2_protocol.py:168: in validate_corpus\n    raise ValueError(f\"witness text is absent from active document: {path}\")\nE   ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "failure_location_group": "corpus_or_frozen_protocol_drift"
+    },
+    {
+      "test": "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+      "kind": "failure",
+      "message": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "text": "tests/docs/test_generic_context_workflows.py:64: in test_first_session_live_query\n    validate_corpus()\neval/project_context_quality_v2_protocol.py:168: in validate_corpus\n    raise ValueError(f\"witness text is absent from active document: {path}\")\nE   ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "failure_location_group": "corpus_or_frozen_protocol_drift"
+    },
+    {
+      "test": "tests/docs/test_generic_context_workflows.py::test_real_architecture_boundary_enters_candidates_without_borrowed_coverage",
+      "kind": "failure",
+      "message": "KeyError: 'matched_terms'",
+      "text": "tests/docs/test_generic_context_workflows.py:209: in test_real_architecture_boundary_enters_candidates_without_borrowed_coverage\n    assert trace[\"matched_terms\"] == [\"evidence\", \"qualification\"]\n           ^^^^^^^^^^^^^^^^^^^^^^\nE   KeyError: 'matched_terms'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-offline]",
+      "kind": "failure",
+      "message": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "text": "tests/docs/test_generic_context_workflows.py:122: in test_remaining_live_workflow_witnesses\n    validate_corpus()\neval/project_context_quality_v2_protocol.py:168: in validate_corpus\n    raise ValueError(f\"witness text is absent from active document: {path}\")\nE   ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "failure_location_group": "corpus_or_frozen_protocol_drift"
+    },
+    {
+      "test": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial]",
+      "kind": "failure",
+      "message": "ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "text": "tests/docs/test_generic_context_workflows.py:122: in test_remaining_live_workflow_witnesses\n    validate_corpus()\neval/project_context_quality_v2_protocol.py:168: in validate_corpus\n    raise ValueError(f\"witness text is absent from active document: {path}\")\nE   ValueError: witness text is absent from active document: docs/modules/project-context-retrieval.md",
+      "failure_location_group": "corpus_or_frozen_protocol_drift"
+    },
+    {
+      "test": "tests/docs/test_host_scope_contract.py::test_public_scope_never_implicitly_widens[all-None-What constraints apply to `ForeignOnlyAnswer`?-None]",
+      "kind": "failure",
+      "message": "AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nassert not {'README.md', 'packages/backend/README.md', 'packages/frontend/README.md'}",
+      "text": "/workspace/scratch/66f7674793b8/DocAtlas/tests/docs/test_host_scope_contract.py:105: in test_public_scope_never_implicitly_widens\n    assert not paths, payload\nE   AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nE   assert not {'README.md', 'packages/backend/README.md', 'packages/frontend/README.md'}",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/docs/test_joint_context_acceptance.py::test_original_and_known_paraphrase_deliver_complete_block[httpx-paraphrase-1]",
+      "kind": "failure",
+      "message": "AssertionError: {'case_id': 'httpx-paraphrase-1', 'payload': {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_availa..._paraph1/project', 'question': 'What do connect, read, write, and pool timeouts each limit in HTTPX?', 'scope': 'all'}}\nassert False\n +  where False = any(<generator object test_original_and_known_paraphrase_deliver_complete_block.<locals>.<genexpr> at 0x7f4b6ed8f760>)",
+      "text": "tests/docs/test_joint_context_acceptance.py:51: in test_original_and_known_paraphrase_deliver_complete_block\n    assert any(block in row['snippet'] for row in payload.get('sources', [])), {\nE   AssertionError: {'case_id': 'httpx-paraphrase-1', 'payload': {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_availa..._paraph1/project', 'question': 'What do connect, read, write, and pool timeouts each limit in HTTPX?', 'scope': 'all'}}\nE   assert False\nE    +  where False = any(<generator object test_original_and_known_paraphrase_deliver_complete_block.<locals>.<genexpr> at 0x7f4b6ed8f760>)",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/docs/test_joint_context_acceptance.py::test_original_and_known_paraphrase_deliver_complete_block[httpx-paraphrase-2]",
+      "kind": "failure",
+      "message": "AssertionError: {'case_id': 'httpx-paraphrase-2', 'payload': {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_availa...project', 'question': 'What is the difference between connect, read, write, and pool timeout limits?', 'scope': 'all'}}\nassert False\n +  where False = any(<generator object test_original_and_known_paraphrase_deliver_complete_block.<locals>.<genexpr> at 0x7f4b4d4ce5e0>)",
+      "text": "tests/docs/test_joint_context_acceptance.py:51: in test_original_and_known_paraphrase_deliver_complete_block\n    assert any(block in row['snippet'] for row in payload.get('sources', [])), {\nE   AssertionError: {'case_id': 'httpx-paraphrase-2', 'payload': {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_availa...project', 'question': 'What is the difference between connect, read, write, and pool timeout limits?', 'scope': 'all'}}\nE   assert False\nE    +  where False = any(<generator object test_original_and_known_paraphrase_deliver_complete_block.<locals>.<genexpr> at 0x7f4b4d4ce5e0>)",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/docs/test_language_flow_experiment.py::test_real_frozen_flow_all_witnesses_without_changing_expected_labels",
+      "kind": "failure",
+      "message": "ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/workspace/scratch/66f7674793b8/DocAtlas/docmancer/docs/application/__init__.py)",
+      "text": "tests/docs/test_language_flow_experiment.py:10: in test_real_frozen_flow_all_witnesses_without_changing_expected_labels\n    with flow_experiment():\n         ^^^^^^^^^^^^^^^^^\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\nexperiments/language_aware_context/flow_experiment.py:53: in flow_experiment\n    from docmancer.docs.application import _docs_context_projection_core as core\nE   ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/workspace/scratch/66f7674793b8/DocAtlas/docmancer/docs/application/__init__.py)",
+      "failure_location_group": "removed_private_module"
+    },
+    {
+      "test": "tests/docs/test_language_packing_experiment.py::test_real_handler_retains_complete_client_example_with_lookup",
+      "kind": "failure",
+      "message": "ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/workspace/scratch/66f7674793b8/DocAtlas/docmancer/docs/application/__init__.py)",
+      "text": "tests/docs/test_language_packing_experiment.py:19: in test_real_handler_retains_complete_client_example_with_lookup\n    with packing_experiment():\n         ^^^^^^^^^^^^^^^^^^^^\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\nexperiments/language_aware_context/packing_experiment.py:42: in packing_experiment\n    from docmancer.docs.application import _docs_context_projection_core as core\nE   ImportError: cannot import name '_docs_context_projection_core' from 'docmancer.docs.application' (/workspace/scratch/66f7674793b8/DocAtlas/docmancer/docs/application/__init__.py)",
+      "failure_location_group": "removed_private_module"
+    },
+    {
+      "test": "tests/docs/test_language_packing_trace.py::test_same_prepared_input_delivers_complete_quote_with_intervention",
+      "kind": "failure",
+      "message": "assert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/docs/test_language_packing_trace.py:49: in test_same_prepared_input_delivers_complete_quote_with_intervention\n    assert len(replayed) == 1\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+      "kind": "failure",
+      "message": "AssertionError: critical_mixed_same_call_snapshot",
+      "text": "tests/docs/test_mixed_context_projection_contract.py:337: in test_mixed_context_preserves_current_same_call_source_bindings\n    project_input, project_incoming = healthy(\ntests/docs/test_mixed_context_projection_contract.py:264: in healthy\n    check_source(row, bound, children[0], body if row[\"path_or_url\"] == path else library_body,\ntests/docs/test_mixed_context_projection_contract.py:164: in check_source\n    require(set(visible) == source_fields and visible == bound[\"projected_source\"],\ntests/docs/test_mixed_context_projection_contract.py:56: in require\n    raise AssertionError(guard)\nE   AssertionError: critical_mixed_same_call_snapshot",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+      "kind": "failure",
+      "message": "AssertionError: assert {'flow_gateway'} == {'flow_applic...ow_selection'}\n  \n  Extra items in the right set:\n  'flow_application'\n  'flow_mcp'\n  'flow_selection'\n  Use -v to get more diff",
+      "text": "tests/docs/test_request_flow_lineage.py:43: in test_request_flow_public_contract_remains_four_fact_fail_safe\n    assert {row[\"id\"] for row in verdict[\"obligations\"] if row[\"met\"]} == {\nE   AssertionError: assert {'flow_gateway'} == {'flow_applic...ow_selection'}\nE     \nE     Extra items in the right set:\nE     'flow_application'\nE     'flow_mcp'\nE     'flow_selection'\nE     Use -v to get more diff",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot",
+      "kind": "failure",
+      "message": "AssertionError: assert 'query-original' in []",
+      "text": "tests/docs/test_source_continuation.py:142: in test_public_handler_binds_reader_to_real_active_sqlite_snapshot\n    assert 'query-original' in observed['covered_query_ids']\nE   AssertionError: assert 'query-original' in []",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_condition_lead.py::test_neutral_condition_remains_complete_without_certifying_postconditions",
+      "kind": "failure",
+      "message": "assert False\n +  where False = any(<generator object test_neutral_condition_remains_complete_without_certifying_postconditions.<locals>.<genexpr> at 0x7f4b6ec6a0a0>)",
+      "text": "tests/evidence_quality_v2/test_condition_lead.py:33: in test_neutral_condition_remains_complete_without_certifying_postconditions\n    assert any(condition in s['snippet'] for s in payload.get('sources', []))\nE   assert False\nE    +  where False = any(<generator object test_neutral_condition_remains_complete_without_certifying_postconditions.<locals>.<genexpr> at 0x7f4b6ec6a0a0>)",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[freshness]",
+      "kind": "failure",
+      "message": "KeyError: 'answer_supported'",
+      "text": "tests/evidence_quality_v2/test_readme_neutral_context.py:61: in test_hint_context_does_not_bypass_candidate_safety\n    assert payload['answer_supported'] is False\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   KeyError: 'answer_supported'",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[lifecycle]",
+      "kind": "failure",
+      "message": "KeyError: 'answer_supported'",
+      "text": "tests/evidence_quality_v2/test_readme_neutral_context.py:61: in test_hint_context_does_not_bypass_candidate_safety\n    assert payload['answer_supported'] is False\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   KeyError: 'answer_supported'",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[project]",
+      "kind": "failure",
+      "message": "KeyError: 'answer_supported'",
+      "text": "tests/evidence_quality_v2/test_readme_neutral_context.py:61: in test_hint_context_does_not_bypass_candidate_safety\n    assert payload['answer_supported'] is False\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   KeyError: 'answer_supported'",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_hint_context_does_not_bypass_candidate_safety[stale]",
+      "kind": "failure",
+      "message": "KeyError: 'answer_supported'",
+      "text": "tests/evidence_quality_v2/test_readme_neutral_context.py:61: in test_hint_context_does_not_bypass_candidate_safety\n    assert payload['answer_supported'] is False\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   KeyError: 'answer_supported'",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_name_only_hint_does_not_establish_an_unknown_topic[\\u041a\\u0430\\u043a Pebble Pebble \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?]",
+      "kind": "failure",
+      "message": "AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nassert not True\n +  where True = <built-in method get of dict object at 0x7f4b44559b80>('context_available')\n +    where <built-in method get of dict object at 0x7f4b44559b80> = {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}.get",
+      "text": "tests/evidence_quality_v2/test_readme_neutral_context.py:129: in test_name_only_hint_does_not_establish_an_unknown_topic\n    assert not answer.get(\"context_available\"), answer\nE   AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nE   assert not True\nE    +  where True = <built-in method get of dict object at 0x7f4b44559b80>('context_available')\nE    +    where <built-in method get of dict object at 0x7f4b44559b80> = {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}.get",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_name_only_hint_does_not_establish_an_unknown_topic[\\u041a\\u0430\\u043a Pebble \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?]",
+      "kind": "failure",
+      "message": "AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nassert not True\n +  where True = <built-in method get of dict object at 0x7f4b6bf34e80>('context_available')\n +    where <built-in method get of dict object at 0x7f4b6bf34e80> = {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}.get",
+      "text": "tests/evidence_quality_v2/test_readme_neutral_context.py:129: in test_name_only_hint_does_not_establish_an_unknown_topic\n    assert not answer.get(\"context_available\"), answer\nE   AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nE   assert not True\nE    +  where True = <built-in method get of dict object at 0x7f4b6bf34e80>('context_available')\nE    +    where <built-in method get of dict object at 0x7f4b6bf34e80> = {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}.get",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_acquisition_source_content_reads_unchanged_validation_io_increases",
+      "kind": "failure",
+      "message": "AssertionError: assert set() == {'/workspace/...ct-docs.yaml'}\n  \n  Extra items in the right set:\n  '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_acquisition_source_conten0/docatlas.project-docs.yaml'\n  Use -v to get more diff",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:267: in test_acquisition_source_content_reads_unchanged_validation_io_increases\n    assert set(reads) == {str(p.root / 'docatlas.project-docs.yaml')}\nE   AssertionError: assert set() == {'/workspace/...ct-docs.yaml'}\nE     \nE     Extra items in the right set:\nE     '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_acquisition_source_conten0/docatlas.project-docs.yaml'\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_completed_invocation_cannot_deliver_another_result_or_sink[changed_result]",
+      "kind": "failure",
+      "message": "KeyError: 'error'",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:539: in test_completed_invocation_cannot_deliver_another_result_or_sink\n    assert result['error']['reason_code'] == 'unsupported_found_window_retention'\n           ^^^^^^^^^^^^^^^\nE   KeyError: 'error'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_completed_invocation_cannot_deliver_another_result_or_sink[changed_sink]",
+      "kind": "failure",
+      "message": "KeyError: 'error'",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:539: in test_completed_invocation_cannot_deliver_another_result_or_sink\n    assert result['error']['reason_code'] == 'unsupported_found_window_retention'\n           ^^^^^^^^^^^^^^^\nE   KeyError: 'error'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_explicit_public_patch_retains_windows_with_live_validation",
+      "kind": "failure",
+      "message": "KeyError: 'sources'",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:158: in test_explicit_public_patch_retains_windows_with_live_validation\n    assert len(packet['sources']) == 32\n               ^^^^^^^^^^^^^^^^^\nE   KeyError: 'sources'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_final_merge_retains_qualified_windows_without_changing_acquisition",
+      "kind": "failure",
+      "message": "assert 0 == 32\n +  where 0 = len([])\n +  and   32 = len({'child-0': '```python\\ndef validate_binding(record):\\n    if record[\"binding_0_0\"] != \"contract-0-0\":\\n        raise ...11_35\"] != \"contract-11-35\":\\n        raise ValueError(\"invalid contract 11 field 35\")\\n    return record\\n```\\n', ...})",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:116: in test_final_merge_retains_qualified_windows_without_changing_acquisition\n    assert len(rows) == len(expected)\nE   assert 0 == 32\nE    +  where 0 = len([])\nE    +  and   32 = len({'child-0': '```python\\ndef validate_binding(record):\\n    if record[\"binding_0_0\"] != \"contract-0-0\":\\n        raise ...11_35\"] != \"contract-11-35\":\\n        raise ValueError(\"invalid contract 11 field 35\")\\n    return record\\n```\\n', ...})",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_late_catalog_authority_change_is_rejected",
+      "kind": "failure",
+      "message": "KeyError: 'error'",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:199: in test_late_catalog_authority_change_is_rejected\n    assert result['error']['reason_code'] == 'invalid_action_packet'\n           ^^^^^^^^^^^^^^^\nE   KeyError: 'error'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_partial_packet_preserves_explicit_constraints_and_window_bindings",
+      "kind": "failure",
+      "message": "AssertionError: assert 'unavailable' == 'partial'\n  \n  - partial\n  + unavailable",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:213: in test_partial_packet_preserves_explicit_constraints_and_window_bindings\n    assert packet['completeness'] == 'partial'\nE   AssertionError: assert 'unavailable' == 'partial'\nE     \nE     - partial\nE     + unavailable",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_project_control_view_and_routing_remain_bounded",
+      "kind": "failure",
+      "message": "AssertionError: assert 0 == 32\n +  where 0 = len([])\n +    where [] = ProjectContextResult(project_path='/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_project_cont..._ids': [], 'assigned_requirement_ids': []}}}, message='Indexed project docs exist, but no results matched this query.').context_pack",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:136: in test_project_control_view_and_routing_remain_bounded\n    assert len(retained.context_pack) == 32\nE   AssertionError: assert 0 == 32\nE    +  where 0 = len([])\nE    +    where [] = ProjectContextResult(project_path='/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_project_cont..._ids': [], 'assigned_requirement_ids': []}}}, message='Indexed project docs exist, but no results matched this query.').context_pack",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_ranking_retains_only_independently_qualified_eligible_windows",
+      "kind": "failure",
+      "message": "IndexError: list index out of range",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:173: in test_ranking_retains_only_independently_qualified_eligible_windows\n    good = sink[0]\n           ^^^^^^^\nE   IndexError: list index out of range",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_real_generation_duplicate_lookup_bindings_survive",
+      "kind": "failure",
+      "message": "assert []",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:476: in test_real_generation_duplicate_lookup_bindings_survive\n    assert independent\nE   assert []",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_real_lexical_public_retention_preserves_every_qualified_window",
+      "kind": "failure",
+      "message": "assert 0 == 1\n +  where 0 = len([])",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:761: in test_real_lexical_public_retention_preserves_every_qualified_window\n    assert len(docs_ranking) == 1\nE   assert 0 == 1\nE    +  where 0 = len([])",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_supported_project_docs_delegate_completes_actual_result_and_sink",
+      "kind": "failure",
+      "message": "KeyError: 'sources'",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:582: in test_supported_project_docs_delegate_completes_actual_result_and_sink\n    assert result['kind'] == 'patch_context' and len(result['sources']) == 32\n                                                     ^^^^^^^^^^^^^^^^^\nE   KeyError: 'sources'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[false]",
+      "kind": "failure",
+      "message": "AssertionError: assert [] == [{'chunk_inde...d', ...}, ...]\n  \n  Right contains 64 more items, first extra item: {'chunk_index': 0, 'metadata': {'authority': 'source_of_truth', 'char_span': [0, 3848], 'display_content_hash': 'bf411...ce': '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_unacknowledged_query_pres1/rules.md', ...}\n  Use -v to get more diff",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:609: in test_unacknowledged_query_preserves_noncopyable_requirements\n    assert [row.model_dump() for row in actual] == [row.model_dump() for row in expected]\nE   AssertionError: assert [] == [{'chunk_inde...d', ...}, ...]\nE     \nE     Right contains 64 more items, first extra item: {'chunk_index': 0, 'metadata': {'authority': 'source_of_truth', 'char_span': [0, 3848], 'display_content_hash': 'bf411...ce': '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_unacknowledged_query_pres1/rules.md', ...}\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[omitted]",
+      "kind": "failure",
+      "message": "AssertionError: assert [] == [{'chunk_inde...d', ...}, ...]\n  \n  Right contains 64 more items, first extra item: {'chunk_index': 0, 'metadata': {'authority': 'source_of_truth', 'char_span': [0, 3848], 'display_content_hash': 'bf411...ce': '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_unacknowledged_query_pres0/rules.md', ...}\n  Use -v to get more diff",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:609: in test_unacknowledged_query_preserves_noncopyable_requirements\n    assert [row.model_dump() for row in actual] == [row.model_dump() for row in expected]\nE   AssertionError: assert [] == [{'chunk_inde...d', ...}, ...]\nE     \nE     Right contains 64 more items, first extra item: {'chunk_index': 0, 'metadata': {'authority': 'source_of_truth', 'char_span': [0, 3848], 'display_content_hash': 'bf411...ce': '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_unacknowledged_query_pres0/rules.md', ...}\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_found_window_retention.py::test_unacknowledged_query_preserves_noncopyable_requirements[unacknowledged-true]",
+      "kind": "failure",
+      "message": "AssertionError: assert [] == [{'chunk_inde...d', ...}, ...]\n  \n  Right contains 64 more items, first extra item: {'chunk_index': 0, 'metadata': {'authority': 'source_of_truth', 'char_span': [0, 3848], 'display_content_hash': 'bf411...ce': '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_unacknowledged_query_pres2/rules.md', ...}\n  Use -v to get more diff",
+      "text": "tests/test_action_packet_v4_found_window_retention.py:609: in test_unacknowledged_query_preserves_noncopyable_requirements\n    assert [row.model_dump() for row in actual] == [row.model_dump() for row in expected]\nE   AssertionError: assert [] == [{'chunk_inde...d', ...}, ...]\nE     \nE     Right contains 64 more items, first extra item: {'chunk_index': 0, 'metadata': {'authority': 'source_of_truth', 'char_span': [0, 3848], 'display_content_hash': 'bf411...ce': '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_unacknowledged_query_pres2/rules.md', ...}\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_action_packet_v4_public.py::test_patch_order_is_deterministic",
+      "kind": "failure",
+      "message": "AssertionError: assert {'assignments...': 14044, ...} == {'assignments...': 14045, ...}\n  \n  Omitting 5 identical items, use -vv to show\n  Differing items:\n  {'sources': [{'authority': 'canonical', 'char_end': 2721, 'char_start': 0, 'content_sha256': 'b32da416b64f0670f032bc37...721, 'char_start': 0, 'content_sha256': 'e52467a9dbbc2839a26d6a8eed06b51e145dd6ff6f79db0313b42f021c56aa20', ...}, ...]} != {'sources': [{'authority': 'canonical', 'char_end': 2783, 'char_start': 0, 'content_sha256': '2ed78e9a30d1eabe2b8768ba...721, 'char_start': 0, 'content_sha256': '0b71b9918df5a0c15e888ef9af04e0120d5429c6c89adb3d151491e99886986e', ...}, ...]}\n  {'estimated_tokens': 14044} != {'...\n  \n  ...Full output truncated (3 lines hidden), use '-vv' to show",
+      "text": "tests/test_action_packet_v4_public.py:275: in test_patch_order_is_deterministic\n    assert first == second\nE   AssertionError: assert {'assignments...': 14044, ...} == {'assignments...': 14045, ...}\nE     \nE     Omitting 5 identical items, use -vv to show\nE     Differing items:\nE     {'sources': [{'authority': 'canonical', 'char_end': 2721, 'char_start': 0, 'content_sha256': 'b32da416b64f0670f032bc37...721, 'char_start': 0, 'content_sha256': 'e52467a9dbbc2839a26d6a8eed06b51e145dd6ff6f79db0313b42f021c56aa20', ...}, ...]} != {'sources': [{'authority': 'canonical', 'char_end': 2783, 'char_start': 0, 'content_sha256': '2ed78e9a30d1eabe2b8768ba...721, 'char_start': 0, 'content_sha256': '0b71b9918df5a0c15e888ef9af04e0120d5429c6c89adb3d151491e99886986e', ...}, ...]}\nE     {'estimated_tokens': 14044} != {'...\nE     \nE     ...Full output truncated (3 lines hidden), use '-vv' to show",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_action_packet_v4_public.py::test_public_caller_kind_and_mutation_do_not_change_docs_policy",
+      "kind": "failure",
+      "message": "KeyError: 'kind'",
+      "text": "tests/test_action_packet_v4_public.py:239: in test_public_caller_kind_and_mutation_do_not_change_docs_policy\n    assert result['kind'] == 'docs_answer'\n           ^^^^^^^^^^^^^^\nE   KeyError: 'kind'",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_action_packet_v4_public.py::test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap",
+      "kind": "failure",
+      "message": "KeyError: 'result'",
+      "text": "tests/test_action_packet_v4_public.py:362: in test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap\n    assert result[\"result\"] == \"data\" and result[\"completeness\"] == \"partial\"\n           ^^^^^^^^^^^^^^^^\nE   KeyError: 'result'",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+      "kind": "failure",
+      "message": "AssertionError: {'answer_available': False, 'answer_supported': False, 'confirmation_reason': 'project_docs_preflight', 'context_available': False, ...}\nassert 155 <= 150\n +  where 155 = _packet_proxy({'answer_available': False, 'answer_supported': False, 'confirmation_reason': 'project_docs_preflight', 'context_available': False, ...})",
+      "text": "tests/test_context_budget_refusal_integration.py:48: in test_final_budget_preserves_stale_source_denial_and_confirmation\n    assert _packet_proxy(bounded) <= REFUSAL_CAP, bounded\nE   AssertionError: {'answer_available': False, 'answer_supported': False, 'confirmation_reason': 'project_docs_preflight', 'context_available': False, ...}\nE   assert 155 <= 150\nE    +  where 155 = _packet_proxy({'answer_available': False, 'answer_supported': False, 'confirmation_reason': 'project_docs_preflight', 'context_available': False, ...})",
+      "failure_location_group": "separate_product_contract_review"
+    },
+    {
+      "test": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries0]",
+      "kind": "failure",
+      "message": "AssertionError: assert ['child-81467...35729b1d511b'] == []\n  \n  Left contains one more item: 'child-81467d945e81a607a3c3e114e1a935729b1d511b'\n  Use -v to get more diff",
+      "text": "tests/test_dictionary_exit_indexed_mcp.py:37: in test_indexed_repo_quote_without_answer_authority_survives_public_mcp\n    assert payload[\"diagnostics\"][\"qualification_rejections\"] == []\nE   AssertionError: assert ['child-81467...35729b1d511b'] == []\nE     \nE     Left contains one more item: 'child-81467d945e81a607a3c3e114e1a935729b1d511b'\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries1]",
+      "kind": "failure",
+      "message": "AssertionError: assert ['child-d6c0f...257729897800'] == []\n  \n  Left contains 2 more items, first extra item: 'child-d6c0f9ddb9d1ee784fe17fe9d79d257729897800'\n  Use -v to get more diff",
+      "text": "tests/test_dictionary_exit_indexed_mcp.py:37: in test_indexed_repo_quote_without_answer_authority_survives_public_mcp\n    assert payload[\"diagnostics\"][\"qualification_rejections\"] == []\nE   AssertionError: assert ['child-d6c0f...257729897800'] == []\nE     \nE     Left contains 2 more items, first extra item: 'child-d6c0f9ddb9d1ee784fe17fe9d79d257729897800'\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[absent]",
+      "kind": "failure",
+      "message": "AssertionError: assert ([{'behavior':...': None, ...}] == []\n  \n  Left contains one more item: {'behavior': 'Selected local source context; behavior remains unresolved.', 'confidence': 'unknown', 'content_hash': None, 'end_line': None, ...}\n  Use -v to get more diff)",
+      "text": "tests/test_dictionary_exit_local_callers.py:95: in test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence\n    assert mapped[\"current_behavior\"] == [] and mapped[\"minimal_patch_path\"] == []\nE   AssertionError: assert ([{'behavior':...': None, ...}] == []\nE     \nE     Left contains one more item: {'behavior': 'Selected local source context; behavior remains unresolved.', 'confidence': 'unknown', 'content_hash': None, 'end_line': None, ...}\nE     Use -v to get more diff)",
+      "failure_location_group": "separate_product_contract_review"
+    },
+    {
+      "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[empty]",
+      "kind": "failure",
+      "message": "AssertionError: assert ([{'behavior':...': None, ...}] == []\n  \n  Left contains one more item: {'behavior': 'Selected local source context; behavior remains unresolved.', 'confidence': 'unknown', 'content_hash': None, 'end_line': None, ...}\n  Use -v to get more diff)",
+      "text": "tests/test_dictionary_exit_local_callers.py:95: in test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence\n    assert mapped[\"current_behavior\"] == [] and mapped[\"minimal_patch_path\"] == []\nE   AssertionError: assert ([{'behavior':...': None, ...}] == []\nE     \nE     Left contains one more item: {'behavior': 'Selected local source context; behavior remains unresolved.', 'confidence': 'unknown', 'content_hash': None, 'end_line': None, ...}\nE     Use -v to get more diff)",
+      "failure_location_group": "separate_product_contract_review"
+    },
+    {
+      "test": "tests/test_dictionary_exit_local_callers.py::test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence[invalid]",
+      "kind": "failure",
+      "message": "AssertionError: assert ([{'behavior':...': None, ...}] == []\n  \n  Left contains one more item: {'behavior': 'Selected local source context; behavior remains unresolved.', 'confidence': 'unknown', 'content_hash': None, 'end_line': None, ...}\n  Use -v to get more diff)",
+      "text": "tests/test_dictionary_exit_local_callers.py:95: in test_callable_scanners_empty_code_never_enumerate_read_or_certify_absence\n    assert mapped[\"current_behavior\"] == [] and mapped[\"minimal_patch_path\"] == []\nE   AssertionError: assert ([{'behavior':...': None, ...}] == []\nE     \nE     Left contains one more item: {'behavior': 'Selected local source context; behavior remains unresolved.', 'confidence': 'unknown', 'content_hash': None, 'end_line': None, ...}\nE     Use -v to get more diff)",
+      "failure_location_group": "separate_product_contract_review"
+    },
+    {
+      "test": "tests/test_dictionary_exit_local_membership.py::test_committed_pilot_exact_roles_hashes_and_no_discovery",
+      "kind": "failure",
+      "message": "AssertionError: assert {'CONTRIBUTIN...runbook', ...} == {'CONTRIBUTIN...tecture', ...}\n  \n  Omitting 14 identical items, use -vv to show\n  Left contains 5 more items:\n  {'docs/PROJECT_BINDING.md': 'runbook',\n   'docs/main-flow-evaluation.md': 'development',\n   'docs/main-flow-logging.md': 'runbook',\n   'docs/opencode-compact-text.md': 'runbook',\n   'wiki/Configuration.md': 'runbook'}\n  Use -v to get more diff",
+      "text": "tests/test_dictionary_exit_local_membership.py:77: in test_committed_pilot_exact_roles_hashes_and_no_discovery\n    assert {item.path: item.reason for item in metadata.docs_candidates} == PILOT\nE   AssertionError: assert {'CONTRIBUTIN...runbook', ...} == {'CONTRIBUTIN...tecture', ...}\nE     \nE     Omitting 14 identical items, use -vv to show\nE     Left contains 5 more items:\nE     {'docs/PROJECT_BINDING.md': 'runbook',\nE      'docs/main-flow-evaluation.md': 'development',\nE      'docs/main-flow-logging.md': 'runbook',\nE      'docs/opencode-compact-text.md': 'runbook',\nE      'wiki/Configuration.md': 'runbook'}\nE     Use -v to get more diff",
+      "failure_location_group": "corpus_or_frozen_protocol_drift"
+    },
+    {
+      "test": "tests/test_dictionary_exit_public_request.py::test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator[insufficient_evidence]",
+      "kind": "failure",
+      "message": "assert False",
+      "text": "tests/test_dictionary_exit_public_request.py:107: in test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator\n    assert captured[\"projection\"][\"context_available\"]\nE   assert False",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_dictionary_exit_public_request.py::test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator[ok]",
+      "kind": "failure",
+      "message": "assert False",
+      "text": "tests/test_dictionary_exit_public_request.py:107: in test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator\n    assert captured[\"projection\"][\"context_available\"]\nE   assert False",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_dictionary_exit_review_boundaries.py::test_actual_public_partial_quote_survives_without_explicit_block",
+      "kind": "failure",
+      "message": "AssertionError: assert ('insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence)",
+      "text": "tests/test_dictionary_exit_review_boundaries.py:235: in test_actual_public_partial_quote_survives_without_explicit_block\n    assert result[\"status\"] == \"ok\" and result[\"sources\"]\nE   AssertionError: assert ('insufficient_evidence' == 'ok'\nE     \nE     - ok\nE     + insufficient_evidence)",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_docs_mcp_stdio_delivery.py::test_acquisition_observer_uses_real_small_public_route_without_changing_results",
+      "kind": "failure",
+      "message": "assert 0 > 0",
+      "text": "tests/test_docs_mcp_stdio_delivery.py:300: in test_acquisition_observer_uses_real_small_public_route_without_changing_results\n    assert report[\"qualified\"][\"unique_nonoverlap_utf8_bytes\"] > 0\nE   assert 0 > 0",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_docs_mcp_stdio_delivery.py::test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten",
+      "kind": "failure",
+      "message": "AssertionError: assert ([{'byte_end': 100, 'byte_start': 0, 'canonical_id': 'local-transport-fixture@1.0.0', 'char_end': 96, ...}] and False)\n +  where False = any(<generator object test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten.<locals>.<genexpr> at 0x7f4b4c357e00>)",
+      "text": "tests/test_docs_mcp_stdio_delivery.py:134: in test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten\n    assert rows and any(row[\"display_text\"] != row[\"content\"] for row in rows)\nE   AssertionError: assert ([{'byte_end': 100, 'byte_start': 0, 'canonical_id': 'local-transport-fixture@1.0.0', 'char_end': 96, ...}] and False)\nE    +  where False = any(<generator object test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overwritten.<locals>.<genexpr> at 0x7f4b4c357e00>)",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_heuristic_removal_public_integration.py::test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only",
+      "kind": "failure",
+      "message": "AssertionError: assert [('docs/issue... storage.\\n')] == [('docs/issue...optique».\\n')]\n  \n  Left contains one more item: ('docs/packing.md', '## Storage after return\\n\\nRemove the blue transport tags before putting empty cases into storage.\\n')\n  Use -v to get more diff",
+      "text": "tests/test_heuristic_removal_public_integration.py:189: in test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only\n    assert [(row[\"path\"], row[\"text\"]) for row in patch_context[\"sources\"]] == [\nE   AssertionError: assert [('docs/issue... storage.\\n')] == [('docs/issue...optique».\\n')]\nE     \nE     Left contains one more item: ('docs/packing.md', '## Storage after return\\n\\nRemove the blue transport tags before putting empty cases into storage.\\n')\nE     Use -v to get more diff",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+      "kind": "failure",
+      "message": "AssertionError: critical_project_read_acquired_qualified",
+      "text": "tests/test_mcp_delivery_member_transaction.py:932: in test_real_service_retrieves_committed_fixture_member_bytes\n    run_project_read_presentation_controls(root.parent / \"read-presentation\", _member_storage_files)\neval/agent_developer_v1/project_read_presentation_controls.py:179: in run_project_read_presentation_controls\n    require(row.path in documents and row.content == documents[row.path]\neval/agent_developer_v1/project_read_presentation_controls.py:46: in require\n    raise AssertionError(guard)\nE   AssertionError: critical_project_read_acquired_qualified",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_named_document_context_integration.py::test_public_project_answer_heading_only_is_not_factual_proof",
+      "kind": "failure",
+      "message": "AssertionError: assert 'ok' == 'insufficient_evidence'\n  \n  - insufficient_evidence\n  + ok",
+      "text": "tests/test_named_document_context_integration.py:236: in test_public_project_answer_heading_only_is_not_factual_proof\n    assert result[\"status\"] == \"insufficient_evidence\"\nE   AssertionError: assert 'ok' == 'insufficient_evidence'\nE     \nE     - insufficient_evidence\nE     + ok",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_named_document_context_integration.py::test_real_sqlite_newcomer_topics_reach_expected_project_docs[How are external dependency docs prepared for a project?-docs/project-docs-mcp-workflow.md-prefetch_project_dependency_docs]",
+      "kind": "failure",
+      "message": "AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nassert 'truncated' == 'ok'\n  \n  - ok\n  + truncated",
+      "text": "tests/test_named_document_context_integration.py:502: in test_real_sqlite_newcomer_topics_reach_expected_project_docs\n    assert result[\"status\"] == \"ok\", result\nE   AssertionError: {'admission_contract': 'source_only_heuristic_removal_v1', 'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, ...}\nE   assert 'truncated' == 'ok'\nE     \nE     - ok\nE     + truncated",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_native_context_preservation_integration.py::test_selected_native_context_survives_public_delivery_with_trace_parity",
+      "kind": "failure",
+      "message": "AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}\n  \n  Extra items in the left set:\n  'budget.output'\n  'budget.input'",
+      "text": "tests/test_native_context_preservation_integration.py:235: in test_selected_native_context_survives_public_delivery_with_trace_parity\n    _assert_trace_contract(records)\ntests/test_native_context_preservation_integration.py:106: in _assert_trace_contract\n    assert {\"recheck.input\", \"recheck.output\", \"budget.input\", \"budget.output\"} <= {\nE   AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}\nE     \nE     Extra items in the left set:\nE     'budget.output'\nE     'budget.input'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_nl_dictionary_removal_literal_contract.py::test_public_mcp_read_keeps_risk_labelled_quote_and_denies_permissions",
+      "kind": "failure",
+      "message": "AssertionError: assert ('insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence)",
+      "text": "tests/test_nl_dictionary_removal_literal_contract.py:61: in test_public_mcp_read_keeps_risk_labelled_quote_and_denies_permissions\n    assert public[\"status\"] == \"ok\" and public[\"kind\"] == \"docs_context\"\nE   AssertionError: assert ('insufficient_evidence' == 'ok'\nE     \nE     - ok\nE     + insufficient_evidence)",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_parent_child_index.py::test_plain_documents_create_a_queryable_current_generation",
+      "kind": "failure",
+      "message": "AssertionError: assert ['both.md', 'alpha.md'] == ['both.md']\n  \n  Left contains one more item: 'alpha.md'\n  Use -v to get more diff",
+      "text": "tests/test_parent_child_index.py:263: in test_plain_documents_create_a_queryable_current_generation\n    assert [result.source for result in results] == [\"both.md\"]\nE   AssertionError: assert ['both.md', 'alpha.md'] == ['both.md']\nE     \nE     Left contains one more item: 'alpha.md'\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+      "kind": "failure",
+      "message": "AssertionError: ('docs/dispatch.md', 'Record the serial number from each lens barrel in the case inventory before closing the case.', ['# Optical case dispatch checklist\n  \n  Complete every dispatch checklist step before handing over an optical case.\n  '])\nassert False\n +  where False = any(<generator object _assert_facts.<locals>.<genexpr> at 0x7f4b47d053c0>)",
+      "text": "tests/test_prepared_retrieval_integration.py:533: in test_final_experimental_budget_preserves_facts_and_bounds_full_packet\n    _assert_facts(bounded, project, CHECKLIST_FACTS)\ntests/test_prepared_retrieval_integration.py:276: in _assert_facts\n    assert any(fact in snippet for snippet in snippets), (relative, fact, snippets)\nE   AssertionError: ('docs/dispatch.md', 'Record the serial number from each lens barrel in the case inventory before closing the case.', ['# Optical case dispatch checklist\nE     \nE     Complete every dispatch checklist step before handing over an optical case.\nE     '])\nE   assert False\nE    +  where False = any(<generator object _assert_facts.<locals>.<genexpr> at 0x7f4b47d053c0>)",
+      "failure_location_group": "independent_fact_or_complete_block_missing"
+    },
+    {
+      "test": "tests/test_project_context_quality_v2_protocol.py::test_delivery_veto_observer_distinguishes_rejected_candidates_from_empty_acquisition[\\u041a\\u0430\\u043a DocAtlas \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u044f\\u0435\\u0442 \\u0441\\u043e\\u043e\\u0431\\u0449\\u0435\\u043d\\u0438\\u044f \\u0447\\u0435\\u0440\\u0435\\u0437 \\u043a\\u0432\\u0430\\u043d\\u0442\\u043e\\u0432\\u044b\\u0439 \\u043a\\u0430\\u043d\\u0430\\u043b?-True]",
+      "kind": "failure",
+      "message": "AssertionError: assert ('ok' == 'insufficient_evidence'\n  \n  - insufficient_evidence\n  + ok)",
+      "text": "tests/test_project_context_quality_v2_protocol.py:224: in test_delivery_veto_observer_distinguishes_rejected_candidates_from_empty_acquisition\n    assert plain[\"status\"] == \"insufficient_evidence\" and not plain.get(\"sources\")\nE   AssertionError: assert ('ok' == 'insufficient_evidence'\nE     \nE     - insufficient_evidence\nE     + ok)",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_project_context_quality_v2_protocol.py::test_public_partial_context_preserves_short_facts_without_cross_owner_or_numeric_credit",
+      "kind": "failure",
+      "message": "AssertionError: ('different section owner', '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_public_partial_context_pr0/qualification-review-proof.json')\nassert 'ok' == 'insufficient_evidence'\n  \n  - insufficient_evidence\n  + ok",
+      "text": "tests/test_project_context_quality_v2_protocol.py:626: in test_public_partial_context_preserves_short_facts_without_cross_owner_or_numeric_credit\n    assert payload[\"status\"] == \"insufficient_evidence\", (label, str(report_path))\nE   AssertionError: ('different section owner', '/workspace/scratch/66f7674793b8/test-tmp/pytest-of-agent/pytest-6/test_public_partial_context_pr0/qualification-review-proof.json')\nE   assert 'ok' == 'insufficient_evidence'\nE     \nE     - insufficient_evidence\nE     + ok",
+      "failure_location_group": "source_response_shape_status_or_mock_contract"
+    },
+    {
+      "test": "tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls",
+      "kind": "failure",
+      "message": "AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}\n  \n  Extra items in the left set:\n  'budget.output'\n  'budget.input'",
+      "text": "tests/test_project_context_quality_v2_protocol.py:115: in test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls\n    assert {\"recheck.input\", \"recheck.output\", \"budget.input\", \"budget.output\"} <= boundaries\nE   AssertionError: assert {'budget.inpu...check.output'} <= {'core.output...check.output'}\nE     \nE     Extra items in the left set:\nE     'budget.output'\nE     'budget.input'",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_public_vector_retrieval.py::test_public_project_docs_query_consumes_dense_vector_index",
+      "kind": "failure",
+      "message": "assert []",
+      "text": "tests/test_public_vector_retrieval.py:96: in test_public_project_docs_query_consumes_dense_vector_index\n    assert chunks\nE   assert []",
+      "failure_location_group": "separate_product_contract_review"
+    },
+    {
+      "test": "tests/test_retrieval_quality_baseline.py::test_case_artifacts_trace_candidates_without_full_document_fields",
+      "kind": "failure",
+      "message": "assert 2 == 1",
+      "text": "tests/test_retrieval_quality_baseline.py:42: in test_case_artifacts_trace_candidates_without_full_document_fields\n    assert case[\"first_expected_rank\"] == 1\nE   assert 2 == 1",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_sqlite_ranking_truth.py::test_exact_filename_qualification_uses_the_same_corpus_as_fts",
+      "kind": "failure",
+      "message": "AssertionError: assert ['docatlas.project-docs.yaml'] == []\n  \n  Left contains one more item: 'docatlas.project-docs.yaml'\n  Use -v to get more diff",
+      "text": "tests/test_sqlite_ranking_truth.py:116: in test_exact_filename_qualification_uses_the_same_corpus_as_fts\n    assert results[0].metadata[\"lexical_match\"][\"missing_exact_terms\"] == []\nE   AssertionError: assert ['docatlas.project-docs.yaml'] == []\nE     \nE     Left contains one more item: 'docatlas.project-docs.yaml'\nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    },
+    {
+      "test": "tests/test_sqlite_ranking_truth.py::test_ranking_trace_exposes_named_components_without_document_text",
+      "kind": "failure",
+      "message": "AssertionError: assert dict_keys(['c...exical_cost']) == {'fts5_bm25_cost'}\n  \n  Use -v to get more diff",
+      "text": "tests/test_sqlite_ranking_truth.py:80: in test_ranking_trace_exposes_named_components_without_document_text\n    assert trace[\"raw_component_ranks\"].keys() == {\"fts5_bm25_cost\"}\nE   AssertionError: assert dict_keys(['c...exical_cost']) == {'fts5_bm25_cost'}\nE     \nE     Use -v to get more diff",
+      "failure_location_group": "old_qualification_or_diagnostic_expectation"
+    }
+  ]
+}

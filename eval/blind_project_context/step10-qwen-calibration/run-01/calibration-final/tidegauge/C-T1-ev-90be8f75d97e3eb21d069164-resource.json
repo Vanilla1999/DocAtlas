@@ -1,0 +1,28 @@
+{
+  "value_raw": {
+    "uri": "docatlas://source/v2/88618195d80563d484342688",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"content_sha256\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"continuation\":\"docatlas://source/v2/30fb70e404504b85c3aa8f66\",\"line_end\":12,\"line_start\":9,\"path\":\"storage.md\",\"project_identity\":\"local:66cdb3b754c2793c25c80253f7d167886b8a34ae949a9f0fdf86875a48ce4869\",\"snippet\":\"## Capacity\\n\\nThe capacity monitor reports filesystem free space every minute. A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.\\n\\n\",\"status\":\"truncated\"}"
+  },
+  "value": {
+    "content_sha256": "sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561",
+    "continuation": "docatlas://source/v2/30fb70e404504b85c3aa8f66",
+    "line_end": 12,
+    "line_start": 9,
+    "path": "storage.md",
+    "project_identity": "local:66cdb3b754c2793c25c80253f7d167886b8a34ae949a9f0fdf86875a48ce4869",
+    "snippet": "## Capacity\n\nThe capacity monitor reports filesystem free space every minute. A low-space alert pauses new survey imports; it does not shorten journal retention or remove a legal hold.\n\n",
+    "status": "truncated"
+  },
+  "replay_raw": {
+    "uri": "docatlas://source/v2/88618195d80563d484342688",
+    "name": "Bounded source continuation",
+    "mimeType": "application/json",
+    "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+  },
+  "replay": {
+    "reason_code": "unknown_or_expired_reference",
+    "status": "source_unavailable"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "recipe": "complete-maxp-token-overlap-v1",
+  "model_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "structural_recipe": "minimal-structure-v1",
+  "lanes": "original_translation_max",
+  "threshold": -7.280395030975342,
+  "calibration_sha256": "5ffbba341931285ae76a538b1b3eaa88d163f2ab19477516ac1a3b0c82c81d0c",
+  "calibration_manifest_sha256": "5ffbba341931285ae76a538b1b3eaa88d163f2ab19477516ac1a3b0c82c81d0c"
+}

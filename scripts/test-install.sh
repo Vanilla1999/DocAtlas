@@ -23,7 +23,8 @@ python3 - "$REPO_ROOT" <<'PY' || fail "hidden/bidirectional Unicode or control c
 import sys, pathlib, unicodedata
 root = pathlib.Path(sys.argv[1])
 BAD = set()
-for cp in list(range(0x200E, 0x2010)) + list(range(0x202A, 0x2030)) + \
+# U+202A..U+202E are bidi controls; U+202F is a Zs narrow no-break space.
+for cp in list(range(0x200E, 0x2010)) + list(range(0x202A, 0x202F)) + \
           list(range(0x2066, 0x206A)) + [0x00AD, 0xFEFF, 0x200B, 0x200C, 0x200D]:
     BAD.add(cp)
 bad = []
@@ -168,7 +169,7 @@ srv = d["mcp"]["servers"]["docatlas-docs"]
 assert srv == {
     "type": "local",
     "command": ["doc-atlas", "mcp", "docs-serve"],
-    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"},
 }, srv
 PY
 pass "agent 'opencode' (via env): JSON config merged"
@@ -209,7 +210,7 @@ assert d["mcp"]["servers"]["user-docs"] == {
     "command": ["doc-atlas", "mcp", "docs-serve"],
     "disabled": True,
     "timeout": 12345,
-    "environment": {"USER_SETTING": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+    "environment": {"USER_SETTING": "keep", "DOCATLAS_MCP_TEXT_FALLBACK": "1", "DOCATLAS_MCP_COMPACT_TEXT": "1"},
 }, d
 PY
 cmp -s "$CFG.bak" "$STUB_ROOT/original.json" || fail "opencode: original backup not preserved"

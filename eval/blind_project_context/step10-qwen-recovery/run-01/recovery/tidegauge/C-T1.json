@@ -1,0 +1,607 @@
+{
+  "packet": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-03e7866f8d8e8157d352e3f8",
+        "path_or_url": "operations.md",
+        "section": "Station operations",
+        "snippet": "# Station operations\n\nThese procedures apply only to authenticated live station feeds in the active harbour.\n\nFor orientation, the operator console links to the dashboard's [display settings](dashboard.md#display).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "6db577167b5502208e2c99261d233141110456df65c446e697cfb883ee3c2625",
+        "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+        "line_start": 1,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/78e07cae34d5000c6413464e"
+      },
+      {
+        "evidence_id": "ev-1275dbf88b080bf31810c677",
+        "path_or_url": "operations.md",
+        "section": "Station operations > Replay",
+        "snippet": "## Replay\n\nTo replay an interrupted feed, pause the receiver and obtain a journal checkpoint before requesting the missing interval. Preserve the original observation identifiers during replay. Resume the receiver only after the exporter acknowledges the checkpoint. See the [retention rule](storage.md#retention) before removing journal files.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "853111989d7681e7591f64816ccef864252aaf621b8a2f2108e8058f596c96ce",
+        "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+        "line_start": 7,
+        "line_end": 10,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/3d640e4cba274fe5ea99e21e"
+      },
+      {
+        "evidence_id": "ev-92c4113bc5d02ebb2084d8ff",
+        "path_or_url": "operations.md",
+        "section": "Station operations > Disconnected station",
+        "snippet": "## Disconnected station\n\nIf a station is still disconnected, do not resume its receiver after replay; leave it paused until a fresh authenticated heartbeat arrives. This exception applies even when the exporter acknowledged the checkpoint.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "c0e97721f8b9188728de7d83d1f9f577826dd1ec8a036ccd524e1998d9868035",
+        "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+        "line_start": 11,
+        "line_end": 14,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/f85ab19e6ae89c5f22fe70c6"
+      },
+      {
+        "evidence_id": "ev-76fac27880a88a288cb9b732",
+        "path_or_url": "operations.md",
+        "section": "Station operations > Survey imports",
+        "snippet": "## Survey imports\n\nSurvey imports assign new identifiers and may start without a station heartbeat. They are scheduled offline and do not repair a live feed. Reusing this process for a station would create duplicate observations.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "c6f161de5b6f5a7e25120e64eed9a55ee45c3f5f309108b4303b7c206f93fddf",
+        "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+        "line_start": 15,
+        "line_end": 17,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/e5d17b0bd7037d6d483eea88"
+      },
+      {
+        "evidence_id": "ev-9b7f79a0bdd524634828b695",
+        "path_or_url": "storage.md",
+        "section": "Journal storage",
+        "snippet": "# Journal storage\n\nJournal files contain original live observations. Exported bundles are derived products, not journal replacements until their checksums have been verified.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "da154d110d21c1208f174b6bb1579e0aa3d8d5a43f54f194c61d57d85d16fd91",
+        "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/8e68a7551a198b976c9cf5ad"
+      },
+      {
+        "evidence_id": "ev-99aa90fa0d9701edcff4228b",
+        "path_or_url": "storage.md",
+        "section": "Journal storage > Retention",
+        "snippet": "## Retention\n\nKeep a journal file for at least seven days and until the corresponding export checksum is verified. Both conditions must hold before deletion. A legal hold blocks deletion regardless of age or checksum status.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "94d184af056a286b51674ecfb24b7b3ce26dbe25531092413a0f800a55916146",
+        "project_identity": "local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/558693e8f79da1e6b79e78d1"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 1424,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "complete_calibrated_context_v1",
+      "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+      "calibration_status": "empirical",
+      "candidate_units": 21,
+      "selected_units": 5,
+      "delivered_rows": 6,
+      "scan_complete": true,
+      "model_pairs": 21,
+      "closure": {
+        "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+        "status": "complete",
+        "documents": 6,
+        "incomplete_dependencies": [],
+        "units": 21,
+        "hydrated_sections": 21,
+        "incoming_anchor_edges": 5,
+        "selected_units": 5,
+        "delivered_spans": 6
+      }
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": null,
+      "remaining_rows": 0,
+      "continuation_token": "c9fd705ce8da201af167db532753e620000fd3e98bc7bb181965b84579b6330b"
+    }
+  },
+  "observations": [
+    {
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9622,
+        "planned_input_tokens": 9622,
+        "preflight_units": 21,
+        "model_loads": 1,
+        "runtime_cache_hits": 0,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.540837681000994,
+        "asset_verification_seconds": 0.5965797680037213,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221184512,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 3.4724579469984747
+      },
+      "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+      "delivery_status": "returned",
+      "scores": [
+        {
+          "identity": "unit-086f843a01f82ddba35dfca792ae3447475b0a30919019d18424b39765c98c0f",
+          "score": 0.22270014882087708,
+          "logit_difference": -1.25,
+          "input_tokens": 372,
+          "input_tokens_sha256": "c12c355ba23d67021e5a3e2b162b60a94a3334dd6fcf182c127d2b372b487a33",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:architecture.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 115,
+          "body_char_start": 26,
+          "heading_path": [
+            "Processing architecture"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4"
+        },
+        {
+          "identity": "unit-c9d65725c43fa1be9bcfaa196ae018ff5c7de75232b7f29678b377f6d3c823b2",
+          "score": 0.05665242671966553,
+          "logit_difference": -2.8125,
+          "input_tokens": 405,
+          "input_tokens_sha256": "94ae411a204bb626fa48055b51393fa032ddc5db932ebea770e842a2caf6a4dd",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:architecture.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 115,
+          "char_end": 377,
+          "body_char_start": 133,
+          "heading_path": [
+            "Processing architecture",
+            "Journal design"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4"
+        },
+        {
+          "identity": "unit-2652480115095aca56088c6fef1b76cc2158b841dcdaaaab1fd530fb7462f7a0",
+          "score": 0.4687906503677368,
+          "logit_difference": -0.125,
+          "input_tokens": 395,
+          "input_tokens_sha256": "0cd7ab3ad389c7b2e43ab83a6c82f55ae9b9f50790e15b83891242fb510a3e71",
+          "path": "architecture.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"_source_snapshot_sha256\":\"sha256:33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"member\":{\"catalog_entry_hash\":\"sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"architecture.md\",\"content_sha256\":\"33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:architecture.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 377,
+          "char_end": 598,
+          "body_char_start": 400,
+          "heading_path": [
+            "Processing architecture",
+            "Recovery simulation"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4"
+        },
+        {
+          "identity": "unit-738bf688575dd8131f60fd76979f8df809abfdb0f1d7d95ecee3d38a94092410",
+          "score": 3.535625000949949e-05,
+          "logit_difference": -10.25,
+          "input_tokens": 386,
+          "input_tokens_sha256": "8f762643f85e67cd30da2b7abf38b5ad7bfa28090d44f39d9cd82e820bf274ab",
+          "path": "export.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"_source_snapshot_sha256\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"member\":{\"catalog_entry_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"export.md\",\"content_sha256\":\"0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:export.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 81,
+          "body_char_start": 16,
+          "heading_path": [
+            "Bundle export"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+        },
+        {
+          "identity": "unit-01139634370ff76abccb21a7dff2398e616b111adef31a8c366987016ba28434",
+          "score": 5.475977013702504e-05,
+          "logit_difference": -9.8125,
+          "input_tokens": 418,
+          "input_tokens_sha256": "06d6bb232b59c21de7bbd911be23ff76a6a2ef93f4a1600a1fc60868e291905f",
+          "path": "export.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"_source_snapshot_sha256\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"member\":{\"catalog_entry_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"export.md\",\"content_sha256\":\"0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:export.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 81,
+          "char_end": 330,
+          "body_char_start": 96,
+          "heading_path": [
+            "Bundle export",
+            "Publication"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+        },
+        {
+          "identity": "unit-7ca91c994f829a862759d7fe72dcee7eff0cefbe3036ed160eaf5ec5d717e4ee",
+          "score": 6.402006692951545e-05,
+          "logit_difference": -9.65625,
+          "input_tokens": 407,
+          "input_tokens_sha256": "981e1be6fa0286d6c09252e82a708a71649d510c0b11f02dab9ebd40fbbdef9f",
+          "path": "export.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"_source_snapshot_sha256\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"member\":{\"catalog_entry_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"export.md\",\"content_sha256\":\"0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:export.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 330,
+          "char_end": 511,
+          "body_char_start": 351,
+          "heading_path": [
+            "Bundle export",
+            "Late observations"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+        },
+        {
+          "identity": "unit-8f57ea3160ce3c95570262d7ddc2e3f01a5f1c4f327cc1dfeb27254469744bc5",
+          "score": 3.76364441763144e-05,
+          "logit_difference": -10.1875,
+          "input_tokens": 403,
+          "input_tokens_sha256": "25fb88ae01366974ee672e6b43be6a65047af87c72ba85608ede8a35d464541a",
+          "path": "export.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"_source_snapshot_sha256\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"member\":{\"catalog_entry_hash\":\"sha256:0608220eb96f2f3f7f4177c944efe5e6389d3350192132d3c03451e4fa741783\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"export.md\",\"content_sha256\":\"0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:export.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 511,
+          "char_end": 650,
+          "body_char_start": 522,
+          "heading_path": [
+            "Bundle export",
+            "Preview"
+          ],
+          "line_start": 13,
+          "line_end": 15,
+          "source_sha256": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe"
+        },
+        {
+          "identity": "unit-9b7f79a0bdd524634828b695de4e3499db47ca01cd799b701775dcedd57ed639",
+          "score": 0.005220125894993544,
+          "logit_difference": -5.25,
+          "input_tokens": 424,
+          "input_tokens_sha256": "51f7b9a8596f181af9acd1ed02a56230b85d12ee0c02cb6f025a4c9fd0d04e58",
+          "path": "storage.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"_source_snapshot_sha256\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"member\":{\"catalog_entry_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"storage.md\",\"content_sha256\":\"9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:storage.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 176,
+          "body_char_start": 18,
+          "heading_path": [
+            "Journal storage"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+        },
+        {
+          "identity": "unit-99aa90fa0d9701edcff4228b1c18cadb001025b7aebeea87cadc0e0eacf50d98",
+          "score": 0.9324532747268677,
+          "logit_difference": 2.625,
+          "input_tokens": 732,
+          "input_tokens_sha256": "23b07263aefc0392a4961003d3d665bc4b3534b1529f185300a721e49a02d74b",
+          "path": "storage.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"_source_snapshot_sha256\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"member\":{\"catalog_entry_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"storage.md\",\"content_sha256\":\"9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:storage.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 176,
+          "char_end": 402,
+          "body_char_start": 189,
+          "heading_path": [
+            "Journal storage",
+            "Retention"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+        },
+        {
+          "identity": "unit-c368d125a6ae93d72d46773d02d8e22ac33373c7c33aa3dd3393ac0b677a1173",
+          "score": 0.0024726232513785362,
+          "logit_difference": -6.0,
+          "input_tokens": 432,
+          "input_tokens_sha256": "73e6794413b885015219d08b939fa239eff7fafb766c39c7739e0ada6b3a1c1f",
+          "path": "storage.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"_source_snapshot_sha256\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"member\":{\"catalog_entry_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"storage.md\",\"content_sha256\":\"9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:storage.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 402,
+          "char_end": 588,
+          "body_char_start": 414,
+          "heading_path": [
+            "Journal storage",
+            "Capacity"
+          ],
+          "line_start": 9,
+          "line_end": 12,
+          "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+        },
+        {
+          "identity": "unit-508ec040e18275da935c29785ee947e44f870716f4ecb84214d23304692e6757",
+          "score": 0.004609572701156139,
+          "logit_difference": -5.375,
+          "input_tokens": 429,
+          "input_tokens_sha256": "ccd8d1890813169072cb6c9c64abc44c225ddcdeeba7b7fd551b86e9a1ad062a",
+          "path": "storage.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"_source_snapshot_sha256\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"member\":{\"catalog_entry_hash\":\"sha256:b1d77714b13bfd935d6612c93e5aa108643fffc6c5d2351b10f6c14151c82eaf\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"storage.md\",\"content_sha256\":\"9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:storage.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 588,
+          "char_end": 777,
+          "body_char_start": 610,
+          "heading_path": [
+            "Journal storage",
+            "Historical default"
+          ],
+          "line_start": 13,
+          "line_end": 15,
+          "source_sha256": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561"
+        },
+        {
+          "identity": "unit-03e7866f8d8e8157d352e3f8b0645f430ca7e513b79f0d31952cfc5a93cb8e2f",
+          "score": 0.9924227595329285,
+          "logit_difference": 4.875,
+          "input_tokens": 482,
+          "input_tokens_sha256": "1539a20026b6f78782d8f809104a15e9556ac2d8d295e13f68fb2f8f1cffacb7",
+          "path": "operations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"_source_snapshot_sha256\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"member\":{\"catalog_entry_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"operations.md\",\"content_sha256\":\"023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:operations.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 216,
+          "body_char_start": 21,
+          "heading_path": [
+            "Station operations"
+          ],
+          "line_start": 1,
+          "line_end": 6,
+          "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+        },
+        {
+          "identity": "unit-1275dbf88b080bf31810c67708e7bbd7d9860a0780c7e6e2b8638667c24c928e",
+          "score": 0.9966233968734741,
+          "logit_difference": 5.6875,
+          "input_tokens": 650,
+          "input_tokens_sha256": "cb8d7b6e1f369dc6ba40f10174777a2d0e27cfbc95f8f53f928ad58bad913b2d",
+          "path": "operations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"_source_snapshot_sha256\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"member\":{\"catalog_entry_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"operations.md\",\"content_sha256\":\"023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:operations.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 216,
+          "char_end": 562,
+          "body_char_start": 226,
+          "heading_path": [
+            "Station operations",
+            "Replay"
+          ],
+          "line_start": 7,
+          "line_end": 10,
+          "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+        },
+        {
+          "identity": "unit-92c4113bc5d02ebb2084d8fff09c72fa54d64e0801d2b573d67e6248c329ad58",
+          "score": 0.9953904151916504,
+          "logit_difference": 5.375,
+          "input_tokens": 486,
+          "input_tokens_sha256": "e0c4a84fd058ac13399cf32d66ab738fba7595e1f80a04374f0d436ddfb05665",
+          "path": "operations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"_source_snapshot_sha256\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"member\":{\"catalog_entry_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"operations.md\",\"content_sha256\":\"023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:operations.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 562,
+          "char_end": 803,
+          "body_char_start": 586,
+          "heading_path": [
+            "Station operations",
+            "Disconnected station"
+          ],
+          "line_start": 11,
+          "line_end": 14,
+          "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+        },
+        {
+          "identity": "unit-76fac27880a88a288cb9b7325a0d653f87d93d23d5d7eac87d5add7df6519a0c",
+          "score": 0.977022647857666,
+          "logit_difference": 3.75,
+          "input_tokens": 487,
+          "input_tokens_sha256": "f594a431486f3d562edf004c3cafd31aac141049bb46fa48ae14ec689af7d747",
+          "path": "operations.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"_source_snapshot_sha256\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"member\":{\"catalog_entry_hash\":\"sha256:77467e44c7bfe40f3114b9e8a3fc8ef59cc3af9b3c70ca93ff9e20db4ca33966\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"operations.md\",\"content_sha256\":\"023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:operations.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 3,
+          "char_start": 803,
+          "char_end": 1033,
+          "body_char_start": 821,
+          "heading_path": [
+            "Station operations",
+            "Survey imports"
+          ],
+          "line_start": 15,
+          "line_end": 17,
+          "source_sha256": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789"
+        },
+        {
+          "identity": "unit-a7914140cc473a364d5820dc0264c6549ae394e5d9885b96b8a271a7b17d5b08",
+          "score": 0.006692850962281227,
+          "logit_difference": -5.0,
+          "input_tokens": 369,
+          "input_tokens_sha256": "f98514f9b658c1f76635427f223d74613fff6de1f6a468a96c66e0bc4b937628",
+          "path": "dashboard.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2\",\"_source_snapshot_sha256\":\"sha256:517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"member\":{\"catalog_entry_hash\":\"sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"dashboard.md\",\"content_sha256\":\"517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:dashboard.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 110,
+          "body_char_start": 20,
+          "heading_path": [
+            "Harbour dashboard"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb"
+        },
+        {
+          "identity": "unit-d4c4b64fa9e02624cb41e8173a320430328b98b7062156a0dd5f2a8ed6c2befb",
+          "score": 0.00806199200451374,
+          "logit_difference": -4.8125,
+          "input_tokens": 666,
+          "input_tokens_sha256": "4fddbb8b637957a39cec497559cc80026fbe5785736fd31cef51a89b9fd3a1cf",
+          "path": "dashboard.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2\",\"_source_snapshot_sha256\":\"sha256:517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"member\":{\"catalog_entry_hash\":\"sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"dashboard.md\",\"content_sha256\":\"517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:dashboard.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 110,
+          "char_end": 330,
+          "body_char_start": 121,
+          "heading_path": [
+            "Harbour dashboard",
+            "Display"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb"
+        },
+        {
+          "identity": "unit-2c8230e4a7fc371bea606e103b0171c2ac928408efeedc7b456c6cc9d9432457",
+          "score": 0.037326883524656296,
+          "logit_difference": -3.25,
+          "input_tokens": 388,
+          "input_tokens_sha256": "dc80a5f01b756da747e2ae8b47207aed59c20ac14b587d56d1daba4e37244e30",
+          "path": "dashboard.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2\",\"_source_snapshot_sha256\":\"sha256:517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"member\":{\"catalog_entry_hash\":\"sha256:644866cbc71ddc83a8a48f024508a79e07617fe7c1d0c7ad627e6a862b8c91e2\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"dashboard.md\",\"content_sha256\":\"517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:dashboard.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 330,
+          "char_end": 525,
+          "body_char_start": 341,
+          "heading_path": [
+            "Harbour dashboard",
+            "Refresh"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb"
+        },
+        {
+          "identity": "unit-3a75af9bb657ccb9e5201bdd2c56b18cb781fc6aba42bbce233da7d7d30e9034",
+          "score": 0.06008664518594742,
+          "logit_difference": -2.75,
+          "input_tokens": 418,
+          "input_tokens_sha256": "c8d24a169b8c43f07c4f4a8cee57802920ec877dc9068499af3e07873221c989",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:overview.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 0,
+          "char_start": 0,
+          "char_end": 166,
+          "body_char_start": 12,
+          "heading_path": [
+            "TideGauge"
+          ],
+          "line_start": 1,
+          "line_end": 4,
+          "source_sha256": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4"
+        },
+        {
+          "identity": "unit-2b09d94f8dd9e981c06e65e60fa57a142b510bca9db93d744f77a6eba6298af6",
+          "score": 0.4687906503677368,
+          "logit_difference": -0.125,
+          "input_tokens": 433,
+          "input_tokens_sha256": "58152d41968804a60d1f022f82d5e2156c8187d8a3490d8594cce35609a65170",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:overview.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 1,
+          "char_start": 166,
+          "char_end": 426,
+          "body_char_start": 180,
+          "heading_path": [
+            "TideGauge",
+            "Components"
+          ],
+          "line_start": 5,
+          "line_end": 8,
+          "source_sha256": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4"
+        },
+        {
+          "identity": "unit-e5a3f58ae86684387ba9bfc27d7087f7a994b0d0bbc0ca79ec1ca6834795dd48",
+          "score": 0.4073334336280823,
+          "logit_difference": -0.375,
+          "input_tokens": 440,
+          "input_tokens_sha256": "c65d01b91cd8c219870038d75018d3479ecb9a6670e234ddcec63a95662ef742",
+          "path": "overview.md",
+          "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"_source_snapshot_sha256\":\"sha256:eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"member\":{\"catalog_entry_hash\":\"sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"overview.md\",\"content_sha256\":\"eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4\",\"document_id\":\"project_file:local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6:overview.md\",\"scope\":{\"project_id\":\"local:17edf689ae9e89837d07fb587a470ca92e99b692858cce91a7f233051c826fd6\",\"snapshot_id\":\"gen-6ebcecb72eeb4ed0a25a9732369ac685\",\"version\":\"\"}}}",
+          "section_index": 2,
+          "char_start": 426,
+          "char_end": 646,
+          "body_char_start": 440,
+          "heading_path": [
+            "TideGauge",
+            "Navigation"
+          ],
+          "line_start": 9,
+          "line_end": 11,
+          "source_sha256": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4"
+        }
+      ]
+    }
+  ],
+  "error": null,
+  "receipt_status": "available",
+  "seconds": 3.7559451300039655
+}

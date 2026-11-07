@@ -1,0 +1,1432 @@
+{
+  "status": "PASS_OFFLINE_INVARIANTS",
+  "questions": 16,
+  "fact_quotes": 81,
+  "unchanged_source_files": 28,
+  "unchanged_fields": "all task fields except optional_support; all unit fields except role",
+  "gate_calls": 0,
+  "changes": [
+    {
+      "task_id": "C-T1",
+      "key": "overview.md#TideGauge",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "storage.md#Capacity",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "export.md#Bundle export",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "export.md#Publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "export.md#Late observations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T1",
+      "key": "export.md#Preview",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "overview.md#TideGauge",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "operations.md#Station operations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "operations.md#Replay",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "operations.md#Disconnected station",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "operations.md#Survey imports",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "storage.md#Journal storage",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "storage.md#Retention",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "storage.md#Capacity",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "storage.md#Historical default",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "dashboard.md#Refresh",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "architecture.md#Processing architecture",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T2",
+      "key": "architecture.md#Recovery simulation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "overview.md#TideGauge",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "operations.md#Station operations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "operations.md#Replay",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "operations.md#Disconnected station",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "export.md#Bundle export",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "export.md#Publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "export.md#Late observations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "export.md#Preview",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "dashboard.md#Display",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "architecture.md#Processing architecture",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "architecture.md#Journal design",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T3",
+      "key": "architecture.md#Recovery simulation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "overview.md#TideGauge",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "operations.md#Station operations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "operations.md#Replay",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "operations.md#Disconnected station",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "operations.md#Survey imports",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "storage.md#Journal storage",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "storage.md#Capacity",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "storage.md#Historical default",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "export.md#Bundle export",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "export.md#Publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "export.md#Late observations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "export.md#Preview",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "dashboard.md#Harbour dashboard",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "dashboard.md#Display",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "architecture.md#Processing architecture",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "architecture.md#Journal design",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-T4",
+      "key": "architecture.md#Recovery simulation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "overview.md#Loom renderer",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "overview.md#Data flow",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "overview.md#Queue ownership",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "recovery.md#Worker recovery",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "recovery.md#Recovery procedure",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "recovery.md#Isolate",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "recovery.md#Resume",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "recovery.md#Preview reset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "publication.md#Derivative publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "publication.md#Approval",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "publication.md#Embargo",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "publication.md#Preview links",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "withdrawal.md#Image withdrawal",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "withdrawal.md#Withdrawal",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "withdrawal.md#Draft cleanup",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L1",
+      "key": "architecture.md#Raster pipeline",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "overview.md#Loom renderer",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "overview.md#Data flow",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "overview.md#Queue ownership",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "colour.md#Colour processing",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "colour.md#Profile choice",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "colour.md#Monochrome originals",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "colour.md#Display preference",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "publication.md#Derivative publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "publication.md#Approval",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "publication.md#Embargo",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "publication.md#Preview links",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "withdrawal.md#Image withdrawal",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "withdrawal.md#Withdrawal",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "withdrawal.md#Draft cleanup",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L2",
+      "key": "architecture.md#Raster pipeline",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "overview.md#Loom renderer",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "overview.md#Data flow",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "overview.md#Queue ownership",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "colour.md#Colour processing",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "colour.md#Profile choice",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "colour.md#Monochrome originals",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "colour.md#Display preference",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "recovery.md#Worker recovery",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "recovery.md#Recovery procedure",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "recovery.md#Isolate",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "recovery.md#Validate",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "recovery.md#Preview reset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "architecture.md#Rendering internals",
+      "old": "negative",
+      "new": "optional_context"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "architecture.md#Raster pipeline",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "C-L3",
+      "key": "architecture.md#Legacy demonstration",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "overview.md#Loom renderer",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "overview.md#Data flow",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "overview.md#Queue ownership",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "colour.md#Colour processing",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "colour.md#Monochrome originals",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "recovery.md#Worker recovery",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "recovery.md#Recovery procedure",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "recovery.md#Isolate",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "recovery.md#Validate",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "recovery.md#Resume",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "recovery.md#Preview reset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "publication.md#Derivative publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "publication.md#Approval",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "publication.md#Embargo",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "publication.md#Preview links",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "withdrawal.md#Image withdrawal",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "withdrawal.md#Withdrawal",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "withdrawal.md#Draft cleanup",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "architecture.md#Rendering internals",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "architecture.md#Raster pipeline",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "C-L4",
+      "key": "architecture.md#Legacy demonstration",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "overview.md#Meridian scheduler",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "overview.md#Services",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "clock.md#Time coordination",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "clock.md#Missing reference",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "clock.md#Simulation clock",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "calendar.md#Timezones",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "architecture.md#Scheduler architecture",
+      "old": "negative",
+      "new": "optional_context"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "architecture.md#Planner",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M1",
+      "key": "architecture.md#Prototype recovery",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "overview.md#Meridian scheduler",
+      "old": "negative",
+      "new": "optional_context"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "overview.md#Services",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "reservations.md#Locked instrument",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "reservations.md#Training slots",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "clock.md#Time coordination",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "clock.md#Clock offset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "clock.md#Missing reference",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "calendar.md#Timezones",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "architecture.md#Scheduler architecture",
+      "old": "negative",
+      "new": "optional_context"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "architecture.md#Planner",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M2",
+      "key": "architecture.md#Prototype recovery",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "overview.md#Meridian scheduler",
+      "old": "negative",
+      "new": "optional_context"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "overview.md#Services",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "reservations.md#Confirmed reservations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "reservations.md#Locked instrument",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "reservations.md#Training slots",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "weather.md#Weather decisions",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "weather.md#Suspension",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "weather.md#Indoor instrument",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "weather.md#Forecast display",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "calendar.md#Colours",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M3",
+      "key": "architecture.md#Planner",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "overview.md#Meridian scheduler",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "overview.md#Services",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "overview.md#Navigation",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "reservations.md#Confirmed reservations",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "reservations.md#Transfer",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "reservations.md#Locked instrument",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "reservations.md#Training slots",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "weather.md#Weather decisions",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "weather.md#Suspension",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "clock.md#Time coordination",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "clock.md#Clock offset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "clock.md#Missing reference",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "clock.md#Simulation clock",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "calendar.md#Calendar display",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "calendar.md#Colours",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "calendar.md#Timezones",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "architecture.md#Scheduler architecture",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "architecture.md#Planner",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-M4",
+      "key": "architecture.md#Prototype recovery",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "overview.md#Cairn archive",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "overview.md#Identity",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "recovery.md#Restore failure handling",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "recovery.md#Recovery procedure",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "recovery.md#Preserve",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "recovery.md#Reconcile",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "recovery.md#Reopen",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "recovery.md#Sandbox reset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "publication.md#Restore publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "publication.md#Switch",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "publication.md#Partial collections",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "rollback.md#Pointer rollback",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "rollback.md#Rollback",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "rollback.md#Abandoned preview",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C1",
+      "key": "architecture.md#Object store",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "overview.md#Cairn archive",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "overview.md#Identity",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "restore.md#Snapshot selection",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "restore.md#Held collection",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "publication.md#Restore publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "publication.md#Switch",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "publication.md#Partial collections",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "publication.md#Preview pointer",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "rollback.md#Pointer rollback",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "rollback.md#Rollback",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C2",
+      "key": "rollback.md#Abandoned preview",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "overview.md#Cairn archive",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "overview.md#Identity",
+      "old": "negative",
+      "new": "optional_support"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "restore.md#Collection restore",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "restore.md#Snapshot selection",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "restore.md#Held collection",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "restore.md#Training archive",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "recovery.md#Restore failure handling",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "recovery.md#Recovery procedure",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "recovery.md#Preserve",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "recovery.md#Reconcile",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "recovery.md#Reopen",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C3",
+      "key": "recovery.md#Sandbox reset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "overview.md#Cairn archive",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "overview.md#Components",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "overview.md#Identity",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "restore.md#Collection restore",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "restore.md#Held collection",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "restore.md#Training archive",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "recovery.md#Restore failure handling",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "recovery.md#Recovery procedure",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "recovery.md#Preserve",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "recovery.md#Reconcile",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "recovery.md#Reopen",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "recovery.md#Sandbox reset",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "publication.md#Restore publication",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "publication.md#Switch",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "publication.md#Partial collections",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "publication.md#Preview pointer",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "rollback.md#Pointer rollback",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "rollback.md#Rollback",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "rollback.md#Abandoned preview",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "architecture.md#Archive architecture",
+      "old": "negative",
+      "new": "unlabelled"
+    },
+    {
+      "task_id": "V-C4",
+      "key": "architecture.md#Demonstration mode",
+      "old": "negative",
+      "new": "unlabelled"
+    }
+  ]
+}

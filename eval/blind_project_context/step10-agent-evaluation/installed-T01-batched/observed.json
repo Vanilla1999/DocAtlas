@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"admission_contract\":\"source_only_heuristic_removal_v1\",\"answer_available\":false,\"answer_supported\":false,\"context_available\":false,\"context_quality\":{\"reasons\":[\"context_emergency_stop\"],\"status\":\"unavailable\"},\"context_unassessed\":true,\"edit_ready\":false,\"estimated_tokens\":168,\"kind\":\"docs_context\",\"missing\":[\"context_emergency_stop\"],\"read_next\":[],\"reason_code\":\"context_emergency_stop\",\"source_selection\":{\"emergency_tokens\":50000,\"measured_tokens\":1179395,\"model_pairs\":9327,\"policy\":\"complete_calibrated_context_v1\",\"scan_complete\":true,\"scope\":\"all\",\"selected_units\":2561},\"sources\":[],\"status\":\"insufficient_evidence\",\"support_status\":\"insufficient_evidence\"}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

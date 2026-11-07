@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "base_commit": "2d667913f279ba72104f158ee6500d75d5ace81f",
+  "contract": {
+    "flag": "DOCATLAS_CONTEXT_PRESENTATION=literal-v2",
+    "format": "docatlas.standalone-text.v2",
+    "applies_to": "supported successful initial docs_context model text",
+    "unchanged": "canonical machine packet, source admission, hashes, access, expiration, source reads, patch, errors/lifecycle/canonical unsupported fallback",
+    "default": "absent or off preserves old renderer/fingerprint",
+    "source_objects": "original public evidence_id as ref; original URI/path/lines/text; shared source_context with full metadata values; no source_groups/source_columns or short aliases",
+    "hash_omission": "source content_sha256 only; existing standalone projection omissions unchanged"
+  },
+  "integration": {
+    "boundary": "real source CLI stdio plus public in-process dispatcher for continuation",
+    "nodes": [
+      "tests/test_context_portions_integration.py::test_literal_presentation_public_stdio_preserves_sources_and_read_guards",
+      "tests/test_context_portions_integration.py::test_context_portions_bind_snapshot_and_stop_after_exhaustion"
+    ],
+    "stdio_budget": {
+      "prepares": 1,
+      "context_calls": 6,
+      "resource_reads": 3
+    },
+    "inference_calls": 0,
+    "assertions": [
+      "original source bytes/identities/scope/version/authority/trust retained",
+      "no source hash or column/group lookup in v2 view",
+      "machine and patch hashes retained",
+      "positive bounded source read; changed snapshot and spent-reference denial",
+      "presentation changes invalidate continuation; explicit off accepts historical token",
+      "actual wire sizes in local o200k units"
+    ]
+  },
+  "minimal_runtime": {
+    "status": "not_run",
+    "reason": "minimal scorer requires pinned mmarco-mMiniLMv2-L12-H384-v1 safetensors and PyTorch; available English MiniLM ONNX is a different provider and is not substituted",
+    "inference_calls": 0
+  },
+  "offline_replay": {
+    "permitted": "16 previously seen actual Qwen recovery/validation packets; source-exact rendering analysis only",
+    "not_proven": "minimal public dispatch or scorer execution; answer quality; provider token savings"
+  },
+  "runtime": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "executable": "/workspace/scratch/66f7674793b8/locked-env/bin/python",
+    "packages": {
+      "pytest": "9.0.3",
+      "mcp": "1.29.0",
+      "fastembed": "0.8.0",
+      "onnxruntime": "1.26.0",
+      "tiktoken": "0.11.0",
+      "numpy": "2.4.6"
+    },
+    "environment": {
+      "PYTHONPATH": "/workspace/scratch/66f7674793b8/DocAtlas-step10-pr",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "DOCATLAS_OFFLINE": "1",
+      "ORT_DISABLE_TELEMETRY": "1",
+      "DOCATLAS_AUTO_VECTORS": "0",
+      "TMPDIR": "/workspace/scratch/66f7674793b8/step11-presentation-work/tmp"
+    }
+  },
+  "source_sha256": {
+    "docmancer/docs/domain/context_presentation.py": "01d704b344fa21c3f6a638bfb4490649bca6a5ce12167d75d99b87fe3127fe96",
+    "docmancer/docs/application/standalone_text_view.py": "df022fb8157fc9db4542d986d6625a29a83ae0038447811f8b004acdd3a4a10e",
+    "docmancer/docs/application/context_assembly.py": "87cbcea17be6349b453c804a7e4cd2fc6c89f55828c57e7e21ae968f4514187b",
+    "docmancer/docs/application/joint_context_selection.py": "828172269ed3bf169f0acf675858367dafa682e926e92ca87ceb0e1bc42e43dc",
+    "docmancer/docs/application/minimal_context_selection.py": "e82a5462223c4d1ff1c1a23e56f57b362aba0a252c1bec58b89b3aee6724effc",
+    "docmancer/mcp/_docs_server_part01.py": "fdf04c1b95a153e16a48363252c0fa7517c4dd3bcfcd15c72a2347d0aede37b3",
+    "docmancer/docs/application/model_context_view.py": "6729c39a9321cba6ecc26c016ac2ca8cc55d516c4eb60633f53c03b9e887edbf",
+    "docmancer/docs/application/source_continuation.py": "a42abb9575a63e264394df01a6e139050758fc15a694f0f87e7e7bd5c78a1bec",
+    "docmancer/docs/application/_source_continuation_core.py": "8f11c8811c1262a48cdd506e7b0bab872943259e6f964d36113cb7a4d863b5fd",
+    "docmancer/docs/infrastructure/project_source_read_gateway.py": "d8030583588c3245cd96db90ddc00843c1f7b0956af551baa507524d5078435d",
+    "tests/test_context_portions_integration.py": "a4855ddcd17dccab46cea967f5f3bebd54efec858935d0ca6690ce11891f45fc",
+    "AGENTS.md": "2c104185055991f618700cc9774e71ad5a9a0e9fa2483b137a8b30f54464f9e3",
+    "v2plan/STEP10_EXECUTION_CHECKPOINT_RU.md": "9a1a8756356edd159803ed43b36047ee7e13f7c278329fd6fce96f904aa0e010"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "script_sha256": "cc5d1abbfec3bcdf8799efebdd0f647fc4c523a54c39bb3d509cc8d67d44b156",
+  "plan_sha256": "c05d4ee6689d473e3918bfa9392acd8d2aad64190c89ae6401c2b347954b40c9",
+  "results_sha256": "85d88201fabd584f34fc22f3510792ee5e99cedfc70407d23f8ab7de419b1065",
+  "all_input_hashes_rechecked": true,
+  "minimal_runtime_proven": false,
+  "inference_calls": 0
+}

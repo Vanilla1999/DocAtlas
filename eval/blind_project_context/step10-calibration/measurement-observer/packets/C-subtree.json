@@ -1,0 +1,158 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-d04bf32e7b7d246aab03c9c9",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station",
+      "snippet": "# Reservoir station\n\nThese procedures apply to the unmanned reservoir station during winter operation.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "72e1b44e3b95c794a6680eca333839f8db6656e036242d6dbad8f29b005746b6",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/a999cf4809f50b3598f23250"
+    },
+    {
+      "evidence_id": "ev-c593a02ceded88fd61b9b47d",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Restart",
+      "snippet": "## Restart\n\nRestart the circulation pump only after the inlet sensor reads at least four degrees Celsius. Record the sensor reading in the shift ledger before pressing START.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f74f4b8a8b5efa9f7962d27a1f8e4cac73fc07efe73e4c8d09568beef93025b4",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/68b7bb9facfb8e9b0c5793d8"
+    },
+    {
+      "evidence_id": "ev-ce7f7a00a9de61492a2c75d4",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Restart > Inspection",
+      "snippet": "### Inspection\n\nBefore restart, inspect the intake grille and remove accumulated leaves. A cracked grille requires replacement before the pump may run.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "5555665ea7b901c9c21f2029a0e595a48e0c3cc519e085297ef2aca84ce16706",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 9,
+      "line_end": 12,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/1c7082907b02b8698f03ec34"
+    },
+    {
+      "evidence_id": "ev-f0704f979684bf6cf644dfdf",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Restart > Indicator lamps",
+      "snippet": "### Indicator lamps\n\nThe amber cabinet lamp indicates that the maintenance drawer is open. Closing the drawer extinguishes this lamp; the lamp does not measure inlet temperature.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "944b68c6c8f693206778a999409ffa2901d1f59486c74fc351be35df4e86ca22",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/66627cb92ce29feedc92742c"
+    },
+    {
+      "evidence_id": "ev-f74434b89b08eac3f11e6676",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Frozen intake",
+      "snippet": "## Frozen intake\n\nWhen ice remains visible inside the intake, restarting the circulation pump is prohibited even if the inlet sensor reads four degrees Celsius or more. Request a manual thaw inspection instead.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "124e2d8bcb7ea80e5f607ec6d40aad596dbd084bebcb3dd682f5e10de7822d1c",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 17,
+      "line_end": 20,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/d4c47352b70072d8fefbbfaa"
+    },
+    {
+      "evidence_id": "ev-4ba1c9e45e99d4b73f7de1df",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Ledger storage",
+      "snippet": "## Ledger storage\n\nCompleted shift ledgers are archived in the west cabinet for nine months. The cabinet key is held by the records clerk.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ceba1d345b922a000cb6657cc1bdb7ca7ab4f4d988d422ebd51bd63f1e85c48d",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 21,
+      "line_end": 24,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/48bb036cd353bc30344301a4"
+    },
+    {
+      "evidence_id": "ev-88c5259951c5eab2d364bdac",
+      "path_or_url": "reservoir.md",
+      "section": "Reservoir station > Cabinet finish",
+      "snippet": "## Cabinet finish\n\nThe exterior cabinet is painted slate blue. Replacement paint tins are stored with the building supplies.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "8ddb7bb10ef03cc536893546ed1e96358072dbf78e3795b7e68408df2e42645c",
+      "project_identity": "local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09",
+      "line_start": 25,
+      "line_end": 27,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/052a584964bdbd5c0f832495"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1439,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "diagnostic-unverified",
+    "calibration_status": "diagnostic_unverified",
+    "candidate_units": 7,
+    "selected_units": 7,
+    "delivered_rows": 7,
+    "scan_complete": true,
+    "model_pairs": 7,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 7,
+      "hydrated_sections": 7,
+      "selected_units": 7,
+      "delivered_spans": 7
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "6c76008b212246335bdaf5764c599735973ce62217bd90f77c0c7b9de6063318"
+  }
+}

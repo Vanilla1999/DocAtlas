@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-06",
+  "default_enabled": false,
+  "quality_acceptance": "FAIL",
+  "measured_wheel_sha256": "663e294282ed6eb04cd052de5392eac57430f3c50ad310d3781495492f9768ef",
+  "finalfast_wheel_sha256": "174e837fa1c63c98132231fee236b21037a9b56e5055e25f321518d84d13f30c",
+  "batched_wheel_sha256": "0651de09b30ad1a5fcf036a9ed403d5cbf8c399f27be89dea2da9cedb8769412",
+  "final_v2_wheel_sha256": "b8ecfb99faba079faa6c74723be16b0ffee388d20365485f69a7e0ba7d457f8e",
+  "v2_policy_sha256": "5eb8d93aabd318bf24505383ed54c14733a8900eaf19a783f8f078cc953520ff",
+  "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+  "renewed_targeted_terra": {
+    "case": "L0/T01-ru",
+    "provider_available": true,
+    "recipe": "v1",
+    "facts": "3/3",
+    "citations_verified": 6,
+    "source_rows_verified": 157,
+    "input_with_cache": 61419,
+    "baseline_input_with_cache": 5247,
+    "usage_reconciled": true,
+    "exact_question_preserved_in_mcp": false,
+    "acceptance": "FAIL",
+    "detail": "renewed-results.md"
+  },
+  "integration_checks": [
+    {"check": "public preparation/storage257/scope/generation/read-only", "status": "PASS", "seconds": 2.82},
+    {"check": "public real MiniLM257/full text/scope/ref/replay/stale/read-only", "status": "PASS", "seconds": 18.58},
+    {"check": "public real fenced-block emergency above50000BPE", "status": "PASS", "seconds": 22.93},
+    {"check": "existing library public version isolation with candidate activation", "status": "PASS", "seconds": 1.07},
+    {"check": "public257 after obsolete dependency-proposal bypass", "status": "PASS", "seconds": 19.07},
+    {"check": "installed structural multiline reference closure delta", "status": "PASS", "detail": "structural-review.json; stage-level public acquisition hook, not Terra parity"},
+    {"check": "installed final2 long-heading stdio", "status": "PASS", "tool_calls": 4, "wire_tokens": 505, "seconds": 4.091},
+    {"check": "installed finalfast long-heading and long-path stdio", "status": "PASS", "tool_calls": 4, "detail": "/tmp/opencode/step10-finalfast-installed-wire.json"},
+    {"check": "public257 after batched URI pricing", "status": "PASS", "seconds": 19.42},
+    {"check": "installed batched original/translated/focused T01 plus trace/read/replay", "status": "delivery_contract_PASS_broad_quality_FAIL", "tool_calls": 6, "detail": "installed-T01-batched/receipt.json"},
+    {"check": "fresh v2 public validation", "status": "quality_FAIL", "facts": "22/22", "direct_retention": "15/16", "contaminated_no_answer_cases": "1/2"},
+    {"check": "installed v2 policy long-heading/long-path stdio", "status": "PASS", "tool_calls": 4, "wire_tokens": 617, "seconds": 4.046}
+  ],
+  "known_legacy_failure": {
+    "test": "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot",
+    "failure": "line142 query-original absent from covered_query_ids",
+    "baseline_head": "393082976d2e06b946e6ce6d12997d50d869f73d",
+    "reproduced_on_baseline": true,
+    "baseline_seconds": 1.03,
+    "not_fixed_or_deleted": true
+  },
+  "failed_installed_attempts": [
+    {"directory": "/tmp/opencode/step10-installed-T01", "reason": "startup storage ancestor not sticky; no request completed"},
+    {"directory": "/tmp/opencode/step10-installed-T01-02", "reason": "uninitialized stores; four refusals, not six product calls or retrieval PASS"},
+    {"directory": "/tmp/opencode/step10-installed-T01-03", "reason": "evaluator incorrectly compared canonical source material digest with snippet SHA; assertion failed after first response"},
+    {"directory": "/tmp/opencode/step10-installed-T01-04", "reason": "superseded interrupted run after general dependency-preparation correction; no context response saved"}
+  ],
+  "proof_boundaries": "Integration, installed structural-stage hook, installed stdio, scripted provider capture and actual Terra answer evaluation are separate. Frozen-wheel answer metrics do not certify later-wheel parity. Cost=0 in provider receipts is not a monetary tariff. Censored usage is a lower bound."
+}

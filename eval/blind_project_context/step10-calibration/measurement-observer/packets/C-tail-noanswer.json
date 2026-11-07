@@ -1,0 +1,102 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-52c79015c957fee98e52ed90",
+      "path_or_url": "relay.md",
+      "section": "Relay workshop",
+      "snippet": "# Relay workshop\n\nThis workshop record concerns the ceramic timing relay used in the orchard irrigation controller.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "039ebb4f8e98a934243e78ffce757b2e4f5ca6ab05b3b88d3c185cde248d29b9",
+      "project_identity": "local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/f326526100cc91ba610b8d2c"
+    },
+    {
+      "evidence_id": "ev-eb5886b8bb3dc2c448a35d51",
+      "path_or_url": "relay.md",
+      "section": "Relay workshop > Bench record",
+      "snippet": "## Bench record\n\nThe workbench has a wooden top and a steel frame. Its left drawer contains blank forms and soft pencils. The right drawer holds paper envelopes used for returning small components. A numbered stool stands beneath the bench when the room is closed. The floor is swept at the end of each shift. The wall clock is mechanical and is wound by the caretaker. The west window has a cotton curtain that reduces afternoon glare. A notice board displays the weekly cleaning rota. Visitors leave outdoor coats on hooks beside the entrance. The storage cupboard contains empty trays in three sizes. Each tray has a flat base and rounded corners. The trays are washed with plain water and dried on a rack. The rack stands beside the utility sink. The sink tap is checked for dripping on Friday afternoons. A small bin beneath the sink receives used paper towels. The caretaker empties the bin before locking the room. The room key hangs in a locked box in the reception office. Reception staff record each key loan in a ruled notebook. The notebook is replaced when its pages are full. Completed notebooks are tied with cotton string and placed in a cardboard box. The box is stored on the highest reception shelf. A stepladder is available for reaching that shelf. The ladder has rubber feet and a wooden handrail. Staff return it to the alcove after use. The alcove also contains a brush and a dustpan. The entrance mat is shaken outdoors each morning. During wet weather a second mat is placed beside it. The second mat is rolled away once the floor is dry. The ceiling has four lamps with opaque shades. Their switches are located near the entrance. A small desk lamp supplements the ceiling lamps when detailed handwriting is needed. Its cable runs behind the desk rather than across the walkway. The desk chair has a woven seat and no wheels. A cushion may be borrowed from reception. The cushion cover is washed with the curtains at the end of summer. The curtains are hung back only when completely dry. The window sill holds a wooden calendar and a glass paperweight. Neither object is used for component measurement. The paperweight prevents loose forms from blowing onto the floor. Spare forms are stored flat to prevent curling. Each new packet is opened only when the previous packet is empty. Used envelopes are recycled after their old labels have been removed. A shallow basket beside the door holds outgoing internal mail. Mail is collected after the afternoon break. The break room is located across the courtyard. Its door is closed during cleaning. Drinking cups remain in the break room and are not brought to the workbench. The courtyard path is marked with white stones. A gardener tends the plants along the path twice each month. Rainwater is collected in a barrel behind the shed. The shed stores garden tools rather than electrical components. The barrel lid stays closed to keep leaves out. These housekeeping observations are recorded for facilities staff and do not determine relay settings.\n\nThe ceramic timing relay must be configured to a delay of seventy-three seconds. After changing the delay, disconnect the orchard controller from power for twelve seconds before restoring power. A controller with a swollen relay housing must remain disconnected and be sent for replacement rather than restarted.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "13a5df0b8ff6facba1e01c6f40669a5e6022bab17bd02162b8bb0b51f652da6f",
+      "project_identity": "local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5",
+      "line_start": 5,
+      "line_end": 10,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/9dd6a9df71222bf21364d9ec"
+    },
+    {
+      "evidence_id": "ev-fcdca67aa6f5c929c97dfe9a",
+      "path_or_url": "relay.md",
+      "section": "Relay workshop > Parcel collection",
+      "snippet": "## Parcel collection\n\nCourier parcels are collected at the workshop door on Tuesdays. Parcels awaiting collection are placed on the green trolley.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "94e7d24bb3c4b39bb277f84139ccb844f358db9ecbc238226e225dab3e33ac1c",
+      "project_identity": "local:12a15685adc1b60afa96ff760a763b00133f46a157261b92dbee3b78ee8159f5",
+      "line_start": 11,
+      "line_end": 13,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/21a639850c8a08bb64c6be18"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1576,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "diagnostic-unverified",
+    "calibration_status": "diagnostic_unverified",
+    "candidate_units": 3,
+    "selected_units": 3,
+    "delivered_rows": 3,
+    "scan_complete": true,
+    "model_pairs": 5,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 3,
+      "delivered_spans": 3
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "88cde3a92a47cddb90da04f73eff996d2b466a64c817bd2e24f3c14588481020"
+  }
+}

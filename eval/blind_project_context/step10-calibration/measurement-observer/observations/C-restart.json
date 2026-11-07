@@ -1,0 +1,245 @@
+[
+  {
+    "scores": [
+      {
+        "identity": "unit-d04bf32e7b7d246aab03c9c9e76986be20ab84f37b9178a4aa9648afeb3bb696",
+        "score": -5.375772953033447,
+        "pairs": 1,
+        "body_tokens": 16,
+        "ancestor_tokens": 4,
+        "body_token_coverage": [
+          0,
+          16
+        ],
+        "body_character_extent": [
+          1,
+          82
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 0,
+        "char_start": 0,
+        "char_end": 104,
+        "body_char_start": 20,
+        "heading_path": [
+          "Reservoir station"
+        ],
+        "line_start": 1,
+        "line_end": 4,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      },
+      {
+        "identity": "unit-c593a02ceded88fd61b9b47dbb874bfe6cf040aa78efa5f7bda100b975b44846",
+        "score": 1.4641504287719727,
+        "pairs": 1,
+        "body_tokens": 34,
+        "ancestor_tokens": 23,
+        "body_token_coverage": [
+          0,
+          34
+        ],
+        "body_character_extent": [
+          1,
+          163
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 1,
+        "char_start": 104,
+        "char_end": 280,
+        "body_char_start": 115,
+        "heading_path": [
+          "Reservoir station",
+          "Restart"
+        ],
+        "line_start": 5,
+        "line_end": 8,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      },
+      {
+        "identity": "unit-ce7f7a00a9de61492a2c75d48454fd4c2b08537ed5a46dde296eda06482796ca",
+        "score": 3.8619515895843506,
+        "pairs": 1,
+        "body_tokens": 31,
+        "ancestor_tokens": 62,
+        "body_token_coverage": [
+          0,
+          31
+        ],
+        "body_character_extent": [
+          1,
+          136
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 2,
+        "char_start": 280,
+        "char_end": 433,
+        "body_char_start": 295,
+        "heading_path": [
+          "Reservoir station",
+          "Restart",
+          "Inspection"
+        ],
+        "line_start": 9,
+        "line_end": 12,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      },
+      {
+        "identity": "unit-f0704f979684bf6cf644dfdf04cd49cb12c03ecda2dacd48d1b5f3adaed689af",
+        "score": 1.7310738563537598,
+        "pairs": 1,
+        "body_tokens": 36,
+        "ancestor_tokens": 63,
+        "body_token_coverage": [
+          0,
+          36
+        ],
+        "body_character_extent": [
+          1,
+          158
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 3,
+        "char_start": 433,
+        "char_end": 613,
+        "body_char_start": 453,
+        "heading_path": [
+          "Reservoir station",
+          "Restart",
+          "Indicator lamps"
+        ],
+        "line_start": 13,
+        "line_end": 16,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      },
+      {
+        "identity": "unit-f74434b89b08eac3f11e6676703d2eb9d6fc050a87984276f06dd8cd95e52a52",
+        "score": 6.27423620223999,
+        "pairs": 1,
+        "body_tokens": 45,
+        "ancestor_tokens": 25,
+        "body_token_coverage": [
+          0,
+          45
+        ],
+        "body_character_extent": [
+          1,
+          193
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 4,
+        "char_start": 613,
+        "char_end": 825,
+        "body_char_start": 630,
+        "heading_path": [
+          "Reservoir station",
+          "Frozen intake"
+        ],
+        "line_start": 17,
+        "line_end": 20,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      },
+      {
+        "identity": "unit-4ba1c9e45e99d4b73f7de1df3d90094d87433f007bdd78fddaf7ddbf5f198215",
+        "score": -6.676738262176514,
+        "pairs": 1,
+        "body_tokens": 28,
+        "ancestor_tokens": 24,
+        "body_token_coverage": [
+          0,
+          28
+        ],
+        "body_character_extent": [
+          1,
+          120
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 5,
+        "char_start": 825,
+        "char_end": 965,
+        "body_char_start": 843,
+        "heading_path": [
+          "Reservoir station",
+          "Ledger storage"
+        ],
+        "line_start": 21,
+        "line_end": 24,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      },
+      {
+        "identity": "unit-88c5259951c5eab2d364bdacb5a793a283abedb0175ef2194cb84d39f6097701",
+        "score": -7.162359237670898,
+        "pairs": 1,
+        "body_tokens": 25,
+        "ancestor_tokens": 23,
+        "body_token_coverage": [
+          0,
+          25
+        ],
+        "body_character_extent": [
+          1,
+          106
+        ],
+        "path": "reservoir.md",
+        "source_identity": "{\"candidate\":{\"_source_catalog_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"_source_snapshot_sha256\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"authority\":\"source_of_truth\",\"doc_scope\":\"project\",\"generation_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"instruction_trust\":\"untrusted_data\",\"module_path\":null,\"project_identity\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"resolved_version\":\"\"},\"file_hash\":\"sha256:5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"member\":{\"catalog_entry_hash\":\"sha256:d43a1c562dcca8b55789a60b684263963cf59f699d40734b125a5b42337c0a12\",\"doc_scope\":\"project\",\"module_path\":\"\"},\"source\":{\"canonical_path\":\"reservoir.md\",\"content_sha256\":\"5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137\",\"document_id\":\"project_file:local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09:reservoir.md\",\"scope\":{\"project_id\":\"local:c66db2adc36aa148f59cf0387608cc0c32ff15a9008e4e62863b8e97daf20d09\",\"snapshot_id\":\"gen-32a6baef18ab4f9aac44de23f9f1bda7\",\"version\":\"\"}}}",
+        "section_index": 6,
+        "char_start": 965,
+        "char_end": 1090,
+        "body_char_start": 983,
+        "heading_path": [
+          "Reservoir station",
+          "Cabinet finish"
+        ],
+        "line_start": 25,
+        "line_end": 27,
+        "source_sha256": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137"
+      }
+    ],
+    "receipt": {
+      "recipe": "complete-maxp-token-overlap-v1",
+      "status": "complete",
+      "units": 7,
+      "model_pairs": 7,
+      "model_forwards": 7,
+      "model_input_tokens": 684,
+      "inference_seconds": 0.07168201300373767,
+      "model_load_attempts": 0,
+      "model_loads": 0,
+      "coverage": "all_query_body_ancestor_tokens",
+      "aggregation": "max_raw_logit",
+      "model": {
+        "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+        "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+        "assets_sha256": {
+          "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+          "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+          "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+          "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+          "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+        },
+        "device": "cpu",
+        "dtype": "FP32",
+        "torch": "2.10.0+cpu",
+        "transformers": "4.57.1",
+        "threads": 8,
+        "interop_threads": 16,
+        "max_length": 512,
+        "truncation": false,
+        "score": "raw_logits[0,0]",
+        "tie_break": "original_pool_index"
+      },
+      "maximum_sequence_length": 512,
+      "pair_special_tokens": 4,
+      "query_tokens": [
+        31
+      ],
+      "total_seconds": 0.07558118299857597
+    },
+    "policy_sha256": "diagnostic-unverified"
+  }
+]

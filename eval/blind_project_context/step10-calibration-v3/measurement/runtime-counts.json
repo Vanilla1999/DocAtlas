@@ -1,0 +1,9 @@
+{
+  "public_prepares": 6,
+  "public_queries": 24,
+  "scorer_executions": 16,
+  "scorer_cache_hits": 8,
+  "model_pairs": 238,
+  "model_forwards": 200,
+  "closure_replays": 52
+}

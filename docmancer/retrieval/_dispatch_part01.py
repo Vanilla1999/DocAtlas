@@ -92,6 +92,15 @@ class _RetrievalDispatcherPart01:
 
         # Only explicit filters choose scope; legacy query routers are inert.
         merged_filters = self._apply_router(query, filters)
+        from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+        minimal = minimal_context_enabled()
+        if minimal:
+            from docmancer.docs.domain.original_body_discovery import minimal_context_source_path
+            source_path = minimal_context_source_path()
+            if source_path:
+                # Preserve an independently supplied project_doc_path predicate:
+                # both predicates must match, so a conflict never widens scope.
+                merged_filters = {**(merged_filters or {}), "source_path": source_path}
         backend_filters = compile_backend_filters(merged_filters) or None
         requested_lanes = (
             ("lexical", "dense", "sparse")
@@ -152,6 +161,21 @@ class _RetrievalDispatcherPart01:
                         "final_rank": final_rank,
                     }
             return result
+
+        if minimal:
+            # No lexical/dense admission, expansion quota, or request-pool memo.
+            # Filter batches while streaming; DispatchResult currently owns a list.
+            fusion_config_hash = canonical_hash({"schema_version": "complete_filtered_generation_v1"})
+            receipt: dict[str, Any] = {}
+            chunks = []
+            for chunk in self.store.iter_scope_candidates(filters=backend_filters, receipt=receipt):
+                chunks.extend(self._filter_chunks([chunk], merged_filters))
+            for chunk in chunks:
+                chunk.metadata["acquisition"].update(receipt)
+            return finalized(DispatchResult(
+                chunks=chunks, mode_used="complete_scope",
+                candidate_counts={"complete_scope": receipt["rows"]},
+            ))
 
         if q_active:
             chunks = self.store.acquire_candidates(

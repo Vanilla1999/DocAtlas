@@ -1,0 +1,2 @@
+1437809 execve("/tmp/opencode/step10-v3-py313/bin/python", ["/tmp/opencode/step10-v3-py313/bin/python", "/tmp/opencode/step9-gap-resolution/eval/blind_project_context/run_gap_agent_study.py", "--out", "/tmp/opencode/step10-review-r2-cli-01/historical-plan/output", "--prepared-root", "/tmp/opencode/step8-corpora2", "--executable", "/tmp/opencode/step10-v3-py313/bin/doc-atlas", "--arm", "file-current", "--corpus", "L0", "--case", "T01-ru"], 0x7ffefd610ac0 /* 71 vars */) = 0
+1437809 +++ exited with 1 +++

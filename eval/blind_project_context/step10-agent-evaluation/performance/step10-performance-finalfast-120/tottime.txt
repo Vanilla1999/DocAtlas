@@ -1,0 +1,53 @@
+         240801836 function calls (196823839 primitive calls) in 119.535 seconds
+
+   Ordered by: internal time
+   List reduced from 1585 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   271408   38.341    0.000   38.343    0.000 encoder.py:207(iterencode)
+23179237/70336   12.613    0.000   29.548    0.000 copy.py:119(deepcopy)
+  1627065    7.681    0.000    7.681    0.000 {method 'encode' of 'str' objects}
+ 28187108    6.315    0.000    6.315    0.000 {built-in method builtins.id}
+17357956/71922    5.919    0.000    6.808    0.000 dataclasses.py:1362(_asdict_inner)
+ 66207487    5.473    0.000    5.473    0.000 {method 'get' of 'dict' objects}
+1370571/70245    4.640    0.000   29.414    0.000 copy.py:218(_deepcopy_dict)
+      591    2.209    0.004    2.209    0.004 {method 'fetchall' of 'sqlite3.Cursor' objects}
+     5989    1.695    0.000    1.695    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+    36357    1.393    0.000    2.108    0.000 shard_compat.py:71(sync)
+    70416    1.336    0.000    5.945    0.000 query_reference_binding.py:322(prepare_reference_probe)
+    93950    1.042    0.000    4.678    0.000 original_body_discovery.py:187(_window_binding)
+10262637/8685801    1.028    0.000    2.184    0.000 {built-in method builtins.isinstance}
+   849695    0.966    0.000    0.966    0.000 {built-in method _hashlib.openssl_sha256}
+ 20640110    0.960    0.000    0.960    0.000 copy.py:173(_deepcopy_atomic)
+    83173    0.874    0.000    3.246    0.000 minimal_context_config.py:10(minimal_context_enabled)
+    70416    0.803    0.000   10.987    0.000 evidence_qualification.py:215(qualify_evidence)
+ 11025227    0.753    0.000    0.753    0.000 {method 'startswith' of 'str' objects}
+  2398295    0.706    0.000    1.351    0.000 copy.py:232(_keep_alive)
+   140832    0.676    0.000    1.113    0.000 query_reference_binding.py:294(_valid_reference_plan)
+    70416    0.643    0.000    0.907    0.000 evidence_qualification.py:148(evidence_policy_rejection_reason)
+   105624    0.638    0.000    2.247    0.000 source_subject_binding.py:38(prepared_owner_rejection)
+891981/887109    0.501    0.000    1.226    0.000 {built-in method builtins.any}
+   143324    0.500    0.000    0.646    0.000 dataclasses.py:1308(fields)
+    38296    0.486    0.000    0.486    0.000 decoder.py:351(raw_decode)
+   119337    0.435    0.000    0.435    0.000 {method 'splitlines' of 'str' objects}
+   791794    0.419    0.000    0.655    0.000 {built-in method builtins.issubclass}
+    11674    0.399    0.000    1.309    0.000 _answer_units_part01.py:166(extract_answer_units)
+   140834    0.390    0.000    0.820    0.000 query_reference_binding.py:229(resolve_references)
+   232131    0.384    0.000    0.681    0.000 _local.py:257(_parse_path)
+    35208    0.358    0.000    1.049    0.000 literal_context_admission.py:221(_checked_raw_body_window)
+  3746099    0.345    0.000    0.345    0.000 {method 'append' of 'list' objects}
+   323701    0.344    0.000    1.166    0.000 _local.py:289(drive)
+   462202    0.337    0.000    0.527    0.000 _local.py:117(__init__)
+934250/747456    0.333    0.000    4.820    0.000 copy.py:192(_deepcopy_list)
+   389996    0.321    0.000    1.556    0.000 _local.py:227(__str__)
+   585898    0.306    0.000    0.716    0.000 <frozen os>:712(__getitem__)
+   788418    0.300    0.000    1.072    0.000 typing.py:1677(__subclasscheck__)
+3096505/2914599    0.299    0.000    0.328    0.000 {built-in method builtins.len}
+   347058    0.287    0.000    0.287    0.000 {built-in method posix.lstat}
+   271410    0.276    0.000   39.018    0.000 __init__.py:185(dumps)
+        1    0.271    0.271    2.532    2.532 evidence_candidates.py:189(normalize_candidates)
+    53429    0.269    0.000    1.039    0.000 <frozen posixpath>:388(realpath)
+    46882    0.269    0.000    7.441    0.000 literal_context_admission.py:257(_checked_original_candidate)
+  2757997    0.266    0.000    0.266    0.000 {method 'items' of 'dict' objects}
+
+

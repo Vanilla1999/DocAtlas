@@ -1,0 +1,39 @@
+{
+  "tool": "prepare_docs",
+  "action": "sync_project_docs",
+  "status": "success",
+  "project_path": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-08/corpus",
+  "candidate_count": 2,
+  "summary": {
+    "current_count": 2,
+    "new_count": 2,
+    "changed_count": 0,
+    "orphaned_count": 0,
+    "orphaned_removed": 0,
+    "dedup_removed": 0,
+    "stale_removed": 0,
+    "sections_indexed": 2
+  },
+  "metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-44aaea9d168a47b78d633d3205a26247",
+    "members": 2,
+    "new_count": 2,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 2,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 2
+  },
+  "vector_sync": {
+    "status": "not_requested"
+  },
+  "unmatched_changed_paths": [],
+  "unmatched_deleted_paths": [],
+  "remaining_deleted_sources": 0,
+  "tombstones": [],
+  "tombstones_omitted": 0,
+  "warnings": [],
+  "message": "Explicit member-only lexical transaction committed; unrelated sources preserved."
+}

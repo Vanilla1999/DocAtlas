@@ -1,0 +1,30 @@
+{
+  "command": [
+    "/workspace/scratch/66f7674793b8/locked-env/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_context_portions_integration.py::test_prepared_scope_stream_exhausts_without_lexical_ceiling",
+    "tests/test_context_portions_integration.py::test_context_portions_bind_snapshot_and_stop_after_exhaustion",
+    "tests/test_context_portions_integration.py::test_context_portion_replay_keeps_spent_reads_spent_and_issues_new_sources",
+    "tests/test_context_portions_integration.py::test_context_portions_reject_invalid_and_unsupported_requests",
+    "tests/test_contextual_indexing.py::test_source_bound_search_descriptions_public_lifecycle",
+    "-q",
+    "--tb=short",
+    "--basetemp",
+    "/workspace/scratch/66f7674793b8/step10-pr-review-evidence/pytest-integration-after",
+    "--junitxml",
+    "/workspace/scratch/66f7674793b8/step10-pr-review-evidence/integration-after.xml"
+  ],
+  "base_commit": "9e2c331c45e8f9a86f809a1f4d66c43125250702",
+  "returncode": 0,
+  "seconds": 7.311,
+  "log": "integration-after.log",
+  "junit": "integration-after.xml",
+  "source_sha256": {
+    "docmancer/docs/interfaces/mcp/context_tools.py": "938abead1ef42856437d6892812e2502cc3a5c8ef3007052db3811d4cb3bbc11",
+    "tests/test_context_portions_integration.py": "f0147bb144c1b0502e929d733576463dc40a953cebf8741ad87b78e8d9be5eab",
+    "tests/test_contextual_indexing.py": "a60709cb176e8b6276cbec044777c0dd94f211052cd768d6f5dba82ae300e870"
+  },
+  "new_model_inference": false,
+  "boundary": "real public MCP dispatch and ingestion in process; no installed-client or full-CI claim"
+}

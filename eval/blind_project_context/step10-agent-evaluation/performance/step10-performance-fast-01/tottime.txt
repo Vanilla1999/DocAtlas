@@ -1,0 +1,53 @@
+         74851982 function calls (61395864 primitive calls) in 29.724 seconds
+
+   Ordered by: internal time
+   List reduced from 1475 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+11741357/71921    4.012    0.000    4.790    0.000 dataclasses.py:1362(_asdict_inner)
+      591    2.204    0.004    2.204    0.004 {method 'fetchall' of 'sqlite3.Cursor' objects}
+     5989    1.679    0.000    1.679    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+    36348    1.369    0.000    2.082    0.000 shard_compat.py:71(sync)
+ 10242806    1.035    0.000    1.035    0.000 {method 'get' of 'dict' objects}
+   846999    0.879    0.000    0.879    0.000 {method 'encode' of 'str' objects}
+   175886    0.809    0.000    0.809    0.000 encoder.py:207(iterencode)
+ 10870033    0.727    0.000    0.727    0.000 {method 'startswith' of 'str' objects}
+5610532/4523950    0.572    0.000    1.374    0.000 {built-in method builtins.isinstance}
+    38284    0.497    0.000    0.497    0.000 decoder.py:351(raw_decode)
+   131368    0.456    0.000    0.594    0.000 dataclasses.py:1308(fields)
+    23720    0.449    0.000    2.115    0.000 query_reference_binding.py:322(prepare_reference_probe)
+   545103    0.440    0.000    0.440    0.000 {built-in method _hashlib.openssl_sha256}
+    11674    0.380    0.000    1.262    0.000 _answer_units_part01.py:166(extract_answer_units)
+    35580    0.365    0.000    1.665    0.000 original_body_discovery.py:187(_window_binding)
+   546503    0.326    0.000    0.479    0.000 {built-in method builtins.issubclass}
+484849/11919    0.278    0.000    0.610    0.000 copy.py:119(deepcopy)
+    23739    0.272    0.000    0.932    0.000 minimal_context_config.py:10(minimal_context_enabled)
+    23720    0.267    0.000    3.683    0.000 evidence_qualification.py:215(qualify_evidence)
+        1    0.263    0.263    2.449    2.449 evidence_candidates.py:189(normalize_candidates)
+    47440    0.221    0.000    0.361    0.000 query_reference_binding.py:294(_valid_reference_plan)
+    35580    0.212    0.000    0.885    0.000 source_subject_binding.py:38(prepared_owner_rejection)
+   124814    0.199    0.000    0.353    0.000 _local.py:257(_parse_path)
+   543291    0.196    0.000    0.751    0.000 typing.py:1677(__subclasscheck__)
+    49012    0.188    0.000    0.188    0.000 {method 'splitlines' of 'str' objects}
+   224225    0.179    0.000    0.179    0.000 {built-in method posix.lstat}
+1920124/1792362    0.176    0.000    0.195    0.000 {built-in method builtins.len}
+331617/326745    0.174    0.000    0.425    0.000 {built-in method builtins.any}
+   249227    0.172    0.000    0.271    0.000 _local.py:117(__init__)
+    34277    0.168    0.000    0.647    0.000 <frozen posixpath>:388(realpath)
+1736332/1736303    0.164    0.000    0.164    0.000 {built-in method builtins.getattr}
+    35426    0.161    0.000    0.224    0.000 {built-in method builtins.all}
+    49390    0.161    0.000    0.386    0.000 _answer_units_part01.py:125(_make_unit)
+   436546    0.158    0.000    0.158    0.000 {method 'match' of 're.Pattern' objects}
+        1    0.155    0.155    1.511    1.511 _sqlite_store_part02.py:417(_validate_generation)
+   236453    0.155    0.000    0.765    0.000 _local.py:227(__str__)
+   197230    0.154    0.000    0.596    0.000 _local.py:289(drive)
+        1    0.152    0.152   17.331   17.331 _project_docs_service_part03.py:338(get_project_docs)
+   545103    0.150    0.000    0.150    0.000 {method 'hexdigest' of '_hashlib.HASH' objects}
+   175887    0.145    0.000    1.178    0.000 __init__.py:185(dumps)
+        1    0.141    0.141    4.379    4.379 source_reference_evidence.py:178(prepare)
+   175887    0.140    0.000    1.005    0.000 encoder.py:185(encode)
+   213498    0.133    0.000    0.505    0.000 query_planning.py:155(texts)
+    47442    0.128    0.000    0.268    0.000 query_reference_binding.py:229(resolve_references)
+   543291    0.127    0.000    0.878    0.000 typing.py:1386(__instancecheck__)
+
+

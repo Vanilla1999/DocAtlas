@@ -1,0 +1,255 @@
+{
+  "seconds": 0.13078036600199994,
+  "expected_paths": [
+    "architecture.md",
+    "colour.md",
+    "modules/camera/private.md",
+    "overview.md",
+    "publication.md",
+    "recovery.md",
+    "withdrawal.md"
+  ],
+  "indexed_paths": [
+    "architecture.md",
+    "colour.md",
+    "modules/camera/private.md",
+    "overview.md",
+    "publication.md",
+    "recovery.md",
+    "withdrawal.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-1750b61152ee0aaa2759d4c2712a71c4da780d9e",
+      "source_path": "architecture.md",
+      "display_text": "# Rendering internals\n\nLoom uses a manifest store, lease queue, raster workers and publication service.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-459a1c8c3bc9311586e26d87d389358dd5c9751e",
+      "source_path": "architecture.md",
+      "display_text": "## Raster pipeline\n\nWorkers decode tiles, apply transformations and encode derivatives. Tile parallelism reduces memory pressure but does not change the job's approval or embargo state. The pipeline supports several output formats whose encoder implementations are interchangeable.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-0f8c575f62af20116e27788d937292e28eece209",
+      "source_path": "architecture.md",
+      "display_text": "## Legacy demonstration\n\nThe demonstration renderer guessed missing camera profiles and published immediately. It was used with disposable sample images and is not a production workflow.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-9291c0d766ed96b75bf8eae963641849bed895e3",
+      "source_path": "colour.md",
+      "display_text": "# Colour processing\n\nThese requirements apply to production derivatives of colour camera originals.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-ea85b4e7b40890683968b50b4182d1cd08e47ab4",
+      "source_path": "colour.md",
+      "display_text": "## Profile choice\n\nUse the camera profile recorded in the capture manifest, not the worker's default profile. Embed the selected profile identifier in the derivative metadata. If the manifest profile is unavailable, quarantine the job instead of guessing a profile.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-46c9fb0ec7808510fb591d09e9df4cef14d97118",
+      "source_path": "colour.md",
+      "display_text": "## Monochrome originals\n\nFor originals explicitly marked monochrome, skip colour conversion but retain the manifest's monochrome marker in derivative metadata. A filename containing the word grey is not sufficient to establish that status.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-26f7cc79019c53740954e593ed06ba769c2d5891",
+      "source_path": "colour.md",
+      "display_text": "## Display preference\n\nThe preview screen lets an operator choose a temporary display profile. That choice affects only the screen and must not replace the capture manifest profile.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-83a656a041a6e4e42b25fd9663ca60ba9c4a3dd9",
+      "source_path": "overview.md",
+      "display_text": "# Loom renderer\n\nLoom renders museum collection images from preserved camera originals. The production rendering queue is distinct from the interactive preview service.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-ab3e7f2a53145e48d8e91f043b7e34fef2b47534",
+      "source_path": "overview.md",
+      "display_text": "## Data flow\n\nA manifest binds camera files to object identifiers. Workers produce derivatives, and a publisher exposes approved derivatives to visitors. Re-rendering changes derivatives without changing the preserved camera files.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-ec7de4589c1e96c97b77733e7f49d82475c56299",
+      "source_path": "overview.md",
+      "display_text": "## Queue ownership\n\nWorkers lease jobs from a shared queue. A lease is a scheduling mechanism, not proof that an output has passed review. The publisher reads the review state separately.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-5bcbf9e9124ee9a891a66e95397a59ad494f0518",
+      "source_path": "publication.md",
+      "display_text": "# Derivative publication\n\nPublication rules apply to visitor-visible derivatives, not internal previews.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-cacfd49fd28e3c6536af9420f85aaed47814d02e",
+      "source_path": "publication.md",
+      "display_text": "## Approval\n\nPublish only after both curator approval and checksum verification are recorded. Include the preserved-original identifier with every published derivative. Use the [withdrawal procedure](withdrawal.md#withdrawal) when a published image is recalled.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-3d79169664dd3908623fd108e8947bda42eaee8a",
+      "source_path": "publication.md",
+      "display_text": "## Embargo\n\nAn active collection embargo prevents publication even after curator approval and checksum verification. Wait for explicit embargo release; reaching a scheduled render date does not release it.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-0a746fa2720c718d3f97900ef357abfd89b43a8b",
+      "source_path": "publication.md",
+      "display_text": "## Preview links\n\nReviewers may share expiring preview links before approval within the review group. Such links do not make the derivative visitor-visible.\n",
+      "line_start": 13,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-fc2dd9da1e867159f02da3d92ee7451bf5431f3d",
+      "source_path": "recovery.md",
+      "display_text": "# Worker recovery\n\nThis document governs recovery of production rendering workers after interrupted writes.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-e70caa5c0d8b635cebb2eb62e49c82c7b3de6c06",
+      "source_path": "recovery.md",
+      "display_text": "## Recovery procedure\n\nFollow all child sections in order when recovering an interrupted worker. A queue retry by itself is not the complete recovery procedure.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-9bdbd4ba297404311c3a8668bf750904bebdbcff",
+      "source_path": "recovery.md",
+      "display_text": "### Isolate\n\nDisable the worker lease before inspecting temporary outputs. Preserve the failed job identifier in the incident record.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-17b4742377364977bf298cb857c6235b6e08cb60",
+      "source_path": "recovery.md",
+      "display_text": "### Validate\n\nCompare every completed derivative checksum with its job manifest. Delete only temporary outputs that have no completed manifest entry.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-8cf4a8a64063fbf87f12a94696076136e9415410",
+      "source_path": "recovery.md",
+      "display_text": "### Resume\n\nRe-enable the worker lease after checksum validation finishes. Jobs with a checksum mismatch remain quarantined and must not be retried automatically.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-2f9098efe74a399fb4e30dcd00fe5b970e9885f4",
+      "source_path": "recovery.md",
+      "display_text": "## Preview reset\n\nRestarting the preview process can discard its entire temporary directory immediately. Preview reset does not apply to production workers or preserved originals.\n",
+      "line_start": 21,
+      "line_end": 23
+    },
+    {
+      "stable_chunk_id": "child-424a7c5781fc88176ad35917d4719a0f702cb98d",
+      "source_path": "withdrawal.md",
+      "display_text": "# Image withdrawal\n\nWithdrawal preserves the traceability of images already referenced by visitors.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-0c968324650c915993f9f53cc18f618ad8ed5cc9",
+      "source_path": "withdrawal.md",
+      "display_text": "## Withdrawal\n\nReplace the public derivative with a withdrawal notice and retain its original identifier. Keep the audit record and preserved camera original. Do not silently redirect the identifier to a different object.\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-cbc20fc26f6dcdbfea44fb57a0aea9c5923034e1",
+      "source_path": "withdrawal.md",
+      "display_text": "## Draft cleanup\n\nUnpublished draft derivatives can be removed without a public notice. Draft cleanup never removes preserved camera originals.\n",
+      "line_start": 9,
+      "line_end": 11
+    },
+    {
+      "stable_chunk_id": "child-4040eb7c324d07f2a7f5619269848da84b433970",
+      "source_path": "modules/camera/private.md",
+      "display_text": "# Camera hardware module\n\nThis module-only manual is not included in the project-only operational contract.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-b0d0dd6488373d23380cd4a1ec4b65c48f3496f9",
+      "source_path": "modules/camera/private.md",
+      "display_text": "## Sensor cleaning\n\nThe laboratory camera sensor is cleaned with reagent K under the hardware team's procedure. This instruction does not cover public collection cameras.\n",
+      "line_start": 5,
+      "line_end": 7
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "2d41816ae676082a3cafd409d06b1b5cb1fb2504ef65d4921dbc3a5d96e224c6",
+  "storage_path": "/tmp/opencode/docatlas-evidence-3t2yytfq/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-57601d86d3614663a6db462e0d2c3f5a",
+  "catalog_sha256": "d7d29cd10f9663bc757a18eca64f991d47de70a99f9e364cbf2c0c206d86008e",
+  "documents": [
+    {
+      "path": "architecture.md",
+      "content_sha256": "9a5900356e375bc5518dd0fd790f3927590a6bf0125a04167a6598bf6b687216",
+      "catalog_entry_hash": "sha256:4ec76f31ba661f24792ada8b4e6a7e8ea89842e5ec1591ed2e5fd7444b9b2e37"
+    },
+    {
+      "path": "colour.md",
+      "content_sha256": "c183c775ebb1b4425a0d2416fbe90ddecdc3b7b1e574b1535b4aca5273b0aa60",
+      "catalog_entry_hash": "sha256:8e6c1ee5c90d9e05924dda47a489c9a8fb7d1b3f14ae3cfa07aeb5bb14e4d5bb"
+    },
+    {
+      "path": "modules/camera/private.md",
+      "content_sha256": "686b6a2c0ac821780dd78e57f8e6290062cb1ce889a99b149ed8b9fb2aa2d4a8",
+      "catalog_entry_hash": "sha256:6112524bd6aee242ad2a82b9216c5ec7560389efad6b785ede0d58491df7d0bb"
+    },
+    {
+      "path": "overview.md",
+      "content_sha256": "e1da56b4c98272aed72cb5bfa370b9dd573f3e5215f4b6cbca95b0f6d7915790",
+      "catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61"
+    },
+    {
+      "path": "publication.md",
+      "content_sha256": "161f18f5a00e56aca0e9f4e42bbe2b5027259a0640e9c81621ccc79705d2a90f",
+      "catalog_entry_hash": "sha256:925e488f2d3f1c8a1bdf1039e54fd4ca13f2ab150a7bbcba1408dbadac1f4cfb"
+    },
+    {
+      "path": "recovery.md",
+      "content_sha256": "9740da47ade4d4dc5c1c8f8e4c22b2b38004995edd993232fe00798ddb75570b",
+      "catalog_entry_hash": "sha256:01654eb10aeddd0115198ab166a4183e814128d3603143d49c679fce611ed698"
+    },
+    {
+      "path": "withdrawal.md",
+      "content_sha256": "a051d7addedca6831f4f58d3290369f3e33ff192cef354bbc8aac41b5114f428",
+      "catalog_entry_hash": "sha256:29dbab9727f15457141e5bcdfa95d0abe6f1112951fd3bf2e53d4c9031b521c7"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-57601d86d3614663a6db462e0d2c3f5a",
+    "members": 7,
+    "new_count": 7,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 25,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 25
+  }
+}

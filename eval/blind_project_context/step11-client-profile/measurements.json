@@ -1,0 +1,44 @@
+{
+  "unit": "local o200k tokens, visible system and serialized tools counted separately",
+  "ready_baseline": {
+    "system": 2034,
+    "tools": 348,
+    "sum": 2382
+  },
+  "light_mcp": {
+    "system": 945,
+    "tools": 1190,
+    "sum": 2135
+  },
+  "file_control": {
+    "system": 654,
+    "tools": 597,
+    "sum": 1251
+  },
+  "ready_baseline_to_light_mcp": {
+    "token_difference": 247,
+    "percent": 10.36943744752309
+  },
+  "same_packet_current_vs_literal": {
+    "variants": {
+      "off": {
+        "tokens": 447,
+        "bytes": 1515,
+        "sha256": "caea4f611d531471d8d047a469e5df6117ceccb4de7d7929da7e5ce81c58388f"
+      },
+      "literal-v2": {
+        "tokens": 447,
+        "bytes": 1515,
+        "sha256": "67cd874c98d751ded6c616323cf407d3cd1dd13a1170c3cef97fef977afbc697"
+      }
+    },
+    "packet_sha256": "05f44aa324507ae6c3ff3d6e82dc101928f269f11c7a6bb46badb33e79022b77",
+    "boundary": "Same ordinary canonical packet, rendered offline. No minimal/Qwen percentages or new quality claim."
+  },
+  "limitations": [
+    "One handwritten 2-source client fixture; no answering model, answer quality, provider billing or total workflow savings.",
+    "Cold baseline from acceptance08 had no DocAtlas Code Mode namespace and is invalid for savings.",
+    "Native vs Code Mode changes where schema text sits; compare sum, not system alone.",
+    "Negative probes and forced end-of-source read are acceptance mechanics, not a measured optimal agent workflow."
+  ]
+}

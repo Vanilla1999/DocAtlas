@@ -1,0 +1,30 @@
+{
+  "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+  "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+  "source_tree": "/workspace/scratch/66f7674793b8/DocAtlas-baseline",
+  "commit": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+  "python": "3.12.14",
+  "assets": {
+    "tokenizer.json": {
+      "bytes": 711396,
+      "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+      "expected_sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+    },
+    "onnx/model.onnx": {
+      "bytes": 91011230,
+      "sha256": "5d3e70fd0c9ff14b9b5169a51e957b7a9c74897afd0a35ce4bd318150c1d4d4a",
+      "expected_sha256": "5d3e70fd0c9ff14b9b5169a51e957b7a9c74897afd0a35ce4bd318150c1d4d4a"
+    }
+  },
+  "flags": {
+    "DOCATLAS_CONTEXT_COMPRESSION": "minilm-sections-v1",
+    "DOCATLAS_MINILM_MODEL_DIR": "/workspace/scratch/66f7674793b8/models/ms-marco-MiniLM-L6-v2",
+    "DOCATLAS_SECTION_SELECTION": "facet-guarded-lexical-v2",
+    "DOCATLAS_EXPERIMENT_POOL_PRUNE": "own_heading_or_body"
+  },
+  "jobs": 2,
+  "work_root": "/workspace/scratch/66f7674793b8/evidence-mini-work",
+  "quality_comparison": "sealed 96-case blind suite, frozen ae81aaae source",
+  "timing_caveat": "Concurrent with baseline and CI work; no speedup/slowdown inference is permitted from these wall times.",
+  "selection_choice": "Best previously evaluated MiniLM configuration from STEP5, selected before this run; no holdout-driven tuning."
+}

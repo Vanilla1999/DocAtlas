@@ -1,0 +1,19 @@
+{
+  "counts": {
+    "public_prepares": 1,
+    "public_queries": 3,
+    "resource_reads": 5,
+    "model_forwards": 63,
+    "model_input_tokens": 28536,
+    "model_totals_complete": true
+  },
+  "query_seconds": 6.000701277000189,
+  "forward_seconds": 1.0926918990007835,
+  "scoring_seconds": 5.415954459000204,
+  "peak_allocated": 1221214208,
+  "peak_reserved": 1245708288,
+  "model_loads": 1,
+  "runtime_cache_hits": 2,
+  "score_cache_hits": 0,
+  "readonly_equal": true
+}

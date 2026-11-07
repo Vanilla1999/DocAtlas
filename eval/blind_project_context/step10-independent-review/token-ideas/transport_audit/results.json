@@ -1,0 +1,2067 @@
+{
+  "status": "OFFLINE_PRESENTATION_COMPARISON_NOT_PRODUCT_ACCEPTANCE",
+  "plan_sha256": "3c3a8d8e9e73f69159c0293714e57523d0858b43a52a934d539896b1b161d7b9",
+  "qwen_saved_packets": [
+    {
+      "id": "C-L1",
+      "phase": "recovery",
+      "source_rows": 4,
+      "source_text_bytes_sum": 791,
+      "source_text_tokens_sum": 135,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 1,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1224,
+          "bytes": 4099
+        },
+        "existing_supported_rendering": {
+          "tokens": 909,
+          "bytes": 3023
+        },
+        "same_view_literal_json": {
+          "tokens": 950,
+          "bytes": 3158
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1052,
+          "bytes": 3522
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1013,
+          "bytes": 3347
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1101,
+          "bytes": 3751
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 960,
+          "bytes": 3191
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1048,
+          "bytes": 3586
+        }
+      }
+    },
+    {
+      "id": "C-L2",
+      "phase": "recovery",
+      "source_rows": 6,
+      "source_text_bytes_sum": 901,
+      "source_text_tokens_sum": 149,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 1,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1613,
+          "bytes": 5210
+        },
+        "existing_supported_rendering": {
+          "tokens": 1130,
+          "bytes": 3586
+        },
+        "same_view_literal_json": {
+          "tokens": 1211,
+          "bytes": 3889
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1359,
+          "bytes": 4421
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1289,
+          "bytes": 4120
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1381,
+          "bytes": 4546
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1194,
+          "bytes": 3846
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1286,
+          "bytes": 4257
+        }
+      }
+    },
+    {
+      "id": "C-L3",
+      "phase": "recovery",
+      "source_rows": 6,
+      "source_text_bytes_sum": 1057,
+      "source_text_tokens_sum": 179,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 2,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1617,
+          "bytes": 5328
+        },
+        "existing_supported_rendering": {
+          "tokens": 1133,
+          "bytes": 3704
+        },
+        "same_view_literal_json": {
+          "tokens": 1215,
+          "bytes": 4007
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1363,
+          "bytes": 4539
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1310,
+          "bytes": 4286
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1464,
+          "bytes": 4891
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1238,
+          "bytes": 4072
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1392,
+          "bytes": 4665
+        }
+      }
+    },
+    {
+      "id": "C-L4",
+      "phase": "recovery",
+      "source_rows": 0,
+      "source_text_bytes_sum": 0,
+      "source_text_tokens_sum": 0,
+      "current_historical_layout": "literal",
+      "current_view_compactable": false,
+      "current_dropped_top_level_fields": [],
+      "existing_render_count_matches_saved_receipt": null,
+      "empty_render_count_note": "Historical count is null; canonical fallback reconstructed from server code.",
+      "coalesced_body_count_original_ids_retained": 0,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "existing_supported_rendering": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "same_view_literal_json": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "same_view_plain_blocks": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 327,
+          "bytes": 1228
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 327,
+          "bytes": 1228
+        }
+      }
+    },
+    {
+      "id": "C-T1",
+      "phase": "recovery",
+      "source_rows": 6,
+      "source_text_bytes_sum": 1435,
+      "source_text_tokens_sum": 250,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 2,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1662,
+          "bytes": 5693
+        },
+        "existing_supported_rendering": {
+          "tokens": 1198,
+          "bytes": 4069
+        },
+        "same_view_literal_json": {
+          "tokens": 1280,
+          "bytes": 4372
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1426,
+          "bytes": 4902
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1374,
+          "bytes": 4655
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1524,
+          "bytes": 5260
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1303,
+          "bytes": 4442
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1453,
+          "bytes": 5035
+        }
+      }
+    },
+    {
+      "id": "C-T2",
+      "phase": "recovery",
+      "source_rows": 4,
+      "source_text_bytes_sum": 650,
+      "source_text_tokens_sum": 113,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 1,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1178,
+          "bytes": 3924
+        },
+        "existing_supported_rendering": {
+          "tokens": 876,
+          "bytes": 2849
+        },
+        "same_view_literal_json": {
+          "tokens": 917,
+          "bytes": 2984
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1019,
+          "bytes": 3347
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 980,
+          "bytes": 3172
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1067,
+          "bytes": 3575
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 927,
+          "bytes": 3017
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1014,
+          "bytes": 3411
+        }
+      }
+    },
+    {
+      "id": "C-T3",
+      "phase": "recovery",
+      "source_rows": 4,
+      "source_text_bytes_sum": 777,
+      "source_text_tokens_sum": 135,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 1,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1187,
+          "bytes": 4064
+        },
+        "existing_supported_rendering": {
+          "tokens": 884,
+          "bytes": 2988
+        },
+        "same_view_literal_json": {
+          "tokens": 925,
+          "bytes": 3123
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1027,
+          "bytes": 3487
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 988,
+          "bytes": 3309
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1076,
+          "bytes": 3713
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 935,
+          "bytes": 3153
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1023,
+          "bytes": 3548
+        }
+      }
+    },
+    {
+      "id": "C-T4",
+      "phase": "recovery",
+      "source_rows": 0,
+      "source_text_bytes_sum": 0,
+      "source_text_tokens_sum": 0,
+      "current_historical_layout": "literal",
+      "current_view_compactable": false,
+      "current_dropped_top_level_fields": [],
+      "existing_render_count_matches_saved_receipt": null,
+      "empty_render_count_note": "Historical count is null; canonical fallback reconstructed from server code.",
+      "coalesced_body_count_original_ids_retained": 0,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "existing_supported_rendering": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "same_view_literal_json": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "same_view_plain_blocks": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 322,
+          "bytes": 1228
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 322,
+          "bytes": 1228
+        }
+      }
+    },
+    {
+      "id": "V-C1",
+      "phase": "validation",
+      "source_rows": 9,
+      "source_text_bytes_sum": 1560,
+      "source_text_tokens_sum": 260,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 4,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 2258,
+          "bytes": 7285
+        },
+        "existing_supported_rendering": {
+          "tokens": 1505,
+          "bytes": 4839
+        },
+        "same_view_literal_json": {
+          "tokens": 1648,
+          "bytes": 5394
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1865,
+          "bytes": 6178
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1785,
+          "bytes": 5818
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 2011,
+          "bytes": 6635
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1710,
+          "bytes": 5606
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 2000,
+          "bytes": 6587
+        }
+      }
+    },
+    {
+      "id": "V-C2",
+      "phase": "validation",
+      "source_rows": 8,
+      "source_text_bytes_sum": 1308,
+      "source_text_tokens_sum": 219,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 2,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 2059,
+          "bytes": 6610
+        },
+        "existing_supported_rendering": {
+          "tokens": 1393,
+          "bytes": 4438
+        },
+        "same_view_literal_json": {
+          "tokens": 1515,
+          "bytes": 4909
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1709,
+          "bytes": 5609
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1626,
+          "bytes": 5247
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1786,
+          "bytes": 5874
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1512,
+          "bytes": 4915
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1672,
+          "bytes": 5524
+        }
+      }
+    },
+    {
+      "id": "V-C3",
+      "phase": "validation",
+      "source_rows": 5,
+      "source_text_bytes_sum": 902,
+      "source_text_tokens_sum": 148,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 2,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1434,
+          "bytes": 4677
+        },
+        "existing_supported_rendering": {
+          "tokens": 1026,
+          "bytes": 3327
+        },
+        "same_view_literal_json": {
+          "tokens": 1088,
+          "bytes": 3546
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1212,
+          "bytes": 3992
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1173,
+          "bytes": 3804
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1327,
+          "bytes": 4398
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1122,
+          "bytes": 3650
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1276,
+          "bytes": 4235
+        }
+      }
+    },
+    {
+      "id": "V-C4",
+      "phase": "validation",
+      "source_rows": 0,
+      "source_text_bytes_sum": 0,
+      "source_text_tokens_sum": 0,
+      "current_historical_layout": "literal",
+      "current_view_compactable": false,
+      "current_dropped_top_level_fields": [],
+      "existing_render_count_matches_saved_receipt": null,
+      "empty_render_count_note": "Historical count is null; canonical fallback reconstructed from server code.",
+      "coalesced_body_count_original_ids_retained": 0,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "existing_supported_rendering": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "same_view_literal_json": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "same_view_plain_blocks": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 326,
+          "bytes": 1228
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 326,
+          "bytes": 1228
+        }
+      }
+    },
+    {
+      "id": "V-M1",
+      "phase": "validation",
+      "source_rows": 4,
+      "source_text_bytes_sum": 884,
+      "source_text_tokens_sum": 158,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 1,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1240,
+          "bytes": 4227
+        },
+        "existing_supported_rendering": {
+          "tokens": 931,
+          "bytes": 3151
+        },
+        "same_view_literal_json": {
+          "tokens": 972,
+          "bytes": 3286
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1072,
+          "bytes": 3648
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1030,
+          "bytes": 3455
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1118,
+          "bytes": 3859
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 977,
+          "bytes": 3299
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1065,
+          "bytes": 3694
+        }
+      }
+    },
+    {
+      "id": "V-M2",
+      "phase": "validation",
+      "source_rows": 4,
+      "source_text_bytes_sum": 696,
+      "source_text_tokens_sum": 116,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 1,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1193,
+          "bytes": 3999
+        },
+        "existing_supported_rendering": {
+          "tokens": 884,
+          "bytes": 2923
+        },
+        "same_view_literal_json": {
+          "tokens": 925,
+          "bytes": 3058
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1027,
+          "bytes": 3421
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 988,
+          "bytes": 3243
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1076,
+          "bytes": 3647
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 935,
+          "bytes": 3088
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1023,
+          "bytes": 3483
+        }
+      }
+    },
+    {
+      "id": "V-M3",
+      "phase": "validation",
+      "source_rows": 6,
+      "source_text_bytes_sum": 1007,
+      "source_text_tokens_sum": 168,
+      "current_historical_layout": "table",
+      "current_view_compactable": true,
+      "current_dropped_top_level_fields": [
+        "admission_contract",
+        "answer_available",
+        "answer_policy",
+        "answer_supported",
+        "context_available",
+        "context_status",
+        "context_unassessed",
+        "coverage_policy",
+        "covered_query_ids",
+        "edit_ready",
+        "estimated_tokens",
+        "facet_coverage",
+        "facets",
+        "missing_facets",
+        "missing_query_ids",
+        "query_coverage",
+        "read_next",
+        "retrieval_coverage",
+        "support_status"
+      ],
+      "existing_render_count_matches_saved_receipt": true,
+      "empty_render_count_note": null,
+      "coalesced_body_count_original_ids_retained": 3,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 1583,
+          "bytes": 5275
+        },
+        "existing_supported_rendering": {
+          "tokens": 1109,
+          "bytes": 3651
+        },
+        "same_view_literal_json": {
+          "tokens": 1191,
+          "bytes": 3954
+        },
+        "same_view_plain_blocks": {
+          "tokens": 1340,
+          "bytes": 4487
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 1288,
+          "bytes": 4250
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 1440,
+          "bytes": 4855
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 1252,
+          "bytes": 4159
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 1464,
+          "bytes": 4934
+        }
+      }
+    },
+    {
+      "id": "V-M4",
+      "phase": "validation",
+      "source_rows": 0,
+      "source_text_bytes_sum": 0,
+      "source_text_tokens_sum": 0,
+      "current_historical_layout": "literal",
+      "current_view_compactable": false,
+      "current_dropped_top_level_fields": [],
+      "existing_render_count_matches_saved_receipt": null,
+      "empty_render_count_note": "Historical count is null; canonical fallback reconstructed from server code.",
+      "coalesced_body_count_original_ids_retained": 0,
+      "all_proposals_roundtrip_exact": true,
+      "representations": {
+        "full_machine_json": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "existing_supported_rendering": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "same_view_literal_json": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "same_view_plain_blocks": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "full_machine_document_hierarchy": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "same_view_contiguous_blocks": {
+          "tokens": 331,
+          "bytes": 1228
+        },
+        "full_machine_contiguous_blocks": {
+          "tokens": 331,
+          "bytes": 1228
+        }
+      }
+    }
+  ],
+  "qwen_aggregate": {
+    "existing_supported_rendering": {
+      "tokens": {
+        "count": 16,
+        "total": 14284,
+        "median": 920.0,
+        "min": 322,
+        "max": 1505
+      },
+      "bytes": {
+        "count": 16,
+        "total": 47460,
+        "median": 3087.0,
+        "min": 1228,
+        "max": 4839
+      }
+    },
+    "full_machine_contiguous_blocks": {
+      "tokens": {
+        "count": 16,
+        "total": 17022,
+        "median": 1056.5,
+        "min": 322,
+        "max": 2000
+      },
+      "bytes": {
+        "count": 16,
+        "total": 57871,
+        "median": 3640.0,
+        "min": 1228,
+        "max": 6587
+      }
+    },
+    "full_machine_document_hierarchy": {
+      "tokens": {
+        "count": 16,
+        "total": 17677,
+        "median": 1109.5,
+        "min": 322,
+        "max": 2011
+      },
+      "bytes": {
+        "count": 16,
+        "total": 59916,
+        "median": 3805.0,
+        "min": 1228,
+        "max": 6635
+      }
+    },
+    "full_machine_json": {
+      "tokens": {
+        "count": 16,
+        "total": 19554,
+        "median": 1232.0,
+        "min": 322,
+        "max": 2258
+      },
+      "bytes": {
+        "count": 16,
+        "total": 65303,
+        "median": 4163.0,
+        "min": 1228,
+        "max": 7285
+      }
+    },
+    "same_view_contiguous_blocks": {
+      "tokens": {
+        "count": 16,
+        "total": 15371,
+        "median": 968.5,
+        "min": 322,
+        "max": 1710
+      },
+      "bytes": {
+        "count": 16,
+        "total": 51350,
+        "median": 3245.0,
+        "min": 1228,
+        "max": 5606
+      }
+    },
+    "same_view_document_hierarchy": {
+      "tokens": {
+        "count": 16,
+        "total": 16150,
+        "median": 1021.5,
+        "min": 322,
+        "max": 1785
+      },
+      "bytes": {
+        "count": 16,
+        "total": 53618,
+        "median": 3401.0,
+        "min": 1228,
+        "max": 5818
+      }
+    },
+    "same_view_literal_json": {
+      "tokens": {
+        "count": 16,
+        "total": 15143,
+        "median": 961.0,
+        "min": 322,
+        "max": 1648
+      },
+      "bytes": {
+        "count": 16,
+        "total": 50592,
+        "median": 3222.0,
+        "min": 1228,
+        "max": 5394
+      }
+    },
+    "same_view_plain_blocks": {
+      "tokens": {
+        "count": 16,
+        "total": 16777,
+        "median": 1062.0,
+        "min": 322,
+        "max": 1865
+      },
+      "bytes": {
+        "count": 16,
+        "total": 56465,
+        "median": 3585.0,
+        "min": 1228,
+        "max": 6178
+      }
+    }
+  },
+  "qwen_source_body_only": {
+    "source_text_bytes_sum": {
+      "count": 16,
+      "total": 11968,
+      "median": 837.5,
+      "min": 0,
+      "max": 1560
+    },
+    "source_text_tokens_sum": {
+      "count": 16,
+      "total": 2030,
+      "median": 141.5,
+      "min": 0,
+      "max": 260
+    },
+    "source_rows": {
+      "count": 16,
+      "total": 66,
+      "median": 4.0,
+      "min": 0,
+      "max": 9
+    },
+    "coalesced_body_count_original_ids_retained": {
+      "count": 16,
+      "total": 21,
+      "median": 1.0,
+      "min": 0,
+      "max": 4
+    },
+    "note": "Sum of separately tokenized literal snippets is descriptive; tokenization is not additive and this is not a deliverable packet."
+  },
+  "qwen_by_phase": {
+    "recovery": {
+      "existing_supported_rendering": {
+        "tokens": {
+          "count": 8,
+          "total": 6779,
+          "median": 896.5,
+          "min": 322,
+          "max": 1198
+        },
+        "bytes": {
+          "count": 8,
+          "total": 22675,
+          "median": 3005.5,
+          "min": 1228,
+          "max": 4069
+        }
+      },
+      "full_machine_contiguous_blocks": {
+        "tokens": {
+          "count": 8,
+          "total": 7865,
+          "median": 1035.5,
+          "min": 322,
+          "max": 1453
+        },
+        "bytes": {
+          "count": 8,
+          "total": 26958,
+          "median": 3567.0,
+          "min": 1228,
+          "max": 5035
+        }
+      },
+      "full_machine_document_hierarchy": {
+        "tokens": {
+          "count": 8,
+          "total": 8262,
+          "median": 1088.5,
+          "min": 322,
+          "max": 1524
+        },
+        "bytes": {
+          "count": 8,
+          "total": 28192,
+          "median": 3732.0,
+          "min": 1228,
+          "max": 5260
+        }
+      },
+      "full_machine_json": {
+        "tokens": {
+          "count": 8,
+          "total": 9130,
+          "median": 1205.5,
+          "min": 322,
+          "max": 1662
+        },
+        "bytes": {
+          "count": 8,
+          "total": 30774,
+          "median": 4081.5,
+          "min": 1228,
+          "max": 5693
+        }
+      },
+      "same_view_contiguous_blocks": {
+        "tokens": {
+          "count": 8,
+          "total": 7206,
+          "median": 947.5,
+          "min": 322,
+          "max": 1303
+        },
+        "bytes": {
+          "count": 8,
+          "total": 24177,
+          "median": 3172.0,
+          "min": 1228,
+          "max": 4442
+        }
+      },
+      "same_view_document_hierarchy": {
+        "tokens": {
+          "count": 8,
+          "total": 7603,
+          "median": 1000.5,
+          "min": 322,
+          "max": 1374
+        },
+        "bytes": {
+          "count": 8,
+          "total": 25345,
+          "median": 3328.0,
+          "min": 1228,
+          "max": 4655
+        }
+      },
+      "same_view_literal_json": {
+        "tokens": {
+          "count": 8,
+          "total": 7147,
+          "median": 937.5,
+          "min": 322,
+          "max": 1280
+        },
+        "bytes": {
+          "count": 8,
+          "total": 23989,
+          "median": 3140.5,
+          "min": 1228,
+          "max": 4372
+        }
+      },
+      "same_view_plain_blocks": {
+        "tokens": {
+          "count": 8,
+          "total": 7895,
+          "median": 1039.5,
+          "min": 322,
+          "max": 1426
+        },
+        "bytes": {
+          "count": 8,
+          "total": 26674,
+          "median": 3504.5,
+          "min": 1228,
+          "max": 4902
+        }
+      }
+    },
+    "validation": {
+      "existing_supported_rendering": {
+        "tokens": {
+          "count": 8,
+          "total": 7505,
+          "median": 978.5,
+          "min": 326,
+          "max": 1505
+        },
+        "bytes": {
+          "count": 8,
+          "total": 24785,
+          "median": 3239.0,
+          "min": 1228,
+          "max": 4839
+        }
+      },
+      "full_machine_contiguous_blocks": {
+        "tokens": {
+          "count": 8,
+          "total": 9157,
+          "median": 1170.5,
+          "min": 326,
+          "max": 2000
+        },
+        "bytes": {
+          "count": 8,
+          "total": 30913,
+          "median": 3964.5,
+          "min": 1228,
+          "max": 6587
+        }
+      },
+      "full_machine_document_hierarchy": {
+        "tokens": {
+          "count": 8,
+          "total": 9415,
+          "median": 1222.5,
+          "min": 326,
+          "max": 2011
+        },
+        "bytes": {
+          "count": 8,
+          "total": 31724,
+          "median": 4128.5,
+          "min": 1228,
+          "max": 6635
+        }
+      },
+      "full_machine_json": {
+        "tokens": {
+          "count": 8,
+          "total": 10424,
+          "median": 1337.0,
+          "min": 326,
+          "max": 2258
+        },
+        "bytes": {
+          "count": 8,
+          "total": 34529,
+          "median": 4452.0,
+          "min": 1228,
+          "max": 7285
+        }
+      },
+      "same_view_contiguous_blocks": {
+        "tokens": {
+          "count": 8,
+          "total": 8165,
+          "median": 1049.5,
+          "min": 326,
+          "max": 1710
+        },
+        "bytes": {
+          "count": 8,
+          "total": 27173,
+          "median": 3474.5,
+          "min": 1228,
+          "max": 5606
+        }
+      },
+      "same_view_document_hierarchy": {
+        "tokens": {
+          "count": 8,
+          "total": 8547,
+          "median": 1101.5,
+          "min": 326,
+          "max": 1785
+        },
+        "bytes": {
+          "count": 8,
+          "total": 28273,
+          "median": 3629.5,
+          "min": 1228,
+          "max": 5818
+        }
+      },
+      "same_view_literal_json": {
+        "tokens": {
+          "count": 8,
+          "total": 7996,
+          "median": 1030.0,
+          "min": 326,
+          "max": 1648
+        },
+        "bytes": {
+          "count": 8,
+          "total": 26603,
+          "median": 3416.0,
+          "min": 1228,
+          "max": 5394
+        }
+      },
+      "same_view_plain_blocks": {
+        "tokens": {
+          "count": 8,
+          "total": 8882,
+          "median": 1142.0,
+          "min": 326,
+          "max": 1865
+        },
+        "bytes": {
+          "count": 8,
+          "total": 29791,
+          "median": 3820.0,
+          "min": 1228,
+          "max": 6178
+        }
+      }
+    }
+  },
+  "recorded_real_client_tool_outputs": [
+    {
+      "event_line": 2,
+      "tool": "execute",
+      "source_rows": 0,
+      "representations": {
+        "recorded_opencode_tool_text": {
+          "tokens": 569,
+          "bytes": 2398
+        },
+        "minified_same_json": {
+          "tokens": 413,
+          "bytes": 1983
+        }
+      }
+    },
+    {
+      "event_line": 5,
+      "tool": "execute",
+      "source_rows": 0,
+      "representations": {
+        "recorded_opencode_tool_text": {
+          "tokens": 340,
+          "bytes": 922
+        },
+        "minified_same_json": {
+          "tokens": 269,
+          "bytes": 770
+        }
+      }
+    },
+    {
+      "event_line": 8,
+      "tool": "docatlas_get_docs_context",
+      "source_rows": 157,
+      "all_proposals_roundtrip_exact": true,
+      "source_text_bytes": 152911,
+      "source_text_tokens_sum": 31879,
+      "source_hash_visibility_ablation_not_lossless": {
+        "removed_source_content_sha256_fields": 157,
+        "same_recorded_layout_without_source_hash_tokens": 43648,
+        "same_recorded_layout_without_source_hash_bytes": 184614,
+        "literal_json_without_source_hash_tokens": 46455,
+        "literal_json_without_source_hash_bytes": 196197,
+        "all_other_current_view_fields_unchanged": true
+      },
+      "representations": {
+        "recorded_opencode_tool_text": {
+          "tokens": 49535,
+          "bytes": 195150
+        },
+        "minified_same_json": {
+          "tokens": 49535,
+          "bytes": 195150
+        },
+        "same_view_literal_json": {
+          "tokens": 52966,
+          "bytes": 209385
+        },
+        "same_view_plain_blocks": {
+          "tokens": 55493,
+          "bytes": 220947
+        },
+        "same_view_document_hierarchy": {
+          "tokens": 52730,
+          "bytes": 208719
+        }
+      }
+    }
+  ],
+  "source_hash_visibility_ablation_not_lossless": {
+    "qwen_cases": [
+      {
+        "id": "C-L1",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 4,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 909,
+            "bytes": 3023
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 749,
+            "bytes": 2738
+          },
+          "literal_json": {
+            "tokens": 950,
+            "bytes": 3158
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 778,
+            "bytes": 2822
+          }
+        }
+      },
+      {
+        "id": "C-L2",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 6,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1130,
+            "bytes": 3586
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 903,
+            "bytes": 3167
+          },
+          "literal_json": {
+            "tokens": 1211,
+            "bytes": 3889
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 964,
+            "bytes": 3385
+          }
+        }
+      },
+      {
+        "id": "C-L3",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 6,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1133,
+            "bytes": 3704
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 893,
+            "bytes": 3285
+          },
+          "literal_json": {
+            "tokens": 1215,
+            "bytes": 4007
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 955,
+            "bytes": 3503
+          }
+        }
+      },
+      {
+        "id": "C-L4",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 0,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 327,
+            "bytes": 1228
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 327,
+            "bytes": 1228
+          },
+          "literal_json": {
+            "tokens": 327,
+            "bytes": 1228
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 327,
+            "bytes": 1228
+          }
+        }
+      },
+      {
+        "id": "C-T1",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 6,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1198,
+            "bytes": 4069
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 970,
+            "bytes": 3650
+          },
+          "literal_json": {
+            "tokens": 1280,
+            "bytes": 4372
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 1032,
+            "bytes": 3868
+          }
+        }
+      },
+      {
+        "id": "C-T2",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 4,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 876,
+            "bytes": 2849
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 715,
+            "bytes": 2564
+          },
+          "literal_json": {
+            "tokens": 917,
+            "bytes": 2984
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 744,
+            "bytes": 2648
+          }
+        }
+      },
+      {
+        "id": "C-T3",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 4,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 884,
+            "bytes": 2988
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 737,
+            "bytes": 2703
+          },
+          "literal_json": {
+            "tokens": 925,
+            "bytes": 3123
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 766,
+            "bytes": 2787
+          }
+        }
+      },
+      {
+        "id": "C-T4",
+        "phase": "recovery",
+        "removed_source_content_sha256_fields": 0,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 322,
+            "bytes": 1228
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 322,
+            "bytes": 1228
+          },
+          "literal_json": {
+            "tokens": 322,
+            "bytes": 1228
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 322,
+            "bytes": 1228
+          }
+        }
+      },
+      {
+        "id": "V-C1",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 9,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1505,
+            "bytes": 4839
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 1151,
+            "bytes": 4219
+          },
+          "literal_json": {
+            "tokens": 1648,
+            "bytes": 5394
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 1262,
+            "bytes": 4638
+          }
+        }
+      },
+      {
+        "id": "V-C2",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 8,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1393,
+            "bytes": 4438
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 1072,
+            "bytes": 3885
+          },
+          "literal_json": {
+            "tokens": 1515,
+            "bytes": 4909
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 1166,
+            "bytes": 4237
+          }
+        }
+      },
+      {
+        "id": "V-C3",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 5,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1026,
+            "bytes": 3327
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 817,
+            "bytes": 2975
+          },
+          "literal_json": {
+            "tokens": 1088,
+            "bytes": 3546
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 863,
+            "bytes": 3126
+          }
+        }
+      },
+      {
+        "id": "V-C4",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 0,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 326,
+            "bytes": 1228
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 326,
+            "bytes": 1228
+          },
+          "literal_json": {
+            "tokens": 326,
+            "bytes": 1228
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 326,
+            "bytes": 1228
+          }
+        }
+      },
+      {
+        "id": "V-M1",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 4,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 931,
+            "bytes": 3151
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 767,
+            "bytes": 2866
+          },
+          "literal_json": {
+            "tokens": 972,
+            "bytes": 3286
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 796,
+            "bytes": 2950
+          }
+        }
+      },
+      {
+        "id": "V-M2",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 4,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 884,
+            "bytes": 2923
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 724,
+            "bytes": 2638
+          },
+          "literal_json": {
+            "tokens": 925,
+            "bytes": 3058
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 753,
+            "bytes": 2722
+          }
+        }
+      },
+      {
+        "id": "V-M3",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 6,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 1109,
+            "bytes": 3651
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 878,
+            "bytes": 3232
+          },
+          "literal_json": {
+            "tokens": 1191,
+            "bytes": 3954
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 940,
+            "bytes": 3450
+          }
+        }
+      },
+      {
+        "id": "V-M4",
+        "phase": "validation",
+        "removed_source_content_sha256_fields": 0,
+        "all_other_current_view_fields_unchanged": true,
+        "representations": {
+          "existing_rendering": {
+            "tokens": 331,
+            "bytes": 1228
+          },
+          "same_existing_layout_without_source_hash": {
+            "tokens": 331,
+            "bytes": 1228
+          },
+          "literal_json": {
+            "tokens": 331,
+            "bytes": 1228
+          },
+          "literal_json_without_source_hash": {
+            "tokens": 331,
+            "bytes": 1228
+          }
+        }
+      }
+    ],
+    "qwen_aggregate": {
+      "existing_rendering": {
+        "tokens": {
+          "count": 16,
+          "total": 14284,
+          "median": 920.0,
+          "min": 322,
+          "max": 1505
+        },
+        "bytes": {
+          "count": 16,
+          "total": 47460,
+          "median": 3087.0,
+          "min": 1228,
+          "max": 4839
+        }
+      },
+      "literal_json": {
+        "tokens": {
+          "count": 16,
+          "total": 15143,
+          "median": 961.0,
+          "min": 322,
+          "max": 1648
+        },
+        "bytes": {
+          "count": 16,
+          "total": 50592,
+          "median": 3222.0,
+          "min": 1228,
+          "max": 5394
+        }
+      },
+      "literal_json_without_source_hash": {
+        "tokens": {
+          "count": 16,
+          "total": 12325,
+          "median": 787.0,
+          "min": 322,
+          "max": 1262
+        },
+        "bytes": {
+          "count": 16,
+          "total": 45048,
+          "median": 2886.0,
+          "min": 1228,
+          "max": 4638
+        }
+      },
+      "same_existing_layout_without_source_hash": {
+        "tokens": {
+          "count": 16,
+          "total": 11682,
+          "median": 758.0,
+          "min": 322,
+          "max": 1151
+        },
+        "bytes": {
+          "count": 16,
+          "total": 42834,
+          "median": 2802.0,
+          "min": 1228,
+          "max": 4219
+        }
+      }
+    },
+    "removed_field_only": "sources[*].content_sha256",
+    "limits": "Metadata visibility loss; a design change requiring explicit model-view/host contract. It does not change source bytes but is not lossless transport of the current view. Patch-context and source-read payload hashes are not removed."
+  },
+  "recorded_client_aggregate_common_modes": {
+    "minified_same_json": {
+      "tokens": {
+        "count": 3,
+        "total": 50217,
+        "median": 413,
+        "min": 269,
+        "max": 49535
+      },
+      "bytes": {
+        "count": 3,
+        "total": 197903,
+        "median": 1983,
+        "min": 770,
+        "max": 195150
+      }
+    },
+    "recorded_opencode_tool_text": {
+      "tokens": {
+        "count": 3,
+        "total": 50444,
+        "median": 569,
+        "min": 340,
+        "max": 49535
+      },
+      "bytes": {
+        "count": 3,
+        "total": 198470,
+        "median": 2398,
+        "min": 922,
+        "max": 195150
+      }
+    }
+  },
+  "saved_installed_probe_envelopes": [
+    {
+      "artifact": "plain.json",
+      "isError": false,
+      "status": "insufficient_evidence",
+      "reason_code": "context_emergency_stop",
+      "source_rows": 0,
+      "literal_passthrough": true,
+      "all_body_fields_retained": true,
+      "outer_envelope_not_transformed": true,
+      "recorded_tokens": 157,
+      "candidate_tokens": 157
+    },
+    {
+      "artifact": "translated.json",
+      "isError": false,
+      "status": "insufficient_evidence",
+      "reason_code": "context_emergency_stop",
+      "source_rows": 0,
+      "literal_passthrough": true,
+      "all_body_fields_retained": true,
+      "outer_envelope_not_transformed": true,
+      "recorded_tokens": 157,
+      "candidate_tokens": 157
+    },
+    {
+      "artifact": "observed.json",
+      "isError": false,
+      "status": "insufficient_evidence",
+      "reason_code": "context_emergency_stop",
+      "source_rows": 0,
+      "literal_passthrough": true,
+      "all_body_fields_retained": true,
+      "outer_envelope_not_transformed": true,
+      "recorded_tokens": 157,
+      "candidate_tokens": 157
+    },
+    {
+      "artifact": "focused.json",
+      "isError": false,
+      "status": "ok",
+      "reason_code": null,
+      "source_rows": 7,
+      "literal_passthrough": false,
+      "all_body_fields_retained": true,
+      "outer_envelope_not_transformed": true,
+      "recorded_tokens": 1729,
+      "candidate_tokens": 1877
+    },
+    {
+      "artifact": "source-read.json",
+      "isError": null,
+      "status": "complete",
+      "reason_code": "end_of_source",
+      "source_rows": 0,
+      "literal_passthrough": true,
+      "all_body_fields_retained": true,
+      "outer_envelope_not_transformed": true,
+      "recorded_tokens": 12,
+      "candidate_tokens": 12
+    }
+  ],
+  "limitations": [
+    "16 Qwen rows are saved in-process public packets; actual client/provider bytes were not captured for them.",
+    "Current rendering is independently reconstructed; its local token count matches all 12 non-null saved supported_rendering receipts. Four empty results have null historical render counts and use code-backed canonical fallback.",
+    "The single older Terra session preserves client tool output, not a new captured outgoing provider request.",
+    "Alternative layouts are source/metadata lossless offline prototypes; no parser/agent comprehension, capability lifecycle, emergency or live transport acceptance is claimed.",
+    "Same-view alternatives retain all CURRENT visible information; current projection already omits specified default/diagnostic fields. The separate full-machine variant retains those too.",
+    "No cross-turn reuse, hidden ledger, reference shortening, source pruning or source condition summarization is proposed."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "missing_required_units": [],
+  "missing_facts": [],
+  "hard_negatives": [],
+  "optional_units": [
+    "storage.md#Historical default"
+  ],
+  "unlabelled_units": [],
+  "selected_units": [
+    "storage.md#Capacity",
+    "storage.md#Historical default",
+    "storage.md#Journal storage",
+    "storage.md#Retention"
+  ],
+  "source_rows": 4,
+  "delivered_source_tokens": 135,
+  "allowed_source_tokens": 742,
+  "role_source_tokens": {
+    "direct": 75,
+    "structural": 29,
+    "optional_support": 31,
+    "optional_context": 0,
+    "negative": 0,
+    "unlabelled": 0
+  },
+  "actual_rendered_tokens": 893,
+  "emergency_tokens": 50000
+}

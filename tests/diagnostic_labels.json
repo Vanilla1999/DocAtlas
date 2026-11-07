@@ -139,7 +139,7 @@
     "tests/test_cli.py": "13936787a169901ccbfa33048d08212c4858b486324ee951bca153b526043f58",
     "tests/test_client.py": "6087d915bf583abe27e9a3a7b2ca6beb09da76d1baefb07dd74f149f2f59ac70",
     "tests/test_config_resolution.py": "e37f4319c5d4f5bd06729545cca27f55e1031f2a9374867631b57be9d3b52a21",
-    "tests/test_contextual_indexing.py": "3d273d234bcf1d4f4272a1fc4a352355c003431b6af0b98a81cba0ff0a65db88",
+    "tests/test_contextual_indexing.py": "10704e6cd6686333a34ecd14c7ceff8c5373a2b344a93c72eafcd5c465bfffb9",
     "tests/test_cross_index_retrieval_mvp.py": "b13d8a4cee44860a003502a2874a65d598ce2033c111ae1e0b1c39626e368e08",
     "tests/test_dart_service_integration.py": "e87ef3a7a4fba985c6f335f457c9fb6a97c472092cada1a6ef39f7ae7da2a71e",
     "tests/test_diagnostic_labels.py": "0c81a4ec1cb3438c49c1d76954ab4739635dcb18fcc812dd5876407a717b4bc2",

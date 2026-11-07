@@ -1,0 +1,158 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-2204221abc1b186536800b05",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive",
+      "snippet": "# Observatory archive\n\nThese instructions govern the observatory's physical photographic plates, including plates borrowed from partner observatories.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "af2346e74420595ce29c3cefdba2997e8541be5a25edea4a139cf1e69617a156",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/6ed937419517b21c2f733cf9"
+    },
+    {
+      "evidence_id": "ev-e5a3ba0d3c98bd404db9f5f1",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch",
+      "snippet": "## Dispatch\n\nDispatch a photographic plate only after its catalogue number has been entered on a padded crate label. The receiving curator must acknowledge the inventory before the crate leaves the archive.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "78566564c187eaa3575211e5868f3b327e2c756c27f3b86aad016dc7d14febde",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 5,
+      "line_end": 8,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/0642de6f448f56082097dc3b"
+    },
+    {
+      "evidence_id": "ev-fb9f7e07c75b11efba1304d4",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch > Packing",
+      "snippet": "### Packing\n\nPlace each plate in an acid-free sleeve with the emulsion facing away from the seam. Separate sleeved plates with rigid spacers.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0a54cfa49cb91f65103db7fdee4215fbd0d25cfd375fbc2dc84fd2de891a67e5",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 9,
+      "line_end": 12,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/c0293e99f88dc98d1b41a7ee"
+    },
+    {
+      "evidence_id": "ev-88758d6a9e594391fb346bb0",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Dispatch > Label printer",
+      "snippet": "### Label printer\n\nThe label printer uses violet ribbon. Its paper tray is refilled from the lower stationery drawer; printer ribbon colour does not identify plate ownership.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "1a7ec70ba13ea63c05ad86fe197e502eac119d19efc242673c78c8b546a046d3",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 13,
+      "line_end": 16,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/424019396ab3e1954444aa45"
+    },
+    {
+      "evidence_id": "ev-65fbf8fa779f51b240c5d6bf",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Partner restriction",
+      "snippet": "## Partner restriction\n\nA photographic plate borrowed from a partner observatory must not be dispatched until the lending institution gives written permission, even when the receiving curator has acknowledged the inventory.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f720f0912dc056cb92724c901eccc7b3e72546e6d4797a9fcb63888065275f55",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 17,
+      "line_end": 20,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/77e2e56eca7953e061a5b7dd"
+    },
+    {
+      "evidence_id": "ev-812d0dfc7c8e2a17186e3578",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Visitor register",
+      "snippet": "## Visitor register\n\nArchive visitors sign a paper register retained for fourteen months. The register is kept at the reception desk.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "a02d2d045fed0985f2b1cfbe67c09fd85a1cc405874d29a567168fbfd01cb54b",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 21,
+      "line_end": 24,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/8eb8e4dbb6de2805bf8fb4ee"
+    },
+    {
+      "evidence_id": "ev-d846fda76eca5c344d44847e",
+      "path_or_url": "observatory.md",
+      "section": "Observatory archive > Corridor lighting",
+      "snippet": "## Corridor lighting\n\nThe archive corridor lights switch off at twenty-one hundred hours. A separate emergency light remains illuminated overnight.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "6c6742764ee5dc86763c2dac871913b9e914f938892a0daa43e6f1690e0a6df1",
+      "project_identity": "local:6cffaebd3e323596b348844a85d359245930988ecfcc311b084a9b6f6a0bf1fb",
+      "line_start": 25,
+      "line_end": 27,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/034dc5be138d89ae1ad5fb63"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1481,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+    "calibration_status": "empirical",
+    "candidate_units": 7,
+    "selected_units": 7,
+    "delivered_rows": 7,
+    "scan_complete": true,
+    "model_pairs": 7,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 7,
+      "hydrated_sections": 7,
+      "selected_units": 7,
+      "delivered_spans": 7
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "f4acb188bd6c812e815e86ccba9f1d2e2db22e25c13b82ee35b01d46e26acbe7"
+  }
+}

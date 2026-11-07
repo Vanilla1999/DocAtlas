@@ -1,0 +1,411 @@
+{
+  "head": "2d667913f279ba72104f158ee6500d75d5ace81f",
+  "base": "ae81aaae82794bfcbf6c0ee777bfc2f76e0e0def",
+  "pr": 246,
+  "draft": true,
+  "mergeable": true,
+  "mergeable_state": "unstable",
+  "branch_protection": {
+    "source": "GET /branches/main",
+    "protected": false,
+    "protection": {
+      "enabled": false,
+      "required_status_checks": {
+        "enforcement_level": "off",
+        "contexts": [],
+        "checks": []
+      }
+    },
+    "rulesets": [],
+    "admin_detail": "GET /branches/main/protection returned 403 Resource not accessible by integration; no administrative changes attempted."
+  },
+  "workflows": [
+    {
+      "name": "Answerability observation safety (not semantic acceptance)",
+      "id": 42346464526,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464526",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:32:12Z"
+    },
+    {
+      "name": "P2 Product Truth protocol",
+      "id": 42346464570,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464570",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:19:59Z"
+    },
+    {
+      "name": "P1.5 mixed-evidence provenance",
+      "id": 42346464535,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464535",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:19:54Z"
+    },
+    {
+      "name": "P2 federated task-pack reopening",
+      "id": 42346464565,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464565",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:19:25Z"
+    },
+    {
+      "name": "P1 Agent Truth closure",
+      "id": 42346464587,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464587",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:27Z"
+    },
+    {
+      "name": "P2.2A comparative harness",
+      "id": 42346464505,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464505",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:04Z"
+    },
+    {
+      "name": "P1.4 paraphrase and proofability",
+      "id": 42346464612,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464612",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:19:54Z"
+    },
+    {
+      "name": "P2.3 Product Truth decision",
+      "id": 42346464611,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464611",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:43Z"
+    },
+    {
+      "name": "P2.2B/C execution gate",
+      "id": 42346464614,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464614",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:43Z"
+    },
+    {
+      "name": "P2.1B positive controls",
+      "id": 42346464623,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464623",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:40Z"
+    },
+    {
+      "name": "P2.1C task pack",
+      "id": 42346464524,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464524",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:45Z"
+    },
+    {
+      "name": "Source-native integration",
+      "id": 42346464579,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464579",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:20:56Z"
+    },
+    {
+      "name": "Documentation language installed MCP",
+      "id": 42346464572,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464572",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:21:02Z"
+    },
+    {
+      "name": "Compact model context installed MCP",
+      "id": 42346464635,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464635",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:21:13Z"
+    },
+    {
+      "name": "P1.6 evidence is data",
+      "id": 42346464625,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464625",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:21:27Z"
+    },
+    {
+      "name": "Main flow context integration",
+      "id": 42346464605,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464605",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:22:00Z"
+    },
+    {
+      "name": "MiniLM sections installed MCP",
+      "id": 42346464590,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464590",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:22:51Z"
+    },
+    {
+      "name": "Release artifact gate and publish",
+      "id": 42346464507,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464507",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:23:13Z"
+    },
+    {
+      "name": "P1 stack exact validation",
+      "id": 42346464552,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464552",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:24:22Z"
+    },
+    {
+      "name": "CI",
+      "id": 42346464571,
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:27:49Z"
+    },
+    {
+      "name": "Blind project-context gate",
+      "id": 42346464639,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464639",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T07:06:17Z"
+    },
+    {
+      "name": "Direct question validation",
+      "id": 42346464525,
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464525",
+      "head_sha": "2d667913f279ba72104f158ee6500d75d5ace81f",
+      "updated_at": "2026-11-07T06:19:11Z"
+    }
+  ],
+  "main_ci_jobs": [
+    {
+      "id": 128325183618,
+      "name": "docs-impact",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183618",
+      "failed_steps": []
+    },
+    {
+      "id": 128325183710,
+      "name": "platform-smoke (macos-15-intel)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183710",
+      "failed_steps": [
+        "Verify installed Docs MCP over stdio"
+      ]
+    },
+    {
+      "id": 128325183724,
+      "name": "bilingual-context-integration (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183724",
+      "failed_steps": []
+    },
+    {
+      "id": 128325183745,
+      "name": "retrieval-evidence",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183745",
+      "failed_steps": [
+        "Verify frozen retrieval evidence and independent sample"
+      ]
+    },
+    {
+      "id": 128325183760,
+      "name": "docs-contract",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183760",
+      "failed_steps": []
+    },
+    {
+      "id": 128325183765,
+      "name": "installer-smoke",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183765",
+      "failed_steps": [
+        "Installer smoke tests"
+      ]
+    },
+    {
+      "id": 128325183790,
+      "name": "test (3.12)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183790",
+      "failed_steps": [
+        "Run offline core tests"
+      ]
+    },
+    {
+      "id": 128325183808,
+      "name": "platform-smoke (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183808",
+      "failed_steps": [
+        "Verify installed Docs MCP over stdio"
+      ]
+    },
+    {
+      "id": 128325183812,
+      "name": "platform-smoke (macos-15)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183812",
+      "failed_steps": [
+        "Verify installed Docs MCP over stdio"
+      ]
+    },
+    {
+      "id": 128325183818,
+      "name": "test (3.11)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183818",
+      "failed_steps": [
+        "Run offline core tests"
+      ]
+    },
+    {
+      "id": 128325183825,
+      "name": "static-contract",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183825",
+      "failed_steps": []
+    },
+    {
+      "id": 128325183830,
+      "name": "advanced-contract",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183830",
+      "failed_steps": [
+        "Run recoverable documentation failure gate",
+        "Run recoverable documentation failure mutation gate",
+        "Run Legacy live compatibility report and lineage floor",
+        "Run V2 project-context acceptance gate",
+        "Run question surface regression gate",
+        "Run Agent Developer Protocol gate",
+        "Run Agent Developer adversarial/token gate",
+        "Run critical mutation gate",
+        "Compare historical and compact literal contract tests"
+      ]
+    },
+    {
+      "id": 128325183846,
+      "name": "bilingual-context-integration (macos-15)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183846",
+      "failed_steps": []
+    },
+    {
+      "id": 128325183867,
+      "name": "bilingual-context-integration (macos-15-intel)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183867",
+      "failed_steps": []
+    },
+    {
+      "id": 128325183892,
+      "name": "test (3.13)",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183892",
+      "failed_steps": [
+        "Run offline core tests"
+      ]
+    },
+    {
+      "id": 128325183946,
+      "name": "installed-mcp-harness",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325183946",
+      "failed_steps": []
+    },
+    {
+      "id": 128325184574,
+      "name": "p1-harden-branch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128325184574",
+      "failed_steps": []
+    },
+    {
+      "id": 128326769907,
+      "name": "acceptance-diagnostics",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128326769907",
+      "failed_steps": [
+        "Summarize existing quality and contract evidence"
+      ]
+    },
+    {
+      "id": 128327120738,
+      "name": "required-ci",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42346464571/job/128327120738",
+      "failed_steps": [
+        "Enforce required CI jobs"
+      ]
+    }
+  ],
+  "limitations": [
+    "No blind-260 raw holdout or workflow logs read; status only.",
+    "Snapshot precedes new step 3/4 implementation and does not validate that future code.",
+    "88 failures in core Python 3.12 are not asserted inherited without matched baseline."
+  ]
+}

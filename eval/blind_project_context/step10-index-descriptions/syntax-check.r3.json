@@ -1,0 +1,11 @@
+{
+  "result": "PASS",
+  "method": "ast.parse; no product imports",
+  "files": {
+    "docmancer/core/_sqlite_store_part02.py": "a9ad289a0c51483fa7a503e145046bc8b44f21e3b4eb6f7ad2faa1a96bde87ef",
+    "docmancer/core/_sqlite_store_part03.py": "d4550fc0cfadd1ec66487303916c86ef7c06dd3e1e5b998149112ed40d7bd45e",
+    "tests/test_contextual_indexing.py": "a60709cb176e8b6276cbec044777c0dd94f211052cd768d6f5dba82ae300e870",
+    "docmancer/retrieval/experimental_search_descriptions.py": "7ff59f3dda8d6d5fec06dc27d8ce9a33f773cbea5c7b254ee772d7e6fd50d393",
+    "eval/blind_project_context/step10-index-descriptions/experiment.py": "d26e4785f051b862e8eaf08a91cb8c1dc2c01626547239289d34338e810367af"
+  }
+}

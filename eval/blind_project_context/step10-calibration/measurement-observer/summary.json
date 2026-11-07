@@ -1,0 +1,46 @@
+{
+  "manifest_sha256": "5ffbba341931285ae76a538b1b3eaa88d163f2ab19477516ac1a3b0c82c81d0c",
+  "tasks": 12,
+  "labeled_units": 68,
+  "policy_sha256": "327fc69db2c97e6d44abbe83118b01fad15a308c071fd5226880c14ee7679a4c",
+  "threshold": -7.280395030975342,
+  "public_prepare_calls": 4,
+  "public_get_docs_context_calls": 12,
+  "boundary": "in-process public production prepare/query; real local pinned model; not installed stdio/client/answer-model",
+  "splits": {
+    "calibration": {
+      "tasks": 6,
+      "labeled_units": 34,
+      "positive_units": 12,
+      "missed_direct_positives": 0,
+      "false_positive_units": 8,
+      "delivered_negative_units": 22,
+      "missed_delivered_positives": 0,
+      "missing_facts": 0,
+      "expected_facts": 13,
+      "noanswer_nonempty": 2,
+      "delivered_characters": 11570,
+      "source_characters": 11570,
+      "serialized_json_tokens": 10108,
+      "seconds": 3.6550735580058245
+    },
+    "validation": {
+      "tasks": 6,
+      "labeled_units": 34,
+      "positive_units": 12,
+      "missed_direct_positives": 1,
+      "false_positive_units": 7,
+      "delivered_negative_units": 10,
+      "missed_delivered_positives": 0,
+      "missing_facts": 0,
+      "expected_facts": 14,
+      "noanswer_nonempty": 1,
+      "delivered_characters": 9801,
+      "source_characters": 11764,
+      "serialized_json_tokens": 7783,
+      "seconds": 1.3467043909950007
+    }
+  },
+  "validation_retention_pass": false,
+  "limitation": "Small authored synthetic set. Calibration packets are keep-all diagnostic, not filtered savings. No conformal or external benchmark guarantee. False positives/no-answer noise reported even when retention passes."
+}

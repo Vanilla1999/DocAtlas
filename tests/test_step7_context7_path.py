@@ -1,6 +1,8 @@
 """Step-7: body pool pruning by default; dense relevance and the Otsu cut stay opt-in."""
 from __future__ import annotations
 
+import hashlib
+
 import pytest
 
 from docmancer.docs.application import experimental_dense_relevance as dense
@@ -108,6 +110,17 @@ def test_pool_pruning_runs_only_when_the_whole_pool_misses_the_budget(monkeypatc
 
     monkeypatch.setattr(selection, "prune_checked_pool", prune)
     monkeypatch.setattr(selection, "_SelectionObservation", stop)
+    # The selector receives checked, identity-bound sources. Continuation now
+    # fingerprints that binding before this historical pruning probe stops it.
+    row = {"evidence_id": "ev-pruning-fixture", "path_or_url": "guide.md",
+           "snippet": "a", "content_sha256": hashlib.sha256(b"a").hexdigest(),
+           "line_start": 1, "line_end": 1, "scope": "project",
+           "project_identity": "local:pruning-fixture", "version_binding": "unversioned"}
+    snapshot = {row["evidence_id"]: {"projected_source": row, "source": {
+        "project_identity": row["project_identity"], "source_class": "project_file",
+        "doc_scope": "project", "content": "a",
+        "project_doc_content_hash": "sha256:" + row["content_sha256"],
+    }}}
     with pytest.raises(_Stop):
-        selection.select_joint_context({"sources": [{"snippet": "a"}]}, {}, {})
+        selection.select_joint_context({"sources": [row]}, snapshot, {})
     assert pruned == ([] if fits else ["body"])

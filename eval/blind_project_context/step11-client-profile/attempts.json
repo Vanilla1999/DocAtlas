@@ -1,0 +1,161 @@
+{
+  "attempts": [
+    {
+      "attempt": "acceptance-01",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 0,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 0,
+      "observed_mcp_dispatches": 0,
+      "explanation": "Probe startup lacked Basic auth for serve API; no session/provider/tool request.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-01",
+      "capture_sha256": {}
+    },
+    {
+      "attempt": "acceptance-02",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 1,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 1,
+      "observed_mcp_dispatches": 0,
+      "explanation": "Serve/prompt captured only native resource before late MCP tool publication.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-02",
+      "capture_sha256": {
+        "mcp/provider-request-1.json": "904eb9fe4efae3a67905a44ce416b3d9129c37c6f8cc7e739b9158d337fe4d1f"
+      }
+    },
+    {
+      "attempt": "acceptance-03",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 7,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 7,
+      "observed_mcp_dispatches": 0,
+      "explanation": "Real CLI reproduced cold MCP catalog race. HTTP500 assertion handling triggered seven physical scripted requests; logical-round cap was not a physical retry cap. Later probe returns stop on assertion failure.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-03",
+      "capture_sha256": {
+        "mcp/provider-request-2.json": "326bd8422779e4e6cfd41c7c31ff0076a4e42d4fa46aa5031344f6bece3291c1",
+        "mcp/provider-request-5.json": "326bd8422779e4e6cfd41c7c31ff0076a4e42d4fa46aa5031344f6bece3291c1",
+        "mcp/provider-request-6.json": "326bd8422779e4e6cfd41c7c31ff0076a4e42d4fa46aa5031344f6bece3291c1",
+        "mcp/provider-request-7.json": "326bd8422779e4e6cfd41c7c31ff0076a4e42d4fa46aa5031344f6bece3291c1",
+        "mcp/provider-request-3.json": "326bd8422779e4e6cfd41c7c31ff0076a4e42d4fa46aa5031344f6bece3291c1",
+        "mcp/provider-request-4.json": "326bd8422779e4e6cfd41c7c31ff0076a4e42d4fa46aa5031344f6bece3291c1",
+        "mcp/provider-request-1.json": "2d8f1c4b1f441cd33ba74265fbc8b83dc0206326eebb4988cf51faba876e99e9"
+      }
+    },
+    {
+      "attempt": "acceptance-04",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 1,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 1,
+      "observed_mcp_dispatches": 0,
+      "explanation": "Prompt readiness fixed catalog. Probe argv transport quoted the question; changed to documented stdin input.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-04",
+      "capture_sha256": {
+        "mcp/provider-request-1.json": "58d21ca2af0069be4c05f5e8af607400e543df97070acc93ade1b803c027957f"
+      }
+    },
+    {
+      "attempt": "acceptance-05",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 2,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 2,
+      "observed_mcp_dispatches": 1,
+      "explanation": "Project status succeeded; guard blocked jobs before dispatch. Probe incorrectly expected internal reason in visible adapter error. Changed to exact host-event reason plus visible undelivered envelope and no dispatch.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-05",
+      "capture_sha256": {
+        "mcp/provider-request-2.json": "d475607a0d7773fbb5369408c60ad7114a4aaf39912c9d6496c9eb02730a2c81",
+        "mcp/provider-request-1.json": "479706da8213b064073773600725f2546ecf96a3de12f97847cf9b16902e1496"
+      }
+    },
+    {
+      "attempt": "acceptance-06",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 4,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 4,
+      "observed_mcp_dispatches": 3,
+      "explanation": "Real resource request reached server; native typed output schema rejected adapter output:string. Rejected jobs did not reach MCP.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-06",
+      "capture_sha256": {
+        "mcp/provider-request-2.json": "afd76001d672fef8a1ef3afdc1b20e45fcdcab388832db6b2a7defb021e5c88c",
+        "mcp/provider-request-3.json": "4a6491b4fd90d8e5c9498972499738921a44a4375d3bdf876f425042b56864f1",
+        "mcp/provider-request-4.json": "2e7f6905713f957cc79c8501a71e5ff68a97ff904a84e1a3dc38d0b2893b8b75",
+        "mcp/provider-request-1.json": "450329abe1d051b8b193f1cb1a6de3ceb62cd37e54562d35e9361de0cbf5b814"
+      }
+    },
+    {
+      "attempt": "acceptance-07",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 4,
+        "files": 0,
+        "baseline": 0
+      },
+      "physical_scripted_requests": 4,
+      "observed_mcp_dispatches": 3,
+      "explanation": "String schema removed type mismatch, revealing native resource has no authoritative MCP content. Split native guard-only tools from strict MCP wrapping.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-07",
+      "capture_sha256": {
+        "mcp/provider-request-2.json": "acfb312347d961f04a6b16f5985bbf2c471f9ae34d58770fe5614de06b4a60dc",
+        "mcp/provider-request-3.json": "5069d23bf60fb27fb5b6450e275cda428efb30b0b0810f9ce90bb3d40fe2ff2e",
+        "mcp/provider-request-4.json": "34844d5b870a36eed7c42b6cd2e1e488ec2f496eb0630481727faba05b297128",
+        "mcp/provider-request-1.json": "afa7c3e9be6dfeab0bd15c005275089811f6db4a198408e1de31eda6048c2040"
+      }
+    },
+    {
+      "attempt": "acceptance-08",
+      "model_calls": 0,
+      "provider_requests": {
+        "mcp": 4,
+        "files": 2,
+        "baseline": 1
+      },
+      "physical_scripted_requests": 7,
+      "observed_mcp_dispatches": 3,
+      "explanation": "Installed MCP and native files acceptance passed. Cold historical baseline captured before DocAtlas catalog and is excluded from savings comparison.",
+      "retained_workspace": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-08",
+      "capture_sha256": {
+        "mcp/provider-request-2.json": "1d7dfb8629a73d28261ebf0cdea10065a8a168041d3a85700411b09d90f8e8b0",
+        "mcp/provider-request-3.json": "c550f5a5af9977e19b719235df512893469a39937f8bc41a101b3fcc2b00d632",
+        "mcp/provider-request-4.json": "1ec99fa5ce8a4006af1766a01534c306a05e29812f401087b8420d43a96d3109",
+        "mcp/provider-request-1.json": "d29ca09333e5ffa39f0c85625ad9e2002d1c5f60942bd2933fe2c40cef996787",
+        "files/provider-request-2.json": "b5a5945f36b0a708aa88e8094f9c6b722103fadc258d6e29e6ff7db0cb74550c",
+        "files/provider-request-1.json": "0b5e07c35a8fdd561f1e50030707c64a3a14de84aae83d4d5e0a0d87a66871b3",
+        "baseline/provider-request-1.json": "1eaa8ad41dd398b80324ba809b5a6e7ebb92d171fc868334f8cd25dc0959e80c"
+      }
+    }
+  ],
+  "ready_baseline_provider_requests": 1,
+  "total_scripted_http_requests": 27,
+  "total_inference_requests": 0,
+  "public_preparations": 8,
+  "canonical_public_queries": 8,
+  "observed_mcp_dispatches": 10,
+  "physical_request_cap_exception": {
+    "attempt": "acceptance-03",
+    "planned_logical_rounds": 4,
+    "observed_physical_requests": 7,
+    "cause": "Client HTTP retries after probe assertion500; terminal-stop response fixed this from acceptance04 onward."
+  }
+}

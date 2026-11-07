@@ -52,6 +52,7 @@ sys.path.insert(0, str(ROOT))
 from corpus import build, documents  # noqa: E402
 from docmancer.docs.application.context_assembly import decode_context  # noqa: E402
 from docmancer.docs.application.section_compression import expand_sections  # noqa: E402
+from docmancer.docs.application.projection_tokenizer import projection_token_count  # noqa: E402
 
 SPLITS = ("dev", "holdout")
 CORPORA = ("L0", "L2")
@@ -147,7 +148,8 @@ def limits(payload: dict, events: list[dict], documents_expected: int) -> dict:
 
 
 def score_case(case: dict, record: dict | None, out: Path, topic: dict, gold: dict, audit: dict,
-               docs: dict[str, str], observed: bool, ranked: bool = False) -> dict:
+               docs: dict[str, str], observed: bool, ranked: bool = False,
+               additional_records: tuple[dict, ...] = ()) -> dict:
     section = "\n".join(docs[topic["path"]].splitlines()[topic["line_start"] - 1:topic["line_end"]])
     answer = "\n".join(fact["quote"] for fact in gold["facts"])
     result = {"case_id": case["id"], "topic_id": case["topic_id"], "split": case["split"], "lang": case["lang"],
@@ -159,15 +161,30 @@ def score_case(case: dict, record: dict | None, out: Path, topic: dict, gold: di
         result.update(facts=[], facts_found=0, facts_total=len(gold["facts"]), all_found=False)
         result["anomalies"].append("missing_record")
         return result
-    text = (out / record["payload"]).read_text(encoding="utf-8")
-    try:
-        payload = json.loads(text)
-        rows = rows_of(payload)
-    except (ValueError, KeyError, TypeError):
-        payload, rows = {}, []
-        result["anomalies"].append("unparsable_payload")
-    if record["is_error"]:
-        result["anomalies"].append("mcp_is_error")
+    payload, rows, texts, seen_rows = {}, [], [], set()
+    combined_events = []
+    for position, current in enumerate((record, *additional_records), 1):
+        text = (out / current["payload"]).read_text(encoding="utf-8")
+        texts.append(text)
+        if current.get("payload_sha256") != hashlib.sha256(text.encode("utf-8")).hexdigest():
+            result["anomalies"].append("payload_hash_mismatch")
+        try:
+            current_payload = json.loads(text)
+            current_rows = rows_of(current_payload)
+        except (ValueError, KeyError, TypeError):
+            current_payload, current_rows = {}, []
+            result["anomalies"].append("unparsable_payload")
+        if position == 1:
+            payload = current_payload
+        current_keys = {(row["path"], row["line_start"], row["line_end"], row["text"])
+                        for row in current_rows}
+        if seen_rows & current_keys:
+            result["anomalies"].append("repeated_row_between_portions")
+        seen_rows.update(current_keys)
+        rows.extend(current_rows)
+        combined_events.extend(current["observer_events"])
+        if current["is_error"]:
+            result["anomalies"].append("mcp_is_error")
     sure: dict[str, list[tuple[int, int]]] = defaultdict(list)
     maybe: dict[str, list[tuple[int, int]]] = defaultdict(list)
     placed: list[list[tuple[int, int]]] = []
@@ -199,7 +216,7 @@ def score_case(case: dict, record: dict | None, out: Path, topic: dict, gold: di
                     for path, span in covered for row, spots in zip(rows, placed))
         facts.append({"fact_id": fact["fact_id"], "found": bool(covered), "first_row": first,
                       "in_one_row": whole if covered else None})
-    acquisitions = [event for event in record["observer_events"] if event.get("event") == "acquisition"]
+    acquisitions = [event for event in combined_events if event.get("event") == "acquisition"]
     for fact in facts:
         ranks = [event["fact_ranks"][fact["fact_id"]] for event in acquisitions
                  if fact["fact_id"] in (event.get("fact_ranks") or {})] if ranked else []
@@ -220,7 +237,10 @@ def score_case(case: dict, record: dict | None, out: Path, topic: dict, gold: di
                   drawn_section_rows=sum(1 for row in rows if row["path"] == topic["path"]
                                          and row["line_start"] <= topic["line_end"]
                                          and topic["line_start"] <= row["line_end"]),
-                  utf8_bytes=record["utf8_bytes"], seconds=record["seconds"])
+                  utf8_bytes=sum(len(text.encode("utf-8")) for text in texts),
+                  o200k_tokens=sum(projection_token_count(text.encode("utf-8")) for text in texts),
+                  calls=1 + len(additional_records),
+                  seconds=sum(current["seconds"] for current in (record, *additional_records)))
     if observed:
         result["limits"] = limits(payload, record["observer_events"], len(docs))
         if result["limits"]["discovery"]["truncated"]:
@@ -241,6 +261,9 @@ def summarize(cases: list[dict]) -> dict:
             "limit_reached": sum(bool(case.get("limits", {}).get("reached")) for case in cases),
             "output_budget": sum("output_budget" in case.get("limits", {}).get("reached", ()) for case in cases),
             "candidate_ceiling": sum("candidate_ceiling" in case.get("limits", {}).get("reached", ()) for case in cases),
+            "o200k_tokens": sum(case.get("o200k_tokens", 0) for case in cases),
+            "utf8_bytes": sum(case.get("utf8_bytes", 0) for case in cases),
+            "calls": sum(case.get("calls", 1) for case in cases),
             "seconds": round(sum(case.get("seconds") or 0 for case in cases), 1)}
 
 
@@ -265,18 +288,39 @@ def score(out: Path) -> dict:
     with TemporaryDirectory() as tmp:
         corpora = {name: documents(project) for name, project in build(Path(tmp)).items()}
     results = []
+    requested_portions = run.get("requested_portions", 1)
+    cumulative_results: dict[int, list[dict]] = {portion: [] for portion in range(2, requested_portions + 1)}
     for corpus in run["corpora"]:
         audit = {fact["fact_id"]: fact["occurrences"][corpus] for fact in audit_doc["facts"]}
         for case in questions:
             if case["id"] not in selected:
                 continue
-            item = score_case(case, records.get((corpus, case["id"])), out, topics[case["topic_id"]],
+            record = records.get((corpus, case["id"]))
+            item = score_case(case, record, out, topics[case["topic_id"]],
                               oracle[case["topic_id"]], audit, corpora[corpus], run["observer"], ranked)
             results.append({"corpus": corpus, **item})
+            for portion, cumulative in cumulative_results.items():
+                extras = tuple((record or {}).get("portions", ())[:portion - 1])
+                union = score_case(case, record, out, topics[case["topic_id"]],
+                                   oracle[case["topic_id"]], audit, corpora[corpus],
+                                   run["observer"], ranked, extras)
+                cumulative.append({"corpus": corpus, **union})
     slices = defaultdict(list)
     for item in results:
         slices[f"{item['split']}/{item['corpus']}/{item['lang']}"].append(item)
+    portion_summaries = {}
+    for portion, cumulative in cumulative_results.items():
+        groups = defaultdict(list)
+        for item in cumulative:
+            groups[f"{item['split']}/{item['corpus']}/{item['lang']}"].append(item)
+        portion_summaries[str(portion)] = {
+            "slices": {key: summarize(value) for key, value in sorted(groups.items())},
+            "anomalies": sorted({f"{item['corpus']}/{item['case_id']}:{anomaly}"
+                                 for item in cumulative for anomaly in item["anomalies"]}),
+            "cases": cumulative,
+        }
     return {"schema_version": 2, "questions_sha256": run["questions_sha256"], "oracle_sha256": oracle_sha256,
+            "scorer_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "source_tree": run["source_tree"], "server_environment": run["server_environment"],
             "observer": run["observer"], "candidate_ranks": ranked, "wall_seconds": run["wall_seconds"],
             "run": {key: run.get(key) for key in ("started_at_utc", "eval_tree", "python", "platform", "cpus", "jobs",
@@ -284,7 +328,7 @@ def score(out: Path) -> dict:
             "anomalies": sorted({f"{item['corpus']}/{item['case_id']}:{anomaly}"
                                  for item in results for anomaly in item["anomalies"]}),
             "slices": {key: summarize(value) for key, value in sorted(slices.items())},
-            "cases": results}
+            "cases": results, "cumulative_portions": portion_summaries}
 
 
 def _words(item: dict | None) -> str:
@@ -376,6 +420,11 @@ def write_reports(result: dict, out: Path) -> None:
         head += ["**Аномалии (прогон недействителен для сравнения):**", ""] + [f"- {item}" for item in result["anomalies"]] + [""]
     dev = [item for item in result["cases"] if item["split"] == "dev"]
     report = head + ["## Срезы", ""] + _slice_table(result["slices"]) + ["", "## Dev: по вопросам", ""] + _case_table(dev)
+    for portion, cumulative in result.get("cumulative_portions", {}).items():
+        report += ["", f"## Накопительно: до {portion} порций", "",
+                   "Принудительное продолжение до указанного числа; это не оценка решения агента, когда остановиться.",
+                   "Факты оценены накопительно; счётчики лимитов в таблице относятся к первой порции.", ""]
+        report += _slice_table(cumulative["slices"])
     report += ["", "Подробности holdout — в `holdout-details.md`; их не используют для подбора изменений."]
     (out / "report.md").write_text("\n".join(report) + "\n", encoding="utf-8")
     holdout = [item for item in result["cases"] if item["split"] == "holdout"]
@@ -393,6 +442,14 @@ def main() -> int:
     for key, value in result["slices"].items():
         print(key, f"facts {value['facts_found']}/{value['facts_total']}", f"all {value['all_found']}/{value['cases']}",
               f"limit {value['limit_reached']}")
+    for portion, cumulative in result.get("cumulative_portions", {}).items():
+        for key, value in cumulative["slices"].items():
+            print(f"portions<={portion}", key, f"facts {value['facts_found']}/{value['facts_total']}",
+                  f"all {value['all_found']}/{value['cases']}", f"calls {value['calls']}",
+                  f"tokens {value['o200k_tokens']}")
+        if cumulative["anomalies"]:
+            print(f"PORTION {portion} ANOMALIES: {len(cumulative['anomalies'])}")
+            return 1
     if result["anomalies"]:
         print("ANOMALIES:", *result["anomalies"][:20], sep="\n  ")
         return 1

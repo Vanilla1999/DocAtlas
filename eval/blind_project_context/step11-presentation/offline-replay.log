@@ -1,0 +1,1 @@
+{"packet_count":16,"status":"OFFLINE_REPLAY_PASS","summary":{"historical_local_tokens":{"max":1505,"median":920.0,"total":14284},"literal_v2_local_tokens":{"max":1262,"median":787.0,"total":12325},"literal_v2_utf8_bytes":{"max":4638,"median":2886.0,"total":45048}}}

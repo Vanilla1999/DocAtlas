@@ -1,0 +1,417 @@
+{
+  "packet": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-93bb21ec429b11703344b5bc",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide",
+        "snippet": "# Guide\n\nScope introduction. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. The station operates during winter. \n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "eac10cfa2c21e4938f61f2a35c480e6c38acd5203e0d28c65a0ce40ee5e8f49b",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/9e4b41c75faf2642cbdd30cd"
+      },
+      {
+        "evidence_id": "ev-74a09a140584fe2e1430d6a3",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty",
+        "snippet": "## Empty\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "7b2f96edaf550c79269616a62a23c9d4cc058522b58777b6e237964caa203e87",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 5,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/14e6b95a045ce320ad79fa47"
+      },
+      {
+        "evidence_id": "ev-cd5fc5f2ab5c68f9b60368b5",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty > Selected",
+        "snippet": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "2bd0ce40dbd59fc1bf159e390468f95005a2ef500a269bae38e3fe5fdc62623c",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 7,
+        "line_end": 14,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/bf681af607e962949ff07e77"
+      },
+      {
+        "evidence_id": "ev-5139f4d41260f146de05cee1",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty > Selected > Tail",
+        "snippet": "#### Tail\n\nTail condition stays.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "866a894fa2440b0826c1ac04700f7909e3df43159328bbefe0f0dc8430e5701b",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 15,
+        "line_end": 18,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/66e0a7f02e02b9dad900372f"
+      },
+      {
+        "evidence_id": "ev-10a4bfabbef7049889490501",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Noise",
+        "snippet": "## Noise\n\nUnselected noise.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "05b4e56d04b799470126132896631e4477413081ee91c1526de9c42436438f94",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 19,
+        "line_end": 22,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/42a268779cb07e52604d6986"
+      },
+      {
+        "evidence_id": "ev-bc92598006f37b666cb140b7",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Limits",
+        "snippet": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "b512f8d82c46e2ff22e5a40e93b8bf2b83123f7b5a071b7f5d113c861a34d988",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 23,
+        "line_end": 26,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/09be8b62e501c2ff0d3aa0ae"
+      },
+      {
+        "evidence_id": "ev-fd91d8e2a806a6a44490aab7",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Notes",
+        "snippet": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+        "version_binding": "unversioned",
+        "content_sha256": "c3083b07cde704d055f7c1748dfaaa6fdd3d6917f83af7baedd7b65f5cc2b033",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 27,
+        "line_end": 33,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/37b1f7ed1ff3a25614218990"
+      },
+      {
+        "evidence_id": "ev-e2da8f22cc56f621da05bd94",
+        "path_or_url": "docs/other.md",
+        "section": "Other",
+        "snippet": "# Other\n\nOther introduction.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "37fd48867cb2440f11888140c8769addac901d01a644f8266013385f34cf948f",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/e8119183f6ee0f1d9e415b70"
+      },
+      {
+        "evidence_id": "ev-053b48b346eb5b80b73af837",
+        "path_or_url": "docs/other.md",
+        "section": "Other > Remote",
+        "snippet": "## Remote\n\nRemote condition [missing](private.md#hidden).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "01906871e61dd461dd9a98d6d8181c27eda8b4102c07c44cb1bc5937376a242b",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/f1de04690149d7f0a87f141f"
+      },
+      {
+        "evidence_id": "ev-4f1319451d3eecde91df2739",
+        "path_or_url": "docs/other.md",
+        "section": "Other > Long procedure",
+        "snippet": "## Long procedure\n\nRecord the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. Record the measured pressure before continuing. \nDo not restart until the isolation certificate is signed.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "5e46d72f868eef22eb2991780a87a42a4654577397c102100dde14cf3a545bcc",
+        "project_identity": "local:9e28d8fc14eec553b34d2ec18d10cab5cdadddbc68f7d557ab77a4b250ecc6dc",
+        "line_start": 9,
+        "line_end": 12,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/v2/27176661419c06135f548be3"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "incomplete_structural_dependency"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 3303,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "complete_calibrated_context_v1",
+      "calibration_sha256": "diagnostic-unverified",
+      "calibration_status": "diagnostic_unverified",
+      "candidate_units": 9,
+      "selected_units": 9,
+      "delivered_rows": 10,
+      "scan_complete": true,
+      "model_pairs": 11,
+      "closure": {
+        "structural_recipe": "minimal-structure-v1",
+        "status": "incomplete_dependency",
+        "documents": 2,
+        "incomplete_dependencies": [
+          {
+            "reason_code": "incomplete_dependency",
+            "path": "docs/other.md",
+            "char_start": 30,
+            "target": "private.md#hidden",
+            "reason": "target_not_in_checked_scope"
+          }
+        ],
+        "units": 9,
+        "hydrated_sections": 10,
+        "selected_units": 9,
+        "delivered_spans": 10
+      }
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": null,
+      "remaining_rows": 0,
+      "continuation_token": "df8a75dfe7588f170e9639332e8b9fc9d53a2b0b963316914528a53367eb0506"
+    }
+  },
+  "observations": [],
+  "passive_scorer_returns": [
+    [
+      [
+        {
+          "identity": "unit-e2da8f22cc56f621da05bd946e779bc86b9a28aedf789f90860475fae2704bfe",
+          "score": -5.343864917755127,
+          "pairs": 1,
+          "body_tokens": 4,
+          "ancestor_tokens": 2,
+          "body_token_coverage": [
+            0,
+            4
+          ],
+          "body_character_extent": [
+            1,
+            20
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-053b48b346eb5b80b73af837b4cb6247e1f048fc185279d80e965f787a0031f2",
+          "score": -5.939117908477783,
+          "pairs": 1,
+          "body_tokens": 15,
+          "ancestor_tokens": 8,
+          "body_token_coverage": [
+            0,
+            15
+          ],
+          "body_character_extent": [
+            1,
+            47
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-4f1319451d3eecde91df2739a5f7ccb98876c2a18e55b06c4206584871af82c3",
+          "score": -5.842313289642334,
+          "pairs": 3,
+          "body_tokens": 912,
+          "ancestor_tokens": 9,
+          "body_token_coverage": [
+            0,
+            912
+          ],
+          "body_character_extent": [
+            1,
+            4859
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 3
+        },
+        {
+          "identity": "unit-93bb21ec429b11703344b5bc3c3dcf7ee5f9380e541914e12f5bd3a94dac3b5b",
+          "score": -5.770540714263916,
+          "pairs": 1,
+          "body_tokens": 341,
+          "ancestor_tokens": 2,
+          "body_token_coverage": [
+            0,
+            341
+          ],
+          "body_character_extent": [
+            1,
+            1748
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-cd5fc5f2ab5c68f9b60368b52decc85adc864eecdae3bd06133ccd16d6807de2",
+          "score": -5.786701202392578,
+          "pairs": 1,
+          "body_tokens": 47,
+          "ancestor_tokens": 350,
+          "body_token_coverage": [
+            0,
+            47
+          ],
+          "body_character_extent": [
+            1,
+            104
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-5139f4d41260f146de05cee187f2ee0100b0bc6d90b0f5bd205b4fb346137d77",
+          "score": -5.57097864151001,
+          "pairs": 1,
+          "body_tokens": 6,
+          "ancestor_tokens": 401,
+          "body_token_coverage": [
+            0,
+            6
+          ],
+          "body_character_extent": [
+            1,
+            22
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-10a4bfabbef7049889490501146539f045057f3e0961220a1f994ed6f2d38f94",
+          "score": -5.839452743530273,
+          "pairs": 1,
+          "body_tokens": 6,
+          "ancestor_tokens": 346,
+          "body_token_coverage": [
+            0,
+            6
+          ],
+          "body_character_extent": [
+            1,
+            18
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-bc92598006f37b666cb140b70948dbe61c7632798bc837fe5d92855f21a1e188",
+          "score": -4.490063190460205,
+          "pairs": 1,
+          "body_tokens": 10,
+          "ancestor_tokens": 346,
+          "body_token_coverage": [
+            0,
+            10
+          ],
+          "body_character_extent": [
+            1,
+            36
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        },
+        {
+          "identity": "unit-fd91d8e2a806a6a44490aab7175e837939e19bac981ba1a6d512af495a45762c",
+          "score": -5.715939044952393,
+          "pairs": 1,
+          "body_tokens": 24,
+          "ancestor_tokens": 346,
+          "body_token_coverage": [
+            0,
+            24
+          ],
+          "body_character_extent": [
+            1,
+            79
+          ],
+          "intervals_recorded": 0,
+          "intervals_omitted": 1
+        }
+      ],
+      {
+        "recipe": "complete-fit-first-maxp-v4",
+        "status": "complete",
+        "units": 9,
+        "model_pairs": 11,
+        "model_forwards": 9,
+        "model_input_tokens": 3837,
+        "inference_seconds": 0.2862766990074306,
+        "model_load_attempts": 1,
+        "model_loads": 1,
+        "coverage": "all_query_body_ancestor_tokens",
+        "aggregation": "max_raw_logit",
+        "intervals_recorded": 0,
+        "intervals_omitted": 11,
+        "asset_verification_seconds": 0.26071445300476626,
+        "model_import_seconds": 2.4718223540039617,
+        "model": {
+          "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+          "assets_sha256": {
+            "model.safetensors": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+            "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+            "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+            "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+            "special_tokens_map.json": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+            "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+          },
+          "device": "cpu",
+          "dtype": "FP32",
+          "torch": "2.10.0+cpu",
+          "transformers": "4.57.1",
+          "threads": 8,
+          "interop_threads": 16,
+          "max_length": 512,
+          "truncation": false,
+          "score": "raw_logits[0,0]",
+          "tie_break": "original_pool_index"
+        },
+        "model_load_seconds": 3.3728246799946646,
+        "maximum_sequence_length": 512,
+        "pair_special_tokens": 4,
+        "query_tokens": [
+          10
+        ],
+        "total_seconds": 3.6709667019968037
+      }
+    ]
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-3ed3a95e1db6877763d4e00e",
+      "path_or_url": "textiles.md",
+      "section": "Textile conservation room",
+      "snippet": "# Textile conservation room\n\nThe following record concerns quarantine of woven museum textiles in the conservation room, not furniture or paper collections.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "60be31add61e85e719633114d9d743bd0ac931577362f2d900ba15bf97033cc8",
+      "project_identity": "local:8cec383684f35d72a23ffc7eafc8a647093db96389011cc00328c646472dedaa",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/29d6262f22d6b4ba3c7b1aa9"
+    },
+    {
+      "evidence_id": "ev-3946e3f813128722e6b9a6ab",
+      "path_or_url": "textiles.md",
+      "section": "Textile conservation room > Lighting inventory",
+      "snippet": "## Lighting inventory\n\nThe room has five ceiling lamps with frosted covers. Replacement covers are ordered through the buildings office.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9badc913f4b12aca2e0dddd3dab57321e86b55ff0ae7defa9a3787a94751bd66",
+      "project_identity": "local:8cec383684f35d72a23ffc7eafc8a647093db96389011cc00328c646472dedaa",
+      "line_start": 11,
+      "line_end": 13,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/v2/15637fc9414aca85876e52d0"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 644,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "complete_calibrated_context_v1",
+    "calibration_sha256": "5683d27c6ca11ed0181768c4a3d0f7f9f7f60d34f29c82260c70ff55ea746391",
+    "calibration_status": "empirical",
+    "candidate_units": 3,
+    "selected_units": 1,
+    "delivered_rows": 2,
+    "scan_complete": true,
+    "model_pairs": 10,
+    "closure": {
+      "structural_recipe": "minimal-structure-v1",
+      "status": "complete",
+      "documents": 1,
+      "incomplete_dependencies": [],
+      "units": 3,
+      "hydrated_sections": 3,
+      "selected_units": 1,
+      "delivered_spans": 2
+    }
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "e9cc2e3ff401dae61457604b1da324bb1c4c56c3d0d5a4421c6338f76103f275"
+  }
+}

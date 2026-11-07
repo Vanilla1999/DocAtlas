@@ -1,0 +1,16 @@
+{
+  "public_prepares": 2,
+  "public_queries": 11,
+  "resource_reads": 4,
+  "model_totals_complete": true,
+  "lost_trace_queries": 0,
+  "model_forwards": 239,
+  "model_input_tokens": 104524,
+  "score_cache_hits": 0,
+  "runtime_cache_hits": 10,
+  "model_loads": 1,
+  "inference_seconds": 3.442691589007154,
+  "scoring_total_seconds": 13.503790887007199,
+  "peak_vram_allocated_bytes": 1221214208,
+  "peak_vram_reserved_bytes": 1245708288
+}

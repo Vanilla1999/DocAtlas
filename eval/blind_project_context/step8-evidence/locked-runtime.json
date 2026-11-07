@@ -1,0 +1,19 @@
+{
+  "python": "3.12.14",
+  "packages": {
+    "mcp": "1.29.0",
+    "onnxruntime": "1.26.0",
+    "tokenizers": "0.22.2",
+    "numpy": "2.4.6",
+    "openai": "2.38.0",
+    "httpx": "0.28.1",
+    "pytest": "9.0.3"
+  },
+  "uv_lock_sha256": "dc0556cb2b3fddd1633a9d8526c72bb3a3afe27373816b45847749e6a1c7463a",
+  "applies_to": [
+    "delivery caps",
+    "three-portion study",
+    "core-confirmed tests"
+  ],
+  "model_runs": "See models/runtime-versions.json for the separate research environment."
+}

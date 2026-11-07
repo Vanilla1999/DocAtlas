@@ -1,0 +1,11 @@
+{
+  "tasks.json": "a8fc708a34274ab246dca8f592f4e547758f4ffb8c3ab1134edf0855897927d9",
+  "draft-labels.json": "0fd0b3d7f1129ff97a88c45f2028eb682d7b22bb17becb74ce27ccbbf5abe932",
+  "fact-spans.json": "0f6998f93d5e0cbe457282d58a2fe449426df7526b2842f2d63730e8087d0ed5",
+  "source-extent-graph.json": "a83808677f28b1c1e6cdd3eda3b834ab0d27b4e9378af531efd917b03bd68f8d",
+  "annotation-receipt.json": "074e0ba71b9442d03129cc829a8cd7ba050b112ce411d5b649f7df632b37bc0a",
+  "source-provenance.json": "c07af1035a32b2cf5875a04ebf7bf7714371ffb58abf582dde6c051b99118ca8",
+  "holdout-tasks.json": "b14a77dc14be5bd7b75167318ad9c1d4f2ac6e03d7daa93d82e7f6a0543edfb4",
+  "prepare_annotations.py": "61c0956c53d215f8f88536db03b06434aad4cae76fae63399f72878efe39343b",
+  "parent-reviewed-holdout-tasks.json": "e9f0834b71cbce1e5b492f41029f6ed44a589498544eabf683cf1ec32f07c268"
+}

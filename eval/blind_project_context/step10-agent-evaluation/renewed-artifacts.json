@@ -1,0 +1,23 @@
+{
+  "performance/README.md": "267a35a262d8981ff72fc671eddbb97dd3d736a03b9df9dbc29043f3f67f25eb",
+  "performance/step10-performance-fast-01/cumulative.txt": "bde241bc5baa33b4f8ef7e3ca6efd4775945d64896bcf3a70d0d679a61e19c0c",
+  "performance/step10-performance-fast-01/receipt.json": "be3eb6345ca3d005d1e0d19f08d717fd3a0cb425d4562a12dfb1ba47fc209e12",
+  "performance/step10-performance-fast-01/tottime.txt": "1cc3b5eed539d32cb5257d65502a2b3e457cebd23cb2405691d2d9b8087ef827",
+  "performance/step10-performance-fast-01/source-hashes.json": "9fa16400625904016b7c08f94a5fa2f12745291690200d04b53d114d6c1e96a8",
+  "performance/step10-performance-finalfast-120/cumulative.txt": "d61afb834ba940c61d33b339bcc915f2293089e5c23be914e2c7563d0c05a1d0",
+  "performance/step10-performance-finalfast-120/receipt.json": "662bb52c239877c2086715d60192e6b3a7dbe248b9e0d1d5594ba98d5c290276",
+  "performance/step10-performance-finalfast-120/tottime.txt": "6e17cd6c186633811f5ec9bb1aba9da9b68e60dea0ba358a8017d42786e74a50",
+  "performance/step10-performance-finalfast-120/hot-callers.txt": "697ebad9b96513a0b8c81d0880b142db31a224ce8c25b7f6aff50abf31050c40",
+  "performance/step10-performance-finalfast-120/source-hashes.json": "9fa16400625904016b7c08f94a5fa2f12745291690200d04b53d114d6c1e96a8",
+  "performance/step10-performance-profile-02/cumulative.txt": "a7cf46b16fc3c8c5d62a38f1f2768122f46b27f7025de21b9a79b2d4964bbac0",
+  "performance/step10-performance-profile-02/receipt.json": "e5c4583a09b175cf0f32d162b05b5f0caf25ce4e69ebaf88a0d1cd75c880c56e",
+  "performance/step10-performance-profile-02/tottime.txt": "c087ed0cfc73cbebb29df65df3f7a450354c2c1e5a08e06795d59e695b7e4bfc",
+  "performance/step10-performance-profile-02/hot-callers.txt": "98f48a3168edd4067b4eff8cb744e12b58826c67c31bf8aa309cafbfa45aa4dd",
+  "performance/step10-performance-profile-02/installed-code-sha256.json": "868b70203734f1bcf832d533fb1cb2c0a908b3c2a4c06c7df41b70e401a2963f",
+  "renewed-raw/minimal-context-plan.json": "ac5134ce6c1732aa83ac01d9746f2e4bc23d6744522caf6351f02acae3c6ed2c",
+  "renewed-raw/L0/minimal-context/T01-ru.session.json": "e1358bf91e5b1acda86a5ee5c70cc7483cda4e18315bc1532d49effe3152fa1c",
+  "renewed-raw/L0/minimal-context/T01-ru.jsonl": "1c9c908fe062c6b9ef5c83c3829bb9b5c0292032331ef839464ea3a2eb63c8c4",
+  "renewed-raw/L0/minimal-context/opencode.json": "80482f1641d8fef2988da1033d04789e5475986512fe26ad51aa9f031a904a9a",
+  "renewed-raw/L0/minimal-context/T01-ru.receipt.json": "8bf8848b2307832f9f7401dff82af46c7a35306f9813e7397d596ce0431d8211",
+  "renewed-raw/L0/minimal-context/T01-ru.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,350 @@
+[
+  {
+    "stage": "C-T1",
+    "function": "_bind_atomic",
+    "event": "call",
+    "line": 270,
+    "uri": null,
+    "requested_uri_spent": null,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/a43779d38cb20b271650cfd9",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/a43779d38cb20b271650cfd9",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/a43779d38cb20b271650cfd9"
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/c06206f6eac3f2bd57d951d0",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/c06206f6eac3f2bd57d951d0",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/c06206f6eac3f2bd57d951d0"
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/88ae03c2182651dd82de125b",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/88ae03c2182651dd82de125b",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/88ae03c2182651dd82de125b"
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/6c466e2ddb6d16617cb1bf06",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/6c466e2ddb6d16617cb1bf06",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/6c466e2ddb6d16617cb1bf06"
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/732c2b3ee1ccb2c8e6d4a327",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/732c2b3ee1ccb2c8e6d4a327",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/732c2b3ee1ccb2c8e6d4a327"
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T1",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/838a9a5e37e5e6522849e141"
+  },
+  {
+    "stage": "C-T1",
+    "function": "_bind_atomic",
+    "event": "return",
+    "line": 300,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": null,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 1,
+      "resource_reads": 0,
+      "model_forwards": 0,
+      "model_input_tokens": 0,
+      "model_totals_complete": true
+    },
+    "return": null
+  },
+  {
+    "stage": "C-T3",
+    "function": "_bind_atomic",
+    "event": "call",
+    "line": 270,
+    "uri": null,
+    "requested_uri_spent": null,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T3",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/732c2b3ee1ccb2c8e6d4a327",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T3",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/732c2b3ee1ccb2c8e6d4a327",
+    "requested_uri_spent": false,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    },
+    "return": "docatlas://source/v2/732c2b3ee1ccb2c8e6d4a327"
+  },
+  {
+    "stage": "C-T3",
+    "function": "issue",
+    "event": "call",
+    "line": 92,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": true,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    }
+  },
+  {
+    "stage": "C-T3",
+    "function": "issue",
+    "event": "return",
+    "line": 95,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": true,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    },
+    "return": null
+  },
+  {
+    "stage": "C-T3",
+    "function": "_bind_atomic",
+    "event": "exception",
+    "line": 312,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": null,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    },
+    "exception_type": "ValueError",
+    "exception": "source_reference_rejected"
+  },
+  {
+    "stage": "C-T3",
+    "function": "_bind_atomic",
+    "event": "return",
+    "line": 300,
+    "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+    "requested_uri_spent": null,
+    "counts": {
+      "public_prepares": 1,
+      "public_queries": 2,
+      "resource_reads": 2,
+      "model_forwards": 21,
+      "model_input_tokens": 9622,
+      "model_totals_complete": true
+    },
+    "return": null
+  }
+]

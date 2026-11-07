@@ -1,0 +1,190 @@
+{
+  "status": "OFFLINE_CONFIRMED_PUBLIC_SPENT_REJECTION",
+  "driver_exit": 1,
+  "driver_assertion_defect": "return line expected99; CPython with cleanup reports95; original failure preserved",
+  "files": {
+    "trace.json": "4657592fe12ee086d0f5e8097fcd5b5e7d6b1396e89131e84d84accfa26e8c66",
+    "consume.json": "4c64f4783dceb6376f6aaf4a6e3e5e8524ad1909f514979e4d331b6eb784e5d8",
+    "readonly.json": "0cfc3136ad13683366bb5d853a2b796ff561f1cb9c74b1f5389b22b8f67f8675",
+    "counts.json": "c490c7e0d239e00e615acae67cefffb6c1b4729b1f8596ced4ccfed81e9e3b99",
+    "C-T3.json": "d7ba55fc0b730d50f58c189c4df46c5b0d4074b3003971571533d40aff878d23",
+    "C-T1.json": "568d93a892352435cf65f3195e6dd00ebe9aa859e599c5fe8c9275585b5192b2",
+    "prepare.json": "142ee669d82ef10d5c35ab98406016c9b1b8c3ed35e4ddf1f86a83c4409f23a7",
+    "replay.json": "e0d068c13e40a6754d5b298641b8bc4338ec11012f02951f6336b35eae4b4f20",
+    "failure.json": "cb0b3f8b23dc63ff8611337bcb8f2d8257bdc8b1c142c3d4d74aa44c7bd74461",
+    "project/operations.md": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789",
+    "project/overview.md": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4",
+    "project/dashboard.md": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb",
+    "project/export.md": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe",
+    "project/architecture.md": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4",
+    "project/docatlas.project-docs.yaml": "57c603b75abbe93a6da3cd41e5a8b606a73349996e25db0a5ec954844927d425",
+    "project/storage.md": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561",
+    "project/modules/survey/private.md": "9f6890fe717dfbac5dfb79dbee76d4ab6331b8cbeac86b3a6f8a8f11bce0441b"
+  },
+  "original_runtime_root": "/tmp/opencode/step10-qwen-capability-repro-01",
+  "events": [
+    {
+      "stage": "C-T3",
+      "function": "issue",
+      "event": "call",
+      "line": 92,
+      "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+      "requested_uri_spent": true,
+      "counts": {
+        "public_prepares": 1,
+        "public_queries": 2,
+        "resource_reads": 2,
+        "model_forwards": 21,
+        "model_input_tokens": 9622,
+        "model_totals_complete": true
+      }
+    },
+    {
+      "stage": "C-T3",
+      "function": "issue",
+      "event": "return",
+      "line": 95,
+      "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+      "requested_uri_spent": true,
+      "counts": {
+        "public_prepares": 1,
+        "public_queries": 2,
+        "resource_reads": 2,
+        "model_forwards": 21,
+        "model_input_tokens": 9622,
+        "model_totals_complete": true
+      },
+      "return": null
+    },
+    {
+      "stage": "C-T3",
+      "function": "_bind_atomic",
+      "event": "exception",
+      "line": 312,
+      "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+      "requested_uri_spent": null,
+      "counts": {
+        "public_prepares": 1,
+        "public_queries": 2,
+        "resource_reads": 2,
+        "model_forwards": 21,
+        "model_input_tokens": 9622,
+        "model_totals_complete": true
+      },
+      "exception_type": "ValueError",
+      "exception": "source_reference_rejected"
+    },
+    {
+      "stage": "C-T3",
+      "function": "_bind_atomic",
+      "event": "return",
+      "line": 300,
+      "uri": "docatlas://source/v2/838a9a5e37e5e6522849e141",
+      "requested_uri_spent": null,
+      "counts": {
+        "public_prepares": 1,
+        "public_queries": 2,
+        "resource_reads": 2,
+        "model_forwards": 21,
+        "model_input_tokens": 9622,
+        "model_totals_complete": true
+      },
+      "return": null
+    }
+  ],
+  "counts": {
+    "public_prepares": 1,
+    "public_queries": 2,
+    "resource_reads": 2,
+    "model_forwards": 42,
+    "model_input_tokens": 19076,
+    "model_totals_complete": true
+  },
+  "per_query": [
+    {
+      "id": "C-T1",
+      "seconds": 6.7931144920003135,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9622,
+        "planned_input_tokens": 9622,
+        "preflight_units": 21,
+        "model_loads": 1,
+        "runtime_cache_hits": 0,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.5821735889985575,
+        "asset_verification_seconds": 0.5949557339990861,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221184512,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 5.663282254005026
+      }
+    },
+    {
+      "id": "C-T3",
+      "seconds": 1.7850925130042015,
+      "receipt": {
+        "recipe": "qwen3-contextual-own-body-evidence-v1",
+        "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+        "status": "complete",
+        "units": 21,
+        "model_pairs": 21,
+        "model_forwards": 21,
+        "model_input_tokens": 9454,
+        "planned_input_tokens": 9454,
+        "preflight_units": 21,
+        "model_loads": 0,
+        "runtime_cache_hits": 1,
+        "score_cache_hits": 0,
+        "diagnostics_recorded": 21,
+        "diagnostics_omitted": 0,
+        "inference_seconds": 0.3159239320011693,
+        "asset_verification_seconds": 0.5962839330022689,
+        "runtime": {
+          "torch": "2.10.0+cu128",
+          "cuda": "12.8",
+          "transformers": "4.57.1",
+          "tokenizers": "0.22.2",
+          "safetensors": "0.8.0",
+          "capability": [
+            12,
+            0
+          ],
+          "dtype": "bfloat16",
+          "attention": "sdpa",
+          "batch": 1
+        },
+        "peak_vram_allocated_bytes": 1221064704,
+        "peak_vram_reserved_bytes": 1245708288,
+        "total_seconds": 1.2580684989952715
+      }
+    }
+  ],
+  "prepare_seconds": 0.12647869599459227,
+  "inference_seconds": 0.8980975209997268,
+  "scoring_seconds": 6.921350753000297,
+  "peak_allocated": 1221184512,
+  "peak_reserved": 1245708288,
+  "readonly_unchanged": true,
+  "frozen_hashes_unchanged": 534
+}

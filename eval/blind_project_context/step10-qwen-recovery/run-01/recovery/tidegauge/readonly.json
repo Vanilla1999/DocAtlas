@@ -1,0 +1,63 @@
+{
+  "boundary": "post-prepare source/catalog + logical SQLite + pinned assets",
+  "before": {
+    "source_catalog_sha256": {
+      "operations.md": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789",
+      "overview.md": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4",
+      "dashboard.md": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb",
+      "export.md": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe",
+      "architecture.md": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4",
+      "docatlas.project-docs.yaml": "57c603b75abbe93a6da3cd41e5a8b606a73349996e25db0a5ec954844927d425",
+      "storage.md": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561",
+      "modules/survey/private.md": "9f6890fe717dfbac5dfb79dbee76d4ab6331b8cbeac86b3a6f8a8f11bce0441b"
+    },
+    "logical_db_sha256": "f1e68bcd5cba59e81638633a0f967bc933b6204c835fe9d7125e58dec3579123",
+    "assets": {
+      "path": "/tmp/opencode/step10-qwen-reranker-06b-assets",
+      "sha256": {
+        "README.md": "5bba8c734f6dd3ae48317b4139317e45a7fce48fc55e15670b23a0dd15492ab6",
+        "config.json": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0",
+        "generation_config.json": "81051cd3f6e77013827148d0b8a6ead93f8ac390d5ab805f849199f0af6a08db",
+        "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "tokenizer_config.json": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0",
+        "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "chat_template.jinja": "6f682162495ec5b39fd9005c01b6aa2a74669379fe967039f1e2cbbe8752369d",
+        "model.safetensors": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+        "provenance.json": "4d939016a5a168ba580571d0f5193ad7088d90ab16c0e004fefbfd8bc48d1fb8"
+      },
+      "status": "verified"
+    }
+  },
+  "after": {
+    "source_catalog_sha256": {
+      "operations.md": "023b406172d1777d578f13115c35568258e2a0d105218954be4838c4fb153789",
+      "overview.md": "eb9fe8685d8982318bb48991805d10fc03baa9b3551eb77c07d25d014ce392a4",
+      "dashboard.md": "517eb821d027260c2dbc1d00ff192e7669d08ff836995dbb8bb768651c414ebb",
+      "export.md": "0059141f9b66fd989e5b0bbf2edfaa3a3cf4eca287660b8b9af878979c6fbbfe",
+      "architecture.md": "33f40808c6d8262bf0dc6e7507b7c1c1c5ec160f952b4d2c91764251358959f4",
+      "docatlas.project-docs.yaml": "57c603b75abbe93a6da3cd41e5a8b606a73349996e25db0a5ec954844927d425",
+      "storage.md": "9a6988319f4ba2a19e65386f041885df3fa2eff2dcda6622adf74828fd109561",
+      "modules/survey/private.md": "9f6890fe717dfbac5dfb79dbee76d4ab6331b8cbeac86b3a6f8a8f11bce0441b"
+    },
+    "logical_db_sha256": "f1e68bcd5cba59e81638633a0f967bc933b6204c835fe9d7125e58dec3579123",
+    "assets": {
+      "path": "/tmp/opencode/step10-qwen-reranker-06b-assets",
+      "sha256": {
+        "README.md": "5bba8c734f6dd3ae48317b4139317e45a7fce48fc55e15670b23a0dd15492ab6",
+        "config.json": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0",
+        "generation_config.json": "81051cd3f6e77013827148d0b8a6ead93f8ac390d5ab805f849199f0af6a08db",
+        "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "tokenizer_config.json": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0",
+        "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "chat_template.jinja": "6f682162495ec5b39fd9005c01b6aa2a74669379fe967039f1e2cbbe8752369d",
+        "model.safetensors": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+        "provenance.json": "4d939016a5a168ba580571d0f5193ad7088d90ab16c0e004fefbfd8bc48d1fb8"
+      },
+      "status": "verified"
+    }
+  },
+  "unchanged": true,
+  "trace_complete": true
+}

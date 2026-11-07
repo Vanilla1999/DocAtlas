@@ -1,0 +1,560 @@
+--- before/docmancer/docs/application/minimal_context_structure.py
++++ after/docmancer/docs/application/minimal_context_structure.py
+@@ -28,6 +28,7 @@
+ 
+ STRUCTURAL_RECIPE = "minimal-structure-v1"
+ EVIDENCE_STRUCTURAL_RECIPE = "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2"
++REFERENCE_STRUCTURAL_RECIPE = "explicit_addressed_section_closure_v3"
+ 
+ 
+ class StructuralContextError(ValueError):
+@@ -210,7 +211,7 @@
+ 
+ def build_units(payload, snapshot, retrieval, *, recipe=STRUCTURAL_RECIPE):
+     """Build all checked own bodies, with ancestors as scoring context only."""
+-    if recipe not in {STRUCTURAL_RECIPE, EVIDENCE_STRUCTURAL_RECIPE}:
++    if recipe not in {STRUCTURAL_RECIPE, EVIDENCE_STRUCTURAL_RECIPE, REFERENCE_STRUCTURAL_RECIPE}:
+         raise StructuralContextError("Unknown structural recipe")
+     plan = retrieval.get("documentation_query_plan") or {}
+     question = str(plan.get("original_question") or retrieval.get("question") or "")
+@@ -277,7 +278,7 @@
+     """
+     source = entry.get("source")
+     seed = entry.get("structural_native_candidate")
+-    if (entry.get("structural_recipe") not in {STRUCTURAL_RECIPE, EVIDENCE_STRUCTURAL_RECIPE} or
++    if (entry.get("structural_recipe") not in {STRUCTURAL_RECIPE, EVIDENCE_STRUCTURAL_RECIPE, REFERENCE_STRUCTURAL_RECIPE} or
+             not isinstance(source, dict) or not isinstance(seed, dict)):
+         raise StructuralContextError("Missing structural provenance")
+     ref = source.get("_reference_evidence") or {}
+@@ -332,7 +333,7 @@
+     return unescape(value.split()[0]) if value else ""
+ 
+ 
+-def _edges(syntax, definitions):
++def _edges(syntax, definitions, *, report_assets=False):
+     """Recognize explicit Markdown/HTML links; code was masked by the parser.
+ 
+     Ordinary URLs without a fragment are not subtree dependencies. Reference
+@@ -352,24 +353,33 @@
+         if syntax[after:after + 1] == "(":
+             target_end = _closing(syntax, after, "(", ")")
+             if target_end is not None:
+-                yield "url", _destination(syntax[after + 1:target_end])
++                yield ("asset" if report_assets and index and syntax[index - 1] == "!" else "url"), _destination(syntax[after + 1:target_end])
+                 index = target_end + 1
+                 continue
+         if syntax[after:after + 1] == "[":
+             reference_end = _closing(syntax, after, "[", "]")
+             if reference_end is not None:
+-                yield "definition", _label(syntax[after + 1:reference_end] or label)
++                yield ("asset" if report_assets and index and syntax[index - 1] == "!" else "definition"), _label(syntax[after + 1:reference_end] or label)
+                 index = reference_end + 1
+                 continue
+         if label.startswith("^"):
+             yield "definition", _label(label)
+         elif _label(label) in definitions:
+-            yield "definition", _label(label)
++            yield ("asset" if report_assets and index and syntax[index - 1] == "!" else "definition"), _label(label)
++        elif report_assets:
++            yield "unsupported", label
+         index = end + 1
+     for match in re.finditer(r"<(?:[A-Za-z][\w:-]*)\b[^>]*?\bhref\s*=\s*(['\"])(.*?)\1[^>]*>", syntax):
+         yield "url", unescape(match[2])
+     for match in re.finditer(r"<([^<>\s]+#[^<>\s]+)>", syntax):
+         yield "url", match[1]
++    if report_assets:
++        for match in re.finditer(r"<(?:img|video|audio|source)\b[^>]*>", syntax, flags=re.I):
++            yield "asset", match[0]
++        for match in re.finditer(r"<((?:https?://|mailto:)[^<>\s]+)>", syntax):
++            yield "url", match[1]
++        for match in re.finditer(r"<[A-Za-z][^>]*\bhref\s*=\s*[^\s'\"][^>]*>", syntax):
++            yield "unsupported", match[0]
+ 
+ 
+ def close_selection(structure, selected_ids, payload, snapshot, retrieval):
+@@ -383,7 +393,9 @@
+     if (str(plan.get("original_question") or retrieval.get("question") or "") != structure.question
+             or retrieval.get("project_identity") != structure.expected_project_identity):
+         raise StructuralContextError("Structural request binding changed")
+-    wanted, queue, incomplete = set(), deque(), list(structure.receipt.get("incomplete_dependencies", ()))
++    reference_mode = structure.recipe == REFERENCE_STRUCTURAL_RECIPE
++    wanted, queue, incomplete = set(), deque(), ([] if reference_mode else list(structure.receipt.get("incomplete_dependencies", ())))
++    processed_edges = 0
+     paths = defaultdict(list)
+     for identity, doc in structure.documents.items():
+         paths[doc.path].append(identity)
+@@ -416,14 +428,24 @@
+     while queue:
+         identity, index = queue.popleft()
+         doc = structure.documents[identity]
+-        edges = deque(_edges(doc.syntax[index], doc.definitions))
++        edges = deque(_edges(doc.syntax[index], doc.definitions, report_assets=reference_mode))
+         seen_edges = set()
+         while edges:
+             kind, target = edges.popleft()
+             if (kind, target) in seen_edges:
+                 continue
+             seen_edges.add((kind, target))
++            processed_edges += 1
++            if kind == "asset":
++                gap(doc, index, target, "unsupported_asset_dependency")
++                continue
++            if kind == "unsupported":
++                gap(doc, index, target, "unsupported_reference_syntax")
++                continue
+             if kind == "definition":
++                if reference_mode and not target:
++                    gap(doc, index, target, "unsupported_definition_label")
++                    continue
+                 matches = doc.definitions.get(target, ())
+                 if len(matches) != 1:
+                     gap(doc, index, target, "missing_or_ambiguous_definition")
+@@ -438,13 +460,16 @@
+             except ValueError:
+                 gap(doc, index, target, "invalid_link_target")
+                 continue
+-            if not url.fragment:
++            if not url.fragment and not reference_mode:
+                 continue
+             if url.scheme or url.netloc or url.query:
+                 gap(doc, index, target, "target_not_in_checked_scope")
+                 continue
+             path = (posixpath.normpath(posixpath.join(posixpath.dirname(doc.path), unquote(url.path)))
+                     if url.path else doc.path)
++            if reference_mode and (not target or "\\" in url.path or (url.path and not path.lower().endswith((".md", ".markdown")))):
++                gap(doc, index, target, "unsupported_local_document_target")
++                continue
+             candidates = paths.get(path, ())
+             if len(candidates) != 1:
+                 gap(doc, index, target, "target_not_in_checked_scope")
+@@ -456,11 +481,15 @@
+                     doc.seeds[0]["_reference_evidence"]["source"]["scope"]):
+                 gap(doc, index, target, "target_scope_mismatch")
+                 continue
++            if reference_mode and not url.fragment:
++                for target_index in range(len(other.parents)):
++                    add(other_id, target_index)
++                continue
+             matches = set(other.anchors.get(unquote(url.fragment), ()))
+             if len(matches) != 1:
+                 gap(doc, index, target, "missing_or_ambiguous_anchor")
+                 continue
+-            if structure.recipe == STRUCTURAL_RECIPE:
++            if structure.recipe == STRUCTURAL_RECIPE or reference_mode:
+                 add(other_id, next(iter(matches)), subtree=True)
+     rows, bound = [], {}
+     for identity, index in sorted(wanted, key=lambda key: (structure.documents[key[0]].path, key)):
+@@ -470,4 +499,7 @@
+     receipt = {**structure.receipt, "selected_units": len(selected), "delivered_spans": len(rows),
+                "incomplete_dependencies": incomplete,
+                "status": "incomplete_dependency" if incomplete else "complete"}
++    if reference_mode:
++        receipt.update(closure_complete=not incomplete, processed_dependency_edges=processed_edges,
++                       coverage="unverified", dependency_rule="all_delivered_bodies_addressed_extent")
+     return rows, bound, receipt
+--- before/docmancer/docs/application/context_evidence_structure.py
++++ after/docmancer/docs/application/context_evidence_structure.py
+@@ -9,13 +9,13 @@
+ from urllib.parse import unquote, urlsplit
+ 
+ from .minimal_context_structure import (
+-    EVIDENCE_STRUCTURAL_RECIPE, StructuralContextError, _hydrate, _edges, _destination,
++    EVIDENCE_STRUCTURAL_RECIPE, REFERENCE_STRUCTURAL_RECIPE, StructuralContextError, _hydrate, _edges, _destination,
+ )
+ 
+ 
+ class EvidenceDocuments:
+     def __init__(self, structure):
+-        if structure.recipe != EVIDENCE_STRUCTURAL_RECIPE:
++        if structure.recipe not in {EVIDENCE_STRUCTURAL_RECIPE, REFERENCE_STRUCTURAL_RECIPE}:
+             raise StructuralContextError("Evidence context requires structural v2")
+         self.structure = structure
+         self.incoming = defaultdict(set)
+@@ -72,7 +72,12 @@
+                                      "target": target, "reason": reason})
+                     else:
+                         self.incoming[(other_id, anchor_index)].add((identity, index))
+-        structure.receipt["incomplete_dependencies"] = gaps
++        if structure.recipe == REFERENCE_STRUCTURAL_RECIPE:
++            # This graph still supplies precisely the historical model JSON.
++            # Unselected sources cannot mint delivered dependency obligations.
++            structure.receipt["incoming_context_unresolved_count"] = len(gaps)
++        else:
++            structure.receipt["incomplete_dependencies"] = gaps
+         structure.receipt["incoming_anchor_edges"] = sum(len(v) for v in self.incoming.values())
+ 
+     def _checked_document(self, doc):
+--- before/docmancer/docs/application/minimal_context_selection.py
++++ after/docmancer/docs/application/minimal_context_selection.py
+@@ -24,6 +24,7 @@
+ from .projection_tokenizer import projection_token_count
+ from .standalone_text_view import render_standalone_text
+ from . import context_evidence_scoring as evidence_scoring
++from . import reference_closure_contract as reference_closure
+ 
+ 
+ POLICY = "complete_calibrated_context_v1"
+@@ -34,7 +35,7 @@
+ 
+ def scoring_recipe() -> str:
+     recipe = os.environ.get("DOCATLAS_MINIMAL_CONTEXT_RECIPE", WINDOW_RECIPE)
+-    if recipe not in {WINDOW_RECIPE, GATED_WINDOW_RECIPE, FIT_WINDOW_RECIPE, evidence_scoring.RECIPE}:
++    if recipe not in {WINDOW_RECIPE, GATED_WINDOW_RECIPE, FIT_WINDOW_RECIPE, evidence_scoring.RECIPE, reference_closure.RECIPE}:
+         raise ValueError("minimal_context_unknown_scoring_recipe")
+     return recipe
+ 
+@@ -66,7 +67,14 @@
+     expected = {"schema_version": 1, "recipe": scoring_recipe(),
+                 "model_revision": MINI_REVISION, "structural_recipe": STRUCTURAL_RECIPE,
+                  "lanes": "original_translation_max"}
+-    if scoring_recipe() == evidence_scoring.RECIPE:
++    if scoring_recipe() == reference_closure.RECIPE:
++        expected = {"schema_version": 4, "recipe": reference_closure.RECIPE,
++                    "model_id": evidence_scoring.MODEL_ID, "model_revision": evidence_scoring.REVISION,
++                    "structural_recipe": reference_closure.STRUCTURAL_RECIPE, "lanes": "exact_original_only",
++                    "scoring_contract_sha256": evidence_scoring.CONTRACT_SHA256,
++                    "contract_sha256": reference_closure.CONTRACT_SHA256,
++                    "calibration_recipe": reference_closure.CALIBRATION_RECIPE}
++    elif scoring_recipe() == evidence_scoring.RECIPE:
+         expected = {"schema_version": 3, "recipe": evidence_scoring.RECIPE,
+                     "model_id": evidence_scoring.MODEL_ID, "model_revision": evidence_scoring.REVISION,
+                     "structural_recipe": EVIDENCE_STRUCTURAL_RECIPE,
+@@ -113,8 +121,10 @@
+     from .source_continuation import attach_source_continuation_locators
+ 
+     policy, policy_digest = load_policy()
+-    evidence_mode = scoring_recipe() == evidence_scoring.RECIPE
+-    structural_recipe = EVIDENCE_STRUCTURAL_RECIPE if evidence_mode else STRUCTURAL_RECIPE
++    reference_mode = scoring_recipe() == reference_closure.RECIPE
++    evidence_mode = scoring_recipe() in {evidence_scoring.RECIPE, reference_closure.RECIPE}
++    structural_recipe = (reference_closure.STRUCTURAL_RECIPE if reference_mode else
++                         EVIDENCE_STRUCTURAL_RECIPE if evidence_mode else STRUCTURAL_RECIPE)
+     request = request_binding or {}
+     original = (retrieval.get("documentation_query_plan") or {}).get("original_question")
+     if not isinstance(original, str) or not original.strip():
+@@ -130,6 +140,9 @@
+         settings.update(model_revision=evidence_scoring.REVISION, structural_recipe=structural_recipe,
+                         model_id=evidence_scoring.MODEL_ID, contract_sha256=evidence_scoring.CONTRACT_SHA256,
+                         lanes="exact_original_only")
++        if reference_mode:
++            settings.update(contract_sha256=reference_closure.CONTRACT_SHA256,
++                            scoring_contract_sha256=evidence_scoring.CONTRACT_SHA256)
+         if portion > 1 or not payload.get("sources"):
+             try:
+                 evidence_scoring.verify_assets(os.environ.get("DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH", ""))
+@@ -160,6 +173,9 @@
+     def record_work(receipt):
+         nonlocal work_observation
+         if observations is not None and work_observation is None:
++            if reference_mode:
++                receipt = {**receipt, "selection_recipe": reference_closure.RECIPE,
++                           "closure_contract_sha256": reference_closure.CONTRACT_SHA256}
+             work_observation = {"receipt": receipt, "policy_sha256": policy_digest,
+                                 "delivery_status": "not_confirmed"}
+             observations.append(work_observation)
+@@ -174,6 +190,9 @@
+                 original, tuple(unit.identity for unit in structure.units), documents,
+                 os.environ.get("DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH", ""),
+                 diagnostics=_OBSERVER.get() is not None)
++            if reference_mode:
++                scoring = {**scoring, "selection_recipe": reference_closure.RECIPE,
++                           "closure_contract_sha256": reference_closure.CONTRACT_SHA256}
+         else:
+             scores, scoring = score_complete_units(lanes, structure.units,
+                                                os.environ.get("DOCATLAS_EXPERIMENT_MINI_PATH", ""),
+@@ -189,6 +208,13 @@
+         selected = {row["identity"] for row in scores
+                     if policy is None or row["score"] >= policy["threshold"]}
+         rows, bound, closure = close_selection(structure, selected, payload, snapshot, retrieval)
++        if reference_mode and closure["incomplete_dependencies"]:
++            stopped, bound = stop_packet(payload, snapshot, retrieval, "dependency_incomplete",
++                                        failed_stage="reference_closure", receipt=scoring, closure=closure,
++                                        scan_complete=True)
++            stopped.update(status="error", hard_stop=True)
++            _refresh_estimate(stopped)
++            return stopped, bound
+     except JointSemanticRelevanceError as exc:
+         record_work(exc.receipt)
+         return stop_packet(payload, snapshot, retrieval, "scan_incomplete",
+--- before/docmancer/docs/domain/minimal_context_config.py
++++ after/docmancer/docs/domain/minimal_context_config.py
+@@ -30,7 +30,8 @@
+         if name in os.environ and os.environ[name] != str(EMERGENCY_TOKENS):
+             raise ValueError(f"{name} must be removed or set to {EMERGENCY_TOKENS} for minimal context")
+     key = ("DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH"
+-           if os.environ.get("DOCATLAS_MINIMAL_CONTEXT_RECIPE") == "qwen3-contextual-own-body-evidence-v1"
++           if os.environ.get("DOCATLAS_MINIMAL_CONTEXT_RECIPE") in {
++               "qwen3-contextual-own-body-evidence-v1", "qwen3-contextual-addressed-section-closure-v3"}
+            else "DOCATLAS_EXPERIMENT_MINI_PATH")
+     model = os.environ.get(key, "")
+     if not model or not Path(model).is_absolute() or not Path(model).is_dir():
+--- before/eval/blind_project_context/step10-multidoc-gate/runner.py
++++ after/eval/blind_project_context/step10-multidoc-gate/runner.py
+@@ -99,7 +99,7 @@
+ 
+ 
+ def inventory(project, labels):
+-    sources = {path: (ROOT / project["root"] / path).read_bytes().decode("utf-8")
++    sources = {path: (Path(project.get("_dataset_root", ROOT)) / project["root"] / path).read_bytes().decode("utf-8")
+                for path in project["project_documents"]}
+     units = {}
+     for row in labels:
+@@ -108,7 +108,7 @@
+         raw = sources[row["path"]]
+         lines = raw.splitlines(keepends=True)
+         start = sum(map(len, lines[:row["heading_line"] - 1]))
+-        body_start = start + len(lines[row["heading_line"] - 1])
++        body_start = start + len(lines[row["heading_line"] - 1]) if row["heading_level"] else start
+         end = sum(map(len, lines[:row["line_end"]]))
+         assert raw[body_start:end] == row["own_text"]
+         assert digest(raw.encode()) == row["source_sha256"]
+@@ -117,7 +117,8 @@
+     # The authored fixtures intentionally contain no footnote/reference-definition
+     # syntax; offline fitting closes ancestors only. Inline anchors do not add
+     # bodies in structural v2. New fixture syntax requires evaluator review.
+-    assert all("[^" not in raw and not re.search(r"(?m)^ {0,3}\[[^\]\n]+\]:", raw) for raw in sources.values())
++    if not project.get("_reference_v3"):
++        assert all("[^" not in raw and not re.search(r"(?m)^ {0,3}\[[^\]\n]+\]:", raw) for raw in sources.values())
+     for key, unit in units.items():
+         earlier = sorted((u for u in units.values() if u["path"] == unit["path"] and
+                           u["heading_line"] < unit["heading_line"]), key=lambda u: u["heading_line"], reverse=True)
+@@ -128,6 +129,19 @@
+                 level = other["heading_level"]
+         unit["ancestors"] = ancestors
+     return sources, units
++
++
++def independent_reference_closure(seeds, units):
++    """Authored raw-source inventory edges, never production parser/closure."""
++    selected, pending = set(), list(seeds)
++    while pending:
++        key = pending.pop()
++        if key in selected:
++            continue
++        selected.add(key)
++        pending.extend(units[key]["ancestors"])
++        pending.extend(units[key]["reference_targets"])
++    return selected
+ 
+ 
+ def source_tokens(selected, units, sources, count):
+@@ -154,19 +168,22 @@
+             "optional_units": sorted(k for k in selected if units[k]["role"].startswith("optional")),
+             "unlabelled_units": sorted(k for k in selected if units[k]["role"] == "unlabelled"),
+             "selected_units": sorted(selected), "source_rows": len(selected),
++            "dependency_gaps": [{"unit": k, **g} for k in sorted(selected)
++                                for g in units[k].get("reference_gaps", [])],
+             "delivered_source_tokens": source_tokens(selected, units, sources, count),
+             "allowed_source_tokens": sum(count(raw.encode()) for raw in sources.values()),
+             "role_source_tokens": {role: source_tokens({k for k in selected if units[k]["role"] == role}, units, sources, count)
+                                    for role in ("direct", "structural", "optional_support", "optional_context", "negative", "unlabelled")}}
+ 
+ 
+-def packet_check(packet, observation, task, project, labels, count, expected_project_identity):
++def packet_check(packet, observation, task, project, labels, count, expected_project_identity, *, threshold=None):
+     sources, units = inventory(project, labels)
+     assert packet.get("kind") == "docs_context", packet
+     selection = packet.get("source_selection", {})
+     assert selection.get("scan_complete") and observation["receipt"]["status"] == "complete", packet
+-    assert not selection.get("closure", {}).get("incomplete_dependencies"), packet
+-    assert packet.get("reason_code") not in ("scan_incomplete", "context_emergency_stop")
++    if not project.get("_reference_v3"):
++        assert not selection.get("closure", {}).get("incomplete_dependencies"), packet
++    assert packet.get("reason_code") not in ("scan_incomplete", "context_emergency_stop", "dependency_incomplete")
+     selected, order = set(), []
+     for row in packet.get("sources", []):
+         path = row["path_or_url"]
+@@ -195,7 +212,17 @@
+         assert json.loads(score["source_identity"])["candidate"]["project_identity"] == expected_project_identity
+         assert math.isfinite(score["score"])
+         scores[matches[0]] = score["score"]
+-    assert scores.keys() == units.keys(), "scan inventory incomplete or foreign source scored"
++    assert scores.keys() == {k for k, u in units.items() if u["own_text"].strip()}, "scan inventory incomplete or foreign source scored"
++    if project.get("_reference_v3"):
++        seeds = {k for k, value in scores.items() if threshold is None or value >= threshold}
++        assert selected == independent_reference_closure(seeds, units), "independent addressed-extent closure mismatch"
++        expected_gaps = {(units[k]["path"], units[k]["char_start"], g["target"], g["reason"])
++                         for k in selected for g in units[k]["reference_gaps"]}
++        actual_gaps = {(g["path"], g["char_start"], g["target"], g["reason"])
++                       for g in selection["closure"]["incomplete_dependencies"]}
++        assert expected_gaps == actual_gaps, "independent delivered dependency gaps mismatch"
++        assert selection["closure"]["closure_complete"] == (not expected_gaps)
++        assert not expected_gaps, "a dependency-incomplete result cannot pass as a successful answer"
+     if task.get("explicit_full_section"):
+         descendants = [k for k, u in units.items() if task["explicit_full_section"] in u["ancestors"]]
+         assert set(descendants) <= set(task["direct"]) | set(task["structural"])
+@@ -210,6 +237,7 @@
+     denominator = sum(r["allowed_source_tokens"] for r in answerable)
+     numerator = sum(r["delivered_source_tokens"] for r in answerable)
+     return {"required_pass": all(not r["missing_required_units"] and not r["missing_facts"] for r in results),
++            "dependency_pass": all(not r.get("dependency_gaps") for r in results),
+             "no_answer_pass": all(r["source_rows"] == 0 for r in results if r["no_answer"]),
+             "hard_negative_pass": all(not r["hard_negatives"] for r in results),
+             "reduction_pass": bool(denominator and numerator * 2 <= denominator),
+@@ -226,15 +254,26 @@
+     from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
+     from docmancer.docs.application.minimal_context_selection import observe_minimal_context
+     from docmancer.docs.application import context_evidence_scoring as scorer
++    from docmancer.docs.application import reference_closure_contract as reference_contract
+     from docmancer.docs.application.projection_tokenizer import projection_token_count as count
+     from docmancer.docs.application.standalone_text_view import render_standalone_text
+     import yaml
+-    assert manifest["contract_sha256"] == scorer.CONTRACT_SHA256
++    reference_mode = bool(getattr(args, "v3_dataset", None))
++    contract = reference_contract if reference_mode else scorer
++    data_root = args.v3_dataset.resolve() if reference_mode else ROOT
++    assert manifest["contract_sha256"] == contract.CONTRACT_SHA256
++    if reference_mode:
++        assert manifest["dataset_root"] == str(data_root.relative_to(TREE))
++        assert manifest["scoring_contract_sha256"] == scorer.CONTRACT_SHA256
++        if args.command == "recovery":
++            raise ValueError("historical_policy_recovery_not_valid_for_v3")
+     args.out = args.out.resolve()
+     args.out.mkdir(parents=True, exist_ok=False)
+-    projects = json.loads((ROOT / "projects.json").read_text())
+-    tasks = json.loads((ROOT / "tasks.json").read_text())
+-    labels = {r["task_id"]: r["units"] for r in json.loads((ROOT / "draft-labels.json").read_text())}
++    projects = json.loads((data_root / "projects.json").read_text())
++    for project in projects:
++        project.update(_dataset_root=str(data_root), _reference_v3=reference_mode)
++    tasks = json.loads((data_root / "tasks.json").read_text())
++    labels = {r["task_id"]: r["units"] for r in json.loads((data_root / "draft-labels.json").read_text())}
+     counts = {"public_prepares": 0, "public_queries": 0, "resource_reads": 0,
+               "model_totals_complete": True, "lost_trace_queries": 0,
+               "model_forwards": 0, "model_input_tokens": 0, "score_cache_hits": 0,
+@@ -253,7 +292,7 @@
+             fixture = args.out / "fixtures" / project["id"]
+             source_root = fixture / "project"
+             names = project["project_documents"] + [d["path"] for d in project["module_documents"]]
+-            originals = {p: (ROOT / project["root"] / p).read_bytes() for p in names}
++            originals = {p: (data_root / project["root"] / p).read_bytes() for p in names}
+             if project["id"] not in prepared:
+                 runtime.write_project(source_root, {p: raw.decode() for p, raw in originals.items()})
+                 catalog_path = source_root / "docatlas.project-docs.yaml"
+@@ -266,7 +305,7 @@
+             watched = {p.relative_to(source_root).as_posix(): digest(p.read_bytes()) for p in source_root.rglob("*") if p.is_file()}
+             with runtime.isolated_service(fixture / "state") as (service, config), ExitStack() as audits:
+                 os.environ.update(DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT="1", DOCATLAS_CONTEXT_COMPRESSION="off",
+-                                  DOCATLAS_MINIMAL_CONTEXT_RECIPE=scorer.RECIPE,
++                                  DOCATLAS_MINIMAL_CONTEXT_RECIPE=contract.RECIPE,
+                                   DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH=str(args.model.resolve()))
+                 if policy_path:
+                     os.environ["DOCATLAS_MINIMAL_CONTEXT_POLICY"] = str(policy_path.resolve())
+@@ -346,7 +385,8 @@
+                     expected_policy = digest(policy_path.read_bytes()) if policy_path else "diagnostic-unverified"
+                     assert observed[0]["policy_sha256"] == expected_policy
+                     checked, scores = packet_check(packet, observed[0], task, project, labels[task["id"]], count,
+-                                                   "local:" + digest(str(source_root.resolve()).encode()))
++                                                   "local:" + digest(str(source_root.resolve()).encode()),
++                                                   threshold=json.loads(policy_path.read_text())["threshold"] if policy_path else None)
+                     rendered = render_standalone_text(packet)
+                     record = {"id": task["id"], "phase": name, "split": split,
+                               "no_answer": bool(task.get("no_answer")), **checked,
+@@ -354,6 +394,9 @@
+                               "packet_json_tokens": count(json.dumps(packet, ensure_ascii=False, separators=(",", ":")).encode()),
+                               "supported_rendering_tokens": count(rendered.text.encode()) if rendered.text else None,
+                               "actual_mcp_wire_tokens": None, "actual_client_model_visible_tokens": None}
++                    if reference_mode:
++                        record["delivered_dependency_gaps"] = packet["source_selection"]["closure"]["incomplete_dependencies"]
++                        record["coverage_claim"] = "required authored obligations only; gaps remain explicit"
+                     records.append(record)
+                     all_records.append(record)
+                     if name == "calibration-diagnostic":
+@@ -401,7 +444,8 @@
+                     project = next(p for p in projects if p["id"] == task["project"])
+                     sources, units = inventory(project, labels[task["id"]])
+                     seeds = {k for k, score in diagnostic_scores[task["id"]].items() if score >= threshold}
+-                    selected = seeds | {a for key in seeds for a in units[key]["ancestors"]}
++                    selected = (independent_reference_closure(seeds, units) if reference_mode else
++                                seeds | {a for key in seeds for a in units[key]["ancestors"]})
+                     predicted.append({"id": task["id"], "no_answer": bool(task.get("no_answer")),
+                                       **coverage(selected, task, units, sources, count)})
+                 result = gates(predicted)
+@@ -410,7 +454,7 @@
+                     best = trials[-1]
+                     break
+             save(args.out / "breakpoints.json", trials)
+-            if best is None or not all(best["gates"][key] for key in ("required_pass", "no_answer_pass", "hard_negative_pass", "reduction_pass")):
++            if best is None or not all(best["gates"][key] for key in ("required_pass", "dependency_pass", "no_answer_pass", "hard_negative_pass", "reduction_pass")):
+                 save(args.out / "summary.json", {"status": "FAIL", "stage": "calibration_fit", "best": best, "counts": counts})
+                 return
+             policy = {"schema_version": 3, "recipe": scorer.RECIPE, "model_id": scorer.MODEL_ID,
+@@ -418,6 +462,12 @@
+                       "lanes": "exact_original_only", "contract_sha256": scorer.CONTRACT_SHA256,
+                       "calibration_recipe": scorer.CALIBRATION_RECIPE, "calibration_sha256": manifest_sha,
+                       "threshold": best["threshold"]}
++            if reference_mode:
++                policy.update(schema_version=4, recipe=reference_contract.RECIPE,
++                              structural_recipe=reference_contract.STRUCTURAL_RECIPE,
++                              contract_sha256=reference_contract.CONTRACT_SHA256,
++                              scoring_contract_sha256=scorer.CONTRACT_SHA256,
++                              calibration_recipe=reference_contract.CALIBRATION_RECIPE)
+             policy_path = args.out / "policy.json"
+             save(policy_path, policy)
+             final = phase("calibration", "calibration-final", policy_path)
+@@ -454,17 +504,23 @@
+             if summary["phase"] == "recovery":
+                 assert summary["policy_sha256"] == ORIGINAL_POLICY_SHA256
+             authorization = json.loads(args.validation_authorization.read_text())
+-            assert authorization["status"] == "PARENT_APPROVED_VALIDATION"
++            assert authorization["status"] == ("PARENT_APPROVED_SEEN_REGRESSION" if args.command == "seen" else "PARENT_APPROVED_VALIDATION")
+             assert authorization["manifest_sha256"] == manifest_sha
+             assert authorization["policy_sha256"] == summary["policy_sha256"]
+             assert authorization["calibration_summary_sha256"] == digest((args.calibration / "summary.json").read_bytes())
+-            final = phase("validation", "validation", policy_path)
++            if args.command == "seen" and not reference_mode:
++                raise ValueError("seen_command_requires_v3_dataset")
++            split = "seen" if args.command == "seen" else "holdout" if reference_mode else "validation"
++            final = phase(split, args.command, policy_path)
++            assert len(final) == 8
+             verdict = gates(final)
+-        save(args.out / "summary.json", {"status": "PASS" if all(verdict[k] for k in ("required_pass", "no_answer_pass", "hard_negative_pass", "reduction_pass")) else "FAIL",
++        save(args.out / "summary.json", {"status": "PASS" if all(verdict[k] for k in ("required_pass", "dependency_pass", "no_answer_pass", "hard_negative_pass", "reduction_pass")) else "FAIL",
+              "phase": args.command, "manifest_sha256": manifest_sha, "policy_sha256": digest(policy_path.read_bytes()),
+              "gates": verdict, "counts": counts, "process_total_seconds": time.perf_counter() - process_started,
+              "boundary": ("public in-process fresh-prepared recovery acceptance, not exact historical replay/validation/installed/client"
+-                          if args.command == "recovery" else "public in-process, not installed/client/Terra")})
++                          if args.command == "recovery" else
++                          "public in-process v3 authored-obligation check with explicit dependency gaps; not global completeness/installed/client"
++                          if reference_mode else "public in-process, not installed/client/Terra")})
+     except Exception as exc:
+         save(args.out / "failure.json", {"status": "ERROR_NOT_PASS", "error_type": type(exc).__name__, "error": str(exc), "counts": counts})
+         raise
+@@ -475,11 +531,12 @@
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("command", choices=("calibration", "recovery", "validation"))
++    parser.add_argument("command", choices=("calibration", "recovery", "seen", "validation"))
+     parser.add_argument("--manifest", type=Path, required=True)
+     parser.add_argument("--model", type=Path, required=True)
+     parser.add_argument("--out", type=Path, required=True)
+     parser.add_argument("--calibration", type=Path)
+     parser.add_argument("--validation-authorization", type=Path)
+     parser.add_argument("--recovery-authorization", type=Path)
++    parser.add_argument("--v3-dataset", type=Path)
+     run(parser.parse_args())
+--- before/docmancer/docs/application/reference_closure_contract.py
++++ after/docmancer/docs/application/reference_closure_contract.py
+@@ -0,0 +1,21 @@
++"""Versioned closure experiment; the historical Qwen scoring input is unchanged."""
++import hashlib
++from . import context_evidence_scoring as scoring
++
++RECIPE = "qwen3-contextual-addressed-section-closure-v3"
++STRUCTURAL_RECIPE = "explicit_addressed_section_closure_v3"
++CALIBRATION_RECIPE = "largest-finite-breakpoint-independent-reference-closure-v3"
++CONTRACT = {
++    "recipe": RECIPE, "structural_recipe": STRUCTURAL_RECIPE,
++    "scoring_contract_sha256": scoring.CONTRACT_SHA256,
++    "seeds": "own body plus ancestors; no seed subtree",
++    "expand": "all delivered bodies, including ancestors and definition owners",
++    "anchor": "unique owning section through next heading of same or lower level",
++    "document": "exact checked local Markdown path without fragment: full document",
++    "definitions": "whole owner body and its actual links",
++    "unresolved": "delivered dependency gap => body-free dependency_incomplete refusal; unselected graph gaps are diagnostics only; no fetch or scope expansion",
++    "syntax": "existing masked Markdown inline/full/collapsed/defined-shortcut/footnote and quoted HTML href/id/name; images are unsupported assets",
++    "external_query_scheme": "unresolved; never fetched",
++    "identity": "full native scope/version/generation/content/catalog identity, not path alone",
++}
++CONTRACT_SHA256 = hashlib.sha256(scoring.canonical(CONTRACT).encode()).hexdigest()

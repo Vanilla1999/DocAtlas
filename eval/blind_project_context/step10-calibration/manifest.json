@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "frozen_before_inference": true,
+  "provenance": "Independent agent-authored fictional manuals; not an external benchmark",
+  "files": {
+    "tasks.json": "e74c45893358c758259bb137dcc7057fe94c9ad6c94ce05a9138d379591c43bb",
+    "labels.json": "5ba41397a8294516c5c14f9733b8fe04810fa37d431cd894508d946ac62b866e",
+    "recipe.json": "99c73654d6dbbf1f65d7c09d6cc187572dfa089c1a407053c37ea779cabe8b98",
+    "README.md": "fc6ce21e278d81bb7aa89c92118035922ebd17bd0d745eb09ea6fd254d28bffd",
+    "calibration/relay.md": "14c9fcd32c24dcc716a72e264cc8753a47d46c6bda28ca939aea744be2dece55",
+    "calibration/reservoir.md": "5deccd72f64f5a4958759db5a0d903b415582a216abc6a247c71c07f30fe0137",
+    "validation/loom.md": "8dde24978c911ac1b7c93dbad31af0c6453f8814e4faebd79ed8df1a26171e17",
+    "validation/observatory.md": "a4b94adfeffd4c90031ff9ad0fd15ee8c90acf32365773f2c5ea1e829c31a00b"
+  },
+  "split_families": {
+    "reservoir-restart": [
+      "calibration"
+    ],
+    "irrigation-relay": [
+      "calibration"
+    ],
+    "plate-dispatch": [
+      "validation"
+    ],
+    "pneumatic-loom": [
+      "validation"
+    ]
+  },
+  "task_count": 12,
+  "labeled_units": 68
+}

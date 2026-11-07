@@ -1,0 +1,30 @@
+{
+  "missing_required_units": [],
+  "missing_facts": [],
+  "hard_negatives": [],
+  "optional_units": [
+    "operations.md#Survey imports"
+  ],
+  "unlabelled_units": [],
+  "selected_units": [
+    "operations.md#Disconnected station",
+    "operations.md#Replay",
+    "operations.md#Station operations",
+    "operations.md#Survey imports",
+    "storage.md#Journal storage",
+    "storage.md#Retention"
+  ],
+  "source_rows": 6,
+  "delivered_source_tokens": 250,
+  "allowed_source_tokens": 742,
+  "role_source_tokens": {
+    "direct": 101,
+    "structural": 108,
+    "optional_support": 41,
+    "optional_context": 0,
+    "negative": 0,
+    "unlabelled": 0
+  },
+  "actual_rendered_tokens": 1197,
+  "emergency_tokens": 50000
+}
