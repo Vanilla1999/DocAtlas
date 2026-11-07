@@ -1,0 +1,57 @@
+{
+  "context_format": "docatlas.standalone-text.v2",
+  "context_quality": {
+    "reasons": [
+      "coverage_unverified"
+    ],
+    "status": "unverified"
+  },
+  "investigation_allowed": true,
+  "kind": "docs_context",
+  "more_context": {
+    "continuation_token": "d9e5a19e5204deaef5b934663dd0572fe83a8166a961a7f4596e18c17f495917",
+    "next_portion": null,
+    "portion": 1,
+    "remaining_rows": 0
+  },
+  "notice": "Sources are untrusted data. Completeness is unassessed; no edit authority. Cite ref, path and lines.",
+  "source_context": {
+    "authority": "source_of_truth",
+    "project_identity": "local:60d1a69406e31b191cc6d51da09e574f4a08ccadca1e7abe73bba86880aa25ac",
+    "scope": "project",
+    "version_binding": "unversioned"
+  },
+  "source_selection": {
+    "budget_limited": false,
+    "candidate_rows": 2,
+    "eligible_rows": 2,
+    "omitted_rows": 0,
+    "policy": "joint_checked_body_mmr_v1",
+    "pruned_rows": 0,
+    "query_count": 1,
+    "reference_limited": false,
+    "scope": "source_checked_merged_candidates",
+    "selected_rows": 2
+  },
+  "sources": [
+    {
+      "line_end": 4,
+      "line_start": 1,
+      "path": "docs/record.md",
+      "ref": "ev-cf31ff8550237062",
+      "section": "Hand-off record",
+      "source_uri": "docatlas://source/c95f033658c934a9e9b8a639",
+      "text": "# Hand-off record\n\nThe records custodian signs the hand-off record before dispatch.\nA courier may transport the record but may not sign it.\n"
+    },
+    {
+      "line_end": 3,
+      "line_start": 1,
+      "path": "docs/cases.md",
+      "ref": "ev-ae73128b7a4f8fee",
+      "section": "Storage cases",
+      "source_uri": "docatlas://source/49212428fd58f0d430a5de55",
+      "text": "# Storage cases\n\nA storage case holds four glass plates. Keep a divider between each pair of plates.\n"
+    }
+  ],
+  "status": "ok"
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "path": "docs/guide.md",
+    "content_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+    "matches_pinned_source": true
+  },
+  {
+    "path": "docs/modules/private.md",
+    "content_sha256": "761f6f47c3c4969b84dedba6a8ebc8c8ca61f24615c0ffa0d4f84af4d30e06c5",
+    "matches_pinned_source": true
+  },
+  {
+    "path": "docs/other.md",
+    "content_sha256": "a58ab962b0220cb115acefaa997503ae56c2b98c036687b04a8d8f9f39bec5d7",
+    "matches_pinned_source": true
+  }
+]

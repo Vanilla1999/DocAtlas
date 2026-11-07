@@ -15,6 +15,7 @@ from contextvars import ContextVar
 from pathlib import Path
 
 from docmancer.docs.domain.minimal_context_config import EMERGENCY_TOKENS
+from docmancer.docs.domain.context_links import OFF, context_link_expansion
 from .complete_context_scoring import WINDOW_RECIPE, GATED_WINDOW_RECIPE, FIT_WINDOW_RECIPE, score_complete_units
 from .experimental_selection_modes import MINI_REVISION, JointSemanticRelevanceError
 from .context_continuation import continuation_fingerprint, continuation_metadata
@@ -114,6 +115,35 @@ def delivery_size(packet: dict) -> int:
     return projection_token_count(text.encode("utf-8"))
 
 
+def model_closure_receipt(closure: dict) -> dict:
+    """Keep actionable literal gaps, not the host's full successful-edge trace.
+
+    Historical closures are returned unchanged. Unfollowed links are not a list
+    of all question-relevant conditions, so even zero pending links cannot certify
+    answer completeness. No source aliases or lookup dictionaries are introduced.
+    """
+    expansion = closure.get("reference_expansion")
+    if not expansion:
+        return closure
+    return {
+        "selected_units": closure["selected_units"],
+        "delivered_spans": closure["delivered_spans"],
+        "coverage": "unverified",
+        "reference_expansion": {key: expansion[key] for key in (
+            "recipe", "max_hops", "added_spans", "examined_references",
+            "followed_references", "satisfied_references", "pending_references",
+        )},
+        "incomplete_dependencies": [
+            {key: item[key] for key in (
+                "path", "char_start", "char_end", "target", "origin", "navigation",
+                "reason", "target_path", "target_char_start", "target_char_end",
+                "missing_descendants",
+            ) if key in item}
+            for item in closure.get("incomplete_dependencies", ())
+        ],
+    }
+
+
 def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
                            portion: int, continuation_token: str | None,
                            request_binding: dict | None, finalize_packet=None) -> tuple[dict, dict]:
@@ -121,6 +151,7 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
     from .source_continuation import attach_source_continuation_locators
 
     policy, policy_digest = load_policy()
+    link_expansion = context_link_expansion()
     reference_mode = scoring_recipe() == reference_closure.RECIPE
     evidence_mode = scoring_recipe() in {evidence_scoring.RECIPE, reference_closure.RECIPE}
     structural_recipe = (reference_closure.STRUCTURAL_RECIPE if reference_mode else
@@ -139,6 +170,11 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
     from docmancer.docs.domain.context_presentation import LITERAL_V2, literal_presentation_enabled
     if literal_presentation_enabled():
         settings["presentation"] = LITERAL_V2
+    if link_expansion != OFF:
+        # Off adds no key: historical continuation fingerprints remain intact.
+        from .bounded_context_links import CONTRACT_SHA256
+        settings["reference_expansion"] = link_expansion
+        settings["reference_expansion_contract_sha256"] = CONTRACT_SHA256
     if evidence_mode:
         settings.update(model_revision=evidence_scoring.REVISION, structural_recipe=structural_recipe,
                         model_id=evidence_scoring.MODEL_ID, contract_sha256=evidence_scoring.CONTRACT_SHA256,
@@ -210,7 +246,9 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
             work_observation["scores"] = [{**row, **structure.metadata.get(row["identity"], {})} for row in scores]
         selected = {row["identity"] for row in scores
                     if policy is None or row["score"] >= policy["threshold"]}
-        rows, bound, closure = close_selection(structure, selected, payload, snapshot, retrieval)
+        rows, bound, closure = close_selection(
+            structure, selected, payload, snapshot, retrieval,
+            **({"reference_expansion": link_expansion} if link_expansion != OFF else {}))
         if reference_mode and closure["incomplete_dependencies"]:
             stopped, bound = stop_packet(payload, snapshot, retrieval, "dependency_incomplete",
                                         failed_stage="reference_closure", receipt=scoring, closure=closure,
@@ -241,8 +279,10 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
         "calibration_status": "diagnostic_unverified" if policy is None else "empirical",
         "candidate_units": len(scores), "selected_units": len(selected),
         "delivered_rows": len(rows), "scan_complete": True,
-        "model_pairs": scoring["model_pairs"], "closure": closure,
+        "model_pairs": scoring["model_pairs"], "closure": model_closure_receipt(closure),
     }
+    if link_expansion != OFF:
+        result["source_selection"]["calibration_scope"] = "selected_units_before_link_expansion"
     retrieval.setdefault("retrieval_diagnostics", {})["minimal_context"] = {
         **({"scores": scores} if not evidence_mode or observations is not None else {}),
         "receipt": scoring, "policy_sha256": policy_digest,

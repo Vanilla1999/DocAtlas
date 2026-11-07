@@ -1,0 +1,170 @@
+{
+  "passed": true,
+  "measurements": {
+    "mcp": {
+      "provider_requests": 4,
+      "first_system_tokens": 2105,
+      "first_tools_tokens": 1190,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {
+        "status": 334,
+        "blocked_status": 46,
+        "context": 442,
+        "source": 80
+      },
+      "source_tokens": 50
+    },
+    "files": {
+      "provider_requests": 2,
+      "first_system_tokens": 1815,
+      "first_tools_tokens": 597,
+      "tool_names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "visible_result_tokens": {
+        "read": 83,
+        "blocked_read": 46
+      },
+      "source_tokens": 50
+    }
+  },
+  "sessions": {
+    "mcp": [
+      "ses_e4a3bd59bffe3cUqJdEY3OHjM0"
+    ],
+    "files": [
+      "ses_e4a3bc4edffe2wXHBYZZx6ohZD"
+    ]
+  },
+  "source_to_draft_prompt_delivered": [
+    "files",
+    "mcp"
+  ],
+  "mcp_readiness": {
+    "status": "ready",
+    "checks": 41,
+    "elapsed_ms": 1047,
+    "deadline_ms": 10000,
+    "required_tools": [
+      "docatlas_get_docs_context",
+      "docatlas_docs_status"
+    ]
+  },
+  "rejected_status_never_dispatched": true,
+  "prepared_documents": [
+    {
+      "path": "docs/record.md",
+      "content_sha256": "120f89fb65c99a5eac737c6d9beb019a2290164020b64ce27b6e47e1a9e57ed1",
+      "catalog_entry_hash": "sha256:fe1de863f33adbba40b4e735e230b1764da37eba03d6ec28017f2e0c08772832"
+    },
+    {
+      "path": "docs/cases.md",
+      "content_sha256": "eb7f2d330b622331c71f45628b523a3885bba0836cdf292ed0c1a3038130c595",
+      "catalog_entry_hash": "sha256:725265fc065ebf2d7b9711a33c0da42f5bf5206ab1437e367d7f1c0c34b714c4"
+    }
+  ],
+  "source_files_unchanged": true,
+  "database_unchanged": true,
+  "source_snapshot": {
+    "docatlas.project-docs.yaml": "f425aa68dd4755a13dd692c46ca626e3602e2dc7365ac728e516e10f1e002cab",
+    "AGENTS.md": "64f0b9af4a07ddb52564f1d7fca7f083bf39f693fcc0d2492cbd8c442cbaabbb",
+    "docs/record.md": "120f89fb65c99a5eac737c6d9beb019a2290164020b64ce27b6e47e1a9e57ed1",
+    "docs/cases.md": "eb7f2d330b622331c71f45628b523a3885bba0836cdf292ed0c1a3038130c595"
+  },
+  "installed_package": "/workspace/scratch/66f7674793b8/step12-wheel.FOrJVx/venv/lib/python3.12/site-packages/docmancer/__init__.py",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "dependencies": {
+    "idna": "3.17",
+    "annotated-types": "0.7.0",
+    "h2": "4.3.0",
+    "pydantic-settings": "2.14.1",
+    "beautifulsoup4": "4.14.3",
+    "pytz": "2026.2",
+    "httpcore": "1.0.9",
+    "hyperframe": "6.1.0",
+    "rpds-py": "2026.5.1",
+    "soupsieve": "2.8.4",
+    "mcp": "1.29.0",
+    "babel": "2.18.0",
+    "markdownify": "1.2.2",
+    "PyYAML": "6.0.3",
+    "flatbuffers": "25.12.19",
+    "tzlocal": "5.3.1",
+    "jsonschema": "4.26.0",
+    "anyio": "4.13.0",
+    "h11": "0.16.0",
+    "attrs": "26.1.0",
+    "courlan": "1.3.2",
+    "tqdm": "4.67.3",
+    "typing_extensions": "4.15.0",
+    "uvicorn": "0.48.0",
+    "filelock": "3.29.0",
+    "mmh3": "5.2.1",
+    "tld": "0.13.2",
+    "grpcio": "1.80.0",
+    "certifi": "2026.5.20",
+    "httpx": "0.28.1",
+    "jusText": "3.0.2",
+    "typing-inspection": "0.4.2",
+    "jsonschema-specifications": "2025.9.1",
+    "charset-normalizer": "3.4.7",
+    "lxml": "5.4.0",
+    "python-docx": "1.2.0",
+    "click": "8.4.1",
+    "py_rust_stemmers": "0.1.8",
+    "pycparser": "3.0",
+    "fsspec": "2026.4.0",
+    "pdfminer.six": "20251230",
+    "htmldate": "1.9.4",
+    "qdrant-client": "1.18.0",
+    "pydantic": "2.13.4",
+    "hf-xet": "1.5.0",
+    "regex": "2026.5.9",
+    "lxml_html_clean": "0.4.4",
+    "ultimate-sitemap-parser": "1.8.0",
+    "doc-atlas": "1.3.2",
+    "packaging": "26.2",
+    "hpack": "4.1.0",
+    "trafilatura": "2.0.0",
+    "sse-starlette": "3.4.4",
+    "requests": "2.34.2",
+    "tiktoken": "0.11.0",
+    "huggingface_hub": "0.36.2",
+    "sqlite-vec": "0.1.9",
+    "cryptography": "48.0.0",
+    "pillow": "12.2.0",
+    "pypdf": "6.12.2",
+    "loguru": "0.7.3",
+    "pdfplumber": "0.11.9",
+    "httpx-sse": "0.4.3",
+    "fastembed": "0.8.0",
+    "striprtf": "0.0.32",
+    "tokenizers": "0.22.2",
+    "protobuf": "7.35.0",
+    "portalocker": "3.2.0",
+    "python-dotenv": "1.2.2",
+    "starlette": "1.2.1",
+    "python-multipart": "0.0.29",
+    "numpy": "2.4.6",
+    "six": "1.17.0",
+    "onnxruntime": "1.26.0",
+    "cffi": "2.0.0",
+    "python-dateutil": "2.9.0.post0",
+    "referencing": "0.37.0",
+    "pydantic_core": "2.46.4",
+    "PyJWT": "2.13.0",
+    "dateparser": "1.4.0",
+    "w3lib": "2.4.1",
+    "urllib3": "2.7.0",
+    "pypdfium2": "5.8.0"
+  },
+  "model_calls": 0,
+  "scripted_provider_requests": 6,
+  "boundary": "Client/transport/permissions/source fidelity acceptance. No answer-model quality, provider usage or savings claim."
+}

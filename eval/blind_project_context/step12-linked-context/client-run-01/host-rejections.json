@@ -1,0 +1,59 @@
+{
+  "mcp": {
+    "partID": "prt_1b5c431bd001iShfft1AR84gpB",
+    "sessionID": "ses_e4a3bd59bffe3cUqJdEY3OHjM0",
+    "messageID": "msg_1b5c431a2001l2c1gWuqoYVmK7",
+    "type": "tool",
+    "id": "blocked_status",
+    "tool": "docatlas_docs_status",
+    "state": {
+      "status": "error",
+      "input": {
+        "action": "jobs",
+        "job_id": "unrelated-job"
+      },
+      "error": "documentation_profile_project_status_only",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"action\":\"jobs\",\"job_id\":\"unrelated-job\"}"
+      },
+      "time": {
+        "start": 1794050896317,
+        "end": 1794050896332
+      }
+    }
+  },
+  "files": {
+    "partID": "prt_1b5c43e10001n701CkwecQ0lmH",
+    "sessionID": "ses_e4a3bc4edffe2wXHBYZZx6ohZD",
+    "messageID": "msg_1b5c43df9001D9EbtdTTvDlDjI",
+    "type": "tool",
+    "id": "blocked_read",
+    "tool": "read",
+    "state": {
+      "status": "error",
+      "input": {
+        "path": "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/outside.txt"
+      },
+      "error": "documentation_profile_scope_mismatch",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"path\":\"/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/outside.txt\"}"
+      },
+      "time": {
+        "start": 1794050899472,
+        "end": 1794050899493
+      }
+    }
+  }
+}

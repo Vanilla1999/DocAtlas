@@ -1,0 +1,12 @@
+{"at_utc": "2026-11-07T11:23:22.684479+00:00", "operation": "prepare_docs", "status": "started", "group": "meridian"}
+{"at_utc": "2026-11-07T11:23:22.793860+00:00", "operation": "get_docs_context", "status": "started", "case": "V-M1"}
+{"at_utc": "2026-11-07T11:23:22.957329+00:00", "operation": "get_docs_context", "status": "returned", "case": "V-M1", "status_result": "BLOCKED"}
+{"at_utc": "2026-11-07T11:23:22.958167+00:00", "operation": "get_docs_context", "status": "started", "case": "V-M2"}
+{"at_utc": "2026-11-07T11:23:23.902074+00:00", "operation": "get_docs_context", "status": "returned", "case": "V-M2", "status_result": "PASS_STRUCTURAL_REPLAY_ONLY"}
+{"at_utc": "2026-11-07T11:23:23.903024+00:00", "operation": "get_docs_context", "status": "started", "case": "V-M3"}
+{"at_utc": "2026-11-07T11:23:24.700650+00:00", "operation": "get_docs_context", "status": "returned", "case": "V-M3", "status_result": "PASS_STRUCTURAL_REPLAY_ONLY"}
+{"at_utc": "2026-11-07T11:23:24.701683+00:00", "operation": "get_docs_context", "status": "started", "case": "V-M4"}
+{"at_utc": "2026-11-07T11:23:24.854657+00:00", "operation": "get_docs_context", "status": "returned", "case": "V-M4", "status_result": "BLOCKED"}
+{"at_utc": "2026-11-07T11:23:24.863144+00:00", "operation": "prepare_docs", "status": "started", "group": "guard"}
+{"at_utc": "2026-11-07T11:23:24.944943+00:00", "operation": "get_docs_context", "status": "started", "case": "structural-guard"}
+{"at_utc": "2026-11-07T11:23:25.318152+00:00", "operation": "get_docs_context", "status": "returned", "case": "structural-guard", "status_result": "PASS_STRUCTURAL_REPLAY_ONLY"}

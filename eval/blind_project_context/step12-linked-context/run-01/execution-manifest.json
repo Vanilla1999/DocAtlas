@@ -1,0 +1,180 @@
+{
+  "boundary": "public in-process acquisition with live structural selection-input replay; not final public Qwen packet",
+  "python": "3.12.14",
+  "source_commit": "b1eba6c677d91dd60af570d18877b038992431f7",
+  "input_sha256": {
+    "eval/blind_project_context/step10-reference-closure-v3/projects.json": "ba2df3bb43b7d58c4c1e19182a1b38c73babdf90d844b4060174d01f7292f039",
+    "eval/blind_project_context/step10-reference-closure-v3/tasks.json": "910f4607e5dafd01d3570cc726245b004bd4addea23af1cd9810576d67efb5b5",
+    "eval/blind_project_context/step10-reference-closure-v3/source-extent-graph.json": "a83808677f28b1c1e6cdd3eda3b834ab0d27b4e9378af531efd917b03bd68f8d",
+    "eval/blind_project_context/step10-multidoc-gate/tasks.json": "c88b895fbc4fef9af8aa9cc7490e8c54bbde842749c96d65b4deb0d7ad846b33",
+    "eval/blind_project_context/step10-qwen-validation/provenance/original-policy.json": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/overview.md": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/reservations.md": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/weather.md": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/clock.md": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/calendar.md": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/architecture.md": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+    "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/modules/laser/private.md": "c6679714ceccc372227bce88792ea7e01489917a8afd28897a0aed7a6fcf4881",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M1.json": "689774d299e94892bd17bd470b1ab4738d611ae21cb095f7458d20c4b84e9cab",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M2.json": "8e6a18d527dea609b6f274848ceeb603a92cabbc01e8a25d18fdc88d327a8f59",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M3.json": "b3505834217f4842991b362d5bfb1953118f10289d80696f2149bf74a4804bba",
+    "eval/blind_project_context/step10-qwen-validation/run-01/validation/meridian/V-M4.json": "226e5552d9def193747cafa003619511efa42c3a3e4bd24ff3a6b542d6eb2032",
+    "docmancer/docs/application/minimal_context_structure.py": "0731048c1870c016ba2252fb3d96f6619966ecd9b7e63565350ee0f5fb5beea9",
+    "docmancer/docs/application/bounded_context_links.py": "feb25f5dbf0b761aa651edfc7b927ef7501596fba7ffcdc03bb646c308a13094",
+    "docmancer/docs/application/minimal_context_selection.py": "739da743c4640e0fb5593c57c2f6ae3082e3af3764e1e299f18848df0481eab1",
+    "docmancer/docs/application/context_evidence_scoring.py": "a14d181407e4dfd836130c579ca037f90053775eb002c3b30a42a29bb0e83144",
+    "docmancer/docs/application/context_evidence_structure.py": "bf8f81a5ff81d6f321c396c6244d131805102f290810a780de99b4aa5f7c16f2",
+    "pyproject.toml": "08d8a8adde828cc03e2e733d8d25c669eeb7c0198b2e07508de4477d44e65aa0",
+    "uv.lock": "dc0556cb2b3fddd1633a9d8526c72bb3a3afe27373816b45847749e6a1c7463a",
+    "docmancer/docs/application/experimental_context_finalization.py": "ff56b24869002dabb3d428475b371dd0f6bacaf16d6a9d2732ef1a8d9bbaf66d",
+    "eval/evidence_quality_v2/runtime.py": "2c1e2fa6a96c77c3e0925b3eda5f8ec0a5db10659a11e6b4ffd5c2cc9870c531",
+    "eval/blind_project_context/probe_minimal_structure.py": "78a2fbb8d14b00f9051af02b639114679bc84509a188e5f7af9e76deffc8bed6",
+    "eval/heuristic_removal/receipts.py": "75b75968e32b991f3d12f23c02c27627b78171c51b68fccec62e98e4a481d1a6",
+    "v2plan/STEP12_LINKED_CONTEXT_CHECKPOINT_RU.md": "8b2ca9cd8a9a43f0bc9e0a719f629d3933f17766a731b1359939c72799b802a6",
+    "eval/blind_project_context/step12-linked-context/replay.py": "3dd5f9538670dc8bb871cd91ab2bbe35209860249a89103da3c3756d2f451629",
+    "eval/blind_project_context/step12-linked-context/inputs.py": "5390fbfc103065a94a4c30ef1fc315b3af9d4ef7a1840828ce047cea2cbda959"
+  },
+  "cases": [
+    "V-M1",
+    "V-M2",
+    "V-M3",
+    "V-M4",
+    "structural-guard"
+  ],
+  "planned_counts": {
+    "public_prepares": 2,
+    "public_contexts": 5,
+    "resource_reads": 0,
+    "model_scorer_calls": 0,
+    "closure_calls": 10
+  },
+  "guard_source_sha256": {
+    "docs/guide.md": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+    "docs/other.md": "d7b6d359fa38539d483ade2c116b3a83a4b78f05db800861ba2ab0706619909b",
+    "docs/modules/private.md": "761f6f47c3c4969b84dedba6a8ebc8c8ca61f24615c0ffa0d4f84af4d30e06c5"
+  },
+  "guard_inputs": [
+    {
+      "id": "structural-guard",
+      "question": "Explain the selected conditions and their limits.",
+      "facts": [
+        {
+          "path": "docs/guide.md",
+          "start": 9,
+          "end": 28,
+          "quote": "Scope introduction."
+        },
+        {
+          "path": "docs/guide.md",
+          "start": 124,
+          "end": 178,
+          "quote": "Keep this condition [limits](#limits) and [more][ref]."
+        },
+        {
+          "path": "docs/guide.md",
+          "start": 562,
+          "end": 597,
+          "quote": "Limit condition [cycle](#selected)."
+        },
+        {
+          "path": "docs/guide.md",
+          "start": 618,
+          "end": 661,
+          "quote": "Footnote condition.\n    Continued footnote."
+        },
+        {
+          "path": "docs/other.md",
+          "start": 9,
+          "end": 28,
+          "quote": "Other introduction."
+        },
+        {
+          "path": "docs/other.md",
+          "start": 41,
+          "end": 87,
+          "quote": "Remote condition [missing](private.md#hidden)."
+        },
+        {
+          "path": "docs/other.md",
+          "start": 435,
+          "end": 488,
+          "quote": "The single-decoded entity condition must be retained."
+        }
+      ],
+      "no_answer": false,
+      "component_seed": [
+        "docs/guide.md",
+        110,
+        488
+      ],
+      "forbidden": [
+        [
+          "docs/other.md",
+          "Ancestor-only condition is not automatically fetched."
+        ],
+        [
+          "docs/other.md",
+          "Navigation-only content is not automatically fetched."
+        ],
+        [
+          "docs/other.md",
+          "Second-hop condition is not automatically fetched."
+        ],
+        [
+          "docs/other.md",
+          "The double-decoded entity condition must not be substituted."
+        ],
+        [
+          "docs/modules/private.md",
+          "Restricted condition must remain outside project scope."
+        ]
+      ],
+      "literal_html_target": "other.md#condition&amp;amp;gate",
+      "pending": [
+        [
+          "ancestor",
+          "other.md#ancestor-only"
+        ],
+        [
+          "selected_body",
+          "other.md#absent"
+        ],
+        [
+          "selected_body",
+          "other.md"
+        ],
+        [
+          "selected_body",
+          "modules/private.md#hidden"
+        ],
+        [
+          "selected_body",
+          "other.md#navigation-only"
+        ],
+        [
+          "linked_body",
+          "#second-hop"
+        ]
+      ]
+    }
+  ],
+  "coverage": {
+    "Meridian": {
+      "direct_anchored_link": "V-M1 Transfer to Suspension",
+      "ancestor_only_link": "NOT COVERED: the parent itself is a Qwen seed",
+      "navigation_only_block": "NOT COVERED: overview Navigation is not selected",
+      "linked_body_second_hop": "NOT COVERED",
+      "missing_anchor": "NOT COVERED",
+      "document_only_target": "NOT COVERED",
+      "excluded_module": "V-M4 project scope; no cross-scope link in this corpus"
+    },
+    "guard": "Direct/ancestor/navigation/linked-body origins, missing anchor, document-only target, excluded module, exact single-decode HTML target; no scorer or model-selection claim"
+  },
+  "limitations": [
+    "Seen development material; no fresh validation gate or model inference.",
+    "Closure packets are reconstructed inside a passive same-call observer, not returned by the public Qwen route.",
+    "Ordinary public packets are saved separately and never replaced by closure output.",
+    "No issued source capabilities for reconstructed packets; no installed/stdio/client/answer-model acceptance.",
+    "Token counts describe reconstructed document packets, not provider instructions/history/billing."
+  ]
+}

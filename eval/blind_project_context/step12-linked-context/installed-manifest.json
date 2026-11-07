@@ -1,0 +1,14 @@
+{
+  "boundary": "installed default/off stdio regression, not Qwen or one-hop acceptance",
+  "config": {"runtime_authorized": true, "packing_tokens": 12000},
+  "authorization": "v2plan/STEP12_LINKED_CONTEXT_CHECKPOINT_RU.md; current user request",
+  "planned_counts": {"prepare": 1, "context": 2, "resource": 1, "model": 0},
+  "inputs_sha256": {
+    "eval/heuristic_removal/installed_stdio.py": "9aa79c3dbdaac979cce79dde13fc16655ff66449b4f5e5512249a556a59b4bf8",
+    "eval/heuristic_removal/receipts.py": "75b75968e32b991f3d12f23c02c27627b78171c51b68fccec62e98e4a481d1a6",
+    "uv.lock": "dc0556cb2b3fddd1633a9d8526c72bb3a3afe27373816b45847749e6a1c7463a",
+    "docmancer/docs/application/bounded_context_links.py": "ad20572b6d1e98a9f4798ef1113839bb272bf61125ca03009f37b095cd11f8f4",
+    "docmancer/docs/application/minimal_context_selection.py": "739da743c4640e0fb5593c57c2f6ae3082e3af3764e1e299f18848df0481eab1",
+    "docmancer/docs/domain/context_links.py": "d3db32e1c10beef67865bcbd740e2d2046be529eb22dea5fcf5d7d3c55c339eb"
+  }
+}

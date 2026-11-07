@@ -1,0 +1,171 @@
+{
+  "seconds": 0.08160837399918819,
+  "expected_paths": [
+    "docs/guide.md",
+    "docs/modules/private.md",
+    "docs/other.md"
+  ],
+  "indexed_paths": [
+    "docs/guide.md",
+    "docs/modules/private.md",
+    "docs/other.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-15b9dab4428361fb81bbe04e540230a28bd059b1",
+      "source_path": "docs/guide.md",
+      "display_text": "# Guide\n\nScope introduction. The scope refers to the [ancestor condition](other.md#ancestor-only).\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-21c6ae19c009521d52c27565d33e3219b9e42282",
+      "source_path": "docs/guide.md",
+      "display_text": "## Empty\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-9eaa2bc59831abb5f89326bc463c5cf0a81c81e2",
+      "source_path": "docs/guide.md",
+      "display_text": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\nConsult the [absent condition](other.md#absent), [whole document](other.md), and [restricted condition](modules/private.md#hidden).\n\nThe rule also refers to its [scope introduction](#guide).\n\nAlso retain the <a href=\"other.md#condition&amp;amp;gate\">required condition</a>.\n\nInspect the <a href=\"other.md#raw`target`\">raw syntax reference</a>.\n\n- [Index entry](other.md#navigation-only)\n\n",
+      "line_start": 7,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-d7e4cdf1e5e808112e391c44e764461102fda040",
+      "source_path": "docs/guide.md",
+      "display_text": "| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-579671f7b4d776c2e68f76b4a72f97e26c2d7762",
+      "source_path": "docs/guide.md",
+      "display_text": "#### Tail\n\nTail condition stays.\n\n",
+      "line_start": 25,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-df69a05500ac0d8472d2a35551bc2286507bcf14",
+      "source_path": "docs/guide.md",
+      "display_text": "## Noise\n\nUnselected noise.\n\n",
+      "line_start": 29,
+      "line_end": 32
+    },
+    {
+      "stable_chunk_id": "child-fb92427ca425e2a91cd584dab16f91b1f27e3813",
+      "source_path": "docs/guide.md",
+      "display_text": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+      "line_start": 33,
+      "line_end": 36
+    },
+    {
+      "stable_chunk_id": "child-6161beb923897d71b1f546ea8427aa2138327580",
+      "source_path": "docs/guide.md",
+      "display_text": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+      "line_start": 37,
+      "line_end": 43
+    },
+    {
+      "stable_chunk_id": "child-617662e4dbe9d1530ef3f8717689d641a2c6a747",
+      "source_path": "docs/other.md",
+      "display_text": "# Other\n\nOther introduction.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-8e0c59af298e025dc0119852c904084d9da14767",
+      "source_path": "docs/other.md",
+      "display_text": "## Remote\n\nRemote condition [missing](private.md#hidden). The remote condition also depends on [second step](#second-hop).\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-c82dc895b9ca15bddb1169e80d88a24b6a70e665",
+      "source_path": "docs/other.md",
+      "display_text": "## Ancestor only\n\nAncestor-only condition is not automatically fetched.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-b5dc1f9adcd5c0388df05c909cfb9e03320cdb90",
+      "source_path": "docs/other.md",
+      "display_text": "## Navigation only\n\nNavigation-only content is not automatically fetched.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-4a54e980d72ddb22b948dde046cc25a40a5c43b4",
+      "source_path": "docs/other.md",
+      "display_text": "## Second hop\n\nSecond-hop condition is not automatically fetched.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-dd6254fdf42831f00161ab2e62d33cf9fa814d75",
+      "source_path": "docs/other.md",
+      "display_text": "## Correct entity condition\n\n<a id=\"condition&amp;amp;gate\"></a>\n\nThe single-decoded entity condition must be retained.\n\n",
+      "line_start": 21,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-52c36f9ea50b0dc604ba7b55cf74c6b0e8635e55",
+      "source_path": "docs/other.md",
+      "display_text": "## Wrong entity condition\n\n<a id=\"condition&amp;gate\"></a>\n\nThe double-decoded entity condition must not be substituted.\n\n",
+      "line_start": 27,
+      "line_end": 32
+    },
+    {
+      "stable_chunk_id": "child-14940d32d88dc18f5a227be536e6748887bd87e6",
+      "source_path": "docs/other.md",
+      "display_text": "## Raw syntax target\n\n<a id=\"raw`target`\"></a>\n\nRaw HTML attribute content must not be fabricated.\n",
+      "line_start": 33,
+      "line_end": 37
+    },
+    {
+      "stable_chunk_id": "child-2888541b0f1a5dc348fb8de11a71d42f89fe1a40",
+      "source_path": "docs/modules/private.md",
+      "display_text": "# Hidden\n\nRestricted condition must remain outside project scope.\n",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.53.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "1a67b32a6d3688a8e4b2aa99fe5de0e5fd1125325fca5f9ec381a898b4f91021",
+  "storage_path": "/workspace/scratch/66f7674793b8/DocAtlas/docatlas-evidence-o4twk_zc/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-cd53a5d9b6df40eea501cbb74b1107f0",
+  "catalog_sha256": "335991a594a09bf2fcb5d3db27009e202eb57cb1f83b56eec412f695a15fbe80",
+  "documents": [
+    {
+      "path": "docs/guide.md",
+      "content_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+      "catalog_entry_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f"
+    },
+    {
+      "path": "docs/modules/private.md",
+      "content_sha256": "761f6f47c3c4969b84dedba6a8ebc8c8ca61f24615c0ffa0d4f84af4d30e06c5",
+      "catalog_entry_hash": "sha256:cc91a00795b8a23e850a6d0aab1b599eea82ff72ce805602938ee207690f7207"
+    },
+    {
+      "path": "docs/other.md",
+      "content_sha256": "a58ab962b0220cb115acefaa997503ae56c2b98c036687b04a8d8f9f39bec5d7",
+      "catalog_entry_hash": "sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-cd53a5d9b6df40eea501cbb74b1107f0",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 16,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 16
+  }
+}

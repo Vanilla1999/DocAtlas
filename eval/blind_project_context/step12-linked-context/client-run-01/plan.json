@@ -1,0 +1,31 @@
+{
+  "cases": [
+    "mcp",
+    "files"
+  ],
+  "opencode": "opencode v2.2.5",
+  "question": "Who signs the hand-off record, and may a courier sign it?",
+  "model_calls": 0,
+  "launch": "opencode run --standalone; no API prewarm or fixed sleeps",
+  "maximum_provider_requests": {
+    "mcp": 4,
+    "files": 2,
+    "baseline": 1
+  },
+  "public_preparations": 1,
+  "canonical_packet_queries": 1,
+  "planned_client_calls": {
+    "mcp": [
+      "project status",
+      "rejected jobs bypass",
+      "context",
+      "issued source read"
+    ],
+    "files": [
+      "in-scope read",
+      "rejected out-of-scope read"
+    ],
+    "baseline": []
+  },
+  "boundary": "Real installed public operations and client; scripted provider controls calls, no model-quality or billing claim."
+}

@@ -1,0 +1,479 @@
+"""Post-selection, source-exact one-hop links; never an answer-completeness gate.
+
+The historical scoring parser is untouched. This parser inspects the already
+checked same-call documents only after scoring. It neither fetches a target nor
+widens authorization, treats links as mandatory facts, or follows added bodies.
+"""
+from __future__ import annotations
+
+from collections import Counter, defaultdict
+from dataclasses import dataclass
+import hashlib
+from html import unescape
+from html.parser import HTMLParser
+import json
+import posixpath
+import re
+from urllib.parse import unquote, urlsplit
+
+from docmancer.core.structured_chunking import _atom_spans
+from .minimal_context_structure import (
+    EVIDENCE_STRUCTURAL_RECIPE, StructuralContextError, _closing,
+    _hydrate, _label,
+)
+
+
+RECIPE = "one-hop-v1"
+PARSER_REVISION = "masked-source-origin-links-v1"
+CONTRACT = {
+    "recipe": RECIPE, "parser_revision": PARSER_REVISION,
+    "scoring": "unchanged evidence v1 own-body scoring and frozen policy",
+    "frontier": "selected own bodies only; not ancestor or linked bodies",
+    "target": "unique checked Markdown anchor own section plus ancestors",
+    "navigation": "explicit HTML nav or parser atom containing only links and list/punctuation syntax",
+    "definitions": "source-defined Markdown reference owners and direct destination; no recursive frontier",
+    "document_link": "no full-document expansion; explicit unresolved section requirement",
+    "subtree": "not expanded; undelivered descendants are explicit gaps",
+    "scope": "same native scope/version/snapshot; no fetch or authorization expansion",
+    "pending": "delivered-body links only; origins retained; already included targets are not gaps",
+    "coverage": "always unverified; observed links do not enumerate all answer conditions",
+}
+CONTRACT_SHA256 = hashlib.sha256(json.dumps(
+    CONTRACT, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+).encode()).hexdigest()
+
+
+@dataclass
+class _Link:
+    start: int
+    end: int
+    kind: str
+    target: str
+    navigation: bool = False
+    reason: str | None = None
+    syntax: str = "markdown"
+
+
+def _literal_attributes(tag):
+    """Keep source spelling; HTMLParser separately checks parsed attribute values."""
+    attributes, index = [], 1
+    while index < len(tag) and not tag[index].isspace() and tag[index] not in "/>":
+        index += 1
+    while index < len(tag):
+        while index < len(tag) and (tag[index].isspace() or tag[index] == "/"):
+            index += 1
+        start = index
+        while index < len(tag) and not tag[index].isspace() and tag[index] not in "=/>":
+            index += 1
+        if start == index:
+            break
+        name, value = tag[start:index].lower(), None
+        while index < len(tag) and tag[index].isspace():
+            index += 1
+        if index < len(tag) and tag[index] == "=":
+            index += 1
+            while index < len(tag) and tag[index].isspace():
+                index += 1
+            quote = tag[index] if index < len(tag) and tag[index] in "\"'" else None
+            index += bool(quote)
+            start = index
+            while index < len(tag) and (tag[index] != quote if quote else
+                                       not tag[index].isspace() and tag[index] != ">"):
+                index += 1
+            value = tag[start:index]
+            if quote and index < len(tag):
+                index += 1
+        attributes.append((name, value))
+    return attributes
+
+
+class _HTMLLinks(HTMLParser):
+    """HTML names are case-insensitive; source target values retain their case."""
+
+    def __init__(self, text):
+        super().__init__(convert_charrefs=True)
+        self.text = text
+        self.starts = [0, *(m.end() for m in re.finditer("\n", text))]
+        self.links, self.anchors, self.tags, self.nav = [], [], [], []
+        self._nav_stack, self._links, self._raw = [], [], []
+        self.feed(text)
+        self.close()
+        self.nav.extend((start, len(text)) for start in self._nav_stack)
+        self.tags.extend((start, len(text)) for _, start in self._raw)
+
+    def _position(self):
+        line, column = self.getpos()
+        return self.starts[line - 1] + column
+
+    def handle_starttag(self, tag, attrs):
+        start = self._position()
+        literal = self.get_starttag_text()
+        end = start + len(literal)
+        if self._raw:
+            return
+        # HTMLParser also treats angle-bracket Markdown URIs as start tags.
+        # Leave them for the Markdown parser, retaining their original spans.
+        if re.fullmatch(r"<[^<>\s]+>", literal) and (
+                "#" in literal or re.match(r"<[A-Za-z][A-Za-z0-9+.-]*:", literal)):
+            return
+        self.tags.append((start, end))
+        if tag == "nav":
+            self._nav_stack.append(start)
+        if tag in {"script", "style", "textarea", "title"}:
+            self._raw.append((tag, start))
+        for name, value in attrs:
+            if name in {"id", "name"} and value:
+                self.anchors.append((value, start))
+        destinations = [value for name, value in attrs if name == "href"]
+        if destinations:
+            reason = "duplicate_href_attribute" if len(destinations) != 1 else None
+            literal_attrs = _literal_attributes(literal)
+            raw_destinations = [value for name, value in literal_attrs if name == "href"]
+            if [(name, unescape(value) if value is not None else None) for name, value in literal_attrs] != attrs:
+                reason = "unsupported_html_attribute_syntax"
+            target = raw_destinations[0] if raw_destinations else literal
+            if target is None:
+                reason, target = "missing_href_value", ""
+            link = _Link(start, end, "url", target, reason=reason, syntax="html")
+            self.links.append(link)
+            if tag == "a":
+                self._links.append(link)
+        if tag in {"img", "video", "audio", "source"}:
+            target = next((value for name, value in attrs if name == "src" and value),
+                          self.get_starttag_text())
+            self.links.append(_Link(start, end, "asset", target))
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        self.handle_endtag(tag)
+
+    def handle_endtag(self, tag):
+        start = self._position()
+        closing = self.text.find(">", start)
+        end = len(self.text) if closing < 0 else closing + 1
+        if self._raw:
+            if self._raw[-1][0] == tag:
+                _, opening = self._raw.pop()
+                self.tags.append((opening, end))
+            return
+        self.tags.append((start, end))
+        if tag == "a" and self._links:
+            self._links.pop().end = end
+        if tag == "nav" and self._nav_stack:
+            self.nav.append((self._nav_stack.pop(), end))
+
+
+def _body_start(doc, index):
+    parent = doc.parents[index]
+    start = parent.char_start
+    if parent.level:
+        start += len(doc.raw[start:parent.char_end].splitlines(keepends=True)[0])
+    return start
+
+
+def _mask(text, intervals):
+    value = list(text)
+    for start, end in intervals:
+        for index in range(start, end):
+            if value[index] not in "\r\n":
+                value[index] = " "
+    return "".join(value)
+
+
+def _source_syntax(doc):
+    """Mask literals after scoring without destroying escaped URI punctuation."""
+    code = [atom for parent in doc.parents
+            for atom in _atom_spans(doc.raw, parent.char_start, parent.char_end)
+            if atom.atom_type == "code"]
+    syntax = _mask(doc.raw, [(atom.start, atom.end) for atom in code])
+    syntax = _mask(syntax, [match.span() for match in re.finditer(
+        r"(`+)(?!`)(.*?)(?<!`)\1(?!`)", syntax, flags=re.S)])
+    return _mask(syntax, [match.span() for match in re.finditer(r"<!--.*?-->", syntax, flags=re.S)])
+
+
+def _literal_destination(value):
+    value = value.lstrip()
+    if value.startswith("<") and ">" in value:
+        return value[1:value.index(">")]
+    return value.split()[0] if value else ""
+
+
+def _markdown_links(text, definitions, source_syntax):
+    # A definition declaration is data used by an occurrence, not an outgoing
+    # shortcut link to itself. Keep its character coordinates for source spans.
+    declarations = []
+    for match in re.finditer(r"(?m)^ {0,3}\[([^\]\n]+)\]:([^\n]*)", text):
+        # A footnote's body can itself contain references. Mask its declaration
+        # label, not that body: any outgoing edge is accounted at its true hop.
+        declarations.append((match.start(), match.start(2)) if match[1].startswith("^") else match.span())
+    syntax = _mask(text, declarations)
+    index, consumed = 0, []
+    while index < len(syntax):
+        if syntax[index] == "\\":
+            index += 2
+            continue
+        if syntax[index] != "[":
+            index += 1
+            continue
+        end = _closing(syntax, index, "[", "]")
+        if end is None:
+            index += 1
+            continue
+        label, after = syntax[index + 1:end], end + 1
+        image = index > 0 and syntax[index - 1] == "!"
+        kind, target, stop = None, None, after
+        if syntax[after:after + 1] == "(":
+            closing = _closing(syntax, after, "(", ")")
+            if closing is not None:
+                kind, target, stop = "url", _literal_destination(source_syntax[after + 1:closing]), closing + 1
+        elif syntax[after:after + 1] == "[":
+            closing = _closing(syntax, after, "[", "]")
+            if closing is not None:
+                kind, target, stop = "definition", syntax[after + 1:closing] or label, closing + 1
+        elif label.startswith("^") or _label(label) in definitions:
+            kind, target = "definition", label
+        if kind:
+            yield _Link(index - int(image), stop, "asset" if image else kind, target)
+            consumed.append((index - int(image), stop))
+        index = stop
+    for match in re.finditer(r"<([^<>\s]+)>", syntax):
+        target = match[1]
+        if not any(a <= match.start() < b for a, b in consumed) and (
+                "#" in target or re.match(r"[A-Za-z][A-Za-z0-9+.-]*:", target)):
+            yield _Link(match.start(), match.end(), "url", target)
+
+
+class _SourceLinks:
+    def __init__(self, doc):
+        self.doc = doc
+        self.syntax = _source_syntax(doc)
+        if len(self.syntax) != len(doc.raw):
+            raise StructuralContextError("Link parser source coordinates changed", path=doc.path)
+        html = _HTMLLinks(self.syntax)
+        self.anchors, self.definitions = {}, defaultdict(list)
+        counts = Counter()
+        for index, parent in enumerate(doc.parents):
+            if parent.level:
+                slug = re.sub(r"[^\w\- ]", "", parent.title.casefold()).replace(" ", "-")
+                label = slug + (f"-{counts[slug]}" if counts[slug] else "")
+                counts[slug] += 1
+                self.anchors.setdefault(label, set()).add(index)
+        for label, position in html.anchors:
+            for index, parent in enumerate(doc.parents):
+                if parent.char_start <= position < parent.char_end:
+                    self.anchors.setdefault(label, set()).add(index)
+                    break
+        markdown = _mask(self.syntax, html.tags)
+        for index, parent in enumerate(doc.parents):
+            syntax = markdown[parent.char_start:parent.char_end]
+            for match in re.finditer(r"(?m)^ {0,3}\[([^\]\n]+)\]:(.*)$", syntax):
+                destination = self.syntax[parent.char_start + match.start(2):parent.char_start + match.end(2)].strip()
+                if not destination and not match[1].startswith("^"):
+                    following = re.match(r"\r?\n[ \t]*([^\s].*)", self.syntax[parent.char_start + match.end():parent.char_end])
+                    if following is not None:
+                        destination = following[1].strip()
+                self.definitions[_label(match[1])].append((index, destination))
+        links = sorted([*html.links, *_markdown_links(markdown, self.definitions, self.syntax)],
+                       key=lambda link: (link.start, link.end, link.kind, link.target))
+        navigation_text = _mask(self.syntax, [(link.start, link.end) for link in links] + html.tags)
+        self.by_section = defaultdict(list)
+        for index, parent in enumerate(doc.parents):
+            start = _body_start(doc, index)
+            local = [link for link in links if start <= link.start < parent.char_end]
+            atoms = _atom_spans(doc.raw, start, parent.char_end)
+            atom_index, navigation_atoms = 0, {}
+            for link in local:
+                if link.end > parent.char_end:
+                    link.reason = "unsupported_cross_section_reference"
+                link.navigation = any(a <= link.start < b for a, b in html.nav)
+                while atom_index < len(atoms) and atoms[atom_index].end <= link.start:
+                    atom_index += 1
+                atom = atoms[atom_index] if atom_index < len(atoms) else None
+                if atom is not None and not link.target.startswith("^"):
+                    # The parser owns the whole prose/list atom. An introduction
+                    # such as a requirement before a list prevents link-only
+                    # classification; no heading/topic vocabulary is consulted.
+                    if atom_index not in navigation_atoms:
+                        remaining = re.sub(r"(?m)^\s*(?:[-+*]|\d+[.)])\s*", "",
+                                           navigation_text[atom.start:atom.end])
+                        navigation_atoms[atom_index] = not re.search(r"\w", remaining)
+                    if navigation_atoms[atom_index]:
+                        link.navigation = True
+                self.by_section[index].append(link)
+            self.by_section[index].sort(key=lambda link: (link.start, link.end, link.kind, link.target))
+
+
+def close_one_hop(structure, selected_ids, payload, snapshot, retrieval):
+    """Expand one checked hop and account for the remaining delivered-body links.
+
+    Classification is not a relevance verdict. Suppressed navigation/ancestor
+    references remain visible as pending unless their targets are already in the
+    final union. The normal caller still applies terminal live validation and the
+    existing whole-response emergency guard; this function never trims bodies.
+    """
+    if structure.recipe != EVIDENCE_STRUCTURAL_RECIPE:
+        raise StructuralContextError("One-hop expansion requires evidence structural v2")
+    plan = retrieval.get("documentation_query_plan") or {}
+    if (str(plan.get("original_question") or retrieval.get("question") or "") != structure.question
+            or retrieval.get("project_identity") != structure.expected_project_identity):
+        raise StructuralContextError("Structural request binding changed")
+    selected = set(selected_ids)
+    seeds, wanted, linked = set(), set(), set()
+    paths = defaultdict(list)
+    for identity, doc in structure.documents.items():
+        paths[doc.path].append(identity)
+    parsed = {}
+
+    def source_links(identity):
+        if identity not in parsed:
+            parsed[identity] = _SourceLinks(structure.documents[identity])
+        return parsed[identity]
+
+    def add(identity, index):
+        doc = structure.documents[identity]
+        wanted.update((identity, item) for item in (*doc.ancestors[index], index))
+        if index and doc.parents[0].level == 0:
+            wanted.add((identity, 0))
+
+    for unit_id in selected:
+        if unit_id not in structure.metadata:
+            raise StructuralContextError("Unknown structural unit identity")
+        meta = structure.metadata[unit_id]
+        key = meta["source_identity"], meta["section_index"]
+        seeds.add(key)
+        add(*key)
+    original = set(wanted)
+
+    def resolve(identity, link):
+        doc = structure.documents[identity]
+        target, owners = link.target, []
+        if link.reason:
+            return None, owners, target, link.reason, False
+        if link.kind == "asset":
+            return None, owners, target, "unsupported_asset_dependency", False
+        if link.kind == "definition":
+            matches = source_links(identity).definitions.get(_label(target), ())
+            if len(matches) != 1:
+                return None, owners, target, "missing_or_ambiguous_definition", False
+            owner, destination = matches[0]
+            owners.append((identity, owner))
+            if target.startswith("^"):
+                return (identity, owner), owners, target, None, False
+            target = _literal_destination(destination)
+        try:
+            # Decode syntax, not aliases. Keep the literal destination in the
+            # receipt and use only its URI spelling for checked-path lookup.
+            uri = unescape(target)
+            if link.syntax == "markdown":
+                uri = re.sub(r"\\([^\w\s])", r"\1", uri)
+            url = urlsplit(uri)
+        except ValueError:
+            return None, owners, target, "invalid_link_target", False
+        if url.scheme or url.netloc or url.query:
+            return None, owners, target, "target_not_in_checked_scope", False
+        path = (posixpath.normpath(posixpath.join(posixpath.dirname(doc.path), unquote(url.path)))
+                if url.path else doc.path)
+        if (not target or "\\" in unquote(url.path) or (url.path and
+                not path.lower().endswith((".md", ".markdown")))):
+            return None, owners, target, "unsupported_local_document_target", False
+        candidates = paths.get(path, ())
+        if len(candidates) != 1:
+            return None, owners, target, "target_not_in_checked_scope", False
+        other_id = candidates[0]
+        other = structure.documents[other_id]
+        if (other.seeds[0]["_reference_evidence"]["source"]["scope"] !=
+                doc.seeds[0]["_reference_evidence"]["source"]["scope"]):
+            return None, owners, target, "target_scope_mismatch", False
+        if not url.fragment:
+            return (other_id, None), owners, target, "document_target_requires_section", False
+        matches = source_links(other_id).anchors.get(unquote(url.fragment), ())
+        if len(matches) != 1:
+            return None, owners, target, "missing_or_ambiguous_anchor", False
+        return (other_id, next(iter(matches))), owners, target, None, True
+
+    # Only selected bodies are an expansion frontier. Resolving reference syntax
+    # through its source-owned definition does not recursively expand that owner.
+    followed = set()
+    for identity, index in sorted(seeds):
+        for link in source_links(identity).by_section[index]:
+            target, owners, _, reason, _ = resolve(identity, link)
+            if not link.navigation:
+                for owner in owners:
+                    add(*owner)
+                    linked.add(owner)
+            if reason or link.navigation:
+                continue
+            add(*target)
+            linked.add(target)
+            followed.add((identity, index, link.start, link.end, link.kind, link.target))
+
+    records, incomplete = [], []
+    order = lambda key: (structure.documents[key[0]].path,
+                         structure.documents[key[0]].parents[key[1]].char_start, key[0])
+    for identity, index in sorted(wanted, key=order):
+        doc, parent = structure.documents[identity], structure.documents[identity].parents[index]
+        origin = "selected_body" if (identity, index) in seeds else (
+            "linked_body" if (identity, index) in linked else "ancestor")
+        for link in source_links(identity).by_section[index]:
+            target, owners, destination, reason, addressed = resolve(identity, link)
+            record = {
+                "source_path": doc.path, "source_char_start": link.start, "source_char_end": link.end,
+                "source_section_start": parent.char_start, "source_section_end": parent.char_end,
+                "origin": origin, "kind": link.kind, "target": destination,
+                "navigation": link.navigation,
+            }
+            if link.kind == "definition":
+                record["reference_label"] = link.target
+            if target is not None:
+                target_doc = structure.documents[target[0]]
+                indices = range(len(target_doc.parents)) if target[1] is None else (target[1],)
+                required = {(target[0], item) for item in indices}
+                target_parent = None if target[1] is None else target_doc.parents[target[1]]
+                record.update(target_path=target_doc.path,
+                              target_char_start=target_parent.char_start if target_parent else 0,
+                              target_char_end=target_parent.char_end if target_parent else len(target_doc.raw))
+                if required <= wanted and all(owner in wanted for owner in owners):
+                    absent = [child for child in range(target[1] + 1, target_doc.subtrees[target[1]])
+                              if (target[0], child) not in wanted] if addressed else []
+                    if absent:
+                        reason = "target_descendants_not_included"
+                        record["missing_descendants"] = len(absent)
+                    else:
+                        reason = None
+                        record["status"] = "already_included" if required <= original else "included"
+                elif reason is None:
+                    reason = ("navigation_reference" if link.navigation else
+                              "ancestor_reference" if origin == "ancestor" else "depth_limit")
+            if reason:
+                record.update(status="pending", reason=reason)
+                incomplete.append({"reason_code": "incomplete_dependency", "path": doc.path,
+                                   "char_start": link.start, "char_end": link.end,
+                                   "target": destination, "reason": reason, "origin": origin,
+                                   **{key: record[key] for key in (
+                                       "navigation", "target_path", "target_char_start", "target_char_end",
+                                       "missing_descendants", "reference_label") if key in record}})
+            records.append(record)
+
+    rows, bound = [], {}
+    for identity, index in sorted(wanted, key=order):
+        row, entry = _hydrate(structure.documents[identity], index, structure)
+        rows.append(row)
+        bound[row["evidence_id"]] = entry
+    statuses = Counter(record["status"] for record in records)
+    expansion = {
+        "recipe": RECIPE, "parser_revision": PARSER_REVISION, "contract_sha256": CONTRACT_SHA256,
+        "max_hops": 1, "coverage": "unverified", "selected_sections": len(seeds),
+        "linked_sections": len(linked - seeds), "ancestor_sections": len(wanted - seeds - linked),
+        "added_spans": len(wanted - original), "examined_references": len(records),
+        "followed_references": len(followed),
+        "satisfied_references": statuses["included"] + statuses["already_included"],
+        "pending_references": statuses["pending"], "references": records,
+    }
+    receipt = {
+        **structure.receipt, "selected_units": len(selected), "delivered_spans": len(rows),
+        "incoming_context_unresolved_count": len(structure.receipt.get("incomplete_dependencies", ())),
+        "incomplete_dependencies": incomplete,
+        "status": "incomplete_dependency" if incomplete else "complete",
+        "coverage": "unverified", "reference_expansion": expansion,
+    }
+    return rows, bound, receipt
