@@ -1,0 +1,300 @@
+{
+  "passed": true,
+  "client_cases": 8,
+  "model_inference": 0,
+  "scripted_provider_requests": 14,
+  "provider_requests_by_case": {
+    "mcp-concise": 4,
+    "mcp-host": 3,
+    "files": 2,
+    "mcp-failure": 2,
+    "language-unknown": 1,
+    "language-mixed": 1,
+    "language-stale-config": 1,
+    "language-binding-mismatch": 0
+  },
+  "measurements": {
+    "mcp-concise": {
+      "provider_requests": 4,
+      "first_system_tokens": 774,
+      "first_tools_tokens": 658,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {
+        "status": 322,
+        "blocked_status": 46,
+        "context": 441,
+        "source": 76
+      },
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 774,
+          "messages_json_tokens": 829,
+          "tools_json_tokens": 658
+        },
+        {
+          "request": 2,
+          "system_text_tokens": 774,
+          "messages_json_tokens": 1315,
+          "tools_json_tokens": 658
+        },
+        {
+          "request": 3,
+          "system_text_tokens": 774,
+          "messages_json_tokens": 1844,
+          "tools_json_tokens": 658
+        },
+        {
+          "request": 4,
+          "system_text_tokens": 774,
+          "messages_json_tokens": 2011,
+          "tools_json_tokens": 658
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 3096,
+        "messages_json_tokens": 5999,
+        "tools_json_tokens": 2632
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 8631
+    },
+    "mcp-host": {
+      "provider_requests": 3,
+      "first_system_tokens": 877,
+      "first_tools_tokens": 658,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {
+        "context": 441,
+        "blocked_status": 46,
+        "source": 76
+      },
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 877,
+          "messages_json_tokens": 938,
+          "tools_json_tokens": 658
+        },
+        {
+          "request": 2,
+          "system_text_tokens": 877,
+          "messages_json_tokens": 1563,
+          "tools_json_tokens": 658
+        },
+        {
+          "request": 3,
+          "system_text_tokens": 877,
+          "messages_json_tokens": 1730,
+          "tools_json_tokens": 658
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 2631,
+        "messages_json_tokens": 4231,
+        "tools_json_tokens": 1974
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 6205
+    },
+    "files": {
+      "provider_requests": 2,
+      "first_system_tokens": 710,
+      "first_tools_tokens": 597,
+      "tool_names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "visible_result_tokens": {
+        "read": 77,
+        "blocked_read": 46
+      },
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 710,
+          "messages_json_tokens": 761,
+          "tools_json_tokens": 597
+        },
+        {
+          "request": 2,
+          "system_text_tokens": 710,
+          "messages_json_tokens": 1031,
+          "tools_json_tokens": 597
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 1420,
+        "messages_json_tokens": 1792,
+        "tools_json_tokens": 1194
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 2986
+    },
+    "mcp-failure": {
+      "provider_requests": 2,
+      "first_system_tokens": 879,
+      "first_tools_tokens": 746,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "docatlas_read_docs_source",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {
+        "context": 40
+      },
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 879,
+          "messages_json_tokens": 940,
+          "tools_json_tokens": 746
+        },
+        {
+          "request": 2,
+          "system_text_tokens": 879,
+          "messages_json_tokens": 1048,
+          "tools_json_tokens": 746
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 1758,
+        "messages_json_tokens": 1988,
+        "tools_json_tokens": 1492
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 3480
+    },
+    "language-unknown": {
+      "provider_requests": 1,
+      "first_system_tokens": 874,
+      "first_tools_tokens": 658,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {},
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 874,
+          "messages_json_tokens": 933,
+          "tools_json_tokens": 658
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 874,
+        "messages_json_tokens": 933,
+        "tools_json_tokens": 658
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 1591
+    },
+    "language-mixed": {
+      "provider_requests": 1,
+      "first_system_tokens": 880,
+      "first_tools_tokens": 658,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {},
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 880,
+          "messages_json_tokens": 941,
+          "tools_json_tokens": 658
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 880,
+        "messages_json_tokens": 941,
+        "tools_json_tokens": 658
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 1599
+    },
+    "language-stale-config": {
+      "provider_requests": 1,
+      "first_system_tokens": 880,
+      "first_tools_tokens": 658,
+      "tool_names": [
+        "docatlas_docs_status",
+        "docatlas_get_docs_context",
+        "opencode_read_mcp_resource"
+      ],
+      "visible_result_tokens": {},
+      "source_tokens": 50,
+      "local_request_projection": [
+        {
+          "request": 1,
+          "system_text_tokens": 880,
+          "messages_json_tokens": 941,
+          "tools_json_tokens": 658
+        }
+      ],
+      "local_projection_totals": {
+        "system_text_tokens": 880,
+        "messages_json_tokens": 941,
+        "tools_json_tokens": 658
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 1599
+    },
+    "language-binding-mismatch": {
+      "provider_requests": 0,
+      "first_system_tokens": 0,
+      "first_tools_tokens": 0,
+      "tool_names": [],
+      "visible_result_tokens": {},
+      "source_tokens": 50,
+      "local_request_projection": [],
+      "local_projection_totals": {
+        "system_text_tokens": 0,
+        "messages_json_tokens": 0,
+        "tools_json_tokens": 0
+      },
+      "count_boundary": "Local projection tokenizer on captured scripted request text/JSON; no provider usage, cache or billing measurement",
+      "total_messages_and_tools_json_tokens": 0
+    }
+  },
+  "boundary": "Local o200k projection of captured scripted HTTP messages and tool JSON; messages include system; not provider usage, cache, price or real-model quality.",
+  "comparison": {
+    "control": 8631,
+    "host": 6205,
+    "files": 2986,
+    "host_reduction_percent": 28.1079828525084,
+    "host_to_files": 2.078030810448761
+  },
+  "archives": [
+    {
+      "path": "evidence/client-attempt-01.tar.gz",
+      "bytes": 93037,
+      "sha256": "a9c8cff2ae1e6835d51a103767e56a3fbdae6c6094ef048f7e910f9e29626161"
+    },
+    {
+      "path": "evidence/client-attempt-02.tar.gz",
+      "bytes": 100012,
+      "sha256": "dc15f1448438bea0e828da1142d033c5cc30deeea77ac861f63540e8b461e748"
+    }
+  ]
+}

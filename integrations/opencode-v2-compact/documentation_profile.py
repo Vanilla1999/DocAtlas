@@ -17,6 +17,7 @@ import sys
 
 PROFILE = "documentation-light-v1"
 INSTRUCTION_VARIANTS = ("standard", "concise-v1")
+LANGUAGE_PREFLIGHTS = ("model", "host-v1")
 HERE = Path(__file__).resolve().parent
 
 
@@ -59,7 +60,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                   server_name: str = "docatlas", agent_name: str = "docs",
                   model: str | None = None, frozen: bool = False,
                   max_steps: int | None = None,
-                  instruction_variant: str = "standard") -> tuple[dict, dict]:
+                  instruction_variant: str = "standard",
+                  language_preflight: str = "model") -> tuple[dict, dict]:
     """Build a new configuration, without changing the selected retrieval policy.
 
     This first profile binds project scope. Module/library/all-scope workflows use
@@ -72,6 +74,10 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
         raise ValueError("backend must be mcp or files")
     if instruction_variant not in INSTRUCTION_VARIANTS:
         raise ValueError("instruction_variant must be standard or concise-v1")
+    if language_preflight not in LANGUAGE_PREFLIGHTS:
+        raise ValueError("language_preflight must be model or host-v1")
+    if backend != "mcp" and language_preflight != "model":
+        raise ValueError("host-v1 language preflight requires the MCP backend")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", server_name):
         raise ValueError("server_name must be an explicit stable MCP prefix")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", agent_name):
@@ -95,7 +101,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
         raise ValueError("server_environment must map strings to strings")
     if env.get("DOCATLAS_MCP_MODEL_VIEW") not in (None, "", "off"):
         raise ValueError("The text documentation profile cannot use a private-ledger model view")
-    env.update(DOCATLAS_PROJECT_BINDING=json.dumps(make_binding(root, location)),
+    project_binding = make_binding(root, location)
+    env.update(DOCATLAS_PROJECT_BINDING=json.dumps(project_binding),
                DOCATLAS_MCP_TEXT_FALLBACK="1", DOCATLAS_MCP_COMPACT_TEXT="1",
                DOCATLAS_CONTEXT_PRESENTATION="literal-v2",
                DOCATLAS_MCP_ADMIN_TOOLS="0", DOCATLAS_MCP_ADVANCED_TOOLS="0",
@@ -104,6 +111,18 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
     specific_path = HERE / "profile" / (
         "mcp-concise.txt" if backend == "mcp" and instruction_variant == "concise-v1" else f"{backend}.txt")
     specific = specific_path.read_text(encoding="utf-8").strip()
+    host_language_path = HERE / "profile/language-host.txt"
+    if language_preflight == "host-v1":
+        # Both existing instruction variants have one dedicated language
+        # paragraph. Replace that paragraph only; retain their other rules and
+        # leave the default model-preflight prompts byte-for-byte unchanged.
+        paragraphs = specific.split("\n\n")
+        language_sections = [index for index, paragraph in enumerate(paragraphs)
+                             if 'docs_status(action="project", include_language=true)' in paragraph]
+        if len(language_sections) != 1:
+            raise ValueError("MCP language instruction boundary changed; review the host preflight profile")
+        paragraphs[language_sections[0]] = host_language_path.read_text(encoding="utf-8").strip()
+        specific = "\n\n".join(paragraphs)
     binding = f"Bound documentation project: {json.dumps(str(root), ensure_ascii=False)}. Scope: project."
     if frozen:
         binding += " This comparison uses a designated frozen source corpus; do not read evaluation annotations."
@@ -130,6 +149,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
     profile_options = {"backend": backend, "projectRoot": str(root), "serverName": server_name}
     if instruction_variant != "standard":
         profile_options["instructionVariant"] = instruction_variant
+    if language_preflight == "host-v1":
+        profile_options.update(languagePreflight="host-v1", projectBinding=project_binding)
     if file_snapshot is not None:
         profile_options["fileSnapshot"] = file_snapshot
     config = {"$schema": "https://opencode.ai/config.json", "default_agent": agent_name,
@@ -156,7 +177,10 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                "model_step_limit": max_steps,
                "presentation": "literal-v2" if backend == "mcp" else "native-file-text",
                "common_prompt_sha256": _digest(common.encode()), "system_sha256": _digest(system.encode()),
-               "allowed_tools": names, "language_preflight": "unchanged; bound language unknown",
+               "allowed_tools": names,
+               "language_preflight": "fresh host metadata before each user prompt" if language_preflight == "host-v1"
+                   else "unchanged; bound language unknown",
+               "language_preflight_mode": language_preflight,
                "adapter_execute_tools": names[:-1] if backend == "mcp" else [],
                "adapter_guard_tools": ["opencode_read_mcp_resource"] if backend == "mcp" else names,
                "retrieval_policy_selected_by_profile": False,
@@ -167,7 +191,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                "inputs": {str(path.relative_to(HERE)): _digest(path.read_bytes()) for path in
                           [HERE / "documentation_profile.py", HERE / "profile/common.txt",
                            specific_path, HERE / "profile/index.js", HERE / "index.js",
-                           HERE / "count_tokens.py"]},
+                           HERE / "count_tokens.py", HERE / "profile/language-preflight.js"] +
+                          ([host_language_path] if language_preflight == "host-v1" else [])},
                "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."}
     return deepcopy(config), receipt
 
@@ -179,6 +204,8 @@ def main() -> None:
     parser.add_argument("--backend", choices=("mcp", "files"), default="mcp")
     parser.add_argument("--instruction-variant", choices=INSTRUCTION_VARIANTS, default="standard",
                         help="Opt-in concise-v1 MCP instructions/descriptions; files and runtime guards stay unchanged")
+    parser.add_argument("--language-preflight", choices=LANGUAGE_PREFLIGHTS, default="model",
+                        help="Opt-in host-v1: real bound MCP language metadata before the first model request of each user prompt")
     parser.add_argument("--executable", type=Path, required=True, help="Absolute installed doc-atlas executable")
     parser.add_argument("--python", type=Path, required=True, help="Absolute interpreter from the same installed environment")
     parser.add_argument("--server-env-json", type=Path, help="Explicit existing server environment map; no policy is selected automatically")
@@ -197,7 +224,8 @@ def main() -> None:
         config, receipt = build_profile(project_root=args.project, workspace=args.output,
             backend=args.backend, executable=args.executable, python=args.python,
             server_environment=environment, server_name=args.server_name, agent_name=args.agent_name, model=args.model,
-            max_steps=args.max_steps, instruction_variant=args.instruction_variant)
+            max_steps=args.max_steps, instruction_variant=args.instruction_variant,
+            language_preflight=args.language_preflight)
     except (ValueError, OSError, TypeError) as exc:
         parser.error(str(exc))
     for name, value in (("opencode.json", config), ("profile-receipt.json", receipt)):
@@ -206,6 +234,7 @@ def main() -> None:
             stream.write("\n")
     print(json.dumps({"profile": PROFILE, "location": str(args.output), "agent": args.agent_name,
                       "instruction_variant": args.instruction_variant,
+                      "language_preflight": args.language_preflight,
                       "next": "Run OpenCode here with this agent; pass the unchanged question through stdin."}))
 
 

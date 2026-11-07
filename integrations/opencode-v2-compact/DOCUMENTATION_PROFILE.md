@@ -83,10 +83,11 @@ continues to refuse overwrites, and the receipt records the actual prompt hashes
   included explicitly. The generator does not discard instructions to lower a
   token count; inherited and dynamically discovered instructions remain part of
   the actual client input.
-- The language preflight is conditional, as in the existing contract. There is
-  no arbitrary `--language en` switch or unverified language cache. Reuse requires
-  matching project/scope/version/snapshot metadata; otherwise project status is
-  still needed. Unknown or mixed language is not assumed to be English.
+- By default, the language preflight remains model-selected, as in the existing
+  contract. The explicit `--language-preflight host-v1` mode below moves this
+  same metadata read before the first model request. There is no arbitrary
+  `--language en` switch, language guess or unverified persistent language cache.
+  Unknown, mixed and partial language are never treated as English.
 - Titles are deterministic in both comparison backends. The profile neither
   summarizes nor removes previous tool results or conversation history.
 - The existing native adapter guards complete model-facing tool text with the
@@ -169,7 +170,71 @@ The bounded Step13 check and the distinction between archived provider usage,
 offline sizing and the real-client scripted-provider check are recorded in
 [Step13 results](../../eval/blind_project_context/step13-runtime-token-review/RESULTS_RU.md).
 
-For offline sizing of a preserved Responses request from the diagnostic observer:
+## Host language preflight
+
+For a **new MCP documentation location**, add:
+
+```text
+--language-preflight host-v1
+```
+
+It can be combined with `--instruction-variant concise-v1`. The default remains
+`model`: existing generated configurations do not change, and the files control
+does not support this MCP-only option. The builder still makes no MCP/model
+calls and does not store a language guess in the generated configuration.
+
+At each new user prompt, after actual tool readiness, the host invokes the
+connected native `docs_status` executor with the trusted project path,
+`action="project"` and `include_language=true`. It uses the same server, native
+permissions and source authorization. A wrong project is rejected by the
+server before inspection; the host also validates the returned project path,
+project ID, workspace path and project scope before accepting any hint.
+This does not add a second MCP process or a host-side file-reading shortcut.
+
+Only a bounded normalized language hint is included in the model's current
+system context. The full status response, source inventory, raw messages and
+warning text do not become model instructions. No synthetic assistant/tool
+history is inserted. The original user question, history and source-to-draft
+paragraph remain unchanged. The model can begin with retrieval instead of a
+separate round choosing the language-status tool; the metadata read itself
+still happens once.
+
+The language comes from the catalog's existing `documentation_languages`
+declarations, **not** from MiniLM, Qwen, an English default, source filenames or
+a new classifier. An unknown declaration stays `unknown`; multilingual and
+partially declared sets stay `mixed` and `partial`. A successful unknown
+preflight is not an instruction to repeat the same status call. Search the
+original question without assuming a source language when no useful hint is
+available. Any `search_question` remains a complete model-supplied translation
+with the original question preserved, not a synonym dictionary or query rewrite
+performed by this feature.
+
+The API's catalog/snapshot hashes describe current **inspected candidates and
+declarations**, not an active retrieval-index version or a proof that inspection
+was exhaustive. This routing hint never grants source, preparation or edit
+authority. Retrieval and issued source reads retain their independent
+scope/snapshot/version/expiry checks. Sources changing after preflight must
+still be revalidated through those ordinary mechanisms.
+
+Hints are bound in memory to the exact admitted session and user-message ID;
+there is no fallback to another message's hint or trust in imported metadata.
+When no matching current record exists, the model receives `unknown`. A new
+user prompt reads metadata again. The host rejects malformed/truncated results,
+binding mismatches and permission/transport errors before model admission; it
+does not retry, prepare sources or silently continue with a remembered language.
+The metadata read has a bounded timeout and is aborted on plugin disposal.
+
+This is verified against the installed **OpenCode 2.2.5** native tool executor
+and primary context hook. Transient generation, compaction and title hooks do
+not infer or refresh a language. Reverify after a client upgrade. The bounded
+acceptance plan and its limits are recorded in
+[Step14](../../eval/blind_project_context/step14-host-language/PLAN_RU.md), with
+[results and raw captures](../../eval/blind_project_context/step14-host-language/RESULTS_RU.md).
+
+### Offline instruction sizing
+
+The following command measures the instruction variant, not host-preflight
+session savings. For a preserved Responses request from the diagnostic observer:
 
 ```sh
 node /absolute/DocAtlas/integrations/opencode-v2-compact/measure_instruction_variant.mjs \
