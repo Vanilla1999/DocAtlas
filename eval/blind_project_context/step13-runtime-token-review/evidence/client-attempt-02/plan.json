@@ -1,0 +1,44 @@
+{
+  "cases": [
+    "mcp",
+    "mcp-concise",
+    "files",
+    "mcp-failure"
+  ],
+  "opencode": "opencode v2.2.5",
+  "question": "Who signs the hand-off record, and may a courier sign it?",
+  "model_calls": 0,
+  "launch": "opencode run --standalone; no API prewarm or fixed sleeps",
+  "maximum_provider_requests": {
+    "mcp": 4,
+    "mcp-concise": 4,
+    "files": 2,
+    "mcp-failure": 3
+  },
+  "public_preparations": 1,
+  "canonical_packet_queries": 1,
+  "planned_client_calls": {
+    "mcp": [
+      "project status",
+      "rejected jobs bypass",
+      "context",
+      "issued source read"
+    ],
+    "mcp-concise": [
+      "project status",
+      "rejected jobs bypass",
+      "context",
+      "issued source read"
+    ],
+    "files": [
+      "in-scope read",
+      "rejected out-of-scope read"
+    ],
+    "mcp-failure": [
+      "project status",
+      "expected missing-assets context failure"
+    ]
+  },
+  "session_runtime": "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step13-runtime-token-review/session_runtime.py",
+  "boundary": "Real installed public operations and client; scripted provider controls calls, no model-quality or billing claim."
+}

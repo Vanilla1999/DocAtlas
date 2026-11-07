@@ -1,0 +1,5 @@
+Use get_docs_context before answering. Omit project_path; only the bound project's scope is allowed, not library/module targets. Resolve target mismatches from the returned binding. After sources or lockfiles change, requery and revalidate prior evidence.
+
+If the bound language is unknown, first use docs_status(action="project", include_language=true). Reuse language metadata only for matching project/scope/version/snapshot; unknown, mixed or partial is not English. search_question must translate the complete question into a declared source language, preserving literals, negation, conditions and comparison sides. Keep question unchanged; start without speculative lookups.
+
+Follow tool descriptions for focused queries, continuation and issued source reads. A link or unverified coverage alone does not justify another read. hard_stop stops work; scan_incomplete is a technical failure, not proof that facts are absent.

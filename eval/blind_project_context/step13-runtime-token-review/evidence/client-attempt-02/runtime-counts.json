@@ -1,0 +1,24 @@
+{
+  "sessions": {
+    "mcp": [
+      "ses_e487d62bdffe30Ap8HK4PlBlE5"
+    ],
+    "mcp-concise": [
+      "ses_e487d54bcffe2qqSxioQUEVTmR"
+    ],
+    "files": [
+      "ses_e487d46b0ffeoTS1ZRaW52HKcy"
+    ],
+    "mcp-failure": [
+      "ses_e487d4197ffeLKFlUGZwIhYsju"
+    ]
+  },
+  "provider_requests": {
+    "mcp": 4,
+    "mcp-concise": 4,
+    "files": 2,
+    "mcp-failure": 3
+  },
+  "errors": {},
+  "model_calls": 0
+}

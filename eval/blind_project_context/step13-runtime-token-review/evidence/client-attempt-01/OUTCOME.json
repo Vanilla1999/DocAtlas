@@ -1,0 +1,15 @@
+{
+  "outcome": "FAIL",
+  "observation_source": "Parent-observed real check_profile_client.py exit and independent MCP child assertion; the raw helper receipt is retained unchanged.",
+  "exit_code": 1,
+  "assertion": "MCP child was not observed",
+  "scripted_provider_requests": 4,
+  "model_inference_calls": 0,
+  "completed_case_before_assertion": "mcp",
+  "cases_not_started": ["mcp-concise", "files", "mcp-failure"],
+  "cause": "The actual MCP child had a different process group/session from the OpenCode client. Group-only tracking could not verify its lifecycle.",
+  "raw_receipt_warning": "The old helper's transport_pass=true and no_live_owned_processes=true do not make this attempt a PASS: the independent child identity assertion rejected that incomplete proof.",
+  "corrective_change": "Explicit host-owned server/transport PID, start_ticks and PID namespace registration; held pidfds; verification of both exact identities and exit before the next session.",
+  "retry": "Exactly one new bounded acceptance run after this corrective change; preserved separately as client-attempt-02.",
+  "no_global_kill": true
+}

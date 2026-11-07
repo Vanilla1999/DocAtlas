@@ -16,6 +16,7 @@ import re
 import sys
 
 PROFILE = "documentation-light-v1"
+INSTRUCTION_VARIANTS = ("standard", "concise-v1")
 HERE = Path(__file__).resolve().parent
 
 
@@ -57,7 +58,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                   executable: Path, python: Path, server_environment: dict[str, str] | None = None,
                   server_name: str = "docatlas", agent_name: str = "docs",
                   model: str | None = None, frozen: bool = False,
-                  max_steps: int | None = None) -> tuple[dict, dict]:
+                  max_steps: int | None = None,
+                  instruction_variant: str = "standard") -> tuple[dict, dict]:
     """Build a new configuration, without changing the selected retrieval policy.
 
     This first profile binds project scope. Module/library/all-scope workflows use
@@ -68,6 +70,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
 
     if backend not in {"mcp", "files"}:
         raise ValueError("backend must be mcp or files")
+    if instruction_variant not in INSTRUCTION_VARIANTS:
+        raise ValueError("instruction_variant must be standard or concise-v1")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", server_name):
         raise ValueError("server_name must be an explicit stable MCP prefix")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", agent_name):
@@ -97,7 +101,9 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                DOCATLAS_MCP_ADMIN_TOOLS="0", DOCATLAS_MCP_ADVANCED_TOOLS="0",
                DOCATLAS_OFFLINE="1", DOCATLAS_AUTO_VECTORS="0")
     common = (HERE / "profile/common.txt").read_text(encoding="utf-8").strip()
-    specific = (HERE / f"profile/{backend}.txt").read_text(encoding="utf-8").strip()
+    specific_path = HERE / "profile" / (
+        "mcp-concise.txt" if backend == "mcp" and instruction_variant == "concise-v1" else f"{backend}.txt")
+    specific = specific_path.read_text(encoding="utf-8").strip()
     binding = f"Bound documentation project: {json.dumps(str(root), ensure_ascii=False)}. Scope: project."
     if frozen:
         binding += " This comparison uses a designated frozen source corpus; do not read evaluation annotations."
@@ -122,6 +128,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
     if max_steps is not None:
         agent["steps"] = max_steps
     profile_options = {"backend": backend, "projectRoot": str(root), "serverName": server_name}
+    if instruction_variant != "standard":
+        profile_options["instructionVariant"] = instruction_variant
     if file_snapshot is not None:
         profile_options["fileSnapshot"] = file_snapshot
     config = {"$schema": "https://opencode.ai/config.json", "default_agent": agent_name,
@@ -141,6 +149,9 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
     if not location.is_relative_to(root) and instructions.is_file():
         config["instructions"] = [str(instructions)]
     receipt = {"profile": PROFILE, "backend": backend, "project_path": str(root),
+               "instruction_variant": instruction_variant,
+               "tool_description_policy": "concise-v1 model-facing annotations only"
+                   if backend == "mcp" and instruction_variant == "concise-v1" else "original catalog",
                "workspace_path": str(location), "scope": "project", "agent": agent_name,
                "model_step_limit": max_steps,
                "presentation": "literal-v2" if backend == "mcp" else "native-file-text",
@@ -155,7 +166,7 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                "model_calls": 0, "preparation_calls": 0,
                "inputs": {str(path.relative_to(HERE)): _digest(path.read_bytes()) for path in
                           [HERE / "documentation_profile.py", HERE / "profile/common.txt",
-                           HERE / f"profile/{backend}.txt", HERE / "profile/index.js", HERE / "index.js",
+                           specific_path, HERE / "profile/index.js", HERE / "index.js",
                            HERE / "count_tokens.py"]},
                "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."}
     return deepcopy(config), receipt
@@ -166,6 +177,8 @@ def main() -> None:
     parser.add_argument("--project", type=Path, required=True, help="Known absolute documentation project root")
     parser.add_argument("--output", type=Path, required=True, help="New dedicated OpenCode location")
     parser.add_argument("--backend", choices=("mcp", "files"), default="mcp")
+    parser.add_argument("--instruction-variant", choices=INSTRUCTION_VARIANTS, default="standard",
+                        help="Opt-in concise-v1 MCP instructions/descriptions; files and runtime guards stay unchanged")
     parser.add_argument("--executable", type=Path, required=True, help="Absolute installed doc-atlas executable")
     parser.add_argument("--python", type=Path, required=True, help="Absolute interpreter from the same installed environment")
     parser.add_argument("--server-env-json", type=Path, help="Explicit existing server environment map; no policy is selected automatically")
@@ -184,7 +197,7 @@ def main() -> None:
         config, receipt = build_profile(project_root=args.project, workspace=args.output,
             backend=args.backend, executable=args.executable, python=args.python,
             server_environment=environment, server_name=args.server_name, agent_name=args.agent_name, model=args.model,
-            max_steps=args.max_steps)
+            max_steps=args.max_steps, instruction_variant=args.instruction_variant)
     except (ValueError, OSError, TypeError) as exc:
         parser.error(str(exc))
     for name, value in (("opencode.json", config), ("profile-receipt.json", receipt)):
@@ -192,6 +205,7 @@ def main() -> None:
             json.dump(value, stream, ensure_ascii=False, indent=2)
             stream.write("\n")
     print(json.dumps({"profile": PROFILE, "location": str(args.output), "agent": args.agent_name,
+                      "instruction_variant": args.instruction_variant,
                       "next": "Run OpenCode here with this agent; pass the unchanged question through stdin."}))
 
 

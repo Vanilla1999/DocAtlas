@@ -1,0 +1,11 @@
+{
+  "sessions": {},
+  "provider_requests": {
+    "mcp": 4,
+    "mcp-concise": 0,
+    "files": 0,
+    "mcp-failure": 0
+  },
+  "errors": {},
+  "model_calls": 0
+}

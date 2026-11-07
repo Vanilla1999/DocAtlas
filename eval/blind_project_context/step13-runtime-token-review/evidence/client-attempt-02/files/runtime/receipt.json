@@ -1,0 +1,51 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "Client integration checked; this is not a model answer.",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 2,
+  "expected_host_rejections": [
+    "blocked_read"
+  ],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 1.286979712000175,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 154,
+    "observed_processes": [
+      {
+        "pid": 154,
+        "state": "Z",
+        "pgid": 154,
+        "sid": 154,
+        "start_ticks": 4070176,
+        "name": "opencode"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 154,
+        "state": "Z",
+        "pgid": 154,
+        "sid": 154,
+        "start_ticks": 4070176,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "process_started": true
+}

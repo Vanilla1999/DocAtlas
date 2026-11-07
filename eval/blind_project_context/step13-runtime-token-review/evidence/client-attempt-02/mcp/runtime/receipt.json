@@ -1,0 +1,92 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "Client integration checked; this is not a model answer.",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 4,
+  "retrieval_calls": 2,
+  "expected_host_rejections": [
+    "blocked_status"
+  ],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 3.589516159001505,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 22,
+    "observed_processes": [
+      {
+        "pid": 22,
+        "state": "Z",
+        "pgid": 22,
+        "sid": 22,
+        "start_ticks": 4069456,
+        "name": "opencode"
+      },
+      {
+        "pid": 60,
+        "state": "S",
+        "pgid": 60,
+        "sid": 60,
+        "start_ticks": 4069553,
+        "name": "python",
+        "role": "transport",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp/mcp-process.json"
+      },
+      {
+        "pid": 61,
+        "state": "R",
+        "pgid": 60,
+        "sid": 60,
+        "start_ticks": 4069555,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 22,
+        "state": "Z",
+        "pgid": 22,
+        "sid": 22,
+        "start_ticks": 4069456,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 60,
+        "pgid": 60,
+        "sid": 60,
+        "start_ticks": 4069553,
+        "pid_namespace": "pid:[4026532309]",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 61,
+        "pgid": 60,
+        "sid": 60,
+        "start_ticks": 4069555,
+        "pid_namespace": "pid:[4026532309]",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "process_started": true
+}

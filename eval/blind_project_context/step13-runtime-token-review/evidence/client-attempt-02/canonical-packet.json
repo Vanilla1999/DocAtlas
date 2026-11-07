@@ -1,0 +1,80 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-26ff455303099c95",
+      "path_or_url": "docs/record.md",
+      "section": "Hand-off record",
+      "snippet": "# Hand-off record\n\nThe records custodian signs the hand-off record before dispatch.\nA courier may transport the record but may not sign it.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "50c7951144203fe21c73cc112bbb907b476d40a27c8ef89ccdc7a31dc950485a",
+      "project_identity": "local:a831d32ae682f4a6ef17617bb1c6dccc60b6629f03725c80e9deab7a28592c22",
+      "line_start": 1,
+      "line_end": 4,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/376676e8b835d997656e352a"
+    },
+    {
+      "evidence_id": "ev-8059fef5e17b7a8f",
+      "path_or_url": "docs/cases.md",
+      "section": "Storage cases",
+      "snippet": "# Storage cases\n\nA storage case holds four glass plates. Keep a divider between each pair of plates.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "eb343ac5540e6ffda653977118dea1dc5f0b8d952df175f529d0fd8f8d359dd8",
+      "project_identity": "local:a831d32ae682f4a6ef17617bb1c6dccc60b6629f03725c80e9deab7a28592c22",
+      "line_start": 1,
+      "line_end": 3,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/bab48f6de27766c3d4f1009c"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 561,
+  "context_unassessed": true,
+  "admission_contract": "source_only_heuristic_removal_v1",
+  "source_selection": {
+    "policy": "joint_checked_body_mmr_v1",
+    "scope": "source_checked_merged_candidates",
+    "query_count": 1,
+    "candidate_rows": 2,
+    "pruned_rows": 0,
+    "eligible_rows": 2,
+    "budget_limited": false,
+    "reference_limited": false,
+    "selected_rows": 2,
+    "omitted_rows": 0
+  },
+  "more_context": {
+    "portion": 1,
+    "next_portion": null,
+    "remaining_rows": 0,
+    "continuation_token": "ac23a4bfd47eb25434a74f8d8ac597db91f24bd87ddb5bf6c91d82fbec28f2d3"
+  }
+}

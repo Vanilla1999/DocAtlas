@@ -68,8 +68,8 @@ continues to refuse overwrites, and the receipt records the actual prompt hashes
   still happen on the server.
 - Other MCP servers are removed from **this dedicated location's** configuration.
   Permissions and final model-tool filtering exclude shell, writes, preparation,
-  job inspection, web research and delegation. The tool input schemas are
-  retained. A runtime `execute.before` hook enforces the target restrictions even
+  job inspection, web research and delegation. Tool fields and validation
+  constraints are retained. A runtime `execute.before` hook enforces target restrictions even
   when OpenCode attaches MCP executors after initial registry transforms.
 - In pinned V2.2.5, MCP's connected notification can precede publication of its
   native tools. Before admitting an MCP prompt, the profile checks the public
@@ -122,6 +122,66 @@ remained partial. That result is not a general completeness guarantee, a Terra
 Low result, an end-to-end OpenCode test or evidence of token savings. Prompt
 delivery and final-answer quality must still be measured separately. The
 historical skill, historical study prompts and frozen results are not rewritten.
+
+## Opt-in concise instructions experiment
+
+The default instruction variant remains `standard`. For a **new dedicated
+location**, the generator accepts:
+
+```text
+--instruction-variant concise-v1
+```
+
+This is an experiment within `documentation-light-v1`, not a new retrieval
+policy or a replacement for the ordinary MCP catalog. It changes only:
+
+- the MCP-specific paragraph, using `profile/mcp-concise.txt` instead of
+  `profile/mcp.txt`;
+- descriptions of the allowed MCP/source-read tools, when advertised, in the
+  **model-facing session snapshot**, removing repeated rules already stated in the shared
+  instructions or the concise tool prose;
+- known JSON Schema `description` annotations whose exact field semantics are
+  retained in that prose. All property names, required fields, enums, defaults,
+  length/range limits and other validation constraints remain unchanged.
+
+No tool is added or removed relative to the same standard profile. The existing
+context/generation/compaction hooks apply the annotations to MCP tools published
+after setup as well. The executable registry, server catalog, call validation,
+permissions, source text, tool results and history are untouched. The same
+target/scope/version, language, continuation, uncertainty and truncation rules
+still apply. Technical `scan_incomplete` results are explicitly distinguished
+from missing evidence in the concise prompt.
+
+`profile/common.txt`, including the exact source-to-draft paragraph, is unchanged
+and shared by both comparison backends. With `--backend files`, selecting
+`concise-v1` records the variant but does not change the file prompt or native
+tool descriptions. Applicable project/host instructions remain enabled.
+
+The receipt records `instruction_variant`, `tool_description_policy` and the
+actual selected prompt hash. Existing generated profiles do not gain this
+variant automatically: absence of the option means `standard`.
+
+A smaller locally tokenized prompt or a successful scripted-provider delivery
+check does not establish lower provider billing or equal final-answer quality.
+Those require the same real answering model and a separately fixed live run.
+
+The bounded Step13 check and the distinction between archived provider usage,
+offline sizing and the real-client scripted-provider check are recorded in
+[Step13 results](../../eval/blind_project_context/step13-runtime-token-review/RESULTS_RU.md).
+
+For offline sizing of a preserved Responses request from the diagnostic observer:
+
+```sh
+node /absolute/DocAtlas/integrations/opencode-v2-compact/measure_instruction_variant.mjs \
+  --capture /absolute/saved/capture/events.jsonl \
+  --python /absolute/docatlas-venv/bin/python
+```
+
+The command applies the actual session annotation transform to the first saved
+request and replaces only an exact occurrence of the standard MCP paragraph.
+It reports local `o200k` estimates, hashes and structural schema identity; it does
+not call the provider, retrieve sources or infer a full-session saving. Counting
+serialized JSON tool definitions is not the provider's internal schema accounting.
 
 ## Files comparison control
 
@@ -191,6 +251,27 @@ represents native tool failures as an undelivered error envelope, so the check
 does not mistake that envelope for a source answer or require the internal guard
 message to be visible. There is no model inference,
 answer-quality result or provider-billing measurement.
+
+To compare the opt-in variant and exercise the corrected standalone launcher,
+use a new output directory with these additional options instead of the optional
+historical inventory:
+
+```text
+--compare-concise
+--session-runtime /absolute/DocAtlas/eval/blind_project_context/step13-runtime-token-review/session_runtime.py
+--check-retrieval-failure
+```
+
+This bounded roster uses at most 13 scripted provider requests: standard MCP4,
+concise MCP4, files2 and a missing-Qwen-assets negative case up to3. The negative
+case invokes the real installed server but fails asset verification before model
+inference. It must produce failed retrieval, never a successful no-answer. The
+Linux-only launcher requires `/proc`, `waitid(WNOWAIT)` and `pidfd`; it records
+and verifies the actual MCP server/transport identities, including processes
+OpenCode places outside its own group. Missing registration or unverified cleanup
+cannot pass. This is not a GPU-memory measurement or a guarantee about unseen
+detached descendants. A failed run is retained; repeats need a diagnosed change
+and a new output directory.
 
 The first outgoing provider request of each new MCP/files session must contain
 the exact source-to-draft paragraph. This verifies delivery through the generated

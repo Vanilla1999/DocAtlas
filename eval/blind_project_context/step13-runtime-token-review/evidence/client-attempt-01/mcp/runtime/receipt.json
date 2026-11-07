@@ -1,0 +1,49 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "Client integration checked; this is not a model answer.",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 4,
+  "retrieval_calls": 2,
+  "expected_host_rejections": [
+    "blocked_status"
+  ],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 3.816298805002589,
+  "cleanup": {
+    "strategy": "private-session-group; leader held with waitid WNOWAIT until cleanup",
+    "group": 23,
+    "observed_processes": [
+      {
+        "pid": 23,
+        "state": "Z",
+        "pgid": 23,
+        "sid": 23,
+        "start_ticks": 3995963,
+        "name": "opencode"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 23,
+        "state": "Z",
+        "pgid": 23,
+        "sid": 23,
+        "start_ticks": 3995963,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Process exit proof only; GPU allocation/VRAM was not measured by this launcher."
+  },
+  "process_started": true
+}

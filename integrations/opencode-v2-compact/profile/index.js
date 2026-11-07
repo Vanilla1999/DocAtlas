@@ -10,15 +10,61 @@ class DocumentationReadinessError extends Error {
   }
 }
 
+// Only replace annotations whose field semantics are explicitly retained in the
+// concise prompt/tool prose. This never changes a property, enum, required field,
+// default, length/range constraint or the executable registry's input schema.
+function conciseDefinition(tool, description, describedFields, replaceRootDescription = false) {
+  const schema = tool.input;
+  if (!schema || typeof schema !== "object" || Array.isArray(schema) ||
+      !schema.properties || typeof schema.properties !== "object" || Array.isArray(schema.properties)) {
+    return tool; // An unfamiliar client schema keeps its original explanation.
+  }
+  const input = { ...schema, properties: { ...schema.properties } };
+  if (replaceRootDescription) delete input.description;
+  for (const name of describedFields) {
+    const property = input.properties[name];
+    if (property && typeof property === "object" && !Array.isArray(property)) {
+      input.properties[name] = { ...property };
+      delete input.properties[name].description;
+    }
+  }
+  return { ...tool, description, input };
+}
+
+// The real session hook and the separately labelled offline sizing command use
+// this same text transformation. It does not execute tools or simulate a model.
+export function conciseToolDescriptions(tools, serverName) {
+  const definitions = { ...tools };
+  const contextTool = `${serverName}_get_docs_context`;
+  const statusTool = `${serverName}_docs_status`;
+  const sourceTool = `${serverName}_read_docs_source`;
+  const resourceTool = "opencode_read_mcp_resource";
+  if (definitions[contextTool]) definitions[contextTool] = conciseDefinition(definitions[contextTool],
+    "Retrieve sources for the unchanged original question. For a known-document gap, source_path must be an exact returned/user-provided relative path; start portion=1 without a token. When a lookup-count limit is advertised, source_path reserves one slot. For other gaps, follow more_context.next_portion with identical arguments and its continuation_token, retaining prior evidence. If stale, restart portion=1 without a token and revalidate earlier evidence. Semantic rejects are not deferred pages. After useful continuation ends, lookup_queries may reword the whole same question plus its exact key words in source language, not generic fragments, independent questions or expected answers. Omit version unless an exact/historical version is requested.",
+    ["source_path", "portion", "continuation_token", "project_path", "library", "version", "module_path"], true);
+  if (definitions[statusTool]) definitions[statusTool] = conciseDefinition(definitions[statusTool],
+    "Read project status or language only: action=project; include_language=true for unknown source language. details=true adds status diagnostics to the language result; otherwise omit it. Only language preflight, an explicit status request or returned project recovery; no jobs, discovery or preparation.",
+    ["include_language", "details"]);
+  if (definitions[sourceTool]) definitions[sourceTool] = conciseDefinition(definitions[sourceTool],
+    "Read the exact issued source_uri or continuation_uri once for a concrete gap, not an arbitrary path/section or citation lookup. Authorization, snapshot, expiry and one-use guards apply; stop on unavailable or emergency results.", []);
+  if (definitions[resourceTool]) definitions[resourceTool] = conciseDefinition(definitions[resourceTool],
+    `Read once from server ${JSON.stringify(serverName)} using only an exact issued docatlas://source/ URI for a concrete gap. No arbitrary files, sections, citation lookup or hidden overflow files. Authorization, snapshot, expiry and one-use checks apply; stop on refusal.`,
+    ["server", "uri"]);
+  return definitions;
+}
+
 // This plugin is for an explicitly created read-only documentation location.
 // It is not a replacement for project instructions or an operating-system sandbox.
 export default {
   id: "docatlas-documentation-light-v1",
   async setup(ctx) {
-    const { backend, projectRoot, serverName = "docatlas" } = ctx.options;
+    const { backend, projectRoot, serverName = "docatlas", instructionVariant = "standard" } = ctx.options;
     if (!["mcp", "files"].includes(backend) || typeof projectRoot !== "string" ||
         !path.isAbsolute(projectRoot) || !/^[A-Za-z][A-Za-z0-9_]*$/.test(serverName)) {
       throw new Error("Documentation profile requires a backend, absolute root and explicit server name");
+    }
+    if (!["standard", "concise-v1"].includes(instructionVariant)) {
+      throw new Error("Unknown documentation instruction variant; regenerate the profile");
     }
     const root = await realpath(projectRoot);
     if (root !== projectRoot) throw new Error("Documentation profile root changed; regenerate the profile");
@@ -139,6 +185,11 @@ export default {
       for (const name of Object.keys(event.tools)) {
         if (!allowed.has(name)) delete event.tools[name];
       }
+      if (backend !== "mcp" || instructionVariant !== "concise-v1") return;
+      // These existing session hooks receive the final model-facing definitions,
+      // including MCP tools published after registry transforms. Keep the real
+      // executors, permissions, schemas/guards and returned context untouched.
+      Object.assign(event.tools, conciseToolDescriptions(event.tools, serverName));
     };
     for (const hook of ["context", "generate", "compaction"]) {
       await ctx.session.hook(hook, visibleTools);

@@ -1,0 +1,115 @@
+{
+  "session_status": "interrupted",
+  "retrieval_status": "failed",
+  "answer_status": "not_produced",
+  "answer": "",
+  "failures": [
+    {
+      "kind": "retrieval_failed",
+      "tool": "docatlas_get_docs_context",
+      "call_id": "context",
+      "reason_code": "scan_incomplete"
+    },
+    {
+      "kind": "client_error"
+    }
+  ],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 1,
+  "expected_host_rejections": [],
+  "transport_pass": false,
+  "answer_quality": "not_graded",
+  "termination": "fail_fast",
+  "returncode": 130,
+  "seconds": 3.6513036230026046,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 201,
+    "observed_processes": [
+      {
+        "pid": 201,
+        "state": "S",
+        "pgid": 201,
+        "sid": 201,
+        "start_ticks": 4070305,
+        "name": "opencode"
+      },
+      {
+        "pid": 237,
+        "state": "S",
+        "pgid": 237,
+        "sid": 237,
+        "start_ticks": 4070400,
+        "name": "python",
+        "role": "transport",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-failure/mcp-process.json"
+      },
+      {
+        "pid": 238,
+        "state": "R",
+        "pgid": 237,
+        "sid": 237,
+        "start_ticks": 4070402,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-failure/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 201,
+        "state": "S",
+        "pgid": 201,
+        "sid": 201,
+        "start_ticks": 4070305,
+        "name": "opencode"
+      }
+    ],
+    "signals": [
+      {
+        "signal": "SIGTERM",
+        "private_group": 201
+      },
+      {
+        "signal": "SIGTERM",
+        "registered_pid": 237,
+        "role": "transport"
+      },
+      {
+        "signal": "SIGTERM",
+        "registered_pid": 238,
+        "role": "server"
+      }
+    ],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 237,
+        "pgid": 237,
+        "sid": 237,
+        "start_ticks": 4070400,
+        "pid_namespace": "pid:[4026532309]",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-failure/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 238,
+        "pgid": 237,
+        "sid": 237,
+        "start_ticks": 4070402,
+        "pid_namespace": "pid:[4026532309]",
+        "registry": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-failure/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "process_started": true
+}

@@ -386,9 +386,9 @@ def test_e5_focused_context_preserves_scope_snapshot_and_read_only_state(tmp_pat
 
 
 def test_literal_presentation_public_stdio_preserves_sources_and_read_guards(tmp_path):
-    """Real source stdio: canonical, historical compact and literal-v2 delivery.
+    """Real source stdio: delivery, model failure and public source guards.
 
-    One confirmed preparation, six context calls, three resource reads; no
+    One confirmed preparation, seven context calls, three resource reads; no
     model, substitute retrieval or private renderer invocation. The emitted
     receipt distinguishes this checkout from an installed-package test.
     """
@@ -435,6 +435,8 @@ def test_literal_presentation_public_stdio_preserves_sources_and_read_guards(tmp
         if os.environ.get(key):
             env[key] = os.environ[key]
     database = Path(env["DOCATLAS_HOME"]) / "mcp-members/members.db"
+    unprepared_model = tmp_path / "unprepared-qwen-model"
+    unprepared_model.mkdir()
     mutation = {
         "operation": "sync_project_docs", "confirm": True,
         "storage_path": str(database), "expected_generation_id": None,
@@ -448,21 +450,28 @@ def test_literal_presentation_public_stdio_preserves_sources_and_read_guards(tmp
             "question": "Explain job polling, terminal status and retry approval."}
     transcript, responses, texts = [], {}, {}
 
-    async def call(session, tool, arguments):
+    async def call(session, tool, arguments, *, expected_error=False):
         response = await session.call_tool(tool, arguments)
         blocks = [item.text for item in response.content if item.type == "text"]
         assert len(blocks) == 1 and response.structuredContent is None
         value = json.loads(blocks[0])
         transcript.append({"tool": tool, "arguments": arguments, "text": blocks[0],
                            "is_error": response.isError})
-        assert not response.isError, value
+        assert response.isError is expected_error, value
         return value, blocks[0]
 
     async def run():
-        for mode in ("canonical", "historical", "literal-v2"):
+        for mode in ("canonical", "historical", "qwen-failure", "literal-v2"):
             selected = dict(env)
             if mode != "canonical":
                 selected["DOCATLAS_MCP_COMPACT_TEXT"] = "1"
+            if mode == "qwen-failure":
+                selected.update(
+                    DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT="1",
+                    DOCATLAS_MINIMAL_CONTEXT_RECIPE="qwen3-contextual-own-body-evidence-v1",
+                    DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH=str(unprepared_model),
+                    DOCATLAS_CONTEXT_PRESENTATION="literal-v2",
+                )
             if mode == "literal-v2":
                 selected["DOCATLAS_CONTEXT_PRESENTATION"] = "literal-v2"
                 # An old explicit table preference cannot repack the new view.
@@ -480,7 +489,25 @@ def test_literal_presentation_public_stdio_preserves_sources_and_read_guards(tmp
                         prepared, _ = await call(session, "prepare_docs", {
                             "action": "sync_project_docs", "project_path": str(project), "mutation": mutation})
                         assert prepared["status"] == "success", prepared
-                    responses[mode], texts[mode] = await call(session, "get_docs_context", args)
+                    before_query = hashlib.sha256(database.read_bytes()).hexdigest()
+                    responses[mode], texts[mode] = await call(
+                        session, "get_docs_context", args, expected_error=mode == "qwen-failure")
+                    if mode == "qwen-failure":
+                        failed = responses[mode]
+                        assert failed["status"] == "error" and failed["hard_stop"] is True, failed
+                        assert failed["reason_code"] == "scan_incomplete", failed
+                        assert not failed.get("sources") and not failed.get("read_next"), failed
+                        assert "more_context" not in failed, failed
+                        selection = failed["source_selection"]
+                        assert selection["failed_stage"] == "semantic_scoring", selection
+                        receipt = selection["receipt"]
+                        assert receipt["status"] == "scan_incomplete", receipt
+                        assert receipt["error_type"] == "FileNotFoundError", receipt
+                        assert "provenance.json" in receipt["error"], receipt
+                        assert receipt["model_forwards"] == receipt["model_pairs"] == receipt["model_loads"] == 0
+                        assert "PRIVATE-SCOPE-SENTINEL" not in texts[mode]
+                        assert hashlib.sha256(database.read_bytes()).hexdigest() == before_query
+                        continue
                     if mode in {"canonical", "literal-v2"}:
                         responses[mode + "-patch"], _ = await call(session, "get_docs_context", {
                             **args, "context_format": "patch_context"})

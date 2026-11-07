@@ -102,6 +102,11 @@ def stop_packet(payload: dict, snapshot: dict, retrieval: dict, reason: str, **d
     result.update(status="insufficient_evidence", reason_code=reason,
                   context_quality={"status": "unavailable", "reasons": [reason]},
                   source_selection={"policy": POLICY, **details})
+    if reason in {"scan_incomplete", "context_emergency_stop"}:
+        # A failed scan/delivery is not a successful search with no evidence.
+        # Keep its receipt and reason, but make the failure visible to ordinary
+        # MCP clients as isError too; an unchanged retry must not hide it.
+        result.update(status="error", hard_stop=True)
     result.pop("more_context", None)
     result["missing"] = [reason]
     _refresh_estimate(result)
