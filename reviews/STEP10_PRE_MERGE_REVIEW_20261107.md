@@ -12,7 +12,8 @@ commit `9e2c331c45e8f9a86f809a1f4d66c43125250702`.
 **Draft PR.** Найден и исправлен P2 в маршрутизации продолжений. Отдельный P2
 остаётся открытым в экспериментальном reference-closure parser. Сохранённые
 отрицательные результаты качества и `PRE-INFERENCE BLOCKED` не превращены в PASS.
-Новый цикл моделей для этого ревью не запускался.
+Локальный цикл моделей для этого ревью не запускался. Автоматические проверки
+GitHub Actions после создания PR учитываются отдельно.
 
 PR объединяет четыре уже опубликованных коммита шагов 8–10, исправление по ревью
 и результаты независимого анализа. Исходный diff к main: 904 файла, из которых
@@ -103,11 +104,11 @@ calibration. Следующее исправление должно:
 | Новое mixed-target условие до production fix | 1 FAIL, 1,45 s pytest | Реальный public in-process MCP, дефект воспроизведён |
 | Пять выбранных integration nodes после fix | 5 PASS, 6,83 s pytest | Текущий checkout, реальные preparation/storage/retrieval/dispatch |
 | AST изменённых и новых Python-файлов | PASS | Синтаксис, без импорта production |
-| Python module size gate | PASS | Все `.py` не длиннее 1000 строк |
+| Python module size gate | PASS после CI correction | Guard добавил две строки после первоначального PASS; комментарий сокращён, AST не изменился |
 | Проверка diff whitespace | PASS | Изменения кода и подготовленного PR |
 | Независимый review source/capability/scope | P2 выше; fix подтверждён | Статический diff и call graph |
 | Независимый review scorers/selection/projection | Открытый parser P2 выше | Нет нового semantic acceptance |
-| Независимый review CI/installer/OpenCode | P3 выше; иных подтверждённых blockers не найдено | Не заменяет запуск установленного клиента |
+| Независимый статический review CI/installer/OpenCode | P3 выше | Реальный CI затем выявил дополнительные blockers; см. разбор ниже |
 
 Пять выполненных nodes:
 
@@ -128,9 +129,22 @@ tests/test_contextual_indexing.py::test_source_bound_search_descriptions_public_
 не требовались. Эти сценарии работают in-process. Tests с `python -I` в старом
 editable окружении намеренно не зачтены как проверка текущего wheel.
 
-До создания PR у исходного 9e2c331c не было GitHub Actions runs. Полный CI
-и проверка установленного wheel должны оцениваться по реальному PR run;
-в этот отчёт не подставлены результаты старых wheel или прежнего main.
+До создания PR у исходного 9e2c331c не было GitHub Actions runs. После открытия
+PR #246 автоматический CI на `b0193227` завершился с ошибками. Часть причин
+подтверждена в коде main, часть относится к step10 и к исправлению ревью,
+часть пока не классифицирована. Нельзя объявлять весь красный CI старым.
+
+Моя проверка размера была выполнена до добавления двух строк в guard. Реальный
+CI обнаружил `context_tools.py: 1002 > 1000`. Исправлены только две строки
+комментария: теперь 1000 строк, AST до/после идентичен, module-size gate проходит.
+Пять integration nodes повторно не запускались: их исполняемый код не изменён.
+Hashes и результат сравнения:
+[`comment-only-size-fix.json`](../eval/blind_project_context/step10-independent-review/pr-validation/comment-only-size-fix.json).
+
+Причины падений, точные ссылки на jobs и границы выводов:
+[`CI_TRIAGE_20261107.md`](CI_TRIAGE_20261107.md). Полный CI нового head после
+comment-only исправления оценивается отдельно по GitHub Actions; старый запуск
+не объявляется успешным или проверкой нового коммита.
 
 ## Что проверено в остальном коде
 

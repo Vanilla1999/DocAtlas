@@ -1,0 +1,12 @@
+{
+  "parent_commit": "b0193227fec674ca0ffc8344f83d1896fe6bc9e6",
+  "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+  "before_lines": 1002,
+  "after_lines": 1000,
+  "ast_identical": true,
+  "before_sha256": "938abead1ef42856437d6892812e2502cc3a5c8ef3007052db3811d4cb3bbc11",
+  "after_sha256": "44b6a1bcaec892760a1e9ce6060aa7a8f3d35213df2ff74184ed44f7cebc3304",
+  "module_size_gate": "Python module size gate: PASS (all .py <= 1000 lines)",
+  "runtime_tests_repeated": false,
+  "reason": "CI caught two extra lines after the routing fix; only a comment was shortened, preserving the tested AST."
+}

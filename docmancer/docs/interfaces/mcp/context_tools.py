@@ -323,10 +323,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 return _bad_request("invalid_lookup_queries", "source_path reserves one of five lookup slots")
     if args.get("search_question") is not None and context_format == "patch_context":
         return _bad_request("search_question_docs_only", "search_question is a documentation lookup, not patch authorization")
-    # Freeze the validated effective query plan before opening the request-owned
-    # native body read. The translated host lookup must be in the same plan used
-    # to acquire sources and to verify their original-read receipts; otherwise
-    # a successful translated search is incorrectly rejected at admission.
+    # Freeze the effective plan before opening the native read scope.
+    # Acquisition and original-read admission must use the same translated lookup.
     prepared_args = {**args, "lookup_queries": lookup_queries}
     # Request-local reuse of pure results only; every check still runs.
     with request_memo_scope():
