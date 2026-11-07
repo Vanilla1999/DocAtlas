@@ -1,0 +1,59 @@
+{
+  "mcp": {
+    "partID": "prt_1b504a70f001RH8ptvXCdjmDnX",
+    "sessionID": "ses_e4afb5eb9ffeumapnqMjD7E2YH",
+    "messageID": "msg_1b504a6f7001uYGxvsj2qbfAIn",
+    "type": "tool",
+    "id": "blocked_status",
+    "tool": "docatlas_docs_status",
+    "state": {
+      "status": "error",
+      "input": {
+        "action": "jobs",
+        "job_id": "unrelated-job"
+      },
+      "error": "documentation_profile_project_status_only",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"action\":\"jobs\",\"job_id\":\"unrelated-job\"}"
+      },
+      "time": {
+        "start": 1794038343439,
+        "end": 1794038343454
+      }
+    }
+  },
+  "files": {
+    "partID": "prt_1b504b223001lc1iaKS3vVAgrm",
+    "sessionID": "ses_e4afb5072ffe4dKZWmg2v922Sr",
+    "messageID": "msg_1b504b20f001SKqsEFVIBXlxbG",
+    "type": "tool",
+    "id": "blocked_read",
+    "tool": "read",
+    "state": {
+      "status": "error",
+      "input": {
+        "path": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-08/outside.txt"
+      },
+      "error": "documentation_profile_scope_mismatch",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"path\":\"/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-08/outside.txt\"}"
+      },
+      "time": {
+        "start": 1794038346275,
+        "end": 1794038346288
+      }
+    }
+  }
+}

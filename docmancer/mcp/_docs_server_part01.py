@@ -512,6 +512,8 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
     minimal = minimal_context_enabled()
+    from docmancer.docs.domain.context_presentation import validate_context_presentation
+    validate_context_presentation(minimal=minimal)
     if not minimal and os.environ.get("DOCATLAS_MCP_MODEL_VIEW", "off") not in ("", "off", "1"):
         raise ValueError("invalid DOCATLAS_MCP_MODEL_VIEW: use off or 1")
     compact = os.environ.get("DOCATLAS_MCP_COMPACT_TEXT", "off")

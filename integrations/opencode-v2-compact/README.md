@@ -3,7 +3,14 @@
 Verified against **OpenCode 2.2.5**. This local server plugin forwards DocAtlas's
 already assembled, self-contained text through a native tool. It neither selects
 sources nor changes their text, references, scope, quality or continuation fields.
-The tool is removed from Code Mode by the supported tool transform API.
+Use native MCP delivery (`codemode: false` on the configured server). The plugin
+also sets native mode for tools already present in its registry transform.
+
+For a separate read-only documentation client with a smaller tool catalog, use
+the explicit [documentation profile](DOCUMENTATION_PROFILE.md). It reuses this
+adapter; installing the adapter alone does not select that profile or change
+existing agent instructions. The new profile requests `literal-v2` presentation,
+not the older adaptive table layouts described in the historical measurements.
 
 ## Install explicitly
 
@@ -22,7 +29,8 @@ absolute Python path (not a checkout-dependent `PYTHONPATH`). Add this plugin
     "package": "/absolute/path/integrations/opencode-v2-compact",
     "options": {
       "python": "/absolute/path/docatlas-venv/bin/python",
-      "tools": ["docatlas_get_docs_context", "docatlas_read_docs_source"]
+      "tools": ["docatlas_get_docs_context", "docatlas_read_docs_source"],
+      "guard_tools": []
     }
   }],
   "tool_output": { "max_bytes": 6400000, "max_lines": 6400000 }
@@ -31,10 +39,19 @@ absolute Python path (not a checkout-dependent `PYTHONPATH`). Add this plugin
 
 `tools` must contain the **effective native tool IDs from your installed catalog**,
 including candidate `read_docs_source` (normally `docatlas_read_docs_source`). Server prefixes vary;
-do not assume the example matches every installation. The adapter follows MCP
-catalog refreshes. It leaves inputs, permissions and underlying execution intact.
-Do not enable this on a generic resource reader serving unrelated servers. A
-resource reader is covered only when its dedicated native ID is explicitly listed.
+do not assume the example matches every installation. It leaves inputs,
+permissions and underlying execution intact. In V2.2.5 a late MCP attachment can
+occur after initial tool transforms, so set `codemode: false` on the existing MCP
+server as well. The final model-bound guard covers these native results even
+when an execute wrapper was not attached. The documentation profile configures
+this and waits for the actual context/status catalog before prompt admission.
+
+Use optional `guard_tools` for **native resource/file tools**, such as
+`opencode_read_mcp_resource`. Their executors, typed output schemas and native
+rendering remain unchanged; only their rendered model text is checked. `tools`
+can be empty when `guard_tools` is nonempty. Generic resource readers need a
+separate server/URI guard, as supplied by the documentation profile; do not enable
+this on a generic reader serving unrelated servers and assume it enforces scope.
 
 With the minimal-context candidate enabled, the server advertises
 `read_docs_source({uri})` after its existing three public tools. Prefer it over a
@@ -53,10 +70,14 @@ configuration is changed by adding these files to this repository.
 
 ## Boundary and failure semantics
 
-- Exactly one text content block is forwarded byte-for-byte. No `_meta`-only
-  evidence, structured-body duplicate, or hidden-file substitute is used.
-- The complete text is priced before return, and again after OpenCode rendering
-  in `context`, `compaction`, `generate` and `title` hooks. Above **50,000** tokens
+- When the MCP execute wrapper attaches, exactly one authoritative text content
+  block is forwarded byte-for-byte. Its normalized output is a string with a
+  matching string schema; missing/unsupported content fails closed. No `_meta`-only
+  evidence or hidden-file substitute is used. Native `guard_tools` retain their
+  original output, schema and rendering contract.
+- Wrapped MCP text is priced before return. All configured native results are
+  checked after OpenCode rendering in `context`, `compaction`, `generate` and
+  `title` hooks. Above **50,000** tokens
   the model receives `context_emergency_stop`, measured size and no source body.
 - The threshold comes from the installed package's single canonical
   `minimal_context_config.EMERGENCY_TOKENS` constant. The Python subprocess returns

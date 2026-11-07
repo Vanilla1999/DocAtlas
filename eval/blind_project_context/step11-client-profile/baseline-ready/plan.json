@@ -1,0 +1,8 @@
+{
+  "provider_requests": 1,
+  "tool_calls": 0,
+  "model_calls": 0,
+  "label": "warm/ready historical inventory; no historical trajectory claim",
+  "prior_config_sha256": "201e9031ef0deb8b09a379995872b39dbec882eb4125b3494f7ce8f89662c5f2",
+  "changes": "isolated location/provider endpoint/observer readiness only; agent system, permissions and native schemas unchanged"
+}

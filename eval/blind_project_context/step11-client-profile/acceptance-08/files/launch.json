@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/workspace/scratch/66f7674793b8/step11-client-profile/tools/opencode-2.2.5/opencode",
+    "run",
+    "--standalone",
+    "--format",
+    "json",
+    "--agent",
+    "docs",
+    "--model",
+    "local-check/capture",
+    "--title",
+    "Documentation"
+  ],
+  "cwd": "/workspace/scratch/66f7674793b8/step11-client-profile/acceptance-08/files",
+  "stdin": "Who signs the hand-off record, and may a courier sign it?",
+  "boundary": "Actual documented user launch; no sleep or API prewarm before the first question."
+}

@@ -48,8 +48,10 @@ export default {
   id: "docatlas-compact-v2",
   async setup(ctx) {
     const tools = ctx.options.tools;
+    const guardTools = ctx.options.guard_tools ?? [];
     const python = ctx.options.python;
-    if (!Array.isArray(tools) || !tools.length || tools.some(t => typeof t !== "string") ||
+    if (!Array.isArray(tools) || !Array.isArray(guardTools) || !(tools.length + guardTools.length) ||
+        [...tools, ...guardTools].some(t => typeof t !== "string") ||
         typeof python !== "string" || !python.startsWith("/")) {
       throw new Error("Set explicit effective tool IDs and an absolute installed DocAtlas Python executable");
     }
@@ -61,11 +63,21 @@ export default {
       if (result.emergency_tokens !== limit) throw new Error("Host contract changed; reload adapter");
       return result.counts;
     };
-    const names = new Set(tools);
+    const wrappedNames = new Set(tools);
+    const names = new Set([...tools, ...guardTools]);
     await ctx.tool.transform(editor => {
-      for (const name of names) editor.update(name, tool => {
+      // Native resource/file tools own their output schema and renderer. Keep
+      // those contracts intact; guard their actual rendered text below.
+      for (const name of guardTools) editor.update(name, tool => {
+        tool.options = { ...tool.options, codemode: false };
+      });
+      for (const name of wrappedNames) editor.update(name, tool => {
         const execute = tool.execute;
         tool.options = { ...tool.options, codemode: false };
+        // The adapter returns a text output. Native tools such as resource/file
+        // reads declare object outputs; retaining that schema makes OpenCode
+        // reject the successful wrapped result after execution.
+        tool.output = { type: "string" };
         tool.execute = async (input, context) => {
           const result = await execute(input, context);
           let text;

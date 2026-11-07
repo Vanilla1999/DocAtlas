@@ -136,6 +136,9 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
     settings = {"policy_sha256": policy_digest, "model_revision": MINI_REVISION,
                 "recipe": scoring_recipe(), "structural_recipe": STRUCTURAL_RECIPE,
                  "lanes": "original_translation_max", "presentation": "standalone-adaptive-v1"}
+    from docmancer.docs.domain.context_presentation import LITERAL_V2, literal_presentation_enabled
+    if literal_presentation_enabled():
+        settings["presentation"] = LITERAL_V2
     if evidence_mode:
         settings.update(model_revision=evidence_scoring.REVISION, structural_recipe=structural_recipe,
                         model_id=evidence_scoring.MODEL_ID, contract_sha256=evidence_scoring.CONTRACT_SHA256,

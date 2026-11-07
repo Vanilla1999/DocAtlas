@@ -1,0 +1,22 @@
+{
+  "base_commit": "2d667913f279ba72104f158ee6500d75d5ace81f",
+  "files": {
+    "integrations/opencode-v2-compact/index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "integrations/opencode-v2-compact/count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80",
+    "integrations/opencode-v2-compact/documentation_profile.py": "eff66631964100ca6cdb4c7dd998015c6192eb1edf576384efe13211c412044b",
+    "integrations/opencode-v2-compact/check_profile_client.py": "5e365b2b9ad003567912b636eb366933abe76faba748d102e367125af23b8e7f",
+    "eval/blind_project_context/run_gap_agent_study.py": "7c64582d65b146fcd6d3fa09646f71f07625b1f2adb6a808c6c1824937d4740d",
+    "integrations/opencode-v2-compact/profile/common.txt": "34822f48d728c18bede3ea4852169998f96863681bdf94a7458c3eb08ea91242",
+    "integrations/opencode-v2-compact/profile/files.txt": "5254a90d106fec363fda17c824358491ef12fd5c53cf1144cbf4167c4a2b1c83",
+    "integrations/opencode-v2-compact/profile/index.js": "a1a713eb537ef76ae6057b84de8446b76a4fd6b62b1052469c76290029ac2614",
+    "integrations/opencode-v2-compact/profile/mcp.txt": "56e0662be7df80e20104d6b652ed9f7cc5472e9d18b31c626a1d7b31e2cd84ea"
+  },
+  "wheel_sha256": "73e2bbd73c18a4d20044eb61cc22a0cb78906754bfc4618b79cbf7e70a624070",
+  "wheel_receipt": "../step11-presentation/wheel-receipt.json",
+  "runtime": "fresh installed wheel venv, uv.lock dependencies, Python3.12.14, no editable path",
+  "public_profile_input_hashes_equal_pass08": true,
+  "sdk_reference": {
+    "plugin_2.2.5_tgz_sha256": "0a7905691259b790a0962a02f62661fb9c464d2b8b5f5daa5390408e8789944f",
+    "schema_2.2.5_tgz_sha256": "68b395496c3407ab4b478f6efe89f2bec631aba6b463398984fde82272a99758"
+  }
+}

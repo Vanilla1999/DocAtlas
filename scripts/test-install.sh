@@ -23,7 +23,8 @@ python3 - "$REPO_ROOT" <<'PY' || fail "hidden/bidirectional Unicode or control c
 import sys, pathlib, unicodedata
 root = pathlib.Path(sys.argv[1])
 BAD = set()
-for cp in list(range(0x200E, 0x2010)) + list(range(0x202A, 0x2030)) + \
+# U+202A..U+202E are bidi controls; U+202F is a Zs narrow no-break space.
+for cp in list(range(0x200E, 0x2010)) + list(range(0x202A, 0x202F)) + \
           list(range(0x2066, 0x206A)) + [0x00AD, 0xFEFF, 0x200B, 0x200C, 0x200D]:
     BAD.add(cp)
 bad = []

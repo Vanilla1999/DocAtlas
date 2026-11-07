@@ -1,0 +1,14 @@
+{
+  "first_system_tokens": 2034,
+  "first_tools_tokens": 348,
+  "tool_names": [
+    "skill",
+    "execute"
+  ],
+  "system_permissions_mcp_unchanged": true,
+  "model_calls": 0,
+  "provider_requests": 1,
+  "tool_calls": 0,
+  "passed": true,
+  "boundary": "Ready inventory only, local o200k components; not billing or answer quality."
+}

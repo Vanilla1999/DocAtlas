@@ -13,6 +13,7 @@ import math
 import os
 
 from docmancer.docs.domain.delivery_limits import delivery_token_ceiling
+from docmancer.docs.domain.context_presentation import LITERAL_FORMAT, literal_presentation_enabled
 
 BASE = "docatlas.standalone-text.v1"
 POLICIES = ("literal", "grouped", "table", "grouped-table", "adaptive")
@@ -70,7 +71,7 @@ def decode_context(view: dict) -> dict:
     expiry, hashes and access. Reject ambiguous/malformed layouts explicitly.
     """
     fmt = view.get("context_format")
-    if fmt == BASE:
+    if fmt in (BASE, LITERAL_FORMAT):
         return deepcopy(view)
     policy = next((p for p, name in _FORMATS.items() if name == fmt), None)
     if policy is None:
@@ -157,6 +158,10 @@ def assemble_context(text: str, *, policy: str | None = None) -> str:
     Deterministic ties prefer literal, then grouped, table, grouped-table.
     No approximate score cutoff. No assumption that smaller means sufficient.
     """
+    # This revision is ordinary source objects even when the historical
+    # minimal-context path would force adaptive column/group packing.
+    if literal_presentation_enabled():
+        return text
     from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
     if minimal_context_enabled():
         policy = "adaptive"

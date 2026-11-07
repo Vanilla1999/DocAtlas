@@ -341,7 +341,9 @@ def _whole_pool_fits(payload: dict, snapshot: dict, retrieval: dict, rows: list[
 
 def _continuation_settings() -> dict:
     """Bind stable host choices that affect selection or its wire pricing."""
+    from docmancer.docs.domain.context_presentation import presentation_settings
     return {
+        **presentation_settings(),
         **{name: _experiment(name) for name in _EXPERIMENT_CHOICES},
         "DOCATLAS_EXPERIMENT_POOL_PRUNE": pool_prune_mode(JOINT_POOL_PRUNE_DEFAULT),
         "selector": experimental_selector_settings(),

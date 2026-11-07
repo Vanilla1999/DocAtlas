@@ -1,0 +1,18 @@
+ok   sh -n scripts/install.sh (POSIX syntax)
+ok   no hidden/bidirectional Unicode in *.sh/*.md/*.toml/*.py
+ok   installer URLs point at scripts/install.sh
+ok   agent 'none': no registration
+ok   agent 'claude-code': registered via 'claude mcp add --scope user'
+ok   agent 'codex' (CLI present): registered via 'codex mcp add'
+ok   agent 'codex' (fallback): idempotent direct TOML write
+ok   agent 'opencode' (via env): JSON config merged
+ok   agent 'opencode': user keys/name/disabled state preserved, re-run unchanged
+ok   agent 'opencode': OPENCODE_CONFIG custom path honored
+ok   agent 'opencode': OPENCODE_CONFIG_DIR is ignored for config-file path
+ok   README pipe form: cat scripts/install.sh | DOCATLAS_AGENT=opencode sh
+ok   README pipe form: cat scripts/install.sh | sh -s -- claude-code opencode
+ok   agent 'opencode': JSONC refused, bytes unchanged, no backup or duplicate config
+ok   unknown positional agent 'codx': strict failure
+ok   unknown env agent 'claud-code': strict failure
+
+All installer smoke tests passed.

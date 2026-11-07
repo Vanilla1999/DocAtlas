@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -32,6 +33,8 @@ def main():
     parser.add_argument("--cache", type=Path)
     parser.add_argument("--corpus", choices=("L0", "L2"), action="append")
     parser.add_argument("--case", action="append")
+    parser.add_argument("--client-profile", choices=("historical", "documentation-light-v1"), default="historical",
+                        help="Explicit paired read-only native client; historical configuration remains the default")
     args = parser.parse_args()
     step10 = args.arm in {"minimal-context", "file-current"}
     if args.arm == "minimal-context" and (not args.model_dir or not args.policy):
@@ -43,6 +46,12 @@ def main():
     assert len(cases) == len(selected) and all(c["split"] == "dev" for c in cases)
     args.out.mkdir(parents=True, exist_ok=True)
     skill = (tree / "SKILL.md").read_text()
+    light_profile = None
+    if args.client_profile != "historical":
+        profile_path = tree / "integrations/opencode-v2-compact/documentation_profile.py"
+        spec = importlib.util.spec_from_file_location("docatlas_documentation_profile", profile_path)
+        light_profile = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(light_profile)
     plan = {"cases": cases, "arm": args.arm, "corpora": args.corpus or ["L0", "L2"], "model": "openai/gpt-6.1-terra#low",
               "question_transport": "cli_stdin_exact",
               "skill_sha256": hashlib.sha256(skill.encode()).hexdigest(), "steps": None if step10 else 12,
@@ -53,6 +62,12 @@ def main():
               "policy_sha256": hashlib.sha256(args.policy.read_bytes()).hexdigest() if args.policy else None}
     if args.recipe:
         plan["scoring_recipe"] = args.recipe
+    if light_profile is not None:
+        plan["client_profile"] = args.client_profile
+        plan["shipped_skill_sha256_not_injected"] = plan.pop("skill_sha256")
+        plan["client_profile_inputs"] = {str(path.relative_to(tree)): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted((tree / "integrations/opencode-v2-compact").rglob("*"))
+            if path.is_file() and path.suffix in {".py", ".js", ".txt"}}
     plan_path = args.out / (args.arm + "-plan.json")
     if plan_path.exists():
         if json.loads(plan_path.read_text()) != plan:
@@ -118,6 +133,17 @@ def main():
                                   "options": {"python": str(args.executable.parent / "python"),
                                               "tools": ["docatlas_get_docs_context", "docatlas_read_docs_source"]}}]
             config["tool_output"] = {"max_bytes": 6400000, "max_lines": 6400000}
+        if light_profile is not None:
+            config, profile_receipt = light_profile.build_profile(
+                project_root=(root / "project").resolve(), workspace=dest.resolve(),
+                backend="files" if args.arm == "file-current" else "mcp",
+                executable=args.executable.absolute(), python=(args.executable.parent / "python").absolute(),
+                server_environment=env, agent_name="measure", frozen=True, max_steps=plan["steps"],
+            )
+            profile_path = dest / "client-profile.json"
+            if profile_path.exists() and json.loads(profile_path.read_text()) != profile_receipt:
+                raise ValueError("client profile changed; use a new output")
+            profile_path.write_text(json.dumps(profile_receipt, ensure_ascii=False, indent=2) + "\n")
         path = dest / "opencode.json"
         if path.exists() and json.loads(path.read_text()) != config:
             raise ValueError("study configuration changed; use a new output")

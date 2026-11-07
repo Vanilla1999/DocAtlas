@@ -15,6 +15,7 @@ from dataclasses import dataclass
 import math
 
 from docmancer.docs.domain.delivery_limits import DEFAULT_DELIVERY_MAX_TOKENS, delivery_token_ceiling
+from docmancer.docs.domain.context_presentation import LITERAL_FORMAT, literal_presentation_enabled
 
 from .model_context_view import ModelViewError, canonical, encode_model_result
 from .projection_tokenizer import projection_token_count
@@ -68,6 +69,7 @@ def render_standalone_text(packet: dict) -> StandaloneTextResult:
             "invalid_model_view_sources": "invalid_source_binding",
             "model_view_field_collision": "model_view_field_collision",
             "invalid_DOCATLAS_CONTEXT_ASSEMBLY": "invalid_context_assembly_policy",
+            "invalid_DOCATLAS_CONTEXT_PRESENTATION": "invalid_context_presentation_policy",
         }.get(str(exc), "invalid_compact_context")
         return StandaloneTextResult(None, reason)
 
@@ -84,6 +86,7 @@ def _encode_standalone_text(packet: dict) -> str | None:
     standard projection. Unsupported source shapes never lose unknown fields
     merely to make the compact representation fit.
     """
+    literal_v2 = literal_presentation_enabled()
     rendered = encode_model_result(packet)
     if rendered is None:
         return None
@@ -119,11 +122,13 @@ def _encode_standalone_text(packet: dict) -> str | None:
         visible["ref"] = original["evidence_id"]
         if "source_uri" in original:
             visible["source_uri"] = deepcopy(original["source_uri"])
-        if minimal and "content_sha256" in original:
+        if minimal and not literal_v2 and "content_sha256" in original:
             visible["content_sha256"] = original["content_sha256"]
         if not shared_identity and "project_identity" in original:
             visible["project_identity"] = deepcopy(original["project_identity"])
-    view["context_format"] = FORMAT
+    # v2 hides only the initial source hash from the model. The original
+    # machine packet, public capabilities and server-side hash checks remain.
+    view["context_format"] = LITERAL_FORMAT if literal_v2 else FORMAT
     text = canonical(view)
     if not minimal and not compact_text_fits(text):
         raise StandaloneTextError("standalone_context_output_limit")

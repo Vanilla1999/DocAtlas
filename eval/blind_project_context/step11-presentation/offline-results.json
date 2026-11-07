@@ -1,0 +1,218 @@
+{
+  "status": "OFFLINE_REPLAY_PASS",
+  "minimal_runtime_proven": false,
+  "inference_calls": 0,
+  "packet_count": 16,
+  "source_rows": 66,
+  "summary": {
+    "historical_local_tokens": {
+      "total": 14284,
+      "median": 920.0,
+      "max": 1505
+    },
+    "literal_v2_local_tokens": {
+      "total": 12325,
+      "median": 787.0,
+      "max": 1262
+    },
+    "literal_v2_utf8_bytes": {
+      "total": 45048,
+      "median": 2886.0,
+      "max": 4638
+    }
+  },
+  "cases": [
+    {
+      "id": "C-L1",
+      "phase": "recovery",
+      "source_rows": 4,
+      "historical_local_tokens": 909,
+      "literal_v2_local_tokens": 778,
+      "literal_v2_utf8_bytes": 2822,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "C-L2",
+      "phase": "recovery",
+      "source_rows": 6,
+      "historical_local_tokens": 1130,
+      "literal_v2_local_tokens": 964,
+      "literal_v2_utf8_bytes": 3385,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "C-L3",
+      "phase": "recovery",
+      "source_rows": 6,
+      "historical_local_tokens": 1133,
+      "literal_v2_local_tokens": 955,
+      "literal_v2_utf8_bytes": 3503,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "C-L4",
+      "phase": "recovery",
+      "source_rows": 0,
+      "historical_local_tokens": 327,
+      "literal_v2_local_tokens": 327,
+      "literal_v2_utf8_bytes": 1228,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": true
+    },
+    {
+      "id": "C-T1",
+      "phase": "recovery",
+      "source_rows": 6,
+      "historical_local_tokens": 1198,
+      "literal_v2_local_tokens": 1032,
+      "literal_v2_utf8_bytes": 3868,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "C-T2",
+      "phase": "recovery",
+      "source_rows": 4,
+      "historical_local_tokens": 876,
+      "literal_v2_local_tokens": 744,
+      "literal_v2_utf8_bytes": 2648,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "C-T3",
+      "phase": "recovery",
+      "source_rows": 4,
+      "historical_local_tokens": 884,
+      "literal_v2_local_tokens": 766,
+      "literal_v2_utf8_bytes": 2787,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "C-T4",
+      "phase": "recovery",
+      "source_rows": 0,
+      "historical_local_tokens": 322,
+      "literal_v2_local_tokens": 322,
+      "literal_v2_utf8_bytes": 1228,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": true
+    },
+    {
+      "id": "V-C1",
+      "phase": "validation",
+      "source_rows": 9,
+      "historical_local_tokens": 1505,
+      "literal_v2_local_tokens": 1262,
+      "literal_v2_utf8_bytes": 4638,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "V-C2",
+      "phase": "validation",
+      "source_rows": 8,
+      "historical_local_tokens": 1393,
+      "literal_v2_local_tokens": 1166,
+      "literal_v2_utf8_bytes": 4237,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "V-C3",
+      "phase": "validation",
+      "source_rows": 5,
+      "historical_local_tokens": 1026,
+      "literal_v2_local_tokens": 863,
+      "literal_v2_utf8_bytes": 3126,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "V-C4",
+      "phase": "validation",
+      "source_rows": 0,
+      "historical_local_tokens": 326,
+      "literal_v2_local_tokens": 326,
+      "literal_v2_utf8_bytes": 1228,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": true
+    },
+    {
+      "id": "V-M1",
+      "phase": "validation",
+      "source_rows": 4,
+      "historical_local_tokens": 931,
+      "literal_v2_local_tokens": 796,
+      "literal_v2_utf8_bytes": 2950,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "V-M2",
+      "phase": "validation",
+      "source_rows": 4,
+      "historical_local_tokens": 884,
+      "literal_v2_local_tokens": 753,
+      "literal_v2_utf8_bytes": 2722,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "V-M3",
+      "phase": "validation",
+      "source_rows": 6,
+      "historical_local_tokens": 1109,
+      "literal_v2_local_tokens": 940,
+      "literal_v2_utf8_bytes": 3450,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": false
+    },
+    {
+      "id": "V-M4",
+      "phase": "validation",
+      "source_rows": 0,
+      "historical_local_tokens": 331,
+      "literal_v2_local_tokens": 331,
+      "literal_v2_utf8_bytes": 1228,
+      "source_fields_preserved_except_visible_hash": true,
+      "source_bytes_hashes_spans_verified": true,
+      "canonical_packet_unchanged": true,
+      "empty_fallback_reconstructed": true
+    }
+  ]
+}
