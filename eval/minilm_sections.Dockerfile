@@ -9,6 +9,6 @@ RUN pip install --no-cache-dir uv==0.9.25 \
  && uv sync --frozen --no-dev --no-install-project \
  && uv build --wheel --out-dir /wheels \
  && uv pip install --python /opt/venv/bin/python --no-deps /wheels/*.whl \
- && /opt/venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("o200k_base")' \
+ && /opt/venv/bin/python -c 'import tiktoken; [tiktoken.get_encoding(name) for name in ("o200k_base", "cl100k_base")]' \
  && /opt/venv/bin/python -m docmancer.docs.application.section_model /model
 ENTRYPOINT ["/opt/venv/bin/python", "-I", "/repo/eval/minilm_sections_integration.py"]
