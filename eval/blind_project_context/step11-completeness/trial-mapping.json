@@ -1,0 +1,114 @@
+[
+  {
+    "question_id": "V-M1",
+    "arm": "one_hop",
+    "input_id": "input-001",
+    "source_rows": 8,
+    "source_facts": 8
+  },
+  {
+    "question_id": "V-M2",
+    "arm": "one_hop",
+    "input_id": "input-002",
+    "source_rows": 4,
+    "source_facts": 6
+  },
+  {
+    "question_id": "V-M1",
+    "arm": "full_audit",
+    "input_id": "input-003",
+    "source_rows": 6,
+    "source_facts": 8
+  },
+  {
+    "question_id": "V-M4",
+    "arm": "selected",
+    "input_id": "input-004",
+    "source_rows": 0,
+    "source_facts": 0
+  },
+  {
+    "question_id": "V-M4",
+    "arm": "one_hop",
+    "input_id": "input-004",
+    "source_rows": 0,
+    "source_facts": 0
+  },
+  {
+    "question_id": "V-M1",
+    "arm": "selected",
+    "input_id": "input-005",
+    "source_rows": 4,
+    "source_facts": 5
+  },
+  {
+    "question_id": "V-M2",
+    "arm": "full_audit",
+    "input_id": "input-006",
+    "source_rows": 6,
+    "source_facts": 6
+  },
+  {
+    "question_id": "V-M4",
+    "arm": "full",
+    "input_id": "input-007",
+    "source_rows": 6,
+    "source_facts": 0
+  },
+  {
+    "question_id": "V-M3",
+    "arm": "full",
+    "input_id": "input-008",
+    "source_rows": 6,
+    "source_facts": 5
+  },
+  {
+    "question_id": "V-M3",
+    "arm": "full_audit",
+    "input_id": "input-009",
+    "source_rows": 6,
+    "source_facts": 5
+  },
+  {
+    "question_id": "V-M3",
+    "arm": "selected",
+    "input_id": "input-010",
+    "source_rows": 6,
+    "source_facts": 5
+  },
+  {
+    "question_id": "V-M4",
+    "arm": "full_audit",
+    "input_id": "input-011",
+    "source_rows": 6,
+    "source_facts": 0
+  },
+  {
+    "question_id": "V-M2",
+    "arm": "selected",
+    "input_id": "input-002",
+    "source_rows": 4,
+    "source_facts": 6
+  },
+  {
+    "question_id": "V-M1",
+    "arm": "full",
+    "input_id": "input-012",
+    "source_rows": 6,
+    "source_facts": 8
+  },
+  {
+    "question_id": "V-M3",
+    "arm": "one_hop",
+    "input_id": "input-010",
+    "source_rows": 6,
+    "source_facts": 5
+  },
+  {
+    "question_id": "V-M2",
+    "arm": "full",
+    "input_id": "input-013",
+    "source_rows": 6,
+    "source_facts": 6
+  }
+]

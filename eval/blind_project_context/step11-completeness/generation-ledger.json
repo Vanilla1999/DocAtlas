@@ -1,0 +1,93 @@
+{
+  "frozen_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+  "unique_final_answers": 13,
+  "question_arm_combinations": 16,
+  "model": "inherited GPT-6 Astra Pro",
+  "no_model_override": true,
+  "fresh_fork_turns": "none",
+  "input_loading": "one exact immutable GitHub file per worker",
+  "provider_requests": null,
+  "provider_usage": null,
+  "cost": null,
+  "outputs": [
+    {
+      "id": "input-001",
+      "agent": "/root/answer_001",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-001.md"
+    },
+    {
+      "id": "input-002",
+      "agent": "/root/answer_002",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-002.md"
+    },
+    {
+      "id": "input-003",
+      "agent": "/root/answer_003",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-003.md"
+    },
+    {
+      "id": "input-004",
+      "agent": "/root/answer_004",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-004.md"
+    },
+    {
+      "id": "input-005",
+      "agent": "/root/answer_005",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-005.md"
+    },
+    {
+      "id": "input-006",
+      "agent": "/root/answer_006",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-006.md"
+    },
+    {
+      "id": "input-007",
+      "agent": "/root/answer_007",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-007.md"
+    },
+    {
+      "id": "input-008",
+      "agent": "/root/answer_008",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-008.md"
+    },
+    {
+      "id": "input-009",
+      "agent": "/root/answer_009",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-009.md"
+    },
+    {
+      "id": "input-010",
+      "agent": "/root/answer_010",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-010.md"
+    },
+    {
+      "id": "input-011",
+      "agent": "/root/answer_011",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-011.md"
+    },
+    {
+      "id": "input-012",
+      "agent": "/root/answer_012",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-012.md"
+    },
+    {
+      "id": "input-013",
+      "agent": "/root/answer_013",
+      "input_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+      "output": "answers/outputs/input-013.md"
+    }
+  ],
+  "local_environment_unavailable": true
+}

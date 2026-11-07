@@ -1,0 +1,102 @@
+{
+  "provenance": "Direct report from /root/model_audit after successful local execution before exec environment disconnected. Root received aggregates; detailed local study.py/plan/results/receipt not recovered and not claimed accessible. Treat new perturbation metrics as worker-reported exploratory evidence, not a reverified gate.",
+  "execution": {
+    "exit_code": 0,
+    "seconds": 0.367,
+    "model_calls": 0,
+    "mcp_calls": 0,
+    "downloads": 0,
+    "production_changes": 0
+  },
+  "corpus": {
+    "seen_qwen_tasks": 16,
+    "seen_public_tasks": 8,
+    "old_blind260_used": false
+  },
+  "synthetic": {
+    "recovery": {
+      "baseline_facts": [
+        40,
+        40
+      ],
+      "baseline_tokens": 961,
+      "onehop_tokens": 1021,
+      "closure_tokens": 1021,
+      "budget_tokens": 1021
+    },
+    "validation": {
+      "baseline_facts": [
+        38,
+        41
+      ],
+      "onehop_facts": [
+        41,
+        41
+      ],
+      "closure_facts": [
+        41,
+        41
+      ],
+      "budget_facts": [
+        38,
+        41
+      ],
+      "baseline_tokens": 1069,
+      "onehop_tokens": 1176,
+      "closure_tokens": 1176,
+      "budget_tokens": 1127,
+      "budget_incomplete_cases": 1
+    },
+    "noanswer_unchanged": 4,
+    "hard_negative_added": 0
+  },
+  "ablations": {
+    "seed_removals": 59,
+    "body_removed": 44,
+    "fact_loss_cases": 29,
+    "loss_unrecovered_by_full_closure_cases": 26,
+    "lost_fact_occurrences": 64,
+    "unrecovered_occurrences": 56,
+    "not_unique_facts": true,
+    "not_error_rate": true
+  },
+  "single_entry": {
+    "entry_fact_pairs": 366,
+    "depth_0": 142,
+    "depth_1": 104,
+    "unreachable": 120,
+    "required_facts_only_reachable_at_depth_2_plus": 0
+  },
+  "public_oracle": {
+    "baseline_facts": [
+      39,
+      39
+    ],
+    "baseline_tokens": 7387,
+    "onehop_tokens": 16778,
+    "twohop_tokens": 19405,
+    "closure_tokens": 26776,
+    "budget_tokens": 7767,
+    "not_qwen_result": true,
+    "baseline_perfect_by_construction": true,
+    "reference_incomplete_answerable_cases": 6,
+    "noanswer_cases": 2
+  },
+  "otel": {
+    "cases": 3,
+    "baseline_source_tokens": 3625,
+    "onehop_source_tokens": 11464,
+    "onehop_ratio": 3.1624827586206896,
+    "full_closure_source_tokens": 21462
+  },
+  "budget_recipe": "deterministic BFS on whole per-body target groups; floor(1.5 times baseline source tokens); no crop or semantic rules",
+  "export_before_disconnect_sha256": "23adbb56555f36521409eec4ccbb778d63fb7b80469452a461975d86c464c46d",
+  "verified_by_worker": [
+    "source document/unit/body hashes",
+    "raw reference witness spans",
+    "saved score source_sha256 and frozen policy_sha256",
+    "baseline replay exactness",
+    "input hashes unchanged after run"
+  ],
+  "unverified_inference": "Navigation-before-weather explanation of V-M1 budget failure follows ordering plus aggregates; detailed per-case budget row was not read after disconnect."
+}

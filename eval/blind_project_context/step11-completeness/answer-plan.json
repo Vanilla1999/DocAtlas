@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "created_before_any_answer_generation": true,
+  "base_commit": "8636d8992ecdfda0abd05738f15d4ddb869a78d1",
+  "implementation_merged_pr": 246,
+  "model": "inherited GPT-6 Astra Pro collaboration runtime; no model or effort override",
+  "boundary": "Controlled answer-only diagnostic. Not Terra Low, not OpenCode/MCP replay. Provider usage, cache, cost and number of underlying model requests unavailable.",
+  "transport": "Fresh fork_turns=none worker may fetch exactly its immutable GitHub input URL once, then answer. No gold, previous responses, other files, search or external knowledge. Fetch is input loading, not retrieval being evaluated.",
+  "environment_incident": "Local execution environment disconnected after phase1 merge and completed offline study. Answer inputs reconstructed from immutable main source graph, original source files and saved packets using GitHub reader; local files are not claimed available.",
+  "source_contract": "All six authorized Meridian project documents, excluding module/private docs. Original questions and 19 frozen question-fact occurrences unchanged. Source excerpts retain original content, except terminal newline normalization applied equally to selected/one-hop/full.",
+  "arms": [
+    "selected",
+    "one_hop",
+    "full",
+    "full_audit"
+  ],
+  "trial_count": 16,
+  "unique_answer_generations": 13,
+  "maximum_answer_generations": 16,
+  "duplicate_policy": "Byte-identical authored prompts share one answer; shared answers are not independent repeats.",
+  "randomization_seed": 20261107,
+  "intervention": "One generic source-to-draft audit instruction; exact text in genericinstruction.txt. No dictionary, source hints, expected facts, output template or extra model call.",
+  "evaluation": "Frozen facts scored full/partial/missing; compound full requires all material clauses. Source support evaluated against actual arm. No-answer/unsupported claims separate. One independent evaluator plus root adjudication; no output-driven prompt tuning.",
+  "source_fact_counts": {
+    "selected": 16,
+    "one_hop": 19,
+    "full": 19,
+    "full_audit": 19
+  },
+  "no_answer_cases_per_arm": 1,
+  "scope_of_inference": "Four already seen development questions; single sample per unique input. No general reliability, causal reproduction of old Terra failures, or production-default claim."
+}

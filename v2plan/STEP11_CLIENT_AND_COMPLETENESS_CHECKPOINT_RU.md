@@ -97,3 +97,13 @@ PR: https://github.com/Vanilla1999/DocAtlas/pull/246.
 `eval/blind_project_context/step11-ci-readiness/`,
 `eval/blind_project_context/step11-client-profile/` и
 `reviews/STEP11_IMPLEMENTATION_RU.md`. Исторический blind holdout не читается.
+
+## Завершение первой фазы и исследование после merge
+
+PR #246 merged=true, main `8636d8992ecdfda0abd05738f15d4ddb869a78d1`.
+После merge завершены offline link study и 13 уникальных answer-only генераций
+Astra Pro по заранее опубликованным inputs; сохранены независимая оценка и root review.
+Локальная среда отключилась после offline study: его недоступные raw artifacts
+отмечены отдельно. Новый answer study восстановлен и полностью опубликован через
+GitHub; это не воспроизведение Terra Low и не billing measurement.
+Отчёт: `eval/blind_project_context/step11-completeness/README_RU.md`.

@@ -1,0 +1,444 @@
+{
+  "instruction": "Evaluate answer coverage independently. Use only each case's source_material and frozen facts. Do not infer experimental arm or prefer a style. For each fact label full, partial, or missing, and give a short evidence quote/reason. Full requires every material component, including scope, triggering/timing conditions and conjunctions. Facts present only in the question/source/citation but not expressed in the answer do not count as answer coverage. A paraphrase is allowed. Mark source support separately and unsupported factual assertions; true in a larger corpus is not sufficient. For no_answer require no invented temperature and no unsupported claim the rule does not exist anywhere. Return one compact JSON object with all input_ids, ordered fact labels and short reasons for non-full cases, unsupported_claims, no_answer_status. No additional model generations, no fetching other files.",
+  "cases": [
+    {
+      "input_id": "input-001",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "reservations.md#Confirmed reservations",
+          "quote": "These rules apply to confirmed night-time reservations on shared instruments."
+        },
+        {
+          "id": "F2",
+          "source": "reservations.md#Transfer",
+          "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."
+        },
+        {
+          "id": "F3",
+          "source": "reservations.md#Transfer",
+          "quote": "Retain the original reservation identifier and record both observers in the audit trail."
+        },
+        {
+          "id": "F4",
+          "source": "reservations.md#Locked instrument",
+          "quote": "leave the transfer pending even after observer acceptance and operator approval"
+        },
+        {
+          "id": "F5",
+          "source": "reservations.md#Locked instrument",
+          "quote": "The lock must be cleared by the instrument team first."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F7",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F8",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: calendar.md\nLines: 1-4\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n-----\n\nSource path: calendar.md\nLines: 5-8\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n-----\n\nSource path: reservations.md\nLines: 1-6\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n-----\n\nSource path: reservations.md\nLines: 7-10\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n-----\n\nSource path: reservations.md\nLines: 11-14\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n-----\n\nSource path: reservations.md\nLines: 15-17\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-4\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n-----\n\nSource path: weather.md\nLines: 5-8\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n",
+      "answer": "**При активной блокировке обслуживания передачу нужно оставить в ожидании — даже после согласия принимающего наблюдателя и одобрения дежурного оператора. Сначала команда инструмента должна снять блокировку. Погодная приостановка при передаче сохраняется.** Эти правила относятся к подтверждённым ночным бронированиям на общих инструментах. (`reservations.md`, строки 1–14)\n\nПорядок действий:\n\n1. **Получите оба согласования:** принимающий наблюдатель должен принять бронирование, а дежурный оператор — одобрить передачу. (`reservations.md`, строки 7–10)\n\n2. **Сохраните исходный идентификатор бронирования и зафиксируйте обоих наблюдателей в журнале аудита.** Передача не должна менять идентификатор; его также необходимо сохранять во время погодной приостановки. (`reservations.md`, строки 7–10; `weather.md`, строки 5–8)\n\n3. **Оставьте передачу в состоянии ожидания, пока команда инструмента не снимет блокировку обслуживания.** Полученные согласования не позволяют завершить передачу при действующей блокировке. Снятие блокировки — обязательное предварительное условие. (`reservations.md`, строки 11–14)\n\n4. **Рассматривайте возобновление наблюдения отдельно от передачи бронирования.** Погодные решения регулируют выполнение наблюдений, а не принадлежность бронирований; передача не отменяет погодную приостановку. Для наружных наблюдений при размыкании ветровой блокировки выполнение приостанавливается. Возобновление допускается только после её замыкания **и** записи дежурным оператором разрешения на перезапуск. Одобрение передачи и разрешение на перезапуск относятся к разным действиям. (`weather.md`, строки 1–8; `reservations.md`, строки 7–10)\n\n**Исключение для дневных учебных сеансов здесь неприменимо.** Инструктор может переназначать такие сеансы без ночной процедуры согласования, но этот упрощённый порядок не распространяется на подтверждённые наблюдения. (`reservations.md`, строки 15–17)\n\nКалендарь служит только отображением состояния: янтарный цвет обозначает ожидающее назначения бронирование, синий — подтверждённый интервал, серый — приостановленный. Изменение темы браузера меняет цвета локально, не влияя на выполнение наблюдений, а визуальное обновление не снимает блокировку обслуживания. (`calendar.md`, строки 1–8)\n\nВ предоставленных фрагментах не указаны конкретные кнопки или команды передачи, процедура снятия блокировки командой инструмента и то, завершается ли ожидающая передача автоматически после снятия блокировки. Эти детали по имеющимся выдержкам определить нельзя."
+    },
+    {
+      "input_id": "input-002",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "weather.md#Weather decisions",
+          "quote": "Weather decisions govern execution, not ownership of reservations."
+        },
+        {
+          "id": "F2",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F3",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F4",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        },
+        {
+          "id": "F5",
+          "source": "weather.md#Indoor instrument",
+          "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Indoor instrument",
+          "quote": "A roof visible as closed on the calendar does not establish indoor classification."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: weather.md\nLines: 1-4\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n-----\n\nSource path: weather.md\nLines: 5-8\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n-----\n\nSource path: weather.md\nLines: 9-12\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n-----\n\nSource path: weather.md\nLines: 13-15\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "- **Stop outdoor observations when the wind interlock opens.** Preserve reservation identifiers during the suspension. Weather decisions govern execution, not ownership of reservations. (`weather.md`, lines 1–8)\n\n- **Restart only after both conditions are met:** the wind interlock has closed, and the duty operator has recorded a restart approval. The forecast panel is for planning; a favourable forecast is not an interlock signal and cannot authorize a restart. (`weather.md`, lines 5–8 and 13–15)\n\n- **An indoor instrument may continue during a wind suspension** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–12)\n\nThe supplied excerpts do not specify a numerical wind-speed threshold; the stated suspension trigger is the wind interlock opening. (`weather.md`, lines 5–8)"
+    },
+    {
+      "input_id": "input-003",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "reservations.md#Confirmed reservations",
+          "quote": "These rules apply to confirmed night-time reservations on shared instruments."
+        },
+        {
+          "id": "F2",
+          "source": "reservations.md#Transfer",
+          "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."
+        },
+        {
+          "id": "F3",
+          "source": "reservations.md#Transfer",
+          "quote": "Retain the original reservation identifier and record both observers in the audit trail."
+        },
+        {
+          "id": "F4",
+          "source": "reservations.md#Locked instrument",
+          "quote": "leave the transfer pending even after observer acceptance and operator approval"
+        },
+        {
+          "id": "F5",
+          "source": "reservations.md#Locked instrument",
+          "quote": "The lock must be cleared by the instrument team first."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F7",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F8",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "**Пока блокировка обслуживания активна, передачу нужно оставить в ожидании — даже если принимающий наблюдатель уже согласился, а дежурный оператор её одобрил.** Сначала блокировку должна снять команда инструмента. При этом передача не отменяет погодную приостановку. (`reservations.md:7–13`)\n\n### Порядок передачи\n\n1. **Получите согласие принимающего наблюдателя и одобрение дежурного оператора.** Для передачи подтверждённого ночного бронирования нужны оба условия. (`reservations.md:7–9`)\n2. **Сохраните передачу в состоянии ожидания, пока действует блокировка обслуживания.** Согласие и одобрение сами по себе не позволяют завершить её: блокировку должна предварительно снять команда инструмента. (`reservations.md:11–13`)\n3. **После снятия блокировки, при наличии обоих согласований, выполните передачу.** Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка остаётся в силе. (`reservations.md:7–13`)\n\nУпрощённое переназначение инструктором предусмотрено для дневных учебных слотов; к подтверждённому ночному наблюдению оно не применяется. (`reservations.md:15–17`)\n\n### Когда можно возобновить наблюдение\n\nПогодные решения регулируют **выполнение наблюдений**, а не принадлежность бронирований. Поэтому завершение передачи и возобновление выполнения имеют отдельные условия. (`weather.md:1–7`; `reservations.md:7–9`)\n\nДля наблюдения на открытом воздухе размыкание ветровой блокировки требует приостановки с сохранением идентификаторов бронирований. Возобновление допускается только после того, как **ветровая блокировка снова замкнётся и дежурный оператор зафиксирует разрешение на перезапуск**. Одобрение передачи не устраняет эти требования. (`weather.md:5–7`; `reservations.md:7–9`)\n\nЕсть погодное исключение: инструмент, **явно классифицированный как находящийся в помещении**, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки остаются замкнутыми. Закрытая крыша, отображаемая в календаре, не подтверждает такую классификацию. Это исключение не снимает требование оставить передачу ожидающей при активной блокировке обслуживания. (`weather.md:9–11`; `reservations.md:11–13`)\n\n### Проверки и ограничения при возобновлении\n\nПеред выполнением расписания шлюз сверяет время инструмента с эталонными часами обсерватории. **Если абсолютное расхождение превышает две секунды**, выполнение нужно приостановить и уведомить дежурного оператора, оставив бронирования в очереди без изменений. После такой остановки возобновление возможно лишь после двух последовательных эталонных проверок, каждая из которых показывает расхождение не более двух секунд. Если эталон недоступен, выполнение остаётся приостановленным; одного локального показания часов недостаточно. (`clock.md:3–11`)\n\nНе применяйте восстановление из снятого с эксплуатации прототипа: очистку ожидающих бронирований при расхождении времени и запуск по первому локальному показанию. Для текущего шлюза эти действия прямо запрещены. Ускоренные часы симулятора также изолированы от реального шлюза. (`architecture.md:9–11`; `clock.md:13–15`)\n\nКалендарь служит отображением состояния: обновление страницы не снимает блокировку обслуживания, а сам календарь не разрешает выполнение. Благоприятный прогноз не заменяет сигнал ветровой блокировки и не разрешает перезапуск. Планировщик может рассчитать план во время приостановки, но этот план не позволяет обойти погодную блокировку или проверку часов. (`calendar.md:3–7`; `overview.md:5–7`; `weather.md:13–15`; `architecture.md:5–7`)\n\nВ предоставленных фрагментах не описаны конкретные кнопки, команды или API для оформления передачи и снятия блокировки. Они устанавливают условия и ответственность участников; технический способ выполнения этих действий по данным фрагментам определить нельзя."
+    },
+    {
+      "input_id": "input-004",
+      "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+      "facts": [],
+      "no_answer": true,
+      "source_material": "No source excerpts were delivered.\n",
+      "answer": "Определить обязательную температуру охлаждения для всех общих приборов обсерватории нельзя: **выдержки из документации не были предоставлены**. Поэтому нельзя подтвердить ни конкретное значение температуры, ни наличие единого требования для всех приборов. Отсутствие предоставленных источников не означает, что такого требования нет в документации."
+    },
+    {
+      "input_id": "input-005",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "reservations.md#Confirmed reservations",
+          "quote": "These rules apply to confirmed night-time reservations on shared instruments."
+        },
+        {
+          "id": "F2",
+          "source": "reservations.md#Transfer",
+          "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."
+        },
+        {
+          "id": "F3",
+          "source": "reservations.md#Transfer",
+          "quote": "Retain the original reservation identifier and record both observers in the audit trail."
+        },
+        {
+          "id": "F4",
+          "source": "reservations.md#Locked instrument",
+          "quote": "leave the transfer pending even after observer acceptance and operator approval"
+        },
+        {
+          "id": "F5",
+          "source": "reservations.md#Locked instrument",
+          "quote": "The lock must be cleared by the instrument team first."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F7",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F8",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: reservations.md\nLines: 1-6\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n-----\n\nSource path: reservations.md\nLines: 7-10\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n-----\n\nSource path: reservations.md\nLines: 11-14\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n-----\n\nSource path: reservations.md\nLines: 15-17\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+      "answer": "**При активной блокировке обслуживания передачу нужно оставить в ожидании — даже если принимающий наблюдатель уже согласился, а дежурный оператор одобрил её. Сначала блокировку должна снять команда инструмента.** (`reservations.md`, строки 11–14)\n\nДля подтверждённого ночного бронирования на общем инструменте действуйте так:\n\n1. **Получите согласие принимающего наблюдателя и одобрение дежурного оператора.** Оба условия обязательны для передачи. (`reservations.md`, строки 1–3, 7–10)\n2. **Оставьте передачу в ожидании до снятия блокировки обслуживания командой инструмента.** Согласие наблюдателя и одобрение оператора сами по себе не позволяют завершить передачу при действующей блокировке. (`reservations.md`, строки 11–14)\n3. **Сохраните исходный идентификатор бронирования и зафиксируйте обоих наблюдателей в журнале аудита.** Это требования к оформлению передачи. (`reservations.md`, строки 7–10)\n4. **Учитывайте, что погодная приостановка сохраняется.** Передача бронирования другому наблюдателю не изменяет её, поэтому завершение передачи само по себе не означает возобновления наблюдения. (`reservations.md`, строки 7–10)\n\nУпрощённое переназначение инструктором предусмотрено для дневных учебных слотов; к подтверждённым наблюдениям оно не применяется. (`reservations.md`, строки 15–17)\n\nВ предоставленных выдержках не описаны конкретные действия в интерфейсе, процедура снятия блокировки обслуживания и условия отмены погодной приостановки. По этим материалам нельзя определить, когда можно будет возобновить само наблюдение."
+    },
+    {
+      "input_id": "input-006",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "weather.md#Weather decisions",
+          "quote": "Weather decisions govern execution, not ownership of reservations."
+        },
+        {
+          "id": "F2",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F3",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F4",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        },
+        {
+          "id": "F5",
+          "source": "weather.md#Indoor instrument",
+          "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Indoor instrument",
+          "quote": "A roof visible as closed on the calendar does not establish indoor classification."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "**Suspend outdoor observations when the wind interlock opens. Restart requires both the interlock to close and the duty operator to record restart approval. An explicitly classified indoor instrument may continue if its own safety interlocks remain closed.** (`weather.md`, lines 5–11)\n\n### When wind should stop observations\n\nThe specified trigger is **the wind interlock opening**. The supplied excerpts do not give a numerical wind-speed threshold. Suspension affects execution, not reservation ownership, and reservation identifiers must be preserved. Transferring a reservation does not change its weather suspension. (`weather.md`, lines 3–7; `reservations.md`, lines 7–9)\n\n### What is required to restart\n\nBoth weather recovery conditions must be met:\n\n1. The wind interlock has closed.\n2. The duty operator has **recorded** restart approval. (`weather.md`, lines 5–7)\n\nA favourable forecast cannot authorize a restart: the forecast panel supports planning and is not an interlock signal. The planner may compute a plan while execution is suspended, but that plan cannot bypass weather interlocks or clock checks. The calendar likewise cannot authorize execution. (`weather.md`, lines 13–15; `architecture.md`, lines 5–7; `overview.md`, lines 5–7)\n\n**Any independent clock pause must also be resolved.** The gateway checks instrument time against the observatory reference before execution. If the absolute offset exceeds two seconds, execution pauses, the duty operator must be notified, and queued reservations remain unchanged. Recovery from that pause requires **two consecutive reference checks reporting an offset within two seconds**. If the reference is unavailable, execution stays paused; a local clock reading alone cannot satisfy either recovery check. These are the clock-pause recovery conditions, not an additional two-check requirement stated for every wind suspension. (`clock.md`, lines 3–11)\n\n### Whether an indoor instrument may continue\n\n**Yes**, provided the instrument is **explicitly classified as indoor** and its own safety interlocks **remain closed**. A roof shown as closed on the calendar does **not** establish indoor classification. (`weather.md`, lines 9–11)"
+    },
+    {
+      "input_id": "input-007",
+      "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+      "facts": [],
+      "no_answer": true,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "**По предоставленным выдержкам определить обязательную температуру охлаждения для всех общих приборов обсерватории нельзя.** В них описаны планирование наблюдений, бронирование, погодные блокировки и проверки времени, но требования к охлаждению и значения температуры не приведены (`overview.md`, строки 1–11; `reservations.md`, строки 1–17; `weather.md`, строки 1–15; `clock.md`, строки 1–15).\n\nЭти данные не подтверждают существование единого температурного требования для всех приборов. При этом отсутствие сведений в предоставленных выдержках не означает, что таких требований нет в других частях документации."
+    },
+    {
+      "input_id": "input-008",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "clock.md#Time coordination",
+          "quote": "The gateway compares instrument time with the observatory reference before executing a schedule."
+        },
+        {
+          "id": "F2",
+          "source": "clock.md#Clock offset",
+          "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."
+        },
+        {
+          "id": "F3",
+          "source": "clock.md#Clock offset",
+          "quote": "Keep queued reservations unchanged."
+        },
+        {
+          "id": "F4",
+          "source": "clock.md#Clock offset",
+          "quote": "Resume only after two consecutive reference checks report an offset within two seconds."
+        },
+        {
+          "id": "F5",
+          "source": "clock.md#Missing reference",
+          "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "If the **absolute clock offset exceeds two seconds**, the gateway must **pause schedule execution, notify the duty operator, and keep queued reservations unchanged**. The comparison is between instrument time and the observatory reference clock. (`clock.md`, lines 3–7)\n\nRecovery must follow these rules:\n\n1. **Require two consecutive reference checks with an offset within two seconds before resuming.** A single satisfactory check is insufficient. (`clock.md`, line 7)\n2. **If the reference clock is unavailable, keep execution paused.** A local clock reading alone cannot satisfy either recovery check; recovery therefore requires reference checks to become possible again and meet the two-check requirement. (`clock.md`, lines 7–11)\n3. **Do not use the retired prototype’s recovery behavior.** Clearing pending reservations or restarting on the first local clock sample is explicitly prohibited for the current gateway. (`architecture.md`, lines 9–11)\n4. **Do not apply the simulator’s exception to the gateway.** The simulator advances time manually without waiting for reference checks, but its accelerated clock is isolated from the real instrument gateway. (`clock.md`, lines 13–15)\n\nPlanning may continue while execution is paused, but a computed plan cannot bypass a clock check or weather interlock. If outdoor observations are also suspended because the wind interlock opened, their restart additionally requires the interlock to close and the duty operator to record restart approval. (`architecture.md`, lines 5–7; `weather.md`, lines 5–7)\n\nThe supplied excerpts do not describe how to repair or restore an unavailable reference clock; they specify that execution must remain paused while it is unavailable. (`clock.md`, lines 9–11)"
+    },
+    {
+      "input_id": "input-009",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "clock.md#Time coordination",
+          "quote": "The gateway compares instrument time with the observatory reference before executing a schedule."
+        },
+        {
+          "id": "F2",
+          "source": "clock.md#Clock offset",
+          "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."
+        },
+        {
+          "id": "F3",
+          "source": "clock.md#Clock offset",
+          "quote": "Keep queued reservations unchanged."
+        },
+        {
+          "id": "F4",
+          "source": "clock.md#Clock offset",
+          "quote": "Resume only after two consecutive reference checks report an offset within two seconds."
+        },
+        {
+          "id": "F5",
+          "source": "clock.md#Missing reference",
+          "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "When the **absolute clock offset exceeds two seconds**, the gateway must **pause schedule execution, notify the duty operator, and keep queued reservations unchanged**. The gateway checks this offset by comparing instrument time with the observatory reference before executing a schedule. (`clock.md`, lines 3–7)\n\nRecovery must follow these rules:\n\n- **Require two consecutive successful reference checks.** Execution may resume only after both checks report an offset within two seconds. A single successful check is insufficient. (`clock.md`, line 7)\n- **Remain paused if the reference clock is unavailable.** A local clock reading alone cannot satisfy either recovery check, so reference unavailability does not permit a local-clock restart. Recovery still requires the two consecutive reference checks. (`clock.md`, lines 7–11)\n- **Do not use the retired prototype’s recovery behavior.** Clearing pending reservations after drift or restarting on the first local clock sample is explicitly prohibited for the current gateway. (`architecture.md`, lines 9–11)\n\nPlanning may continue while execution is suspended, but a computed plan cannot bypass a clock check or weather interlock. The simulator’s manually advanced clock is isolated from the real gateway; its exemption from waiting for reference checks does not provide a gateway recovery exception. (`architecture.md`, lines 5–7; `clock.md`, lines 13–15)\n\nThe supplied excerpts do not specify how to correct the clock, how frequently to repeat reference checks, or any alternative recovery procedure while the reference remains unavailable."
+    },
+    {
+      "input_id": "input-010",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "clock.md#Time coordination",
+          "quote": "The gateway compares instrument time with the observatory reference before executing a schedule."
+        },
+        {
+          "id": "F2",
+          "source": "clock.md#Clock offset",
+          "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."
+        },
+        {
+          "id": "F3",
+          "source": "clock.md#Clock offset",
+          "quote": "Keep queued reservations unchanged."
+        },
+        {
+          "id": "F4",
+          "source": "clock.md#Clock offset",
+          "quote": "Resume only after two consecutive reference checks report an offset within two seconds."
+        },
+        {
+          "id": "F5",
+          "source": "clock.md#Missing reference",
+          "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-4\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n-----\n\nSource path: architecture.md\nLines: 9-11\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: clock.md\nLines: 1-4\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n-----\n\nSource path: clock.md\nLines: 5-8\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n-----\n\nSource path: clock.md\nLines: 9-12\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n-----\n\nSource path: clock.md\nLines: 13-15\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n",
+      "answer": "The gateway must **pause schedule execution when the absolute clock offset exceeds two seconds** and resume only after **two consecutive reference checks** each report an offset within two seconds. Its comparison is between instrument time and the observatory reference, performed before executing a schedule. (`clock.md`, lines 1–8)\n\nAfter excessive drift, it must:\n\n- **Notify the duty operator.**\n- **Keep queued reservations unchanged.**\n- **Remain paused until both consecutive reference checks meet the recovery threshold.** (`clock.md`, lines 5–8)\n\n**If the reference clock is unavailable, execution must stay paused.** A local clock reading alone cannot satisfy either recovery check. Recovery therefore requires the reference to become available and the two consecutive qualifying checks to be completed; the supplied excerpts do not specify an alternative recovery procedure while the reference remains unavailable. (`clock.md`, lines 5–12)\n\nThe gateway must not use the retired prototype’s recovery behavior: **clearing pending reservations or restarting on the first local clock sample is explicitly prohibited** for the current gateway. (`architecture.md`, lines 9–11)\n\nThe simulator’s behavior is a separate exception: it advances time manually and never waits for reference checks, but its accelerated clock is isolated from the real instrument gateway. That behavior does not change the gateway’s recovery requirements. (`clock.md`, lines 13–15)"
+    },
+    {
+      "input_id": "input-011",
+      "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+      "facts": [],
+      "no_answer": true,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "**По предоставленным фрагментам определить обязательную температуру охлаждения для всех общих приборов обсерватории нельзя.** В них описаны планирование наблюдений, бронирование, проверки времени и погодные блокировки, но требования к температуре охлаждения не приведены (`overview.md`, строки 1–11; `reservations.md`, строки 1–17; `clock.md`, строки 1–15; `weather.md`, строки 1–15).\n\nЭто не означает, что такого требования нет в другой документации: предоставленные источники не позволяют подтвердить ни конкретное значение температуры, ни его обязательность для всех приборов."
+    },
+    {
+      "input_id": "input-012",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "reservations.md#Confirmed reservations",
+          "quote": "These rules apply to confirmed night-time reservations on shared instruments."
+        },
+        {
+          "id": "F2",
+          "source": "reservations.md#Transfer",
+          "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."
+        },
+        {
+          "id": "F3",
+          "source": "reservations.md#Transfer",
+          "quote": "Retain the original reservation identifier and record both observers in the audit trail."
+        },
+        {
+          "id": "F4",
+          "source": "reservations.md#Locked instrument",
+          "quote": "leave the transfer pending even after observer acceptance and operator approval"
+        },
+        {
+          "id": "F5",
+          "source": "reservations.md#Locked instrument",
+          "quote": "The lock must be cleared by the instrument team first."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F7",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F8",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "**При активной блокировке обслуживания передача должна оставаться в ожидании, даже если принимающий наблюдатель уже согласился и дежурный оператор одобрил её.** Сначала блокировку должна снять команда инструмента. Погодная приостановка регулирует выполнение наблюдения и не отменяется при смене владельца бронирования. (`reservations.md`, строки 7–13; `weather.md`, строки 3–7.)\n\n### Порядок передачи\n\n1. **Получите согласие принимающего наблюдателя и одобрение дежурного оператора.** Для передачи подтверждённого ночного бронирования необходимы оба условия. (`reservations.md`, строки 3, 7–9.)\n2. **Оставьте передачу в состоянии ожидания, пока действует блокировка обслуживания.** Согласие наблюдателя и одобрение оператора не позволяют обойти её; снять блокировку должна команда инструмента. (`reservations.md`, строки 11–13.)\n3. **После снятия блокировки передача может быть завершена при выполнении обоих условий согласования.** Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при этом остаётся в силе: погодные решения относятся к выполнению наблюдения, а не к владению бронированием. (`reservations.md`, строки 7–13; `weather.md`, строки 3–7.)\n\nУпрощённое переназначение инструктором предусмотрено для дневных учебных слотов. К подтверждённому ночному наблюдению оно не применяется. (`reservations.md`, строки 15–17.)\n\n### Условия возобновления наблюдения\n\n**Одобрение передачи не заменяет одобрение повторного запуска.** Для наружного наблюдения после ветровой приостановки необходимы закрытие ветровой блокировки и зарегистрированное дежурным оператором одобрение возобновления. Во время приостановки идентификатор бронирования сохраняется. (`reservations.md`, строка 9; `weather.md`, строки 5–7.)\n\nПеред выполнением расписания шлюз также сравнивает время инструмента с эталонным временем обсерватории. Если абсолютное расхождение превышает две секунды, выполнение следует приостановить, уведомить дежурного оператора и оставить бронирования в очереди без изменений. После такой приостановки возобновление допускается только после **двух последовательных проверок по эталону с расхождением не более двух секунд**. Если эталон недоступен, выполнение остаётся приостановленным; одного показания локальных часов недостаточно. (`clock.md`, строки 3–11.)\n\nЕсть исключение для инструмента, **явно классифицированного как находящийся в помещении**: он может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки остаются закрытыми. Отображение закрытой крыши в календаре не подтверждает такую классификацию. Это исключение относится к погодному ограничению; требование оставить передачу в ожидании при блокировке обслуживания сохраняется. (`weather.md`, строки 9–11; `reservations.md`, строки 11–13.)\n\n### Что не позволяет обойти ограничения\n\nОбновление календаря не снимает блокировку обслуживания. Благоприятный прогноз не является сигналом ветровой блокировки и не разрешает повторный запуск. Планировщик может рассчитать план во время приостановки, но такой план не даёт права обходить погодную блокировку или проверку часов. (`calendar.md`, строки 3–7; `weather.md`, строки 13–15; `architecture.md`, строки 5–7.)\n\nВ предоставленных выдержках не описаны конкретные кнопки или команды передачи и снятия блокировки, а также не указано, завершается ли ожидающая передача автоматически после её снятия. Для этих деталей нужна дополнительная документация; отсутствие сведений в данных выдержках не означает их отсутствия в проекте."
+    },
+    {
+      "input_id": "input-013",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "facts": [
+        {
+          "id": "F1",
+          "source": "weather.md#Weather decisions",
+          "quote": "Weather decisions govern execution, not ownership of reservations."
+        },
+        {
+          "id": "F2",
+          "source": "weather.md#Suspension",
+          "quote": "Suspend outdoor observations when the wind interlock opens."
+        },
+        {
+          "id": "F3",
+          "source": "weather.md#Suspension",
+          "quote": "Preserve reservation identifiers during suspension."
+        },
+        {
+          "id": "F4",
+          "source": "weather.md#Suspension",
+          "quote": "Resume only after the interlock closes and the duty operator records a restart approval."
+        },
+        {
+          "id": "F5",
+          "source": "weather.md#Indoor instrument",
+          "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."
+        },
+        {
+          "id": "F6",
+          "source": "weather.md#Indoor instrument",
+          "quote": "A roof visible as closed on the calendar does not establish indoor classification."
+        }
+      ],
+      "no_answer": false,
+      "source_material": "Source path: architecture.md\nLines: 1-11\n# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n\n-----\n\nSource path: calendar.md\nLines: 1-11\n# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n\n-----\n\nSource path: clock.md\nLines: 1-15\n# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n\n-----\n\nSource path: overview.md\nLines: 1-11\n# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n\n-----\n\nSource path: reservations.md\nLines: 1-17\n# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n\n-----\n\nSource path: weather.md\nLines: 1-15\n# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+      "answer": "**Suspend outdoor observations when the wind interlock opens.** Weather suspension affects execution, not reservation ownership; preserve reservation identifiers throughout the suspension. The supplied excerpts do not specify a numeric wind-speed threshold. (`weather.md`, lines 3–7)\n\n**Restart requires both the interlock to close and the duty operator to record a restart approval.** A favourable forecast cannot authorize a restart, and a computed plan cannot bypass the weather interlock or clock checks. (`weather.md`, lines 7 and 13–15; `architecture.md`, lines 5–7)\n\n**An indoor instrument may continue during a wind suspension only if it is explicitly classified as indoor and its own safety interlocks remain closed.** A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)\n\nIf execution is **also paused for clock offset**, that separate recovery requirement still applies: two consecutive observatory-reference checks must report an absolute offset within two seconds. If the reference clock is unavailable, execution must remain paused; a local clock reading alone cannot satisfy either check. (`clock.md`, lines 3–11)"
+    }
+  ]
+}
