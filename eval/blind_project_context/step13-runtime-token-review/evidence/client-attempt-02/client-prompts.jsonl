@@ -1,0 +1,4 @@
+{"location":"/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp","metadata":{"docatlas_readiness":{"status":"ready","checks":35,"elapsed_ms":890,"deadline_ms":10000,"required_tools":["docatlas_get_docs_context","docatlas_docs_status"]}}}
+{"location":"/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-concise","metadata":{"docatlas_readiness":{"status":"ready","checks":36,"elapsed_ms":898,"deadline_ms":10000,"required_tools":["docatlas_get_docs_context","docatlas_docs_status"]}}}
+{"location":"/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/files"}
+{"location":"/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-failure","metadata":{"docatlas_readiness":{"status":"ready","checks":32,"elapsed_ms":817,"deadline_ms":10000,"required_tools":["docatlas_get_docs_context","docatlas_docs_status"]}}}

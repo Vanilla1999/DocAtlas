@@ -1,0 +1,10 @@
+{
+  "boundary": "Read-only equality check of built wheel, installed package and current checkout product; not model inference or full CI",
+  "wheel_sha256": "0a7c36ff9f2b3066e6c810bdeca39a2f126458446f3c16a919ba5ac59afccadb",
+  "packaged_files": 457,
+  "python_files": 441,
+  "manifest_sha256": "931c42815f86de2bc619e5c4397e6afbe15cba582633ecf5468e190b50c9e562",
+  "manifest_encoding": "Sorted relative wheel member names to SHA-256, compact JSON",
+  "mismatches": [],
+  "passed": true
+}

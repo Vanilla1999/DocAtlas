@@ -1,0 +1,88 @@
+{
+  "mcp": {
+    "partID": "prt_1b782a335001eDVzHfZGbnBPtW",
+    "sessionID": "ses_e487d62bdffe30Ap8HK4PlBlE5",
+    "messageID": "msg_1b782a31e001kgjzfy7p7aExuG",
+    "type": "tool",
+    "id": "blocked_status",
+    "tool": "docatlas_docs_status",
+    "state": {
+      "status": "error",
+      "input": {
+        "action": "jobs",
+        "job_id": "unrelated-job"
+      },
+      "error": "documentation_profile_project_status_only",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"action\":\"jobs\",\"job_id\":\"unrelated-job\"}"
+      },
+      "time": {
+        "start": 1794080154421,
+        "end": 1794080154437
+      }
+    }
+  },
+  "mcp-concise": {
+    "partID": "prt_1b782b144001qxAjSPzQ8Bd7Nd",
+    "sessionID": "ses_e487d54bcffe2qqSxioQUEVTmR",
+    "messageID": "msg_1b782b131001QU0x9xKC9qsS6D",
+    "type": "tool",
+    "id": "blocked_status",
+    "tool": "docatlas_docs_status",
+    "state": {
+      "status": "error",
+      "input": {
+        "action": "jobs",
+        "job_id": "unrelated-job"
+      },
+      "error": "documentation_profile_project_status_only",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"action\":\"jobs\",\"job_id\":\"unrelated-job\"}"
+      },
+      "time": {
+        "start": 1794080158020,
+        "end": 1794080158034
+      }
+    }
+  },
+  "files": {
+    "partID": "prt_1b782bb9b001oaEMgcGDzzHjqF",
+    "sessionID": "ses_e487d46b0ffeoTS1ZRaW52HKcy",
+    "messageID": "msg_1b782bb89001grOOMXAAasNl8k",
+    "type": "tool",
+    "id": "blocked_read",
+    "tool": "read",
+    "state": {
+      "status": "error",
+      "input": {
+        "path": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/outside.txt"
+      },
+      "error": "documentation_profile_scope_mismatch",
+      "metadata": {
+        "providerCall": {
+          "executed": false
+        },
+        "providerResult": {
+          "executed": false
+        },
+        "rawInput": "{\"path\":\"/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/outside.txt\"}"
+      },
+      "time": {
+        "start": 1794080160667,
+        "end": 1794080160680
+      }
+    }
+  }
+}

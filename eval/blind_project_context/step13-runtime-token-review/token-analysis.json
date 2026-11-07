@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "timezone": "Europe/Moscow",
+  "path_base": "Directory containing this file; all artifact paths below are relative to it.",
+  "boundary": "Read-only analysis of preserved evidence. Historical provider usage, offline text estimates and scripted-client acceptance are separate measurements. This analysis made no new client, preparation, provider or model calls.",
+  "historical_provider_usage": {
+    "measurement_kind": "Actual Step12 provider usage and provider input attribution, not local tokenizer estimates",
+    "cases": ["V-M1", "V-M2", "V-M3"],
+    "excluded_cases": {
+      "V-M4": "Excluded from every arm of this matched comparison because the one-hop run had a technical retrieval failure. Its historical evidence is retained."
+    },
+    "sources": [
+      {
+        "path": "../step12-live-comparison/audit.json",
+        "sha256": "ea749bf19c3b391ed204445a020fc806688ee06f280319e626946983a310ba25"
+      },
+      {
+        "path": "../step12-live-comparison/accounting.json",
+        "sha256": "631fe2a8cdc25c3c64c0a995ebe22c1ef6bf3e56024304b88eba6eeeaee79599"
+      }
+    ],
+    "definitions": {
+      "input": "Provider input_tokens, including cached input",
+      "cached": "Subset of input; not added to input a second time",
+      "uncached": "input minus cached",
+      "output": "Provider output_tokens, including reasoning, not final-answer-only tokens",
+      "requests": "Distinct captured provider responses with usage",
+      "instructions": "Sum of provider usage.attribution.request_fields.instructions.input_tokens",
+      "tool_schemas": "Sum of provider usage.attribution.request_fields.tools.input_tokens",
+      "question_tools_results_history": "input minus instructions minus tool_schemas; includes questions, calls, results and history, not just document text",
+      "qwen-off": "Historical arm name: Qwen selection with one-hop disabled, not a no-Qwen baseline"
+    },
+    "reproduction": {
+      "filter": "Keep exactly V-M1, V-M2 and V-M3, then group by arm and sum usage, requests and provider_input_categories.",
+      "accounting_crosscheck": "For every selected arm/case, audit.usage equals accounting.usage and audit.requests equals accounting.requests_with_usage. Recomputed instruction/schema attribution from accounting.provider_records; verified each request's attribution sums to its input_tokens.",
+      "selected_rows_crosschecked": 9,
+      "selected_provider_requests": 28
+    },
+    "arms": {
+      "qwen-off": {
+        "input": 25193,
+        "cached": 14464,
+        "uncached": 10729,
+        "output": 967,
+        "requests": 10,
+        "instructions": 9780,
+        "tool_schemas": 9000,
+        "question_tools_results_history": 6413,
+        "instructions_plus_tool_schemas": 18780
+      },
+      "qwen-one-hop": {
+        "input": 22121,
+        "cached": 9472,
+        "uncached": 12649,
+        "output": 1018,
+        "requests": 9,
+        "instructions": 8820,
+        "tool_schemas": 8100,
+        "question_tools_results_history": 5201,
+        "instructions_plus_tool_schemas": 16920
+      },
+      "files": {
+        "input": 13872,
+        "cached": 5376,
+        "uncached": 8496,
+        "output": 1135,
+        "requests": 9,
+        "instructions": 6165,
+        "tool_schemas": 4221,
+        "question_tools_results_history": 3486,
+        "instructions_plus_tool_schemas": 10386
+      }
+    },
+    "one_hop_minus_files": {
+      "input": 8249,
+      "cached": 4096,
+      "uncached": 4153,
+      "output": -117,
+      "requests": 0,
+      "instructions": 2655,
+      "tool_schemas": 3879,
+      "question_tools_results_history": 1715,
+      "instructions_plus_tool_schemas": 6534,
+      "overhead_share_of_input_difference": {
+        "numerator": 6534,
+        "denominator": 8249,
+        "fraction": 0.7920960116377743
+      },
+      "interpretation": "79.2% of the observed extra inclusive input came from instructions and tool schemas. This does not establish that MCP transport itself costs these tokens, or that removing overhead yields the same uncached or monetary saving."
+    }
+  },
+  "local_token_counter": {
+    "measurement_kind": "Offline ordinary-text o200k_base estimate; not provider usage or billing",
+    "counter_path": "../../../integrations/opencode-v2-compact/count_tokens.py",
+    "counter_sha256": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80",
+    "implementation": "docmancer.docs.application.projection_tokenizer.projection_token_count",
+    "vocabulary": "Vendored o200k_base from tiktoken 0.11.0, decoded vocabulary SHA-256 checked by the installed implementation",
+    "vocabulary_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+    "installed_python_used": "/workspace/scratch/66f7674793b8/step13-wheel.AOHQJ9/venv/bin/python",
+    "counter_input_contract": "JSON array of strings on stdin; output counts correspond to the same strings. No downloads or model inference."
+  },
+  "source_corpus_local_size": {
+    "measurement_kind": "Offline source-text count, not delivered context or repeated conversation input",
+    "source_directory": "../step10-multidoc-gate/projects/validation/meridian",
+    "source_manifest": {
+      "path": "../step12-live-comparison/sources.json",
+      "sha256": "995dc5b546b938e08c607eae94f580a2436c81b50ff2b47938b59351dd14b2a9"
+    },
+    "method": "Read each of the six UTF-8 Markdown files without trimming or added wrappers, count separately with the local counter, then sum. Source SHA-256 values match the historical manifest.",
+    "excluded": ["AGENTS.md", "docatlas.project-docs.yaml"],
+    "documents": [
+      {
+        "file": "weather.md",
+        "sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "bytes": 696,
+        "local_tokens": 116
+      },
+      {
+        "file": "overview.md",
+        "sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+        "bytes": 595,
+        "local_tokens": 111
+      },
+      {
+        "file": "calendar.md",
+        "sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "bytes": 538,
+        "local_tokens": 94
+      },
+      {
+        "file": "architecture.md",
+        "sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+        "bytes": 565,
+        "local_tokens": 96
+      },
+      {
+        "file": "clock.md",
+        "sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "bytes": 681,
+        "local_tokens": 113
+      },
+      {
+        "file": "reservations.md",
+        "sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "bytes": 884,
+        "local_tokens": 158
+      }
+    ],
+    "total_documents": 6,
+    "total_bytes": 3959,
+    "total_local_tokens": 688
+  },
+  "preserved_request_offline_estimate": {
+    "measurement_kind": "Offline first-request instructions and schemas only, using the production concise annotation transform on the preserved Qwen wire catalog",
+    "case": "V-M1",
+    "request_selection": "First experimental.ws.send event; JSON.parse(event.data)",
+    "text_selection": "Count request.instructions and JSON.stringify(request.tools) separately, then add. This omits question, conversation history, source results and provider framing.",
+    "measure_script": {
+      "path": "../../../integrations/opencode-v2-compact/measure_instruction_variant.mjs",
+      "sha256": "651844052b0d9ea212483ea39433b237d3c2b6a91b105576efca4589a324d4b3"
+    },
+    "transform": {
+      "path": "../../../integrations/opencode-v2-compact/profile/index.js",
+      "sha256": "2a4993a745d7447a64e423026c35b7fe77ab0bac2c2423f5353fdae83627ea0e",
+      "export": "conciseToolDescriptions"
+    },
+    "command_from_repository_root": "node integrations/opencode-v2-compact/measure_instruction_variant.mjs --capture eval/blind_project_context/step12-live-comparison/qwen-one-hop/V-M1/capture/events.jsonl --python /workspace/scratch/66f7674793b8/step13-wheel.AOHQJ9/venv/bin/python",
+    "qwen_capture": {
+      "path": "../step12-live-comparison/qwen-one-hop/V-M1/capture/events.jsonl",
+      "sha256": "c10c6b2ff9c991aef4902095c461e80b44df72365496207a11fab6efbe63f0e2"
+    },
+    "qwen_tool_names": ["docatlas_docs_status", "docatlas_get_docs_context", "docatlas_read_docs_source", "opencode_read_mcp_resource"],
+    "structural_schema_unchanged": true,
+    "instructions": {
+      "standard": 976,
+      "concise_v1": 743,
+      "saved_local_tokens": 233,
+      "standard_sha256": "a723a837f7c04dfc8eb60c261e09c372ee2a2efa2f4f66062ada79634acdaff8",
+      "concise_sha256": "83d954d2f4f32ec6a8b6d832cb2a8e8034df5b333a4ac8f0b727fdd43c3ca7a1"
+    },
+    "tool_schemas": {
+      "standard": 1028,
+      "concise_v1": 734,
+      "saved_local_tokens": 294,
+      "standard_sha256": "e2f2a91941cfbefc41720906a73f658acd478882c0a5eca826c297eafdb81056",
+      "concise_sha256": "47bddab702af4e80df111f50edbce7f7015e47756d9a77979a3247736b929cef"
+    },
+    "qwen_combined_standard": 2004,
+    "qwen_combined_concise_v1": 1477,
+    "qwen_first_request_overhead_reduction": {
+      "local_tokens": 527,
+      "fraction": 0.2629740518962076
+    },
+    "files_same_case_same_counter": {
+      "capture_path": "../step12-live-comparison/files/V-M1/capture/events.jsonl",
+      "capture_sha256": "ab35e8f869cffd0cba5a4672ab453a0c1a9ee6fe51abb086690f8c3626373f70",
+      "tool_names": ["glob", "grep", "read"],
+      "instructions": 681,
+      "tool_schemas": 588,
+      "combined": 1269,
+      "instructions_sha256": "49f2a158592014603cb5c34c61501cbf33056e7ef0873751bfb9627412d8005a",
+      "tool_schemas_sha256": "83709754d559d7d6fc9f1e6395c1e196019936854298ffd3018340e83c939e7c"
+    },
+    "concise_qwen_minus_files_local_tokens": 208,
+    "new_provider_calls": 0,
+    "new_tool_calls": 0,
+    "new_model_inference": 0,
+    "limitation": "The candidate is applied offline to an old four-tool Qwen request. This is not a successful live Qwen candidate run, client acceptance, provider billing measurement or answer-quality result. No complete-session saving is extrapolated."
+  },
+  "scripted_client_acceptance": {
+    "measurement_kind": "Actual installed OpenCode delivery with scripted external provider; local counts of the preserved first request, not provider billing",
+    "result": {
+      "path": "evidence/client-attempt-02/result.json",
+      "sha256": "462d6aeb0dd10dc2ca5df924e8c4dc36a25ab33f7a1d4bcb440c96348bc3dfdc"
+    },
+    "runtime_counts": {
+      "path": "evidence/client-attempt-02/runtime-counts.json",
+      "sha256": "08adbdba6d14789f4cd36da5a8e37b21aad0352bb1114d51980c9dac26f62c28"
+    },
+    "passed": true,
+    "method": "Recomputed first_system_tokens as the sum of local counts for each system message, and first_tools_tokens from the complete tools array serialized with Python json.dumps(ensure_ascii=False, separators=(',', ':')). Every value matches the archived result.json. The tool array in these Chat Completions requests has a different wrapper from the preserved Responses requests above.",
+    "paired_ordinary_three_tool_sessions": {
+      "mcp": {
+        "request_path": "evidence/client-attempt-02/mcp/provider-request-1.json",
+        "request_sha256": "d54ce37e8e7a29d7c0624564822dcffaf16c66a72af0ecf4c455ea18a78c8507",
+        "scripted_provider_requests": 4,
+        "first_system_tokens": 1001,
+        "first_tools_tokens": 1190,
+        "first_combined_overhead": 2191,
+        "tool_names": ["docatlas_docs_status", "docatlas_get_docs_context", "opencode_read_mcp_resource"]
+      },
+      "mcp-concise": {
+        "request_path": "evidence/client-attempt-02/mcp-concise/provider-request-1.json",
+        "request_sha256": "577b10bb74df121a576d4ba3637e28d3ca40fba89ed4a87281a7a408aa9ec815",
+        "scripted_provider_requests": 4,
+        "first_system_tokens": 774,
+        "first_tools_tokens": 658,
+        "first_combined_overhead": 1432,
+        "tool_names": ["docatlas_docs_status", "docatlas_get_docs_context", "opencode_read_mcp_resource"]
+      },
+      "files": {
+        "request_path": "evidence/client-attempt-02/files/provider-request-1.json",
+        "request_sha256": "3e6019c93d7a3ea9d9fdd12c3933c791b2307f7f1d1cedd027474cbf06618220",
+        "scripted_provider_requests": 2,
+        "first_system_tokens": 710,
+        "first_tools_tokens": 597,
+        "first_combined_overhead": 1307,
+        "tool_names": ["glob", "grep", "read"]
+      }
+    },
+    "paired_first_request_overhead_reduction": {
+      "local_tokens": 759,
+      "fraction": 0.34641716111364673,
+      "concise_minus_files_local_tokens": 125
+    },
+    "separate_expected_failure_four_tool_session": {
+      "case": "mcp-failure",
+      "request_path": "evidence/client-attempt-02/mcp-failure/provider-request-1.json",
+      "request_sha256": "e9ae500c943e7ea9569ffe0b22500c9b43bb760ef8f3de6ded8df39a1c7750a8",
+      "scripted_provider_requests": 3,
+      "first_system_tokens": 772,
+      "first_tools_tokens": 746,
+      "first_combined_overhead": 1518,
+      "tool_names": ["docatlas_docs_status", "docatlas_get_docs_context", "docatlas_read_docs_source", "opencode_read_mcp_resource"],
+      "retrieval_status": "failed",
+      "reason_code": "scan_incomplete",
+      "answer_status": "not_produced",
+      "boundary": "Intentionally missing Qwen assets test technical failure and cleanup without inference. This catalog is real, but its size is not evidence of successful retrieval or answer quality."
+    },
+    "scripted_provider_requests": 13,
+    "model_calls": 0,
+    "first_failed_attempt_not_merged_into_pass": {
+      "runtime_counts_path": "evidence/client-attempt-01/runtime-counts.json",
+      "runtime_counts_sha256": "779b41b15145bab557edc92ec85788a9cbc6c2bf675f4e673d7e8b54a34ef6a8",
+      "plan_path": "PLAN_RU.md",
+      "acceptance_pass": false,
+      "scripted_provider_requests": 4,
+      "model_calls": 0,
+      "completed_case": "mcp",
+      "reason": "Standard MCP transport/source-read scenario finished, but independent lifecycle observation found an MCP child outside the client process group. Group-only tracking did not prove its cleanup; later cases did not run. The corrected attempt uses owned-process registration and pidfd tracking."
+    },
+    "scripted_provider_requests_all_attempts": 17,
+    "model_calls_all_attempts": 0,
+    "limitation": "The ordinary paired scenario verifies transport, delivered instructions/tool constraints, source fidelity and permissions, not model behavior. Its two small hand-off documents are not the six Meridian documents above. A scripted completion does not establish final-answer completeness or session-wide token/cost savings."
+  },
+  "not_claimed": [
+    "No new Qwen or Terra quality result.",
+    "No measured whole-session savings for concise-v1, and no monetary savings calculation.",
+    "No conclusion that DocAtlas is cheaper or better than direct file search on a large corpus.",
+    "No removal of docs_status preflight or either source-reading tool is implemented by this analysis.",
+    "Provider tokens, local tokenizer estimates and scripted request counts are not interchangeable."
+  ]
+}

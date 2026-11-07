@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/workspace/scratch/66f7674793b8/step12-client-runtime.J9NDwg/package/bin/opencode",
+    "run",
+    "--standalone",
+    "--format",
+    "json",
+    "--agent",
+    "docs",
+    "--model",
+    "local-check/capture",
+    "--title",
+    "Documentation"
+  ],
+  "cwd": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/files",
+  "question": "Who signs the hand-off record, and may a courier sign it?",
+  "timeout_seconds": 50,
+  "expected_rejections": [
+    "blocked_read"
+  ],
+  "owned_process_files": [],
+  "environment_values_recorded": false,
+  "automatic_retries": false
+}

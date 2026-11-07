@@ -1,0 +1,45 @@
+{
+  "profile": "documentation-light-v1",
+  "backend": "mcp",
+  "project_path": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/corpus",
+  "instruction_variant": "concise-v1",
+  "tool_description_policy": "concise-v1 model-facing annotations only",
+  "workspace_path": "/workspace/scratch/66f7674793b8/step13-client.OdvhxB/run-02/mcp-failure",
+  "scope": "project",
+  "agent": "docs",
+  "model_step_limit": 12,
+  "presentation": "literal-v2",
+  "common_prompt_sha256": "9533321f7cf4cfeff4a26ff66fa03058694a07455e87e54e188c8f3fa0b78aea",
+  "system_sha256": "c3bf9d8b647fd8d7b8c85880a4dd70aea46156a77280219a4d6368abbcd62223",
+  "allowed_tools": [
+    "docatlas_get_docs_context",
+    "docatlas_docs_status",
+    "docatlas_read_docs_source",
+    "opencode_read_mcp_resource"
+  ],
+  "language_preflight": "unchanged; bound language unknown",
+  "adapter_execute_tools": [
+    "docatlas_get_docs_context",
+    "docatlas_docs_status",
+    "docatlas_read_docs_source"
+  ],
+  "adapter_guard_tools": [
+    "opencode_read_mcp_resource"
+  ],
+  "retrieval_policy_selected_by_profile": false,
+  "instructions_disabled": false,
+  "history_pruned": false,
+  "file_control_snapshot": null,
+  "mcp_active_snapshot_verified_by_builder": false,
+  "model_calls": 0,
+  "preparation_calls": 0,
+  "inputs": {
+    "documentation_profile.py": "6e0f448ae125f16f63b63f16f4dbf55a18b9031f13c4d70b662619929576a4da",
+    "profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "profile/mcp-concise.txt": "bf428bdc64a19f72bacda702fb39a0c4513a5ced571c65c7eaf97ac87dc05d7d",
+    "profile/index.js": "2a4993a745d7447a64e423026c35b7fe77ab0bac2c2423f5353fdae83627ea0e",
+    "index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80"
+  },
+  "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."
+}
