@@ -1,0 +1,83 @@
+{
+  "unit": "exact UTF-8 bytes and whitespace-delimited words, not model tokens",
+  "rows": [
+    {
+      "input_id": "input-001",
+      "prompt_utf8_bytes": 2910,
+      "answer_utf8_bytes": 4475,
+      "answer_whitespace_words": 284
+    },
+    {
+      "input_id": "input-002",
+      "prompt_utf8_bytes": 1747,
+      "answer_utf8_bytes": 930,
+      "answer_whitespace_words": 134
+    },
+    {
+      "input_id": "input-003",
+      "prompt_utf8_bytes": 5508,
+      "answer_utf8_bytes": 6732,
+      "answer_whitespace_words": 423
+    },
+    {
+      "input_id": "input-004",
+      "prompt_utf8_bytes": 966,
+      "answer_utf8_bytes": 646,
+      "answer_whitespace_words": 41
+    },
+    {
+      "input_id": "input-005",
+      "prompt_utf8_bytes": 2094,
+      "answer_utf8_bytes": 2707,
+      "answer_whitespace_words": 178
+    },
+    {
+      "input_id": "input-006",
+      "prompt_utf8_bytes": 5371,
+      "answer_utf8_bytes": 2216,
+      "answer_whitespace_words": 304
+    },
+    {
+      "input_id": "input-007",
+      "prompt_utf8_bytes": 5156,
+      "answer_utf8_bytes": 1074,
+      "answer_whitespace_words": 73
+    },
+    {
+      "input_id": "input-008",
+      "prompt_utf8_bytes": 5122,
+      "answer_utf8_bytes": 1764,
+      "answer_whitespace_words": 247
+    },
+    {
+      "input_id": "input-009",
+      "prompt_utf8_bytes": 5381,
+      "answer_utf8_bytes": 1610,
+      "answer_whitespace_words": 225
+    },
+    {
+      "input_id": "input-010",
+      "prompt_utf8_bytes": 2156,
+      "answer_utf8_bytes": 1477,
+      "answer_whitespace_words": 203
+    },
+    {
+      "input_id": "input-011",
+      "prompt_utf8_bytes": 5415,
+      "answer_utf8_bytes": 1008,
+      "answer_whitespace_words": 68
+    },
+    {
+      "input_id": "input-012",
+      "prompt_utf8_bytes": 5249,
+      "answer_utf8_bytes": 6264,
+      "answer_whitespace_words": 412
+    },
+    {
+      "input_id": "input-013",
+      "prompt_utf8_bytes": 5112,
+      "answer_utf8_bytes": 1193,
+      "answer_whitespace_words": 165
+    }
+  ]
+}

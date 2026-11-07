@@ -1,0 +1,81 @@
+{
+  "head": "8636d8992ecdfda0abd05738f15d4ddb869a78d1",
+  "counts": {
+    "success": 9,
+    "failure": 3
+  },
+  "runs": [
+    {
+      "name": "P1.4 paraphrase and proofability",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846448"
+    },
+    {
+      "name": "P2.3 Product Truth decision",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846363"
+    },
+    {
+      "name": "P1.6 evidence is data",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846523"
+    },
+    {
+      "name": "P1.5 mixed-evidence provenance",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846483"
+    },
+    {
+      "name": "P2 federated task-pack reopening",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846351"
+    },
+    {
+      "name": "P2.1B positive controls",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846436"
+    },
+    {
+      "name": "P2.1C task pack",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846377"
+    },
+    {
+      "name": "P2 Product Truth protocol",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846390"
+    },
+    {
+      "name": "P1 Agent Truth closure",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846368"
+    },
+    {
+      "name": "P2.2A comparative harness",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846443"
+    },
+    {
+      "name": "P2.2B/C execution gate",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846554"
+    },
+    {
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/42354846522"
+    }
+  ]
+}

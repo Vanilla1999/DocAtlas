@@ -1,0 +1,322 @@
+{
+  "model": "independent fresh Astra Pro agent /root/answer_judge",
+  "input_commit": "4a25f65c8b4cff6762eba8f030122a0ecbcad9f7",
+  "blind_to_arm_mapping": true,
+  "cases": [
+    {
+      "input_id": "input-001",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-002",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-003",
+      "fact_labels": [
+        "partial",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {
+        "F1": "“Для передачи подтверждённого ночного бронирования” expresses confirmed and night-time scope, but the answer never expresses the shared-instrument scope."
+      },
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-004",
+      "fact_labels": [],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "pass"
+    },
+    {
+      "input_id": "input-005",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "missing",
+        "partial",
+        "missing"
+      ],
+      "non_full_reasons": {
+        "F6": "No statement that opening the wind interlock requires suspension of outdoor observations.",
+        "F7": "“Сохраните исходный идентификатор бронирования” states identifier preservation, but explicitly frames it as a transfer requirement; preservation during suspension is not expressed.",
+        "F8": "No interlock-closure and recorded restart-approval conditions; the answer says the supplied excerpts do not establish when observations may resume."
+      },
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-006",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-007",
+      "fact_labels": [],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "pass"
+    },
+    {
+      "input_id": "input-008",
+      "fact_labels": [
+        "partial",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {
+        "F1": "“The comparison is between instrument time and the observatory reference clock” identifies the comparison, but does not say that it occurs before executing a schedule."
+      },
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-009",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-010",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-011",
+      "fact_labels": [],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "pass"
+    },
+    {
+      "input_id": "input-012",
+      "fact_labels": [
+        "partial",
+        "full",
+        "full",
+        "full",
+        "full",
+        "missing",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {
+        "F1": "“Для передачи подтверждённого ночного бронирования” expresses confirmed and night-time scope, but not the shared-instrument scope.",
+        "F6": "“Для наружного наблюдения после ветровой приостановки” introduces restart conditions; the answer never states the suspension action or its trigger, opening the wind interlock."
+      },
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    },
+    {
+      "input_id": "input-013",
+      "fact_labels": [
+        "full",
+        "full",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "non_full_reasons": {},
+      "unsupported_claims": [],
+      "no_answer_status": "not_applicable"
+    }
+  ],
+  "judge_totals_unique": {
+    "facts": 65,
+    "full": 58,
+    "partial": 4,
+    "missing": 3,
+    "unsupported_claims": 0,
+    "no_answer_passes": 3
+  },
+  "adjudication": {
+    "root_before_judge": {
+      "labels": {
+        "input-001": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-002": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-003": [
+          "partial",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-004": [],
+        "input-005": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "input-006": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-007": [],
+        "input-008": [
+          "partial",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-009": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-010": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ],
+        "input-011": [],
+        "input-012": [
+          "partial",
+          "full",
+          "full",
+          "full",
+          "full",
+          "missing",
+          "full",
+          "full"
+        ],
+        "input-013": [
+          "full",
+          "full",
+          "full",
+          "full",
+          "full",
+          "full"
+        ]
+      },
+      "reasons": {
+        "input-003": {
+          "F1": "Confirmed night-time stated, but shared-instrument scope omitted."
+        },
+        "input-005": {
+          "F6": "No wind-interlock opening trigger; weather source not delivered.",
+          "F7": "ID preservation at transfer stated, but not during weather suspension; weather source not delivered.",
+          "F8": "Restart conditions not given, absence explicitly acknowledged; weather source not delivered."
+        },
+        "input-008": {
+          "F1": "Instrument/reference comparison stated, but before-executing-schedule timing omitted."
+        },
+        "input-012": {
+          "F1": "Confirmed night-time stated, but shared-instrument scope omitted.",
+          "F6": "Outdoor wind suspension is presupposed in restart discussion; opening-interlock suspension rule is not stated. Root initially calls missing; evaluator may reasonably call partial."
+        }
+      }
+    },
+    "disagreements": [
+      {
+        "input_id": "input-005",
+        "fact": "F7",
+        "root": "missing",
+        "judge": "partial",
+        "adopted": "partial",
+        "reason": "The answer expresses identifier preservation for transfer but not its suspension applicability. Partial overlap is credited; this does not mean the absent weather condition was delivered."
+      }
+    ],
+    "classification_sensitivity": [
+      {
+        "input_id": "input-012",
+        "fact": "F6",
+        "adopted": "missing",
+        "alternative": "partial",
+        "reason": "Both reviewers use missing because neither stopping action nor opening-interlock trigger is stated. Looser treatment of a presupposed outdoor suspension could award partial; full totals are unchanged."
+      }
+    ]
+  }
+}

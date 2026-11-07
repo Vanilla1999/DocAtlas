@@ -1,0 +1,55 @@
+{
+  "frozen_inputs_commit": "80a64d8006d6333d4ba64cdd846f730e3504fc29",
+  "outputs_commit": "4a25f65c8b4cff6762eba8f030122a0ecbcad9f7",
+  "unique_generations": 13,
+  "question_arm_combinations": 16,
+  "independent_evaluators": 1,
+  "root_review": true,
+  "arms": {
+    "one_hop": {
+      "full": 19,
+      "partial": 0,
+      "missing": 0,
+      "source_facts": 19,
+      "no_answer_pass": 1,
+      "answer_bytes": 7528,
+      "answer_words": 662
+    },
+    "full_audit": {
+      "full": 18,
+      "partial": 1,
+      "missing": 0,
+      "source_facts": 19,
+      "no_answer_pass": 1,
+      "answer_bytes": 11566,
+      "answer_words": 1020
+    },
+    "selected": {
+      "full": 16,
+      "partial": 1,
+      "missing": 2,
+      "source_facts": 16,
+      "no_answer_pass": 1,
+      "answer_bytes": 5760,
+      "answer_words": 556
+    },
+    "full": {
+      "full": 16,
+      "partial": 2,
+      "missing": 1,
+      "source_facts": 19,
+      "no_answer_pass": 1,
+      "answer_bytes": 10295,
+      "answer_words": 897
+    }
+  },
+  "facts_are_question_fact_occurrences": true,
+  "no_answer_unique_outputs": 3,
+  "unsupported_claims_found": 0,
+  "provider_usage": null,
+  "cost": null,
+  "default_changes": 0,
+  "production_changes_in_phase2": 0,
+  "known_development_questions": true,
+  "offline_raw_artifacts_unavailable": true
+}

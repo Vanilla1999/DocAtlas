@@ -127,3 +127,10 @@ whitespace исключает только сохранённый implementation
 с единственным пробелом — обязательные context lines unified diff, а не пробелы
 в исходном коде. Артефакт и его исходный hash сохраняются. Независимое финальное
 ревью adapter/profile/receipts блокирующих замечаний не выявило.
+
+## Подтверждение merge и результат второй фазы
+
+PR #246 успешно смержен в main: `8636d8992ecdfda0abd05738f15d4ddb869a78d1`.
+GitHub подтвердил merged=true; origin/main проверен и содержит implementation head.
+Результаты исследования пунктов 2 и 5, 13 новых answer-only outputs и ограничения:
+[STEP11 completeness](../eval/blind_project_context/step11-completeness/README_RU.md).
