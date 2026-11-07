@@ -1,0 +1,1005 @@
+{
+  "id": "structural-guard",
+  "status": "PASS_STRUCTURAL_REPLAY_ONLY",
+  "seconds": 0.3717916799996601,
+  "public_packet": {
+    "status": "truncated",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-e5e2f9b46102effe",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Empty > Selected",
+        "snippet": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\nConsult the [absent condition](other.md#absent), [whole document](other.md), and [restricted condition](modules/private.md#hidden).\n\nAlso retain the <a href=\"other.md#condition&amp;amp;gate\">required condition</a>.\n\n- [Index entry](other.md#navigation-only)\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "ecb48ef15ba300c22d0fda2a296de5c324e9fffdce6949535d239dc14d965466",
+        "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+        "line_start": 7,
+        "line_end": 20,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/c50063c7a26934341ec06f58"
+      },
+      {
+        "evidence_id": "ev-bcfc221fad47fb06",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide > Limits",
+        "snippet": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "9d77f254de777e8cc9917b40d13015b899b555e585345fb99d5713c9d51fa340",
+        "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+        "line_start": 29,
+        "line_end": 32,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/118ef4951b8952309d367f12"
+      },
+      {
+        "evidence_id": "ev-dcd61acd3641922e",
+        "path_or_url": "docs/other.md",
+        "section": "Other > Wrong entity condition",
+        "snippet": "## Wrong entity condition\n\n<a id=\"condition&amp;gate\"></a>\n\nThe double-decoded entity condition must not be substituted.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "f03254792eacc02136749f5e23f93a3221dac4ba7c0a28f1d4254af9bef5b203",
+        "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+        "line_start": 27,
+        "line_end": 31,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/b826026ca60104edd299a997"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "joint_selection_partial"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 770,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "joint_checked_body_mmr_v1",
+      "scope": "source_checked_merged_candidates",
+      "query_count": 1,
+      "candidate_rows": 6,
+      "pruned_rows": 0,
+      "eligible_rows": 6,
+      "budget_limited": false,
+      "reference_limited": false,
+      "selected_rows": 3,
+      "omitted_rows": 3
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": 2,
+      "remaining_rows": 3,
+      "continuation_token": "84a46b2115df82f571519826b534e0689951657a7dc9ff921689ec233f3e7f00"
+    }
+  },
+  "observation": {
+    "callbacks": 1,
+    "errors": [],
+    "blocked": []
+  },
+  "structural_replay": [
+    {
+      "seed_kind": "explicit_source_authored_component_input_not_model_selection",
+      "live_units": 13,
+      "seed_units": 1,
+      "structural_inputs_sha256": "f6627bc263590bad15cb048456137e6379336fccade28af2c51b2c0696a569b5",
+      "seeds": [
+        {
+          "path": "docs/guide.md",
+          "source_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+          "char_start": 110,
+          "char_end": 488
+        }
+      ],
+      "variants": {
+        "off": {
+          "metrics": {
+            "facts_found": 3,
+            "facts_total": 7,
+            "fact_indices": [
+              0,
+              1,
+              3
+            ],
+            "delivered_rows": 4,
+            "source_bytes": 577,
+            "source_tokens": 148,
+            "reconstructed_packet_tokens": 652,
+            "intervals": [
+              [
+                "docs/guide.md",
+                0,
+                100
+              ],
+              [
+                "docs/guide.md",
+                100,
+                110
+              ],
+              [
+                "docs/guide.md",
+                110,
+                488
+              ],
+              [
+                "docs/guide.md",
+                599,
+                688
+              ]
+            ],
+            "checked_rows": [
+              {
+                "index": 0,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 1,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 2,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 3,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              }
+            ]
+          },
+          "packet": {
+            "status": "truncated",
+            "kind": "docs_context",
+            "context_status": "ready",
+            "context_available": true,
+            "answer_supported": false,
+            "answer_available": false,
+            "support_status": "retrieval_only",
+            "answer_policy": "cite_only",
+            "coverage_policy": "retrieval_attribution_only",
+            "query_coverage": "partial",
+            "retrieval_coverage": "partial",
+            "facet_coverage": "unverified",
+            "covered_query_ids": [],
+            "missing_query_ids": [
+              "query-original"
+            ],
+            "missing_facets": [],
+            "facets": [],
+            "sources": [
+              {
+                "evidence_id": "ev-1d3d549b6362f6a23ba1c6c7",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide",
+                "snippet": "# Guide\n\nScope introduction. The scope refers to the [ancestor condition](other.md#ancestor-only).\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "9abff52f1b35466d56184ce5e242ac4553a19cd46ce070200191e164f9f941eb",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 1,
+                "line_end": 4,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-b65b6041928e02e0a58196c0",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Empty",
+                "snippet": "## Empty\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "7b2f96edaf550c79269616a62a23c9d4cc058522b58777b6e237964caa203e87",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 5,
+                "line_end": 6,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-a125ed440aa5edb43264d5da",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Empty > Selected",
+                "snippet": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\nConsult the [absent condition](other.md#absent), [whole document](other.md), and [restricted condition](modules/private.md#hidden).\n\nAlso retain the <a href=\"other.md#condition&amp;amp;gate\">required condition</a>.\n\n- [Index entry](other.md#navigation-only)\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "f917f2c667410876a827be8b5a53d6bd4326b0e52a99071baf2a3537230ce1f9",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 7,
+                "line_end": 20,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-2dd9c0ffc77dadf2753985d4",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Notes",
+                "snippet": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+                "version_binding": "unversioned",
+                "content_sha256": "c3083b07cde704d055f7c1748dfaaa6fdd3d6917f83af7baedd7b65f5cc2b033",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 33,
+                "line_end": 39,
+                "authority": "source_of_truth",
+                "scope": "project"
+              }
+            ],
+            "context_quality": {
+              "status": "unverified",
+              "reasons": [
+                "coverage_unverified"
+              ]
+            },
+            "read_next": [],
+            "edit_ready": false,
+            "investigation_allowed": true,
+            "estimated_tokens": 912,
+            "context_unassessed": true,
+            "admission_contract": "source_only_heuristic_removal_v1",
+            "source_selection": {
+              "closure": {
+                "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+                "status": "incomplete_dependency",
+                "documents": 2,
+                "incomplete_dependencies": [
+                  {
+                    "reason_code": "incomplete_dependency",
+                    "path": "docs/guide.md",
+                    "char_start": 110,
+                    "target": "other.md#absent",
+                    "reason": "missing_or_ambiguous_anchor"
+                  },
+                  {
+                    "reason_code": "incomplete_dependency",
+                    "path": "docs/guide.md",
+                    "char_start": 110,
+                    "target": "modules/private.md#hidden",
+                    "reason": "target_not_in_checked_scope"
+                  },
+                  {
+                    "reason_code": "incomplete_dependency",
+                    "path": "docs/other.md",
+                    "char_start": 30,
+                    "target": "private.md#hidden",
+                    "reason": "target_not_in_checked_scope"
+                  }
+                ],
+                "units": 13,
+                "hydrated_sections": 14,
+                "incoming_anchor_edges": 8,
+                "selected_units": 1,
+                "delivered_spans": 4
+              }
+            }
+          },
+          "host_closure": {
+            "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+            "status": "incomplete_dependency",
+            "documents": 2,
+            "incomplete_dependencies": [
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 110,
+                "target": "other.md#absent",
+                "reason": "missing_or_ambiguous_anchor"
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 110,
+                "target": "modules/private.md#hidden",
+                "reason": "target_not_in_checked_scope"
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/other.md",
+                "char_start": 30,
+                "target": "private.md#hidden",
+                "reason": "target_not_in_checked_scope"
+              }
+            ],
+            "units": 13,
+            "hydrated_sections": 14,
+            "incoming_anchor_edges": 8,
+            "selected_units": 1,
+            "delivered_spans": 4
+          }
+        },
+        "one-hop-v1": {
+          "metrics": {
+            "facts_found": 7,
+            "facts_total": 7,
+            "fact_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "delivered_rows": 8,
+            "source_bytes": 900,
+            "source_tokens": 218,
+            "reconstructed_packet_tokens": 1190,
+            "intervals": [
+              [
+                "docs/guide.md",
+                0,
+                100
+              ],
+              [
+                "docs/guide.md",
+                100,
+                110
+              ],
+              [
+                "docs/guide.md",
+                110,
+                488
+              ],
+              [
+                "docs/guide.md",
+                551,
+                599
+              ],
+              [
+                "docs/guide.md",
+                599,
+                688
+              ],
+              [
+                "docs/other.md",
+                0,
+                30
+              ],
+              [
+                "docs/other.md",
+                30,
+                154
+              ],
+              [
+                "docs/other.md",
+                369,
+                490
+              ]
+            ],
+            "checked_rows": [
+              {
+                "index": 0,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 1,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 2,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 3,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 4,
+                "path": "docs/guide.md",
+                "raw_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+                "errors": []
+              },
+              {
+                "index": 5,
+                "path": "docs/other.md",
+                "raw_sha256": "d7b6d359fa38539d483ade2c116b3a83a4b78f05db800861ba2ab0706619909b",
+                "errors": []
+              },
+              {
+                "index": 6,
+                "path": "docs/other.md",
+                "raw_sha256": "d7b6d359fa38539d483ade2c116b3a83a4b78f05db800861ba2ab0706619909b",
+                "errors": []
+              },
+              {
+                "index": 7,
+                "path": "docs/other.md",
+                "raw_sha256": "d7b6d359fa38539d483ade2c116b3a83a4b78f05db800861ba2ab0706619909b",
+                "errors": []
+              }
+            ]
+          },
+          "packet": {
+            "status": "truncated",
+            "kind": "docs_context",
+            "context_status": "ready",
+            "context_available": true,
+            "answer_supported": false,
+            "answer_available": false,
+            "support_status": "retrieval_only",
+            "answer_policy": "cite_only",
+            "coverage_policy": "retrieval_attribution_only",
+            "query_coverage": "partial",
+            "retrieval_coverage": "partial",
+            "facet_coverage": "unverified",
+            "covered_query_ids": [],
+            "missing_query_ids": [
+              "query-original"
+            ],
+            "missing_facets": [],
+            "facets": [],
+            "sources": [
+              {
+                "evidence_id": "ev-1d3d549b6362f6a23ba1c6c7",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide",
+                "snippet": "# Guide\n\nScope introduction. The scope refers to the [ancestor condition](other.md#ancestor-only).\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "9abff52f1b35466d56184ce5e242ac4553a19cd46ce070200191e164f9f941eb",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 1,
+                "line_end": 4,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-b65b6041928e02e0a58196c0",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Empty",
+                "snippet": "## Empty\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "7b2f96edaf550c79269616a62a23c9d4cc058522b58777b6e237964caa203e87",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 5,
+                "line_end": 6,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-a125ed440aa5edb43264d5da",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Empty > Selected",
+                "snippet": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\nConsult the [absent condition](other.md#absent), [whole document](other.md), and [restricted condition](modules/private.md#hidden).\n\nAlso retain the <a href=\"other.md#condition&amp;amp;gate\">required condition</a>.\n\n- [Index entry](other.md#navigation-only)\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "f917f2c667410876a827be8b5a53d6bd4326b0e52a99071baf2a3537230ce1f9",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 7,
+                "line_end": 20,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-32747b8d4c0994f14c31cd88",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Limits",
+                "snippet": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "b512f8d82c46e2ff22e5a40e93b8bf2b83123f7b5a071b7f5d113c861a34d988",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 29,
+                "line_end": 32,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-2dd9c0ffc77dadf2753985d4",
+                "path_or_url": "docs/guide.md",
+                "section": "Guide > Notes",
+                "snippet": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+                "version_binding": "unversioned",
+                "content_sha256": "c3083b07cde704d055f7c1748dfaaa6fdd3d6917f83af7baedd7b65f5cc2b033",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 33,
+                "line_end": 39,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-c28637ab01eb4de587c1180f",
+                "path_or_url": "docs/other.md",
+                "section": "Other",
+                "snippet": "# Other\n\nOther introduction.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "37fd48867cb2440f11888140c8769addac901d01a644f8266013385f34cf948f",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 1,
+                "line_end": 4,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-ffb0a5176158c46ac420cae2",
+                "path_or_url": "docs/other.md",
+                "section": "Other > Remote",
+                "snippet": "## Remote\n\nRemote condition [missing](private.md#hidden). The remote condition also depends on [second step](#second-hop).\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "a48b1a5c51a2e7add4cb79d8b1f6c3a18d699631a4b080a94aed447949205f88",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 5,
+                "line_end": 8,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-f04a0da4f5489d7aa98b5d58",
+                "path_or_url": "docs/other.md",
+                "section": "Other > Correct entity condition",
+                "snippet": "## Correct entity condition\n\n<a id=\"condition&amp;amp;gate\"></a>\n\nThe single-decoded entity condition must be retained.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "7cb4ffa422ade0647c49ac1960063e0a5ed395e4703d2cdd0acb010145d16c8e",
+                "project_identity": "local:58b04cef54c7d65676b493e9c69b61fdcfa8604a854bca1f5dd1c87439ef9887",
+                "line_start": 21,
+                "line_end": 26,
+                "authority": "source_of_truth",
+                "scope": "project"
+              }
+            ],
+            "context_quality": {
+              "status": "unverified",
+              "reasons": [
+                "coverage_unverified"
+              ]
+            },
+            "read_next": [],
+            "edit_ready": false,
+            "investigation_allowed": true,
+            "estimated_tokens": 1716,
+            "context_unassessed": true,
+            "admission_contract": "source_only_heuristic_removal_v1",
+            "source_selection": {
+              "closure": {
+                "selected_units": 1,
+                "delivered_spans": 8,
+                "coverage": "unverified",
+                "reference_expansion": {
+                  "recipe": "one-hop-v1",
+                  "max_hops": 1,
+                  "added_spans": 5,
+                  "examined_references": 12,
+                  "followed_references": 4,
+                  "satisfied_references": 4,
+                  "pending_references": 8
+                },
+                "incomplete_dependencies": [
+                  {
+                    "path": "docs/guide.md",
+                    "char_start": 53,
+                    "char_end": 97,
+                    "target": "other.md#ancestor-only",
+                    "origin": "ancestor",
+                    "navigation": false,
+                    "reason": "ancestor_reference",
+                    "target_path": "docs/other.md",
+                    "target_char_start": 154,
+                    "target_char_end": 227
+                  },
+                  {
+                    "path": "docs/guide.md",
+                    "char_start": 192,
+                    "char_end": 227,
+                    "target": "other.md#absent",
+                    "origin": "selected_body",
+                    "navigation": false,
+                    "reason": "missing_or_ambiguous_anchor"
+                  },
+                  {
+                    "path": "docs/guide.md",
+                    "char_start": 229,
+                    "char_end": 255,
+                    "target": "other.md",
+                    "origin": "selected_body",
+                    "navigation": false,
+                    "reason": "document_target_requires_section",
+                    "target_path": "docs/other.md",
+                    "target_char_start": 0,
+                    "target_char_end": 611
+                  },
+                  {
+                    "path": "docs/guide.md",
+                    "char_start": 261,
+                    "char_end": 310,
+                    "target": "modules/private.md#hidden",
+                    "origin": "selected_body",
+                    "navigation": false,
+                    "reason": "target_not_in_checked_scope"
+                  },
+                  {
+                    "path": "docs/guide.md",
+                    "char_start": 398,
+                    "char_end": 437,
+                    "target": "other.md#navigation-only",
+                    "origin": "selected_body",
+                    "navigation": true,
+                    "reason": "navigation_reference",
+                    "target_path": "docs/other.md",
+                    "target_char_start": 227,
+                    "target_char_end": 302
+                  },
+                  {
+                    "path": "docs/guide.md",
+                    "char_start": 578,
+                    "char_end": 596,
+                    "target": "#selected",
+                    "origin": "linked_body",
+                    "navigation": false,
+                    "reason": "target_descendants_not_included",
+                    "target_path": "docs/guide.md",
+                    "target_char_start": 110,
+                    "target_char_end": 488,
+                    "missing_descendants": 1
+                  },
+                  {
+                    "path": "docs/other.md",
+                    "char_start": 58,
+                    "char_end": 86,
+                    "target": "private.md#hidden",
+                    "origin": "linked_body",
+                    "navigation": false,
+                    "reason": "target_not_in_checked_scope"
+                  },
+                  {
+                    "path": "docs/other.md",
+                    "char_start": 125,
+                    "char_end": 151,
+                    "target": "#second-hop",
+                    "origin": "linked_body",
+                    "navigation": false,
+                    "reason": "depth_limit",
+                    "target_path": "docs/other.md",
+                    "target_char_start": 302,
+                    "target_char_end": 369
+                  }
+                ]
+              }
+            }
+          },
+          "host_closure": {
+            "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+            "status": "incomplete_dependency",
+            "documents": 2,
+            "incomplete_dependencies": [
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 53,
+                "char_end": 97,
+                "target": "other.md#ancestor-only",
+                "reason": "ancestor_reference",
+                "origin": "ancestor",
+                "navigation": false,
+                "target_path": "docs/other.md",
+                "target_char_start": 154,
+                "target_char_end": 227
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 192,
+                "char_end": 227,
+                "target": "other.md#absent",
+                "reason": "missing_or_ambiguous_anchor",
+                "origin": "selected_body",
+                "navigation": false
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 229,
+                "char_end": 255,
+                "target": "other.md",
+                "reason": "document_target_requires_section",
+                "origin": "selected_body",
+                "navigation": false,
+                "target_path": "docs/other.md",
+                "target_char_start": 0,
+                "target_char_end": 611
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 261,
+                "char_end": 310,
+                "target": "modules/private.md#hidden",
+                "reason": "target_not_in_checked_scope",
+                "origin": "selected_body",
+                "navigation": false
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 398,
+                "char_end": 437,
+                "target": "other.md#navigation-only",
+                "reason": "navigation_reference",
+                "origin": "selected_body",
+                "navigation": true,
+                "target_path": "docs/other.md",
+                "target_char_start": 227,
+                "target_char_end": 302
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/guide.md",
+                "char_start": 578,
+                "char_end": 596,
+                "target": "#selected",
+                "reason": "target_descendants_not_included",
+                "origin": "linked_body",
+                "navigation": false,
+                "target_path": "docs/guide.md",
+                "target_char_start": 110,
+                "target_char_end": 488,
+                "missing_descendants": 1
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/other.md",
+                "char_start": 58,
+                "char_end": 86,
+                "target": "private.md#hidden",
+                "reason": "target_not_in_checked_scope",
+                "origin": "linked_body",
+                "navigation": false
+              },
+              {
+                "reason_code": "incomplete_dependency",
+                "path": "docs/other.md",
+                "char_start": 125,
+                "char_end": 151,
+                "target": "#second-hop",
+                "reason": "depth_limit",
+                "origin": "linked_body",
+                "navigation": false,
+                "target_path": "docs/other.md",
+                "target_char_start": 302,
+                "target_char_end": 369
+              }
+            ],
+            "units": 13,
+            "hydrated_sections": 14,
+            "incoming_anchor_edges": 8,
+            "selected_units": 1,
+            "delivered_spans": 8,
+            "incoming_context_unresolved_count": 3,
+            "coverage": "unverified",
+            "reference_expansion": {
+              "recipe": "one-hop-v1",
+              "parser_revision": "masked-source-origin-links-v1",
+              "contract_sha256": "b82e64a5606d09cc7488477d109bcc3cbda824b9b5a17b649b501814cca32bd9",
+              "max_hops": 1,
+              "coverage": "unverified",
+              "selected_sections": 1,
+              "linked_sections": 4,
+              "ancestor_sections": 3,
+              "added_spans": 5,
+              "examined_references": 12,
+              "followed_references": 4,
+              "satisfied_references": 4,
+              "pending_references": 8,
+              "references": [
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 53,
+                  "source_char_end": 97,
+                  "source_section_start": 0,
+                  "source_section_end": 100,
+                  "origin": "ancestor",
+                  "kind": "url",
+                  "target": "other.md#ancestor-only",
+                  "navigation": false,
+                  "target_path": "docs/other.md",
+                  "target_char_start": 154,
+                  "target_char_end": 227,
+                  "status": "pending",
+                  "reason": "ancestor_reference"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 144,
+                  "source_char_end": 161,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "url",
+                  "target": "#limits",
+                  "navigation": false,
+                  "target_path": "docs/guide.md",
+                  "target_char_start": 551,
+                  "target_char_end": 599,
+                  "status": "included"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 166,
+                  "source_char_end": 177,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "definition",
+                  "target": "other.md#remote",
+                  "navigation": false,
+                  "reference_label": "ref",
+                  "target_path": "docs/other.md",
+                  "target_char_start": 30,
+                  "target_char_end": 154,
+                  "status": "included"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 192,
+                  "source_char_end": 227,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "url",
+                  "target": "other.md#absent",
+                  "navigation": false,
+                  "status": "pending",
+                  "reason": "missing_or_ambiguous_anchor"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 229,
+                  "source_char_end": 255,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "url",
+                  "target": "other.md",
+                  "navigation": false,
+                  "target_path": "docs/other.md",
+                  "target_char_start": 0,
+                  "target_char_end": 611,
+                  "status": "pending",
+                  "reason": "document_target_requires_section"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 261,
+                  "source_char_end": 310,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "url",
+                  "target": "modules/private.md#hidden",
+                  "navigation": false,
+                  "status": "pending",
+                  "reason": "target_not_in_checked_scope"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 329,
+                  "source_char_end": 393,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "url",
+                  "target": "other.md#condition&amp;amp;gate",
+                  "navigation": false,
+                  "target_path": "docs/other.md",
+                  "target_char_start": 369,
+                  "target_char_end": 490,
+                  "status": "included"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 398,
+                  "source_char_end": 437,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "url",
+                  "target": "other.md#navigation-only",
+                  "navigation": true,
+                  "target_path": "docs/other.md",
+                  "target_char_start": 227,
+                  "target_char_end": 302,
+                  "status": "pending",
+                  "reason": "navigation_reference"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 477,
+                  "source_char_end": 484,
+                  "source_section_start": 110,
+                  "source_section_end": 488,
+                  "origin": "selected_body",
+                  "kind": "definition",
+                  "target": "^note",
+                  "navigation": false,
+                  "reference_label": "^note",
+                  "target_path": "docs/guide.md",
+                  "target_char_start": 599,
+                  "target_char_end": 688,
+                  "status": "included"
+                },
+                {
+                  "source_path": "docs/guide.md",
+                  "source_char_start": 578,
+                  "source_char_end": 596,
+                  "source_section_start": 551,
+                  "source_section_end": 599,
+                  "origin": "linked_body",
+                  "kind": "url",
+                  "target": "#selected",
+                  "navigation": false,
+                  "target_path": "docs/guide.md",
+                  "target_char_start": 110,
+                  "target_char_end": 488,
+                  "missing_descendants": 1,
+                  "status": "pending",
+                  "reason": "target_descendants_not_included"
+                },
+                {
+                  "source_path": "docs/other.md",
+                  "source_char_start": 58,
+                  "source_char_end": 86,
+                  "source_section_start": 30,
+                  "source_section_end": 154,
+                  "origin": "linked_body",
+                  "kind": "url",
+                  "target": "private.md#hidden",
+                  "navigation": false,
+                  "status": "pending",
+                  "reason": "target_not_in_checked_scope"
+                },
+                {
+                  "source_path": "docs/other.md",
+                  "source_char_start": 125,
+                  "source_char_end": 151,
+                  "source_section_start": 30,
+                  "source_section_end": 154,
+                  "origin": "linked_body",
+                  "kind": "url",
+                  "target": "#second-hop",
+                  "navigation": false,
+                  "target_path": "docs/other.md",
+                  "target_char_start": 302,
+                  "target_char_end": 369,
+                  "status": "pending",
+                  "reason": "depth_limit"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "source_and_database_unchanged": true
+}

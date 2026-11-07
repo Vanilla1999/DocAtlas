@@ -1,0 +1,24 @@
+{
+  "args": [
+    "/workspace/scratch/66f7674793b8/step12-wheel.FOrJVx/venv/bin/python",
+    "-I",
+    "/workspace/scratch/66f7674793b8/DocAtlas/integrations/opencode-v2-compact/documentation_profile.py",
+    "--project",
+    "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/corpus",
+    "--output",
+    "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/mcp",
+    "--backend",
+    "mcp",
+    "--executable",
+    "/workspace/scratch/66f7674793b8/step12-wheel.FOrJVx/venv/bin/doc-atlas",
+    "--python",
+    "/workspace/scratch/66f7674793b8/step12-wheel.FOrJVx/venv/bin/python",
+    "--server-env-json",
+    "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/server-environment.json",
+    "--max-steps",
+    "12"
+  ],
+  "exit": 0,
+  "stdout": "{\"profile\": \"documentation-light-v1\", \"location\": \"/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/mcp\", \"agent\": \"docs\", \"next\": \"Run OpenCode here with this agent; pass the unchanged question through stdin.\"}\n",
+  "stderr": ""
+}

@@ -1,0 +1,53 @@
+schema_version: 1
+code_files: []
+documents:
+- path: architecture.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+- path: calendar.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+- path: clock.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+- path: modules/laser/private.md
+  role: other
+  scope: module
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+  module_path: modules/laser
+- path: overview.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+- path: reservations.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track
+- path: weather.md
+  role: other
+  scope: project
+  description: Pinned documentation source
+  authority: source_of_truth
+  status: active
+  impact: track

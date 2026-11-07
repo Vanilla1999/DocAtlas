@@ -1,0 +1,19 @@
+{
+  "package": "@opencode/cli-linux-x64",
+  "version": "2.2.5",
+  "metadata_url": "https://registry.npmjs.org/@opencode%2fcli-linux-x64/2.2.5",
+  "tarball": "https://registry.npmjs.org/@opencode/cli-linux-x64/-/cli-linux-x64-2.2.5.tgz",
+  "integrity": "sha512-BkHAfTqNsg/qphyHNrnH+DGkOxZsGjamNpM5DvwoEvz7ZAPNw8mEbMXGTCDOAH+/+40Eqeie6KNZBZZQwPCjaA==",
+  "tarball_sha256": "92690eee07a680d3cb760ca02ba43878de9eab1b4e5d5dfae8795518c53628f4",
+  "binary_sha256": "8d060e1d2fbb9bb44cf09ae6ed1f3f6a7cff070b5227e2f90970132b23a92050",
+  "binary": "/workspace/scratch/66f7674793b8/step12-client-runtime.J9NDwg/package/bin/opencode",
+  "version_output": "opencode v2.2.5",
+  "setup_verification": {
+    "metadata_matches_step11_receipt": true,
+    "tarball_sha512_integrity_verified": true,
+    "tarball_sha256_matches_step11_receipt": true,
+    "binary_sha256_matches_step11_receipt": true,
+    "version_verified": true
+  },
+  "boundary": "Explicit isolated pinned client install; package archive integrity and binary checksum checked against existing Step11 receipt. Version command only; acceptance and model calls not run."
+}

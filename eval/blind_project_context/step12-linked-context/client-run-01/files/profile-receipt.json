@@ -1,0 +1,57 @@
+{
+  "profile": "documentation-light-v1",
+  "backend": "files",
+  "project_path": "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/corpus",
+  "workspace_path": "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/files",
+  "scope": "project",
+  "agent": "docs",
+  "model_step_limit": 12,
+  "presentation": "native-file-text",
+  "common_prompt_sha256": "9533321f7cf4cfeff4a26ff66fa03058694a07455e87e54e188c8f3fa0b78aea",
+  "system_sha256": "b7d4fba4315c363e5e9e420a2f80bf566e4d2f23e3d201dcabf4b831d84a77da",
+  "allowed_tools": [
+    "read",
+    "glob",
+    "grep"
+  ],
+  "language_preflight": "unchanged; bound language unknown",
+  "adapter_execute_tools": [],
+  "adapter_guard_tools": [
+    "read",
+    "glob",
+    "grep"
+  ],
+  "retrieval_policy_selected_by_profile": false,
+  "instructions_disabled": false,
+  "history_pruned": false,
+  "file_control_snapshot": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "64f0b9af4a07ddb52564f1d7fca7f083bf39f693fcc0d2492cbd8c442cbaabbb"
+    },
+    {
+      "path": "docatlas.project-docs.yaml",
+      "sha256": "f425aa68dd4755a13dd692c46ca626e3602e2dc7365ac728e516e10f1e002cab"
+    },
+    {
+      "path": "docs/cases.md",
+      "sha256": "eb7f2d330b622331c71f45628b523a3885bba0836cdf292ed0c1a3038130c595"
+    },
+    {
+      "path": "docs/record.md",
+      "sha256": "120f89fb65c99a5eac737c6d9beb019a2290164020b64ce27b6e47e1a9e57ed1"
+    }
+  ],
+  "mcp_active_snapshot_verified_by_builder": false,
+  "model_calls": 0,
+  "preparation_calls": 0,
+  "inputs": {
+    "documentation_profile.py": "eff66631964100ca6cdb4c7dd998015c6192eb1edf576384efe13211c412044b",
+    "profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "profile/files.txt": "5254a90d106fec363fda17c824358491ef12fd5c53cf1144cbf4167c4a2b1c83",
+    "profile/index.js": "a1a713eb537ef76ae6057b84de8446b76a4fd6b62b1052469c76290029ac2614",
+    "index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80"
+  },
+  "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."
+}

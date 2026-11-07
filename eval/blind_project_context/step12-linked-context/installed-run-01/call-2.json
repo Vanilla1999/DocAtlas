@@ -1,0 +1,148 @@
+{
+  "tool": "get_docs_context",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-b8342bd7e3081dbd",
+        "path_or_url": "docs/auth.md",
+        "section": "Auth",
+        "snippet": "# Auth\n\nAuthenticate with OAuth tokens.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "9c2e3fe324f94375dcebe19c057784901a52683a13159dbefd4b1585bc0642a2",
+        "project_identity": "local:1782e0c643f8c4f85c7ce5d2d6fff6f89a2c50b0568d6744961006792f212cd7",
+        "line_start": 1,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/79f3b39c16ebdf9a5837c0e4"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 394,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "joint_checked_body_mmr_v1",
+      "scope": "source_checked_merged_candidates",
+      "query_count": 1,
+      "candidate_rows": 1,
+      "pruned_rows": 0,
+      "eligible_rows": 1,
+      "budget_limited": false,
+      "reference_limited": false,
+      "selected_rows": 1,
+      "omitted_rows": 0
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": null,
+      "remaining_rows": 0,
+      "continuation_token": "1ef25760d26d9faa6f1a24879461f65a1332ef572b4bac6f9af659f89db3439b"
+    }
+  },
+  "is_error": false,
+  "sdk_result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-b8342bd7e3081dbd",
+          "path_or_url": "docs/auth.md",
+          "section": "Auth",
+          "snippet": "# Auth\n\nAuthenticate with OAuth tokens.\n",
+          "version_binding": "unversioned",
+          "content_sha256": "9c2e3fe324f94375dcebe19c057784901a52683a13159dbefd4b1585bc0642a2",
+          "project_identity": "local:1782e0c643f8c4f85c7ce5d2d6fff6f89a2c50b0568d6744961006792f212cd7",
+          "line_start": 1,
+          "line_end": 3,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/79f3b39c16ebdf9a5837c0e4"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 394,
+      "context_unassessed": true,
+      "admission_contract": "source_only_heuristic_removal_v1",
+      "source_selection": {
+        "policy": "joint_checked_body_mmr_v1",
+        "scope": "source_checked_merged_candidates",
+        "query_count": 1,
+        "candidate_rows": 1,
+        "pruned_rows": 0,
+        "eligible_rows": 1,
+        "budget_limited": false,
+        "reference_limited": false,
+        "selected_rows": 1,
+        "omitted_rows": 0
+      },
+      "more_context": {
+        "portion": 1,
+        "next_portion": null,
+        "remaining_rows": 0,
+        "continuation_token": "1ef25760d26d9faa6f1a24879461f65a1332ef572b4bac6f9af659f89db3439b"
+      }
+    },
+    "isError": false
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "DOCATLAS_HOME": "/workspace/scratch/66f7674793b8/DocAtlas/eval/blind_project_context/step12-linked-context/client-run-01/docatlas-state",
+  "DOCATLAS_OFFLINE": "1",
+  "DOCATLAS_AUTO_VECTORS": "0",
+  "DOCATLAS_CONTEXT_COMPRESSION": "off",
+  "DOCATLAS_CONTEXT_PRESENTATION": "literal-v2",
+  "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+  "DOCATLAS_MCP_COMPACT_TEXT": "1",
+  "ORT_DISABLE_TELEMETRY": "1"
+}

@@ -1,0 +1,16 @@
+{
+  "sessions": {
+    "mcp": [
+      "ses_e4a3bd59bffe3cUqJdEY3OHjM0"
+    ],
+    "files": [
+      "ses_e4a3bc4edffe2wXHBYZZx6ohZD"
+    ]
+  },
+  "provider_requests": {
+    "mcp": 4,
+    "files": 2
+  },
+  "errors": {},
+  "model_calls": 0
+}

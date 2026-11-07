@@ -1,0 +1,22 @@
+schema_version: 1
+code_files: []
+documentation_languages:
+  docs/record.md:
+  - en
+  docs/cases.md:
+  - en
+documents:
+- path: docs/record.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source
+- path: docs/cases.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source

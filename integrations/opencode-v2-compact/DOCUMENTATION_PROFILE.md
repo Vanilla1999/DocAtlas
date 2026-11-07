@@ -50,6 +50,12 @@ opencode run --agent docs --model your-provider/your-model < /absolute/question.
 client's configured model. An optional `--max-steps` creates an explicit host
 limit. The profile adds no default model-step limit.
 
+The generated `opencode.json` embeds the instruction text at generation time.
+To adopt an updated profile prompt, generate a **new dedicated location** using
+the updated integration and launch OpenCode there. Updating the integration files
+alone does not replace the prompt in an existing configuration. The generator
+continues to refuse overwrites, and the receipt records the actual prompt hashes.
+
 ## What the profile changes
 
 - The MCP project root is explicitly bound. This first profile fixes
@@ -96,6 +102,26 @@ The plugins remain in the generated order, with the compact adapter last. Do not
 move this restrictive profile into a general coding location or remove its scope
 guard while retaining the file-tool permissions. This is an application-level
 profile, not an operating-system sandbox.
+
+## Source-to-draft check
+
+The shared `profile/common.txt` now asks for one final comparison of the draft
+against each question-relevant statement in the supplied sources: add supported
+omissions and remove unsupported claims, then return only the final answer.
+Both MCP and files profiles receive this same paragraph through the builder.
+This is an internal answer-writing instruction, not a new tool, permission,
+retrieval route or client-scheduled provider request. It cannot recover evidence
+that was never supplied and does not certify that all relevant conditions were
+found. Existing scope, uncertainty, citation and stopping rules still apply.
+
+The exact paragraph was previously tested in an
+[answer-only diagnostic](../../eval/blind_project_context/step11-completeness/README_RU.md)
+on four known Meridian questions with Astra Pro. With all six allowed documents,
+fully preserved requirements increased from 16/19 to 18/19; one scope condition
+remained partial. That result is not a general completeness guarantee, a Terra
+Low result, an end-to-end OpenCode test or evidence of token savings. Prompt
+delivery and final-answer quality must still be measured separately. The
+historical skill, historical study prompts and frozen results are not rewritten.
 
 ## Files comparison control
 
@@ -165,6 +191,11 @@ represents native tool failures as an undelivered error envelope, so the check
 does not mistake that envelope for a source answer or require the internal guard
 message to be visible. There is no model inference,
 answer-quality result or provider-billing measurement.
+
+The first outgoing provider request of each new MCP/files session must contain
+the exact source-to-draft paragraph. This verifies delivery through the generated
+configuration and real client, not whether a model follows the instruction or
+preserves the required facts. The historical inventory prompt remains unchanged.
 
 The same ordinary canonical MCP packet is also rendered offline with current
 and `literal-v2` presentation. Ordinary standalone already omits per-source

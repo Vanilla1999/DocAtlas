@@ -1,0 +1,157 @@
+{
+  "seconds": 0.07757524599946919,
+  "expected_paths": [
+    "docs/guide.md",
+    "docs/modules/private.md",
+    "docs/other.md"
+  ],
+  "indexed_paths": [
+    "docs/guide.md",
+    "docs/modules/private.md",
+    "docs/other.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-e043c827ebc3cfe340a583ef1b8a6f2821c7d945",
+      "source_path": "docs/guide.md",
+      "display_text": "# Guide\n\nScope introduction. The scope refers to the [ancestor condition](other.md#ancestor-only).\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-b9bc924d4c7c0eb93e28967c932339463ad30e96",
+      "source_path": "docs/guide.md",
+      "display_text": "## Empty\n\n",
+      "line_start": 5,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-67396f55c70ba70eccd3115db7f39f735c704bc8",
+      "source_path": "docs/guide.md",
+      "display_text": "### Selected\n\nKeep this condition [limits](#limits) and [more][ref].\n\nConsult the [absent condition](other.md#absent), [whole document](other.md), and [restricted condition](modules/private.md#hidden).\n\nAlso retain the <a href=\"other.md#condition&amp;amp;gate\">required condition</a>.\n\n- [Index entry](other.md#navigation-only)\n\n| Item | Value |\n| --- | --- |\n| A | B[^note] |\n\n",
+      "line_start": 7,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-84d83866ac88e9d50d7668c99cf74f6cf8865ed2",
+      "source_path": "docs/guide.md",
+      "display_text": "#### Tail\n\nTail condition stays.\n\n",
+      "line_start": 21,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-819798be4c625a79752f23328b7f2967a0443753",
+      "source_path": "docs/guide.md",
+      "display_text": "## Noise\n\nUnselected noise.\n\n",
+      "line_start": 25,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-e19f4b4afeaed16d9bfef2cf101df5a97e305bdd",
+      "source_path": "docs/guide.md",
+      "display_text": "## Limits\n\nLimit condition [cycle](#selected).\n\n",
+      "line_start": 29,
+      "line_end": 32
+    },
+    {
+      "stable_chunk_id": "child-7d15fe18a84fc6aa0c2b6310b689e43fec7ee3c7",
+      "source_path": "docs/guide.md",
+      "display_text": "## Notes\n\n[^note]: Footnote condition.\n    Continued footnote.\n\n[ref]:\n  other.md#remote\n",
+      "line_start": 33,
+      "line_end": 39
+    },
+    {
+      "stable_chunk_id": "child-195b96879db3d5339e7032f4ff1bd9e53751df3c",
+      "source_path": "docs/other.md",
+      "display_text": "# Other\n\nOther introduction.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-33abf81e4e4000016619196651e8b2b229b50719",
+      "source_path": "docs/other.md",
+      "display_text": "## Remote\n\nRemote condition [missing](private.md#hidden). The remote condition also depends on [second step](#second-hop).\n\n",
+      "line_start": 5,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-ac91955bd6d7ab5bae81d996798abfa6547d68ab",
+      "source_path": "docs/other.md",
+      "display_text": "## Ancestor only\n\nAncestor-only condition is not automatically fetched.\n\n",
+      "line_start": 9,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-0c7555d6b094851bf352ea85314dc7812ec6e33b",
+      "source_path": "docs/other.md",
+      "display_text": "## Navigation only\n\nNavigation-only content is not automatically fetched.\n\n",
+      "line_start": 13,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-f3d6ed61d3605837a7023619bc2fe3721d7253d0",
+      "source_path": "docs/other.md",
+      "display_text": "## Second hop\n\nSecond-hop condition is not automatically fetched.\n\n",
+      "line_start": 17,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-6004c78ee66081c1eb40c0513cfb8e661e81b662",
+      "source_path": "docs/other.md",
+      "display_text": "## Correct entity condition\n\n<a id=\"condition&amp;amp;gate\"></a>\n\nThe single-decoded entity condition must be retained.\n\n",
+      "line_start": 21,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-ad255b415d24eca731f5a30dba63fe36ff2f8443",
+      "source_path": "docs/other.md",
+      "display_text": "## Wrong entity condition\n\n<a id=\"condition&amp;gate\"></a>\n\nThe double-decoded entity condition must not be substituted.\n",
+      "line_start": 27,
+      "line_end": 31
+    },
+    {
+      "stable_chunk_id": "child-8a47ed4ffcc3775dda70e296bd3adddfda2b5aff",
+      "source_path": "docs/modules/private.md",
+      "display_text": "# Hidden\n\nRestricted condition must remain outside project scope.\n",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.53.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "44e0d6e1a517c5bbd87795b75b36ff06bad0efa5af7dbd409e28058317f36b09",
+  "storage_path": "/workspace/scratch/66f7674793b8/DocAtlas/docatlas-evidence-fwotixyv/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-e897a62b785d4ffe8bb466842582c755",
+  "catalog_sha256": "335991a594a09bf2fcb5d3db27009e202eb57cb1f83b56eec412f695a15fbe80",
+  "documents": [
+    {
+      "path": "docs/guide.md",
+      "content_sha256": "ffd4992a32449aefa81e8755658d096dd3a01adb009cf3d4b7f3420f4cd219f3",
+      "catalog_entry_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f"
+    },
+    {
+      "path": "docs/modules/private.md",
+      "content_sha256": "761f6f47c3c4969b84dedba6a8ebc8c8ca61f24615c0ffa0d4f84af4d30e06c5",
+      "catalog_entry_hash": "sha256:cc91a00795b8a23e850a6d0aab1b599eea82ff72ce805602938ee207690f7207"
+    },
+    {
+      "path": "docs/other.md",
+      "content_sha256": "d7b6d359fa38539d483ade2c116b3a83a4b78f05db800861ba2ab0706619909b",
+      "catalog_entry_hash": "sha256:82a45cd77454cc1710b36aa62877355cbd43083b72ab69ff6ec813c74ab864b8"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-e897a62b785d4ffe8bb466842582c755",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 15,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 15
+  }
+}

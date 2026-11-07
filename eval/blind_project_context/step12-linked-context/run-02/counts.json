@@ -1,0 +1,9 @@
+{
+  "public_prepares": 1,
+  "public_contexts": 1,
+  "resource_reads": 0,
+  "model_scorer_calls": 0,
+  "closure_calls": 2,
+  "structural_row_rechecks": 12,
+  "expired_provenance_checks": 2
+}

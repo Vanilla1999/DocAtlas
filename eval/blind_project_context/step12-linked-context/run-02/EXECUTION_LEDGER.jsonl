@@ -1,0 +1,3 @@
+{"at_utc": "2026-11-07T11:27:34.234551+00:00", "operation": "prepare_docs", "status": "started", "group": "guard"}
+{"at_utc": "2026-11-07T11:27:34.330027+00:00", "operation": "get_docs_context", "status": "started", "case": "structural-guard"}
+{"at_utc": "2026-11-07T11:27:34.940947+00:00", "operation": "get_docs_context", "status": "returned", "case": "structural-guard", "status_result": "PASS_STRUCTURAL_REPLAY_ONLY"}

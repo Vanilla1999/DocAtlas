@@ -27,6 +27,13 @@ DOCUMENTS = {
     "docs/cases.md": "# Storage cases\n\nA storage case holds four glass plates. Keep a divider between each pair of plates.\n",
 }
 PROJECT_INSTRUCTION = "This documentation fixture is read-only. Never change its source documents."
+# Frozen wording from step11-completeness/genericinstruction.txt. Keep this
+# expectation independent of the profile builder and its source prompt file.
+SOURCE_TO_DRAFT_INSTRUCTION = (
+    "Make one final pass through the supplied sources, comparing each question-relevant statement with your draft. "
+    "Add any supported point the draft leaves out, and remove claims the sources do not support. "
+    "Keep this check internal; return only the final answer."
+)
 
 
 def compact(value):
@@ -199,6 +206,7 @@ def main():
     requests = {case: [] for case in cases}
     finished = {case: threading.Event() for case in cases}
     errors = {}
+    source_to_draft_delivered = set()
 
     def calls(items):
         return {"role": "assistant", "tool_calls": [{"index": index, "id": call_id, "type": "function",
@@ -212,6 +220,9 @@ def main():
         if step == 1:
             system = "\n".join(content(message) for message in body["messages"] if message["role"] == "system")
             assert PROJECT_INSTRUCTION in system, "Applicable project instructions were lost"
+            if case in ("mcp", "files"):
+                assert SOURCE_TO_DRAFT_INSTRUCTION in system, "Source-to-draft instruction was not delivered"
+                source_to_draft_delivered.add(case)
             users = [content(message) for message in body["messages"] if message["role"] == "user"]
             assert users[-1] == QUESTION, "The client rewrote the original question"
             if case == "mcp":
@@ -411,6 +422,7 @@ def main():
                 "source_tokens": sum(count(text) for text in DOCUMENTS.values())}
         import docmancer
         result = {"passed": True, "measurements": measurements, "sessions": sessions,
+                  "source_to_draft_prompt_delivered": sorted(source_to_draft_delivered),
                   "mcp_readiness": readiness, "rejected_status_never_dispatched": True,
                   "prepared_documents": prepared_documents, "source_files_unchanged": True, "database_unchanged": True,
                   "source_snapshot": source_before, "installed_package": str(Path(docmancer.__file__).resolve()),

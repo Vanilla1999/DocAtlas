@@ -382,13 +382,19 @@ def _edges(syntax, definitions, *, report_assets=False):
             yield "unsupported", match[0]
 
 
-def close_selection(structure, selected_ids, payload, snapshot, retrieval):
-    """Close selected subtrees, introductions and explicit edges to a fixpoint.
+def close_selection(structure, selected_ids, payload, snapshot, retrieval, *, reference_expansion="off"):
+    """Hydrate selected units using the explicit post-selection recipe.
 
-    Return (public rows, bound snapshot, receipt). No network or new document
-    authorization occurs here: cross-document targets must be in the checked
-    same-call scope. An unavailable/ambiguous edge is an explicit dependency gap.
+    Return (public rows, bound snapshot, receipt). The historical off path below
+    closes its structural dependencies to a fixpoint. The opt-in one-hop path is
+    separately versioned and never uses added bodies as a recursive frontier.
+    Neither path fetches documents or widens the checked same-call scope.
     """
+    if reference_expansion != "off":
+        from .bounded_context_links import RECIPE, close_one_hop
+        if reference_expansion != RECIPE:
+            raise StructuralContextError("Unknown reference expansion recipe")
+        return close_one_hop(structure, selected_ids, payload, snapshot, retrieval)
     plan = retrieval.get("documentation_query_plan") or {}
     if (str(plan.get("original_question") or retrieval.get("question") or "") != structure.question
             or retrieval.get("project_identity") != structure.expected_project_identity):

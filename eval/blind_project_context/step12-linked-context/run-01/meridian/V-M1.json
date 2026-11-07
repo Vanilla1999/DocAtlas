@@ -1,0 +1,39 @@
+{
+  "id": "V-M1",
+  "status": "BLOCKED",
+  "seconds": 0.16283512199879624,
+  "public_packet": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "context_only"
+    ],
+    "estimated_tokens": 124,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "context_only",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "context_only"
+    },
+    "operational_status": "not_found"
+  },
+  "observation": {
+    "callbacks": 0,
+    "errors": [],
+    "blocked": []
+  },
+  "structural_replay": [],
+  "source_and_database_unchanged": true
+}

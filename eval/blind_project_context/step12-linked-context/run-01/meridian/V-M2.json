@@ -1,0 +1,656 @@
+{
+  "id": "V-M2",
+  "status": "PASS_STRUCTURAL_REPLAY_ONLY",
+  "seconds": 0.9427300179995655,
+  "public_packet": {
+    "status": "truncated",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-da9f3097618cd108",
+        "path_or_url": "weather.md",
+        "section": "Weather decisions > Indoor instrument",
+        "snippet": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "53e30807a958c0f4d1bafb64e4a339623137de6df701c540a96e56191ae144a9",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 9,
+        "line_end": 12,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/23183a75108874821f7ce171"
+      },
+      {
+        "evidence_id": "ev-c5f9e0e006826702",
+        "path_or_url": "weather.md",
+        "section": "Weather decisions > Suspension",
+        "snippet": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "41b22334169a925a4ebfdd741bd7e2d2e02527f613c05c0ba1443e15898e05c9",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/71e0411adce9f5160f94c211"
+      },
+      {
+        "evidence_id": "ev-b3b2c2aa8dd9eb4f",
+        "path_or_url": "weather.md",
+        "section": "Weather decisions > Forecast display",
+        "snippet": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "7dc6fd6c45091753fd2b1eb9535d4af46cf054e47725393c797e79cbb21ece31",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 13,
+        "line_end": 15,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/10a095cdf9477d0e8ce61a3d"
+      },
+      {
+        "evidence_id": "ev-cb38782494fce93b",
+        "path_or_url": "reservations.md",
+        "section": "Confirmed reservations > Training slots",
+        "snippet": "## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "597b27843cec4ac1030e6b1847f00bdaac77b7081f23254926e36c3d96c2f4a7",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 15,
+        "line_end": 17,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/09042645798f246ea5eef003"
+      },
+      {
+        "evidence_id": "ev-9f3daf40208e2c8d",
+        "path_or_url": "architecture.md",
+        "section": "Scheduler architecture > Prototype recovery",
+        "snippet": "## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "eea9d4694f180e578b91eca75f1f71ec4b1aa9d80de77fca233ba136423b5905",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 9,
+        "line_end": 11,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/c5d3aaa80aa37d4c2154b9bc"
+      },
+      {
+        "evidence_id": "ev-f2416760e194e497",
+        "path_or_url": "architecture.md",
+        "section": "Scheduler architecture > Planner",
+        "snippet": "## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "cbd82cf29b36107f60622c2d1a01b2119bcea6d2aec9467258a9c870bf8c9b7b",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/4ecb808e78aa392dec0c1249"
+      },
+      {
+        "evidence_id": "ev-870a67d90c766009",
+        "path_or_url": "calendar.md",
+        "section": "Calendar display > Timezones",
+        "snippet": "## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "34e712841cb63d332c1c4c9941a0de25971a62fbfb981b3177bddfd369e0bccc",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 9,
+        "line_end": 11,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/ec9dfd83466cc183c2c3dc60"
+      },
+      {
+        "evidence_id": "ev-1d8adf7025958993",
+        "path_or_url": "clock.md",
+        "section": "Time coordination > Simulation clock",
+        "snippet": "## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "ddf4144fe71fcb3d2c941edef703699f08df5e000838bc469cf1ceab8025f51e",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 13,
+        "line_end": 15,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/c543a73409f218100a783663"
+      },
+      {
+        "evidence_id": "ev-f38cd6f471cd840c",
+        "path_or_url": "calendar.md",
+        "section": "Calendar display",
+        "snippet": "# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "d96c3f96e95051fb44e94f14e15a0e2f861a18aa5dc27b89b689e1bd30ec4ea5",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/5e0476495265830e80f9bfb7"
+      },
+      {
+        "evidence_id": "ev-cbd7763631b693ba",
+        "path_or_url": "overview.md",
+        "section": "Meridian scheduler > Services",
+        "snippet": "## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "1ca72dae5209f58066b3b26f65c5121af7b164cfe5d513ece62e528d4119f6c1",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/3797ab873c80222d2778e30b"
+      },
+      {
+        "evidence_id": "ev-0c8f9b879ff0f781",
+        "path_or_url": "architecture.md",
+        "section": "Scheduler architecture",
+        "snippet": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "11ec815189c4e34c869d025c90c2bdedbea551aefbec896a743f6201b91f25e4",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/aaf2e02168765a736b53a74f"
+      },
+      {
+        "evidence_id": "ev-b6237577d9b82b4d",
+        "path_or_url": "reservations.md",
+        "section": "Confirmed reservations > Locked instrument",
+        "snippet": "## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "773974301201448826d18ef3f8e17d0789e6a16dd164c55aef90d10eac10b6b2",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 11,
+        "line_end": 14,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/407cdaaec521a3ab481eced3"
+      },
+      {
+        "evidence_id": "ev-74830431fd790c37",
+        "path_or_url": "calendar.md",
+        "section": "Calendar display > Colours",
+        "snippet": "## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "be7b6499828323d5c9ae4826b54c68ff424788d979c8fc2fb586d3ff530f5a2d",
+        "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+        "line_start": 5,
+        "line_end": 8,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/9cb00adf1f503783e19e2bd4"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "joint_selection_partial"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 2429,
+    "context_unassessed": true,
+    "admission_contract": "source_only_heuristic_removal_v1",
+    "source_selection": {
+      "policy": "joint_checked_body_mmr_v1",
+      "scope": "source_checked_merged_candidates",
+      "query_count": 1,
+      "candidate_rows": 20,
+      "pruned_rows": 0,
+      "eligible_rows": 20,
+      "budget_limited": false,
+      "reference_limited": false,
+      "selected_rows": 13,
+      "omitted_rows": 7
+    },
+    "more_context": {
+      "portion": 1,
+      "next_portion": 2,
+      "remaining_rows": 7,
+      "continuation_token": "4f17b3938526b8063cc9a0112e01a9486bc17419bdfaf3a0a29b102a0a034bb9"
+    }
+  },
+  "observation": {
+    "callbacks": 1,
+    "errors": [],
+    "blocked": []
+  },
+  "structural_replay": [
+    {
+      "seed_kind": "actual_saved_qwen_scores_at_unchanged_frozen_threshold",
+      "live_units": 21,
+      "seed_units": 4,
+      "structural_inputs_sha256": "1c1221647821d3e456c7d53a33fab1401225919a54e00e4a1c4958dc1d718cb4",
+      "seeds": [
+        {
+          "path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "char_start": 89,
+          "char_end": 306
+        },
+        {
+          "path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "char_start": 306,
+          "char_end": 547
+        },
+        {
+          "path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "char_start": 547,
+          "char_end": 696
+        },
+        {
+          "path": "weather.md",
+          "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "char_start": 0,
+          "char_end": 89
+        }
+      ],
+      "variants": {
+        "off": {
+          "metrics": {
+            "facts_found": 6,
+            "facts_total": 6,
+            "fact_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "delivered_rows": 4,
+            "source_bytes": 696,
+            "source_tokens": 116,
+            "reconstructed_packet_tokens": 489,
+            "intervals": [
+              [
+                "weather.md",
+                0,
+                89
+              ],
+              [
+                "weather.md",
+                89,
+                306
+              ],
+              [
+                "weather.md",
+                306,
+                547
+              ],
+              [
+                "weather.md",
+                547,
+                696
+              ]
+            ],
+            "checked_rows": [
+              {
+                "index": 0,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              },
+              {
+                "index": 1,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              },
+              {
+                "index": 2,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              },
+              {
+                "index": 3,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              }
+            ]
+          },
+          "packet": {
+            "status": "truncated",
+            "kind": "docs_context",
+            "context_status": "ready",
+            "context_available": true,
+            "answer_supported": false,
+            "answer_available": false,
+            "support_status": "retrieval_only",
+            "answer_policy": "cite_only",
+            "coverage_policy": "retrieval_attribution_only",
+            "query_coverage": "partial",
+            "retrieval_coverage": "partial",
+            "facet_coverage": "unverified",
+            "covered_query_ids": [],
+            "missing_query_ids": [
+              "query-original"
+            ],
+            "missing_facets": [],
+            "facets": [],
+            "sources": [
+              {
+                "evidence_id": "ev-fe05fca1278bbd9111616416",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions",
+                "snippet": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "47538b49a66e39e7065254d6f23595e323499083e28baa11a03a6f96ed32aaf2",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 1,
+                "line_end": 4,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-4dc4b356209ba81ecbf05ca5",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions > Suspension",
+                "snippet": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "5d1edf4b7ee97f1b2c5ec3fda6ce63a0d833400e98961bae8561f3a746e99c7a",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 5,
+                "line_end": 8,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-7877d1d1a28dd0069ef70b55",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions > Indoor instrument",
+                "snippet": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "0dcbe0e75b674f165d70e740ecb19ac8feecfbead6a91aabaa79b464ab1131dd",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 9,
+                "line_end": 12,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-e02a5c3a147743ff042c0cb1",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions > Forecast display",
+                "snippet": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+                "version_binding": "unversioned",
+                "content_sha256": "2c719f6ee9eed18cc0acad7cdbcd4e00af2b7600efe4ad74fb33e7b176cba2ec",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 13,
+                "line_end": 15,
+                "authority": "source_of_truth",
+                "scope": "project"
+              }
+            ],
+            "context_quality": {
+              "status": "unverified",
+              "reasons": [
+                "coverage_unverified"
+              ]
+            },
+            "read_next": [],
+            "edit_ready": false,
+            "investigation_allowed": true,
+            "estimated_tokens": 837,
+            "context_unassessed": true,
+            "admission_contract": "source_only_heuristic_removal_v1",
+            "source_selection": {
+              "closure": {
+                "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+                "status": "complete",
+                "documents": 6,
+                "incomplete_dependencies": [],
+                "units": 21,
+                "hydrated_sections": 21,
+                "incoming_anchor_edges": 6,
+                "selected_units": 4,
+                "delivered_spans": 4
+              }
+            }
+          },
+          "host_closure": {
+            "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+            "status": "complete",
+            "documents": 6,
+            "incomplete_dependencies": [],
+            "units": 21,
+            "hydrated_sections": 21,
+            "incoming_anchor_edges": 6,
+            "selected_units": 4,
+            "delivered_spans": 4
+          }
+        },
+        "one-hop-v1": {
+          "metrics": {
+            "facts_found": 6,
+            "facts_total": 6,
+            "fact_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "delivered_rows": 4,
+            "source_bytes": 696,
+            "source_tokens": 116,
+            "reconstructed_packet_tokens": 498,
+            "intervals": [
+              [
+                "weather.md",
+                0,
+                89
+              ],
+              [
+                "weather.md",
+                89,
+                306
+              ],
+              [
+                "weather.md",
+                306,
+                547
+              ],
+              [
+                "weather.md",
+                547,
+                696
+              ]
+            ],
+            "checked_rows": [
+              {
+                "index": 0,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              },
+              {
+                "index": 1,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              },
+              {
+                "index": 2,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              },
+              {
+                "index": 3,
+                "path": "weather.md",
+                "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+                "errors": []
+              }
+            ]
+          },
+          "packet": {
+            "status": "truncated",
+            "kind": "docs_context",
+            "context_status": "ready",
+            "context_available": true,
+            "answer_supported": false,
+            "answer_available": false,
+            "support_status": "retrieval_only",
+            "answer_policy": "cite_only",
+            "coverage_policy": "retrieval_attribution_only",
+            "query_coverage": "partial",
+            "retrieval_coverage": "partial",
+            "facet_coverage": "unverified",
+            "covered_query_ids": [],
+            "missing_query_ids": [
+              "query-original"
+            ],
+            "missing_facets": [],
+            "facets": [],
+            "sources": [
+              {
+                "evidence_id": "ev-fe05fca1278bbd9111616416",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions",
+                "snippet": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "47538b49a66e39e7065254d6f23595e323499083e28baa11a03a6f96ed32aaf2",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 1,
+                "line_end": 4,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-4dc4b356209ba81ecbf05ca5",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions > Suspension",
+                "snippet": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "5d1edf4b7ee97f1b2c5ec3fda6ce63a0d833400e98961bae8561f3a746e99c7a",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 5,
+                "line_end": 8,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-7877d1d1a28dd0069ef70b55",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions > Indoor instrument",
+                "snippet": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n",
+                "version_binding": "unversioned",
+                "content_sha256": "0dcbe0e75b674f165d70e740ecb19ac8feecfbead6a91aabaa79b464ab1131dd",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 9,
+                "line_end": 12,
+                "authority": "source_of_truth",
+                "scope": "project"
+              },
+              {
+                "evidence_id": "ev-e02a5c3a147743ff042c0cb1",
+                "path_or_url": "weather.md",
+                "section": "Weather decisions > Forecast display",
+                "snippet": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+                "version_binding": "unversioned",
+                "content_sha256": "2c719f6ee9eed18cc0acad7cdbcd4e00af2b7600efe4ad74fb33e7b176cba2ec",
+                "project_identity": "local:08d140cd5cd56c4dd1b02f2227e51cb0ac5cf89255461561a75bd7bb2961bb7d",
+                "line_start": 13,
+                "line_end": 15,
+                "authority": "source_of_truth",
+                "scope": "project"
+              }
+            ],
+            "context_quality": {
+              "status": "unverified",
+              "reasons": [
+                "coverage_unverified"
+              ]
+            },
+            "read_next": [],
+            "edit_ready": false,
+            "investigation_allowed": true,
+            "estimated_tokens": 839,
+            "context_unassessed": true,
+            "admission_contract": "source_only_heuristic_removal_v1",
+            "source_selection": {
+              "closure": {
+                "selected_units": 4,
+                "delivered_spans": 4,
+                "coverage": "unverified",
+                "reference_expansion": {
+                  "recipe": "one-hop-v1",
+                  "max_hops": 1,
+                  "added_spans": 0,
+                  "examined_references": 0,
+                  "followed_references": 0,
+                  "satisfied_references": 0,
+                  "pending_references": 0
+                },
+                "incomplete_dependencies": []
+              }
+            }
+          },
+          "host_closure": {
+            "structural_recipe": "own_body_ancestors_definitions_no_automatic_anchor_or_seed_subtrees_v2",
+            "status": "complete",
+            "documents": 6,
+            "incomplete_dependencies": [],
+            "units": 21,
+            "hydrated_sections": 21,
+            "incoming_anchor_edges": 6,
+            "selected_units": 4,
+            "delivered_spans": 4,
+            "incoming_context_unresolved_count": 0,
+            "coverage": "unverified",
+            "reference_expansion": {
+              "recipe": "one-hop-v1",
+              "parser_revision": "masked-source-origin-links-v1",
+              "contract_sha256": "b82e64a5606d09cc7488477d109bcc3cbda824b9b5a17b649b501814cca32bd9",
+              "max_hops": 1,
+              "coverage": "unverified",
+              "selected_sections": 4,
+              "linked_sections": 0,
+              "ancestor_sections": 0,
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "satisfied_references": 0,
+              "pending_references": 0,
+              "references": []
+            }
+          }
+        }
+      }
+    }
+  ],
+  "source_and_database_unchanged": true
+}

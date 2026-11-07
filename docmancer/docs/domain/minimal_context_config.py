@@ -4,6 +4,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from .context_links import context_link_expansion
+
 EMERGENCY_TOKENS = 50000
 
 
@@ -13,6 +15,7 @@ def minimal_context_enabled() -> bool:
     Pinned asset hashes are verified by the scorer at execution. An absent policy
     is a supported diagnostic run (all sections retained), not a fallback filter.
     """
+    context_link_expansion()
     value = os.environ.get("DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT", "0")
     if value not in {"0", "1"}:
         raise ValueError("DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT must be 0 or 1")

@@ -1,0 +1,16 @@
+{
+  "source": "First built wheel, not current working tree",
+  "verified_against": "run-01/execution-manifest.json",
+  "files": [
+    {
+      "path": "docmancer/docs/application/bounded_context_links.py",
+      "sha256": "feb25f5dbf0b761aa651edfc7b927ef7501596fba7ffcdc03bb646c308a13094",
+      "preserved_as": "provenance/bounded_context_links.py.txt"
+    },
+    {
+      "path": "docmancer/docs/application/minimal_context_structure.py",
+      "sha256": "0731048c1870c016ba2252fb3d96f6619966ecd9b7e63565350ee0f5fb5beea9",
+      "preserved_as": "provenance/minimal_context_structure.py.txt"
+    }
+  ]
+}

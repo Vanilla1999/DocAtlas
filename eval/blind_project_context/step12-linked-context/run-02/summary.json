@@ -1,0 +1,218 @@
+{
+  "status": "PASS_STRUCTURAL_REPLAY_ONLY",
+  "boundary": "public in-process acquisition with live structural selection-input replay; not final public Qwen packet",
+  "counts": {
+    "public_prepares": 1,
+    "public_contexts": 1,
+    "resource_reads": 0,
+    "model_scorer_calls": 0,
+    "closure_calls": 2,
+    "structural_row_rechecks": 12,
+    "expired_provenance_checks": 2
+  },
+  "coverage": {
+    "Meridian": {
+      "direct_anchored_link": "V-M1 Transfer to Suspension",
+      "ancestor_only_link": "NOT COVERED: the parent itself is a Qwen seed",
+      "navigation_only_block": "NOT COVERED: overview Navigation is not selected",
+      "linked_body_second_hop": "NOT COVERED",
+      "missing_anchor": "NOT COVERED",
+      "document_only_target": "NOT COVERED",
+      "excluded_module": "V-M4 project scope; no cross-scope link in this corpus"
+    },
+    "guard": "Direct/ancestor/navigation/linked-body origins, missing anchor, document-only target, excluded module, exact single-decode HTML target, fail-closed backtick HTML attribute; no scorer or model-selection claim"
+  },
+  "results": [
+    {
+      "id": "structural-guard",
+      "status": "PASS_STRUCTURAL_REPLAY_ONLY",
+      "seconds": 0.6093487979997008,
+      "observation": {
+        "callbacks": 1,
+        "errors": [],
+        "blocked": []
+      }
+    }
+  ],
+  "metrics": {
+    "structural-guard": {
+      "off": {
+        "facts_found": 3,
+        "facts_total": 7,
+        "fact_indices": [
+          0,
+          1,
+          3
+        ],
+        "delivered_rows": 4,
+        "source_bytes": 706,
+        "source_tokens": 182,
+        "reconstructed_packet_tokens": 692,
+        "intervals": [
+          [
+            "docs/guide.md",
+            0,
+            100
+          ],
+          [
+            "docs/guide.md",
+            100,
+            110
+          ],
+          [
+            "docs/guide.md",
+            110,
+            617
+          ],
+          [
+            "docs/guide.md",
+            728,
+            817
+          ]
+        ],
+        "checked_rows": [
+          {
+            "index": 0,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 1,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 2,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 3,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          }
+        ]
+      },
+      "one-hop-v1": {
+        "facts_found": 7,
+        "facts_total": 7,
+        "fact_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "delivered_rows": 8,
+        "source_bytes": 1029,
+        "source_tokens": 252,
+        "reconstructed_packet_tokens": 1345,
+        "intervals": [
+          [
+            "docs/guide.md",
+            0,
+            100
+          ],
+          [
+            "docs/guide.md",
+            100,
+            110
+          ],
+          [
+            "docs/guide.md",
+            110,
+            617
+          ],
+          [
+            "docs/guide.md",
+            680,
+            728
+          ],
+          [
+            "docs/guide.md",
+            728,
+            817
+          ],
+          [
+            "docs/other.md",
+            0,
+            30
+          ],
+          [
+            "docs/other.md",
+            30,
+            154
+          ],
+          [
+            "docs/other.md",
+            369,
+            490
+          ]
+        ],
+        "checked_rows": [
+          {
+            "index": 0,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 1,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 2,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 3,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 4,
+            "path": "docs/guide.md",
+            "raw_sha256": "715c94345b7337b8d4e2e93fa8c14cda8d11a398a0f9ac52cae9d6a878e3079e",
+            "errors": []
+          },
+          {
+            "index": 5,
+            "path": "docs/other.md",
+            "raw_sha256": "a58ab962b0220cb115acefaa997503ae56c2b98c036687b04a8d8f9f39bec5d7",
+            "errors": []
+          },
+          {
+            "index": 6,
+            "path": "docs/other.md",
+            "raw_sha256": "a58ab962b0220cb115acefaa997503ae56c2b98c036687b04a8d8f9f39bec5d7",
+            "errors": []
+          },
+          {
+            "index": 7,
+            "path": "docs/other.md",
+            "raw_sha256": "a58ab962b0220cb115acefaa997503ae56c2b98c036687b04a8d8f9f39bec5d7",
+            "errors": []
+          }
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Seen development material; no fresh validation gate or model inference.",
+    "Closure packets are reconstructed inside a passive same-call observer, not returned by the public Qwen route.",
+    "Ordinary public packets are saved separately and never replaced by closure output.",
+    "No issued source capabilities for reconstructed packets; no installed/stdio/client/answer-model acceptance.",
+    "Token counts describe reconstructed document packets, not provider instructions/history/billing."
+  ]
+}
