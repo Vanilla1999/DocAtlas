@@ -343,6 +343,8 @@ def _handle_prepared_context_tool(
     if args.get("portion", 1) > 1 or args.get("continuation_token") is not None or args.get("source_path"):
         from docmancer.docs.application.section_compression import enabled as section_compression_enabled
         if (experimental_context_max_tokens() is None or args.get("maintenance")
+                or args.get("library") or args.get("libraries")
+                or args.get("mode") not in (None, "auto", "project")
                 or section_compression_enabled()):
             return _bad_request("portion_unavailable", "context portions require native checked project documentation")
     search_question = args.get("search_question") if args.get("search_question") is not None else question

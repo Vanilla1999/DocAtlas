@@ -306,6 +306,11 @@ def test_context_portions_reject_invalid_and_unsupported_requests(prepared_proje
         "library": "unprepared-library", "question": args["question"], "portion": 2,
         "continuation_token": token}, service)
     assert library["error"]["reason_code"] == "portion_unavailable"
+    mixed = call_docs_tool_payload("get_docs_context", {
+        **args, "library": "unprepared-library", "portion": 2,
+        "continuation_token": token}, service)
+    assert mixed.get("error", {}).get("reason_code") == "portion_unavailable", mixed
+    assert not mixed.get("sources"), mixed
 
 
 def test_e5_focused_context_preserves_scope_snapshot_and_read_only_state(tmp_path, monkeypatch):
