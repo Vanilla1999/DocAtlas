@@ -1,0 +1,43 @@
+{
+  "profile": "documentation-light-v1",
+  "backend": "mcp",
+  "project_path": "/tmp/opencode/step12-live-work/project",
+  "workspace_path": "/tmp/opencode/step12-live-work/qwen-one-hop/V-M1",
+  "scope": "project",
+  "agent": "measure",
+  "model_step_limit": 12,
+  "presentation": "literal-v2",
+  "common_prompt_sha256": "9533321f7cf4cfeff4a26ff66fa03058694a07455e87e54e188c8f3fa0b78aea",
+  "system_sha256": "5913d216d489582f93deed5d9d2ea74a478746813937f37c621044974aa0f35d",
+  "allowed_tools": [
+    "docatlas_get_docs_context",
+    "docatlas_docs_status",
+    "docatlas_read_docs_source",
+    "opencode_read_mcp_resource"
+  ],
+  "language_preflight": "unchanged; bound language unknown",
+  "adapter_execute_tools": [
+    "docatlas_get_docs_context",
+    "docatlas_docs_status",
+    "docatlas_read_docs_source"
+  ],
+  "adapter_guard_tools": [
+    "opencode_read_mcp_resource"
+  ],
+  "retrieval_policy_selected_by_profile": false,
+  "instructions_disabled": false,
+  "history_pruned": false,
+  "file_control_snapshot": null,
+  "mcp_active_snapshot_verified_by_builder": false,
+  "model_calls": 0,
+  "preparation_calls": 0,
+  "inputs": {
+    "documentation_profile.py": "eff66631964100ca6cdb4c7dd998015c6192eb1edf576384efe13211c412044b",
+    "profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "profile/mcp.txt": "56e0662be7df80e20104d6b652ed9f7cc5472e9d18b31c626a1d7b31e2cd84ea",
+    "profile/index.js": "a1a713eb537ef76ae6057b84de8446b76a4fd6b62b1052469c76290029ac2614",
+    "index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80"
+  },
+  "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."
+}

@@ -1,0 +1,3 @@
+- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [weather.md, lines 5–8](ev-84694b3a07a6f1eed9d173d7)
+- **Restart only after** the interlock closes **and** the duty operator records a restart approval. A favourable forecast does not authorize a restart. [weather.md, lines 5–8](ev-84694b3a07a6f1eed9d173d7); [lines 13–15](ev-0f186342d13a75be5643ba14)
+- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [weather.md, lines 9–12](ev-2615ed16947ea83976b6779b)

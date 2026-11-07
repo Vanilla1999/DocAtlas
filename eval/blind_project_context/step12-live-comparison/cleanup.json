@@ -1,0 +1,74 @@
+[
+  {
+    "pid": 1484608,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1485382,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1486812,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1487282,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1488200,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1488713,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1489551,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  },
+  {
+    "pid": 1490301,
+    "command": [
+      "/tmp/opencode/step12-qwen-env/bin/python",
+      "/tmp/opencode/step12-qwen-env/bin/doc-atlas",
+      "mcp",
+      "docs-serve"
+    ]
+  }
+]

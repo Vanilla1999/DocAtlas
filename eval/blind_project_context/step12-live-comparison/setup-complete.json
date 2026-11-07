@@ -1,0 +1,6 @@
+{
+  "model": "openai/gpt-6.1-terra#low",
+  "sessions": 12,
+  "preparation_calls": 1,
+  "inference_calls": 0
+}

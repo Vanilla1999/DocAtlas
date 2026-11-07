@@ -1,0 +1,33 @@
+{
+  "data": {
+    "id": "ses_e48ac4a25ffewJzPpIVpEcoRwo",
+    "projectID": "3f188da414385ea6254b492eab823b48711aa4c5",
+    "agent": "measure",
+    "model": {
+      "id": "gpt-6.1-terra",
+      "providerID": "openai",
+      "variant": "low"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 1880,
+      "output": 247,
+      "reasoning": 0,
+      "cache": {
+        "read": 2176,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1794077079004,
+      "updated": 1794077087276,
+      "busy": 1794077079248,
+      "idle": 1794077087280
+    },
+    "title": "Step12 files V-M3",
+    "location": {
+      "directory": "/tmp/opencode/step12-live-work/files/V-M3"
+    }
+  }
+}

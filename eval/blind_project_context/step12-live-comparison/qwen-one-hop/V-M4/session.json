@@ -1,0 +1,33 @@
+{
+  "data": {
+    "id": "ses_e48abdd4bffeIdsmH6YP2VmITp",
+    "projectID": "e7b09a47b1804a412c2e5ec86e14903e70a2b116",
+    "agent": "measure",
+    "model": {
+      "id": "gpt-6.1-terra",
+      "providerID": "openai",
+      "variant": "low"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 3202,
+      "output": 135,
+      "reasoning": 0,
+      "cache": {
+        "read": 3840,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1794077106870,
+      "updated": 1794077118228,
+      "busy": 1794077107651,
+      "idle": 1794077118245
+    },
+    "title": "Step12 qwen-one-hop V-M4",
+    "location": {
+      "directory": "/tmp/opencode/step12-live-work/qwen-one-hop/V-M4"
+    }
+  }
+}

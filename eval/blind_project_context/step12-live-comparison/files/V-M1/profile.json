@@ -1,0 +1,73 @@
+{
+  "profile": "documentation-light-v1",
+  "backend": "files",
+  "project_path": "/tmp/opencode/step12-live-work/project",
+  "workspace_path": "/tmp/opencode/step12-live-work/files/V-M1",
+  "scope": "project",
+  "agent": "measure",
+  "model_step_limit": 12,
+  "presentation": "native-file-text",
+  "common_prompt_sha256": "9533321f7cf4cfeff4a26ff66fa03058694a07455e87e54e188c8f3fa0b78aea",
+  "system_sha256": "08d3a2d80dd2f938a4ac67e9468eca6a4b5577133f71d1097690906a47ba78e3",
+  "allowed_tools": [
+    "read",
+    "glob",
+    "grep"
+  ],
+  "language_preflight": "unchanged; bound language unknown",
+  "adapter_execute_tools": [],
+  "adapter_guard_tools": [
+    "read",
+    "glob",
+    "grep"
+  ],
+  "retrieval_policy_selected_by_profile": false,
+  "instructions_disabled": false,
+  "history_pruned": false,
+  "file_control_snapshot": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "64f0b9af4a07ddb52564f1d7fca7f083bf39f693fcc0d2492cbd8c442cbaabbb"
+    },
+    {
+      "path": "architecture.md",
+      "sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+    },
+    {
+      "path": "calendar.md",
+      "sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+    },
+    {
+      "path": "clock.md",
+      "sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+    },
+    {
+      "path": "docatlas.project-docs.yaml",
+      "sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927"
+    },
+    {
+      "path": "overview.md",
+      "sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7"
+    },
+    {
+      "path": "reservations.md",
+      "sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+    },
+    {
+      "path": "weather.md",
+      "sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    }
+  ],
+  "mcp_active_snapshot_verified_by_builder": false,
+  "model_calls": 0,
+  "preparation_calls": 0,
+  "inputs": {
+    "documentation_profile.py": "eff66631964100ca6cdb4c7dd998015c6192eb1edf576384efe13211c412044b",
+    "profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "profile/files.txt": "5254a90d106fec363fda17c824358491ef12fd5c53cf1144cbf4167c4a2b1c83",
+    "profile/index.js": "a1a713eb537ef76ae6057b84de8446b76a4fd6b62b1052469c76290029ac2614",
+    "index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80"
+  },
+  "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."
+}

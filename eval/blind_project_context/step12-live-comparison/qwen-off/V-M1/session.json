@@ -1,0 +1,33 @@
+{
+  "data": {
+    "id": "ses_e48ae1d2dffe09JcXbnWk4z0UA",
+    "projectID": "3eb75277a37134477358afb60949c45570fca487",
+    "agent": "measure",
+    "model": {
+      "id": "gpt-6.1-terra",
+      "providerID": "openai",
+      "variant": "low"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 4004,
+      "output": 406,
+      "reasoning": 13,
+      "cache": {
+        "read": 6784,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1794076959443,
+      "updated": 1794076981614,
+      "busy": 1794076960534,
+      "idle": 1794076981618
+    },
+    "title": "Step12 qwen-off V-M1",
+    "location": {
+      "directory": "/tmp/opencode/step12-live-work/qwen-off/V-M1"
+    }
+  }
+}

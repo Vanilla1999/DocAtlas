@@ -1,0 +1,761 @@
+[
+  {
+    "arm": "qwen-off",
+    "case": "V-M1",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+    ],
+    "delivery_count": 5,
+    "total_facts": 8,
+    "checked_source_rows": 4,
+    "successful_qwen_pairs": 25,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+          "search_question": "How can a confirmed nighttime observation be transferred to another observer while a maintenance lock and a weather suspension are active?",
+          "scope": "project"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+          "search_question": "How can a confirmed nighttime observation be transferred to another observer while a maintenance lock and a weather suspension are active?",
+          "scope": "project",
+          "source_path": "weather.md"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 3912,
+      "tool_schemas": 3600,
+      "question_tools_results_history": 3276
+    },
+    "usage": {
+      "input": 10788,
+      "output": 419,
+      "cached": 6784,
+      "cache_write": 0,
+      "reasoning": 13,
+      "uncached": 4004
+    },
+    "requests": 4,
+    "seconds": 22.26388934499846
+  },
+  {
+    "arm": "qwen-off",
+    "case": "V-M2",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 6,
+    "total_facts": 6,
+    "checked_source_rows": 4,
+    "successful_qwen_pairs": 21,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2934,
+      "tool_schemas": 2700,
+      "question_tools_results_history": 1472
+    },
+    "usage": {
+      "input": 7106,
+      "output": 266,
+      "cached": 3840,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3266
+    },
+    "requests": 3,
+    "seconds": 13.093848129996331
+  },
+  {
+    "arm": "qwen-off",
+    "case": "V-M3",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 5,
+    "total_facts": 5,
+    "checked_source_rows": 6,
+    "successful_qwen_pairs": 21,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2934,
+      "tool_schemas": 2700,
+      "question_tools_results_history": 1665
+    },
+    "usage": {
+      "input": 7299,
+      "output": 282,
+      "cached": 3840,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3459
+    },
+    "requests": 3,
+    "seconds": 14.20498805999523
+  },
+  {
+    "arm": "qwen-off",
+    "case": "V-M4",
+    "delivered": [],
+    "delivery_count": 0,
+    "total_facts": 0,
+    "checked_source_rows": 0,
+    "successful_qwen_pairs": 42,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+          "search_question": "What cooling temperature is mandatory for all common instruments of the observatory?",
+          "scope": "project"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+          "search_question": "What cooling temperature is mandatory for all common instruments of the observatory?",
+          "lookup_queries": [
+            "observatory common user instruments cooling temperature requirements"
+          ],
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 3912,
+      "tool_schemas": 3600,
+      "question_tools_results_history": 2206
+    },
+    "usage": {
+      "input": 9718,
+      "output": 221,
+      "cached": 6272,
+      "cache_write": 0,
+      "reasoning": 14,
+      "uncached": 3446
+    },
+    "requests": 4,
+    "seconds": 19.355349957004364
+  },
+  {
+    "arm": "qwen-one-hop",
+    "case": "V-M1",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 8,
+    "total_facts": 8,
+    "checked_source_rows": 8,
+    "successful_qwen_pairs": 21,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+          "search_question": "How do you transfer a confirmed nighttime observation to another observer while a maintenance lock and a weather suspension are active?",
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2940,
+      "tool_schemas": 2700,
+      "question_tools_results_history": 2017
+    },
+    "usage": {
+      "input": 7657,
+      "output": 540,
+      "cached": 3840,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3817
+    },
+    "requests": 3,
+    "seconds": 18.6427883810029
+  },
+  {
+    "arm": "qwen-one-hop",
+    "case": "V-M2",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 6,
+    "total_facts": 6,
+    "checked_source_rows": 4,
+    "successful_qwen_pairs": 21,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2940,
+      "tool_schemas": 2700,
+      "question_tools_results_history": 1492
+    },
+    "usage": {
+      "input": 7132,
+      "output": 231,
+      "cached": 1792,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 5340
+    },
+    "requests": 3,
+    "seconds": 13.723741822002921
+  },
+  {
+    "arm": "qwen-one-hop",
+    "case": "V-M3",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 5,
+    "total_facts": 5,
+    "checked_source_rows": 6,
+    "successful_qwen_pairs": 21,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2940,
+      "tool_schemas": 2700,
+      "question_tools_results_history": 1692
+    },
+    "usage": {
+      "input": 7332,
+      "output": 247,
+      "cached": 3840,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3492
+    },
+    "requests": 3,
+    "seconds": 12.936587772004714
+  },
+  {
+    "arm": "qwen-one-hop",
+    "case": "V-M4",
+    "delivered": [],
+    "delivery_count": 0,
+    "total_facts": 0,
+    "checked_source_rows": 0,
+    "successful_qwen_pairs": 0,
+    "errors": [
+      {
+        "admission_contract": "source_only_heuristic_removal_v1",
+        "answer_available": false,
+        "answer_supported": false,
+        "context_available": false,
+        "context_quality": {
+          "reasons": [
+            "scan_incomplete"
+          ],
+          "status": "unavailable"
+        },
+        "context_unassessed": true,
+        "edit_ready": false,
+        "estimated_tokens": 567,
+        "kind": "docs_context",
+        "missing": [
+          "scan_incomplete"
+        ],
+        "read_next": [],
+        "reason_code": "scan_incomplete",
+        "source_selection": {
+          "failed_stage": "semantic_scoring",
+          "policy": "complete_calibrated_context_v1",
+          "receipt": {
+            "asset_verification_seconds": 0.5942360980043304,
+            "contract_sha256": "65dcde1445c86fe3d8245022e1b9db84f4c79cca4cd2ee868aa9d5234b863991",
+            "diagnostics_omitted": 0,
+            "diagnostics_recorded": 0,
+            "error": "CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 15.46 GiB of which 78.56 MiB is free. Process 33615 has 21.07 MiB memory in use. Process 68646 has 2.48 GiB memory in use. Process 816960 has 593.79 MiB memory in use. Process 1484608 has 1.43 GiB memory in use. Process 1485382 has 1.43 GiB memory in use. Process 1486812 has 1.43 GiB memory in use. Process 1487282 has 1.43 GiB memory in use. Process 1488200 has 1.43 GiB memory in use. Process 1488713 has 1.43 GiB memory in use. Process 1489551 has 1.43 GiB memory in use. Including non-PyTorch memory, this process has 982.00 MiB memory in use. Of the allocated memory 754.30 MiB is allocated by PyTorch, and 5.70 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "error_type": "OutOfMemoryError",
+            "inference_seconds": 0.0,
+            "model_forwards": 0,
+            "model_input_tokens": 0,
+            "model_loads": 0,
+            "model_pairs": 0,
+            "planned_input_tokens": 0,
+            "preflight_units": 0,
+            "recipe": "qwen3-contextual-own-body-evidence-v1",
+            "runtime": {
+              "attention": "sdpa",
+              "batch": 1,
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "12.8",
+              "dtype": "bfloat16",
+              "safetensors": "0.8.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.10.0+cu128",
+              "transformers": "4.57.1"
+            },
+            "runtime_cache_hits": 0,
+            "score_cache_hits": 0,
+            "status": "scan_incomplete",
+            "total_seconds": 2.6215474769996945,
+            "units": 0
+          }
+        },
+        "sources": [],
+        "status": "insufficient_evidence",
+        "support_status": "insufficient_evidence"
+      }
+    ],
+    "calls": [
+      {
+        "tool": "docatlas_docs_status",
+        "input": {
+          "action": "project",
+          "include_language": true
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "docatlas_get_docs_context",
+        "input": {
+          "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+          "search_question": "What cooling temperature is mandatory for all of the observatory's common instruments?",
+          "scope": "project"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2940,
+      "tool_schemas": 2700,
+      "question_tools_results_history": 1402
+    },
+    "usage": {
+      "input": 7042,
+      "output": 135,
+      "cached": 3840,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3202
+    },
+    "requests": 3,
+    "seconds": 12.255131878999237
+  },
+  {
+    "arm": "files",
+    "case": "V-M1",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 8,
+    "total_facts": 8,
+    "checked_source_rows": 0,
+    "successful_qwen_pairs": 0,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "ночн|наблюден|наблюдател",
+          "include": "*.md",
+          "limit": 100
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "weather|maintenance|handoff",
+          "limit": 100
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/reservations.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/weather.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/overview.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/architecture.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/calendar.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/clock.md"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2055,
+      "tool_schemas": 1407,
+      "question_tools_results_history": 2257
+    },
+    "usage": {
+      "input": 5719,
+      "output": 641,
+      "cached": 1024,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 4695
+    },
+    "requests": 3,
+    "seconds": 15.142306720001216
+  },
+  {
+    "arm": "files",
+    "case": "V-M2",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 6,
+    "total_facts": 6,
+    "checked_source_rows": 0,
+    "successful_qwen_pairs": 0,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "wind",
+          "caseSensitive": false,
+          "limit": 100
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/weather.md"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2055,
+      "tool_schemas": 1407,
+      "question_tools_results_history": 635
+    },
+    "usage": {
+      "input": 4097,
+      "output": 247,
+      "cached": 2176,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 1921
+    },
+    "requests": 3,
+    "seconds": 9.08423315500113
+  },
+  {
+    "arm": "files",
+    "case": "V-M3",
+    "delivered": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "delivery_count": 5,
+    "total_facts": 5,
+    "checked_source_rows": 0,
+    "successful_qwen_pairs": 0,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "clock drift",
+          "caseSensitive": false
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "reference clock",
+          "caseSensitive": false
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/clock.md"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2055,
+      "tool_schemas": 1407,
+      "question_tools_results_history": 594
+    },
+    "usage": {
+      "input": 4056,
+      "output": 247,
+      "cached": 2176,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 1880
+    },
+    "requests": 3,
+    "seconds": 8.400452718997258
+  },
+  {
+    "arm": "files",
+    "case": "V-M4",
+    "delivered": [],
+    "delivery_count": 0,
+    "total_facts": 0,
+    "checked_source_rows": 0,
+    "successful_qwen_pairs": 0,
+    "errors": [],
+    "calls": [
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "cooling|temperature|common instruments",
+          "caseSensitive": false,
+          "limit": 100
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "grep",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project",
+          "pattern": "температур|охлажден",
+          "caseSensitive": false,
+          "limit": 100
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/overview.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/architecture.md"
+        },
+        "status": "completed"
+      },
+      {
+        "tool": "read",
+        "input": {
+          "path": "/tmp/opencode/step12-live-work/project/docatlas.project-docs.yaml"
+        },
+        "status": "completed"
+      }
+    ],
+    "provider_input_categories": {
+      "instructions": 2740,
+      "tool_schemas": 1876,
+      "question_tools_results_history": 1518
+    },
+    "usage": {
+      "input": 6134,
+      "output": 293,
+      "cached": 3456,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2678
+    },
+    "requests": 4,
+    "seconds": 10.943862054999045
+  }
+]

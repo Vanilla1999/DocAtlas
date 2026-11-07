@@ -1,0 +1,10 @@
+verified README.md 14742
+verified config.json 727
+verified generation_config.json 214
+verified tokenizer.json 11422654
+verified tokenizer_config.json 9706
+verified merges.txt 1671853
+verified vocab.json 2776833
+verified chat_template.jinja 741
+verified model.safetensors 1191588280
+All frozen assets restored; no inference.

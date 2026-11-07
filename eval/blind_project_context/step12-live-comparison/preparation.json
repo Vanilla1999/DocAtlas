@@ -1,0 +1,39 @@
+{
+  "tool": "prepare_docs",
+  "action": "sync_project_docs",
+  "status": "success",
+  "project_path": "/tmp/opencode/step12-live-work/project",
+  "candidate_count": 6,
+  "summary": {
+    "current_count": 6,
+    "new_count": 6,
+    "changed_count": 0,
+    "orphaned_count": 0,
+    "orphaned_removed": 0,
+    "dedup_removed": 0,
+    "stale_removed": 0,
+    "sections_indexed": 21
+  },
+  "metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-061d7637ebe64d28b463727d1934844d",
+    "members": 6,
+    "new_count": 6,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 21,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 21
+  },
+  "vector_sync": {
+    "status": "not_requested"
+  },
+  "unmatched_changed_paths": [],
+  "unmatched_deleted_paths": [],
+  "remaining_deleted_sources": 0,
+  "tombstones": [],
+  "tombstones_omitted": 0,
+  "warnings": [],
+  "message": "Explicit member-only lexical transaction committed; unrelated sources preserved."
+}

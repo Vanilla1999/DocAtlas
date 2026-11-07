@@ -1,0 +1,33 @@
+{
+  "data": {
+    "id": "ses_e48acd870ffexhDu5KEsyOBWzk",
+    "projectID": "74f11907f5ed071769a74ccb7663a516ec13465a",
+    "agent": "measure",
+    "model": {
+      "id": "gpt-6.1-terra",
+      "providerID": "openai",
+      "variant": "low"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 1921,
+      "output": 247,
+      "reasoning": 0,
+      "cache": {
+        "read": 2176,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1794077042577,
+      "updated": 1794077051584,
+      "busy": 1794077042831,
+      "idle": 1794077051587
+    },
+    "title": "Step12 files V-M2",
+    "location": {
+      "directory": "/tmp/opencode/step12-live-work/files/V-M2"
+    }
+  }
+}

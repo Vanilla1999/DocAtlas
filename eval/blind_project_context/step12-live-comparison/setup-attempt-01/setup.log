@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/tmp/opencode/step12-live-comparison/eval/blind_project_context/step12-live-comparison/run.py", line 147, in <module>
+    setup() if args.action == 'setup' else run()
+    ~~~~~^^
+  File "/tmp/opencode/step12-live-comparison/eval/blind_project_context/step12-live-comparison/run.py", line 71, in setup
+    service = create_local_mcp_service()
+  File "/tmp/opencode/step12-qwen-env/lib/python3.13/site-packages/docmancer/mcp/_docs_server_part01.py", line 64, in create_local_mcp_service
+    return LocalMemberService(resolve_mcp_config(explicit_path=config_path))
+                              ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/step12-qwen-env/lib/python3.13/site-packages/docmancer/core/config_resolution.py", line 92, in resolve_mcp_config
+    policy.validate()
+    ~~~~~~~~~~~~~~~^^
+  File "/tmp/opencode/step12-qwen-env/lib/python3.13/site-packages/docmancer/core/member_storage_policy.py", line 93, in validate
+    self._directories()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/tmp/opencode/step12-qwen-env/lib/python3.13/site-packages/docmancer/core/member_storage_policy.py", line 50, in _directories
+    self._directory(directory, private=False)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/step12-qwen-env/lib/python3.13/site-packages/docmancer/core/member_storage_policy.py", line 64, in _directory
+    raise PermissionError("storage ancestors must not permit foreign namespace replacement")
+PermissionError: storage ancestors must not permit foreign namespace replacement

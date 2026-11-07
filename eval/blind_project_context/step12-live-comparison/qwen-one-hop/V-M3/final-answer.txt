@@ -1,0 +1,5 @@
+If the absolute clock offset exceeds **two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md, lines 5–8](ev-b12e42ea1df39ecdd13a0e6f)
+
+If the reference clock is unavailable, execution must remain paused: a local clock reading cannot satisfy either recovery check. [clock.md, lines 9–12](ev-40bd605ce77a5db0943e7c87)
+
+The gateway must not use the retired prototype’s recovery behavior of clearing pending reservations or restarting on its first local clock sample. [architecture.md, lines 9–11](ev-9067c8cd4b8511716c02cbec)

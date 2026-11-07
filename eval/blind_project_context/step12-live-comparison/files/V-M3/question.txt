@@ -1,0 +1,1 @@
+What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?
