@@ -11,7 +11,7 @@ import re
 
 POLICIES = frozenset({"facet-max-v1", "facet-envelope-v1", "facet-guarded-v1",
                       "facet-margin-envelope-v1", "facet-guarded-lexical-v1",
-                      "facet-guarded-lexical-v2"})
+                      "facet-guarded-lexical-v2", "facet-tiny-select-v1", "facet-tiny-plan-v1"})
 MAX_PROBES = 16
 SCORE_MARGIN = 1.0  # development heuristic in frozen-model logits, NOT calibrated probability
 CAPSULE_TOKENS = 512  # maximum admitted source-text cost of one parent, not top-k
@@ -269,6 +269,13 @@ def plan(engine, question, sections, global_scores, receipt, *, policy, snapshot
     GUARDED revision 2 limits that band to the full original scoring question;
     fragment probes supply only their best matches, avoiding flat-score floods.
     """
+    if policy in {"facet-tiny-select-v1", "facet-tiny-plan-v1"}:
+        from .tiny_selection import propose
+        proposal = propose(engine, question, sections, global_scores, receipt,
+                           policy=policy, budget=budget)
+        if proposal is not None:
+            return proposal
+        policy = "facet-guarded-lexical-v2"
     guarded = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1", "facet-guarded-lexical-v2"}
     margin = policy in {"facet-guarded-v1", "facet-guarded-lexical-v1", "facet-guarded-lexical-v2", "facet-margin-envelope-v1"}
     probes, fallback = question_probes(question)
